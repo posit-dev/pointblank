@@ -26809,7 +26809,7 @@ def _step_report_row_based(
             not_shown = STEP_REPORT_TEXT["not_shown"][lang]
             shown_failures = ""
 
-        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i)
+        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CROSS_MARK_SPAN
         assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
         failure_rate_metrics = f"<strong>{n_failed}</strong> / <strong>{n}</strong>"
 
@@ -26896,6 +26896,17 @@ def _step_report_rows_distinct(
         columns_list = ", ".join(column)
         text = STEP_REPORT_TEXT["rows_distinct_subset"][lang].format(columns_subset=columns_list)
 
+    # Show the assertion text in a code box after the `ASSERTION` label (as in other step reports)
+    assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
+    text = (
+        f"{assertion_header_text} <span style='border-style: solid; border-width: thin; "
+        "border-color: lightblue; padding-left: 2px; padding-right: 2px;'>"
+        "<code style='color: #303030; background-color: transparent; "
+        "position: relative; bottom: 1px;'>"
+        f"<code style='color: #303030; font-family: monospace; font-size: smaller;'>{text}</code>"
+        "</code></span>"
+    )
+
     if all_passed:
         step_report = tbl_preview
 
@@ -26954,7 +26965,7 @@ def _step_report_rows_distinct(
             mark_missing_values=False,
         )
 
-        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i)
+        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CROSS_MARK_SPAN
         failure_rate_metrics = f"<strong>{n_failed}</strong> / <strong>{n}</strong>"
 
         failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_rows_distinct"][lang].format(
@@ -27147,8 +27158,9 @@ def _step_report_aggregate(
     )
 
 
-# Width (in px) of the summary step reports, matching that of the `col_schema_match()` step reports
-STEP_REPORT_SUMMARY_WIDTH = 900
+# Width (in px) of the step reports that don't show the target table's columns (summary and table
+# comparison reports), matching that of the `col_schema_match()` step reports
+STEP_REPORT_WIDTH = 900
 
 
 def _step_report_fmt_value(v: Any) -> str:
@@ -27223,7 +27235,7 @@ def _step_report_summary(
     # Scale the column widths so that, with the status column, they fill the fixed table width
     status_width = 50
     weights = [int(width.removesuffix("px")) for _, _, _, width in cells]
-    available = STEP_REPORT_SUMMARY_WIDTH - status_width
+    available = STEP_REPORT_WIDTH - status_width
     col_widths = [available * weight // sum(weights) for weight in weights]
     col_widths[-1] += available - sum(col_widths)
 
@@ -27551,7 +27563,10 @@ def _step_report_tbl_match(
     """
     from pointblank._compare_report import _comparison_report, _header_html
 
-    step_report = _comparison_report(comparison, limit=limit, lang=lang, locale=locale)
+    # Give the report a fixed width (the comparison report otherwise fills its container)
+    step_report = _comparison_report(comparison, limit=limit, lang=lang, locale=locale).tab_options(
+        table_width=f"{STEP_REPORT_WIDTH}px"
+    )
 
     # If no header requested, return the comparison report with its own header
     if header is None:
@@ -27568,6 +27583,10 @@ def _step_report_tbl_match(
                 continue
             settings.append(f"{name}={setting!r}")
     assertion_text = html_module.escape(f"{assertion_type}({', '.join(settings)})")
+    assertion_text = (
+        "<code style='color: #303030; font-family: monospace; font-size: smaller;'>"
+        f"{assertion_text}</code>"
+    )
 
     assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
     mark = CHECK_MARK_SPAN if all_passed else CROSS_MARK_SPAN
