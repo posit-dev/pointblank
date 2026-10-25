@@ -117,7 +117,7 @@ There were four validation steps performed, where the first three steps had fail
 validation.get_step_report(i=1)
 ```
 
-| Report for Validation Step 1 ASSERTION `d < 3500` **2** / **13** TEST UNIT FAILURES IN COLUMN **6** EXTRACT OF ALL **2** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
+| Report for Validation Step 1 ✗ ASSERTION `d < 3500` **2** / **13** TEST UNIT FAILURES IN COLUMN **6** EXTRACT OF ALL **2** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
 |  | date_time *datetime64\[ns\]* | date *datetime64\[ns\]* | a *int64* | b *object* | c *float64* | d *float64* | e *bool* | f *object* |
 | 2 | 2016-01-04 00:32:00 | 2016-01-04 00:00:00 | 3 | 5-egh-163 | 8.0 | 9999.99 | True | low |
@@ -153,7 +153,7 @@ If you'd like to trim down the number of columns shown in the report, you can pr
 validation.get_step_report(i=1, columns_subset=["a", "b", "c"])
 ```
 
-| Report for Validation Step 1 ASSERTION `d < 3500` **2** / **13** TEST UNIT FAILURES IN COLUMN **6** (NOT SHOWN) EXTRACT OF ALL **2** ROWS : |  |  |  |
+| Report for Validation Step 1 ✗ ASSERTION `d < 3500` **2** / **13** TEST UNIT FAILURES IN COLUMN **6** (NOT SHOWN) EXTRACT OF ALL **2** ROWS : |  |  |  |
 |----|----|----|----|
 |  | a *int64* | b *object* | c *float64* |
 | 2 | 3 | 5-egh-163 | 8.0 |
@@ -165,7 +165,7 @@ If you'd like to increase or reduce the maximum number of rows shown in the repo
 validation.get_step_report(i=3, limit=5)
 ```
 
-| Report for Validation Step 3 ASSERTION `a > 3` **7** / **13** TEST UNIT FAILURES IN COLUMN **3** EXTRACT OF FIRST **5** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
+| Report for Validation Step 3 ✗ ASSERTION `a > 3` **7** / **13** TEST UNIT FAILURES IN COLUMN **3** EXTRACT OF FIRST **5** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
 |  | date_time *datetime64\[ns\]* | date *datetime64\[ns\]* | a *int64* | b *object* | c *float64* | d *float64* | e *bool* | f *object* |
 | 1 | 2016-01-04 11:00:00 | 2016-01-04 00:00:00 | 2 | 1-bcd-345 | 3.0 | 3423.29 | True | high |

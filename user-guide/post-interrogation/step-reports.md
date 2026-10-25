@@ -42,7 +42,7 @@ step_report = validation.get_step_report(i=2)
 step_report
 ```
 
-| Report for Validation Step 2 ASSERTION `category ∈ {A, B, C}` **5** / **10** TEST UNIT FAILURES IN COLUMN **3** EXTRACT OF ALL **5** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |
+| Report for Validation Step 2 ✗ ASSERTION `category ∈ {A, B, C}` **5** / **10** TEST UNIT FAILURES IN COLUMN **3** EXTRACT OF ALL **5** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |
 |----|----|----|----|----|----|
 |  | id *Int64* | value *Int64* | category *String* | ratio *Float64* | status *String* |
 | 5 | 5 | 50 | D | 0.8 | inactive |
@@ -107,7 +107,7 @@ validation_values = (
 validation_values.get_step_report(i=1)
 ```
 
-| Report for Validation Step 1 ASSERTION `value > 50` **4** / **7** TEST UNIT FAILURES IN COLUMN **2** EXTRACT OF ALL **4** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |
+| Report for Validation Step 1 ✗ ASSERTION `value > 50` **4** / **7** TEST UNIT FAILURES IN COLUMN **2** EXTRACT OF ALL **4** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |
 |----|----|----|----|
 |  | id *Int64* | value *Int64* | category *String* |
 | 3 | 3 | 47 | C |
@@ -145,7 +145,7 @@ validation_duplicates = (
 validation_duplicates.get_step_report(i=1)
 ```
 
-| Report for Validation Step 1 Rows are distinct across a subset of columns **2** / **7** TEST UNIT FAILURES EXTRACT OF ALL **2** ROWS: |  |  |
+| Report for Validation Step 1 ✗ ASSERTION `Rows are distinct across a subset of columns` **2** / **7** TEST UNIT FAILURES EXTRACT OF ALL **2** ROWS: |  |  |
 |----|----|----|
 |  | customer_id *Int64* | product *String* |
 | 1 | 101 | Laptop |
@@ -253,7 +253,7 @@ validation.get_step_report(
 )
 ```
 
-| Report for Validation Step 2 ASSERTION `category ∈ {A, B, C}` **5** / **10** TEST UNIT FAILURES IN COLUMN **3** EXTRACT OF ALL **5** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |
+| Report for Validation Step 2 ✗ ASSERTION `category ∈ {A, B, C}` **5** / **10** TEST UNIT FAILURES IN COLUMN **3** EXTRACT OF ALL **5** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |
 |----|----|----|----|
 |  | id *Int64* | category *String* | status *String* |
 | 5 | 5 | D | inactive |
@@ -275,7 +275,7 @@ validation.get_step_report(
 )
 ```
 
-| Report for Validation Step 2 ASSERTION `category ∈ {A, B, C}` **5** / **10** TEST UNIT FAILURES IN COLUMN **3** EXTRACT OF FIRST **2** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |
+| Report for Validation Step 2 ✗ ASSERTION `category ∈ {A, B, C}` **5** / **10** TEST UNIT FAILURES IN COLUMN **3** EXTRACT OF FIRST **2** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |
 |----|----|----|----|----|----|
 |  | id *Int64* | value *Int64* | category *String* | ratio *Float64* | status *String* |
 | 5 | 5 | 50 | D | 0.8 | inactive |
@@ -349,7 +349,7 @@ validation.get_step_report(
 )
 ```
 
-| VALIDATION SUMMARY ASSERTION `category ∈ {A, B, C}` **5** / **10** TEST UNIT FAILURES IN COLUMN **3** EXTRACT OF ALL **5** ROWS (WITH TEST UNIT FAILURES IN RED): Report for Validation Step 2 |  |  |  |  |  |
+| VALIDATION SUMMARY ASSERTION `category ∈ {A, B, C}` **5** / **10** TEST UNIT FAILURES IN COLUMN **3** EXTRACT OF ALL **5** ROWS (WITH TEST UNIT FAILURES IN RED): Report for Validation Step 2 ✗ |  |  |  |  |  |
 |----|----|----|----|----|----|
 |  | id *Int64* | value *Int64* | category *String* | ratio *Float64* | status *String* |
 | 5 | 5 | 50 | D | 0.8 | inactive |
@@ -424,7 +424,7 @@ ratio_report = validation_complex.get_step_report(i=2)
 ratio_report
 ```
 
-| Report for Validation Step 2 ASSERTION `ratio ≤ 1.0` **2** / **10** TEST UNIT FAILURES IN COLUMN **3** EXTRACT OF ALL **2** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |
+| Report for Validation Step 2 ✗ ASSERTION `ratio ≤ 1.0` **2** / **10** TEST UNIT FAILURES IN COLUMN **3** EXTRACT OF ALL **2** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |
 |----|----|----|----|----|
 |  | id *Int64* | value *Int64* | ratio *Float64* | category *String* |
 | 4 | 4 | 40 | 1.4 | A |
@@ -494,7 +494,7 @@ north_report = segmented_validation.get_step_report(i=4)
 north_report
 ```
 
-| Report for Validation Step 4 ASSERTION `value > 10` **2** / **3** TEST UNIT FAILURES IN COLUMN **2** EXTRACT OF ALL **2** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |
+| Report for Validation Step 4 ✗ ASSERTION `value > 10` **2** / **3** TEST UNIT FAILURES IN COLUMN **2** EXTRACT OF ALL **2** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |
 |----|----|----|----|
 |  | id *Int64* | value *Int64* | region *String* |
 | 1 | 7 | 6 | West |

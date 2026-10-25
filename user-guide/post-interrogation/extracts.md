@@ -115,7 +115,7 @@ step_report = validation.get_step_report(i=1)
 step_report
 ```
 
-| Report for Validation Step 1 ASSERTION `d < 3000` **4** / **13** TEST UNIT FAILURES IN COLUMN **6** EXTRACT OF ALL **4** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
+| Report for Validation Step 1 ✗ ASSERTION `d < 3000` **4** / **13** TEST UNIT FAILURES IN COLUMN **6** EXTRACT OF ALL **4** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
 |  | date_time *Datetime* | date *Date* | a *Int64* | b *String* | c *Int64* | d *Float64* | e *Boolean* | f *String* |
 | 1 | 2016-01-04 11:00:00 | 2016-01-04 | 2 | 1-bcd-345 | 3 | 3423.29 | True | high |
@@ -138,7 +138,7 @@ limited_report = validation.get_step_report(i=1, limit=2)
 limited_report
 ```
 
-| Report for Validation Step 1 ASSERTION `d < 3000` **4** / **13** TEST UNIT FAILURES IN COLUMN **6** EXTRACT OF FIRST **2** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
+| Report for Validation Step 1 ✗ ASSERTION `d < 3000` **4** / **13** TEST UNIT FAILURES IN COLUMN **6** EXTRACT OF FIRST **2** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
 |  | date_time *Datetime* | date *Date* | a *Int64* | b *String* | c *Int64* | d *Float64* | e *Boolean* | f *String* |
 | 1 | 2016-01-04 11:00:00 | 2016-01-04 | 2 | 1-bcd-345 | 3 | 3423.29 | True | high |
@@ -405,8 +405,8 @@ shape: (4, 2)
 | str     | u32           |
 | "South" | 6             |
 | "East"  | 2             |
-| "West"  | 1             |
 | "North" | 1             |
+| "West"  | 1             |
 
 Analysis shows that 6 out of 10 failing records (60%) are from the `"South"` region, making it the highest priority area for data quality investigation. This suggests a potential systemic issue with data collection or processing in that specific region.
 

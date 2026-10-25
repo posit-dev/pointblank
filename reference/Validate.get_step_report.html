@@ -1785,7 +1785,7 @@ A GT table object that represents the detailed report for the validation step.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s create a validation plan with a few validation steps and interrogate the data. With that, we’ll have a look at the validation reporting table for the entire collection of steps and what went well or what failed.</p>
-<div id="36954cf6" class="cell" data-execution_count="2">
+<div id="8ed4a426" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -2082,7 +2082,7 @@ A GT table object that represents the detailed report for the validation step.
 </div>
 </div>
 <p>There were four validation steps performed, where the first three steps had failing test units and the last step had no failures. Let’s get a detailed report for the first step by using the <a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link gdls-code">get_step_report()</a> method.</p>
-<div id="6ed1d090" class="cell" data-execution_count="3">
+<div id="559b69cf" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2166,7 +2166,7 @@ A GT table object that represents the detailed report for the validation step.
 <thead>
 
   <tr class="gt_heading">
-    <td colspan="9" class="gt_heading gt_title gt_font_normal" id="pb_preview_tbl-title">Report for Validation Step 1<div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;"><code style="color: #303030; font-family: monospace; font-size: smaller;">d &lt; 3500</code></code></span></div><div style="padding-top: 7px;"><strong>2</strong> / <strong>13</strong> TEST UNIT FAILURES IN COLUMN <strong>6</strong> </div><div>EXTRACT OF ALL <strong>2</strong> ROWS (WITH <span style="color: #B22222;">TEST UNIT FAILURES IN RED</span>):</div></div></td>
+    <td colspan="9" class="gt_heading gt_title gt_font_normal" id="pb_preview_tbl-title">Report for Validation Step 1 <span style="color: #CF142B;">✗</span><div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;"><code style="color: #303030; font-family: monospace; font-size: smaller;">d &lt; 3500</code></code></span></div><div style="padding-top: 7px;"><strong>2</strong> / <strong>13</strong> TEST UNIT FAILURES IN COLUMN <strong>6</strong> </div><div>EXTRACT OF ALL <strong>2</strong> ROWS (WITH <span style="color: #B22222;">TEST UNIT FAILURES IN RED</span>):</div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_preview_tbl-_row_num_"></th>
@@ -2213,7 +2213,7 @@ A GT table object that represents the detailed report for the validation step.
 <p>The report for the first step is displayed. The report includes a summary of the validation step and a detailed breakdown of the interrogation results. The report provides details on what the validation step was checking, the extent to which the test units failed, and a table that shows the failing rows of the data with the column of interest highlighted.</p>
 <p>The second and third steps also had failing test units. Reports for those steps can be viewed by using <code>get_step_report(i=2)</code> and <code>get_step_report(i=3)</code> respectively.</p>
 <p>The final step did not have any failing test units. A report for the final step can still be viewed by using <code>get_step_report(i=4)</code>. The report will indicate that every test unit passed and a prview of the target table will be provided.</p>
-<div id="857293b5" class="cell" data-execution_count="4">
+<div id="040933fa" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">4</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2430,7 +2430,7 @@ A GT table object that represents the detailed report for the validation step.
 </div>
 </div>
 <p>If you’d like to trim down the number of columns shown in the report, you can provide a subset of columns to display. For example, if you only want to see the columns <code>a</code>, <code>b</code>, and <code>c</code>, you can provide those column names as a list.</p>
-<div id="df3ba4dd" class="cell" data-execution_count="5">
+<div id="52cd6a4e" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>, columns_subset<span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>])</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2509,7 +2509,7 @@ A GT table object that represents the detailed report for the validation step.
 <thead>
 
   <tr class="gt_heading">
-    <td colspan="4" class="gt_heading gt_title gt_font_normal" id="pb_preview_tbl-title">Report for Validation Step 1<div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;"><code style="color: #303030; font-family: monospace; font-size: smaller;">d &lt; 3500</code></code></span></div><div style="padding-top: 7px;"><strong>2</strong> / <strong>13</strong> TEST UNIT FAILURES IN COLUMN <strong>6</strong> (NOT SHOWN)</div><div>EXTRACT OF ALL <strong>2</strong> ROWS :</div></div></td>
+    <td colspan="4" class="gt_heading gt_title gt_font_normal" id="pb_preview_tbl-title">Report for Validation Step 1 <span style="color: #CF142B;">✗</span><div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;"><code style="color: #303030; font-family: monospace; font-size: smaller;">d &lt; 3500</code></code></span></div><div style="padding-top: 7px;"><strong>2</strong> / <strong>13</strong> TEST UNIT FAILURES IN COLUMN <strong>6</strong> (NOT SHOWN)</div><div>EXTRACT OF ALL <strong>2</strong> ROWS :</div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_preview_tbl-_row_num_"></th>
@@ -2539,7 +2539,7 @@ A GT table object that represents the detailed report for the validation step.
 </div>
 </div>
 <p>If you’d like to increase or reduce the maximum number of rows shown in the report, you can provide a different value for the <code>limit</code> parameter. For example, if you’d like to see only up to 5 rows, you can set <code>limit=5</code>.</p>
-<div id="059e90c2" class="cell" data-execution_count="6">
+<div id="801bf6bd" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">3</span>, limit<span class="op">=</span><span class="dv">5</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2623,7 +2623,7 @@ A GT table object that represents the detailed report for the validation step.
 <thead>
 
   <tr class="gt_heading">
-    <td colspan="9" class="gt_heading gt_title gt_font_normal" id="pb_preview_tbl-title">Report for Validation Step 3<div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;"><code style="color: #303030; font-family: monospace; font-size: smaller;">a &gt; 3</code></code></span></div><div style="padding-top: 7px;"><strong>7</strong> / <strong>13</strong> TEST UNIT FAILURES IN COLUMN <strong>3</strong> </div><div>EXTRACT OF FIRST <strong>5</strong> ROWS (WITH <span style="color: #B22222;">TEST UNIT FAILURES IN RED</span>):</div></div></td>
+    <td colspan="9" class="gt_heading gt_title gt_font_normal" id="pb_preview_tbl-title">Report for Validation Step 3 <span style="color: #CF142B;">✗</span><div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;"><code style="color: #303030; font-family: monospace; font-size: smaller;">a &gt; 3</code></code></span></div><div style="padding-top: 7px;"><strong>7</strong> / <strong>13</strong> TEST UNIT FAILURES IN COLUMN <strong>3</strong> </div><div>EXTRACT OF FIRST <strong>5</strong> ROWS (WITH <span style="color: #B22222;">TEST UNIT FAILURES IN RED</span>):</div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_preview_tbl-_row_num_"></th>

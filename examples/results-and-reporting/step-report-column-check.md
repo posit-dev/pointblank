@@ -2,7 +2,7 @@
 
 [TABLE]
 
-| Report for Validation Step 1 ASSERTION `c ≥ 4` **4** / **13** TEST UNIT FAILURES IN COLUMN **5** EXTRACT OF ALL **4** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
+| Report for Validation Step 1 ✗ ASSERTION `c ≥ 4` **4** / **13** TEST UNIT FAILURES IN COLUMN **5** EXTRACT OF ALL **4** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
 |  | date_time *Datetime* | date *Date* | a *Int64* | b *String* | c *Int64* | d *Float64* | e *Boolean* | f *String* |
 | 1 | 2016-01-04 11:00:00 | 2016-01-04 | 2 | 1-bcd-345 | 3 | 3423.29 | True | high |
