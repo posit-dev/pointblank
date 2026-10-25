@@ -380,7 +380,7 @@ We can also view step reports for each validation step using the [`get_step_repo
 validation_2.get_step_report(i=2)
 ```
 
-| Report for Validation Step 2 ✗ ASSERTION `3 ≤ c ≤ 10` **1** / **13** TEST UNIT FAILURES IN COLUMN **5** EXTRACT OF ALL **1** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
+| Report for Validation Step 2 ✗ ASSERTION `3 ≤ c ≤ 10` **1** / **13** TEST UNIT FAILURES IN COLUMN **5** EXTRACT OF **1** ROW (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
 |  | date_time *Datetime* | date *Date* | a *Int64* | b *String* | c *Int64* | d *Float64* | e *Boolean* | f *String* |
 | 8 | 2016-01-17 11:27:00 | 2016-01-17 | 4 | 5-boe-639 | 2 | 1035.64 | False | low |

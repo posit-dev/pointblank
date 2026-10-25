@@ -153,7 +153,7 @@ If you'd like to trim down the number of columns shown in the report, you can pr
 validation.get_step_report(i=1, columns_subset=["a", "b", "c"])
 ```
 
-| Report for Validation Step 1 ✗ ASSERTION `d < 3500` **2** / **13** TEST UNIT FAILURES IN COLUMN **6** (NOT SHOWN) EXTRACT OF ALL **2** ROWS : |  |  |  |
+| Report for Validation Step 1 ✗ ASSERTION `d < 3500` **2** / **13** TEST UNIT FAILURES IN COLUMN **6** EXTRACT OF ALL **2** ROWS: |  |  |  |
 |----|----|----|----|
 |  | a *int64* | b *object* | c *float64* |
 | 2 | 3 | 5-egh-163 | 8.0 |
