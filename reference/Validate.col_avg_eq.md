@@ -4,7 +4,7 @@ Does the column average satisfy an equal to comparison?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L991-L1028)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L992-L1029)
 
 ``` python
 Validate.col_avg_eq(

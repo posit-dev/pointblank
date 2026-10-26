@@ -4,7 +4,7 @@ Does the column standard deviation satisfy an equal to comparison?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1186-L1223)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1187-L1224)
 
 ``` python
 Validate.col_sd_eq(

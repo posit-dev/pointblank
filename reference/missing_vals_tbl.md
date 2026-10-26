@@ -4,7 +4,7 @@ Display a table that shows the missing values in the input table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L3057-L3607)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L3060-L3610)
 
 ``` python
 missing_vals_tbl(

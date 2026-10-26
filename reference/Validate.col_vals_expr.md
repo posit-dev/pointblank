@@ -4,7 +4,7 @@ Validate column values using a custom expression.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11243-L11488)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11250-L11502)
 
 ``` python
 Validate.col_vals_expr(
@@ -24,7 +24,7 @@ The [col_vals_expr()](../reference/Validate.col_vals_expr.md#pointblank.Validate
 ## Parameters
 
 `expr: Any`  
-A column expression that will evaluate each row in the table, returning a boolean value per table row. A Narwhals column expression (e.g., `nw.col("a") > 1`) works with every table type. Otherwise, use an expression from the table's own library: a Polars expression for a Polars table, an Ibis expression for an Ibis table, or a PySpark column for a PySpark DataFrame. A function (such as a lambda) can also be given; it receives the table and should return one of those expressions or a boolean Series (e.g., `lambda df: df["a"] > 1` for a pandas DataFrame).
+A column expression that will evaluate each row in the table, returning a boolean value per table row. A Narwhals column expression (e.g., `nw.col("a") > 1`) works with every table type. Otherwise, use an expression from the table's own library: a Polars expression for a Polars table, an Ibis expression for an Ibis table, or a PySpark column for a PySpark DataFrame. A function (such as a lambda) can also be given; it receives the table and should return one of those expressions or a boolean Series (e.g., `lambda df: df["a"] > 1` for a pandas DataFrame). For Polars, Narwhals, and Ibis expressions, the columns used in the expression are shown in the validation report, as is any name given to the expression (e.g., through `.alias("a_is_int")`), which helps to tell apart several [col_vals_expr()](../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) steps. The expression as written in the code (when its source text is available, which requires Python 3.11 or later) appears in a note in the report footer.
 
 `pre: Callable | None = None`  
 An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the *Preprocessing* section for more information on how to use this argument.

@@ -4,7 +4,7 @@ Are column data equal to a fixed value or data in another column?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6920-L7224)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6927-L7231)
 
 ``` python
 Validate.col_vals_eq(

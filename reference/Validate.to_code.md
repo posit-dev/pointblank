@@ -4,7 +4,7 @@ Render this validation plan as canonical Pointblank Python code.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19230-L19328)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19255-L19353)
 
 ``` python
 Validate.to_code()

@@ -4,7 +4,7 @@ Are column data less than a fixed value or data in another column?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6614-L6918)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6621-L6925)
 
 ``` python
 Validate.col_vals_lt(

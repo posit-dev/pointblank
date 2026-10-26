@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="496" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="497" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -1682,7 +1682,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11243-L11488" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11250-L11502" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">col_vals_expr</span>(</span>
@@ -1705,7 +1705,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">expr</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>A column expression that will evaluate each row in the table, returning a boolean value per table row. A Narwhals column expression (e.g., <code>nw.col("a") &gt; 1</code>) works with every table type. Otherwise, use an expression from the table’s own library: a Polars expression for a Polars table, an Ibis expression for an Ibis table, or a PySpark column for a PySpark DataFrame. A function (such as a lambda) can also be given; it receives the table and should return one of those expressions or a boolean Series (e.g., <code>lambda df: df["a"] &gt; 1</code> for a pandas DataFrame).</p>
+<p>A column expression that will evaluate each row in the table, returning a boolean value per table row. A Narwhals column expression (e.g., <code>nw.col("a") &gt; 1</code>) works with every table type. Otherwise, use an expression from the table’s own library: a Polars expression for a Polars table, an Ibis expression for an Ibis table, or a PySpark column for a PySpark DataFrame. A function (such as a lambda) can also be given; it receives the table and should return one of those expressions or a boolean Series (e.g., <code>lambda df: df["a"] &gt; 1</code> for a pandas DataFrame). For Polars, Narwhals, and Ibis expressions, the columns used in the expression are shown in the validation report, as is any name given to the expression (e.g., through <code>.alias("a_is_int")</code>), which helps to tell apart several <a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a> steps. The expression as written in the code (when its source text is available, which requires Python 3.11 or later) appears in a note in the report footer.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">pre</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1791,7 +1791,7 @@ segments=["region", "date"]</code></pre>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). The table is shown below:</p>
-<div id="eb3f2aa4" class="cell" data-execution_count="2">
+<div id="f94ffd13" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1932,7 +1932,7 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 <p>Let’s validate that the values in column <code>a</code> are all integers. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="81bb353c" class="cell" data-execution_count="3">
+<div id="f8fa5805" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_expr(expr<span class="op">=</span>pl.col(<span class="st">"a"</span>) <span class="op">%</span> <span class="dv">1</span> <span class="op">==</span> <span class="dv">0</span>)</span>
@@ -2065,7 +2065,7 @@ segments=["region", "date"]</code></pre>
         </div>
         
         </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">—</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">a</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">COLUMN EXPR</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="pb_tbl-tbl-0-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -2086,7 +2086,9 @@ segments=["region", "date"]</code></pre>
     <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
-
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
+<strong>Notes</strong>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(expr)</span> <code style="font-family: 'IBM Plex Mono', monospace; font-size: 11px;">pl.col("a") % 1 == 0</code></p></span></td></tr></tfoot>
 </table>
 
 </div>
