@@ -13661,7 +13661,7 @@ class Validate:
             .prompt(
                 prompt="Each row should have a valid email address and a non-empty name",
                 columns_subset=["email", "name"],  # Only check these columns
-                model="openai:gpt-4o-mini",
+                model="openai:gpt-6-luna",
             )
             .interrogate()
         )
@@ -13697,7 +13697,7 @@ class Validate:
             .prompt(
                 prompt="Do all the phone numbers include an area code?",
                 columns_subset="phone_number",  # Only check the `phone_number` column
-                model="openai:gpt-4o",
+                model="openai:gpt-6-luna",
                 batch_size=500,
                 max_concurrent=5,
                 thresholds=pb.Thresholds(warning=0.1, error=0.2, critical=0.3),

@@ -9,6 +9,7 @@ from pointblank._constants import MODEL_PROVIDERS
 from pointblank._utils_ai import (
     _check_ai_package,
     _check_syntax,
+    _chat_reply,
     _create_chat_instance,
     _extract_chain_steps,
     _extract_code,
@@ -337,7 +338,7 @@ class DraftValidation:
             system_prompt="You are a terse assistant and a Python expert.",
         )
 
-        response = str(chat.chat(prompt, stream=False, echo="none"))
+        response = _chat_reply(chat, prompt)
         code = _extract_code(response)
 
         # Syntax/lint guardrail: re-prompt on failure up to `max_reprompts` times
@@ -350,7 +351,7 @@ class DraftValidation:
                 "Return the COMPLETE corrected plan again inside ```python + ``` code fences, "
                 "with no text outside the block."
             )
-            response = str(chat.chat(reprompt, stream=False, echo="none"))
+            response = _chat_reply(chat, reprompt)
             code = _extract_code(response)
             ok, message = _check_syntax(code)
 

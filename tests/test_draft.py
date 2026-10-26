@@ -64,6 +64,19 @@ def test_draft_reprompts_on_bad_syntax():
     assert "has a problem" in fake.prompts[1]
 
 
+def test_draft_raises_when_the_reply_is_cut_off():
+    """A plan cut off at the output-token limit is incomplete, so it isn't re-prompted or kept."""
+    pytest.importorskip("chatlas")
+    small_table = load_dataset(dataset="small_table")
+    fake = _FakeChat([_DRAFT[:60]])
+    fake.get_last_turn = lambda: type("Turn", (), {"finish_reason": "max_tokens"})()
+    with patch("pointblank.draft._create_chat_instance", return_value=fake):
+        with pytest.raises(RuntimeError, match="cut off at its output-token limit"):
+            DraftValidation(data=small_table, model="anthropic:claude-sonnet-5-5")
+
+    assert len(fake.prompts) == 1
+
+
 def test_draft_fail_no_chatlas():
     with patch.dict(sys.modules, {"chatlas": None}):
         with pytest.raises(ImportError):
