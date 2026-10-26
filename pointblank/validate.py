@@ -107,6 +107,9 @@ from pointblank._utils import (
     _count_validation_units,
     _derive_bounds,
     _format_to_integer_value,
+    _get_caller_arg_source,
+    _get_expr_alias,
+    _get_expr_root_names,
     _get_fn_name,
     _get_tbl_type,
     _is_duration_dtype,
@@ -4160,6 +4163,9 @@ class _ValidationInfo:
         `"uniqueness"`, etc.). If not set explicitly, it is inferred from the `assertion_type`.
     active
         Whether the validation step is active.
+    expr_source
+        The source text of a `col_vals_expr()` expression, as written by the user (or `None` if
+        it couldn't be determined with certainty).
     all_passed
         Upon interrogation, this describes whether all test units passed for a validation step.
     n
@@ -4246,6 +4252,7 @@ class _ValidationInfo:
     autobrief: str | None = None
     dimension: str | None = None
     active: bool | Callable | None = None
+    expr_source: str | None = None
     # Interrogation results
     eval_error: bool | None = None
     all_passed: bool | None = None
@@ -11268,7 +11275,12 @@ class Validate:
             expression for a Polars table, an Ibis expression for an Ibis table, or a PySpark
             column for a PySpark DataFrame. A function (such as a lambda) can also be given; it
             receives the table and should return one of those expressions or a boolean Series
-            (e.g., `lambda df: df["a"] > 1` for a pandas DataFrame).
+            (e.g., `lambda df: df["a"] > 1` for a pandas DataFrame). For Polars, Narwhals, and
+            Ibis expressions, the columns used in the expression are shown in the validation
+            report, as is any name given to the expression (e.g., through `.alias("a_is_int")`),
+            which helps to tell apart several `col_vals_expr()` steps. The expression as written
+            in the code (when its source text is available, which requires Python 3.11 or later)
+            appears in a note in the report footer.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -11481,6 +11493,8 @@ class Validate:
             brief=brief,
             active=active,
             dimension=dimension,
+            # Keep the expression as written by the user so it can be shown in a report note
+            expr_source=_get_caller_arg_source(method_name="col_vals_expr", arg_name="expr"),
         )
 
         self._add_validation(validation_info=val_info)
@@ -16490,6 +16504,17 @@ class Validate:
                     key="missing_spec", markdown=missing_note[0], text=missing_note[1]
                 )
 
+            # Show the expression of a `col_vals_expr()` step as written by the user (only
+            # available when its source text could be captured), placed within a disclosure
+            if validation.expr_source is not None:
+                validation._add_note(
+                    key="expr",
+                    markdown=_create_expr_source_note_html(
+                        expr_source=validation.expr_source, locale=self.locale
+                    ),
+                    text=f"Expression: {validation.expr_source}",
+                )
+
             # ------------------------------------------------
             # Bypassing the validation step if conditions met
             # ------------------------------------------------
@@ -20892,6 +20917,15 @@ class Validate:
         # Process the `type_upd` entry
         # ------------------------------------------------
 
+        # Aliased `col_vals_expr()` expressions show their name in the step text (e.g.,
+        # `col_vals_expr(a_mod_1)`), which helps to tell apart several such steps
+        assertion_arg_str = [
+            _get_expr_alias(value) if assertion_type == "col_vals_expr" else None
+            for assertion_type, value in zip(
+                validation_info_dict["assertion_type"], validation_info_dict["values"]
+            )
+        ]
+
         # Add the `type_upd` entry to the dictionary
         validation_info_dict["type_upd"] = _transform_assertion_str(
             assertion_str=validation_info_dict["assertion_type"],
@@ -20899,6 +20933,7 @@ class Validate:
             autobrief_str=validation_info_dict["autobrief"],
             segmentation_str=validation_info_dict["segments"],
             lang=lang,
+            assertion_arg_str=assertion_arg_str,
         )
 
         # Remove the `brief` entry from the dictionary
@@ -20927,11 +20962,14 @@ class Validate:
 
             column_text = None
 
-            if assertion_type[i] in [
+            if assertion_type[i] == "col_vals_expr":
+                # Use the columns referenced in the expression (where these can be determined)
+                expr_columns = _get_expr_root_names(validation_info_dict["values"][i])
+                column_text = ", ".join(expr_columns) if expr_columns else "&mdash;"
+            elif assertion_type[i] in [
                 "col_schema_match",
                 "row_count_match",
                 "col_count_match",
-                "col_vals_expr",
             ]:
                 column_text = "&mdash;"
             elif assertion_type[i] in ["rows_distinct", "rows_complete", "prompt"]:
@@ -25219,12 +25257,29 @@ def _transform_assertion_str(
     autobrief_str: list[str],
     segmentation_str: list[tuple | None],
     lang: str,
+    assertion_arg_str: list[str | None] | None = None,
 ) -> list[str]:
     # Get the SVG icons for the assertion types
     svg_icon = _get_assertion_icon(icon=assertion_str)
 
-    # Append `()` to the `assertion_str`
-    assertion_str = [x + "()" for x in assertion_str]
+    # Append `()` to the `assertion_str`, placing any argument text (e.g., the name of an aliased
+    # `col_vals_expr()` expression) inside the parentheses; a long argument is truncated with an
+    # ellipsis so that the step text stays on one line (the full text is available on hover)
+    if assertion_arg_str is None:
+        assertion_arg_str = [None] * len(assertion_str)
+    assertion_nchar = [
+        len(x) + 2 + (len(arg) if arg else 0) for x, arg in zip(assertion_str, assertion_arg_str)
+    ]
+    assertion_str = [
+        (
+            f"{x}(<span title='{html_module.escape(arg, quote=True)}' style='display: inline-block; "
+            "max-width: 50px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; "
+            f"vertical-align: bottom;'>{html_module.escape(arg)}</span>)"
+        )
+        if arg
+        else f"{x}()"
+        for x, arg in zip(assertion_str, assertion_arg_str)
+    ]
 
     # Make every None value in `brief_str` an empty string
     brief_str = ["" if x is None else x for x in brief_str]
@@ -25255,12 +25310,9 @@ def _transform_assertion_str(
             for x in brief_str
         ]
 
-    # Obtain the number of characters contained in the assertion
-    # string; this is important for sizing components appropriately
-    assertion_type_nchar = [len(x) for x in assertion_str]
-
-    # Declare the text size based on the length of `assertion_str`
-    text_size = [10 if nchar + 2 >= 20 else 11 for nchar in assertion_type_nchar]
+    # Declare the text size based on the number of characters in the assertion string (counted
+    # before any HTML escaping)
+    text_size = [10 if nchar + 2 >= 20 else 11 for nchar in assertion_nchar]
 
     # Prepare the CSS style for right-to-left languages
     rtl_css_style = " direction: rtl;" if lang in RTL_LANGUAGES else ""
@@ -26546,6 +26598,49 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
 {step_report_html}
 
 </div>
+</details>
+"""
+
+    return note_html.strip()
+
+
+def _create_expr_source_note_html(expr_source: str, locale: str = "en") -> str:
+    """
+    Create an HTML note showing the source text of a `col_vals_expr()` expression.
+
+    A short, single-line expression is shown in full. A longer one is shown as a truncated
+    preview, with the full text placed in a collapsed disclosure so that it doesn't take up space
+    in the report footer until it's opened.
+    """
+
+    def _md_safe(text: str) -> str:
+        # The notes are rendered as Markdown, so characters having a meaning in Markdown (and line
+        # breaks, which could otherwise end the HTML block) are written as character references
+        return html_module.escape(text).translate(
+            {ord(char): f"&#{ord(char)};" for char in "\n*_`\\[]!#~|"}
+        )
+
+    code_style = "font-family: 'IBM Plex Mono', monospace; font-size: 11px;"
+
+    if "\n" not in expr_source and len(expr_source) <= 80:
+        return f'<code style="{code_style}">{_md_safe(expr_source)}</code>'
+
+    disclosure_text = VALIDATION_REPORT_TEXT["note_expr_source_disclosure"].get(
+        locale, VALIDATION_REPORT_TEXT["note_expr_source_disclosure"]["en"]
+    )
+
+    # Collapse the whitespace of a multi-line expression for the preview
+    preview = " ".join(expr_source.split())
+    preview = re.sub(r"\s+([)\]}])", r"\1", re.sub(r"([(\[{])\s+", r"\1", preview))
+    if len(preview) > 60:
+        preview = preview[:60].rstrip() + "…"
+
+    note_html = f"""
+<code style="{code_style}">{_md_safe(preview)}</code>
+
+<details style="margin-top: 2px; margin-bottom: 8px; font-size: 12px; text-indent: 12px;">
+<summary style="cursor: pointer; font-weight: bold; color: #555;">{disclosure_text}</summary>
+<pre style="margin-top: 4px; margin-left: 15px; padding: 6px 10px; background-color: #F6F6F6; border-radius: 3px; {code_style} text-indent: 0; white-space: pre; overflow-x: auto;">{_md_safe(expr_source)}</pre>
 </details>
 """
 
