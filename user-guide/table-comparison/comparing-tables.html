@@ -705,7 +705,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="a-first-comparison" class="level1">
 <h1>A First Comparison</h1>
 <p>Let’s make two small tables of orders. The target is a later extract of the same data: one order had its amount corrected, one order is gone, and a new order has appeared.</p>
-<div id="5720fee3" class="cell" data-execution_count="2">
+<div id="70097143" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>source <span class="op">=</span> pl.DataFrame(</span>
@@ -727,7 +727,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Since every order has a unique <code>order_id</code>, we’ll use it as the <em>key</em> to line up the rows of the two tables:</p>
-<div id="34af70b4" class="cell" data-execution_count="3">
+<div id="6a9aea14" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(source, target, keys<span class="op">=</span><span class="st">"order_id"</span>)</span>
@@ -887,20 +887,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <p>The counts are available directly on the <a href="../../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> object:</p>
-<div id="0d7aceae" class="cell" data-execution_count="4">
+<div id="479d5a34" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison.status_counts</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>{'match': 3, 'changed': 1, 'missing': 1, 'extra': 1, 'dup_key': 0}</code></pre>
 </div>
 </div>
-<div id="3e599ff4" class="cell" data-execution_count="5">
+<div id="16b2f369" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>comparison.n_changed, comparison.n_missing, comparison.n_extra</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>(1, 1, 1)</code></pre>
 </div>
 </div>
 <p>A <a href="../../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> is truthy only if the tables match, so it can be used directly in a test or an <code>if</code> statement:</p>
-<div id="4efdb1d6" class="cell" data-execution_count="6">
+<div id="3e9a5c36" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">bool</span>(comparison)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>False</code></pre>
@@ -910,7 +910,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="getting-the-differing-rows" class="level1">
 <h1>Getting the Differing Rows</h1>
 <p>Use the <a href="../../reference/Comparison.rows.html#pointblank.Comparison.rows" class="gdls-link gdls-code">rows()</a> method to get the rows with a given status as a table. Changed rows come with a <code>&lt;column&gt;_source</code> and a <code>&lt;column&gt;_target</code> column for each compared column:</p>
-<div id="1732c6db" class="cell" data-execution_count="7">
+<div id="a06cf388" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"changed"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div><style>
@@ -924,7 +924,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Missing rows come from the source and extra rows from the target:</p>
-<div id="96c2082c" class="cell" data-execution_count="8">
+<div id="1bd86611" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"missing"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div><style>
@@ -937,7 +937,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <small>shape: (1, 4)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>order_id</th><th>customer</th><th>amount</th><th>status</th></tr><tr><td>i64</td><td>str</td><td>f64</td><td>str</td></tr></thead><tbody><tr><td>1003</td><td>"Cho"</td><td>12.75</td><td>"pending"</td></tr></tbody></table></div>
 </div>
 </div>
-<div id="acbeac87" class="cell" data-execution_count="9">
+<div id="148cc5a2" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"extra"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div><style>
@@ -951,7 +951,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Only up to <code>limit=</code> rows (100 by default) are collected, so this is safe even for very large tables. For a per-column view of the mismatches, use <a href="../../reference/Comparison.column_summary.html#pointblank.Comparison.column_summary" class="gdls-link gdls-code">column_summary()</a>:</p>
-<div id="7b6b12cd" class="cell" data-execution_count="10">
+<div id="6c31a6de" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>comparison.column_summary()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div><style>
@@ -974,7 +974,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>As multisets</strong> (<code>keys="*"</code>): whole rows are compared regardless of their order, with duplicates counted. This is for tables that have no key at all.</li>
 </ul>
 <p>Here’s what positional alignment makes of the same two tables. Since a row was removed and another added, most rows no longer line up:</p>
-<div id="fa5350d0" class="cell" data-execution_count="11">
+<div id="fa5fb3be" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>pb.compare(source, target).status_counts</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>{'match': 1, 'changed': 4, 'missing': 0, 'extra': 0, 'dup_key': 0}</code></pre>
@@ -984,7 +984,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="tolerances-normalization-and-nulls" class="level1">
 <h1>Tolerances, Normalization, and Nulls</h1>
 <p>Not every difference matters. Numeric and datetime columns can be compared with a tolerance, given for all numeric columns or per column. An absolute tolerance of <code>5</code> absorbs the corrected amount:</p>
-<div id="4e22308c" class="cell" data-execution_count="12">
+<div id="427f3d61" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>pb.compare(source, target, keys<span class="op">=</span><span class="st">"order_id"</span>, tolerance<span class="op">=</span>{<span class="st">"amount"</span>: <span class="dv">5</span>}).n_changed</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>0</code></pre>
@@ -997,7 +997,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="schema-differences" class="level1">
 <h1>Schema Differences</h1>
 <p>Column differences are reported in the <em>Schema differences</em> section of the report and in the <code>schema_diff</code> attribute. Suppose the target renamed a column and added another:</p>
-<div id="1f91f51f" class="cell" data-execution_count="13">
+<div id="b72854c1" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>target_v2 <span class="op">=</span> target.rename({<span class="st">"customer"</span>: <span class="st">"customer_name"</span>}).with_columns(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    region<span class="op">=</span>pl.lit(<span class="st">"EU"</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1010,7 +1010,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>With the default <code>schema="strict"</code>, any schema difference means the tables don’t match and every row counts as failing. Two arguments help here. <code>column_map=</code> pairs up renamed columns, and <code>schema="common"</code> compares only the columns that both tables share (still reporting the schema differences, but without failing any rows):</p>
-<div id="402a5271" class="cell" data-execution_count="14">
+<div id="8e45b2bc" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>pb.compare(</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    source,</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    target_v2,</span>
@@ -1156,7 +1156,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="table-comparison-as-a-validation-step" class="level1">
 <h1>Table Comparison as a Validation Step</h1>
 <p>The <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> validation method uses the same comparison, which makes it a validation step like any other: it can have thresholds and actions, and it shows up in the validation report. The table being validated is the target, and <code>tbl_compare=</code> is the source. Every aligned row is a <em>test unit</em>, so thresholds can be set as a proportion of rows:</p>
-<div id="989a9471" class="cell" data-execution_count="15">
+<div id="52fda258" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>target, tbl_name<span class="op">=</span><span class="st">"orders"</span>, thresholds<span class="op">=</span>(<span class="fl">0.1</span>, <span class="fl">0.25</span>))</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    .tbl_match(tbl_compare<span class="op">=</span>source, keys<span class="op">=</span><span class="st">"order_id"</span>)</span>
@@ -1339,7 +1339,7 @@ Note
 </div>
 </div>
 <p>Three of the six aligned rows differ, exceeding both the ‘warning’ and ‘error’ thresholds. The step report holds the full comparison:</p>
-<div id="dbffb335" class="cell" data-execution_count="16">
+<div id="82864e38" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="16">
 <div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1457,7 +1457,7 @@ Note
 </div>
 </div>
 <p>The data extract for the step contains the failing rows from both tables, with a <code>_status_</code> column and source/target value pairs:</p>
-<div id="5197f6a4" class="cell" data-execution_count="17">
+<div id="2f38d888" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
 <div><style>
@@ -1483,7 +1483,7 @@ Note
 <h1>Reconciling Aggregates</h1>
 <p>Sometimes two tables shouldn’t have the same rows but should add up to the same numbers: a warehouse table loaded from a source system, a summary table built from detailed transactions, or two systems that record the same activity at different levels of detail. For these, the <a href="../../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a> validation method compares <em>aggregates</em> instead of rows. It groups both tables by the <code>keys=</code> columns, aggregates the <code>measures=</code> columns (with <code>agg="sum"</code> by default, or <code>"count"</code>, <code>"mean"</code>, <code>"min"</code>, or <code>"max"</code>), and compares the results group by group. Each group is a test unit.</p>
 <p>Here, the orders in the target have been loaded at a finer grain than in the source, so we reconcile the total amount per customer:</p>
-<div id="b64f7056" class="cell" data-execution_count="18">
+<div id="f7a2af8f" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>order_lines <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="dv">1001</span>, <span class="dv">1002</span>, <span class="dv">1002</span>, <span class="dv">1004</span>, <span class="dv">1005</span>, <span class="dv">1006</span>],</span>
@@ -1619,7 +1619,7 @@ Note
 <section id="exporting-the-results" class="level1">
 <h1>Exporting the Results</h1>
 <p>The results can be serialized with <code>to_dict()</code> or <code>to_json()</code>, which include the counts, the schema differences, and (by default) samples of the differing rows. If the data could contain sensitive values, leave the samples out:</p>
-<div id="97005db4" class="cell" data-execution_count="19">
+<div id="7506e786" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(comparison.to_json(samples<span class="op">=</span><span class="va">False</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>{

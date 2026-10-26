@@ -4,7 +4,7 @@ Edit an existing validation plan with a plain-English instruction using an LLM.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L101-L517)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L102-L518)
 
 ``` python
 EditValidation(
@@ -100,7 +100,7 @@ Execute the revised plan and return the resulting [Validate](../reference/Valida
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L457-L511)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L458-L512)
 
 ``` python
 accept(data=None)
@@ -124,7 +124,7 @@ Return a structured, step-level list of the changes between the plans.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L386-L404)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L387-L405)
 
 ``` python
 changed_steps()
@@ -143,7 +143,7 @@ Return a unified textual diff of the original plan versus the revised plan.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L369-L384)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L370-L385)
 
 ``` python
 diff()
@@ -155,7 +155,7 @@ Build an [EditValidation](../reference/EditValidation.md#pointblank.EditValidati
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L296-L358)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L297-L359)
 
 ``` python
 from_plans(
@@ -201,7 +201,7 @@ Return a `great_tables` GT object summarizing the step-level changes.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L406-L455)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L407-L456)
 
 ``` python
 review()
@@ -220,7 +220,7 @@ Return the revised validation plan as Python code.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L360-L362)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L361-L363)
 
 ``` python
 to_code()
@@ -232,7 +232,7 @@ Return whether the revised plan parses and uses only known validation methods.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L364-L367)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L365-L368)
 
 ``` python
 validate_syntax()

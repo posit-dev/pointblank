@@ -242,7 +242,7 @@ pb edit plan.py -i "add a not-null check on user_id" -m anthropic:claude-opus-4-
 The command prints the proposed change as a color diff along with a summary (for example, `1 added, 1 removed, 1 modified`). Provide a data source for profile-informed edits with `--data`, and write the revised plan to a file with `--output` (add `--yes` to skip the confirmation prompt):
 
 ``` bash
-pb edit plan.yaml -i "tighten the price range to 0-1000" -m openai:gpt-4o --data sales.csv
+pb edit plan.yaml -i "tighten the price range to 0-1000" -m openai:gpt-6-luna --data sales.csv
 pb edit plan.py   -i "drop the email regex check"        -m anthropic:claude-opus-4-8 -o plan2.py -y
 ```
 

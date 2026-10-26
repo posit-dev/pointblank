@@ -268,7 +268,7 @@ pb.DraftValidation(data=data, model="openai:gpt-5.6-sol")
 pb.DraftValidation(data=data, model="ollama:llama3:latest")
 
 # Using Amazon Bedrock
-pb.DraftValidation(data=data, model="bedrock:anthropic.claude-3-sonnet-20240229-v1:0")
+pb.DraftValidation(data=data, model="bedrock:anthropic.claude-sonnet-5-5")
 
 # Using Azure OpenAI (the value after the colon is the Azure deployment id, not an OpenAI model id;
 # requires AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and OPENAI_API_VERSION env vars)
@@ -279,8 +279,7 @@ pb.DraftValidation(data=data, model="azure-openai:my-gpt4-deployment")
 
 Different models have different capabilities when it comes to generating validation plans:
 
-- Anthropic Claude Sonnet 4.5 generally provides the most comprehensive and accurate validation plans
-- OpenAI GPT-4 models also perform well
+- Current Anthropic Claude and OpenAI GPT models generally provide the most comprehensive and accurate validation plans
 - Local models through Ollama can be useful for private data but they currently have reduced capabilities here
 
 A key advantage of [DraftValidation](../../reference/DraftValidation.md#pointblank.DraftValidation) is that your actual dataset is not sent to the LLM provider. Instead, only a summary is transmitted, which includes:

@@ -362,7 +362,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   Examples:
 
   pb edit plan.py -i "add a not-null check on user_id" -m anthropic:claude-opus-4-8
-  pb edit plan.yaml -i "tighten the price range to 0-1000" -m openai:gpt-4o --data sales.csv
+  pb edit plan.yaml -i "tighten the price range to 0-1000" -m openai:gpt-6-luna --data sales.csv
   pb edit plan.py -i "drop the email regex check" -m anthropic:claude-opus-4-8 -o plan2.py -y
 
 Options:
@@ -421,7 +421,7 @@ Write the output file without asking for confirmation.
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> edit plan.py <span class="at">-i</span> <span class="st">"add a not-null check on user_id"</span> <span class="at">-m</span> anthropic:claude-opus-4-8</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> edit plan.yaml <span class="at">-i</span> <span class="st">"tighten the price range to 0-1000"</span> <span class="at">-m</span> openai:gpt-4o <span class="at">--data</span> sales.csv</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> edit plan.yaml <span class="at">-i</span> <span class="st">"tighten the price range to 0-1000"</span> <span class="at">-m</span> openai:gpt-6-luna <span class="at">--data</span> sales.csv</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> edit plan.py <span class="at">-i</span> <span class="st">"drop the email regex check"</span> <span class="at">-m</span> anthropic:claude-opus-4-8 <span class="at">-o</span> plan2.py <span class="at">-y</span></span></code></pre></div>
 
 

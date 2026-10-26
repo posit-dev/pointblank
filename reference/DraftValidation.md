@@ -4,7 +4,7 @@ Draft a validation plan for a given table using an LLM.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/draft.py#L23-L388)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/draft.py#L24-L389)
 
 ``` python
 DraftValidation(

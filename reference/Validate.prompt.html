@@ -1927,7 +1927,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    .prompt(</span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        prompt<span class="op">=</span><span class="st">"Each row should have a valid email address and a non-empty name"</span>,</span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        columns_subset<span class="op">=</span>[<span class="st">"email"</span>, <span class="st">"name"</span>],  <span class="co"># Only check these columns</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"openai:gpt-4o-mini"</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"openai:gpt-6-luna"</span>,</span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1953,7 +1953,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    .prompt(</span>
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>        prompt<span class="op">=</span><span class="st">"Do all the phone numbers include an area code?"</span>,</span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        columns_subset<span class="op">=</span><span class="st">"phone_number"</span>,  <span class="co"># Only check the `phone_number` column</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"openai:gpt-4o"</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"openai:gpt-6-luna"</span>,</span>
 <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        batch_size<span class="op">=</span><span class="dv">500</span>,</span>
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>        max_concurrent<span class="op">=</span><span class="dv">5</span>,</span>
 <span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>pb.Thresholds(warning<span class="op">=</span><span class="fl">0.1</span>, error<span class="op">=</span><span class="fl">0.2</span>, critical<span class="op">=</span><span class="fl">0.3</span>),</span>

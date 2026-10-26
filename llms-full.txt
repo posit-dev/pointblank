@@ -9605,7 +9605,7 @@ validation = (
     .prompt(
         prompt="Each row should have a valid email address and a non-empty name",
         columns_subset=["email", "name"],  # Only check these columns
-        model="openai:gpt-4o-mini",
+        model="openai:gpt-6-luna",
     )
     .interrogate()
 )
@@ -9641,7 +9641,7 @@ validation = (
     .prompt(
         prompt="Do all the phone numbers include an area code?",
         columns_subset="phone_number",  # Only check the `phone_number` column
-        model="openai:gpt-4o",
+        model="openai:gpt-6-luna",
         batch_size=500,
         max_concurrent=5,
         thresholds=pb.Thresholds(warning=0.1, error=0.2, critical=0.3),
@@ -22485,7 +22485,7 @@ Usage: pb edit [OPTIONS] [VALIDATION_FILE]
   Examples:
 
   pb edit plan.py -i "add a not-null check on user_id" -m anthropic:claude-opus-4-8
-  pb edit plan.yaml -i "tighten the price range to 0-1000" -m openai:gpt-4o --data sales.csv
+  pb edit plan.yaml -i "tighten the price range to 0-1000" -m openai:gpt-6-luna --data sales.csv
   pb edit plan.py -i "drop the email regex check" -m anthropic:claude-opus-4-8 -o plan2.py -y
 
 Options:
@@ -28194,7 +28194,7 @@ pb.DraftValidation(data=data, model="openai:gpt-5.6-sol")
 pb.DraftValidation(data=data, model="ollama:llama3:latest")
 
 # Using Amazon Bedrock
-pb.DraftValidation(data=data, model="bedrock:anthropic.claude-3-sonnet-20240229-v1:0")
+pb.DraftValidation(data=data, model="bedrock:anthropic.claude-sonnet-5-5")
 
 # Using Azure OpenAI (the value after the colon is the Azure deployment id, not an OpenAI model id;
 # requires AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and OPENAI_API_VERSION env vars)
@@ -28205,9 +28205,8 @@ pb.DraftValidation(data=data, model="azure-openai:my-gpt4-deployment")
 
 Different models have different capabilities when it comes to generating validation plans:
 
-- Anthropic Claude Sonnet 4.5 generally provides the most comprehensive and accurate validation
-plans
-- OpenAI GPT-4 models also perform well
+- Current Anthropic Claude and OpenAI GPT models generally provide the most comprehensive and
+accurate validation plans
 - Local models through Ollama can be useful for private data but they currently have reduced
 capabilities here
 
@@ -28905,7 +28904,7 @@ The command prints the proposed change as a color diff along with a summary (for
 and write the revised plan to a file with `--output` (add `--yes` to skip the confirmation prompt):
 
 ```bash
-pb edit plan.yaml -i "tighten the price range to 0-1000" -m openai:gpt-4o --data sales.csv
+pb edit plan.yaml -i "tighten the price range to 0-1000" -m openai:gpt-6-luna --data sales.csv
 pb edit plan.py   -i "drop the email regex check"        -m anthropic:claude-opus-4-8 -o plan2.py -y
 ```
 
