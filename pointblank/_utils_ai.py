@@ -37,6 +37,16 @@ _PROVIDER_PACKAGES = {
 }
 
 
+# The reply-length limit for the Anthropic and Bedrock providers. chatlas's default is 4096, but on
+# current Claude models thinking tokens count toward it, so a plan for a wide table could be cut
+# off. The `anthropic` SDK refuses non-streaming requests above about 21,000 tokens.
+_ANTHROPIC_MAX_TOKENS = 16000
+
+# Finish reasons that mean the reply was cut off at the output-token limit (chatlas passes on the
+# provider's reason, or in recent versions a normalized one)
+_TRUNCATED_FINISH_REASONS = frozenset({"max_tokens", "length", "max_output_tokens"})
+
+
 def _check_ai_package(package: str, needed_for: str) -> None:
     """Raise an `ImportError` with an install hint if a package needed for an AI feature is missing."""
     try:
@@ -174,6 +184,7 @@ def _create_chat_instance(
             model=model_name,
             api_key=api_key,
             system_prompt=system_prompt,
+            max_tokens=_ANTHROPIC_MAX_TOKENS,
             kwargs={"http_client": _async_http_client("anthropic", verify_ssl)},
         )
 
@@ -205,6 +216,7 @@ def _create_chat_instance(
         chat = ChatBedrockAnthropic(
             model=model_name,
             system_prompt=system_prompt,
+            max_tokens=_ANTHROPIC_MAX_TOKENS,
         )
 
     elif provider == "azure-openai":  # pragma: no cover
@@ -238,6 +250,30 @@ def _create_chat_instance(
         raise ValueError(f"Unsupported provider: {provider}")
 
     return chat
+
+
+def _chat_reply(chat: Any, *content: Any) -> str:
+    """
+    Send a message to a chatlas chat and return the reply's text.
+
+    Raises a `RuntimeError` if the reply was cut off at the model's output-token limit, since a
+    partial plan or a partial JSON array can't be used.
+    """
+    response = str(chat.chat(*content, stream=False, echo="none"))
+
+    try:
+        finish_reason = getattr(chat.get_last_turn(), "finish_reason", None)
+    except Exception:
+        finish_reason = None
+
+    if finish_reason in _TRUNCATED_FINISH_REASONS:
+        raise RuntimeError(
+            "The model's reply was cut off at its output-token limit, so it's incomplete and "
+            "can't be used. Try again with fewer columns (or a smaller `batch_size=` for "
+            "`prompt()`), or with another model."
+        )
+
+    return response
 
 
 def _prepare_attachments(attachments: Optional[List[Any]]) -> List[Any]:
@@ -961,7 +997,7 @@ class _AIValidationEngine:
                 # Get response from LLM using chatlas (synchronous). Attachments
                 # ride along as global context content blocks for every batch.
                 self._start_fresh_conversation()
-                response = str(self.chat.chat(prompt, *self.attachments, stream=False, echo="none"))
+                response = _chat_reply(self.chat, prompt, *self.attachments)
 
                 # Debug: Log the raw LLM response
                 logger.debug(f"📥 LLM Response for batch {batch['batch_id']}:")
@@ -1052,7 +1088,7 @@ class _AIValidationEngine:
             # Get response from LLM using chatlas (synchronous). Attachments
             # ride along as global context content blocks for every batch.
             self._start_fresh_conversation()
-            response = str(self.chat.chat(prompt, *self.attachments, stream=False, echo="none"))
+            response = _chat_reply(self.chat, prompt, *self.attachments)
 
             # Parse the response
             parser = _ValidationResponseParser(total_rows=1000)  # This will be set properly
