@@ -140,7 +140,7 @@ from pointblank.column import (
     ReferenceColumn,
     col,
 )
-from pointblank.missing import MissingSpec
+from pointblank.missing import MissingSpec, _missing_spec_to_code, _missing_spec_to_yaml
 from pointblank.schema import Schema, _get_schema_validation_info
 from pointblank.segments import Segment
 from pointblank.thresholds import (
@@ -4148,6 +4148,10 @@ class _ValidationInfo:
         A preprocessing function or lambda to apply to the data table for the validation step.
     segments
         The segments to use for the validation step.
+    segments_spec
+        The `segments=` value as originally given. Interrogation expands a segmented step into one
+        step per segment (replacing `segments` with that segment), so this keeps the original
+        specification for serializing the plan.
     thresholds
         The threshold values for the validation.
     actions
@@ -4245,6 +4249,7 @@ class _ValidationInfo:
     missing: Any | None = None
     pre: Callable | None = None
     segments: Any | None = None
+    segments_spec: Any | None = None
     thresholds: Thresholds | None = None
     actions: Actions | None = None
     label: str | None = None
@@ -4474,6 +4479,7 @@ _SERIALIZE_COLUMN_METHODS = (
     | _SERIALIZE_COLUMN_ONLY_METHODS
     | _SERIALIZE_SEQUENCE_METHODS
     | {"col_vals_regex", "col_vals_within_spec", "col_vals_str_len"}
+    | {"col_pct_null", "col_pct_missing", "col_missing_coded", "col_missing_only_coded"}
 )
 
 
@@ -4487,7 +4493,7 @@ class _UnserializablePlaceholder:
 
     __slots__ = ("code", "yaml_value", "note")
 
-    def __init__(self, code: str, note: str, yaml_value: str | None = None) -> None:
+    def __init__(self, code: str, note: str, yaml_value: Any = None) -> None:
         self.code = code
         self.yaml_value = yaml_value if yaml_value is not None else code
         self.note = note
@@ -4541,9 +4547,7 @@ def _validation_info_to_step(
 
     params: dict[str, Any] = {}
 
-    def _placeholder(
-        code: str, note: str, yaml_value: str | None = None
-    ) -> _UnserializablePlaceholder:
+    def _placeholder(code: str, note: str, yaml_value: Any = None) -> _UnserializablePlaceholder:
         warnings_out.append(note)
         return _UnserializablePlaceholder(code=code, note=note, yaml_value=yaml_value)
 
@@ -4599,6 +4603,38 @@ def _validation_info_to_step(
             params["max_val"] = values["max_val"]
     elif at in _SERIALIZE_COLUMN_ONLY_METHODS:
         _columns_param()
+    elif at == "col_pct_null":
+        _columns_param()
+        values = vi.values or {}
+        params["p"] = values.get("p")
+        # The tolerance is only held by the bound-finding partial
+        tol = getattr(values.get("bound_finder"), "keywords", {}).get("tol", 0)
+        if tol:
+            params["tol"] = tol
+    elif at == "col_pct_missing":
+        _columns_param()
+        values = vi.values or {}
+        params["missing"] = values.get("spec")
+        params["max_pct"] = values.get("max_pct")
+        for key in ("reason", "category"):
+            if values.get(key) is not None:
+                params[key] = values[key]
+    elif at == "col_missing_coded":
+        _columns_param()
+        # The MissingSpec itself is the step's `values`
+        params["missing"] = vi.values
+    elif at == "col_missing_only_coded":
+        _columns_param()
+        values = vi.values or {}
+        params["missing"] = values.get("spec")
+        for key in ("allowed", "min_val", "max_val"):
+            if values.get(key) is not None:
+                params[key] = values[key]
+    elif at == "col_missing_consistent":
+        values = vi.values or {}
+        params["columns"] = [_column_to_name(c) or c for c in vi.column]
+        params["missing"] = values.get("spec")
+        params["when_reason"] = values.get("when_reason")
     elif at in _SERIALIZE_SEQUENCE_METHODS:
         _columns_param()
         info = vi.val_info or {}
@@ -4646,6 +4682,11 @@ def _validation_info_to_step(
     elif at == "row_count_match":
         values = vi.values or {}
         params["count"] = values.get("count")
+        # The tolerance is held as absolute bounds (integers), which `tol=` reads as absolute row
+        # counts, so they reproduce the same check
+        lower, upper = values.get("abs_tol_bounds") or (0, 0)
+        if lower or upper:
+            params["tol"] = lower if lower == upper else (lower, upper)
         if values.get("inverse"):
             params["inverse"] = True
     elif at == "col_count_match":
@@ -4708,13 +4749,34 @@ def _validation_info_to_step(
         params["ref_column"] = values.get("ref_column")
     elif at == "conjointly":
         params["expressions"] = _placeholder(
-            code="[lambda df: df]",
+            code="lambda df: df",
             note=(
                 "Step 'conjointly' uses callable expressions that cannot be serialized to "
                 "source; a placeholder was emitted and must be edited manually."
             ),
-            yaml_value="[]",
+            yaml_value=["lambda df: df"],
         )
+    elif at == "prompt":
+        values = vi.values or {}
+        params["prompt"] = values.get("prompt")
+        params["model"] = f"{values.get('llm_provider')}:{values.get('llm_model')}"
+        if vi.column is not None:
+            params["columns_subset"] = (
+                list(vi.column) if isinstance(vi.column, (list, tuple)) else vi.column
+            )
+        if values.get("batch_size", 1000) != 1000:
+            params["batch_size"] = values["batch_size"]
+        if values.get("max_concurrent", 3) != 3:
+            params["max_concurrent"] = values["max_concurrent"]
+        if values.get("attachments"):
+            params["attachments"] = _placeholder(
+                code="None",
+                note=(
+                    "Step 'prompt' has `attachments=` that cannot be serialized; they were "
+                    "dropped from the generated plan."
+                ),
+                yaml_value="null",
+            )
     elif at == "specially":
         params["expr"] = _placeholder(
             code="lambda df: df",
@@ -4739,6 +4801,9 @@ def _validation_info_to_step(
     if vi.na_pass:
         params["na_pass"] = True
 
+    if vi.missing is not None:
+        params["missing"] = vi.missing
+
     if vi.pre is not None:
         params["pre"] = _placeholder(
             code="None",
@@ -4749,8 +4814,11 @@ def _validation_info_to_step(
             yaml_value="null",
         )
 
-    if vi.segments is not None:
-        params["segments"] = vi.segments
+    # After interrogation, a segmented step has been expanded into one step per segment; the
+    # original `segments=` value is what reproduces the plan
+    segments = vi.segments_spec if vi.segments_spec is not None else vi.segments
+    if segments is not None:
+        params["segments"] = segments
 
     step_thresholds = _thresholds_as_dict(vi.thresholds)
     if step_thresholds and step_thresholds != _thresholds_as_dict(global_thresholds):
@@ -4848,6 +4916,10 @@ def _render_code_value(value: Any) -> str:
         return _render_thresholds_code(value)
     if isinstance(value, Schema):
         return _render_schema_code(value)
+    if isinstance(value, MissingSpec):
+        return _missing_spec_to_code(value)
+    if isinstance(value, Segment):
+        return f"pb.seg_group({_render_code_value(value.segments)})"
     if isinstance(value, tuple):
         inner = ", ".join(_render_code_value(v) for v in value)
         return f"({inner},)" if len(value) == 1 else f"({inner})"
@@ -4895,7 +4967,10 @@ def _render_step_code(method: str, params: dict[str, Any]) -> str:
     """Render one step as a chained `.method(...)` call."""
     parts = []
     for key, value in params.items():
-        if key in ("columns", "columns_subset"):
+        if method == "conjointly" and key == "expressions":
+            # `conjointly()` takes its expressions as positional arguments
+            parts.append(value.code if isinstance(value, _UnserializablePlaceholder) else value)
+        elif key in ("columns", "columns_subset"):
             parts.append(f"{key}={_render_columns_arg(value)}")
         else:
             parts.append(f"{key}={_render_code_value(value)}")
@@ -4924,6 +4999,10 @@ def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
         return _thresholds_as_dict(value)
     if isinstance(value, Schema):
         return _schema_to_yaml(value)
+    if isinstance(value, MissingSpec):
+        return _missing_spec_to_yaml(value)
+    if isinstance(value, Segment):
+        return {"python": f"pb.seg_group({_render_code_value(value.segments)})"}
     if isinstance(value, tuple):
         return [_value_to_yaml(v, warnings_out) for v in value]
     if isinstance(value, list):
@@ -4935,6 +5014,21 @@ def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
         # Written as a duration string (e.g., "1.5s") that `tbl_match(tolerance=)` accepts
         return f"{value.total_seconds():g}s"
     return str(value)  # pragma: no cover
+
+
+def _segments_to_yaml(segments: Any, warnings_out: list[str]) -> Any:
+    """Convert a `segments=` value for `to_yaml()`.
+
+    YAML has no tuples, so each `(column, value)` segment is written as a two-item list inside an
+    outer list (e.g., `[[region, North]]`). This keeps it distinct from a list of column names
+    (e.g., `[region, quarter]`), which `yaml_interrogate()` reads back the same way.
+    """
+    items = [segments] if isinstance(segments, (str, tuple)) else list(segments)
+    result = [
+        item if isinstance(item, str) else [_value_to_yaml(v, warnings_out) for v in item]
+        for item in items
+    ]
+    return result[0] if isinstance(segments, str) else result
 
 
 def _schema_to_yaml(schema: Schema | None) -> dict[str, Any]:
@@ -19241,7 +19335,19 @@ class Validate:
     def _serialize_steps(self, warnings_out: list[str]) -> list[tuple[str, dict[str, Any]]]:
         """Build the coalesced `(method, kwargs)` list for this plan (shared by to_code/to_yaml)."""
         steps: list[tuple[str, dict[str, Any]]] = []
+        prev_vi: _ValidationInfo | None = None
         for vi in self.validation_info:
+            # Steps expanded from a single segmented step (at interrogation) share an `i_o`, and
+            # are serialized once with their original `segments=` value
+            is_segment_copy = (
+                vi.segments_spec is not None
+                and prev_vi is not None
+                and prev_vi.segments_spec is not None
+                and prev_vi.i_o == vi.i_o
+            )
+            prev_vi = vi
+            if is_segment_copy:
+                continue
             step = _validation_info_to_step(
                 vi,
                 global_thresholds=self.thresholds,
@@ -19434,7 +19540,12 @@ class Validate:
                 yaml_steps.append(method)
                 continue
             yaml_params = {
-                key: _value_to_yaml(value, warnings_out) for key, value in params.items()
+                key: (
+                    _segments_to_yaml(value, warnings_out)
+                    if key == "segments"
+                    else _value_to_yaml(value, warnings_out)
+                )
+                for key, value in params.items()
             }
             yaml_steps.append({method: yaml_params})
         config["steps"] = yaml_steps
@@ -22721,6 +22832,7 @@ class Validate:
                 new_validation = copy.deepcopy(validation)
 
                 new_validation.segments = seg
+                new_validation.segments_spec = segments_expr
 
                 expanded_validation_info.append(new_validation)
 
