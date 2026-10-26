@@ -4,7 +4,7 @@ Compare this scan against a baseline and return the differences.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L619-L637)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L632-L650)
 
 ``` python
 DataScan.compare(baseline)

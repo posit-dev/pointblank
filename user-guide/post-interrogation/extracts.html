@@ -755,7 +755,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="csv-data-from-validation-reports" class="level2">
 <h2 class="anchored" data-anchor-id="csv-data-from-validation-reports">CSV Data from Validation Reports</h2>
 <p>Data extracts are embedded within validation report tables. Let’s look at an example, using the <code>small_table</code> dataset, where data extracts are collected in a single validation step due to failing test units:</p>
-<div id="71c9233c" class="cell" data-execution_count="2">
+<div id="01f12b1e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -928,7 +928,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="get_data_extracts" class="level2">
 <h2 class="anchored" data-anchor-id="get_data_extracts"><a href="../../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link gdls-code">get_data_extracts()</a></h2>
 <p>For programmatic access to data extracts, Pointblank provides the <a href="../../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>Validate.get_data_extracts()</code></a> method. This allows you to work with extract data directly in your Python workflow:</p>
-<div id="653422a7" class="cell" data-execution_count="3">
+<div id="bd1b4b76" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get data extracts from step 1</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>extract_1 <span class="op">=</span> validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -956,7 +956,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="step-reports" class="level2">
 <h2 class="anchored" data-anchor-id="step-reports">Step Reports</h2>
 <p>Step reports provide another way to access and visualize failing data. When you generate a step report for a validation step that has failing rows, those failing rows are displayed directly in the report:</p>
-<div id="4d15883b" class="cell" data-execution_count="4">
+<div id="c629266d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a step report for the first validation step</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>step_report <span class="op">=</span> validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1116,7 +1116,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>include additional metadata about the validation step and failure statistics</li>
 </ol>
 <p>For steps with many failures, you can customize how many rows to display:</p>
-<div id="4705f4d0" class="cell" data-execution_count="5">
+<div id="41d29bee" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Limit to just 2 rows of failing data</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>limited_report <span class="op">=</span> validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>, limit<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1253,7 +1253,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="viewing-data-extracts-with-preview" class="level1">
 <h1>Viewing Data Extracts with <a href="../../reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a></h1>
 <p>To get a consistent HTML representation of any data extract (regardless of the table type), we can use the <a href="../../reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> function:</p>
-<div id="bed1cd58" class="cell" data-execution_count="6">
+<div id="00d98e2b" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pb.preview(data<span class="op">=</span>extract_1)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1409,7 +1409,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="working-with-multiple-validation-steps" class="level1">
 <h1>Working with Multiple Validation Steps</h1>
 <p>When validating data with multiple steps, you can extract failing rows from any step or combine extracts from multiple steps:</p>
-<div id="1f305444" class="cell" data-execution_count="7">
+<div id="cf5c65a5" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a validation with multiple steps</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>multi_validation <span class="op">=</span> (</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
@@ -1660,7 +1660,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="extracting-data-from-a-specific-step" class="level2">
 <h2 class="anchored" data-anchor-id="extracting-data-from-a-specific-step">Extracting Data from a Specific Step</h2>
 <p>You can access extracts from any specific validation step:</p>
-<div id="7d916b1c" class="cell" data-execution_count="8">
+<div id="7727440a" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2 (`d &lt; 3000` validation)</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>less_than_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1678,7 +1678,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Using <code>frame=True</code> means that returned value will be a DataFrame (not a dictionary that contains a single DataFrame).</p>
 <p>If a step has no failing rows, an empty DataFrame will be returned:</p>
-<div id="727f0e71" class="cell" data-execution_count="9">
+<div id="2ced2d6f" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 3 (regex check)</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>regex_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">3</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1698,7 +1698,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="getting-all-extracts-at-once" class="level2">
 <h2 class="anchored" data-anchor-id="getting-all-extracts-at-once">Getting All Extracts at Once</h2>
 <p>To retrieve extracts from all steps with failures in one command:</p>
-<div id="2c5d301d" class="cell" data-execution_count="10">
+<div id="8e807233" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get all extracts ()</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>all_extracts <span class="op">=</span> multi_validation.get_data_extracts()</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1713,7 +1713,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="getting-specific-extracts" class="level2">
 <h2 class="anchored" data-anchor-id="getting-specific-extracts">Getting Specific Extracts</h2>
 <p>You can also retrieve data extracts from several specified steps as a dictionary:</p>
-<div id="0105714e" class="cell" data-execution_count="11">
+<div id="3d24f934" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from steps 1 and 2 as a dictionary</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>extract_dict <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">2</span>])</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1738,7 +1738,7 @@ Step 2: 4 failing rows</code></pre>
 <section id="finding-patterns-across-validation-steps" class="level2">
 <h2 class="anchored" data-anchor-id="finding-patterns-across-validation-steps">Finding Patterns Across Validation Steps</h2>
 <p>You can analyze patterns across different validation steps by combining extracts:</p>
-<div id="df1a4580" class="cell" data-execution_count="12">
+<div id="887fc5fd" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a consolidated view of all rows that failed any validation</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>all_failure_rows <span class="op">=</span> <span class="bu">set</span>()</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> step, extract <span class="kw">in</span> all_extracts.items():</span>
@@ -1756,7 +1756,7 @@ Row numbers with failures: [1, 2, 4, 6, 9, 10, 12, 13]</code></pre>
 <section id="identifying-rows-with-multiple-failures" class="level2">
 <h2 class="anchored" data-anchor-id="identifying-rows-with-multiple-failures">Identifying Rows with Multiple Failures</h2>
 <p>You might want to find rows that failed multiple validation checks, as these often represent more serious data quality issues:</p>
-<div id="b3e06164" class="cell" data-execution_count="13">
+<div id="841ba98a" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get row numbers from each extract</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>step1_rows <span class="op">=</span> <span class="bu">set</span>(multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)[<span class="st">"_row_num_"</span>])</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>step2_rows <span class="op">=</span> <span class="bu">set</span>(multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)[<span class="st">"_row_num_"</span>])</span>
@@ -1772,7 +1772,7 @@ Row numbers with failures: [1, 2, 4, 6, 9, 10, 12, 13]</code></pre>
 <section id="statistical-analysis-of-failing-values" class="level2">
 <h2 class="anchored" data-anchor-id="statistical-analysis-of-failing-values">Statistical Analysis of Failing Values</h2>
 <p>Once you have data extracts, you can perform statistical analysis to identify patterns in the failing data:</p>
-<div id="9ea59847" class="cell" data-execution_count="14">
+<div id="74e3a59a" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>d_value_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1792,76 +1792,76 @@ Mean failing value: 5151.6775</code></pre>
 <section id="detailed-analysis-with-col_summary_tbl" class="level2">
 <h2 class="anchored" data-anchor-id="detailed-analysis-with-col_summary_tbl">Detailed Analysis with <a href="../../reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a></h2>
 <p>For a more comprehensive view of the statistical properties of your extract data, you can use the <a href="../../reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a> function:</p>
-<div id="1b37e929" class="cell" data-execution_count="15">
+<div id="5e22d8b0" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>d_value_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate a comprehensive statistical summary of the failing data</span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(d_value_failures)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
-<div id="cvwkrekfcb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="tvipwicclz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#cvwkrekfcb table {
+#tvipwicclz table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#cvwkrekfcb thead, tbody, tfoot, tr, td, th { border-style: none; }
+#tvipwicclz thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#cvwkrekfcb p { margin: 0; padding: 0; }
- #cvwkrekfcb .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #cvwkrekfcb .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #cvwkrekfcb .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #cvwkrekfcb .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #cvwkrekfcb .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #cvwkrekfcb .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #cvwkrekfcb .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #cvwkrekfcb .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #cvwkrekfcb .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #cvwkrekfcb .gt_column_spanner_outer:first-child { padding-left: 0; }
- #cvwkrekfcb .gt_column_spanner_outer:last-child { padding-right: 0; }
- #cvwkrekfcb .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #cvwkrekfcb .gt_spanner_row { border-bottom-style: hidden; }
- #cvwkrekfcb .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #cvwkrekfcb .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #cvwkrekfcb .gt_from_md> :first-child { margin-top: 0; }
- #cvwkrekfcb .gt_from_md> :last-child { margin-bottom: 0; }
- #cvwkrekfcb .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #cvwkrekfcb .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #cvwkrekfcb .gt_indent_1 { text-indent: 5px; }
- #cvwkrekfcb .gt_indent_2 { text-indent: calc(5px * 2); }
- #cvwkrekfcb .gt_indent_3 { text-indent: calc(5px * 3); }
- #cvwkrekfcb .gt_indent_4 { text-indent: calc(5px * 4); }
- #cvwkrekfcb .gt_indent_5 { text-indent: calc(5px * 5); }
- #cvwkrekfcb .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #cvwkrekfcb .gt_row_group_first td { border-top-width: 2px; }
- #cvwkrekfcb .gt_row_group_first th { border-top-width: 2px; }
- #cvwkrekfcb .gt_striped { color: #333333; background-color: #F4F4F4; }
- #cvwkrekfcb .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #cvwkrekfcb .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #cvwkrekfcb .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #cvwkrekfcb .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #cvwkrekfcb .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #cvwkrekfcb .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #cvwkrekfcb .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #cvwkrekfcb .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #cvwkrekfcb .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #cvwkrekfcb .gt_left { text-align: left; }
- #cvwkrekfcb .gt_center { text-align: center; }
- #cvwkrekfcb .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #cvwkrekfcb .gt_font_normal { font-weight: normal; }
- #cvwkrekfcb .gt_font_bold { font-weight: bold; }
- #cvwkrekfcb .gt_font_italic { font-style: italic; }
- #cvwkrekfcb .gt_super { font-size: 65%; }
- #cvwkrekfcb .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #cvwkrekfcb .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #cvwkrekfcb .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #cvwkrekfcb .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #cvwkrekfcb .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #cvwkrekfcb .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#tvipwicclz p { margin: 0; padding: 0; }
+ #tvipwicclz .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #tvipwicclz .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #tvipwicclz .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #tvipwicclz .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #tvipwicclz .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #tvipwicclz .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #tvipwicclz .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #tvipwicclz .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #tvipwicclz .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #tvipwicclz .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #tvipwicclz .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #tvipwicclz .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #tvipwicclz .gt_spanner_row { border-bottom-style: hidden; }
+ #tvipwicclz .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #tvipwicclz .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #tvipwicclz .gt_from_md> :first-child { margin-top: 0; }
+ #tvipwicclz .gt_from_md> :last-child { margin-bottom: 0; }
+ #tvipwicclz .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #tvipwicclz .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #tvipwicclz .gt_indent_1 { text-indent: 5px; }
+ #tvipwicclz .gt_indent_2 { text-indent: calc(5px * 2); }
+ #tvipwicclz .gt_indent_3 { text-indent: calc(5px * 3); }
+ #tvipwicclz .gt_indent_4 { text-indent: calc(5px * 4); }
+ #tvipwicclz .gt_indent_5 { text-indent: calc(5px * 5); }
+ #tvipwicclz .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #tvipwicclz .gt_row_group_first td { border-top-width: 2px; }
+ #tvipwicclz .gt_row_group_first th { border-top-width: 2px; }
+ #tvipwicclz .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #tvipwicclz .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #tvipwicclz .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #tvipwicclz .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #tvipwicclz .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #tvipwicclz .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #tvipwicclz .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #tvipwicclz .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #tvipwicclz .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #tvipwicclz .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #tvipwicclz .gt_left { text-align: left; }
+ #tvipwicclz .gt_center { text-align: center; }
+ #tvipwicclz .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #tvipwicclz .gt_font_normal { font-weight: normal; }
+ #tvipwicclz .gt_font_bold { font-weight: bold; }
+ #tvipwicclz .gt_font_italic { font-style: italic; }
+ #tvipwicclz .gt_super { font-size: 65%; }
+ #tvipwicclz .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #tvipwicclz .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #tvipwicclz .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #tvipwicclz .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #tvipwicclz .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #tvipwicclz .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" aria-labelledby="title" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
@@ -1906,20 +1906,20 @@ Mean failing value: 5151.6775</code></pre>
 </thead>
 <tbody class="gt_table_body">
   <tr>
-    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left">&lt;svg width="24px" viewBox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;"&gt;
-    &lt;title&gt;numeric&lt;/title&gt;
-    &lt;g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"&gt;
-        &lt;g id="numeric" transform="translate(4.000000, 4.339342)"&gt;
-            &lt;rect id="square" stroke="#640177" stroke-width="4" fill="#A400CF" x="2" y="2" width="168" height="168" rx="8"&gt;&lt;/rect&gt;
-            &lt;g id="N" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero"&gt;
-                &lt;polygon points="28.116 48.576 19.272 30.096 18.876 30.096 18.876 92.136 0 92.136 0 0 21.912 0 47.124 43.56 55.968 62.04 56.364 62.04 56.364 0 75.24 0 75.24 92.136 53.328 92.136"&gt;&lt;/polygon&gt;
-            &lt;/g&gt;
-        &lt;/g&gt;
-    &lt;/g&gt;
-&lt;/svg&gt;</td>
-    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left">&lt;div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'&gt;_row_num_&lt;/div&gt;&lt;div style='font-size: 11px; color: gray;'&gt;UInt32&lt;/div&gt;</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0&lt;br&gt;0</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">4&lt;br&gt;1</td>
+    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>numeric</title>
+    <g id="icon-0-icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-0-numeric" transform="translate(4.000000, 4.339342)">
+            <rect id="icon-0-square" stroke="#640177" stroke-width="4" fill="#A400CF" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="icon-0-N" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero">
+                <polygon points="28.116 48.576 19.272 30.096 18.876 30.096 18.876 92.136 0 92.136 0 0 21.912 0 47.124 43.56 55.968 62.04 56.364 62.04 56.364 0 75.24 0 75.24 92.136 53.328 92.136"></polygon>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">_row_num_</div><div style="font-size: 11px; color: gray;">UInt32</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">4<br>1</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">3.25</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">2.22</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">1</td>
@@ -1932,72 +1932,72 @@ Mean failing value: 5151.6775</code></pre>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="iqr" class="gt_row gt_center">2.75</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left">&lt;svg width="24px" viewBox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;"&gt;
-    &lt;title&gt;date&lt;/title&gt;
-    &lt;g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"&gt;
-        &lt;g id="date" transform="translate(4.000000, 4.339342)"&gt;
-            &lt;rect id="square" stroke="#007D00" stroke-width="4" fill="#2CCF00" x="2" y="2" width="168" height="168" rx="8"&gt;&lt;/rect&gt;
-            &lt;g id="D" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero"&gt;
-                &lt;path d="M0,0 L34.716,0 C40.788,0 46.332,0.968 51.348,2.904 C56.364,4.84 60.632,7.722 64.152,11.55 C67.672,15.378 70.4,20.174 72.336,25.938 C74.272,31.702 75.24,38.412 75.24,46.068 C75.24,53.724 74.272,60.434 72.336,66.198 C70.4,71.962 67.672,76.758 64.152,80.586 C60.632,84.414 56.364,87.296 51.348,89.232 C46.332,91.168 40.788,92.136 34.716,92.136 L0,92.136 L0,0 Z M34.716,74.316 C40.7,74.316 45.408,72.644 48.84,69.3 C52.272,65.956 53.988,60.588 53.988,53.196 L53.988,38.94 C53.988,31.548 52.272,26.18 48.84,22.836 C45.408,19.492 40.7,17.82 34.716,17.82 L20.064,17.82 L20.064,74.316 L34.716,74.316 Z"&gt;&lt;/path&gt;
-            &lt;/g&gt;
-        &lt;/g&gt;
-    &lt;/g&gt;
-&lt;/svg&gt;</td>
-    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left">&lt;div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'&gt;date_time&lt;/div&gt;&lt;div style='font-size: 11px; color: gray;'&gt;Datetime(time_unit='us', time_zone=None)&lt;/div&gt;</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0&lt;br&gt;0</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">4&lt;br&gt;1</td>
+    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>date</title>
+    <g id="icon-1-icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-1-date" transform="translate(4.000000, 4.339342)">
+            <rect id="icon-1-square" stroke="#007D00" stroke-width="4" fill="#2CCF00" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="icon-1-D" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero">
+                <path d="M0,0 L34.716,0 C40.788,0 46.332,0.968 51.348,2.904 C56.364,4.84 60.632,7.722 64.152,11.55 C67.672,15.378 70.4,20.174 72.336,25.938 C74.272,31.702 75.24,38.412 75.24,46.068 C75.24,53.724 74.272,60.434 72.336,66.198 C70.4,71.962 67.672,76.758 64.152,80.586 C60.632,84.414 56.364,87.296 51.348,89.232 C46.332,91.168 40.788,92.136 34.716,92.136 L0,92.136 L0,0 Z M34.716,74.316 C40.7,74.316 45.408,72.644 48.84,69.3 C52.272,65.956 53.988,60.588 53.988,53.196 L53.988,38.94 C53.988,31.548 52.272,26.18 48.84,22.836 C45.408,19.492 40.7,17.82 34.716,17.82 L20.064,17.82 L20.064,74.316 L34.716,74.316 Z"></path>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">date_time</div><div style="font-size: 11px; color: gray;">Datetime(time_unit='us', time_zone=None)</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">4<br>1</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">-</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">-</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">2016&lt;br&gt;01&lt;br&gt;04 00:32:00</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">2016<br>01<br>04 00:32:00</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">-</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">-</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">-</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">-</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p95" class="gt_row gt_center">-</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="max" class="gt_row gt_center">2016&lt;br&gt;01&lt;br&gt;11 06:15:00</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="max" class="gt_row gt_center">2016<br>01<br>11 06:15:00</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="iqr" class="gt_row gt_center">-</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left">&lt;svg width="24px" viewBox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;"&gt;
-    &lt;title&gt;date&lt;/title&gt;
-    &lt;g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"&gt;
-        &lt;g id="date" transform="translate(4.000000, 4.339342)"&gt;
-            &lt;rect id="square" stroke="#007D00" stroke-width="4" fill="#2CCF00" x="2" y="2" width="168" height="168" rx="8"&gt;&lt;/rect&gt;
-            &lt;g id="D" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero"&gt;
-                &lt;path d="M0,0 L34.716,0 C40.788,0 46.332,0.968 51.348,2.904 C56.364,4.84 60.632,7.722 64.152,11.55 C67.672,15.378 70.4,20.174 72.336,25.938 C74.272,31.702 75.24,38.412 75.24,46.068 C75.24,53.724 74.272,60.434 72.336,66.198 C70.4,71.962 67.672,76.758 64.152,80.586 C60.632,84.414 56.364,87.296 51.348,89.232 C46.332,91.168 40.788,92.136 34.716,92.136 L0,92.136 L0,0 Z M34.716,74.316 C40.7,74.316 45.408,72.644 48.84,69.3 C52.272,65.956 53.988,60.588 53.988,53.196 L53.988,38.94 C53.988,31.548 52.272,26.18 48.84,22.836 C45.408,19.492 40.7,17.82 34.716,17.82 L20.064,17.82 L20.064,74.316 L34.716,74.316 Z"&gt;&lt;/path&gt;
-            &lt;/g&gt;
-        &lt;/g&gt;
-    &lt;/g&gt;
-&lt;/svg&gt;</td>
-    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left">&lt;div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'&gt;date&lt;/div&gt;&lt;div style='font-size: 11px; color: gray;'&gt;Date&lt;/div&gt;</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0&lt;br&gt;0</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">3&lt;br&gt;0.75</td>
+    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>date</title>
+    <g id="icon-2-icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-2-date" transform="translate(4.000000, 4.339342)">
+            <rect id="icon-2-square" stroke="#007D00" stroke-width="4" fill="#2CCF00" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="icon-2-D" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero">
+                <path d="M0,0 L34.716,0 C40.788,0 46.332,0.968 51.348,2.904 C56.364,4.84 60.632,7.722 64.152,11.55 C67.672,15.378 70.4,20.174 72.336,25.938 C74.272,31.702 75.24,38.412 75.24,46.068 C75.24,53.724 74.272,60.434 72.336,66.198 C70.4,71.962 67.672,76.758 64.152,80.586 C60.632,84.414 56.364,87.296 51.348,89.232 C46.332,91.168 40.788,92.136 34.716,92.136 L0,92.136 L0,0 Z M34.716,74.316 C40.7,74.316 45.408,72.644 48.84,69.3 C52.272,65.956 53.988,60.588 53.988,53.196 L53.988,38.94 C53.988,31.548 52.272,26.18 48.84,22.836 C45.408,19.492 40.7,17.82 34.716,17.82 L20.064,17.82 L20.064,74.316 L34.716,74.316 Z"></path>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">date</div><div style="font-size: 11px; color: gray;">Date</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">3<br>0.75</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">-</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">-</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">2016&lt;br&gt;01&lt;br&gt;04</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">2016<br>01<br>04</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">-</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">-</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">-</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">-</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p95" class="gt_row gt_center">-</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="max" class="gt_row gt_center">2016&lt;br&gt;01&lt;br&gt;11</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="max" class="gt_row gt_center">2016<br>01<br>11</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="iqr" class="gt_row gt_center">-</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left">&lt;svg width="24px" viewBox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;"&gt;
-    &lt;title&gt;numeric&lt;/title&gt;
-    &lt;g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"&gt;
-        &lt;g id="numeric" transform="translate(4.000000, 4.339342)"&gt;
-            &lt;rect id="square" stroke="#640177" stroke-width="4" fill="#A400CF" x="2" y="2" width="168" height="168" rx="8"&gt;&lt;/rect&gt;
-            &lt;g id="N" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero"&gt;
-                &lt;polygon points="28.116 48.576 19.272 30.096 18.876 30.096 18.876 92.136 0 92.136 0 0 21.912 0 47.124 43.56 55.968 62.04 56.364 62.04 56.364 0 75.24 0 75.24 92.136 53.328 92.136"&gt;&lt;/polygon&gt;
-            &lt;/g&gt;
-        &lt;/g&gt;
-    &lt;/g&gt;
-&lt;/svg&gt;</td>
-    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left">&lt;div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'&gt;a&lt;/div&gt;&lt;div style='font-size: 11px; color: gray;'&gt;Int64&lt;/div&gt;</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0&lt;br&gt;0</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">3&lt;br&gt;0.75</td>
+    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>numeric</title>
+    <g id="icon-3-icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-3-numeric" transform="translate(4.000000, 4.339342)">
+            <rect id="icon-3-square" stroke="#640177" stroke-width="4" fill="#A400CF" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="icon-3-N" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero">
+                <polygon points="28.116 48.576 19.272 30.096 18.876 30.096 18.876 92.136 0 92.136 0 0 21.912 0 47.124 43.56 55.968 62.04 56.364 62.04 56.364 0 75.24 0 75.24 92.136 53.328 92.136"></polygon>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">a</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">3<br>0.75</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">2.75</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">0.96</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">2</td>
@@ -2010,20 +2010,20 @@ Mean failing value: 5151.6775</code></pre>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="iqr" class="gt_row gt_center">1.25</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left">&lt;svg width="24px" viewBox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;"&gt;
-    &lt;title&gt;string&lt;/title&gt;
-    &lt;g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"&gt;
-        &lt;g id="string" transform="translate(4.000000, 4.500000)"&gt;
-            &lt;rect id="square" stroke="#9A8700" stroke-width="4" fill="#CFB600" x="2" y="2" width="168" height="168" rx="8"&gt;&lt;/rect&gt;
-            &lt;g id="S" transform="translate(49.516000, 38.280000)" fill="#FFFFFF" fill-rule="nonzero"&gt;
-                &lt;path d="M34.98,95.304 C26.884,95.304 20.02,93.918 14.388,91.146 C8.756,88.374 3.96,84.788 0,80.388 L13.2,67.056 C19.448,74.096 27.148,77.616 36.3,77.616 C41.228,77.616 44.88,76.604 47.256,74.58 C49.632,72.556 50.82,69.872 50.82,66.528 C50.82,63.976 50.116,61.842 48.708,60.126 C47.3,58.41 44.44,57.244 40.128,56.628 L31.02,55.44 C21.252,54.208 14.102,51.26 9.57,46.596 C5.038,41.932 2.772,35.728 2.772,27.984 C2.772,23.848 3.564,20.064 5.148,16.632 C6.732,13.2 8.998,10.252 11.946,7.788 C14.894,5.324 18.502,3.41 22.77,2.046 C27.038,0.682 31.9,0 37.356,0 C44.308,0 50.424,1.1 55.704,3.3 C60.984,5.5 65.516,8.712 69.3,12.936 L55.968,26.4 C53.768,23.848 51.106,21.758 47.982,20.13 C44.858,18.502 40.92,17.688 36.168,17.688 C31.68,17.688 28.336,18.48 26.136,20.064 C23.936,21.648 22.836,23.848 22.836,26.664 C22.836,29.832 23.694,32.12 25.41,33.528 C27.126,34.936 29.92,35.948 33.792,36.564 L42.9,38.016 C52.404,39.512 59.444,42.438 64.02,46.794 C68.596,51.15 70.884,57.332 70.884,65.34 C70.884,69.74 70.092,73.788 68.508,77.484 C66.924,81.18 64.614,84.348 61.578,86.988 C58.542,89.628 54.78,91.674 50.292,93.126 C45.804,94.578 40.7,95.304 34.98,95.304 Z"&gt;&lt;/path&gt;
-            &lt;/g&gt;
-        &lt;/g&gt;
-    &lt;/g&gt;
-&lt;/svg&gt;</td>
-    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left">&lt;div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'&gt;b&lt;/div&gt;&lt;div style='font-size: 11px; color: gray;'&gt;String&lt;/div&gt;</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0&lt;br&gt;0</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">4&lt;br&gt;1</td>
+    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>string</title>
+    <g id="icon-4-icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-4-string" transform="translate(4.000000, 4.500000)">
+            <rect id="icon-4-square" stroke="#9A8700" stroke-width="4" fill="#CFB600" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="icon-4-S" transform="translate(49.516000, 38.280000)" fill="#FFFFFF" fill-rule="nonzero">
+                <path d="M34.98,95.304 C26.884,95.304 20.02,93.918 14.388,91.146 C8.756,88.374 3.96,84.788 0,80.388 L13.2,67.056 C19.448,74.096 27.148,77.616 36.3,77.616 C41.228,77.616 44.88,76.604 47.256,74.58 C49.632,72.556 50.82,69.872 50.82,66.528 C50.82,63.976 50.116,61.842 48.708,60.126 C47.3,58.41 44.44,57.244 40.128,56.628 L31.02,55.44 C21.252,54.208 14.102,51.26 9.57,46.596 C5.038,41.932 2.772,35.728 2.772,27.984 C2.772,23.848 3.564,20.064 5.148,16.632 C6.732,13.2 8.998,10.252 11.946,7.788 C14.894,5.324 18.502,3.41 22.77,2.046 C27.038,0.682 31.9,0 37.356,0 C44.308,0 50.424,1.1 55.704,3.3 C60.984,5.5 65.516,8.712 69.3,12.936 L55.968,26.4 C53.768,23.848 51.106,21.758 47.982,20.13 C44.858,18.502 40.92,17.688 36.168,17.688 C31.68,17.688 28.336,18.48 26.136,20.064 C23.936,21.648 22.836,23.848 22.836,26.664 C22.836,29.832 23.694,32.12 25.41,33.528 C27.126,34.936 29.92,35.948 33.792,36.564 L42.9,38.016 C52.404,39.512 59.444,42.438 64.02,46.794 C68.596,51.15 70.884,57.332 70.884,65.34 C70.884,69.74 70.092,73.788 68.508,77.484 C66.924,81.18 64.614,84.348 61.578,86.988 C58.542,89.628 54.78,91.674 50.292,93.126 C45.804,94.578 40.7,95.304 34.98,95.304 Z"></path>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">b</div><div style="font-size: 11px; color: gray;">String</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">4<br>1</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">9</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">0</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">9</td>
@@ -2036,20 +2036,20 @@ Mean failing value: 5151.6775</code></pre>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="iqr" class="gt_row gt_center">0</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left">&lt;svg width="24px" viewBox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;"&gt;
-    &lt;title&gt;numeric&lt;/title&gt;
-    &lt;g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"&gt;
-        &lt;g id="numeric" transform="translate(4.000000, 4.339342)"&gt;
-            &lt;rect id="square" stroke="#640177" stroke-width="4" fill="#A400CF" x="2" y="2" width="168" height="168" rx="8"&gt;&lt;/rect&gt;
-            &lt;g id="N" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero"&gt;
-                &lt;polygon points="28.116 48.576 19.272 30.096 18.876 30.096 18.876 92.136 0 92.136 0 0 21.912 0 47.124 43.56 55.968 62.04 56.364 62.04 56.364 0 75.24 0 75.24 92.136 53.328 92.136"&gt;&lt;/polygon&gt;
-            &lt;/g&gt;
-        &lt;/g&gt;
-    &lt;/g&gt;
-&lt;/svg&gt;</td>
-    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left">&lt;div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'&gt;c&lt;/div&gt;&lt;div style='font-size: 11px; color: gray;'&gt;Int64&lt;/div&gt;</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">1&lt;br&gt;0.25</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">4&lt;br&gt;1</td>
+    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>numeric</title>
+    <g id="icon-5-icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-5-numeric" transform="translate(4.000000, 4.339342)">
+            <rect id="icon-5-square" stroke="#640177" stroke-width="4" fill="#A400CF" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="icon-5-N" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero">
+                <polygon points="28.116 48.576 19.272 30.096 18.876 30.096 18.876 92.136 0 92.136 0 0 21.912 0 47.124 43.56 55.968 62.04 56.364 62.04 56.364 0 75.24 0 75.24 92.136 53.328 92.136"></polygon>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">c</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">1<br>0.25</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">4<br>1</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">5</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">2.65</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">3</td>
@@ -2062,20 +2062,20 @@ Mean failing value: 5151.6775</code></pre>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="iqr" class="gt_row gt_center">2.5</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left">&lt;svg width="24px" viewBox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;"&gt;
-    &lt;title&gt;numeric&lt;/title&gt;
-    &lt;g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"&gt;
-        &lt;g id="numeric" transform="translate(4.000000, 4.339342)"&gt;
-            &lt;rect id="square" stroke="#640177" stroke-width="4" fill="#A400CF" x="2" y="2" width="168" height="168" rx="8"&gt;&lt;/rect&gt;
-            &lt;g id="N" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero"&gt;
-                &lt;polygon points="28.116 48.576 19.272 30.096 18.876 30.096 18.876 92.136 0 92.136 0 0 21.912 0 47.124 43.56 55.968 62.04 56.364 62.04 56.364 0 75.24 0 75.24 92.136 53.328 92.136"&gt;&lt;/polygon&gt;
-            &lt;/g&gt;
-        &lt;/g&gt;
-    &lt;/g&gt;
-&lt;/svg&gt;</td>
-    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left">&lt;div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'&gt;d&lt;/div&gt;&lt;div style='font-size: 11px; color: gray;'&gt;Float64&lt;/div&gt;</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0&lt;br&gt;0</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">4&lt;br&gt;1</td>
+    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>numeric</title>
+    <g id="icon-6-icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-6-numeric" transform="translate(4.000000, 4.339342)">
+            <rect id="icon-6-square" stroke="#640177" stroke-width="4" fill="#A400CF" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="icon-6-N" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero">
+                <polygon points="28.116 48.576 19.272 30.096 18.876 30.096 18.876 92.136 0 92.136 0 0 21.912 0 47.124 43.56 55.968 62.04 56.364 62.04 56.364 0 75.24 0 75.24 92.136 53.328 92.136"></polygon>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">d</div><div style="font-size: 11px; color: gray;">Float64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">4<br>1</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">5,151.68</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">3,242.49</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">3291.03</td>
@@ -2088,24 +2088,24 @@ Mean failing value: 5151.6775</code></pre>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="iqr" class="gt_row gt_center">2,029.07</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left">&lt;svg width="24px" viewBox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;"&gt;
-    &lt;title&gt;boolean&lt;/title&gt;
-    &lt;g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"&gt;
-        &lt;g id="boolean" transform="translate(4.000000, 4.339342)"&gt;
-            &lt;rect id="square" stroke="#9C3E00" stroke-width="4" fill="#CF6100" x="2" y="2" width="168" height="168" rx="8"&gt;&lt;/rect&gt;
-            &lt;g id="T" transform="translate(32.322000, 29.972000)" fill="#FFFFFF" fill-rule="nonzero"&gt;
-                &lt;polygon points="29.326 11.61 29.326 60.028 16.254 60.028 16.254 11.61 0 11.61 0 0 45.58 0 45.58 11.61"&gt;&lt;/polygon&gt;
-            &lt;/g&gt;
-            &lt;g id="F" transform="translate(99.122000, 81.972000)" fill="#FFFFFF" fill-rule="nonzero"&gt;
-                &lt;polygon points="0 60.028 0 0 39.818 0 39.818 11.61 13.072 11.61 13.072 23.908 35.862 23.908 35.862 35.432 13.072 35.432 13.072 60.028"&gt;&lt;/polygon&gt;
-            &lt;/g&gt;
-            &lt;rect id="line" stroke="#FFFFFF" fill="#FFFFFF" transform="translate(82.022437, 84.377940) rotate(-315.000000) translate(-82.022437, -84.377940) " x="78.0224369" y="25.37794" width="8" height="118"&gt;&lt;/rect&gt;
-        &lt;/g&gt;
-    &lt;/g&gt;
-&lt;/svg&gt;</td>
-    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left">&lt;div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'&gt;e&lt;/div&gt;&lt;div style='font-size: 11px; color: gray;'&gt;Boolean&lt;/div&gt;</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0&lt;br&gt;0</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">&lt;span style='font-weight: bold;'&gt;T&lt;/span&gt;0.75&lt;br&gt;&lt;span style='font-weight: bold;'&gt;F&lt;/span&gt;0.25</td>
+    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>boolean</title>
+    <g id="icon-7-icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-7-boolean" transform="translate(4.000000, 4.339342)">
+            <rect id="icon-7-square" stroke="#9C3E00" stroke-width="4" fill="#CF6100" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="icon-7-T" transform="translate(32.322000, 29.972000)" fill="#FFFFFF" fill-rule="nonzero">
+                <polygon points="29.326 11.61 29.326 60.028 16.254 60.028 16.254 11.61 0 11.61 0 0 45.58 0 45.58 11.61"></polygon>
+            </g>
+            <g id="icon-7-F" transform="translate(99.122000, 81.972000)" fill="#FFFFFF" fill-rule="nonzero">
+                <polygon points="0 60.028 0 0 39.818 0 39.818 11.61 13.072 11.61 13.072 23.908 35.862 23.908 35.862 35.432 13.072 35.432 13.072 60.028"></polygon>
+            </g>
+            <rect id="icon-7-line" stroke="#FFFFFF" fill="#FFFFFF" transform="translate(82.022437, 84.377940) rotate(-315.000000) translate(-82.022437, -84.377940) " x="78.0224369" y="25.37794" width="8" height="118"></rect>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">e</div><div style="font-size: 11px; color: gray;">Boolean</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center"><span style="font-weight: bold;">T</span>0.75<br><span style="font-weight: bold;">F</span>0.25</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">-</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">-</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">-</td>
@@ -2118,20 +2118,20 @@ Mean failing value: 5151.6775</code></pre>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="iqr" class="gt_row gt_center">-</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left">&lt;svg width="24px" viewBox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;"&gt;
-    &lt;title&gt;string&lt;/title&gt;
-    &lt;g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"&gt;
-        &lt;g id="string" transform="translate(4.000000, 4.500000)"&gt;
-            &lt;rect id="square" stroke="#9A8700" stroke-width="4" fill="#CFB600" x="2" y="2" width="168" height="168" rx="8"&gt;&lt;/rect&gt;
-            &lt;g id="S" transform="translate(49.516000, 38.280000)" fill="#FFFFFF" fill-rule="nonzero"&gt;
-                &lt;path d="M34.98,95.304 C26.884,95.304 20.02,93.918 14.388,91.146 C8.756,88.374 3.96,84.788 0,80.388 L13.2,67.056 C19.448,74.096 27.148,77.616 36.3,77.616 C41.228,77.616 44.88,76.604 47.256,74.58 C49.632,72.556 50.82,69.872 50.82,66.528 C50.82,63.976 50.116,61.842 48.708,60.126 C47.3,58.41 44.44,57.244 40.128,56.628 L31.02,55.44 C21.252,54.208 14.102,51.26 9.57,46.596 C5.038,41.932 2.772,35.728 2.772,27.984 C2.772,23.848 3.564,20.064 5.148,16.632 C6.732,13.2 8.998,10.252 11.946,7.788 C14.894,5.324 18.502,3.41 22.77,2.046 C27.038,0.682 31.9,0 37.356,0 C44.308,0 50.424,1.1 55.704,3.3 C60.984,5.5 65.516,8.712 69.3,12.936 L55.968,26.4 C53.768,23.848 51.106,21.758 47.982,20.13 C44.858,18.502 40.92,17.688 36.168,17.688 C31.68,17.688 28.336,18.48 26.136,20.064 C23.936,21.648 22.836,23.848 22.836,26.664 C22.836,29.832 23.694,32.12 25.41,33.528 C27.126,34.936 29.92,35.948 33.792,36.564 L42.9,38.016 C52.404,39.512 59.444,42.438 64.02,46.794 C68.596,51.15 70.884,57.332 70.884,65.34 C70.884,69.74 70.092,73.788 68.508,77.484 C66.924,81.18 64.614,84.348 61.578,86.988 C58.542,89.628 54.78,91.674 50.292,93.126 C45.804,94.578 40.7,95.304 34.98,95.304 Z"&gt;&lt;/path&gt;
-            &lt;/g&gt;
-        &lt;/g&gt;
-    &lt;/g&gt;
-&lt;/svg&gt;</td>
-    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left">&lt;div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'&gt;f&lt;/div&gt;&lt;div style='font-size: 11px; color: gray;'&gt;String&lt;/div&gt;</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0&lt;br&gt;0</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">3&lt;br&gt;0.75</td>
+    <td style="font-family: IBM Plex Mono;" headers="icon" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>string</title>
+    <g id="icon-8-icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-8-string" transform="translate(4.000000, 4.500000)">
+            <rect id="icon-8-square" stroke="#9A8700" stroke-width="4" fill="#CFB600" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="icon-8-S" transform="translate(49.516000, 38.280000)" fill="#FFFFFF" fill-rule="nonzero">
+                <path d="M34.98,95.304 C26.884,95.304 20.02,93.918 14.388,91.146 C8.756,88.374 3.96,84.788 0,80.388 L13.2,67.056 C19.448,74.096 27.148,77.616 36.3,77.616 C41.228,77.616 44.88,76.604 47.256,74.58 C49.632,72.556 50.82,69.872 50.82,66.528 C50.82,63.976 50.116,61.842 48.708,60.126 C47.3,58.41 44.44,57.244 40.128,56.628 L31.02,55.44 C21.252,54.208 14.102,51.26 9.57,46.596 C5.038,41.932 2.772,35.728 2.772,27.984 C2.772,23.848 3.564,20.064 5.148,16.632 C6.732,13.2 8.998,10.252 11.946,7.788 C14.894,5.324 18.502,3.41 22.77,2.046 C27.038,0.682 31.9,0 37.356,0 C44.308,0 50.424,1.1 55.704,3.3 C60.984,5.5 65.516,8.712 69.3,12.936 L55.968,26.4 C53.768,23.848 51.106,21.758 47.982,20.13 C44.858,18.502 40.92,17.688 36.168,17.688 C31.68,17.688 28.336,18.48 26.136,20.064 C23.936,21.648 22.836,23.848 22.836,26.664 C22.836,29.832 23.694,32.12 25.41,33.528 C27.126,34.936 29.92,35.948 33.792,36.564 L42.9,38.016 C52.404,39.512 59.444,42.438 64.02,46.794 C68.596,51.15 70.884,57.332 70.884,65.34 C70.884,69.74 70.092,73.788 68.508,77.484 C66.924,81.18 64.614,84.348 61.578,86.988 C58.542,89.628 54.78,91.674 50.292,93.126 C45.804,94.578 40.7,95.304 34.98,95.304 Z"></path>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" headers="colname" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">f</div><div style="font-size: 11px; color: gray;">String</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_missing" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="n_unique" class="gt_row gt_center">3<br>0.75</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">3.25</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">0.5</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">3</td>
@@ -2177,7 +2177,7 @@ Mean failing value: 5151.6775</code></pre>
 <li><strong>Pattern Recognition</strong>: identifying systemic issues by analyzing groups of failing records</li>
 </ol>
 <p>Here’s an example of using extracts to create a corrective action plan:</p>
-<div id="3aaed6f8" class="cell" data-execution_count="16">
+<div id="82350c25" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a new sample of an extract DF</span></span>
