@@ -15,6 +15,8 @@ from pointblank._utils_ai import (
     _PromptBuilder,
     _ValidationResponseParser,
     _AIValidationEngine,
+    _ANTHROPIC_MAX_TOKENS,
+    _chat_reply,
     _create_chat_instance,
 )
 
@@ -959,10 +961,12 @@ def test_create_chat_instance_anthropic():
     pytest.importorskip("anthropic")
     chatlas = pytest.importorskip("chatlas")
 
-    chat = _create_chat_instance("anthropic", "claude-sonnet-4-5", api_key="test-key")
+    chat = _create_chat_instance("anthropic", "claude-sonnet-5-5", api_key="test-key")
 
     assert isinstance(chat, chatlas.Chat)
     assert chat.provider.name == "Anthropic"
+    # Thinking tokens count toward the limit, so chatlas's default of 4096 is too small
+    assert chat.provider._max_tokens == _ANTHROPIC_MAX_TOKENS
 
 
 def test_create_chat_instance_bedrock(monkeypatch):
@@ -974,20 +978,147 @@ def test_create_chat_instance_bedrock(monkeypatch):
     monkeypatch.setenv("AWS_ACCESS_KEY_ID", "test")
     monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "test")
 
-    chat = _create_chat_instance("bedrock", "us.anthropic.claude-sonnet-4-5-v1:0")
+    chat = _create_chat_instance("bedrock", "anthropic.claude-sonnet-5-5")
 
     assert isinstance(chat, chatlas.Chat)
     assert chat.provider.name == "AWS/Bedrock"
+    assert chat.provider._max_tokens == _ANTHROPIC_MAX_TOKENS
 
 
 def test_create_chat_instance_openai():
     pytest.importorskip("openai")
     chatlas = pytest.importorskip("chatlas")
 
-    chat = _create_chat_instance("openai", "gpt-4o", api_key="test-key")
+    chat = _create_chat_instance("openai", "gpt-6-luna", api_key="test-key")
 
     assert isinstance(chat, chatlas.Chat)
     assert chat.provider.name == "OpenAI"
+
+
+def _anthropic_reply(stop_reason):
+    return {
+        "id": "msg_1",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-sonnet-5-5",
+        "content": [{"type": "text", "text": "```python\nimport pointblank as pb\n"}],
+        "stop_reason": stop_reason,
+        "stop_sequence": None,
+        "usage": {"input_tokens": 10, "output_tokens": 16000},
+    }
+
+
+def _openai_reply(path, cut_off):
+    # Older chatlas versions use the Chat Completions API, and newer ones the Responses API
+    if path.endswith("/responses"):
+        return {
+            "id": "resp_1",
+            "object": "response",
+            "created_at": 0,
+            "model": "gpt-6-luna",
+            "status": "incomplete" if cut_off else "completed",
+            "incomplete_details": {"reason": "max_output_tokens"} if cut_off else None,
+            "output": [
+                {
+                    "type": "message",
+                    "id": "msg_1",
+                    "status": "completed",
+                    "role": "assistant",
+                    "content": [{"type": "output_text", "text": "[", "annotations": []}],
+                }
+            ],
+            "parallel_tool_calls": False,
+            "tool_choice": "auto",
+            "tools": [],
+            "usage": {
+                "input_tokens": 1,
+                "output_tokens": 1,
+                "total_tokens": 2,
+                "input_tokens_details": {"cached_tokens": 0},
+                "output_tokens_details": {"reasoning_tokens": 0},
+            },
+        }
+    return {
+        "id": "chatcmpl_1",
+        "object": "chat.completion",
+        "created": 0,
+        "model": "gpt-6-luna",
+        "choices": [
+            {
+                "index": 0,
+                "message": {"role": "assistant", "content": "["},
+                "finish_reason": "length" if cut_off else "stop",
+            }
+        ],
+        "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
+    }
+
+
+def _chat_over_mock_transport(provider, cut_off):
+    """A real chatlas chat whose requests get a canned reply instead of reaching the API."""
+    import importlib
+
+    from pointblank._utils_ai import _http_library
+
+    chatlas = pytest.importorskip("chatlas")
+    pytest.importorskip(provider)
+    httpx = importlib.import_module(_http_library(provider))
+
+    def handler(request):
+        if provider == "anthropic":
+            body = _anthropic_reply("max_tokens" if cut_off else "end_turn")
+        else:
+            body = _openai_reply(request.url.path, cut_off)
+        return httpx.Response(200, json=body)
+
+    chat_class = chatlas.ChatAnthropic if provider == "anthropic" else chatlas.ChatOpenAI
+    model = "claude-sonnet-5-5" if provider == "anthropic" else "gpt-6-luna"
+    return chat_class(
+        model=model,
+        api_key="test-key",
+        kwargs={"http_client": httpx.Client(transport=httpx.MockTransport(handler))},
+    )
+
+
+@pytest.mark.filterwarnings("ignore:Response was truncated")
+@pytest.mark.parametrize("provider", ["anthropic", "openai"])
+def test_chat_reply_raises_when_the_reply_is_cut_off(provider):
+    chat = _chat_over_mock_transport(provider, cut_off=True)
+
+    with pytest.raises(RuntimeError, match="cut off at its output-token limit"):
+        _chat_reply(chat, "Draft a validation plan")
+
+
+@pytest.mark.parametrize("provider", ["anthropic", "openai"])
+def test_chat_reply_returns_a_complete_reply(provider):
+    chat = _chat_over_mock_transport(provider, cut_off=False)
+
+    assert _chat_reply(chat, "Draft a validation plan") in (
+        "```python\nimport pointblank as pb\n",
+        "[",
+    )
+
+
+def test_chat_reply_without_turn_information():
+    """Chats that can't report a finish reason (e.g., test doubles) still give their reply."""
+    chat = Mock(spec=["chat"])
+    chat.chat.return_value = "[]"
+
+    assert _chat_reply(chat, "prompt") == "[]"
+
+
+@patch("pointblank._utils_ai._create_chat_instance")
+def test_validate_batches_raises_when_every_reply_is_cut_off(mock_create_chat, llm_config):
+    from pointblank._interrogation import StepEvaluationError
+
+    mock_chat = Mock()
+    mock_chat.chat.return_value = '[{"index": 0, "result": tr'
+    mock_chat.get_last_turn.return_value.finish_reason = "max_tokens"
+    mock_create_chat.return_value = mock_chat
+    engine = _AIValidationEngine(llm_config)
+
+    with pytest.raises(StepEvaluationError, match="cut off at its output-token limit"):
+        engine.validate_batches(_two_batches(), _PromptBuilder("Check if age > 18"))
 
 
 @pytest.mark.parametrize(
