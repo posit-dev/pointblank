@@ -5109,7 +5109,7 @@ def edit(
 
     \b
     pb edit plan.py -i "add a not-null check on user_id" -m anthropic:claude-opus-4-8
-    pb edit plan.yaml -i "tighten the price range to 0-1000" -m openai:gpt-4o --data sales.csv
+    pb edit plan.yaml -i "tighten the price range to 0-1000" -m openai:gpt-6-luna --data sales.csv
     pb edit plan.py -i "drop the email regex check" -m anthropic:claude-opus-4-8 -o plan2.py -y
     """
     if not validation_file:
