@@ -4,7 +4,7 @@ Get a report of the validation results as a JSON-formatted string.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20108-L20280)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20219-L20391)
 
 ``` python
 Validate.get_json_report(
@@ -108,8 +108,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-26T17:01:42.910+00:00",
-            "proc_duration_s": 0.008468
+            "time_processed": "2026-10-26T20:11:34.698+00:00",
+            "proc_duration_s": 0.00681
         },
         {
             "i": 2,
@@ -135,8 +135,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-26T17:01:42.913+00:00",
-            "proc_duration_s": 0.003009
+            "time_processed": "2026-10-26T20:11:34.700+00:00",
+            "proc_duration_s": 0.002308
         }
     ]
 

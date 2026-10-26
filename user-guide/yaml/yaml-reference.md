@@ -256,6 +256,14 @@ steps:
     brief: "Values must be > 100"      # OPTIONAL: Step description
 ```
 
+To compare against the data in another column, give the column as the value. It can be written directly or in a `python:` block:
+
+``` yaml
+- col_vals_gt:
+    columns: [column_name]
+    value: pb.col("other_column")      # Same as `value: {python: pb.col("other_column")}`
+```
+
 [col_vals_lt](../../reference/Validate.col_vals_lt.md#pointblank.Validate.col_vals_lt): are column data less than a fixed value or data in another column?
 
 ``` yaml
@@ -457,6 +465,16 @@ Examples:
 - col_vals_within_spec:
     columns: account_number
     spec: "iban[DE]"
+```
+
+[col_vals_str_len](../../reference/Validate.col_vals_str_len.md#pointblank.Validate.col_vals_str_len): are string lengths within a range?
+
+``` yaml
+- col_vals_str_len:
+    columns: [column_name]             # REQUIRED: Column(s) to validate
+    min_val: 2                         # OPTIONAL: Minimum length (at least one bound needed)
+    max_val: 10                        # OPTIONAL: Maximum length
+    na_pass: false                     # OPTIONAL: Pass NULL values
 ```
 
 #### Custom Expression Methods
@@ -969,6 +987,7 @@ These parameters are available for most validation methods:
 - `columns`: column selection (string, list, or selector expression)
 - `na_pass`: whether to pass NULL/missing values (boolean, default: false)
 - `pre`: data preprocessing function (Python lambda expression)
+- `segments`: split the step by segment; a column name (one step per distinct value), or a list of column names and two-item `[column, value]` pairs (e.g., `[region, [quarter, Q1]]`), where the value can also be a list of values
 - `thresholds`: step-level failure thresholds (dict)
 - `actions`: step-level failure actions (dict)
 - `brief`: step description (string, boolean, or template)

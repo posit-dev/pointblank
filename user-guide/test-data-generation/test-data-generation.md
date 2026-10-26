@@ -730,19 +730,19 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=200, seed=23, country=["US", "DE", "JP"]))
 ```
 
-| PolarsRows200Columns3 |                  |                   |                   |
-|-----------------------|------------------|-------------------|-------------------|
-|                       | name *String*    | city *String*     | postcode *String* |
-| 1                     | Jürgen Voigt     | Essen             | 45623             |
-| 2                     | Hiroshi Honda    | Chiba             | 260-1449          |
-| 3                     | Cynthia Bailey   | Columbus          | 31986             |
-| 4                     | Emma Nguyen      | San Francisco     | 94137             |
-| 5                     | Pauline Schwarz  | Duisburg          | 47966             |
-| 196                   | Masashi Sugiyama | Obihiro           | 080-8359          |
-| 197                   | Dorothy Price    | St. Paul          | 55182             |
-| 198                   | Maya Gardner     | Rockville         | 20837             |
-| 199                   | Melanie Thiel    | Frankfurt am Main | 60260             |
-| 200                   | Tatsuya Naito    | Sagamihara        | 252-4327          |
+| PolarsRows200Columns3 |                  |               |                   |
+|-----------------------|------------------|---------------|-------------------|
+|                       | name *String*    | city *String* | postcode *String* |
+| 1                     | Nicole Schmidt   | Hannover      | 30034             |
+| 2                     | Kazunori Yoshida | Asahikawa     | 070-1382          |
+| 3                     | Melissa Roberts  | Las Vegas     | 89144             |
+| 4                     | John Sanchez     | Los Angeles   | 90018             |
+| 5                     | Julia Doherty    | Munich        | 80474             |
+| 196                   | Jun Nakajima     | Ichinomiya    | 491-7779          |
+| 197                   | Atlas Lewis      | Peoria        | 61688             |
+| 198                   | Jerry Horn       | Columbus      | 31918             |
+| 199                   | Rüdiger Kaiser   | Dortmund      | 44311             |
+| 200                   | Yukihiro Osawa   | Narashino     | 275-3684          |
 
 To control the proportion of rows per country, pass a dict mapping country codes to weights. The following generates 200 rows with 70% from the US, 20% from Germany, and 10% from France:
 
@@ -758,16 +758,16 @@ pb.preview(
 | PolarsRows200Columns3 |                  |               |                   |
 |-----------------------|------------------|---------------|-------------------|
 |                       | name *String*    | city *String* | postcode *String* |
-| 1                     | Scott Morgan     | Dallas        | 75220             |
-| 2                     | Jörg Blum        | Braunschweig  | 38997             |
-| 3                     | Lisa Hughes      | Columbus      | 31902             |
-| 4                     | Elizabeth Gibson | San Francisco | 94166             |
-| 5                     | Ella Torres      | Philadelphia  | 19190             |
-| 196                   | Michael Werner   | Bochum        | 44341             |
-| 197                   | Amanda Vasquez   | St. Paul      | 55170             |
-| 198                   | Jose Ross        | Rockville     | 20866             |
-| 199                   | George Thompson  | El Paso       | 79971             |
-| 200                   | Maxime Bigot     | Vieux Lyon    | 69020             |
+| 1                     | Tyler Peters     | St. Paul      | 55146             |
+| 2                     | Clemens Schwarz  | Munich        | 80824             |
+| 3                     | Logan Shelton    | Las Vegas     | 89181             |
+| 4                     | David Santiago   | Los Angeles   | 90000             |
+| 5                     | Carol Washington | Jacksonville  | 32217             |
+| 196                   | Marc Kurz        | Bremen        | 28201             |
+| 197                   | John Sanchez     | Peoria        | 61641             |
+| 198                   | Michael Wright   | Columbus      | 31963             |
+| 199                   | Elizabeth Davis  | Dallas        | 75234             |
+| 200                   | Mathieu Lesage   | Rouen         | 76072             |
 
 Weights are auto-normalized, so `{"US": 7, "DE": 2, "FR": 1}` is equivalent to the example above. Row counts are allocated using largest-remainder apportionment, ensuring they always sum to exactly `n`.
 
@@ -782,19 +782,19 @@ pb.preview(
 )
 ```
 
-| PolarsRows120Columns3 |                   |                |                   |
-|-----------------------|-------------------|----------------|-------------------|
-|                       | name *String*     | city *String*  | postcode *String* |
-| 1                     | Debra Lee         | El Paso        | 79923             |
-| 2                     | Nancy McIntosh    | San Diego      | 92195             |
-| 3                     | Susan Wright      | Seattle        | 98161             |
-| 4                     | Teresa Nichols    | Port St. Lucie | 34975             |
-| 5                     | Joyce Ross        | St. Paul       | 55148             |
-| 116                   | Shogo Kato        | Kobe           | 650-0964          |
-| 117                   | Masaki Omura      | Osaka          | 530-4787          |
-| 118                   | Akihiro Takahashi | Chiba          | 260-5539          |
-| 119                   | Kazuki Ando       | Machida        | 194-5768          |
-| 120                   | Mitsutaka Aida    | Hiroshima      | 730-4205          |
+| PolarsRows120Columns3 |                |               |                   |
+|-----------------------|----------------|---------------|-------------------|
+|                       | name *String*  | city *String* | postcode *String* |
+| 1                     | Kevin Schaefer | Chicago       | 60627             |
+| 2                     | Zachary Martin | Ann Arbor     | 48173             |
+| 3                     | Nancy Ramirez  | Buffalo       | 14260             |
+| 4                     | Karen Herrera  | Lafayette     | 70588             |
+| 5                     | Ian Maxwell    | Peoria        | 61658             |
+| 116                   | Reiko Kato     | Asahikawa     | 070-4435          |
+| 117                   | Akira Maruyama | Higashiosaka  | 577-0674          |
+| 118                   | Hayato Miyata  | Sendai        | 980-3412          |
+| 119                   | Yukio Goto     | Kobe          | 650-3032          |
+| 120                   | Kosuke Aoki    | Nakano        | 164-6058          |
 
 All coherence systems (address, person, business) work correctly within each country's batch of rows. A French row will have a French name with a matching French email; a Japanese row will have a Japanese name with a matching Japanese email. Non-preset columns (integers, floats, booleans, dates) are generated independently for each batch but still respect their field constraints.
 
@@ -852,19 +852,19 @@ pb.preview(
 )
 ```
 
-| PolarsRows200Columns2 |                 |               |
-|-----------------------|-----------------|---------------|
-|                       | name *String*   | city *String* |
-| 1                     | Chloe Manning   | Dallas        |
-| 2                     | Ignaz Schneider | Bremen        |
-| 3                     | Carl Mitchell   | Columbus      |
-| 4                     | Madison Wallace | San Francisco |
-| 5                     | Justin Carter   | Philadelphia  |
-| 196                   | Katrin Peters   | Munich        |
-| 197                   | Cheryl Mitchell | St. Paul      |
-| 198                   | Sarah Young     | Rockville     |
-| 199                   | Kelly Hernandez | El Paso       |
-| 200                   | Iris Haupt      | Dortmund      |
+| PolarsRows200Columns2 |                   |               |
+|-----------------------|-------------------|---------------|
+|                       | name *String*     | city *String* |
+| 1                     | Carol Washington  | St. Paul      |
+| 2                     | Elias Lenz        | Stuttgart     |
+| 3                     | Archer Robinson   | Las Vegas     |
+| 4                     | Margaret Mitchell | Los Angeles   |
+| 5                     | Kenneth Wood      | Jacksonville  |
+| 196                   | Sascha Grün       | Braunschweig  |
+| 197                   | Grayson Alvarez   | Peoria        |
+| 198                   | Betty Adams       | Columbus      |
+| 199                   | Margaret Davis    | Dallas        |
+| 200                   | Christa Moritz    | Bremen        |
 
 All 100 supported country locales have tiered name and location data, so `weighted=True` produces realistic frequency distributions for every country.
 

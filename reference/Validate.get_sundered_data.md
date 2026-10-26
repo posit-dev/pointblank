@@ -4,7 +4,7 @@ Get the data that passed or failed the validation steps.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20282-L20443)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20393-L20554)
 
 ``` python
 Validate.get_sundered_data(type="pass")

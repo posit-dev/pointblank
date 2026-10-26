@@ -4,7 +4,7 @@ Validate whether row data are complete by having no missing values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12862-L13114)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12956-L13208)
 
 ``` python
 Validate.rows_complete(

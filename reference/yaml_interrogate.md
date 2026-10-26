@@ -4,7 +4,7 @@ Execute a YAML-based validation workflow.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L963-L1309)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L998-L1342)
 
 ``` python
 yaml_interrogate(
@@ -24,7 +24,7 @@ The YAML configuration defines the data source, validation steps, and optional s
 YAML configuration as string or file path. Can be: (1) a YAML string containing the validation configuration, or (2) a Path object or string path to a YAML file.
 
 `set_tbl: Any = None`  
-An optional table to override the table specified in the YAML configuration. This allows you to apply a YAML-defined validation workflow to a different table than what's specified in the configuration. If provided, this table will replace the table defined in the YAML's `tbl` field before executing the validation workflow. This can be any supported table type including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths, GitHub URLs, or database connection strings.
+An optional table to override the table specified in the YAML configuration. This allows you to apply a YAML-defined validation workflow to a different table than what's specified in the configuration. If provided, this table is used in place of the table defined in the YAML's `tbl` field (which is then not loaded, so it can be a placeholder or a source that isn't available). This can be any supported table type including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths, GitHub URLs, or database connection strings.
 
 `namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None`  
 Optional module namespaces to make available for Python code execution in YAML configurations. Can be a dictionary mapping aliases to module names or a list of module names. See the "Using Namespaces" section below for detailed examples.

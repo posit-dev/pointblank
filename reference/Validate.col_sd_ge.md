@@ -4,7 +4,7 @@ Does the column standard deviation satisfy a greater than or equal to comparison
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1265-L1302)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1266-L1303)
 
 ``` python
 Validate.col_sd_ge(
