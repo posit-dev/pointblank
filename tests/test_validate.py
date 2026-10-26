@@ -10035,7 +10035,13 @@ def test_get_sundered_data_mix_of_step_types(request, tbl_fixture) -> None:
     assert failed_data_rows[1] == (4, 7, 8)
 
 
-def test_comprehensive_validation_report_html_snap(snapshot) -> None:
+def test_comprehensive_validation_report_html_snap(snapshot, monkeypatch) -> None:
+    # Expression source capture needs Python 3.11+; pin it so the snapshot is version-independent
+    monkeypatch.setattr(
+        "pointblank.validate._get_caller_arg_source",
+        lambda **kwargs: 'pl.col("d") > pl.col("a")',
+    )
+
     validation = (
         Validate(
             data=load_dataset(),
