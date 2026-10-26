@@ -1521,7 +1521,12 @@ def interrogate_within_spec(
         # Route to database-native credit card validation
         return interrogate_credit_card_db(tbl, column, values, na_pass)
 
-    # For non-Ibis tables or other specs, materialize data and use Python validation
+    # For non-Ibis tables or other specs, materialize data and use Python validation; a Polars
+    # LazyFrame is collected here (it can't be indexed by column) and given back as a LazyFrame
+    is_polars_lazy = is_polars_lazyframe(native_tbl)
+    if is_polars_lazy:
+        nw_tbl = nw_tbl.collect()
+
     # Get the column data as a list
     col_data: Any = nw_tbl.select(column).to_native()
 
@@ -1593,6 +1598,9 @@ def interrogate_within_spec(
     result_tbl = result_tbl.with_columns(
         pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2")
     ).drop("pb_is_good_1", "pb_is_good_2")
+
+    if is_polars_lazy:
+        return result_tbl.to_native().lazy()
 
     return result_tbl.to_native()
 
