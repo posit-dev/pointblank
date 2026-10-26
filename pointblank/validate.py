@@ -20514,8 +20514,11 @@ class Validate:
         # and that the index is reset
         labeled_tbl_nw: nw.DataFrame | nw.LazyFrame | None = None
         for i, validation in enumerate(validation_info):
-            # Add row numbers to the results table
-            results_tbl = _with_row_index(validation.tbl_checked, name=index_name)
+            # Add row numbers to the results table (put on the same backend as the data first, as
+            # some steps materialize their results, and eager and lazy tables can't be joined)
+            results_tbl = _with_row_index(
+                _results_on_data_backend(validation.tbl_checked, data_nw), name=index_name
+            )
 
             # Add numerical suffix to the `pb_is_good_` column to make it unique
             results_tbl = results_tbl.select([index_name, "pb_is_good_"]).rename(
@@ -22440,6 +22443,19 @@ class Validate:
                 ],
             }
 
+        # Normalize `segments`: after interrogation, each segmented step holds a `(column, value)`
+        # pair (a list in the JSON report), which can't go into the string-typed column. It's
+        # only used for the `segmented` flag, so any non-null value is kept as JSON text.
+        segments = final_report.get("segments")
+        if isinstance(segments, list):
+            final_report = {
+                **final_report,
+                "segments": [
+                    s if s is None or isinstance(s, str) else json.dumps(s, default=str)
+                    for s in segments
+                ],
+            }
+
         if tbl_type == "polars":
             if not _is_lib_present(lib_name="polars"):
                 raise ImportError(
@@ -22946,6 +22962,49 @@ class Validate:
             return "some failing"
         else:
             return "all passed"
+
+
+def _results_on_data_backend(results_tbl: Any, data_nw: Any) -> Any:
+    """
+    Put a step's results table on the same backend as the target table, so the two can be joined.
+
+    Most steps give their results on the target table's backend, but some materialize them: e.g.,
+    `col_vals_in_table()` and the checksum specs of `col_vals_within_spec()` give an eager table for
+    a database table, and `conjointly()` does for a Polars LazyFrame. An eager result for a
+    database (Ibis) table becomes a memtable, cast to the table's column types so that the rows are
+    numbered in the same order by `_with_row_index()`.
+    """
+    results_nw = nw.from_native(results_tbl)
+    data_impl = data_nw.implementation
+    results_eager = isinstance(results_nw, nw.DataFrame)
+
+    if results_nw.implementation == data_impl and results_eager == isinstance(
+        data_nw, nw.DataFrame
+    ):
+        return results_tbl
+
+    if isinstance(data_nw, nw.DataFrame):
+        results_df = results_nw if results_eager else results_nw.collect()
+        if data_impl == nw.Implementation.PANDAS:
+            return results_df.to_pandas()
+        if data_impl == nw.Implementation.POLARS:
+            return results_df.to_polars()
+        return results_tbl  # pragma: no cover
+
+    if not results_eager:
+        return results_tbl  # pragma: no cover
+
+    if data_impl == nw.Implementation.POLARS:
+        return results_nw.to_polars().lazy()
+
+    if data_impl == nw.Implementation.IBIS:
+        import ibis
+
+        memtable = ibis.memtable(results_nw.to_native())
+        data_schema = data_nw.to_native().schema()
+        return memtable.cast({c: data_schema[c] for c in memtable.columns if c in data_schema})
+
+    return results_tbl  # pragma: no cover
 
 
 def _normalize_reporting_language(lang: str | None) -> str:

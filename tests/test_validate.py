@@ -9930,6 +9930,105 @@ def test_get_sundered_data_lazy_preserves_row_order() -> None:
     assert_frame_equal(sundered_data_fail.collect(), expected_fail)
 
 
+_SUNDER_TBL = pl.DataFrame(
+    {
+        "id": [3, 1, 4, 2, 5, 6],
+        "isbn": [
+            "978-0-306-40615-7",
+            "978-0-306-40615-8",
+            "0-306-40615-2",
+            "0-306-40615-3",
+            None,
+            "978-0-306-40615-7",
+        ],
+        "g": ["p", "q", "r", "p", "q", "s"],
+    }
+)
+
+
+def _sunder_tbl(tbl_type: str):
+    if tbl_type == "polars":
+        return _SUNDER_TBL
+    if tbl_type == "lazy":
+        return _SUNDER_TBL.lazy()
+    if tbl_type == "pandas":
+        return _SUNDER_TBL.to_pandas()
+    if tbl_type == "duckdb":
+        return ibis.memtable(_SUNDER_TBL)
+    return ibis.sqlite.connect().create_table("sunder_tbl", _SUNDER_TBL.to_pandas())
+
+
+def _sorted_ids(tbl) -> list:
+    if isinstance(tbl, pl.LazyFrame):
+        tbl = tbl.collect()
+    elif hasattr(tbl, "execute"):
+        tbl = tbl.execute()
+    return sorted(nw.from_native(tbl)["id"].to_list())
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "lazy", "pandas", "duckdb", "sqlite"])
+@pytest.mark.parametrize(
+    "add_step, expected_pass",
+    [
+        # Steps that materialize their results: `col_vals_in_table()` and the checksum specs of
+        # `col_vals_within_spec()` give an eager table for a database table
+        (
+            lambda v: v.col_vals_in_table(
+                columns="g", ref_table=pl.DataFrame({"g": ["p", "q"]}), ref_column="g"
+            ),
+            [1, 2, 3, 5],
+        ),
+        (lambda v: v.col_vals_within_spec(columns="isbn", spec="isbn"), [3, 4, 6]),
+    ],
+    ids=["in_table", "isbn"],
+)
+def test_get_sundered_data_with_materialized_results(tbl_type, add_step, expected_pass) -> None:
+    validation = add_step(Validate(_sunder_tbl(tbl_type)).col_vals_gt(columns="id", value=0))
+    validation = validation.interrogate()
+
+    assert not any(vi.eval_error for vi in validation.validation_info)
+
+    sundered_pass = validation.get_sundered_data(type="pass")
+    sundered_fail = validation.get_sundered_data(type="fail")
+
+    assert type(sundered_pass) is type(_sunder_tbl(tbl_type))
+    assert _sorted_ids(sundered_pass) == expected_pass
+    assert _sorted_ids(sundered_fail) == sorted(set(range(1, 7)) - set(expected_pass))
+
+
+def test_get_sundered_data_conjointly_lazy() -> None:
+    # `conjointly()` gives an eager result for a Polars LazyFrame
+    validation = (
+        Validate(_SUNDER_TBL.lazy())
+        .col_vals_gt(columns="id", value=1)
+        .conjointly(lambda df: pl.col("id") < 6, lambda df: pl.col("g") != "r")
+        .interrogate()
+    )
+
+    sundered_pass = validation.get_sundered_data(type="pass")
+
+    assert isinstance(sundered_pass, pl.LazyFrame)
+    assert _sorted_ids(sundered_pass) == [2, 3, 5]
+    assert _sorted_ids(validation.get_sundered_data(type="fail")) == [1, 4, 6]
+
+
+def test_col_vals_within_spec_checksum_on_lazyframe() -> None:
+    # The checksum specs collect a LazyFrame to check its values, and give a LazyFrame back
+    results = {}
+    for label, data in [("eager", _SUNDER_TBL), ("lazy", _SUNDER_TBL.lazy())]:
+        validation = Validate(data).col_vals_within_spec(columns="isbn", spec="isbn").interrogate()
+        results[label] = validation
+
+    lazy_info = results["lazy"].validation_info[0]
+    assert not lazy_info.eval_error
+    assert isinstance(lazy_info.tbl_checked, pl.LazyFrame)
+    assert results["lazy"].n_passed(i=1, scalar=True) == 3
+    assert results["lazy"].n_failed(i=1, scalar=True) == 3
+    assert_frame_equal(
+        lazy_info.tbl_checked.collect(), results["eager"].validation_info[0].tbl_checked
+    )
+
+
 def test_get_data_extracts_lazy_row_numbers() -> None:
     # Row numbers must follow the table's row order, not the sort order of its first column
     tbl = pl.DataFrame({"x": [5, 1, 4, 1, 3], "y": [10, 20, 30, 40, 50]})
@@ -14877,6 +14976,26 @@ def test_get_dataframe_report_composite_key(tbl_type):
     if tbl_type == "duckdb":
         report = report.to_polars()
     assert list(report["columns"]) == ["a, b"]
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+@pytest.mark.parametrize("interrogated", [False, True])
+def test_get_dataframe_report_segmented_steps(tbl_type, interrogated):
+    # After interrogation, each segmented step holds a `(column, value)` pair
+    validation = (
+        Validate(pl.DataFrame({"a": [1, 2, 3], "g": ["x", "y", "x"]}))
+        .col_vals_gt(columns="a", value=1, segments="g")
+        .col_vals_gt(columns="a", value=0)
+    )
+    if interrogated:
+        validation = validation.interrogate()
+
+    report = validation.get_dataframe_report(tbl_type=tbl_type)
+    if tbl_type == "duckdb":
+        report = report.to_polars()
+
+    expected = [True, True, False] if interrogated else [True, False]
+    assert list(report["segmented"]) == expected
 
 
 def get_schema_info(
