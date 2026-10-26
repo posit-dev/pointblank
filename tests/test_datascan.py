@@ -293,6 +293,7 @@ def test_datascan_class_raises():
         ("polars", {"amount": [decimal.Decimal("1.50")]}, "amount (Decimal"),
         ("polars", {"t": [datetime.time(9, 0)]}, "t (Time)"),
         ("pandas", {"flag": [True, None, False]}, "flag (Object)"),
+        ("polars", {"tags": [["a"], ["b", "c"]]}, "tags (List(String))"),
     ],
 )
 def test_col_summary_tbl_no_supported_columns(backend, data, skipped):
@@ -596,6 +597,36 @@ def test_datascan_with_struct_column():
     # The struct column should not be in the summary
     assert "id" in col_names
     assert "name" in col_names
+
+
+@pytest.mark.parametrize(
+    "nested",
+    [
+        pl.Series("nested", [[1], [2, 3], None], dtype=pl.List(pl.Int64)),
+        pl.Series("nested", [["a"], ["b"], ["c"]], dtype=pl.List(pl.String)),
+        pl.Series("nested", [[1, 2], [3, 4], [5, 6]], dtype=pl.Array(pl.Int64, 2)),
+    ],
+)
+def test_col_summary_tbl_skips_list_and_array_columns(nested):
+    df_pl = pl.DataFrame({"id": [1, 2, 3]}).with_columns(nested)
+
+    scanner = DataScan(data=df_pl)
+    col_names = scanner.summary_data["colname"].to_list()
+
+    assert col_names == ["id"]
+    assert list(scanner.profile.skipped_columns) == ["nested"]
+    assert isinstance(col_summary_tbl(df_pl), GT)
+
+
+def test_col_summary_tbl_skips_list_column_duckdb():
+    ibis = pytest.importorskip("ibis")
+    tbl = ibis.duckdb.connect().sql("SELECT 1 AS id, [1, 2] AS nested UNION ALL SELECT 2, [3]")
+
+    scanner = DataScan(data=tbl)
+
+    assert nw.from_native(scanner.summary_data)["colname"].to_list() == ["id"]
+    assert list(scanner.profile.skipped_columns) == ["nested"]
+    assert isinstance(col_summary_tbl(tbl), GT)
 
 
 def test_datascan_save_to_json(tmp_path):
