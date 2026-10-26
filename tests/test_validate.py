@@ -849,6 +849,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "autobrief",
         "dimension",
         "active",
+        "expr_source",
         "eval_error",
         "all_passed",
         "n",
@@ -933,6 +934,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "autobrief",
         "dimension",
         "active",
+        "expr_source",
         "eval_error",
         "all_passed",
         "n",
@@ -5664,6 +5666,83 @@ def test_col_vals_expr_display_text_formatting() -> None:
 
     # Verify it has the basic failure structure
     assert "TEST UNIT FAILURES" in report_html_fail
+
+
+def test_col_vals_expr_tabular_report_columns_and_alias() -> None:
+    df = pl.DataFrame({"a": [1, 2, 3], "b": [0, 1, 2]})
+
+    validation = (
+        Validate(df)
+        .col_vals_expr(expr=pl.col("a") > pl.col("b"))
+        .col_vals_expr(expr=(pl.col("b") % 1 == 0).alias("b_<is>_int"))
+        .col_vals_expr(expr=lambda df: df["a"] > 0)
+        .interrogate()
+    )
+
+    report_html = validation.get_tabular_report().as_raw_html()
+
+    # The columns referenced in each expression are shown in the COLUMNS cell
+    assert ">a, b</td>" in report_html
+    assert ">b</td>" in report_html
+
+    # The columns of a function can't be determined, so an em dash is used
+    assert ">&mdash;</td>" in report_html
+
+    # Steps without an alias keep the plain step text
+    assert report_html.count("col_vals_expr()") == 2
+
+    # The alias of an expression is shown (escaped) in the step text
+    assert "col_vals_expr(<span title='b_&lt;is&gt;_int'" in report_html
+    assert ">b_&lt;is&gt;_int</span>)" in report_html
+
+
+@pytest.mark.skipif(sys.version_info < (3, 11), reason="requires exact call positions")
+def test_col_vals_expr_expression_source_note() -> None:
+    import html as html_lib
+
+    df = pl.DataFrame({"a": [1, 2, 3], "b": [0, 1, 2]})
+
+    validation = (
+        Validate(df)
+        .col_vals_expr(expr=pl.col("a") * 2 > pl.col("b"))
+        .col_vals_expr(
+            expr=(
+                (pl.col("a") > 0)
+                & (pl.col("b") >= 0)
+                & pl.col("a").cast(pl.String).str.contains(r"^[0-9_]+$")
+            )
+        )
+        .interrogate()
+    )
+
+    # The expression is stored as written by the user, along with a plain-text note
+    assert validation.validation_info[0].expr_source == 'pl.col("a") * 2 > pl.col("b")'
+    assert validation.get_note(i=1, key="expr", format="text") == (
+        'Expression: pl.col("a") * 2 > pl.col("b")'
+    )
+    assert validation.validation_info[1].expr_source.startswith("(\n    (pl.col")
+
+    report_html = validation.get_tabular_report().as_raw_html()
+
+    # A short expression is shown in full, with Markdown-sensitive characters kept
+    assert ">pl.col(&quot;a&quot;) * 2 &gt; pl.col(&quot;b&quot;)</code>" in report_html
+
+    # A long expression gets a truncated preview and a disclosure with its full text
+    assert report_html.count("<details") == 1
+    assert ">Expression</summary>" in report_html
+    assert "…</code>" in report_html
+    assert 'str.contains(r"^[0-9_]+$")\n)</pre>' in html_lib.unescape(report_html)
+
+
+def test_col_vals_expr_no_expression_source_note_without_source() -> None:
+    # Without the source text (here, a validation built through `exec()`), no note is made
+    namespace = {"Validate": Validate, "pl": pl, "df": pl.DataFrame({"a": [1, 2, 3]})}
+    exec('validation = Validate(df).col_vals_expr(expr=pl.col("a") > 0).interrogate()', namespace)
+    validation = namespace["validation"]
+
+    assert validation.validation_info[0].expr_source is None
+    assert validation.get_note(i=1, key="expr") is None
+    assert "(expr)" not in validation.get_tabular_report().as_raw_html()
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
