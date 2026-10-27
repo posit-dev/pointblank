@@ -10061,6 +10061,17 @@ def test_get_sundered_data_leaves_out_steps_with_pre() -> None:
     assert _sorted_ids(validation.get_sundered_data(type="fail")) == [6]
 
 
+def test_get_sundered_data_many_steps_sqlite() -> None:
+    # The query mustn't nest more deeply with every step: SQLite before 3.46 can't parse it
+    validation = Validate(_sunder_tbl("sqlite"))
+    for value in range(2, 14):
+        validation = validation.col_vals_gt(columns="id", value=value % 3)
+    validation = validation.interrogate()
+
+    assert _sorted_ids(validation.get_sundered_data(type="pass")) == [3, 4, 5, 6]
+    assert _sorted_ids(validation.get_sundered_data(type="fail")) == [1, 2]
+
+
 def test_col_vals_within_spec_checksum_on_lazyframe() -> None:
     # The checksum specs collect a LazyFrame to check its values, and give a LazyFrame back
     results = {}
