@@ -293,6 +293,7 @@ def test_datascan_class_raises():
         ("polars", {"amount": [decimal.Decimal("1.50")]}, "amount (Decimal"),
         ("polars", {"t": [datetime.time(9, 0)]}, "t (Time)"),
         ("pandas", {"flag": [True, None, False]}, "flag (Object)"),
+        ("polars", {"tags": [["a"], ["b", "c"]]}, "tags (List(String))"),
     ],
 )
 def test_col_summary_tbl_no_supported_columns(backend, data, skipped):
@@ -598,6 +599,36 @@ def test_datascan_with_struct_column():
     assert "name" in col_names
 
 
+@pytest.mark.parametrize(
+    "nested",
+    [
+        pl.Series("nested", [[1], [2, 3], None], dtype=pl.List(pl.Int64)),
+        pl.Series("nested", [["a"], ["b"], ["c"]], dtype=pl.List(pl.String)),
+        pl.Series("nested", [[1, 2], [3, 4], [5, 6]], dtype=pl.Array(pl.Int64, 2)),
+    ],
+)
+def test_col_summary_tbl_skips_list_and_array_columns(nested):
+    df_pl = pl.DataFrame({"id": [1, 2, 3]}).with_columns(nested)
+
+    scanner = DataScan(data=df_pl)
+    col_names = scanner.summary_data["colname"].to_list()
+
+    assert col_names == ["id"]
+    assert list(scanner.profile.skipped_columns) == ["nested"]
+    assert isinstance(col_summary_tbl(df_pl), GT)
+
+
+def test_col_summary_tbl_skips_list_column_duckdb():
+    ibis = pytest.importorskip("ibis")
+    tbl = ibis.duckdb.connect().sql("SELECT 1 AS id, [1, 2] AS nested UNION ALL SELECT 2, [3]")
+
+    scanner = DataScan(data=tbl)
+
+    assert nw.from_native(scanner.summary_data)["colname"].to_list() == ["id"]
+    assert list(scanner.profile.skipped_columns) == ["nested"]
+    assert isinstance(col_summary_tbl(tbl), GT)
+
+
 def test_datascan_save_to_json(tmp_path):
     """Test the save_to_json() method."""
 
@@ -664,3 +695,47 @@ def test_dataprofile_as_dataframe_with_mixed_column_types():
     # Verify we can also call with strict=True
     result_strict = scanner.profile.as_dataframe(strict=True)
     assert result_strict is not None
+
+
+def _body_cells(gt_tbl: GT) -> list[str]:
+    import re
+
+    return re.findall(r"<td[^>]*>(.*?)</td>", gt_tbl.as_raw_html(), re.S)
+
+
+@pytest.mark.parametrize("show_sample_data", [False, True])
+@pytest.mark.parametrize(
+    "to_backend", [lambda df: df, lambda df: df.to_pandas(), lambda df: df.to_arrow()]
+)
+def test_tabular_report_renders_html_cells(show_sample_data, to_backend):
+    # The icon, column name and two-line cells are HTML: GT escapes cells that no formatter
+    # touches (with `great_tables>=1.1.0`, including those skipped by `sub_missing()`), which
+    # showed the HTML as text
+    df = pl.DataFrame(
+        {
+            "num": [1.5, None, 3.0],
+            "day": [datetime.date(2020, 1, 1), None, datetime.date(2020, 1, 3)],
+            "flag": [True, False, None],
+            "txt": ["a", "bb", None],
+        }
+    )
+    report = DataScan(to_backend(df)).get_tabular_report(show_sample_data=show_sample_data)
+    cells = _body_cells(report)
+
+    assert not any("&lt;div" in c or "&lt;svg" in c or "&lt;br" in c for c in cells)
+    assert any(c.startswith("<svg") for c in cells)
+    assert any("<div style='font-size: 13px;" in c and ">num</div>" in c for c in cells)
+    assert any("<br>" in c for c in cells)  # e.g., the count and percentage of missing values
+
+
+def test_tabular_report_escapes_table_values():
+    # The column name and type go into HTML, so they're escaped, and so are the sample values
+    df = pl.DataFrame({"<b>x</b>": [1, 2], "s": ["<i>a</i>", "b"]})
+
+    html = DataScan(df).get_tabular_report(show_sample_data=True).as_raw_html()
+
+    assert "<b>x</b>" not in html
+    assert "&lt;b&gt;x&lt;/b&gt;" in html
+    assert "<i>a</i>" not in html
+    assert "&lt;i&gt;a&lt;/i&gt;" in html
+    assert "<b>x</b>" not in col_summary_tbl(df).as_raw_html()

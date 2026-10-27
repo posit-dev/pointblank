@@ -121,10 +121,15 @@ def otel_log_exporter():
     """
     otel_sdk = pytest.importorskip("opentelemetry.sdk")
     from opentelemetry.sdk._logs import LoggerProvider
-    from opentelemetry.sdk._logs.export import (
-        InMemoryLogRecordExporter,
-        SimpleLogRecordProcessor,
-    )
+    from opentelemetry.sdk._logs.export import SimpleLogRecordProcessor
+
+    try:
+        from opentelemetry.sdk._logs.export import InMemoryLogRecordExporter
+    except ImportError:
+        # The name before opentelemetry-sdk 1.39
+        from opentelemetry.sdk._logs.export import (
+            InMemoryLogExporter as InMemoryLogRecordExporter,
+        )
 
     exporter = InMemoryLogRecordExporter()
     provider = LoggerProvider()

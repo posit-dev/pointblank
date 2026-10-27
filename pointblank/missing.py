@@ -499,3 +499,32 @@ class MissingSpec:
             null_reason=null_reason,
             description=f"Imported missing values for '{getattr(variable, 'name', 'variable')}'",
         )
+
+
+def _missing_spec_to_code(spec: MissingSpec) -> str:
+    """Render a `MissingSpec` as a `pb.MissingSpec(...)` constructor call for code generation."""
+    parts = [f"reasons={spec.reasons!r}"]
+    if spec.categories is not None:
+        parts.append(f"categories={spec.categories!r}")
+    if spec.null_is_missing is not True:
+        parts.append(f"null_is_missing={spec.null_is_missing!r}")
+    if spec.null_reason != "unknown":
+        parts.append(f"null_reason={spec.null_reason!r}")
+    if spec.description is not None:
+        parts.append(f"description={spec.description!r}")
+    return f"pb.MissingSpec({', '.join(parts)})"
+
+
+def _missing_spec_to_yaml(spec: MissingSpec) -> dict[str, Any]:
+    """Render a `MissingSpec` as the inline mapping that YAML configs accept for `missing:`."""
+    # Sentinel keys keep their types (e.g., `-99` stays a number) so they match the data on reload
+    result: dict[str, Any] = {"reasons": dict(spec.reasons)}
+    if spec.categories is not None:
+        result["categories"] = {k: list(v) for k, v in spec.categories.items()}
+    if spec.null_is_missing is not True:
+        result["null_is_missing"] = spec.null_is_missing
+    if spec.null_reason != "unknown":
+        result["null_reason"] = spec.null_reason
+    if spec.description is not None:
+        result["description"] = spec.description
+    return result

@@ -10,7 +10,7 @@ Format: `"provider:model_name"`
 
 ```python
 model="anthropic:claude-sonnet-4-6"
-model="anthropic:claude-haiku-4-5-20251001"
+model="anthropic:claude-haiku-5-5"
 model="anthropic:claude-opus-4-8"
 ```
 
@@ -21,8 +21,7 @@ Install: `pip install "pointblank[generate]"` (includes chatlas and every provid
 ### OpenAI
 
 ```python
-model="openai:gpt-4o"
-model="openai:gpt-4o-mini"
+model="openai:gpt-6-luna"
 model="openai:gpt-5.6-sol"
 ```
 
@@ -49,8 +48,8 @@ ollama pull llama3
 ### AWS Bedrock
 
 ```python
-model="bedrock:anthropic.claude-sonnet-4-20250514-v1:0"
-model="bedrock:anthropic.claude-haiku-4-5-20251001-v1:0"
+model="bedrock:anthropic.claude-sonnet-5-5"
+model="bedrock:anthropic.claude-haiku-5-5"
 ```
 
 Uses AWS credentials from the environment (AWS_ACCESS_KEY_ID,

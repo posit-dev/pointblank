@@ -1320,7 +1320,7 @@ class TestSerializationRoundTrips:
         assert rebuilt.validation_info[0].assertion_type == "col_vals_increasing"
         assert rebuilt.validation_info[1].assertion_type == "col_vals_decreasing"
 
-    def test_col_pct_missing_not_serializable(self):
+    def test_col_pct_missing_serializable(self):
         from pointblank.missing import MissingSpec
 
         spec = MissingSpec(reasons={-99: "not_asked"})
@@ -1328,21 +1328,21 @@ class TestSerializationRoundTrips:
         v = Validate(data=df, tbl_name="test").col_pct_missing(
             columns="age", missing=spec, max_pct=0.5
         )
-        with pytest.warns(UserWarning, match="col_pct_missing"):
-            code = v.to_code()
-        assert "col_pct_missing" not in code
+        code = v.to_code()
+        assert ".col_pct_missing(" in code
+        assert "missing=pb.MissingSpec(reasons={-99: 'not_asked'})" in code
 
-    def test_col_missing_coded_not_serializable(self):
+    def test_col_missing_coded_serializable(self):
         from pointblank.missing import MissingSpec
 
         spec = MissingSpec(reasons={-99: "not_asked"})
         df = pl.DataFrame({"age": [25, -99, 30]})
         v = Validate(data=df, tbl_name="test").col_missing_coded(columns="age", missing=spec)
-        with pytest.warns(UserWarning, match="col_missing_coded"):
-            code = v.to_code()
-        assert "col_missing_coded" not in code
+        code = v.to_code()
+        assert ".col_missing_coded(" in code
+        assert "missing=pb.MissingSpec(reasons={-99: 'not_asked'})" in code
 
-    def test_col_missing_consistent_not_serializable(self):
+    def test_col_missing_consistent_serializable(self):
         from pointblank.missing import MissingSpec
 
         spec = MissingSpec(reasons={-99: "not_asked"})
@@ -1350,9 +1350,9 @@ class TestSerializationRoundTrips:
         v = Validate(data=df, tbl_name="test").col_missing_consistent(
             columns=["a", "b"], missing=spec, when_reason="not_asked"
         )
-        with pytest.warns(UserWarning, match="col_missing_consistent"):
-            code = v.to_code()
-        assert "col_missing_consistent" not in code
+        code = v.to_code()
+        assert ".col_missing_consistent(" in code
+        assert "missing=pb.MissingSpec(reasons={-99: 'not_asked'})" in code
 
     def test_yaml_within_spec(self):
         df = pl.DataFrame({"email": ["test@example.com"]})

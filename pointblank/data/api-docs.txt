@@ -3391,6 +3391,17 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
         Validate
             The `Validate` object with the added validation step.
 
+        Missing Values
+        --------------
+        A missing value (`None`, `NA`, or Null) counts as a failing test unit unless `set=` contains
+        `None`. Alternatively, `missing=MissingSpec(null_is_missing=True)` lets missing values pass
+        (a [`MissingSpec`](`pointblank.MissingSpec`) can also declare sentinel values, such as
+        `-99`, that pass as documented missing values).
+
+        A `NaN` in a float column counts as missing on pandas, so it passes when `set=` contains
+        `None`. Polars, DuckDB and other backends treat `NaN` as a regular value, so it passes only
+        when `set=` contains `NaN`.
+
         Preprocessing
         -------------
         The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
@@ -3581,7 +3592,7 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
         specified set.
         
 
-col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether column values are not in a set of values.
 
@@ -3601,7 +3612,14 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
             A collection of values to compare against. Can be a list of values, a Python Enum class,
             or a collection containing Enum instances. When an Enum class is provided, all enum
             values will be used. When a collection contains Enum instances, their values will be
-            extracted automatically.
+            extracted automatically. It can't contain `None`; see the *Missing Values* section.
+        na_pass
+            Should any encountered None, NA, or Null values be considered as passing test units? By
+            default, this is `False`. Set to `True` to pass test units with missing values.
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring values that encode
+            missingness (and whether nulls count as missing). Those values are excluded from the
+            check, so they pass. See the *Missing Values* section.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -3648,6 +3666,21 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
         -------
         Validate
             The `Validate` object with the added validation step.
+
+        Missing Values
+        --------------
+        A missing value (`None`, `NA`, or Null) isn't in the set, but it isn't a valid value either,
+        so by default it counts as a failing test unit. There are two ways to let missing values
+        pass: `na_pass=True`, or `missing=MissingSpec(null_is_missing=True)` (a `MissingSpec` can
+        also declare sentinel values, such as `-99`, that pass as documented missing values). As
+        missing values are handled with these options, `set=` can't contain `None`.
+
+        A `NaN` in a float column counts as missing on pandas, so it fails unless `na_pass=True`.
+        Polars, DuckDB and other backends treat `NaN` as a regular value, so it passes unless `set=`
+        contains `NaN` (unlike comparison methods such as
+        [`col_vals_gt()`](`pointblank.Validate.col_vals_gt`), which treat `NaN` as missing on every
+        backend). To treat `NaN` as missing everywhere, convert it to null first, for example with
+        `pre=lambda df: df.with_columns(pl.col("a").fill_nan(None))` on a Polars table.
 
         Preprocessing
         -------------
@@ -3816,7 +3849,7 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
         statuses in the `InvalidStatus` enum.
         
 
-col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, decreasing_tol: 'float | None' = None, na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, decreasing_tol: 'float | None' = None, na_pass: 'bool' = False, order_by: 'str | list[str] | None' = None, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Are column data increasing by row?
 
@@ -3848,6 +3881,11 @@ col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+        order_by
+            The column (or list of columns) that puts the rows in order before the values are
+            compared, in ascending order. If `None` (the default), the table's own row order is
+            used. Tables without an inherent row order (e.g., database tables, Ibis tables, or
+            PySpark DataFrames) need `order_by=`. See the *Row Order and Missing Values* section.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -3895,12 +3933,19 @@ col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
         Validate
             The `Validate` object with the added validation step.
 
-        Notes
-        -----
-        This validation method is not supported for PySpark DataFrames. PySpark DataFrames are
-        represented as LazyFrames in Narwhals, which do not support order-dependent operations like
-        `shift()`. Calling this method on a PySpark DataFrame will raise an
-        `InvalidOperationError` during interrogation.
+        Row Order and Missing Values
+        ----------------------------
+        Each value is compared with the value before it, so the rows need an order. Polars and
+        pandas DataFrames (and Polars LazyFrames) have one, which is used unless `order_by=` is
+        given. Database tables, Ibis tables, and PySpark DataFrames have no inherent row order, so
+        `order_by=` is needed for them; without it, the step is marked as having an evaluation
+        error. The results are reported against the table's own rows either way. If the
+        `order_by=` columns have ties, the order of the tied rows (and so the result) may vary.
+
+        A missing value fails unless `na_pass=True`, and it doesn't break the sequence: the next
+        non-missing value is compared with the last non-missing value before it. For example, with
+        `[1, 2, None, 5]` the `5` is compared with the `2`. The first non-missing value has nothing
+        to be compared with, so it always passes.
 
         Examples
         --------
@@ -3962,7 +4007,7 @@ col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
         ```
         
 
-col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, increasing_tol: 'float | None' = None, na_pass: 'bool' = False, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, increasing_tol: 'float | None' = None, na_pass: 'bool' = False, order_by: 'str | list[str] | None' = None, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Are column data decreasing by row?
 
@@ -3994,6 +4039,11 @@ col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+        order_by
+            The column (or list of columns) that puts the rows in order before the values are
+            compared, in ascending order. If `None` (the default), the table's own row order is
+            used. Tables without an inherent row order (e.g., database tables, Ibis tables, or
+            PySpark DataFrames) need `order_by=`. See the *Row Order and Missing Values* section.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -4041,12 +4091,19 @@ col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
         Validate
             The `Validate` object with the added validation step.
 
-        Notes
-        -----
-        This validation method is not supported for PySpark DataFrames. PySpark DataFrames are
-        represented as LazyFrames in Narwhals, which do not support order-dependent operations like
-        `shift()`. Calling this method on a PySpark DataFrame will raise an
-        `InvalidOperationError` during interrogation.
+        Row Order and Missing Values
+        ----------------------------
+        Each value is compared with the value before it, so the rows need an order. Polars and
+        pandas DataFrames (and Polars LazyFrames) have one, which is used unless `order_by=` is
+        given. Database tables, Ibis tables, and PySpark DataFrames have no inherent row order, so
+        `order_by=` is needed for them; without it, the step is marked as having an evaluation
+        error. The results are reported against the table's own rows either way. If the
+        `order_by=` columns have ties, the order of the tied rows (and so the result) may vary.
+
+        A missing value fails unless `na_pass=True`, and it doesn't break the sequence: the next
+        non-missing value is compared with the last non-missing value before it. For example, with
+        `[1, 2, None, 5]` the `5` is compared with the `2`. The first non-missing value has nothing
+        to be compared with, so it always passes.
 
         Examples
         --------
@@ -4951,9 +5008,17 @@ col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'Segme
         ----------
         expr
             A column expression that will evaluate each row in the table, returning a boolean value
-            per table row. If the target table is a Polars DataFrame, the expression should either
-            be a Polars column expression or a Narwhals one. For a Pandas DataFrame, the expression
-            should either be a lambda expression or a Narwhals column expression.
+            per table row. A Narwhals column expression (e.g., `nw.col("a") > 1`) works with every
+            table type. Otherwise, use an expression from the table's own library: a Polars
+            expression for a Polars table, an Ibis expression for an Ibis table, or a PySpark
+            column for a PySpark DataFrame. A function (such as a lambda) can also be given; it
+            receives the table and should return one of those expressions or a boolean Series
+            (e.g., `lambda df: df["a"] > 1` for a pandas DataFrame). For Polars, Narwhals, and
+            Ibis expressions, the columns used in the expression are shown in the validation
+            report, as is any name given to the expression (e.g., through `.alias("a_is_int")`),
+            which helps to tell apart several `col_vals_expr()` steps. The expression as written
+            in the code (when its source text is available, which requires Python 3.11 or later)
+            appears in a note in the report footer.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -5001,11 +5066,16 @@ col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'Segme
         Validate
             The `Validate` object with the added validation step.
 
-        Notes
-        -----
-        This validation method is not supported for PySpark DataFrames. The internal implementation
-        uses pandas-style `.assign()` which is not available on PySpark DataFrames. Calling this
-        method on a PySpark DataFrame will raise an `AttributeError` during interrogation.
+        Missing Values and Evaluation Errors
+        ------------------------------------
+        A row where the expression evaluates to a missing value (e.g., `pl.col("a") > 1` when `a`
+        is null) counts as a failing test unit. To let such rows pass, allow for them in the
+        expression itself, as in `(pl.col("a") > 1) | pl.col("a").is_null()`.
+
+        If the expression can't be evaluated against the table (e.g., it refers to a column that
+        doesn't exist, comes from a library that doesn't match the table, or doesn't produce boolean
+        values), the step is marked as having an evaluation error and a note explains why. The
+        other validation steps are still interrogated.
 
         Preprocessing
         -------------
@@ -8918,7 +8988,8 @@ col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'boo
         [`Schema`](`pointblank.Schema`) class. That class object is the expectation for the actual
         schema of the target table. The validation step operates over a single test unit, which is
         whether the schema matches that of the table (within the constraints enforced by the
-        `complete=`, and `in_order=` options).
+        `complete=`, and `in_order=` options). Every column in the schema must be present in the
+        table, so a schema that names the same column more than once never matches.
 
         Parameters
         ----------
@@ -8926,9 +8997,9 @@ col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'boo
             A `Schema` object that represents the expected schema of the table. This object is
             generated by the [`Schema`](`pointblank.Schema`) class.
         complete
-            Should the schema match be complete? If `True`, then the target table must have all
-            columns specified in the schema. If `False`, then the table can have additional columns
-            not in the schema (i.e., the schema is a subset of the target table's columns).
+            Should the schema match be complete? If `True`, then the schema must account for every
+            column in the target table. If `False`, then the table can have additional columns not
+            in the schema (i.e., the schema is a subset of the target table's columns).
         in_order
             Should the schema match be in order? If `True`, then the columns in the schema must
             appear in the same order as they do in the target table. If `False`, then the order of
@@ -9442,7 +9513,9 @@ tbl_match(self, tbl_compare: 'Any', keys: 'str | list[str] | None' = None, colum
             also compares the duplicated rows pairwise to show which columns differ.
         order_by
             Column(s) defining the row order for positional alignment on backends without an
-            inherent row order (e.g., database tables). Ignored when `keys=` is given.
+            inherent row order (e.g., PySpark or database tables). Without it, such tables are
+            collected and compared in the order in which their rows are returned; use `keys=` for
+            a reliable alignment. Ignored when `keys=` is given.
         partitions
             Compare the tables in this many passes, each covering a disjoint subset of the key
             values (by key hash), to bound memory use for very large tables. Each pass reads the
@@ -9919,6 +9992,16 @@ conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 
         -------
         Validate
             The `Validate` object with the added validation step.
+
+        Missing Values and Evaluation Errors
+        ------------------------------------
+        A row where any expression evaluates to a missing value (e.g., a comparison on a null)
+        counts as a failing test unit. To let such rows pass, allow for them in the expression
+        itself (e.g., `lambda df: (pl.col("a") > 1) | pl.col("a").is_null()`).
+
+        If any of the expressions can't be evaluated against the table (e.g., one refers to a column
+        that doesn't exist), the step is marked as having an evaluation error and a note says which
+        expression failed and why. The other validation steps are still interrogated.
 
         Preprocessing
         -------------
@@ -10696,7 +10779,7 @@ prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | Non
             .prompt(
                 prompt="Each row should have a valid email address and a non-empty name",
                 columns_subset=["email", "name"],  # Only check these columns
-                model="openai:gpt-4o-mini",
+                model="openai:gpt-6-luna",
             )
             .interrogate()
         )
@@ -10732,7 +10815,7 @@ prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | Non
             .prompt(
                 prompt="Do all the phone numbers include an area code?",
                 columns_subset="phone_number",  # Only check the `phone_number` column
-                model="openai:gpt-4o",
+                model="openai:gpt-6-luna",
                 batch_size=500,
                 max_concurrent=5,
                 thresholds=pb.Thresholds(warning=0.1, error=0.2, critical=0.3),
@@ -12664,7 +12747,12 @@ get_step_report(self, i: 'int', columns_subset: 'str | list[str] | Column | None
         - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
         - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
         - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
+        - [`col_vals_str_len()`](`pointblank.Validate.col_vals_str_len`)
+        - [`col_vals_in_table()`](`pointblank.Validate.col_vals_in_table`)
         - [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`)
+        - [`col_missing_coded()`](`pointblank.Validate.col_missing_coded`)
+        - [`col_missing_only_coded()`](`pointblank.Validate.col_missing_only_coded`)
+        - [`col_missing_consistent()`](`pointblank.Validate.col_missing_consistent`)
         - [`conjointly()`](`pointblank.Validate.conjointly`)
         - [`prompt()`](`pointblank.Validate.prompt`)
         - [`rows_complete()`](`pointblank.Validate.rows_complete`)
@@ -12676,6 +12764,29 @@ get_step_report(self, i: 'int', columns_subset: 'str | list[str] | Column | None
         The [`col_schema_match()`](`pointblank.Validate.col_schema_match`) validation step will
         produce a report that shows the schema of the data table and the schema of the validation
         step. The report will indicate whether the schemas match or not.
+
+        The [`tbl_match()`](`pointblank.Validate.tbl_match`) and
+        [`tbl_reconcile()`](`pointblank.Validate.tbl_reconcile`) validation steps will produce a
+        report comparing the target table to the comparison table, with samples of the rows (or key
+        groups) that differ.
+
+        The remaining validation steps check the table, or a column, as a whole. Each produces a
+        summary report with the measured value(s) beside the expected value(s):
+
+        - the aggregate methods (e.g., [`col_sum_gt()`](`pointblank.Validate.col_sum_gt`),
+          [`col_avg_eq()`](`pointblank.Validate.col_avg_eq`),
+          [`col_sd_le()`](`pointblank.Validate.col_sd_le`)): the computed aggregate value
+        - [`col_exists()`](`pointblank.Validate.col_exists`): the column's position in the table
+          (and, if it's missing, the closest-matching column name)
+        - [`row_count_match()`](`pointblank.Validate.row_count_match`) and
+          [`col_count_match()`](`pointblank.Validate.col_count_match`): the row or column count
+        - [`col_pct_null()`](`pointblank.Validate.col_pct_null`) and
+          [`col_pct_missing()`](`pointblank.Validate.col_pct_missing`): the number and percentage
+          of null or missing values
+        - [`data_freshness()`](`pointblank.Validate.data_freshness`): the most recent datetime
+          value and its age
+        - [`specially()`](`pointblank.Validate.specially`): the number of passing and failing test
+          units
 
         Examples
         --------

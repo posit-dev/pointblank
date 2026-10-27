@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from importlib import import_module
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Iterable, Mapping, Optional, Union
@@ -8,7 +9,7 @@ import yaml
 
 from pointblank._agg import is_valid_agg
 from pointblank._utils import _is_lib_present
-from pointblank.missing import MissingSpec
+from pointblank.missing import MissingSpec, _missing_spec_to_code
 from pointblank.thresholds import Actions
 from pointblank.validate import Validate, load_dataset
 
@@ -28,22 +29,11 @@ def _missing_spec_from_dict(spec_def: dict) -> MissingSpec:
     )
 
 
-def _missing_spec_to_code(spec: MissingSpec) -> str:
-    """Render a `MissingSpec` as a `pb.MissingSpec(...)` constructor call for code generation."""
-    parts = [f"reasons={spec.reasons!r}"]
-    if spec.categories is not None:
-        parts.append(f"categories={spec.categories!r}")
-    if spec.null_is_missing is not True:
-        parts.append(f"null_is_missing={spec.null_is_missing!r}")
-    if spec.null_reason != "unknown":
-        parts.append(f"null_reason={spec.null_reason!r}")
-    if spec.description is not None:
-        parts.append(f"description={spec.description!r}")
-    return f"pb.MissingSpec({', '.join(parts)})"
-
-
 if TYPE_CHECKING:
     from typing import Literal
+
+# A column reference written directly as a step value (e.g., `value: pb.col("b")`)
+_COLUMN_REF_PATTERN = re.compile(r"\s*pb\.(col|ref)\(.*\)\s*", re.DOTALL)
 
 
 class YAMLValidationError(Exception):
@@ -274,6 +264,7 @@ class YAMLValidator:
         "col_vals_increasing": "col_vals_increasing",
         "col_vals_decreasing": "col_vals_decreasing",
         "col_vals_within_spec": "col_vals_within_spec",
+        "col_vals_str_len": "col_vals_str_len",
         "col_pct_null": "col_pct_null",
         "col_pct_missing": "col_pct_missing",
         "col_missing_coded": "col_missing_coded",
@@ -646,6 +637,29 @@ class YAMLValidator:
                 f"Schema specification must be a dictionary, got: {type(schema_spec)}"
             )
 
+    def _parse_segments_spec(self, segments: Any) -> Any:
+        """Parse a `segments=` specification from YAML.
+
+        A string is a column to segment by. In a list, each string is a column and each two-item
+        `[column, value]` list is a `(column, value)` segment (the value may itself be a list of
+        values). This mirrors how `to_yaml()` writes segments, since YAML has no tuples.
+        """
+        if not isinstance(segments, list):
+            return segments
+
+        parsed: list[Any] = []
+        for item in segments:
+            if isinstance(item, (str, tuple)):
+                parsed.append(item)
+            elif isinstance(item, list) and len(item) == 2 and isinstance(item[0], str):
+                parsed.append(tuple(item))
+            else:
+                raise YAMLValidationError(
+                    f"Invalid 'segments' item: {item!r}. Use a column name, or a two-item "
+                    "[column, value] list for a specific segment."
+                )
+        return parsed
+
     def _parse_missing_specs(self, config: dict) -> dict[str, MissingSpec]:
         """Parse the top-level `missing_specs` block into named `MissingSpec` objects."""
         raw = config.get("missing_specs")
@@ -749,6 +763,14 @@ class YAMLValidator:
             # (e.g., `active: pb.has_columns("col_a")` or `active: false`)
             elif key == "active" and isinstance(value, str):
                 processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
+            # Special case: a column reference given as a comparison value can be written directly
+            # (e.g., `value: pb.col("b")`) as well as in a `python:` block
+            elif (
+                key in ("value", "left", "right")
+                and isinstance(value, str)
+                and _COLUMN_REF_PATTERN.fullmatch(value)
+            ):
+                processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
             elif key == "missing":
                 # Pass the raw value through (a spec name, inline mapping, or MissingSpec); it is
                 # resolved to a MissingSpec below, after the loop
@@ -813,6 +835,14 @@ class YAMLValidator:
         if "inclusive" in parameters and isinstance(parameters["inclusive"], list):
             parameters["inclusive"] = tuple(parameters["inclusive"])
 
+        # A `tol=` given as a two-item list is a (lower, upper) tolerance tuple
+        if "tol" in parameters and isinstance(parameters["tol"], list):
+            parameters["tol"] = tuple(parameters["tol"])
+
+        # Convert `segments=`, where each `[column, value]` pair in a list is a segment tuple
+        if "segments" in parameters:
+            parameters["segments"] = self._parse_segments_spec(parameters["segments"])
+
         # Resolve the method name: static map takes priority, then dynamic aggregate methods
         if method_name in self.validation_method_map:
             resolved_name = self.validation_method_map[method_name]
@@ -823,7 +853,10 @@ class YAMLValidator:
         return resolved_name, parameters
 
     def build_validation(
-        self, config: dict, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
+        self,
+        config: dict,
+        namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
+        tbl: Any = None,
     ) -> Validate:
         """Convert YAML config to Validate object.
 
@@ -831,6 +864,8 @@ class YAMLValidator:
         ----------
         config
             Validated configuration dictionary.
+        tbl
+            A table to validate in place of the config's `tbl` (which is then not loaded).
 
         Returns
         -------
@@ -839,7 +874,7 @@ class YAMLValidator:
         """
         # Load data source with specified library
         df_library = config.get("df_library", "polars")
-        data = self._load_data_source(config["tbl"], df_library)
+        data = tbl if tbl is not None else self._load_data_source(config["tbl"], df_library)
 
         # Create Validate object
         validate_kwargs = {}
@@ -982,8 +1017,9 @@ def yaml_interrogate(
     set_tbl
         An optional table to override the table specified in the YAML configuration. This allows you
         to apply a YAML-defined validation workflow to a different table than what's specified in
-        the configuration. If provided, this table will replace the table defined in the YAML's
-        `tbl` field before executing the validation workflow. This can be any supported table type
+        the configuration. If provided, this table is used in place of the table defined in the
+        YAML's `tbl` field (which is then not loaded, so it can be a placeholder or a source
+        that isn't available). This can be any supported table type
         including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths, GitHub
         URLs, or database connection strings.
     namespaces
@@ -1296,13 +1332,10 @@ def yaml_interrogate(
     validator = YAMLValidator()
     config = validator.load_config(yaml)
 
-    # If `set_tbl=` is provided, we need to build the validation workflow and then use `set_tbl()`
+    # If `set_tbl=` is provided, build the validation on that table (without loading the config's
+    # `tbl`, which may be a placeholder or unavailable) and then interrogate
     if set_tbl is not None:
-        # First build the validation object without interrogation
-        validation = validator.build_validation(config, namespaces=namespaces)
-        # Then replace the table using set_tbl method
-        validation = validation.set_tbl(tbl=set_tbl)
-        # Finally interrogate with the new table
+        validation = validator.build_validation(config, namespaces=namespaces, tbl=set_tbl)
         return validation.interrogate()
     else:
         # Standard execution without table override (includes interrogation)
@@ -1920,6 +1953,14 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
             ):
                 # Use the original Python expression
                 param_parts.append(f"{key}={step_expressions[expression_path]}")
+            elif (
+                key in ("value", "left", "right")
+                and isinstance(step_params, dict)
+                and isinstance(step_params.get(key), str)
+                and _COLUMN_REF_PATTERN.fullmatch(step_params[key])
+            ):
+                # A column reference written directly (e.g., `value: pb.col("b")`)
+                param_parts.append(f"{key}={step_params[key].strip()}")
             elif key == "expressions" and method_name == "conjointly":
                 # Handle conjointly expressions list
                 if isinstance(value, list):

@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import ast
+import functools
 import inspect
+import linecache
 import math
 import numbers
 import re
+import sys
+import textwrap
 from collections import defaultdict
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Collection
@@ -769,6 +774,223 @@ def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
         columns: list[Column] | list[str] = [columns]
 
     return columns
+
+
+def _narwhals_expr_nodes(expr: nw.Expr) -> list[Any]:
+    # Narwhals doesn't have a public API for inspecting expressions so this relies on the
+    # `_nodes` attribute (present in recent versions); callers must guard against failure
+    nodes = list(expr._nodes)
+    for node in list(nodes):
+        for arg in (*node.exprs, *node.kwargs.values()):
+            if isinstance(arg, nw.Expr):
+                nodes.extend(_narwhals_expr_nodes(arg))
+    return nodes
+
+
+def _get_expr_root_names(expr: Any) -> list[str]:
+    """
+    Get the names of the columns referenced by a `col_vals_expr()` expression.
+
+    Polars, Narwhals, and Ibis expressions are supported. An empty list is returned when the
+    columns can't be determined (e.g., for callables, PySpark columns, or Polars expressions that
+    use `pl.all()` or regex column selection).
+    """
+    try:
+        module = type(expr).__module__.split(".")[0]
+
+        if module == "polars":
+            names = expr.meta.root_names()
+
+        elif isinstance(expr, nw.Expr):
+            names = [
+                name
+                for node in _narwhals_expr_nodes(expr)
+                if node.name == "col"
+                for name in node.kwargs.get("names", [])
+            ]
+
+        elif module == "ibis" and hasattr(expr, "op"):
+            import ibis.expr.operations as ops
+
+            names = [field.name for field in expr.op().find(ops.Field)]
+
+        else:
+            return []
+
+        # De-duplicate while keeping the order in which the columns were referenced
+        return list(dict.fromkeys(str(name) for name in names))
+
+    except Exception:
+        return []
+
+
+def _get_expr_alias(expr: Any) -> str | None:
+    """
+    Get the name explicitly given to a `col_vals_expr()` expression through an alias.
+
+    Supported are Polars (`.alias()`), Narwhals (`.alias()`), and Ibis (`.name()`) expressions.
+    `None` is returned when the expression wasn't given a name or the name can't be determined.
+    """
+    try:
+        module = type(expr).__module__.split(".")[0]
+
+        if module == "polars":
+            # Only report a name if one was set (otherwise the output name is just the name of
+            # the first column in the expression)
+            if expr.meta.eq(expr.meta.undo_aliases()):
+                return None
+            return expr.meta.output_name(raise_if_undetermined=False)
+
+        if isinstance(expr, nw.Expr):
+            aliases = [node.kwargs["name"] for node in expr._nodes if node.name == "alias"]
+            return str(aliases[-1]) if aliases else None
+
+        if module == "ibis" and hasattr(expr, "op"):
+            import ibis.expr.operations as ops
+
+            op = expr.op()
+            return str(op.name) if isinstance(op, ops.Alias) else None
+
+    except Exception:
+        return None
+
+    return None
+
+
+@functools.lru_cache(maxsize=8)
+def _parse_source(source: str) -> ast.Module:
+    # Several steps are usually defined in the same file or notebook cell, so cache the parsing
+    return ast.parse(source)
+
+
+def _get_source_span(
+    source: str,
+    start: tuple[int, int],
+    end: tuple[int, int],
+    limit: tuple[int, int],
+    expand_parens: bool = False,
+) -> str:
+    # AST positions are given as line numbers and UTF-8 byte offsets within the lines, so work
+    # with the encoded source
+    lines = source.encode("utf-8").splitlines(keepends=True)
+    line_starts = [0]
+    for line in lines:
+        line_starts.append(line_starts[-1] + len(line))
+    source_bytes = b"".join(lines)
+
+    def _offset(position: tuple[int, int]) -> int:
+        return line_starts[position[0] - 1] + position[1]
+
+    i_start, i_end, i_limit = _offset(start), _offset(end), _offset(limit)
+
+    # Widen the span to take in any pairs of parentheses enclosing it (the opening one being
+    # beyond `limit`, so that the parentheses of the call itself are excluded)
+    while expand_parens:
+        before = source_bytes[i_limit:i_start].rstrip()
+        after = source_bytes[i_end:].lstrip()
+        if len(before.lstrip()) > 1 and before.endswith(b"(") and after.startswith(b")"):
+            i_start = len(before) - 1 + i_limit
+            i_end = len(source_bytes) - len(after) + 1
+        else:
+            break
+
+    # Pad the first line with spaces so that it lines up with any continuation lines
+    line_start = source_bytes.rfind(b"\n", 0, i_start) + 1
+    padding = " " * len(source_bytes[line_start:i_start].decode("utf-8"))
+
+    return padding + source_bytes[i_start:i_end].decode("utf-8")
+
+
+def _get_caller_arg_source(method_name: str, arg_name: str, arg_index: int = 0) -> str | None:
+    """
+    Get the source text of an argument as written in the user's call to a method.
+
+    This is to be called directly from within the method (e.g., `Validate.col_vals_expr()`). The
+    call is located through the exact source position of the caller's current instruction, which
+    requires Python 3.11 or later. `None` is returned whenever the text can't be determined with
+    certainty: on earlier Python versions, when the source isn't available (e.g., in the standard
+    Python REPL or with `exec()`), when the method was called from within pointblank (e.g., when
+    building a validation from YAML), or when the argument was supplied through `*args` or
+    `**kwargs` unpacking.
+    """
+    if sys.version_info < (3, 11):
+        return None
+
+    frame = inspect.currentframe()
+
+    try:
+        # The frame of the code that called the method that called this function
+        caller = frame.f_back.f_back
+
+        if caller.f_globals.get("__name__", "").split(".")[0] == "pointblank":
+            return None
+
+        _, end_lineno, _, end_col_offset = list(caller.f_code.co_positions())[caller.f_lasti // 2]
+
+        filename = caller.f_code.co_filename
+        linecache.checkcache(filename)
+        source = "".join(linecache.getlines(filename, caller.f_globals))
+
+        if not source or end_lineno is None or end_col_offset is None:
+            return None
+
+        # The call that ends exactly where the caller's current instruction ends must be the only
+        # one there and it must be a call of the method
+        calls = [
+            node
+            for node in ast.walk(_parse_source(source))
+            if isinstance(node, ast.Call)
+            and (node.end_lineno, node.end_col_offset) == (end_lineno, end_col_offset)
+        ]
+        if len(calls) != 1:
+            return None
+
+        call = calls[0]
+        func_name = getattr(call.func, "attr", getattr(call.func, "id", None))
+        if func_name != method_name:
+            return None
+
+        if any(isinstance(arg, ast.Starred) for arg in call.args) or any(
+            keyword.arg is None for keyword in call.keywords
+        ):
+            return None
+
+        keywords = [keyword for keyword in call.keywords if keyword.arg == arg_name]
+
+        if keywords:
+            # The keyword's source (e.g., `expr=(...)`) includes any parentheses around the value,
+            # which aren't part of the value's own node
+            start = (keywords[0].lineno, keywords[0].col_offset)
+            end = (keywords[0].end_lineno, keywords[0].end_col_offset)
+        elif len(call.args) > arg_index:
+            arg_node = call.args[arg_index]
+            start = (arg_node.lineno, arg_node.col_offset)
+            end = (arg_node.end_lineno, arg_node.end_col_offset)
+        else:
+            return None
+
+        arg_source = _get_source_span(
+            source=source,
+            start=start,
+            end=end,
+            # Parentheses beyond the end of the method name belong to the call itself
+            limit=(call.func.end_lineno, call.func.end_col_offset),
+            expand_parens=not keywords,
+        )
+
+        # Remove the indentation of any continuation lines (the first line is padded so that it
+        # gets the same treatment) and then the `expr=` part of a keyword argument
+        arg_source = textwrap.dedent(arg_source).strip()
+        if keywords:
+            arg_source = arg_source[len(arg_name) :].lstrip().removeprefix("=").lstrip()
+
+        return arg_source or None
+
+    except Exception:
+        return None
+
+    finally:
+        del frame
 
 
 def _get_fn_name() -> str | None:

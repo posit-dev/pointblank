@@ -842,6 +842,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "missing",
         "pre",
         "segments",
+        "segments_spec",
         "thresholds",
         "actions",
         "label",
@@ -849,6 +850,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "autobrief",
         "dimension",
         "active",
+        "expr_source",
         "eval_error",
         "all_passed",
         "n",
@@ -926,6 +928,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "missing",
         "pre",
         "segments",
+        "segments_spec",
         "thresholds",
         "actions",
         "label",
@@ -933,6 +936,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "autobrief",
         "dimension",
         "active",
+        "expr_source",
         "eval_error",
         "all_passed",
         "n",
@@ -5666,6 +5670,83 @@ def test_col_vals_expr_display_text_formatting() -> None:
     assert "TEST UNIT FAILURES" in report_html_fail
 
 
+def test_col_vals_expr_tabular_report_columns_and_alias() -> None:
+    df = pl.DataFrame({"a": [1, 2, 3], "b": [0, 1, 2]})
+
+    validation = (
+        Validate(df)
+        .col_vals_expr(expr=pl.col("a") > pl.col("b"))
+        .col_vals_expr(expr=(pl.col("b") % 1 == 0).alias("b_<is>_int"))
+        .col_vals_expr(expr=lambda df: df["a"] > 0)
+        .interrogate()
+    )
+
+    report_html = validation.get_tabular_report().as_raw_html()
+
+    # The columns referenced in each expression are shown in the COLUMNS cell
+    assert ">a, b</td>" in report_html
+    assert ">b</td>" in report_html
+
+    # The columns of a function can't be determined, so an em dash is used
+    assert ">&mdash;</td>" in report_html
+
+    # Steps without an alias keep the plain step text
+    assert report_html.count("col_vals_expr()") == 2
+
+    # The alias of an expression is shown (escaped) in the step text
+    assert "col_vals_expr(<span title='b_&lt;is&gt;_int'" in report_html
+    assert ">b_&lt;is&gt;_int</span>)" in report_html
+
+
+@pytest.mark.skipif(sys.version_info < (3, 11), reason="requires exact call positions")
+def test_col_vals_expr_expression_source_note() -> None:
+    import html as html_lib
+
+    df = pl.DataFrame({"a": [1, 2, 3], "b": [0, 1, 2]})
+
+    validation = (
+        Validate(df)
+        .col_vals_expr(expr=pl.col("a") * 2 > pl.col("b"))
+        .col_vals_expr(
+            expr=(
+                (pl.col("a") > 0)
+                & (pl.col("b") >= 0)
+                & pl.col("a").cast(pl.String).str.contains(r"^[0-9_]+$")
+            )
+        )
+        .interrogate()
+    )
+
+    # The expression is stored as written by the user, along with a plain-text note
+    assert validation.validation_info[0].expr_source == 'pl.col("a") * 2 > pl.col("b")'
+    assert validation.get_note(i=1, key="expr", format="text") == (
+        'Expression: pl.col("a") * 2 > pl.col("b")'
+    )
+    assert validation.validation_info[1].expr_source.startswith("(\n    (pl.col")
+
+    report_html = validation.get_tabular_report().as_raw_html()
+
+    # A short expression is shown in full, with Markdown-sensitive characters kept
+    assert ">pl.col(&quot;a&quot;) * 2 &gt; pl.col(&quot;b&quot;)</code>" in report_html
+
+    # A long expression gets a truncated preview and a disclosure with its full text
+    assert report_html.count("<details") == 1
+    assert ">Expression</summary>" in report_html
+    assert "…</code>" in report_html
+    assert 'str.contains(r"^[0-9_]+$")\n)</pre>' in html_lib.unescape(report_html)
+
+
+def test_col_vals_expr_no_expression_source_note_without_source() -> None:
+    # Without the source text (here, a validation built through `exec()`), no note is made
+    namespace = {"Validate": Validate, "pl": pl, "df": pl.DataFrame({"a": [1, 2, 3]})}
+    exec('validation = Validate(df).col_vals_expr(expr=pl.col("a") > 0).interrogate()', namespace)
+    validation = namespace["validation"]
+
+    assert validation.validation_info[0].expr_source is None
+    assert validation.get_note(i=1, key="expr") is None
+    assert "(expr)" not in validation.get_tabular_report().as_raw_html()
+
+
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
 def test_rows_distinct(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
@@ -6291,7 +6372,7 @@ def test_col_schema_match() -> None:
         .col_schema_match(schema=schema, in_order=False, complete=False)
         .interrogate()
         .n_passed(i=1, scalar=True)
-        == 1
+        == 0
     )
 
     # Schema has duplicate column/dtype: wrong column name
@@ -7220,7 +7301,7 @@ def test_col_schema_match_list_of_dtypes() -> None:
         .col_schema_match(schema=schema, in_order=False, complete=False)
         .interrogate()
         .n_passed(i=1, scalar=True)
-        == 1
+        == 0
     )
 
     # Schema has duplicate column/dtype: wrong dtypes in one case
@@ -7255,7 +7336,7 @@ def test_col_schema_match_list_of_dtypes() -> None:
         .col_schema_match(schema=schema, in_order=False, complete=False)
         .interrogate()
         .n_passed(i=1, scalar=True)
-        == 1
+        == 0
     )
 
     # Schema has duplicate column/dtype: wrong dtypes in both cases
@@ -7900,7 +7981,7 @@ def test_col_schema_match_columns_only() -> None:
         .col_schema_match(schema=schema, in_order=False, complete=False)
         .interrogate()
         .n_passed(i=1, scalar=True)
-        == 1
+        == 0
     )
 
     # Schema columns has duplicate column and a wrong column name
@@ -9849,6 +9930,165 @@ def test_get_sundered_data_lazy_preserves_row_order() -> None:
     assert_frame_equal(sundered_data_fail.collect(), expected_fail)
 
 
+_SUNDER_TBL = pl.DataFrame(
+    {
+        "id": [3, 1, 4, 2, 5, 6],
+        "isbn": [
+            "978-0-306-40615-7",
+            "978-0-306-40615-8",
+            "0-306-40615-2",
+            "0-306-40615-3",
+            None,
+            "978-0-306-40615-7",
+        ],
+        "g": ["p", "q", "r", "p", "q", "s"],
+    }
+)
+
+
+def _sunder_tbl(tbl_type: str):
+    if tbl_type == "polars":
+        return _SUNDER_TBL
+    if tbl_type == "lazy":
+        return _SUNDER_TBL.lazy()
+    if tbl_type == "pandas":
+        return _SUNDER_TBL.to_pandas()
+    if tbl_type == "duckdb":
+        return ibis.memtable(_SUNDER_TBL)
+    return ibis.sqlite.connect().create_table("sunder_tbl", _SUNDER_TBL.to_pandas())
+
+
+def _sorted_ids(tbl) -> list:
+    if isinstance(tbl, pl.LazyFrame):
+        tbl = tbl.collect()
+    elif hasattr(tbl, "execute"):
+        tbl = tbl.execute()
+    return sorted(nw.from_native(tbl)["id"].to_list())
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "lazy", "pandas", "duckdb", "sqlite"])
+@pytest.mark.parametrize(
+    "add_step, expected_pass",
+    [
+        # Steps that materialize their results: `col_vals_in_table()` and the checksum specs of
+        # `col_vals_within_spec()` give an eager table for a database table
+        (
+            lambda v: v.col_vals_in_table(
+                columns="g", ref_table=pl.DataFrame({"g": ["p", "q"]}), ref_column="g"
+            ),
+            [1, 2, 3, 5],
+        ),
+        (lambda v: v.col_vals_within_spec(columns="isbn", spec="isbn"), [3, 4, 6]),
+    ],
+    ids=["in_table", "isbn"],
+)
+def test_get_sundered_data_with_materialized_results(tbl_type, add_step, expected_pass) -> None:
+    validation = add_step(Validate(_sunder_tbl(tbl_type)).col_vals_gt(columns="id", value=0))
+    validation = validation.interrogate()
+
+    assert not any(vi.eval_error for vi in validation.validation_info)
+
+    sundered_pass = validation.get_sundered_data(type="pass")
+    sundered_fail = validation.get_sundered_data(type="fail")
+
+    assert type(sundered_pass) is type(_sunder_tbl(tbl_type))
+    assert _sorted_ids(sundered_pass) == expected_pass
+    assert _sorted_ids(sundered_fail) == sorted(set(range(1, 7)) - set(expected_pass))
+
+
+def test_get_sundered_data_conjointly_lazy() -> None:
+    # `conjointly()` gives an eager result for a Polars LazyFrame
+    validation = (
+        Validate(_SUNDER_TBL.lazy())
+        .col_vals_gt(columns="id", value=1)
+        .conjointly(lambda df: pl.col("id") < 6, lambda df: pl.col("g") != "r")
+        .interrogate()
+    )
+
+    sundered_pass = validation.get_sundered_data(type="pass")
+
+    assert isinstance(sundered_pass, pl.LazyFrame)
+    assert _sorted_ids(sundered_pass) == [2, 3, 5]
+    assert _sorted_ids(validation.get_sundered_data(type="fail")) == [1, 4, 6]
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "lazy", "pandas", "duckdb", "sqlite"])
+@pytest.mark.parametrize(
+    "add_steps, expected_pass",
+    [
+        # Every row is in one of the segments (`g` is p, q, r or s), so the step covers them all
+        (lambda v: v.col_vals_gt(columns="id", value=2, segments="g"), [3, 4, 5, 6]),
+        # Rows outside the segments (r and s) aren't checked, so they pass
+        (lambda v: v.col_vals_gt(columns="id", value=3, segments=("g", ["p", "q"])), [4, 5, 6]),
+        (
+            lambda v: v.col_vals_lt(columns="id", value=6).col_vals_gt(
+                columns="id", value=3, segments=("g", ["p", "q"])
+            ),
+            [4, 5],
+        ),
+    ],
+    ids=["all_segments", "some_segments", "after_unsegmented_step"],
+)
+def test_get_sundered_data_with_segments(tbl_type, add_steps, expected_pass) -> None:
+    # Each segment's results only hold its own rows; they have to be matched to those rows
+    validation = add_steps(Validate(_sunder_tbl(tbl_type))).interrogate()
+
+    assert _sorted_ids(validation.get_sundered_data(type="pass")) == expected_pass
+    assert _sorted_ids(validation.get_sundered_data(type="fail")) == sorted(
+        set(range(1, 7)) - set(expected_pass)
+    )
+
+
+def test_get_sundered_data_with_segments_all_passing() -> None:
+    validation = Validate(load_dataset("small_table")).col_vals_gt("d", 100, segments="f")
+    validation = validation.interrogate()
+
+    assert validation.all_passed()
+    assert validation.get_sundered_data(type="pass").height == 13
+    assert validation.get_sundered_data(type="fail").height == 0
+
+
+def test_get_sundered_data_leaves_out_steps_with_pre() -> None:
+    # `pre=` can change the rows, so its results can't be matched to the table's rows
+    validation = (
+        Validate(_SUNDER_TBL)
+        .col_vals_gt(columns="id", value=3, pre=lambda df: df.filter(pl.col("g") != "p"))
+        .col_vals_lt(columns="id", value=6)
+        .interrogate()
+    )
+
+    assert _sorted_ids(validation.get_sundered_data(type="pass")) == [1, 2, 3, 4, 5]
+    assert _sorted_ids(validation.get_sundered_data(type="fail")) == [6]
+
+
+def test_get_sundered_data_many_steps_sqlite() -> None:
+    # The query mustn't nest more deeply with every step: SQLite before 3.46 can't parse it
+    validation = Validate(_sunder_tbl("sqlite"))
+    for value in range(2, 14):
+        validation = validation.col_vals_gt(columns="id", value=value % 3)
+    validation = validation.interrogate()
+
+    assert _sorted_ids(validation.get_sundered_data(type="pass")) == [3, 4, 5, 6]
+    assert _sorted_ids(validation.get_sundered_data(type="fail")) == [1, 2]
+
+
+def test_col_vals_within_spec_checksum_on_lazyframe() -> None:
+    # The checksum specs collect a LazyFrame to check its values, and give a LazyFrame back
+    results = {}
+    for label, data in [("eager", _SUNDER_TBL), ("lazy", _SUNDER_TBL.lazy())]:
+        validation = Validate(data).col_vals_within_spec(columns="isbn", spec="isbn").interrogate()
+        results[label] = validation
+
+    lazy_info = results["lazy"].validation_info[0]
+    assert not lazy_info.eval_error
+    assert isinstance(lazy_info.tbl_checked, pl.LazyFrame)
+    assert results["lazy"].n_passed(i=1, scalar=True) == 3
+    assert results["lazy"].n_failed(i=1, scalar=True) == 3
+    assert_frame_equal(
+        lazy_info.tbl_checked.collect(), results["eager"].validation_info[0].tbl_checked
+    )
+
+
 def test_get_data_extracts_lazy_row_numbers() -> None:
     # Row numbers must follow the table's row order, not the sort order of its first column
     tbl = pl.DataFrame({"x": [5, 1, 4, 1, 3], "y": [10, 20, 30, 40, 50]})
@@ -9956,7 +10196,13 @@ def test_get_sundered_data_mix_of_step_types(request, tbl_fixture) -> None:
     assert failed_data_rows[1] == (4, 7, 8)
 
 
-def test_comprehensive_validation_report_html_snap(snapshot) -> None:
+def test_comprehensive_validation_report_html_snap(snapshot, monkeypatch) -> None:
+    # Expression source capture needs Python 3.11+; pin it so the snapshot is version-independent
+    monkeypatch.setattr(
+        "pointblank.validate._get_caller_arg_source",
+        lambda **kwargs: 'pl.col("d") > pl.col("a")',
+    )
+
     validation = (
         Validate(
             data=load_dataset(),
@@ -13878,7 +14124,15 @@ def test_connection_string_invalid_table_name() -> None:
 
 
 def test_connection_string_backend_specific_error_guidance() -> None:
-    # Test BigQuery backend error (likely not installed in test environment)
+    # Test BigQuery backend error; with the backend installed, the connection would instead start
+    # Google's interactive login (a local web server that waits for a browser) and hang
+    try:
+        import google.cloud.bigquery  # noqa: F401
+    except ImportError:
+        pass
+    else:
+        pytest.skip("The BigQuery backend is installed")
+
     with pytest.raises(ConnectionError) as exc_info:
         Validate(data="bigquery://fake-project/fake-dataset::fake-table")
 
@@ -14751,7 +15005,8 @@ def test_get_dataframe_report_duckdb_with_non_string_values():
     assert stored[3] == '"[a-z]"'
     assert [None if v is None else json.loads(v) for v in stored] == expected
     assert report.to_polars()["values"].to_list() == stored
-    assert list(report.to_pandas()["values"]) == stored
+    # pandas 3's `str` dtype gives NaN for missing values
+    assert [None if pd.isna(v) else v for v in report.to_pandas()["values"]] == stored
 
 
 @pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
@@ -14790,6 +15045,26 @@ def test_get_dataframe_report_composite_key(tbl_type):
     if tbl_type == "duckdb":
         report = report.to_polars()
     assert list(report["columns"]) == ["a, b"]
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+@pytest.mark.parametrize("interrogated", [False, True])
+def test_get_dataframe_report_segmented_steps(tbl_type, interrogated):
+    # After interrogation, each segmented step holds a `(column, value)` pair
+    validation = (
+        Validate(pl.DataFrame({"a": [1, 2, 3], "g": ["x", "y", "x"]}))
+        .col_vals_gt(columns="a", value=1, segments="g")
+        .col_vals_gt(columns="a", value=0)
+    )
+    if interrogated:
+        validation = validation.interrogate()
+
+    report = validation.get_dataframe_report(tbl_type=tbl_type)
+    if tbl_type == "duckdb":
+        report = report.to_polars()
+
+    expected = [True, True, False] if interrogated else [True, False]
+    assert list(report["segmented"]) == expected
 
 
 def get_schema_info(
@@ -22019,6 +22294,391 @@ def test_aggregate_step_report_custom_header() -> None:
     report_no_header = validation.get_step_report(i=1, header=None)
 
     assert isinstance(report_no_header, GT.GT)
+
+
+# =============================================================================
+# Tests for table-level step reports (col_exists(), row_count_match(), etc.)
+# =============================================================================
+
+
+def _table_level_validation(tbl_type: str = "polars", passing: bool = True) -> Validate:
+    """A validation with each table-level step type, all passing or all failing."""
+
+    tbl = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    return (
+        Validate(tbl)
+        .col_exists(columns="a" if passing else "dat_time")
+        .row_count_match(count=13 if passing else 20)
+        .col_count_match(count=8 if passing else 5)
+        .col_pct_null(columns="c", p=2 / 13 if passing else 0.5)
+        .col_pct_missing(
+            columns="c", missing=MissingSpec(reasons={}), max_pct=0.2 if passing else 0.1
+        )
+        .data_freshness(
+            column="date_time",
+            max_age="30 days" if passing else "6 hours",
+            reference_time="2016-01-31 00:00:00",
+        )
+        .specially(expr=lambda df: [True, passing, True])
+        .interrogate()
+    )
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+@pytest.mark.parametrize("passing", [True, False])
+def test_table_level_step_reports(tbl_type, passing) -> None:
+    """Test that every table-level step type produces a step report."""
+
+    validation = _table_level_validation(tbl_type=tbl_type, passing=passing)
+
+    for step in validation.validation_info:
+        assert step.all_passed is passing
+
+        report = validation.get_step_report(i=step.i)
+
+        assert isinstance(report, GT.GT), step.assertion_type
+
+        html = report.as_raw_html()
+
+        # The report has the same fixed width as the `col_schema_match()` step reports
+        col_widths = re.findall(r'<col style="width:(\d+)px;"/>', html)
+        assert sum(int(width) for width in col_widths) == 900
+
+        if step.assertion_type == "specially":
+            # A `specially()` step can have many test units, so they're counted
+            assert ("ALL PASSED" in html) is passing
+            assert ("TEST UNIT FAILURES" in html) is not passing
+        else:
+            # The other steps have a single test unit, so the outcome is stated instead
+            assert ("The table satisfies the condition." in html) is passing
+            assert ("The table does not satisfy the condition." in html) is not passing
+            assert "TEST UNIT" not in html
+
+
+def test_table_level_step_report_contents() -> None:
+    """Test the measured and expected values shown in table-level step reports."""
+
+    from html import unescape
+
+    validation = _table_level_validation(passing=False)
+
+    def cells(i: int) -> list[str]:
+        html = validation.get_step_report(i=i).as_raw_html()
+        return re.findall(r'<td [^>]*class="gt_row[^"]*"[^>]*>(.*?)</td>', html, flags=re.S)
+
+    def header(i: int) -> str:
+        html = validation.get_step_report(i=i).as_raw_html()
+        return unescape(re.search(r"ASSERTION.*?</code></span>", html, re.S).group())
+
+    # col_exists(): the column is missing, and the closest match is suggested
+    assert "EXISTS(dat_time)" in header(1)
+    assert [c.strip() for c in cells(1)[:4]] == ["dat_time", "—", "8", "date_time"]
+
+    # row_count_match(): actual, expected, tolerance, and difference
+    assert "ROWS = 20" in header(2)
+    assert [c.strip() for c in cells(2)[:4]] == ["13", "20", "—", "-7"]
+
+    # col_count_match(): actual, expected, and difference
+    assert "COLUMNS = 5" in header(3)
+    assert [c.strip() for c in cells(3)[:3]] == ["8", "5", "+3"]
+
+    # col_pct_null(): nulls, rows, actual and expected percentages, allowed number of nulls
+    assert "PCT_NULL(c) = 50%" in header(4)
+    assert [c.strip() for c in cells(4)[:5]] == ["2", "13", "15.38%", "50%", "6"]
+
+    # col_pct_missing(): missing values, rows, actual and maximum percentages
+    assert "PCT_MISSING(c) ≤ 10%" in header(5)
+    assert [c.strip() for c in cells(5)[:4]] == ["2", "13", "15.38%", "10%"]
+
+    # data_freshness(): most recent datetime, reference time, age, maximum age
+    assert "AGE(MAX(date_time)) ≤ 6.0h" in header(6)
+    assert [c.strip() for c in cells(6)[:4]] == [
+        "2016-01-30 11:23:00",
+        "2016-01-31 00:00:00",
+        "12.6h",
+        "6.0h",
+    ]
+
+    # specially(): test units, passed, failed
+    assert "SPECIALLY(expr)" in header(7)
+    assert [c.strip() for c in cells(7)[:3]] == ["3", "2", "1"]
+
+
+def test_table_level_step_report_variants() -> None:
+    """Test tolerance, inverse, filtered, and named-function variants of table-level reports."""
+
+    def check_rows(df):
+        return True
+
+    validation = (
+        Validate(pl.DataFrame({"a": [1, None, 3], "b": [-99, -98, 1]}))
+        .row_count_match(count=4, tol=(2, 1))
+        .row_count_match(count=3, tol=1)
+        .row_count_match(count=3, inverse=True)
+        .col_count_match(count=3, inverse=True)
+        .col_pct_missing(
+            columns="b",
+            missing=MissingSpec(reasons={-99: "refused", -98: "dont_know"}),
+            max_pct=0.5,
+            reason="refused",
+        )
+        .col_exists(columns="a")
+        .specially(expr=check_rows)
+        .interrogate()
+    )
+
+    html = [validation.get_step_report(i=i).as_raw_html() for i in range(1, 8)]
+
+    assert "(-2, +1)" in html[0]
+    assert "±1" in html[1]
+    assert "ROWS &ne; 3" in html[2]
+    assert "COLUMNS &ne; 3" in html[3]
+    assert "reason=&#x27;refused&#x27;" in html[4] or "reason='refused'" in html[4]
+
+    # The legend of missing-value codes is appended to the col_pct_missing() report
+    assert "refused" in html[4] and "dont_know" in html[4]
+
+    # A column that's present shows its position and no closest-match column
+    assert "POSITION" in html[5]
+    assert "CLOSEST MATCH" not in html[5]
+
+    # A column name that differs only in case is matched case-insensitively
+    html_case = (
+        (Validate(pl.DataFrame({"a": [1]})).col_exists(columns="A").interrogate())
+        .get_step_report(i=1)
+        .as_raw_html()
+    )
+
+    assert "CLOSEST MATCH" in html_case
+    assert re.search(r'headers="pb_step_tbl-closest_match"[^>]*>a</td>', html_case)
+
+    assert "SPECIALLY(check_rows)" in html[6]
+
+
+def test_table_level_step_report_escapes_column_names() -> None:
+    """Test that column names with Markdown/HTML characters are shown literally."""
+
+    name = "*x*_<b>y</b>"
+
+    validation = (
+        Validate(pl.DataFrame({name: [1, None]}))
+        .col_exists(columns=name)
+        .col_pct_null(columns=name, p=0.5)
+        .interrogate()
+    )
+
+    for i in (1, 2):
+        html = validation.get_step_report(i=i).as_raw_html()
+
+        assert "*x*_&lt;b&gt;y&lt;/b&gt;" in html
+        assert "<b>y</b>" not in html
+        assert "<em>x</em>" not in html
+
+
+def test_table_level_step_report_header_options() -> None:
+    """Test custom headers, no header, and translated text in table-level step reports."""
+
+    validation = (
+        Validate(pl.DataFrame({"a": [1, 2]}), lang="fr")
+        .row_count_match(count=2)
+        .col_count_match(count=2)
+        .interrogate()
+    )
+
+    html_default = validation.get_step_report(i=1).as_raw_html()
+
+    assert "Rapport pour l'étape de validation 1" in html_default
+    assert "La table satisfait la condition." in html_default
+
+    html_custom = validation.get_step_report(i=2, header="Custom: {title}").as_raw_html()
+
+    assert "Custom: Rapport pour l'étape de validation 2" in html_custom
+    assert "ASSERTION" not in html_custom
+
+    html_no_header = validation.get_step_report(i=2, header=None).as_raw_html()
+
+    assert "Rapport pour" not in html_no_header
+    assert "ACTUAL" in html_no_header
+
+
+def test_table_level_step_report_empty_table() -> None:
+    """Test table-level step reports for a table with no rows."""
+
+    tbl = pl.DataFrame({"a": pl.Series([], dtype=pl.Int64), "d": pl.Series([], dtype=pl.Datetime)})
+
+    validation = (
+        Validate(tbl)
+        .row_count_match(count=0)
+        .col_count_match(count=2)
+        .col_exists(columns="a")
+        .data_freshness(column="d", max_age="1 day")
+        .interrogate()
+    )
+
+    for step in validation.validation_info:
+        assert isinstance(validation.get_step_report(i=step.i), GT.GT), step.assertion_type
+
+    # With no datetime values, the most recent datetime and age are blank
+    html_freshness = validation.get_step_report(i=4).as_raw_html()
+
+    assert html_freshness.count("—") >= 2
+
+
+@pytest.mark.parametrize("passing", [True, False])
+def test_step_report_title_status_mark(passing) -> None:
+    """Test that the step report title has a check mark (passing) or a cross mark (failing)."""
+
+    # The failing table has a duplicate row
+    tbl = pl.DataFrame({"a": [1, 2, 3 if passing else 2]})
+
+    validation = (
+        Validate(tbl)
+        .col_vals_gt(columns="a", value=0 if passing else 1)
+        .rows_distinct()
+        .col_exists(columns="a" if passing else "z")
+        .tbl_match(tbl_compare=tbl if passing else tbl.head(2))
+        .interrogate()
+    )
+
+    for step in validation.validation_info:
+        assert step.all_passed is passing, step.assertion_type
+
+        title = validation.get_step_report(i=step.i).as_raw_html().split("ASSERTION")[0]
+
+        assert ("&check;" in title) is passing, step.assertion_type
+        assert ("&cross;" in title) is not passing, step.assertion_type
+
+
+@pytest.mark.parametrize("passing", [True, False])
+def test_rows_distinct_step_report_assertion(passing) -> None:
+    """Test that the `rows_distinct()` step report shows the assertion after `ASSERTION`."""
+
+    tbl = pl.DataFrame({"a": [1, 2, 3 if passing else 2]})
+
+    html = Validate(tbl).rows_distinct().interrogate().get_step_report(i=1).as_raw_html()
+
+    assert re.search(r"ASSERTION <span[^>]*><code[^>]*><code[^>]*>All rows are distinct", html)
+
+
+@pytest.mark.parametrize("header", [":default:", None])
+def test_tbl_match_step_report_fixed_width(header) -> None:
+    """Test that `tbl_match()` and `tbl_reconcile()` step reports have a fixed width."""
+
+    tbl = pl.DataFrame({"k": ["x", "y"], "a": [1, 2]})
+
+    validation = (
+        Validate(tbl)
+        .tbl_match(tbl_compare=tbl)
+        .tbl_reconcile(tbl_compare=tbl, keys="k", measures="a")
+        .interrogate()
+    )
+
+    for step in validation.validation_info:
+        html = validation.get_step_report(i=step.i, header=header).as_raw_html()
+
+        table_style = re.search(r'<table style="([^"]*)" class="gt_table"', html).group(1)
+
+        assert "width: 900px" in table_style
+
+
+def _step_report_text(validation, i: int = 1) -> str:
+    """Get the text of a step report, with HTML tags removed and whitespace collapsed."""
+
+    html = validation.get_step_report(i=i).as_raw_html()
+
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
+
+
+def test_step_report_extract_text_spacing() -> None:
+    """Test that the extract text has no space before its colon (with or without the red note)."""
+
+    tbl = pl.DataFrame({"a": [1, 2, 3], "b": [1, None, 3]})
+
+    # With the note on the failures in red (the target column is in the extract)
+    html = Validate(tbl).col_vals_gt("a", 1).interrogate().get_step_report(i=1).as_raw_html()
+
+    assert "ROW" in html
+    assert "</span>):</div>" in html
+    assert "NOT SHOWN" not in html
+
+    # Without the note (no target column)
+    html = Validate(tbl).rows_complete().interrogate().get_step_report(i=1).as_raw_html()
+
+    assert "ROW:</div>" in html
+    assert "ROW :" not in html
+
+
+def test_step_report_singular_text() -> None:
+    """Test that step reports use singular forms for a single test unit or extracted row."""
+
+    tbl = pl.DataFrame({"a": [5]})
+
+    def check_tbl(df):
+        return True
+
+    # A single passing test unit, with and without a column
+    assert "1 TEST UNIT PASSED IN COLUMN 1 " in _step_report_text(
+        Validate(tbl).col_vals_gt("a", 1).interrogate()
+    )
+    assert "1 TEST UNIT PASSED " in _step_report_text(Validate(tbl).rows_distinct().interrogate())
+    assert "1 TEST UNIT PASSED " in _step_report_text(
+        Validate(tbl).specially(check_tbl).interrogate()
+    )
+
+    # Multiple passing test units keep the plural form
+    assert "2 TEST UNITS ALL PASSED IN COLUMN 1 " in _step_report_text(
+        Validate(pl.DataFrame({"a": [5, 6]})).col_vals_gt("a", 1).interrogate()
+    )
+
+    # A single extracted row
+    text = _step_report_text(Validate(pl.DataFrame({"a": [5, None]})).rows_complete().interrogate())
+
+    assert "EXTRACT OF 1 ROW:" in text
+    assert "ALL 1 ROWS" not in text
+
+    # Other languages also get the singular form
+    assert "1 UNITÉ DE TEST RÉUSSIE DANS LA COLONNE 1 " in _step_report_text(
+        Validate(tbl, lang="fr").col_vals_gt("a", 1).interrogate()
+    )
+
+
+def test_col_missing_consistent_step_report_text() -> None:
+    """Test that `col_missing_consistent()` step reports don't give a list as a column position."""
+
+    spec = MissingSpec(reasons={-99: "refused", -98: "na"})
+
+    for m, n in [([1, -98], [1, 2]), ([1, -98], [1, -98])]:
+        text = _step_report_text(
+            Validate(pl.DataFrame({"m": m, "n": n}))
+            .col_missing_consistent(["m", "n"], missing=spec, when_reason="na")
+            .interrogate()
+        )
+
+        assert "[1, 2]" not in text
+        assert "IN COLUMN" not in text
+        assert "TEST UNIT" in text
+
+
+def test_conjointly_step_report_assertion() -> None:
+    """Test that `conjointly()` step reports name each of the expressions in the assertion."""
+
+    tbl = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+
+    def a_gt_1(df):
+        return pl.col("a") > 1
+
+    text = _step_report_text(
+        Validate(tbl).conjointly(a_gt_1, lambda df: pl.col("b") < 6).interrogate()
+    )
+
+    assert "ASSERTION CONJOINTLY(a_gt_1, expr_2) " in text
+    assert "conjointly" not in text
+
+    # Lambdas given to `specially()` are named in the same way
+    text = _step_report_text(Validate(tbl).specially(lambda df: True).interrogate())
+
+    assert "SPECIALLY(expr)" in text
 
 
 # =============================================================================

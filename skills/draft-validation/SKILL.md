@@ -115,7 +115,7 @@ edit = pb.EditValidation(
 edit = pb.EditValidation(
     validation=code_string,
     instruction="Remove the regex check and add a between check for age",
-    model="openai:gpt-4o",
+    model="openai:gpt-6-luna",
 )
 
 # From a YAML file
@@ -188,18 +188,18 @@ All LLM features use the format `"provider:model_name"`:
 ```python
 # Anthropic
 model="anthropic:claude-sonnet-4-6"
-model="anthropic:claude-haiku-4-5-20251001"
+model="anthropic:claude-haiku-5-5"
 
 # OpenAI
-model="openai:gpt-4o"
-model="openai:gpt-4o-mini"
+model="openai:gpt-6-luna"
+model="openai:gpt-5.6-sol"
 
 # Ollama (local)
 model="ollama:llama3"
 model="ollama:mistral"
 
 # AWS Bedrock
-model="bedrock:anthropic.claude-sonnet-4-20250514-v1:0"
+model="bedrock:anthropic.claude-sonnet-5-5"
 
 # Azure OpenAI
 model="azure-openai:my-deployment-name"

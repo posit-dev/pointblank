@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from importlib_resources import files
+from importlib.resources import files
 
 from pointblank._constants import MODEL_PROVIDERS
 from pointblank._utils_ai import _check_ai_package, _check_provider_packages
