@@ -30,18 +30,62 @@ from pointblank.scan_profile_stats import (
 # ──────────────────────────────────────────────────────────────────────
 
 
-def test_typemap_is_illegal_struct():
-    assert _TypeMap.is_illegal("Struct{'a': Int64}") is True
+@pytest.mark.parametrize(
+    "dtype, expected",
+    [
+        (nw.Int64(), _TypeMap.NUMERIC),
+        (nw.UInt8(), _TypeMap.NUMERIC),
+        (nw.Float32(), _TypeMap.NUMERIC),
+        (nw.Decimal(), _TypeMap.NUMERIC),
+        (nw.String(), _TypeMap.STRING),
+        (nw.Categorical(), _TypeMap.STRING),
+        (nw.Enum(["a"]), _TypeMap.STRING),
+        (nw.Date(), _TypeMap.DATE),
+        (nw.Datetime("us"), _TypeMap.DATE),
+        (nw.Time(), _TypeMap.DATE),
+        (nw.Boolean(), _TypeMap.BOOL),
+        # Nested and other types have no profile
+        (nw.List(nw.Int64), None),
+        (nw.List(nw.String), None),
+        (nw.Array(nw.Float64, 2), None),
+        (nw.Struct({"a": nw.Int64}), None),
+        (nw.Duration(), None),
+        (nw.Binary(), None),
+        (nw.Object(), None),
+        (nw.Unknown(), None),
+    ],
+    ids=str,
+)
+def test_typemap_from_dtype(dtype, expected):
+    # The string form (the `coltype` of a profile, as saved in the JSON) gives the same result
+    assert _TypeMap.from_dtype(dtype) is expected
+    assert _TypeMap.from_dtype(str(dtype)) is expected
 
 
-@pytest.mark.parametrize("dtype", [nw.List(nw.Int64), nw.List(nw.String), nw.Array(nw.Int64, 2)])
-def test_typemap_is_illegal_list_and_array(dtype):
-    assert _TypeMap.is_illegal(dtype) is True
+# The category names of an Enum, and the inner type of a List, used to pick the profile
+@pytest.mark.parametrize(
+    "categories, expected",
+    [
+        (["print", "floating"], _TypeMap.STRING),
+        (["update", "boolean"], _TypeMap.STRING),
+        (["playlist", "struct"], _TypeMap.STRING),
+    ],
+)
+def test_typemap_from_dtype_ignores_enum_categories(categories, expected):
+    dtype = nw.Enum(categories)
+
+    assert _TypeMap.from_dtype(dtype) is expected
+    assert _TypeMap.from_dtype(str(dtype)) is expected
 
 
-def test_typemap_is_illegal_non_struct():
-    assert _TypeMap.is_illegal("Int64") is False
-    assert _TypeMap.is_illegal("String") is False
+@pytest.mark.parametrize("coltype", ["", "Int64x", "not a type", "Field"])
+def test_typemap_from_dtype_unknown_string(coltype):
+    assert _TypeMap.from_dtype(coltype) is None
+
+
+def test_typemap_fetch_profile_raises_for_unsupported_type():
+    with pytest.raises(NotImplementedError, match="List"):
+        _TypeMap.fetch_profile(nw.List(nw.Int64))
 
 
 def test_typemap_fetch_prof_map_returns_dict():
