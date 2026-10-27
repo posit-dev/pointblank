@@ -4,7 +4,7 @@ Get the data that passed or failed the validation steps.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20393-L20557)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20393-L20548)
 
 ``` python
 Validate.get_sundered_data(type="pass")
@@ -20,7 +20,7 @@ There are some caveats to sundering. The validation steps considered for this sp
 - `active=` is not set to `False`
 - `pre=` has not been given an expression for modifying the input table
 
-So long as these conditions are met, the data will be split into two constituent tables: one with the rows that passed all validation steps and another with the rows that failed at least one validation step.
+So long as these conditions are met, the data will be split into two constituent tables: one with the rows that passed all validation steps and another with the rows that failed at least one validation step. Steps that use `segments=` are included, with each segment's results counting only for the rows in that segment.
 
 ## Parameters
 

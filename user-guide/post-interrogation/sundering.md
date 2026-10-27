@@ -192,6 +192,8 @@ There are some additional caveats though. Even if using a validation method draw
 
 The first one makes intuitive sense (you decided to skip this validation step entirely), the second one requires some explanation. Using `pre=` allows you to modify the target table, there's no easy or practical way to compare rows in a mutated table compared to the original table (e.g., a mutation may drastically reduce the number of rows).
 
+Steps that use `segments=` are used for sundering. Each segment's results apply only to the rows in that segment, so rows outside all of a step's segments aren't affected by that step.
+
 ## Practical Applications of Sundering
 
 ### 1. Creating Clean Datasets for Analysis

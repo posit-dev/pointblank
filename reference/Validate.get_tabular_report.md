@@ -4,7 +4,7 @@ Validation report as a GT table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20704-L21886)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20695-L21877)
 
 ``` python
 Validate.get_tabular_report(
