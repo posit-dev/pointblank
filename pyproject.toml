@@ -114,8 +114,8 @@ dev = [
     "jupyter",
     "nbclient>=0.10.0",
     "nbformat>=5.10.4",
-    "pandas>=2.2.3,<3",  # <3: not tested with pandas 3.0 yet (its default `str` dtype needs duckdb 1.4+)
-    "polars>=1.17.1",
+    "pandas>=2.2.3",
+    "polars>=1.33.0",
     "pre-commit==2.15.0",
     "pyarrow",
     "pyarrow-stubs>=19.4",
