@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import contextlib
 import json
+import numbers
 from dataclasses import dataclass
+from html import escape as html_escape
 from importlib.metadata import version
 from typing import TYPE_CHECKING, Any, cast
 
@@ -116,6 +118,17 @@ class DataScan:
     - `min`: the minimum date/datetime in the column
     - `max`: the maximum date/datetime in the column
 
+    Time columns get the same statistics.
+
+    Supported Column Types
+    ----------------------
+    Numeric columns (integers, floats and decimals), string columns (including categorical and
+    enum columns), date, datetime and time columns, and Boolean columns are summarized. Columns of
+    other types (e.g., lists, arrays, structs, durations and binary data) can't be summarized, so
+    they're listed in the report with no statistics, and in the JSON under `skipped_columns`.
+    pandas stores decimals, times, and Booleans with missing values as `object` columns, which
+    can't be summarized either.
+
     Returns
     -------
     DataScan
@@ -165,6 +178,8 @@ class DataScan:
         # Get schema and extract all column names from it
         schema: Mapping[str, Any] = self.nw_data.collect_schema()
         columns: list[str] = list(schema.keys())
+        if not columns:
+            raise ValueError("The table has no columns, so there is nothing to summarize.")
 
         profile = _DataProfile(
             table_name=self.tbl_name,
@@ -176,9 +191,6 @@ class DataScan:
 
             ## Handle dtyping:
             native_dtype = schema[column]
-            if _TypeMap.is_illegal(native_dtype):
-                profile.skipped_columns[column] = str(native_dtype)
-                continue
             try:
                 prof: type[ColumnProfile] = _TypeMap.fetch_profile(native_dtype)
             except NotImplementedError:
@@ -386,6 +398,9 @@ class DataScan:
                 .drop("__bool_unique_html", "freqs")
             )
 
+        if self.profile.skipped_columns:
+            formatted_data = self._with_skipped_column_rows(formatted_data)
+
         ## Determine Value Formatting Selectors:
         fmt_int: list[str] = formatted_data.select(nw.selectors.by_dtype(nw.dtypes.Int64)).columns
         fmt_float: list[str] = formatted_data.select(
@@ -463,6 +478,43 @@ class DataScan:
 
         return gt_tbl
 
+    def _with_skipped_column_rows(self, data: DataFrame) -> DataFrame:
+        """
+        Add a row for each column that couldn't be summarized, in the table's column order.
+
+        The row has the column's name and type, with an "unsupported type" badge, and no
+        statistics. The rows of `data` follow the order of `column_profiles`.
+        """
+        skipped = self.profile.skipped_columns
+        badge = (
+            "<span style='display: inline-block; margin-top: 2px; padding: 1px 5px; "
+            "border-radius: 3px; background-color: #EEEEEE; color: #666666; font-size: 9px; "
+            "font-weight: 600; white-space: nowrap;'>UNSUPPORTED TYPE</span>"
+        )
+        skipped_rows: dict[str, list[Any]] = {c: [None] * len(skipped) for c in data.columns}
+        skipped_rows["icon"] = [_TypeMap.fetch_icon(None)] * len(skipped)  # the `object` icon
+        skipped_rows["colname"] = [
+            "<div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; "
+            f"overflow: hidden;'>{html_escape(name, quote=False)}</div>"
+            f"<div style='font-size: 11px; color: gray;'>{html_escape(coltype, quote=False)}</div>"
+            f"{badge}"
+            for name, coltype in skipped.items()
+        ]
+        backend = cast(Any, self.profile.implementation)
+        skipped_tbl = nw.from_dict(skipped_rows, schema=data.schema, backend=backend)
+
+        position = {name: i for i, name in enumerate(self.profile.columns)}
+        positions = [position[p.colname] for p in self.profile.column_profiles]
+        positions += [position[name] for name in skipped]
+        return (
+            nw.concat([data, skipped_tbl], how="vertical")
+            .with_columns(
+                nw.new_series("__position", values=positions, dtype=nw.Int64(), backend=backend)
+            )
+            .sort("__position")
+            .drop("__position")
+        )
+
     @staticmethod
     def _build_label_map(cols: Sequence[str]) -> dict[str, Any]:
         label_map: dict[str, Any] = {}
@@ -510,6 +562,8 @@ class DataScan:
                 "table_name": self.profile.table_name,
                 "row_count": self.profile.row_count,
                 "columns": self.profile.columns,
+                # Column name -> type of the columns that couldn't be summarized
+                "skipped_columns": dict(self.profile.skipped_columns),
             },
             "columns": columns_out,
         }
@@ -526,7 +580,7 @@ class DataScan:
         str
             A JSON string representing the profile.
         """
-        return json.dumps(self.to_dict(), indent=4, default=str)
+        return json.dumps(self.to_dict(), indent=4, default=_json_default)
 
     def save_to_json(self, output_file: str) -> None:
         """
@@ -570,7 +624,7 @@ class DataScan:
         profile.columns = meta["columns"]
         profile.implementation = nw.Implementation.POLARS
         profile.column_profiles = []
-        profile.skipped_columns = {}
+        profile.skipped_columns = dict(meta.get("skipped_columns", {}))
 
         stat_class_map: dict[str, type] = {
             stat_cls.name: stat_cls for stat_cls in COLUMN_ORDER_REGISTRY
@@ -650,6 +704,14 @@ class DataScan:
         return DataScanDiff(current=self, baseline=baseline)
 
 
+def _json_default(value: Any) -> Any:
+    """Make a statistic JSON-ready: NumPy numbers become Python numbers, anything else a string."""
+    # pandas gives NumPy integers (e.g., `n_unique`), which `str()` would turn into text
+    if isinstance(value, numbers.Number) and hasattr(value, "item"):
+        return value.item()
+    return str(value)
+
+
 def _html_escape_expr(expr: nw.Expr) -> nw.Expr:
     """Escape `&`, `<` and `>` in a string expression, so its text can go into HTML."""
     return (
@@ -660,11 +722,9 @@ def _html_escape_expr(expr: nw.Expr) -> nw.Expr:
 
 
 def _assign_type_from_coltype(prof: ColumnProfile) -> None:
-    coltype_lower = prof.coltype.lower()
-    for type_enum in _TypeMap:
-        if any(ind in coltype_lower for ind in type_enum.value):
-            prof.__class__ = _TypeMap.fetch_prof_map()[type_enum]
-            return
+    type_enum = _TypeMap.from_dtype(prof.coltype)
+    if type_enum is not None:
+        prof.__class__ = _TypeMap.fetch_prof_map()[type_enum]
 
 
 def _compute_psi_numeric(
@@ -831,8 +891,7 @@ def _get_col_profile(scan: DataScan, colname: str) -> ColumnProfile:
 
 
 def _is_numeric_coltype(coltype: str) -> bool:
-    coltype_lower = coltype.lower()
-    return any(ind in coltype_lower for ind in ("int", "float", "double", "decimal", "numeric"))
+    return _TypeMap.from_dtype(coltype) is _TypeMap.NUMERIC
 
 
 @dataclass
@@ -1192,6 +1251,14 @@ def col_summary_tbl(data: Any, tbl_name: str | None = None) -> GT:
     -------
     GT
         A GT object that displays the column-level summaries of the table.
+
+    Supported Column Types
+    ----------------------
+    Numeric columns (integers, floats and decimals), string columns (including categorical and
+    enum columns), date, datetime and time columns, and Boolean columns are summarized. Columns of
+    other types (e.g., lists, arrays, structs, durations and binary data) can't be summarized, so
+    they get a row marked *unsupported type* with no statistics. pandas stores decimals, times,
+    and Booleans with missing values as `object` columns, which can't be summarized either.
 
     Supported Input Table Types
     ---------------------------
