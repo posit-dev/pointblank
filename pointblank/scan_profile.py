@@ -309,8 +309,9 @@ class _DataProfile:  # TODO: feels redundant and weird
         all_keys = set().union(*(d.keys() for d in cols))
 
         for key in all_keys:
-            # Get all values for this key across all dictionaries
-            values = [d.get(key) for d in cols if key in d]
+            # Get all values for this key across all dictionaries (a missing statistic, e.g., the
+            # `std` of a single value, is left as a null rather than counted as another type)
+            values = [d[key] for d in cols if d.get(key) is not None]
 
             # Check if all values are of the same type
             if len(values) > 1:
@@ -326,7 +327,7 @@ class _DataProfile:  # TODO: feels redundant and weird
                         msg = f"Some types in {key!s} stat are different. Turn off `strict` to bypass."  # pragma: no cover
                         raise TypeError(msg)  # pragma: no cover
                     for d in cols:  # pragma: no cover
-                        if key in d:  # pragma: no cover
+                        if d.get(key) is not None:  # pragma: no cover
                             d[key] = str(d[key])  # pragma: no cover
 
         return nw.from_dict(transpose_dicts(cols), backend=self.implementation)

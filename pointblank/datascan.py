@@ -468,10 +468,8 @@ class DataScan:
             )
         )
 
-        if "PYARROW" != formatted_data.implementation.name:
-            # TODO: this is more proactive than it should be
-            gt_tbl = gt_tbl.sub_missing(missing_text="-")
-            # https://github.com/posit-dev/great-tables/issues/667
+        # TODO: this is more proactive than it should be
+        gt_tbl = gt_tbl.sub_missing(missing_text="-")
 
         # If the version of `great_tables` is `>=0.17.0` then disable Quarto table processing
         if version("great_tables") >= "0.17.0":
@@ -509,7 +507,14 @@ class DataScan:
             for name, dtype in data.schema.items()
         }
         data = data.with_columns(nw.col(name).cast(dtype) for name, dtype in schema.items())
-        skipped_tbl = nw.from_dict(skipped_rows, schema=schema, backend=backend)
+        # On pandas, `from_dict()` (and, before Narwhals 2.27, `lit(None, dtype=...)`) turns `None`
+        # in a string column into the text "None", which `sub_missing()` doesn't replace. A `when()`
+        # that's never true (every skipped row has a name) makes the empty cells real nulls.
+        skipped_tbl = nw.from_dict(skipped_rows, schema=schema, backend=backend).with_columns(
+            nw.when(nw.col("colname").is_null()).then(nw.col(name)).alias(name)
+            for name in data.columns
+            if name not in ("icon", "colname")
+        )
 
         position = {name: i for i, name in enumerate(self.profile.columns)}
         positions = [position[p.colname] for p in self.profile.column_profiles]
