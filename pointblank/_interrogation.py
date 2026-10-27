@@ -1035,9 +1035,13 @@ def interrogate_between(
     else:
         result_tbl = result_tbl.with_columns(pb_is_good_6=nw.col(column) < high_val)
 
+    # A missing value or bound fails both comparisons, so only `na_pass=` decides the row
+    # (`NaN` is greater than every number on Polars and DuckDB, so `x <= NaN` would be `True`)
+    any_missing = nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
+
     result_tbl = result_tbl.with_columns(
         pb_is_good_5=(
-            nw.when(nw.col("pb_is_good_5").is_null() | nw.col("pb_is_good_1"))
+            nw.when(nw.col("pb_is_good_5").is_null() | any_missing)
             .then(nw.lit(False))
             .otherwise(nw.col("pb_is_good_5"))
         )
@@ -1045,7 +1049,7 @@ def interrogate_between(
 
     result_tbl = result_tbl.with_columns(
         pb_is_good_6=(
-            nw.when(nw.col("pb_is_good_6").is_null() | nw.col("pb_is_good_1"))
+            nw.when(nw.col("pb_is_good_6").is_null() | any_missing)
             .then(nw.lit(False))
             .otherwise(nw.col("pb_is_good_6"))
         )
@@ -1113,11 +1117,15 @@ def interrogate_outside(
     else:
         result_tbl = result_tbl.with_columns(pb_is_good_6=nw.col(column) >= high_val)
 
+    # A missing value or bound fails both comparisons, so only `na_pass=` decides the row
+    # (`NaN` is greater than every number on Polars and DuckDB, so `x <= NaN` would be `True`)
+    any_missing = nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
+
     result_tbl = result_tbl.with_columns(
-        pb_is_good_5=nw.when(nw.col("pb_is_good_5").is_null() | nw.col("pb_is_good_1"))
+        pb_is_good_5=nw.when(nw.col("pb_is_good_5").is_null() | any_missing)
         .then(False)
         .otherwise(nw.col("pb_is_good_5")),
-        pb_is_good_6=nw.when(nw.col("pb_is_good_6").is_null() | nw.col("pb_is_good_1"))
+        pb_is_good_6=nw.when(nw.col("pb_is_good_6").is_null() | any_missing)
         .then(False)
         .otherwise(nw.col("pb_is_good_6")),
     )
