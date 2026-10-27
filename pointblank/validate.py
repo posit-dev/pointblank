@@ -4977,6 +4977,12 @@ def _render_step_code(method: str, params: dict[str, Any]) -> str:
     return f"    .{method}(" + ", ".join(parts) + ")"
 
 
+_REFERENCE_PLACEHOLDER_NOTE = (
+    "The `reference=` table is an in-memory table that cannot be serialized; the placeholder "
+    "`your_reference_data` was emitted and must be replaced with the reference data."
+)
+
+
 def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
     """Convert a Python value into a YAML-safe structure for `to_yaml()`."""
     if isinstance(value, _UnserializablePlaceholder):
@@ -5959,7 +5965,11 @@ class Validate:
         # Process data through the centralized data processing pipeline
         self.data = _process_data(self.data)
 
-        # Process reference data if provided
+        # Process reference data if provided, keeping a file path or connection string so that
+        # `to_code()` and `to_yaml()` can write it back out
+        self._reference_source: str | None = (
+            str(self.reference) if isinstance(self.reference, (str, Path)) else None
+        )
         if self.reference is not None:
             self.reference = _process_data(self.reference)
 
@@ -19389,7 +19399,9 @@ class Validate:
         str
             The validation plan as a block of Python code. The data source is rendered as the
             placeholder `your_data`, since the original data variable name is not known to the
-            plan.
+            plan. Reference data given as a file path or connection string is written out as-is;
+            an in-memory reference table becomes the placeholder `your_reference_data` (with a
+            warning).
 
         Notes on Fidelity
         -----------------
@@ -19450,6 +19462,16 @@ class Validate:
                 validate_args.append((f"{attr}={json.dumps(value)}", None))
         if self.consumers is not None:
             validate_args.append((f"consumers={_render_code_value(self.consumers)}", None))
+        if self._reference_source is not None:
+            validate_args.append((f"reference={json.dumps(self._reference_source)}", None))
+        elif self.reference is not None:
+            validate_args.append(
+                (
+                    "reference=your_reference_data",
+                    "  # Replace your_reference_data with the actual reference table",
+                )
+            )
+            warnings_out.append(_REFERENCE_PLACEHOLDER_NOTE)
 
         lines = ["import pointblank as pb", "", "validation = (", "    pb.Validate("]
         for arg, comment in validate_args:
@@ -19490,7 +19512,9 @@ class Validate:
         str
             The validation plan as a YAML string. The `tbl` field is set from `tbl_name` when
             available, otherwise to the placeholder `your_data`; set it to a loadable data
-            source before passing the YAML to `yaml_interrogate()`.
+            source before passing the YAML to `yaml_interrogate()`. The `reference` field is
+            written the same way as in `to_code()`: a file path or connection string as-is, and
+            the placeholder `your_reference_data` (with a warning) for an in-memory table.
 
         Notes on Fidelity
         -----------------
@@ -19541,6 +19565,11 @@ class Validate:
                 config[attr] = value
         if self.consumers is not None:
             config["consumers"] = self.consumers
+        if self._reference_source is not None:
+            config["reference"] = self._reference_source
+        elif self.reference is not None:
+            config["reference"] = "your_reference_data"
+            warnings_out.append(_REFERENCE_PLACEHOLDER_NOTE)
         if self.actions is not None:
             warnings_out.append(
                 "Table-level `actions=` cannot be serialized to YAML and were omitted."
