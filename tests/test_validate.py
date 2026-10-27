@@ -4956,22 +4956,20 @@ def test_col_vals_not_in_set_missing_spec(tbl_type, null_is_missing, expected) -
 
 
 def test_col_vals_not_in_set_nan() -> None:
-    # pandas treats `NaN` as missing (it fails unless `na_pass=True`); Polars treats it as a value
+    # `NaN` counts as missing on every backend, so it fails unless `na_pass=True`
     data = {"a": [1.0, float("nan"), 2.0]}
 
-    for na_pass, expected in [(False, (1, 2)), (True, (2, 1))]:
-        validation = (
-            Validate(pd.DataFrame(data))
-            .col_vals_not_in_set(columns="a", set=[1.0], na_pass=na_pass)
-            .interrogate()
-        )
-        assert (
-            validation.n_passed(i=1, scalar=True),
-            validation.n_failed(i=1, scalar=True),
-        ) == expected
-
-    validation = Validate(pl.DataFrame(data)).col_vals_not_in_set(columns="a", set=[1.0])
-    assert validation.interrogate().n_passed(i=1, scalar=True) == 2
+    for tbl in [pd.DataFrame(data), pl.DataFrame(data)]:
+        for na_pass, expected in [(False, (1, 2)), (True, (2, 1))]:
+            validation = (
+                Validate(tbl)
+                .col_vals_not_in_set(columns="a", set=[1.0], na_pass=na_pass)
+                .interrogate()
+            )
+            assert (
+                validation.n_passed(i=1, scalar=True),
+                validation.n_failed(i=1, scalar=True),
+            ) == expected
 
 
 def test_col_vals_not_in_set_none_in_set_raises() -> None:
