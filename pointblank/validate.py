@@ -20509,13 +20509,10 @@ class Validate:
 
         data_nw = _with_row_index(self.data, name=index_name)
 
-        # Start from every row of the data, so that rows outside a segmented step's segment are
-        # kept (their result for that step is missing, which `pb_is_good_all` ignores)
-        labeled_tbl_nw = data_nw.select(index_name)
-
-        # Join the `pb_is_good_` column of every validation step's results table, naming the
-        # columns uniquely (e.g., `pb_is_good_1`, `pb_is_good_2`, ...)
-        for i, validation in enumerate(validation_info):
+        # Collect the numbers of the rows that failed in each validation step (a missing result
+        # doesn't count as a failure; e.g., a row outside a segmented step's segment)
+        failed_rows = []
+        for validation in validation_info:
             # Add row numbers to the results table (put on the same backend as the data first, as
             # some steps materialize their results, and eager and lazy tables can't be joined)
             results_tbl = _with_row_index(
@@ -20529,33 +20526,22 @@ class Validate:
                     results_tbl, data_nw, segments=validation.segments, index_name=index_name
                 )
 
-            # Add numerical suffix to the `pb_is_good_` column to make it unique
-            results_tbl = results_tbl.select([index_name, "pb_is_good_"]).rename(
-                {"pb_is_good_": f"pb_is_good_{i}"}
-            )
+            # The results can be an `object` column in pandas, so they're made Boolean first
+            is_good = nw.col("pb_is_good_").fill_null(True).cast(nw.Boolean)
+            failed_rows.append(results_tbl.filter(~is_good).select(index_name))
 
-            labeled_tbl_nw = labeled_tbl_nw.join(results_tbl, on=index_name, how="left")
+        # The failing rows of all steps are combined at once (rather than joining the steps'
+        # results one by one), so that the query for a database table doesn't nest more deeply with
+        # every step (SQLite versions before 3.46 can't parse deeply nested queries)
+        failed_rows = nw.concat(failed_rows, how="vertical")
 
-        # Get list of columns that are the `pb_is_good_` columns
-        pb_is_good_cols = [f"pb_is_good_{i}" for i in range(len(validation_steps_i))]
-
-        # Determine the rows that passed all validation steps by checking if all `pb_is_good_`
-        # columns are `True`; joins don't guarantee row order (e.g., Polars >= 2.0 collects
-        # LazyFrames with the streaming engine), so the original order is restored via the index
-        labeled_tbl_nw = (
-            labeled_tbl_nw.with_columns(
-                pb_is_good_all=nw.all_horizontal(pb_is_good_cols, ignore_nulls=True)
-            )
-            .join(data_nw, on=index_name, how="left")
+        # The rows that passed are those that failed in no step; joins don't guarantee row order
+        # (e.g., Polars >= 2.0 collects LazyFrames with the streaming engine), so the original
+        # order is restored via the index
+        sundered_tbl = (
+            data_nw.join(failed_rows, on=index_name, how="anti" if type == "pass" else "semi")
             .sort(index_name)
             .drop(index_name)
-        )
-
-        bool_val = True if type == "pass" else False
-
-        sundered_tbl = (
-            labeled_tbl_nw.filter(nw.col("pb_is_good_all") == bool_val)
-            .drop(pb_is_good_cols + ["pb_is_good_all"])
             .to_native()
         )
 
