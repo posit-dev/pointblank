@@ -1,3 +1,4 @@
+import json
 import warnings
 
 import pytest
@@ -228,6 +229,73 @@ def test_col_vals_in_table_ref_path_roundtrips(tmp_path):
     assert "tbl: your_data" in yaml_text
     rebuilt = yaml_interrogate(yaml_text, set_tbl=tbl)
     assert rebuilt.n_failed(i=1, scalar=True) == 1
+
+
+def _ref_plan(reference):
+    # `pb.ref()` steps need the reference data to be set on the rebuilt plan as well
+    import polars as pl
+
+    tbl = pl.DataFrame({"a": [1, 2, 3]})
+    validation = (
+        Validate(data=tbl, reference=reference)
+        .col_avg_le(columns="a", value=pb.ref("a"))
+        .col_sum_eq(columns="a", value=pb.ref("a"))
+    )
+    return tbl, validation
+
+
+@pytest.mark.parametrize("as_path", [False, True])
+def test_reference_path_roundtrips(tmp_path, as_path):
+    import polars as pl
+
+    ref_path = tmp_path / "ref.csv"
+    pl.DataFrame({"a": [1, 2, 4]}).write_csv(ref_path)
+    tbl, validation = _ref_plan(ref_path if as_path else str(ref_path))
+    expected = validation.interrogate().n_failed(scalar=False)
+    assert expected == {1: 0, 2: 1}
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        code = validation.to_code()
+        yaml_text = validation.to_yaml()
+
+    assert f"reference={json.dumps(str(ref_path))}," in code
+    assert _exec_code(code, tbl).interrogate().n_failed(scalar=False) == expected
+
+    assert f"reference: {ref_path}" in yaml_text
+    rebuilt = yaml_interrogate(yaml_text, set_tbl=tbl)
+    assert rebuilt.n_failed(scalar=False) == expected
+
+
+def test_reference_in_memory_uses_placeholder():
+    import polars as pl
+
+    ref = pl.DataFrame({"a": [1, 2, 4]})
+    tbl, validation = _ref_plan(ref)
+    expected = validation.interrogate().n_failed(scalar=False)
+
+    with pytest.warns(UserWarning, match="`reference=` table is an in-memory table"):
+        code = validation.to_code()
+    assert "reference=your_reference_data," in code
+
+    # With the placeholder bound to the reference table, the generated code gives the same plan
+    namespace = {}
+    exec(
+        code.replace("your_data", "data"),
+        {"pb": pb, "data": tbl, "your_reference_data": ref},
+        namespace,
+    )
+    assert namespace["validation"].interrogate().n_failed(scalar=False) == expected
+
+    with pytest.warns(UserWarning, match="`reference=` table is an in-memory table"):
+        yaml_text = validation.to_yaml()
+    assert "reference: your_reference_data" in yaml_text
+
+
+def test_no_reference_is_not_serialized(small_table):
+    validation = Validate(data=small_table).col_vals_gt(columns="d", value=0)
+    assert "reference" not in validation.to_code()
+    assert "reference" not in validation.to_yaml()
 
 
 def test_to_yaml_roundtrips_via_yaml_interrogate(small_table):
