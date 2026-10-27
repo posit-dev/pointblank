@@ -1682,7 +1682,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9274-L9606" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9274-L9602" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">col_vals_not_in_set</span>(</span>
@@ -1767,7 +1767,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="missing-values" class="level2 doc-missing-values">
 <h2 class="doc-missing-values anchored" data-anchor-id="missing-values">Missing Values</h2>
 <p>A missing value (<code>None</code>, <code>NA</code>, or Null) isn’t in the set, but it isn’t a valid value either, so by default it counts as a failing test unit. There are two ways to let missing values pass: <code>na_pass=True</code>, or <code>missing=MissingSpec(null_is_missing=True)</code> (a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> can also declare sentinel values, such as <code>-99</code>, that pass as documented missing values). As missing values are handled with these options, <code>set=</code> can’t contain <code>None</code>.</p>
-<p>A <code>NaN</code> in a float column counts as missing on pandas, so it fails unless <code>na_pass=True</code>. Polars, DuckDB and other backends treat <code>NaN</code> as a regular value, so it passes unless <code>set=</code> contains <code>NaN</code> (unlike comparison methods such as <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>, which treat <code>NaN</code> as missing on every backend). To treat <code>NaN</code> as missing everywhere, convert it to null first, for example with <code>pre=lambda df: df.with_columns(pl.col("a").fill_nan(None))</code> on a Polars table.</p>
+<p>A <code>NaN</code> in a float column counts as missing on every backend (as in comparison methods such as <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link"><code>col_vals_gt()</code></a>), so it fails unless <code>na_pass=True</code>.</p>
 </section>
 <section id="preprocessing" class="level2 doc-preprocessing">
 <h2 class="doc-preprocessing anchored" data-anchor-id="preprocessing">Preprocessing</h2>
@@ -1806,7 +1806,7 @@ segments=["region", "date"]</code></pre>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with two numeric columns (<code>a</code> and <code>b</code>). The table is shown below:</p>
-<div id="f9ebb0f6" class="cell" data-execution_count="2">
+<div id="1f8578e7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1938,7 +1938,7 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 <p>Let’s validate that none of the values in column <code>a</code> are in the set of <code>[2, 3, 4, 5, 6]</code>. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="093be71c" class="cell" data-execution_count="3">
+<div id="1044c4bc" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_in_set(columns<span class="op">=</span><span class="st">"a"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>])</span>
@@ -2102,7 +2102,7 @@ segments=["region", "date"]</code></pre>
 </div>
 <p>Printing the <code>validation</code> object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using <a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link gdls-code">col_vals_not_in_set()</a>. All test units passed, and there are no failing test units.</p>
 <p>Now, let’s use that same set of values for a validation on column <code>b</code>.</p>
-<div id="b23dde99" class="cell" data-execution_count="4">
+<div id="b93e9dfb" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_in_set(columns<span class="op">=</span><span class="st">"b"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>])</span>
@@ -2267,7 +2267,7 @@ segments=["region", "date"]</code></pre>
 <p>The validation table reports two failing test units. The specific failing cases are for the column <code>b</code> values of <code>2</code> and <code>6</code>, both of which are in the set of <code>[2, 3, 4, 5, 6]</code>.</p>
 <p><strong>Using Python Enums</strong></p>
 <p>Like <a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a>, this method also supports Python Enum classes and instances:</p>
-<div id="92637c8a" class="cell" data-execution_count="5">
+<div id="db402317" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> enum <span class="im">import</span> Enum</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> InvalidStatus(Enum):</span>

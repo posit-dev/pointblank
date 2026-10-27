@@ -4,7 +4,7 @@ Validate whether column values are not in a set of values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9274-L9606)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9274-L9602)
 
 ``` python
 Validate.col_vals_not_in_set(
@@ -68,7 +68,7 @@ The [Validate](../reference/Validate.md#pointblank.Validate) object with the add
 
 A missing value (`None`, `NA`, or Null) isn't in the set, but it isn't a valid value either, so by default it counts as a failing test unit. There are two ways to let missing values pass: `na_pass=True`, or `missing=MissingSpec(null_is_missing=True)` (a [MissingSpec](../reference/MissingSpec.md#pointblank.MissingSpec) can also declare sentinel values, such as `-99`, that pass as documented missing values). As missing values are handled with these options, `set=` can't contain `None`.
 
-A `NaN` in a float column counts as missing on pandas, so it fails unless `na_pass=True`. Polars, DuckDB and other backends treat `NaN` as a regular value, so it passes unless `set=` contains `NaN` (unlike comparison methods such as [`col_vals_gt()`](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), which treat `NaN` as missing on every backend). To treat `NaN` as missing everywhere, convert it to null first, for example with `pre=lambda df: df.with_columns(pl.col("a").fill_nan(None))` on a Polars table.
+A `NaN` in a float column counts as missing on every backend (as in comparison methods such as [`col_vals_gt()`](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt)), so it fails unless `na_pass=True`.
 
 ## Preprocessing
 

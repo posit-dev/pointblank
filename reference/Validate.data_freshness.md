@@ -4,7 +4,7 @@ Validate that data in a datetime column is not older than a specified maximum ag
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14391-L14765)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14387-L14761)
 
 ``` python
 Validate.data_freshness(

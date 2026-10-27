@@ -4011,9 +4011,9 @@ A missing value (`None`, `NA`, or Null) counts as a failing test unit unless `se
 (a [`MissingSpec`](`pointblank.MissingSpec`) can also declare sentinel values, such as
 `-99`, that pass as documented missing values).
 
-A `NaN` in a float column counts as missing on pandas, so it passes when `set=` contains
-`None`. Polars, DuckDB and other backends treat `NaN` as a regular value, so it passes only
-when `set=` contains `NaN`.
+A `NaN` in a float column counts as missing on every backend (as in comparison methods such
+as [`col_vals_gt()`](`pointblank.Validate.col_vals_gt`)), so it passes when `set=` contains
+`None`.
 
 Preprocessing
 -------------
@@ -4293,12 +4293,8 @@ pass: `na_pass=True`, or `missing=MissingSpec(null_is_missing=True)` (a `Missing
 also declare sentinel values, such as `-99`, that pass as documented missing values). As
 missing values are handled with these options, `set=` can't contain `None`.
 
-A `NaN` in a float column counts as missing on pandas, so it fails unless `na_pass=True`.
-Polars, DuckDB and other backends treat `NaN` as a regular value, so it passes unless `set=`
-contains `NaN` (unlike comparison methods such as
-[`col_vals_gt()`](`pointblank.Validate.col_vals_gt`), which treat `NaN` as missing on every
-backend). To treat `NaN` as missing everywhere, convert it to null first, for example with
-`pre=lambda df: df.with_columns(pl.col("a").fill_nan(None))` on a Polars table.
+A `NaN` in a float column counts as missing on every backend (as in comparison methods such
+as [`col_vals_gt()`](`pointblank.Validate.col_vals_gt`)), so it fails unless `na_pass=True`.
 
 Preprocessing
 -------------

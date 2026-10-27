@@ -61,7 +61,7 @@ The [Validate](../reference/Validate.md#pointblank.Validate) object with the add
 
 A missing value (`None`, `NA`, or Null) counts as a failing test unit unless `set=` contains `None`. Alternatively, `missing=MissingSpec(null_is_missing=True)` lets missing values pass (a [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) can also declare sentinel values, such as `-99`, that pass as documented missing values).
 
-A `NaN` in a float column counts as missing on pandas, so it passes when `set=` contains `None`. Polars, DuckDB and other backends treat `NaN` as a regular value, so it passes only when `set=` contains `NaN`.
+A `NaN` in a float column counts as missing on every backend (as in comparison methods such as [`col_vals_gt()`](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt)), so it passes when `set=` contains `None`.
 
 ## Preprocessing
 

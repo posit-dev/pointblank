@@ -1801,7 +1801,7 @@ The result of the comparison.
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="c207603a" class="cell" data-execution_count="1">
+<div id="8f53aff1" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1933,13 +1933,13 @@ The result of the comparison.
 </div>
 </div>
 <p>The counts are available as attributes, and the differing rows can be retrieved by status:</p>
-<div id="475e92d2" class="cell" data-execution_count="2">
+<div id="adbde375" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cmp</span>.n_changed, <span class="bu">cmp</span>.n_missing, <span class="bu">cmp</span>.n_extra</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>(1, 1, 1)</code></pre>
 </div>
 </div>
-<div id="1d04c688" class="cell" data-execution_count="3">
+<div id="aa5494b4" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cmp</span>.rows(<span class="st">"changed"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div><style>
@@ -1953,7 +1953,7 @@ The result of the comparison.
 </div>
 </div>
 <p>A tolerance can absorb small numeric differences:</p>
-<div id="57b8578c" class="cell" data-execution_count="4">
+<div id="8db59251" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pb.compare(source, target, keys<span class="op">=</span><span class="st">"id"</span>, tolerance<span class="op">=</span>{<span class="st">"amount"</span>: <span class="dv">1</span>}).n_changed</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>0</code></pre>
