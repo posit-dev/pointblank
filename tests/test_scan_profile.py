@@ -368,6 +368,25 @@ def test_data_profile_as_dataframe_multiple_profiles():
     assert len(result) == 2
 
 
+def test_data_profile_as_dataframe_keeps_missing_stats_null():
+    # The `std` of a single string is missing; it mustn't turn the column into text
+    df = nw.from_native(pl.DataFrame({"a": [1.0, 2.0], "b": ["x", None]}))
+    dp = _DataProfile(table_name="t", columns=["a", "b"], implementation=nw.Implementation.POLARS)
+    dp.set_row_count(df)
+    for prof in (
+        _NumericProfile(colname="a", coltype="Float64"),
+        _StringProfile(colname="b", coltype="String"),
+    ):
+        prof.sample_data = []
+        prof.calc_stats(df.select(prof.colname))
+        dp.column_profiles.append(prof)
+
+    result = dp.as_dataframe(strict=False)
+
+    assert result.schema["std"] == nw.Float64()
+    assert result["std"].to_list() == [pytest.approx(0.7071, abs=1e-4), None]
+
+
 # ──────────────────────────────────────────────────────────────────────
 # _as_physical
 # ──────────────────────────────────────────────────────────────────────
