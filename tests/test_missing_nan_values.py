@@ -17,6 +17,14 @@ def _table(tbl_type: str, data: dict):
         return pd.DataFrame(data)
     if tbl_type == "pyarrow":
         return pa.table({k: pa.array(v, type=pa.float64()) for k, v in data.items()})
+    if tbl_type == "duckdb":
+        import ibis
+
+        return ibis.duckdb.connect().create_table("tbl", pl.DataFrame(data).to_arrow())
+    if tbl_type == "sqlite":
+        import ibis
+
+        return ibis.sqlite.connect().create_table("tbl", pd.DataFrame(data))
     raise ValueError(tbl_type)
 
 
@@ -119,22 +127,36 @@ def test_missing_spec_checks_on_columns_that_cant_hold_nan(dtype) -> None:
     ] == [(4, 0), (4, 0), (3, 1), (3, 1), (1, 0)]
 
 
-# NaN is not a null in Polars and PyArrow, so col_vals_outside() has to check it on its own.
-@pytest.mark.parametrize("tbl_type", TABLE_TYPES)
-@pytest.mark.parametrize("na_pass", [False, True])
-def test_nan_is_missing_in_col_vals_outside(tbl_type, na_pass) -> None:
-    tbl = _table(tbl_type, {"n": [1.0, 7.0, NAN]})
+# NaN is not a null in Polars, PyArrow and DuckDB, and it's greater than every number there, so
+# `col_vals_between()` and `col_vals_outside()` have to treat it as missing on their own, whether it's
+# the value or one of the bounds
+@pytest.mark.parametrize("tbl_type", TABLE_TYPES + ["duckdb", "sqlite"])
+@pytest.mark.parametrize(
+    "method, data, left, right, expected",
+    [
+        ("between", {"x": [1.0, 7.0, NAN]}, 0, 5, [(1, 2), (2, 1)]),
+        ("between", {"x": [2.0, 2.0], "lo": [NAN, 0.0]}, pb.col("lo"), 5, [(1, 1), (2, 0)]),
+        ("between", {"x": [2.0, 2.0], "hi": [NAN, 5.0]}, 0, pb.col("hi"), [(1, 1), (2, 0)]),
+        ("outside", {"x": [1.0, 7.0, NAN]}, 0, 5, [(1, 2), (2, 1)]),
+        ("outside", {"x": [-1.0, -1.0], "lo": [NAN, 0.0]}, pb.col("lo"), 5, [(1, 1), (2, 0)]),
+        ("outside", {"x": [9.0, 9.0], "hi": [NAN, 5.0]}, 0, pb.col("hi"), [(1, 1), (2, 0)]),
+    ],
+    ids=[
+        "between-value",
+        "between-low-column",
+        "between-high-column",
+        "outside-value",
+        "outside-low-column",
+        "outside-high-column",
+    ],
+)
+def test_nan_is_missing_in_range_checks(tbl_type, method, data, left, right, expected) -> None:
+    # The first count is with `na_pass=False`, the second with `na_pass=True`; the NaN row only
+    # passes with `na_pass=True`
+    counts = []
+    for na_pass in [False, True]:
+        validation = pb.Validate(_table(tbl_type, data))
+        getattr(validation, f"col_vals_{method}")("x", left, right, na_pass=na_pass)
+        counts.append(_counts(validation.interrogate()))
 
-    validation = pb.Validate(tbl).col_vals_outside("n", 0, 5, na_pass=na_pass).interrogate()
-
-
-# NaN is not a null in Polars and PyArrow, so col_vals_between() has to check it on its own.
-@pytest.mark.parametrize("tbl_type", TABLE_TYPES)
-@pytest.mark.parametrize("na_pass", [False, True])
-def test_nan_is_missing_in_col_vals_between(tbl_type, na_pass) -> None:
-    tbl = _table(tbl_type, {"n": [1.0, 7.0, NAN]})
-
-    validation = pb.Validate(tbl).col_vals_between("n", 0, 5, na_pass=na_pass).interrogate()
-
-    # one of the two real values passes and the other fails; the NaN follows na_pass=
-    assert _counts(validation) == ((2, 1) if na_pass else (1, 2))
+    assert counts == expected
