@@ -4,7 +4,7 @@ Does the column sum satisfy an equal to comparison?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L798-L835)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L799-L836)
 
 ``` python
 Validate.col_sum_eq(

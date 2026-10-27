@@ -14828,7 +14828,9 @@ Returns
 str
     The validation plan as a block of Python code. The data source is rendered as the
     placeholder `your_data`, since the original data variable name is not known to the
-    plan.
+    plan. Reference data given as a file path or connection string is written out as-is;
+    an in-memory reference table becomes the placeholder `your_reference_data` (with a
+    warning).
 
 Notes on Fidelity
 -----------------
@@ -14876,7 +14878,9 @@ Returns
 str
     The validation plan as a YAML string. The `tbl` field is set from `tbl_name` when
     available, otherwise to the placeholder `your_data`; set it to a loadable data
-    source before passing the YAML to `yaml_interrogate()`.
+    source before passing the YAML to `yaml_interrogate()`. The `reference` field is
+    written the same way as in `to_code()`: a file path or connection string as-is, and
+    the placeholder `your_reference_data` (with a warning) for an in-memory table.
 
 Notes on Fidelity
 -----------------

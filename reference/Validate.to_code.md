@@ -4,7 +4,7 @@ Render this validation plan as canonical Pointblank Python code.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19373-L19471)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19383-L19493)
 
 ``` python
 Validate.to_code()
@@ -17,7 +17,7 @@ This is useful for sharing a plan, reviewing it in a diff, persisting it alongsi
 ## Returns
 
 `str`  
-The validation plan as a block of Python code. The data source is rendered as the placeholder `your_data`, since the original data variable name is not known to the plan.
+The validation plan as a block of Python code. The data source is rendered as the placeholder `your_data`, since the original data variable name is not known to the plan. Reference data given as a file path or connection string is written out as-is; an in-memory reference table becomes the placeholder `your_reference_data` (with a warning).
 
 ## Notes On Fidelity
 

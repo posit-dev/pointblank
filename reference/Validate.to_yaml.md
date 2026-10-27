@@ -4,7 +4,7 @@ Serialize this validation plan to a [yaml_interrogate()](../reference/yaml_inter
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19473-L19580)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19495-L19609)
 
 ``` python
 Validate.to_yaml(path=None)
@@ -20,7 +20,7 @@ An optional file path. If provided, the YAML is written to this file (parent dir
 ## Returns
 
 `str`  
-The validation plan as a YAML string. The `tbl` field is set from `tbl_name` when available, otherwise to the placeholder `your_data`; set it to a loadable data source before passing the YAML to [yaml_interrogate()](../reference/yaml_interrogate.md#pointblank.yaml_interrogate).
+The validation plan as a YAML string. The `tbl` field is set from `tbl_name` when available, otherwise to the placeholder `your_data`; set it to a loadable data source before passing the YAML to [yaml_interrogate()](../reference/yaml_interrogate.md#pointblank.yaml_interrogate). The `reference` field is written the same way as in `to_code()`: a file path or connection string as-is, and the placeholder `your_reference_data` (with a warning) for an in-memory table.
 
 ## Notes On Fidelity
 

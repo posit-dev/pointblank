@@ -4,7 +4,7 @@ Are column data not equal to a fixed value or data in another column?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L7333-L7637)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L7343-L7647)
 
 ``` python
 Validate.col_vals_ne(

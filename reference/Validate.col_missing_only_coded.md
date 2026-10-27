@@ -4,7 +4,7 @@ Validate that a column contains only documented codes and legitimate values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12502-L12712)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12512-L12722)
 
 ``` python
 Validate.col_missing_only_coded(
