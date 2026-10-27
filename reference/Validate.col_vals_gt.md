@@ -4,7 +4,7 @@ Are column data greater than a fixed value or data in another column?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6416-L6713)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6416-L6715)
 
 ``` python
 Validate.col_vals_gt(
@@ -33,7 +33,7 @@ A single column or a list of columns to validate. Can also use [`col()`](../refe
 The value to compare against. This can be a single value or a single column name given in [`col()`](../reference/col.md#pointblank.col). The latter option allows for a column-to-column comparison. For more information on which types of values are allowed, see the *What Can Be Used in `value=`?* section.
 
 `na_pass: bool = False`  
-Should any encountered None, NA, or Null values be considered as passing test units? By default, this is `False`. Set to `True` to pass test units with missing values.
+Should any encountered None, NA, or Null values be considered as passing test units? By default, this is `False`. Set to `True` to pass test units with missing values. A `NaN` in a float column also counts as missing on every backend, and that includes a `NaN` in a column given to `value=` via [`col()`](../reference/col.md#pointblank.col).
 
 `pre: Callable | None = None`  
 An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the *Preprocessing* section for more information on how to use this argument.

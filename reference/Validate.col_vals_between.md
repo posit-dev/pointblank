@@ -4,7 +4,7 @@ Do column data lie between two specified values or data in other columns?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L8245-L8578)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L8257-L8592)
 
 ``` python
 Validate.col_vals_between(
@@ -41,7 +41,7 @@ The upper bound of the range. This can be a single value or a single column name
 A tuple of two boolean values indicating whether the comparison should be inclusive. The position of the boolean values correspond to the `left=` and `right=` values, respectively. By default, both values are `True`.
 
 `na_pass: bool = False`  
-Should any encountered None, NA, or Null values be considered as passing test units? By default, this is `False`. Set to `True` to pass test units with missing values.
+Should any encountered None, NA, or Null values be considered as passing test units? By default, this is `False`. Set to `True` to pass test units with missing values. A `NaN` in a float column also counts as missing on every backend, and that includes a `NaN` in a bound column given to `left=` or `right=` via [`col()`](../reference/col.md#pointblank.col).
 
 `pre: Callable | None = None`  
 An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the *Preprocessing* section for more information on how to use this argument.
