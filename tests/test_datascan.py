@@ -747,6 +747,39 @@ def test_col_summary_tbl_skipped_columns_with_integer_stats(tbl_type):
     assert "1,000" in stat_cells(tbl)
 
 
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "pyarrow"])
+def test_col_summary_tbl_empty_cells_show_dash(tbl_type):
+    # Empty statistic cells (a date column's mean, the `std` of a single string, a skipped
+    # column's row) show `-` on every backend; they used to show `None` on PyArrow, in a pandas
+    # skipped row, and in a `std` column that also had a number
+    df_pl = pl.DataFrame(
+        {
+            "tags": [["a"], None],
+            "d": [datetime.date(2020, 1, 1), None],
+            "n": [1.5, 2.5],
+            "s": ["x", None],
+        }
+    )
+    convert = {
+        "polars": lambda d: d,
+        "pandas": pl.DataFrame.to_pandas,
+        "pyarrow": pl.DataFrame.to_arrow,
+    }
+    tbl = convert[tbl_type](df_pl)
+
+    def body(data):
+        html = DataScan(data=data).get_tabular_report().as_raw_html()
+        return html[html.index("<tbody") :]
+
+    assert ">None<" not in body(tbl)
+    assert body(tbl).count(">-<") > 0
+    if tbl_type == "pyarrow":
+        # (pandas has no date type, and some of its statistics differ with older Narwhals)
+        assert body(tbl).count(">-<") == body(df_pl).count(">-<")
+    # The `std` of `n` is still a number, so it's formatted (0.7071...)
+    assert ">0.71<" in body(tbl)
+
+
 @pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
 def test_datascan_json_round_trips_skipped_columns(tbl_type):
     df_pl = pl.DataFrame({"tags": [["a"], ["b"], None], "n": [1, 2, 3], "s": ["x", "yy", None]})
