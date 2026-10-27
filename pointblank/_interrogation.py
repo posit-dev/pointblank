@@ -1166,7 +1166,8 @@ def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
         False
     )
     if can_be_null:
-        base_expr = base_expr | nw.col(column).is_null()
+        # `NaN` counts as missing too, as in the comparison methods
+        base_expr = base_expr | _safe_is_nan_or_null_expr(nw_tbl, nw.col(column), column)
 
     result_tbl = nw_tbl.with_columns(pb_is_good_=base_expr)
     return result_tbl.to_native()
@@ -1366,7 +1367,7 @@ def interrogate_notin(tbl: IntoFrame, column: str, set_values: Any, na_pass: boo
     # Missing values fail unless `na_pass=True`; `is_in()` gives null for them on most backends
     # (and False for NaN in pandas), so make the result a plain boolean
     in_set = _is_in(column, set_values, nw_tbl.collect_schema()[column]).fill_null(False)
-    is_null = nw.col(column).is_null()
+    is_null = _safe_is_nan_or_null_expr(nw_tbl, nw.col(column), column)
     result_tbl = nw_tbl.with_columns(pb_is_good_=(~in_set & ~is_null) | (is_null & na_pass))
     return result_tbl.to_native()
 

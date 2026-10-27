@@ -127,6 +127,27 @@ def test_missing_spec_checks_on_columns_that_cant_hold_nan(dtype) -> None:
     ] == [(4, 0), (4, 0), (3, 1), (3, 1), (1, 0)]
 
 
+# NaN is not a null in Polars, PyArrow and DuckDB, so the set methods have to treat it as missing on
+# their own: it passes `col_vals_in_set()` only when `set=` contains `None`, and it passes
+# `col_vals_not_in_set()` only with `na_pass=True`
+@pytest.mark.parametrize("tbl_type", TABLE_TYPES + ["duckdb", "sqlite"])
+@pytest.mark.parametrize(
+    "method, set_values, kwargs, expected",
+    [
+        ("in_set", [1.0], {}, (1, 2)),
+        ("in_set", [1.0, None], {}, (2, 1)),
+        ("not_in_set", [1.0], {}, (1, 2)),
+        ("not_in_set", [1.0], {"na_pass": True}, (2, 1)),
+    ],
+    ids=["in_set", "in_set-none-in-set", "not_in_set", "not_in_set-na-pass"],
+)
+def test_nan_is_missing_in_set_checks(tbl_type, method, set_values, kwargs, expected) -> None:
+    validation = pb.Validate(_table(tbl_type, {"x": [1.0, 7.0, NAN]}))
+    getattr(validation, f"col_vals_{method}")("x", set_values, **kwargs)
+
+    assert _counts(validation.interrogate()) == expected
+
+
 # NaN is not a null in Polars, PyArrow and DuckDB, and it's greater than every number there, so
 # `col_vals_between()` and `col_vals_outside()` have to treat it as missing on their own, whether it's
 # the value or one of the bounds
