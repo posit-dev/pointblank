@@ -722,6 +722,31 @@ def test_col_summary_tbl_shows_skipped_columns(tbl_type):
     assert list(nw.from_native(scanner.summary_data)["colname"]) == ["n", "s"]
 
 
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "pyarrow"])
+def test_col_summary_tbl_skipped_columns_with_integer_stats(tbl_type):
+    # With only an integer column summarized, `min` and `max` are integer columns, which on
+    # pandas can't hold the empty cells of the skipped row
+    import re
+
+    def stat_cells(data):
+        html = DataScan(data=data).get_tabular_report().as_raw_html()
+        rows = re.findall(r"<tr>(.*?)</tr>", html[html.index("<tbody") :], re.S)
+        return re.findall(r"<td[^>]*>(.*?)</td>", rows[-1], re.S)[2:]
+
+    df_pl = pl.DataFrame({"tags": [["a"], None], "n": [1000, 3]})
+    convert = {
+        "polars": lambda d: d,
+        "pandas": pl.DataFrame.to_pandas,
+        "pyarrow": pl.DataFrame.to_arrow,
+    }
+    tbl = convert[tbl_type](df_pl)
+
+    assert _report_rows(DataScan(data=tbl).get_tabular_report())[0].endswith("UNSUPPORTED TYPE")
+    # The integer stats are still formatted as integers (e.g., `1,000` and not `1,000.00`)
+    assert stat_cells(tbl) == stat_cells(convert[tbl_type](df_pl.drop("tags")))
+    assert "1,000" in stat_cells(tbl)
+
+
 @pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
 def test_datascan_json_round_trips_skipped_columns(tbl_type):
     df_pl = pl.DataFrame({"tags": [["a"], ["b"], None], "n": [1, 2, 3], "s": ["x", "yy", None]})
