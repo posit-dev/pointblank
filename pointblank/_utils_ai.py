@@ -695,6 +695,18 @@ DATA TO VALIDATE:
 # ============================================================================
 
 
+class _UnusableReplyError(ValueError):
+    """A model's reply to a batch that gave no results for it (its message quotes the reply)."""
+
+
+def _reply_snippet(response: str, max_length: int = 80) -> str:
+    """The start of a reply, on one line and in quotes, for error messages."""
+    text = " ".join(str(response).split())
+    if len(text) > max_length:
+        text = text[: max_length - 3].rstrip() + "..."
+    return f'"{text}"'
+
+
 class _ValidationResponseParser:
     """Parses AI validation responses."""
 
@@ -737,10 +749,17 @@ class _ValidationResponseParser:
             # Validate the structure
             self._validate_response_structure(json_response, batch_info)
 
-            return json_response
+            return self._keep_batch_rows(json_response, batch_info)
 
         except Exception as e:
-            self.last_parse_error = e
+            from pointblank._interrogation import _first_line
+
+            # The reply goes in the error (it's recorded in the step's note), so that, e.g., a
+            # refusal can be told apart from a malformed reply
+            self.last_parse_error = _UnusableReplyError(
+                f"{_reply_snippet(response)} ({_first_line(e)})"
+            )
+            self.last_parse_error.__cause__ = e
             logger.error(
                 f"Failed to parse response for batch {batch_info.get('batch_id', 'unknown')}: {e}"
             )
@@ -811,6 +830,33 @@ class _ValidationResponseParser:
 
             if not isinstance(result["result"], bool):
                 raise ValueError(f"Result {i} 'result' must be a boolean")
+
+    def _keep_batch_rows(
+        self, json_response: List[Dict[str, Any]], batch_info: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        """
+        Keep the results for the batch's own rows.
+
+        A result for another row (e.g., another batch's) would overwrite that row's result when
+        the batches are combined, so it's dropped. A reply with no results for the batch's rows
+        (e.g., `[]`) is unusable, like one that can't be parsed.
+        """
+        start, end = batch_info["start_row"], batch_info["end_row"]
+        kept = [
+            result
+            for result in json_response
+            if isinstance(result["index"], int)
+            and not isinstance(result["index"], bool)
+            and start <= result["index"] < end
+        ]
+        if not kept:
+            raise ValueError(f"the reply has no results for rows {start} to {end - 1}")
+        if len(kept) < len(json_response):
+            logger.warning(
+                f"Dropped {len(json_response) - len(kept)} results for rows outside "
+                f"{start} to {end - 1} in the reply for batch {batch_info.get('batch_id')}"
+            )
+        return kept
 
     def _create_default_results(self, batch_info: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Create default results (all False) for a batch."""
@@ -1050,10 +1096,15 @@ class _AIValidationEngine:
         if batches and len(errors) == len(batches):
             from pointblank._interrogation import StepEvaluationError, _first_line
 
+            first = errors[0]
+            if isinstance(first, _UnusableReplyError):
+                detail = f"the first reply couldn't be used: {first}"
+            else:
+                detail = f"the first failed with {_first_line(first)}"
             raise StepEvaluationError(
                 f"None of the {len(batches)} requests to the model gave a usable response "
-                f"(the first failed with {_first_line(errors[0])})."
-            ) from errors[0]
+                f"({detail})."
+            ) from first
 
         if errors:
             logger.warning(
