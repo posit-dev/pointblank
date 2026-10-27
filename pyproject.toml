@@ -105,7 +105,7 @@ docs = [
 [dependency-groups]
 dev = [
     "anthropic[bedrock]>=0.68.0",                           # Lets the AI provider setup paths run in tests
-    "chatlas>=0.6.1",
+    "chatlas>=0.10.0",                                      # Older chatlas passes the wrong HTTP client to anthropic 0.68+
     "duckdb>=1.2.0,<2",                                     # 2.0 breaks ibis's `list_tables()` and Narwhals' joins
     "hypothesis>=6.129.2",
     "ibis-framework[duckdb,mysql,postgres,sqlite]>=11.0.0", # ibis 10.x fails on DuckDB 1.4+
