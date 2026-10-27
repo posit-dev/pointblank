@@ -10012,6 +10012,66 @@ def test_get_sundered_data_conjointly_lazy() -> None:
     assert _sorted_ids(validation.get_sundered_data(type="fail")) == [1, 4, 6]
 
 
+@pytest.mark.parametrize("tbl_type", ["polars", "lazy", "pandas", "duckdb", "sqlite"])
+@pytest.mark.parametrize(
+    "add_steps, expected_pass",
+    [
+        # Every row is in one of the segments (`g` is p, q, r or s), so the step covers them all
+        (lambda v: v.col_vals_gt(columns="id", value=2, segments="g"), [3, 4, 5, 6]),
+        # Rows outside the segments (r and s) aren't checked, so they pass
+        (lambda v: v.col_vals_gt(columns="id", value=3, segments=("g", ["p", "q"])), [4, 5, 6]),
+        (
+            lambda v: v.col_vals_lt(columns="id", value=6).col_vals_gt(
+                columns="id", value=3, segments=("g", ["p", "q"])
+            ),
+            [4, 5],
+        ),
+    ],
+    ids=["all_segments", "some_segments", "after_unsegmented_step"],
+)
+def test_get_sundered_data_with_segments(tbl_type, add_steps, expected_pass) -> None:
+    # Each segment's results only hold its own rows; they have to be matched to those rows
+    validation = add_steps(Validate(_sunder_tbl(tbl_type))).interrogate()
+
+    assert _sorted_ids(validation.get_sundered_data(type="pass")) == expected_pass
+    assert _sorted_ids(validation.get_sundered_data(type="fail")) == sorted(
+        set(range(1, 7)) - set(expected_pass)
+    )
+
+
+def test_get_sundered_data_with_segments_all_passing() -> None:
+    validation = Validate(load_dataset("small_table")).col_vals_gt("d", 100, segments="f")
+    validation = validation.interrogate()
+
+    assert validation.all_passed()
+    assert validation.get_sundered_data(type="pass").height == 13
+    assert validation.get_sundered_data(type="fail").height == 0
+
+
+def test_get_sundered_data_leaves_out_steps_with_pre() -> None:
+    # `pre=` can change the rows, so its results can't be matched to the table's rows
+    validation = (
+        Validate(_SUNDER_TBL)
+        .col_vals_gt(columns="id", value=3, pre=lambda df: df.filter(pl.col("g") != "p"))
+        .col_vals_lt(columns="id", value=6)
+        .interrogate()
+    )
+
+    assert _sorted_ids(validation.get_sundered_data(type="pass")) == [1, 2, 3, 4, 5]
+    assert _sorted_ids(validation.get_sundered_data(type="fail")) == [6]
+
+
+def test_get_sundered_data_many_steps_sqlite() -> None:
+    # The query mustn't nest more deeply with every step: SQLite before 3.46 can't parse it
+    validation = Validate(_sunder_tbl("sqlite"))
+    for value in range(2, 14):
+        validation = validation.col_vals_gt(columns="id", value=value % 3)
+    validation = validation.interrogate()
+
+    assert _sorted_ids(validation.get_sundered_data(type="pass")) == [3, 4, 5, 6]
+    assert _sorted_ids(validation.get_sundered_data(type="fail")) == [1, 2]
+
+
 def test_col_vals_within_spec_checksum_on_lazyframe() -> None:
     # The checksum specs collect a LazyFrame to check its values, and give a LazyFrame back
     results = {}

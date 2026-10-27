@@ -20414,7 +20414,8 @@ class Validate:
 
         So long as these conditions are met, the data will be split into two constituent tables: one
         with the rows that passed all validation steps and another with the rows that failed at
-        least one validation step.
+        least one validation step. Steps that use `segments=` are included, with each segment's
+        results counting only for the rows in that segment.
 
         Parameters
         ----------
@@ -20480,19 +20481,18 @@ class Validate:
         # Keep only the validation steps that:
         # - are row-based (included in `ROW_BASED_VALIDATION_TYPES`)
         # - are `active`
+        # - have no `pre=` (it can change the rows, so the results may not line up with the data)
         validation_info = [
             validation
             for validation in self.validation_info
             if validation.active
+            and validation.pre is None
             and (
                 validation.assertion_type in ROW_BASED_VALIDATION_TYPES
                 # `tbl_match()` steps take part when a row-aligned result table is available
                 or (validation.assertion_type == "tbl_match" and validation.tbl_checked is not None)
             )
         ]
-
-        # TODO: ensure that the stored evaluation tables across all steps have not been mutated
-        # from the original table (via any `pre=` functions)
 
         # Obtain the validation steps that are to be used for sundering
         validation_steps_i = [validation.assertion_type for validation in validation_info]
@@ -20509,48 +20509,39 @@ class Validate:
 
         data_nw = _with_row_index(self.data, name=index_name)
 
-        # Get all validation step result tables and join together the `pb_is_good_` columns
-        # ensuring that the columns are named uniquely (e.g., `pb_is_good_1`, `pb_is_good_2`, ...)
-        # and that the index is reset
-        labeled_tbl_nw: nw.DataFrame | nw.LazyFrame | None = None
-        for i, validation in enumerate(validation_info):
+        # Collect the numbers of the rows that failed in each validation step (a missing result
+        # doesn't count as a failure; e.g., a row outside a segmented step's segment)
+        failed_rows = []
+        for validation in validation_info:
             # Add row numbers to the results table (put on the same backend as the data first, as
             # some steps materialize their results, and eager and lazy tables can't be joined)
             results_tbl = _with_row_index(
                 _results_on_data_backend(validation.tbl_checked, data_nw), name=index_name
             )
 
-            # Add numerical suffix to the `pb_is_good_` column to make it unique
-            results_tbl = results_tbl.select([index_name, "pb_is_good_"]).rename(
-                {"pb_is_good_": f"pb_is_good_{i}"}
-            )
+            # A segmented step's results only hold the rows of its segment, numbered from 0, so
+            # replace those numbers with the rows' numbers in the whole table
+            if validation.segments is not None:
+                results_tbl = _results_with_data_row_index(
+                    results_tbl, data_nw, segments=validation.segments, index_name=index_name
+                )
 
-            # Add the results table to the list of tables
-            if labeled_tbl_nw is None:
-                labeled_tbl_nw = results_tbl
-            else:
-                labeled_tbl_nw = labeled_tbl_nw.join(results_tbl, on=index_name, how="left")
+            # The results can be an `object` column in pandas, so they're made Boolean first
+            is_good = nw.col("pb_is_good_").fill_null(True).cast(nw.Boolean)
+            failed_rows.append(results_tbl.filter(~is_good).select(index_name))
 
-        # Get list of columns that are the `pb_is_good_` columns
-        pb_is_good_cols = [f"pb_is_good_{i}" for i in range(len(validation_steps_i))]
+        # The failing rows of all steps are combined at once (rather than joining the steps'
+        # results one by one), so that the query for a database table doesn't nest more deeply with
+        # every step (SQLite versions before 3.46 can't parse deeply nested queries)
+        failed_rows = nw.concat(failed_rows, how="vertical")
 
-        # Determine the rows that passed all validation steps by checking if all `pb_is_good_`
-        # columns are `True`; joins don't guarantee row order (e.g., Polars >= 2.0 collects
-        # LazyFrames with the streaming engine), so the original order is restored via the index
-        labeled_tbl_nw = (
-            labeled_tbl_nw.with_columns(
-                pb_is_good_all=nw.all_horizontal(pb_is_good_cols, ignore_nulls=True)
-            )
-            .join(data_nw, on=index_name, how="left")
+        # The rows that passed are those that failed in no step; joins don't guarantee row order
+        # (e.g., Polars >= 2.0 collects LazyFrames with the streaming engine), so the original
+        # order is restored via the index
+        sundered_tbl = (
+            data_nw.join(failed_rows, on=index_name, how="anti" if type == "pass" else "semi")
             .sort(index_name)
             .drop(index_name)
-        )
-
-        bool_val = True if type == "pass" else False
-
-        sundered_tbl = (
-            labeled_tbl_nw.filter(nw.col("pb_is_good_all") == bool_val)
-            .drop(pb_is_good_cols + ["pb_is_good_all"])
             .to_native()
         )
 
@@ -23005,6 +22996,36 @@ def _results_on_data_backend(results_tbl: Any, data_nw: Any) -> Any:
         return memtable.cast({c: data_schema[c] for c in memtable.columns if c in data_schema})
 
     return results_tbl  # pragma: no cover
+
+
+def _results_with_data_row_index(
+    results_nw: Any, data_nw: Any, segments: Any, index_name: str
+) -> Any:
+    """
+    Number the rows of a segmented step's results by their rows in the whole target table.
+
+    The step was checked on the segment's rows only (`_apply_segments()`), so the k-th row of its
+    results is the k-th row of the segment. Filtering the indexed target table the same way gives
+    each of those rows its number in the whole table. The segment's rows are numbered in the order
+    of that number, which is the order in which `_with_row_index()` numbers the results (by
+    position, or for a database table by sorting on the same columns).
+    """
+    import warnings
+
+    position_name = "pb_segment_row_"
+
+    # The segment is applied again here, so don't repeat any warning it gave at interrogation
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        segment_rows = nw.from_native(_apply_segments(data_nw.to_native(), segments))
+
+    segment_index = _with_row_index(segment_rows.select(index_name), name=position_name)
+
+    return (
+        results_nw.rename({index_name: position_name})
+        .join(segment_index, on=position_name, how="inner")
+        .drop(position_name)
+    )
 
 
 def _normalize_reporting_language(lang: str | None) -> str:
