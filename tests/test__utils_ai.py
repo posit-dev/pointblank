@@ -717,7 +717,8 @@ def test_validate_batches(mock_create_chat, llm_config, mock_chat_response):
 
     assert len(results) == 2  # Two batches
     assert len(results[0]) == 2  # First batch has 2 results
-    assert len(results[1]) == 2  # Second batch also returns 2 results (from mock)
+    # The mock's reply is for rows 0 and 1, so the second batch (row 2) gets the default result
+    assert results[1] == [{"index": 2, "result": False}]
 
     # Verify chat was called for each batch
     assert mock_chat.chat.call_count == 2
@@ -1221,6 +1222,111 @@ def test_parse_response_records_the_error_of_an_unparseable_reply():
         '[{"index": 0, "result": true}, {"index": 1, "result": false}]', batch_info
     )
     assert parser.last_parse_error is None
+
+
+def test_parse_response_error_quotes_the_reply():
+    parser = _ValidationResponseParser(total_rows=2)
+    batch_info = {"start_row": 0, "end_row": 2, "batch_id": 0}
+
+    parser.parse_response("I'm sorry,\n  but I can't help with that request.", batch_info)
+    assert str(parser.last_parse_error) == (
+        "\"I'm sorry, but I can't help with that request.\" "
+        "(JSONDecodeError: Expecting value: line 1 column 1 (char 0))"
+    )
+
+    # A long reply is cut short
+    parser.parse_response("x" * 500, batch_info)
+    snippet = str(parser.last_parse_error).split(" (")[0]
+    assert len(snippet) == 82 and snippet.endswith('..."')
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        "[]",
+        "No rows: []",
+        # Another batch's rows
+        '[{"index": 2, "result": true}, {"index": 3, "result": true}]',
+        # Not row numbers
+        '[{"index": "0", "result": true}, {"index": true, "result": true}]',
+    ],
+    ids=["empty", "empty-in-prose", "other-rows", "not-integers"],
+)
+def test_parse_response_without_results_for_the_batch_is_unusable(response):
+    parser = _ValidationResponseParser(total_rows=4)
+    batch_info = {"start_row": 0, "end_row": 2, "batch_id": 0}
+
+    results = parser.parse_response(response, batch_info)
+
+    assert parser.last_parse_error is not None
+    assert results == [{"index": 0, "result": False}, {"index": 1, "result": False}]
+
+
+def test_parse_response_drops_results_for_other_rows(caplog):
+    parser = _ValidationResponseParser(total_rows=4)
+    batch_info = {"start_row": 2, "end_row": 4, "batch_id": 1}
+
+    with caplog.at_level("WARNING", logger="pointblank._utils_ai"):
+        results = parser.parse_response(
+            '[{"index": 0, "result": true}, {"index": 2, "result": true}, '
+            '{"index": 3, "result": false}, {"index": 4, "result": true}]',
+            batch_info,
+        )
+
+    assert parser.last_parse_error is None
+    assert results == [{"index": 2, "result": True}, {"index": 3, "result": False}]
+    assert "Dropped 2 results for rows outside 2 to 3" in caplog.text
+
+
+@patch("pointblank._utils_ai._create_chat_instance")
+def test_validate_batches_reply_for_other_rows_does_not_overwrite_them(
+    mock_create_chat, llm_config
+):
+    # The second batch's reply uses the first batch's row numbers
+    mock_chat = Mock()
+    mock_chat.chat.side_effect = [
+        '[{"index": 0, "result": true}, {"index": 1, "result": true}]',
+        '[{"index": 0, "result": false}, {"index": 1, "result": false}]',
+    ]
+    mock_create_chat.return_value = mock_chat
+    engine = _AIValidationEngine(llm_config)
+
+    batch_results = engine.validate_batches(_two_batches(), _PromptBuilder("Check if age > 18"))
+    combined = _ValidationResponseParser(total_rows=4).combine_batch_results(batch_results)
+
+    assert combined == {0: True, 1: True, 2: False, 3: False}
+
+
+@patch("pointblank._utils_ai._create_chat_instance")
+@pytest.mark.parametrize(
+    "reply, expected",
+    [
+        (
+            "I'm sorry, but I can't help with that request.",
+            "the first reply couldn't be used: \"I'm sorry, but I can't help with that request.\" "
+            "(JSONDecodeError: Expecting value: line 1 column 1 (char 0))",
+        ),
+        ("[]", 'the first reply couldn\'t be used: "[]" (ValueError: the reply has no results'),
+    ],
+    ids=["refusal", "empty"],
+)
+def test_validate_batches_error_quotes_the_first_reply(
+    mock_create_chat, llm_config, reply, expected
+):
+    from pointblank._interrogation import StepEvaluationError
+
+    mock_chat = Mock()
+    mock_chat.chat.return_value = reply
+    mock_create_chat.return_value = mock_chat
+    engine = _AIValidationEngine(llm_config)
+
+    with pytest.raises(StepEvaluationError) as exc_info:
+        engine.validate_batches(_two_batches(), _PromptBuilder("Check if age > 18"))
+
+    assert str(exc_info.value).startswith(
+        "None of the 2 requests to the model gave a usable response"
+    )
+    assert expected in str(exc_info.value)
 
 
 class _HistoryKeepingChat:
