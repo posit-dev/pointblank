@@ -119,6 +119,15 @@ def test_missing_spec_checks_on_columns_that_cant_hold_nan(dtype) -> None:
     ] == [(4, 0), (4, 0), (3, 1), (3, 1), (1, 0)]
 
 
+# NaN is not a null in Polars and PyArrow, so col_vals_outside() has to check it on its own.
+@pytest.mark.parametrize("tbl_type", TABLE_TYPES)
+@pytest.mark.parametrize("na_pass", [False, True])
+def test_nan_is_missing_in_col_vals_outside(tbl_type, na_pass) -> None:
+    tbl = _table(tbl_type, {"n": [1.0, 7.0, NAN]})
+
+    validation = pb.Validate(tbl).col_vals_outside("n", 0, 5, na_pass=na_pass).interrogate()
+
+
 # NaN is not a null in Polars and PyArrow, so col_vals_between() has to check it on its own.
 @pytest.mark.parametrize("tbl_type", TABLE_TYPES)
 @pytest.mark.parametrize("na_pass", [False, True])
