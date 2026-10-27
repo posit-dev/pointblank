@@ -398,14 +398,15 @@ class DataScan:
                 .drop("__bool_unique_html", "freqs")
             )
 
-        if self.profile.skipped_columns:
-            formatted_data = self._with_skipped_column_rows(formatted_data)
-
         ## Determine Value Formatting Selectors:
         fmt_int: list[str] = formatted_data.select(nw.selectors.by_dtype(nw.dtypes.Int64)).columns
         fmt_float: list[str] = formatted_data.select(
             nw.selectors.by_dtype(nw.dtypes.Float64)
         ).columns
+
+        # (after the selectors, since the integer columns become floats to hold the empty cells)
+        if self.profile.skipped_columns:
+            formatted_data = self._with_skipped_column_rows(formatted_data)
 
         # The columns built as HTML above; GT escapes the cells that no formatter touches (with
         # `great_tables>=1.1.0` that includes cells skipped by `sub_missing()`), so these are given
@@ -501,7 +502,14 @@ class DataScan:
             for name, coltype in skipped.items()
         ]
         backend = cast(Any, self.profile.implementation)
-        skipped_tbl = nw.from_dict(skipped_rows, schema=data.schema, backend=backend)
+        # A pandas integer column can't hold the empty cells, so integer columns become floats
+        # (the caller has already picked the columns to format as integers)
+        schema = {
+            name: nw.Float64() if dtype.is_integer() else dtype
+            for name, dtype in data.schema.items()
+        }
+        data = data.with_columns(nw.col(name).cast(dtype) for name, dtype in schema.items())
+        skipped_tbl = nw.from_dict(skipped_rows, schema=schema, backend=backend)
 
         position = {name: i for i, name in enumerate(self.profile.columns)}
         positions = [position[p.colname] for p in self.profile.column_profiles]
