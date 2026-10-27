@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from importlib_resources import files
+from importlib.resources import files
 
 from pointblank.metadata._types import MetadataImport, MetadataPackage
 

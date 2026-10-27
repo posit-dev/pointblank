@@ -37,7 +37,7 @@ classifiers = [
 dependencies = [
     "commonmark>=0.9.1",
     "importlib-metadata",
-    "great-tables>=0.0.0",
+    "great-tables>=1.1.0",  # 1.1.0 escapes unformatted cells; `fmt_passthrough()` needs 1.0.0+
     "narwhals>=2.0.1",
     "typing_extensions>=3.10.0.0",
     "requests>=2.31.0",
@@ -93,8 +93,8 @@ docs = [
     "jupyter",
     "nbclient>=0.10.0",
     "nbformat>=5.10.4",
-    "pandas>=2.2.3,<3",  # <3: not tested with pandas 3.0 yet (its default `str` dtype needs duckdb 1.4+)
-    "polars>=1.17.1",
+    "pandas>=2.2.3",
+    "polars>=1.33.0",
     "pyspark==3.5.6",
     "openpyxl>=3.0.0",
     "duckdb>=1.2.0,<2",                          # 2.0 breaks ibis's `list_tables()` and Narwhals' joins
@@ -105,7 +105,7 @@ docs = [
 [dependency-groups]
 dev = [
     "anthropic[bedrock]>=0.68.0",                           # Lets the AI provider setup paths run in tests
-    "chatlas>=0.6.1",
+    "chatlas>=0.10.0",                                      # Older chatlas passes the wrong HTTP client to anthropic 0.68+
     "duckdb>=1.2.0,<2",                                     # 2.0 breaks ibis's `list_tables()` and Narwhals' joins
     "hypothesis>=6.129.2",
     "ibis-framework[duckdb,mysql,postgres,sqlite]>=11.0.0", # ibis 10.x fails on DuckDB 1.4+
@@ -114,18 +114,18 @@ dev = [
     "jupyter",
     "nbclient>=0.10.0",
     "nbformat>=5.10.4",
-    "pandas>=2.2.3,<3",  # <3: not tested with pandas 3.0 yet (its default `str` dtype needs duckdb 1.4+)
-    "polars>=1.17.1",
+    "pandas>=2.2.3",
+    "polars>=1.33.0",
     "pre-commit==2.15.0",
     "pyarrow",
     "pyarrow-stubs>=19.4",
     "pyspark==3.5.6",
     "pytest>=8.4.1",
     "pytest-asyncio>=1.0.0",
-    "pytest-cov",
+    "pytest-cov>=6.0.0",
     "pytest-randomly>=3.16.0",
     "pytest-rerunfailures>=15.0",
-    "pytest-snapshot",
+    "pytest-snapshot>=0.9.0",
     "pytest-xdist>=3.6.1",
     "pyreadstat>=1.2.0",
     "pytz>=2025.2",

@@ -275,14 +275,16 @@ class DataScan:
         label_map: dict[str, Any] = self._build_label_map(target_order)
 
         ## Final Formatting:
+        # (the column name and type are escaped since they go into HTML; e.g., an Ibis type can
+        # be `array<int64>`)
         formatted_data = data.with_columns(
             colname=nw.concat_str(
                 nw.lit(
                     "<div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'>"
                 ),
-                nw.col("colname"),
+                _html_escape_expr(nw.col("colname")),
                 nw.lit("</div><div style='font-size: 11px; color: gray;'>"),
-                nw.col("coltype"),
+                _html_escape_expr(nw.col("coltype")),
                 nw.lit("</div>"),
             ),
             __frac_n_unique=nw.col("n_unique") / nw.lit(self.profile.row_count),
@@ -390,6 +392,16 @@ class DataScan:
             nw.selectors.by_dtype(nw.dtypes.Float64)
         ).columns
 
+        # The columns built as HTML above; GT escapes the cells that no formatter touches (with
+        # `great_tables>=1.1.0` that includes cells skipped by `sub_missing()`), so these are given
+        # an identity formatter. Other string cells (e.g., `sample_data`) hold the table's own
+        # values and stay escaped.
+        html_cols: list[str] = [
+            c
+            for c in ("icon", "colname", "n_unique", "n_missing", "min", "max")
+            if c in formatted_data.columns and c not in fmt_int + fmt_float
+        ]
+
         ## GT Table:
         gt_tbl = (
             GT(formatted_data.to_native())
@@ -408,6 +420,7 @@ class DataScan:
                 style=style.text(align="right"), locations=loc.body(columns=list(present_stat_cols))
             )
             ## Value Formatting
+            .fmt(lambda x: x, columns=html_cols)
             .fmt_integer(columns=fmt_int)
             .fmt_number(
                 columns=fmt_float,
@@ -635,6 +648,15 @@ class DataScan:
             An object describing the differences between the two scans.
         """
         return DataScanDiff(current=self, baseline=baseline)
+
+
+def _html_escape_expr(expr: nw.Expr) -> nw.Expr:
+    """Escape `&`, `<` and `>` in a string expression, so its text can go into HTML."""
+    return (
+        expr.str.replace_all("&", "&amp;", literal=True)
+        .str.replace_all("<", "&lt;", literal=True)
+        .str.replace_all(">", "&gt;", literal=True)
+    )
 
 
 def _assign_type_from_coltype(prof: ColumnProfile) -> None:

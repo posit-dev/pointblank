@@ -32,7 +32,10 @@ from pointblank._utils import (
     _format_to_float_value,
     _format_to_integer_value,
     _get_assertion_from_fname,
+    _get_caller_arg_source,
     _get_column_dtype,
+    _get_expr_alias,
+    _get_expr_root_names,
     _get_fn_name,
     _get_tbl_type,
     _is_date_or_datetime_dtype,
@@ -205,11 +208,17 @@ def test_get_column_dtype_pd(tbl_multiple_types_pd):
     assert _get_column_dtype(dfn=dfn, column="float") == "float64"
     assert _get_column_dtype(dfn=dfn, column="str") == "string"
     assert _get_column_dtype(dfn=dfn, column="bool") == "boolean"
-    assert _get_column_dtype(dfn=dfn, column="date") == "datetime(time_unit='ns', time_zone=none)"
+
+    # pandas 3 parses datetimes and timedeltas at microsecond (not nanosecond) resolution
+    unit = tbl_multiple_types_pd["datetime"].dt.unit
     assert (
-        _get_column_dtype(dfn=dfn, column="datetime") == "datetime(time_unit='ns', time_zone=none)"
+        _get_column_dtype(dfn=dfn, column="date") == f"datetime(time_unit='{unit}', time_zone=none)"
     )
-    assert _get_column_dtype(dfn=dfn, column="timedelta") == "duration(time_unit='ns')"
+    assert (
+        _get_column_dtype(dfn=dfn, column="datetime")
+        == f"datetime(time_unit='{unit}', time_zone=none)"
+    )
+    assert _get_column_dtype(dfn=dfn, column="timedelta") == f"duration(time_unit='{unit}')"
 
     assert _get_column_dtype(dfn=dfn, column="int", lowercased=False) == "Int64"
     assert _get_column_dtype(dfn=dfn, column="float", lowercased=False) == "Float64"
@@ -1078,3 +1087,105 @@ def test_with_row_index(tbl_type):
     else:
         assert result["idx"].to_list() == [0, 1, 2, 3, 4]
         assert result["y"].to_list() == [10, 20, 30, 40, 50]
+
+
+# Narwhals only exposes the nodes of an expression (needed to find its columns) in newer releases
+NW_EXPR_NODES = pytest.mark.skipif(
+    not hasattr(nw.col("a"), "_nodes"), reason="Narwhals version doesn't expose `Expr._nodes`"
+)
+
+
+@pytest.mark.parametrize(
+    "expr, root_names, alias",
+    [
+        (pl.col("a") % 1 == 0, ["a"], None),
+        ((pl.col("a") % 1 == 0).alias("a_mod_1"), ["a"], "a_mod_1"),
+        (pl.col("b") > pl.col("a") + pl.col("b"), ["b", "a"], None),
+        (pl.all() > 0, [], None),
+        (pl.lit(True), [], None),
+        pytest.param(nw.col("a") > 1, ["a"], None, marks=NW_EXPR_NODES),
+        pytest.param(
+            ((nw.col("c") * 2 < nw.col("a")) & nw.col("c").is_null()).alias("x"),
+            ["c", "a"],
+            "x",
+            marks=NW_EXPR_NODES,
+        ),
+        (lambda df: df["a"] > 1, [], None),
+        ("not an expression", [], None),
+    ],
+)
+def test_get_expr_root_names_and_alias(expr, root_names, alias):
+    assert _get_expr_root_names(expr) == root_names
+    assert _get_expr_alias(expr) == alias
+
+
+def test_get_expr_root_names_and_alias_ibis():
+    if ibis is None:
+        pytest.skip("ibis is not installed")
+
+    tbl = ibis.table({"a": "int64", "b": "int64"})
+
+    assert _get_expr_root_names(tbl.a > tbl.b) == ["a", "b"]
+    assert _get_expr_alias(tbl.a > tbl.b) is None
+    assert _get_expr_root_names((tbl.b > 0).name("pos_b")) == ["b"]
+    assert _get_expr_alias((tbl.b > 0).name("pos_b")) == "pos_b"
+
+    # Deferred expressions aren't bound to a table, so their columns can't be determined
+    assert _get_expr_root_names(ibis._.a > 1) == []
+    assert _get_expr_alias(ibis._.a > 1) is None
+
+
+class _CallTarget:
+    def col_vals_expr(self, expr=None, **kwargs):
+        self.src = _get_caller_arg_source(method_name="col_vals_expr", arg_name="expr")
+        return self
+
+
+@pytest.mark.skipif(sys.version_info < (3, 11), reason="requires exact call positions")
+def test_get_caller_arg_source():
+    target = _CallTarget()
+
+    assert target.col_vals_expr(expr=pl.col("a") > 1).src == 'pl.col("a") > 1'
+    assert target.col_vals_expr(pl.col("a") > 2).src == 'pl.col("a") > 2'
+    assert target.col_vals_expr(lambda df: df["a"] > 3).src == 'lambda df: df["a"] > 3'
+
+    # In a chain of calls, each call gets its own argument
+    assert target.col_vals_expr(expr=1).col_vals_expr(expr=2).src == "2"
+
+    # Parentheses around the argument are kept, and continuation lines are dedented
+    # fmt: off
+    result = target.col_vals_expr(
+        expr=(
+            pl.col("a")
+            > 4
+        )
+    )
+    assert result.src == '(\n    pl.col("a")\n    > 4\n)'
+    assert target.col_vals_expr(((pl.col("a") > 5))).src == '((pl.col("a") > 5))'
+    # fmt: on
+
+    # Non-ASCII text before and within the argument is handled
+    assert target.col_vals_expr(expr="é" + "ü").src == '"é" + "ü"'
+
+
+@pytest.mark.skipif(sys.version_info < (3, 11), reason="requires exact call positions")
+def test_get_caller_arg_source_uncertain_is_none():
+    target = _CallTarget()
+
+    # Arguments supplied through unpacking
+    kwargs = {"expr": pl.col("a") > 1}
+    assert target.col_vals_expr(**kwargs).src is None
+
+    # The method called through another name
+    method = target.col_vals_expr
+    assert method(expr=pl.col("a") > 1).src is None
+
+    # No source available
+    namespace = {"target": target}
+    exec("result = target.col_vals_expr(expr=1)", namespace)
+    assert namespace["result"].src is None
+
+
+def test_get_caller_arg_source_python_310_is_none():
+    with patch.object(sys, "version_info", (3, 10, 0)):
+        assert _CallTarget().col_vals_expr(expr=1).src is None

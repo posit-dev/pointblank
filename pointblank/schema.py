@@ -444,333 +444,6 @@ class Schema:
                 "The provided table object cannot be converted to a Narwhals DataFrame."
             )
 
-    def _compare_schema_columns_complete_in_order(
-        self,
-        other: Schema,
-        case_sensitive_colnames: bool,
-        case_sensitive_dtypes: bool,
-        full_match_dtypes: bool,
-    ) -> bool:
-        """
-        Compare the columns of the schema with another schema. Ensure that all column names are the
-        same and that they are in the same order. This method is performed when:
-
-        - `complete`: True
-        - `in_order`: True
-
-        Parameters
-        ----------
-        other
-            The other schema to compare against.
-
-        Returns
-        -------
-        bool
-            True if the columns are the same, False otherwise.
-        """
-        if self.columns is None or other.columns is None:
-            return self.columns is None and other.columns is None
-
-        if not case_sensitive_colnames:
-            this_column_list = [col.lower() for col in self.get_column_list()]
-            other_column_list = [col.lower() for col in other.get_column_list()]
-        else:
-            this_column_list = self.get_column_list()
-            other_column_list = other.get_column_list()
-
-        # Check if the column lists are the same length, this is a quick check to determine
-        # if the schemas are different
-        if len(this_column_list) != len(other_column_list):
-            return False
-
-        # Check that the column names are the same in both schemas and in the same order
-        if this_column_list != other_column_list:
-            return False
-
-        # Iteratively move through the columns in `this_column_list` and determine if the dtype of
-        # the column in `this_column_list` is the same as the dtype in `other_column_list`
-        for col in this_column_list:
-            # Skip dtype checks if the tuple value of `col` only contains the column name
-            # (i.e., is a single element tuple)
-            if len(self.columns[this_column_list.index(col)]) == 1:
-                continue
-
-            this_dtype = self.columns[this_column_list.index(col)][1]
-            other_dtype = other.columns[other_column_list.index(col)][1]
-
-            # There may be multiple dtypes for a column, so we need to promote scalar dtypes to
-            # lists before iterating through them
-            if isinstance(this_dtype, str):
-                this_dtype = [this_dtype]
-
-            dtype_matches = []
-
-            for i in range(len(this_dtype)):
-                if not case_sensitive_dtypes:
-                    this_dtype[i] = this_dtype[i].lower()
-                    other_dtype = other_dtype.lower()
-
-                if full_match_dtypes and this_dtype[i] == other_dtype:
-                    dtype_matches.append(True)
-
-                if not full_match_dtypes and this_dtype[i] in other_dtype:
-                    dtype_matches.append(True)
-
-            # If there are no matches for any of the dtypes provided, return False
-            if not any(dtype_matches):
-                return False
-
-        return True
-
-    def _compare_schema_columns_complete_any_order(
-        self,
-        other: Schema,
-        case_sensitive_colnames: bool,
-        case_sensitive_dtypes: bool,
-        full_match_dtypes: bool,
-    ) -> bool:
-        """
-        Compare the columns of the schema with another schema to ensure that all column names are
-        available in both schemas. Column order is not considered here. This method is performed
-        when:
-        - `complete`: True
-        - `in_order`: False
-
-        Parameters
-        ----------
-        other
-            The other schema to compare against.
-
-        Returns
-        -------
-        bool
-            True if the columns are the same, False otherwise.
-        """
-        if self.columns is None or other.columns is None:
-            return self.columns is None and other.columns is None
-
-        if not case_sensitive_colnames:
-            this_column_list = [col.lower() for col in self.get_column_list()]
-            other_column_list = [col.lower() for col in other.get_column_list()]
-        else:
-            this_column_list = self.get_column_list()
-            other_column_list = other.get_column_list()
-
-        # Check if the column names lists are the same length, this is a quick check to determine
-        # if the schemas are different
-        if len(this_column_list) != len(other_column_list):
-            return False
-
-        # Iteratively move through the columns in `this_column_list` and determine if:
-        # - the column is present in `other_column_list` at the same index
-        # - the dtype of the column in `this_column_list` is the same as the dtype in
-        #   `other_column_list`
-        for col in this_column_list:
-            if col not in other_column_list:
-                return False
-            else:
-                # Skip dtype checks if the tuple value of `col` only contains the column name
-                # (i.e., is a single element tuple)
-                if len(self.columns[this_column_list.index(col)]) == 1:
-                    continue
-
-                this_dtype = self.columns[this_column_list.index(col)][1]
-
-                # The corresponding column in the other schema is present but not necessarily at
-                # the same index; get the index of the column in the other schema
-                other_col_index = other_column_list.index(col)
-
-                # Get the dtype of the column in the other schema
-                other_dtype = other.columns[other_col_index][1]
-
-                # There may be multiple dtypes for a column, so we need to promote scalar dtypes to
-                # lists before iterating through them
-                if isinstance(this_dtype, str):
-                    this_dtype = [this_dtype]
-
-                dtype_matches = []
-
-                for i in range(len(this_dtype)):
-                    if not case_sensitive_dtypes:
-                        this_dtype[i] = this_dtype[i].lower()
-                        other_dtype = other_dtype.lower()
-
-                    if full_match_dtypes and this_dtype[i] == other_dtype:
-                        dtype_matches.append(True)
-
-                    if not full_match_dtypes and this_dtype[i] in other_dtype:
-                        dtype_matches.append(True)
-
-                # If there are no matches for any of the dtypes provided, return False
-                if not any(dtype_matches):
-                    return False
-
-        return True
-
-    def _compare_schema_columns_subset_in_order(
-        self,
-        other: Schema,
-        case_sensitive_colnames: bool,
-        case_sensitive_dtypes: bool,
-        full_match_dtypes: bool,
-    ) -> bool:
-        """
-        Compare the columns of the schema with another schema. Ensure that all column names in the
-        schema are available in the other schema and that they are in the same order. This method is
-        performed when:
-
-        - `complete`: False
-        - `in_order`: True
-
-        Parameters
-        ----------
-        other
-            The other schema to compare against.
-
-        Returns
-        -------
-        bool
-            True if the columns are the same, False otherwise.
-        """
-        if self.columns is None or other.columns is None:
-            return self.columns is None and other.columns is None
-
-        if not case_sensitive_colnames:
-            this_column_list = [col.lower() for col in self.get_column_list()]
-            other_column_list = [col.lower() for col in other.get_column_list()]
-        else:
-            this_column_list = self.get_column_list()
-            other_column_list = other.get_column_list()
-
-        # Iteratively move through the columns in `this_column_list` and determine if:
-        # - the column is present in `other_column_list`
-        # - the dtype of the column in `this_column_list` is the same as the dtype in
-        #   `other_column_list`
-        for col in this_column_list:
-            if col not in other_column_list:
-                return False
-            else:
-                # Skip dtype checks if the tuple value of `col` only contains the column name
-                # (i.e., is a single element tuple)
-                if len(self.columns[this_column_list.index(col)]) == 1:
-                    continue
-
-                this_dtype = self.columns[this_column_list.index(col)][1]
-
-                # The corresponding column in the other schema is present but not necessarily at
-                # the same index; get the index of the column in the other schema
-                other_col_index = other_column_list.index(col)
-
-                # Get the dtype of the column in the other schema
-                other_dtype = other.columns[other_col_index][1]
-
-                # There may be multiple dtypes for a column, so we need to promote scalar dtypes to
-                # lists before iterating through them
-                if isinstance(this_dtype, str):
-                    this_dtype = [this_dtype]
-
-                dtype_matches = []
-
-                for i in range(len(this_dtype)):
-                    if not case_sensitive_dtypes:
-                        this_dtype[i] = this_dtype[i].lower()
-                        other_dtype = other_dtype.lower()
-
-                    if full_match_dtypes and this_dtype[i] == other_dtype:
-                        dtype_matches.append(True)
-
-                    if not full_match_dtypes and this_dtype[i] in other_dtype:
-                        dtype_matches.append(True)
-
-                # If there are no matches for any of the dtypes provided, return False
-                if not any(dtype_matches):
-                    return False
-
-        # With the subset of columns in `this_column_list`, ensure that the columns are in the same
-        # order in `other_column_list`
-        other_column_list_subset = [col for col in other_column_list if col in this_column_list]
-
-        if this_column_list != other_column_list_subset:
-            return False
-
-        return True
-
-    def _compare_schema_columns_subset_any_order(
-        self,
-        other: Schema,
-        case_sensitive_colnames: bool,
-        case_sensitive_dtypes: bool,
-        full_match_dtypes: bool,
-    ) -> bool:
-        """
-        Compare the columns of the schema with another schema to ensure that all column names are
-        at least in the other schema. Column order is not considered here. This method is performed
-        when:
-
-        - `complete`: False
-        - `in_order`: False
-
-        Parameters
-        ----------
-        other
-            The other schema to compare against.
-
-        Returns
-        -------
-        bool
-            True if the columns are the same, False otherwise.
-        """
-        if self.columns is None or other.columns is None:
-            return self.columns is None and other.columns is None
-
-        if not case_sensitive_colnames:
-            this_column_list = [col.lower() for col in self.get_column_list()]
-            other_column_list = [col.lower() for col in other.get_column_list()]
-        else:
-            this_column_list = self.get_column_list()
-            other_column_list = other.get_column_list()
-
-        # Iteratively move through the columns in `this_column_list` and determine if:
-        # - the column is present in `other_column_list`
-        # - the dtype of the column in `this_column_list` is the same as the dtype in
-        #   `other_column_list`
-
-        for col in this_column_list:
-            if col not in other_column_list:
-                return False
-            else:
-                # Skip dtype checks if the tuple value of `col` only contains the column name
-                # (i.e., is a single element tuple)
-                if len(self.columns[this_column_list.index(col)]) == 1:
-                    continue
-
-                this_dtype = self.columns[this_column_list.index(col)][1]
-                other_dtype = other.columns[other_column_list.index(col)][1]
-
-                # There may be multiple dtypes for a column, so we need to promote scalar dtypes to
-                # lists before iterating through them
-                if isinstance(this_dtype, str):
-                    this_dtype = [this_dtype]
-
-                dtype_matches = []
-
-                for i in range(len(this_dtype)):
-                    if not case_sensitive_dtypes:
-                        this_dtype[i] = this_dtype[i].lower()
-                        other_dtype = other_dtype.lower()
-
-                    if full_match_dtypes and this_dtype[i] == other_dtype:
-                        dtype_matches.append(True)
-
-                    if not full_match_dtypes and this_dtype[i] in other_dtype:
-                        dtype_matches.append(True)
-
-                # If there are no matches for any of the dtypes provided, return False
-                if not any(dtype_matches):
-                    return False
-
-        return True
-
     def get_tbl_type(self) -> str:
         """
         Get the type of table from which the schema was collected.
@@ -1314,6 +987,7 @@ def _get_schema_validation_info(
     - columns_found: list[str]              # Columns in the target table found in the schema
     - columns_not_found: list[str]          # Columns not found in the target table (from schema)
     - columns_unmatched: list[str]          # Columns in the schema unmatched in the target table
+    - columns_duplicated: list[str]         # Columns in the schema repeating an earlier column
     - columns_full_set: bool                # Full set of columns is matched (w/ no extra columns)
     - columns_subset: bool                  # Subset of columns is matched (w/ no extra columns)
     - columns_matched_in_order: bool        # Whether columns are matched in order
@@ -1346,6 +1020,7 @@ def _get_schema_validation_info(
         "columns_found": [],
         "columns_not_found": [],
         "columns_unmatched": [],
+        "columns_duplicated": [],
         "columns_full_set": False,
         "columns_subset": False,
         "columns_matched_in_order": False,
@@ -1361,219 +1036,191 @@ def _get_schema_validation_info(
         full_match_dtypes=full_match_dtypes,
     )
 
-    # Get the columns of the target table
+    # Match each column of the expected schema to a column of the target table
+    matches = _match_schema_columns(
+        target_schema=schema_tgt.columns,
+        expect_schema=schema_exp.columns,
+        case_sensitive_colnames=case_sensitive_colnames,
+        case_sensitive_dtypes=case_sensitive_dtypes,
+        full_match_dtypes=full_match_dtypes,
+    )
+
     tgt_colnames = schema_tgt.get_column_list()
+    matched_target_indices = {m["target_index"] for m in matches if m["target_index"] is not None}
 
-    # Get the columns of the expected schema
-    exp_colnames = schema_exp.get_column_list()
+    # Which target columns are matched by the expected schema (in the order of the target table)?
+    columns_found = [col for i, col in enumerate(tgt_colnames) if i in matched_target_indices]
 
-    # Create a mapping of lowercased column names to original names in the target table schema
-    tgt_colname_mapping = {col.lower(): col for col in tgt_colnames}
+    # Which columns from the expected schema aren't in the target table?
+    columns_unmatched = [
+        m["colname"] for m in matches if m["target_index"] is None and not m["duplicate"]
+    ]
 
-    if case_sensitive_colnames:
-        # Which columns are in both the target table and the expected schema?
-        columns_found = [col for col in exp_colnames if col in tgt_colnames]
+    # Which columns in the expected schema repeat an earlier one?
+    columns_duplicated = [m["colname"] for m in matches if m["duplicate"]]
 
-        # Which columns from the expected schema aren't in the target table?
-        columns_unmatched = [col for col in exp_colnames if col not in tgt_colnames]
+    # Which columns are in the target table but not in the expected schema?
+    columns_not_found = [
+        col for i, col in enumerate(tgt_colnames) if i not in matched_target_indices
+    ]
 
-        # Which columns are in the target table but not in the expected schema?
-        columns_not_found = [col for col in tgt_colnames if col not in exp_colnames]
-
-    else:
-        # Convert expected column names to lowercase for case-insensitive comparison
-        exp_colnames_lower = [col.lower() for col in exp_colnames]
-
-        # Which columns are in both the target table and the expected schema?
-        columns_found = [
-            tgt_colname_mapping[col.lower()] for col in exp_colnames if col.lower() in tgt_colnames
-        ]
-
-        # Which columns from the expected schema aren't in the target table?
-        columns_unmatched = [col for col in exp_colnames if col.lower() not in tgt_colnames]
-
-        # Which columns are in the target table but not in the expected schema?
-        columns_not_found = [col for col in tgt_colnames if col.lower() not in exp_colnames_lower]
-
-    # Sort `columns_found` based on the order of tgt_colnames
-    columns_found_sorted = sorted(columns_found, key=lambda col: tgt_colnames.index(col))
-
-    # Update the schema information dictionary
-    schema_info["columns_found"] = columns_found_sorted
+    schema_info["columns_found"] = columns_found
     schema_info["columns_not_found"] = columns_not_found
     schema_info["columns_unmatched"] = columns_unmatched
+    schema_info["columns_duplicated"] = columns_duplicated
 
-    # If the number of columns matched is the same as the number of columns in the expected schema,
-    # test if:
-    # - all columns are matched in the target table in the same order
-    # - all columns are matched in the target table in any order
-    if (
-        len(columns_found) == len(exp_colnames)
-        and len(columns_unmatched) == 0
-        and len(columns_not_found) == 0
-    ):
-        # CASE I: Expected columns are the same as the target columns
-        schema_info["columns_full_set"] = True
+    # If every expected column is matched, determine whether they are the full set of target
+    # columns or a subset of them, and whether they follow the order of the target columns
+    if len(columns_found) > 0 and not columns_unmatched and not columns_duplicated:
+        if not columns_not_found:
+            schema_info["columns_full_set"] = True
+        else:
+            schema_info["columns_subset"] = True
 
-        if columns_found == tgt_colnames:
-            # Check if the columns are matched in order
+        if _schema_columns_out_of_order(matches):
+            schema_info["columns_matched_any_order"] = True
+        else:
             schema_info["columns_matched_in_order"] = True
 
-        elif set(columns_found) == set(tgt_colnames):
-            # Check if the columns are matched in any order
-            schema_info["columns_matched_any_order"] = True
-
-    elif (
-        len(columns_found) == len(exp_colnames)
-        and len(columns_found) > 0
-        and len(columns_unmatched) == 0
-    ):
-        # CASE II: Expected columns are a subset of the target columns
-        schema_info["columns_subset"] = True
-
-        # Filter the columns in the target table that are matched
-        tgt_colnames_matched = [col for col in tgt_colnames if col in columns_found]
-
-        # If the columns are matched in order, set `columns_matched_in_order` to True; do this
-        # for case-sensitive and case-insensitive comparisons
-        if case_sensitive_colnames:
-            if columns_found == tgt_colnames_matched:
-                schema_info["columns_matched_in_order"] = True
-
-            elif set(columns_found) == set(tgt_colnames_matched):
-                schema_info["columns_matched_any_order"] = True
-
-        else:
-            if [col.lower() for col in columns_found] == [
-                col.lower() for col in tgt_colnames_matched
-            ]:
-                schema_info["columns_matched_in_order"] = True
-
-            elif set([col.lower() for col in columns_found]) == set(
-                [col.lower() for col in tgt_colnames_matched]
-            ):
-                schema_info["columns_matched_any_order"] = True
-
-    # For each column in the expected schema, determine if the column name is matched
-    # and if the dtype is matched
+    # Collect the information for each column in the expected schema; a duplicated column name
+    # keeps the information of its first occurrence
+    colnames = []
     colname_dict = []
 
-    for col in exp_colnames:
-        #
-        # Phase I: Determine if the column name is matched
-        #
+    for i, m in enumerate(matches):
+        if m["duplicate"]:
+            continue
 
-        if case_sensitive_colnames:
-            # Does the column name have a match in the expected schema?
-            colname_matched = col in columns_found
+        dtype_present = m["dtype_input"] is not None
 
-            # If the column name is matched, get the column name in the target table
-            if colname_matched:
-                matched_to = col
-            else:
-                matched_to = None
-        else:
-            # Does the column name have a match in the expected schema? A lowercase comparison
-            # is used here to determine if the column name is matched
-            colname_matched = col.lower() in columns_found
-
-            # If the column name is matched, get the column name in the target table; this involves
-            # mapping the lowercase column name to the original column name in the target table
-            if colname_matched:
-                matched_to = tgt_colname_mapping[
-                    columns_found[[col.lower() for col in columns_found].index(col.lower())]
-                ]
-            else:
-                matched_to = None
-
-        # Does the index match that of the target table?
-        if matched_to is not None:
-            index_matched = exp_colnames.index(col) == tgt_colnames.index(matched_to)
-        else:
-            index_matched = False
-
-        # Get the dtype of the column in the expected schema
-        # If there is a dtype for the column in the expected schema, get it
-        if len(schema_exp.columns[exp_colnames.index(col)]) == 1:
-            dtype_input = None
-        else:
-            dtype_input = schema_exp.columns[exp_colnames.index(col)][1]
-
-        if isinstance(dtype_input, str):
-            dtype_input = [dtype_input]
-
-        # Is a dtype present in the expected schema column?
-        dtype_present = dtype_input is not None
-
-        #
-        # Phase II: Determine if the dtype of the column in the target table is matched
-        #
-
-        if colname_matched and dtype_present:
-            # Type narrowing: matched_to is not None when colname_matched is True
-            # and dtype_input is not None when dtype_present is True
-            assert matched_to is not None
-            assert dtype_input is not None
-
-            # Get the dtype of the column in the target table
-            dtype_tgt = schema_tgt.columns[tgt_colnames.index(matched_to)][1]
-
-            # Determine if the dtype of the column in the expected schema is matched
-            dtype_matches = []
-            dtype_matches_pos = []
-
-            # Iterate through the dtypes of the column in the expected schema and determine if
-            # any of them match the dtype of the column in the target table
-            for i in range(len(dtype_input)):
-                if not case_sensitive_dtypes:
-                    dtype_input[i] = dtype_input[i].lower()
-                    dtype_tgt = dtype_tgt.lower()
-
-                if full_match_dtypes and dtype_input[i] == dtype_tgt:
-                    dtype_matches.append(True)
-                    dtype_matches_pos.append(i)
-
-                if not full_match_dtypes and dtype_input[i] in dtype_tgt:
-                    dtype_matches.append(True)
-                    dtype_matches_pos.append(i)
-
-            # If there are no matches for any of the dtypes provided, set `dtype_matched` to False
-            dtype_matched = any(dtype_matches)
-
-            # If there are multiple dtypes for a column, set `dtype_multiple` to True
-            dtype_multiple = len(dtype_input) > 1
-
-            # Even if there are multiple matches for the dtype, we simply get the first position
-            # of the matched dtype
-            if dtype_matched:
-                dtype_matched_pos = dtype_matches_pos[0]
-            else:
-                dtype_matched_pos = None
-
-        else:
-            dtype_matched = False
-            dtype_multiple = False
-            dtype_matched_pos = None
-
+        colnames.append(m["colname"])
         colname_dict.append(
             _schema_info_generate_colname_dict(
-                colname_matched=colname_matched,
-                index_matched=index_matched,
-                matched_to=matched_to,
+                colname_matched=m["target_index"] is not None,
+                index_matched=m["target_index"] == i,
+                matched_to=m["matched_to"],
                 dtype_present=dtype_present,
-                dtype_input=dtype_input,
-                dtype_matched=dtype_matched,
-                dtype_multiple=dtype_multiple,
-                dtype_matched_pos=dtype_matched_pos,
+                dtype_input=m["dtype_input"],
+                dtype_matched=m["dtype_matched"],
+                dtype_multiple=dtype_present and len(m["dtype_input"]) > 1,
+                dtype_matched_pos=m["dtype_matched_pos"],
             )
         )
 
     # Generate the columns dictionary
     schema_info["columns"] = _schema_info_generate_columns_dict(
-        colnames=exp_colnames, colname_dict=colname_dict
+        colnames=colnames, colname_dict=colname_dict
     )
 
     return schema_info
+
+
+def _match_schema_columns(
+    target_schema: list[tuple],
+    expect_schema: list[tuple],
+    case_sensitive_colnames: bool,
+    case_sensitive_dtypes: bool,
+    full_match_dtypes: bool,
+) -> list[dict[str, Any]]:
+    """
+    Match each column of a supplied schema to a column of the target table.
+
+    A schema column matches the target column of the same name (ignoring case if
+    `case_sensitive_colnames=False`, though an exact-case match is preferred). A schema column
+    whose name repeats an earlier one is a duplicate and is never matched, since a table can't
+    have two columns of the same name. The dtypes of a matched column are then compared with the
+    dtype of the target column. None of the inputs are modified.
+
+    Returns
+    -------
+    list[dict[str, any]]
+        One dictionary per schema column, in schema order, with these keys:
+
+        - colname: str                  # Column name as supplied in the schema
+        - matched_to: str | None        # Name of the matched target column
+        - target_index: int | None      # Position (0-based) of the matched target column
+        - duplicate: bool               # Whether the name repeats an earlier schema column
+        - dtype_input: list[str] | None # dtypes supplied for the column (as supplied)
+        - dtype_matched: bool           # Whether any supplied dtype matches the target dtype
+        - dtype_matched_pos: int | None # Position of the first matching supplied dtype
+    """
+
+    def norm_name(x: str) -> str:
+        return x if case_sensitive_colnames else x.lower()
+
+    def norm_dtype(x: Any) -> str:
+        return str(x) if case_sensitive_dtypes else str(x).lower()
+
+    tgt_colnames = [col[0] for col in target_schema]
+
+    matches = []
+    seen_names = set()
+
+    for col in expect_schema:
+        colname = col[0]
+
+        duplicate = norm_name(colname) in seen_names
+        seen_names.add(norm_name(colname))
+
+        # Prefer an exact-case match, then fall back to the first case-insensitive match
+        target_index = None
+        if not duplicate:
+            if colname in tgt_colnames:
+                target_index = tgt_colnames.index(colname)
+            elif not case_sensitive_colnames:
+                target_index = next(
+                    (i for i, x in enumerate(tgt_colnames) if x.lower() == colname.lower()), None
+                )
+
+        dtype_input = None
+        if len(col) > 1 and col[1] is not None:
+            dtype_input = [col[1]] if isinstance(col[1], str) else list(col[1])
+
+        dtype_matched_pos = None
+        if target_index is not None and dtype_input is not None:
+            dtype_tgt = norm_dtype(target_schema[target_index][1])
+
+            for i, dtype in enumerate(dtype_input):
+                dtype = norm_dtype(dtype)
+                if (dtype == dtype_tgt) if full_match_dtypes else (dtype in dtype_tgt):
+                    dtype_matched_pos = i
+                    break
+
+        matches.append(
+            {
+                "colname": colname,
+                "matched_to": tgt_colnames[target_index] if target_index is not None else None,
+                "target_index": target_index,
+                "duplicate": duplicate,
+                "dtype_input": dtype_input,
+                "dtype_matched": dtype_matched_pos is not None,
+                "dtype_matched_pos": dtype_matched_pos,
+            }
+        )
+
+    return matches
+
+
+def _schema_columns_out_of_order(matches: list[dict[str, Any]], packed: bool = False) -> set[int]:
+    """
+    Get the positions (in the schema) of matched columns that are out of order.
+
+    The matched columns, taken in schema order, should match the same columns taken in target
+    order. A column is out of order if it isn't in the place that the target order gives it (so
+    two swapped columns are both out of order). With `packed=True` (used when the schema should
+    be complete as well as in order), the place of each column is instead the target column at
+    the same position as the column has in the schema.
+    """
+
+    matched = [
+        (i, m["target_index"]) for i, m in enumerate(matches) if m["target_index"] is not None
+    ]
+    if packed:
+        return {i for i, target_index in matched if target_index != i}
+
+    slots = sorted(target_index for _, target_index in matched)
+
+    return {i for (i, target_index), slot in zip(matched, slots) if target_index != slot}
 
 
 def _check_schema_match(
@@ -1586,7 +1233,11 @@ def _check_schema_match(
     full_match_dtypes: bool = True,
 ):
     """
-    Check if a column exists in a DataFrame or has a certain data type.
+    Check if the schema of a table matches a supplied schema.
+
+    Every column of the schema must be in the table (and only once), with a matching dtype where
+    one is supplied. With `complete=True` the schema must also cover every column of the table,
+    and with `in_order=True` the schema columns must follow the order of the table columns.
 
     Parameters
     ----------
@@ -1613,47 +1264,33 @@ def _check_schema_match(
     schema_expect = schema
     schema_actual = Schema(tbl=data_tbl)
 
-    if complete and in_order:
-        # Check if the schema is complete and in order (most restrictive check)
-        # complete: True, in_order: True
-        res = schema_expect._compare_schema_columns_complete_in_order(
-            other=schema_actual,
-            case_sensitive_colnames=case_sensitive_colnames,
-            case_sensitive_dtypes=case_sensitive_dtypes,
-            full_match_dtypes=full_match_dtypes,
-        )
+    if schema_expect.columns is None or schema_actual.columns is None:
+        return schema_expect.columns is None and schema_actual.columns is None
 
-    elif not complete and not in_order:
-        # Check if the schema is at least a subset, and, order of columns does not matter
-        # complete: False, in_order: False
-        res = schema_expect._compare_schema_columns_subset_any_order(
-            other=schema_actual,
-            case_sensitive_colnames=case_sensitive_colnames,
-            case_sensitive_dtypes=case_sensitive_dtypes,
-            full_match_dtypes=full_match_dtypes,
-        )
+    matches = _match_schema_columns(
+        target_schema=schema_actual.columns,
+        expect_schema=schema_expect.columns,
+        case_sensitive_colnames=case_sensitive_colnames,
+        case_sensitive_dtypes=case_sensitive_dtypes,
+        full_match_dtypes=full_match_dtypes,
+    )
 
-    elif complete:
-        # Check if the schema is complete, but the order of columns does not matter
-        # complete: True, in_order: False
-        res = schema_expect._compare_schema_columns_complete_any_order(
-            other=schema_actual,
-            case_sensitive_colnames=case_sensitive_colnames,
-            case_sensitive_dtypes=case_sensitive_dtypes,
-            full_match_dtypes=full_match_dtypes,
-        )
+    # Every schema column must match a target column (duplicates never do) with a matching dtype
+    for m in matches:
+        if m["target_index"] is None:
+            return False
+        if m["dtype_input"] is not None and not m["dtype_matched"]:
+            return False
 
-    else:
-        # Check if the schema is a subset (doesn't need to be complete) and in order
-        # complete: False, in_order: True
-        res = schema_expect._compare_schema_columns_subset_in_order(
-            other=schema_actual,
-            case_sensitive_colnames=case_sensitive_colnames,
-            case_sensitive_dtypes=case_sensitive_dtypes,
-            full_match_dtypes=full_match_dtypes,
-        )
+    # A complete schema must account for every column of the target table
+    if complete and len(matches) != len(schema_actual.columns):
+        return False
 
-    return res
+    # The schema columns must follow the order of the target table columns
+    if in_order and _schema_columns_out_of_order(matches):
+        return False
+
+    return True
 
 
 def generate_dataset(

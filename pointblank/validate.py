@@ -4,6 +4,7 @@ import base64
 import contextlib
 import copy
 import datetime
+import difflib
 import html as html_module
 import inspect
 import json
@@ -25,7 +26,7 @@ import narwhals as nw
 from great_tables import GT, from_column, google_font, html, loc, md, style, vals
 from great_tables.gt import _get_column_of_values
 from great_tables.vals import fmt_integer, fmt_number
-from importlib_resources import files
+from importlib.resources import files
 from narwhals.dependencies import is_narwhals_lazyframe, is_polars_lazyframe
 
 from pointblank._agg import (
@@ -54,6 +55,7 @@ from pointblank._constants import (
     SEVERITY_LEVEL_COLORS,
     SVG_ICONS_FOR_ASSERTION_TYPES,
     SVG_ICONS_FOR_TBL_STATUS,
+    TABLE_LEVEL_STEP_REPORT_TYPES,
     VALIDATION_REPORT_FIELDS,
 )
 from pointblank._constants_translations import (
@@ -68,10 +70,10 @@ from pointblank._interrogation import (
     StepEvaluationError,
     _first_line,
     apply_missing_exclusion,
-    col_count_match,
-    col_exists,
-    col_pct_missing,
-    col_pct_null,
+    col_count_match_details,
+    col_exists_details,
+    col_pct_missing_details,
+    col_pct_null_details,
     col_schema_match,
     col_vals_expr,
     conjointly_validation,
@@ -93,7 +95,7 @@ from pointblank._interrogation import (
     interrogate_regex,
     interrogate_str_len,
     interrogate_rows_distinct,
-    row_count_match,
+    row_count_match_details,
     rows_complete,
 )
 from pointblank._typing import SegmentSpec
@@ -105,6 +107,9 @@ from pointblank._utils import (
     _count_validation_units,
     _derive_bounds,
     _format_to_integer_value,
+    _get_caller_arg_source,
+    _get_expr_alias,
+    _get_expr_root_names,
     _get_fn_name,
     _get_tbl_type,
     _is_duration_dtype,
@@ -135,7 +140,7 @@ from pointblank.column import (
     ReferenceColumn,
     col,
 )
-from pointblank.missing import MissingSpec
+from pointblank.missing import MissingSpec, _missing_spec_to_code, _missing_spec_to_yaml
 from pointblank.schema import Schema, _get_schema_validation_info
 from pointblank.segments import Segment
 from pointblank.thresholds import (
@@ -153,7 +158,6 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from typing import Any
 
-    import polars as pl
     from narwhals.typing import IntoDataFrame, IntoFrame
 
     from pointblank._typing import AbsoluteBounds, Tolerance, _CompliantValue, _CompliantValues
@@ -4144,6 +4148,10 @@ class _ValidationInfo:
         A preprocessing function or lambda to apply to the data table for the validation step.
     segments
         The segments to use for the validation step.
+    segments_spec
+        The `segments=` value as originally given. Interrogation expands a segmented step into one
+        step per segment (replacing `segments` with that segment), so this keeps the original
+        specification for serializing the plan.
     thresholds
         The threshold values for the validation.
     actions
@@ -4159,6 +4167,9 @@ class _ValidationInfo:
         `"uniqueness"`, etc.). If not set explicitly, it is inferred from the `assertion_type`.
     active
         Whether the validation step is active.
+    expr_source
+        The source text of a `col_vals_expr()` expression, as written by the user (or `None` if
+        it couldn't be determined with certainty).
     all_passed
         Upon interrogation, this describes whether all test units passed for a validation step.
     n
@@ -4238,6 +4249,7 @@ class _ValidationInfo:
     missing: Any | None = None
     pre: Callable | None = None
     segments: Any | None = None
+    segments_spec: Any | None = None
     thresholds: Thresholds | None = None
     actions: Actions | None = None
     label: str | None = None
@@ -4245,6 +4257,7 @@ class _ValidationInfo:
     autobrief: str | None = None
     dimension: str | None = None
     active: bool | Callable | None = None
+    expr_source: str | None = None
     # Interrogation results
     eval_error: bool | None = None
     all_passed: bool | None = None
@@ -4466,6 +4479,7 @@ _SERIALIZE_COLUMN_METHODS = (
     | _SERIALIZE_COLUMN_ONLY_METHODS
     | _SERIALIZE_SEQUENCE_METHODS
     | {"col_vals_regex", "col_vals_within_spec", "col_vals_str_len"}
+    | {"col_pct_null", "col_pct_missing", "col_missing_coded", "col_missing_only_coded"}
 )
 
 
@@ -4479,7 +4493,7 @@ class _UnserializablePlaceholder:
 
     __slots__ = ("code", "yaml_value", "note")
 
-    def __init__(self, code: str, note: str, yaml_value: str | None = None) -> None:
+    def __init__(self, code: str, note: str, yaml_value: Any = None) -> None:
         self.code = code
         self.yaml_value = yaml_value if yaml_value is not None else code
         self.note = note
@@ -4533,9 +4547,7 @@ def _validation_info_to_step(
 
     params: dict[str, Any] = {}
 
-    def _placeholder(
-        code: str, note: str, yaml_value: str | None = None
-    ) -> _UnserializablePlaceholder:
+    def _placeholder(code: str, note: str, yaml_value: Any = None) -> _UnserializablePlaceholder:
         warnings_out.append(note)
         return _UnserializablePlaceholder(code=code, note=note, yaml_value=yaml_value)
 
@@ -4591,6 +4603,38 @@ def _validation_info_to_step(
             params["max_val"] = values["max_val"]
     elif at in _SERIALIZE_COLUMN_ONLY_METHODS:
         _columns_param()
+    elif at == "col_pct_null":
+        _columns_param()
+        values = vi.values or {}
+        params["p"] = values.get("p")
+        # The tolerance is only held by the bound-finding partial
+        tol = getattr(values.get("bound_finder"), "keywords", {}).get("tol", 0)
+        if tol:
+            params["tol"] = tol
+    elif at == "col_pct_missing":
+        _columns_param()
+        values = vi.values or {}
+        params["missing"] = values.get("spec")
+        params["max_pct"] = values.get("max_pct")
+        for key in ("reason", "category"):
+            if values.get(key) is not None:
+                params[key] = values[key]
+    elif at == "col_missing_coded":
+        _columns_param()
+        # The MissingSpec itself is the step's `values`
+        params["missing"] = vi.values
+    elif at == "col_missing_only_coded":
+        _columns_param()
+        values = vi.values or {}
+        params["missing"] = values.get("spec")
+        for key in ("allowed", "min_val", "max_val"):
+            if values.get(key) is not None:
+                params[key] = values[key]
+    elif at == "col_missing_consistent":
+        values = vi.values or {}
+        params["columns"] = [_column_to_name(c) or c for c in vi.column]
+        params["missing"] = values.get("spec")
+        params["when_reason"] = values.get("when_reason")
     elif at in _SERIALIZE_SEQUENCE_METHODS:
         _columns_param()
         info = vi.val_info or {}
@@ -4638,6 +4682,11 @@ def _validation_info_to_step(
     elif at == "row_count_match":
         values = vi.values or {}
         params["count"] = values.get("count")
+        # The tolerance is held as absolute bounds (integers), which `tol=` reads as absolute row
+        # counts, so they reproduce the same check
+        lower, upper = values.get("abs_tol_bounds") or (0, 0)
+        if lower or upper:
+            params["tol"] = lower if lower == upper else (lower, upper)
         if values.get("inverse"):
             params["inverse"] = True
     elif at == "col_count_match":
@@ -4700,13 +4749,34 @@ def _validation_info_to_step(
         params["ref_column"] = values.get("ref_column")
     elif at == "conjointly":
         params["expressions"] = _placeholder(
-            code="[lambda df: df]",
+            code="lambda df: df",
             note=(
                 "Step 'conjointly' uses callable expressions that cannot be serialized to "
                 "source; a placeholder was emitted and must be edited manually."
             ),
-            yaml_value="[]",
+            yaml_value=["lambda df: df"],
         )
+    elif at == "prompt":
+        values = vi.values or {}
+        params["prompt"] = values.get("prompt")
+        params["model"] = f"{values.get('llm_provider')}:{values.get('llm_model')}"
+        if vi.column is not None:
+            params["columns_subset"] = (
+                list(vi.column) if isinstance(vi.column, (list, tuple)) else vi.column
+            )
+        if values.get("batch_size", 1000) != 1000:
+            params["batch_size"] = values["batch_size"]
+        if values.get("max_concurrent", 3) != 3:
+            params["max_concurrent"] = values["max_concurrent"]
+        if values.get("attachments"):
+            params["attachments"] = _placeholder(
+                code="None",
+                note=(
+                    "Step 'prompt' has `attachments=` that cannot be serialized; they were "
+                    "dropped from the generated plan."
+                ),
+                yaml_value="null",
+            )
     elif at == "specially":
         params["expr"] = _placeholder(
             code="lambda df: df",
@@ -4731,6 +4801,9 @@ def _validation_info_to_step(
     if vi.na_pass:
         params["na_pass"] = True
 
+    if vi.missing is not None:
+        params["missing"] = vi.missing
+
     if vi.pre is not None:
         params["pre"] = _placeholder(
             code="None",
@@ -4741,8 +4814,11 @@ def _validation_info_to_step(
             yaml_value="null",
         )
 
-    if vi.segments is not None:
-        params["segments"] = vi.segments
+    # After interrogation, a segmented step has been expanded into one step per segment; the
+    # original `segments=` value is what reproduces the plan
+    segments = vi.segments_spec if vi.segments_spec is not None else vi.segments
+    if segments is not None:
+        params["segments"] = segments
 
     step_thresholds = _thresholds_as_dict(vi.thresholds)
     if step_thresholds and step_thresholds != _thresholds_as_dict(global_thresholds):
@@ -4840,6 +4916,10 @@ def _render_code_value(value: Any) -> str:
         return _render_thresholds_code(value)
     if isinstance(value, Schema):
         return _render_schema_code(value)
+    if isinstance(value, MissingSpec):
+        return _missing_spec_to_code(value)
+    if isinstance(value, Segment):
+        return f"pb.seg_group({_render_code_value(value.segments)})"
     if isinstance(value, tuple):
         inner = ", ".join(_render_code_value(v) for v in value)
         return f"({inner},)" if len(value) == 1 else f"({inner})"
@@ -4887,7 +4967,10 @@ def _render_step_code(method: str, params: dict[str, Any]) -> str:
     """Render one step as a chained `.method(...)` call."""
     parts = []
     for key, value in params.items():
-        if key in ("columns", "columns_subset"):
+        if method == "conjointly" and key == "expressions":
+            # `conjointly()` takes its expressions as positional arguments
+            parts.append(value.code if isinstance(value, _UnserializablePlaceholder) else value)
+        elif key in ("columns", "columns_subset"):
             parts.append(f"{key}={_render_columns_arg(value)}")
         else:
             parts.append(f"{key}={_render_code_value(value)}")
@@ -4916,6 +4999,10 @@ def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
         return _thresholds_as_dict(value)
     if isinstance(value, Schema):
         return _schema_to_yaml(value)
+    if isinstance(value, MissingSpec):
+        return _missing_spec_to_yaml(value)
+    if isinstance(value, Segment):
+        return {"python": f"pb.seg_group({_render_code_value(value.segments)})"}
     if isinstance(value, tuple):
         return [_value_to_yaml(v, warnings_out) for v in value]
     if isinstance(value, list):
@@ -4927,6 +5014,21 @@ def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
         # Written as a duration string (e.g., "1.5s") that `tbl_match(tolerance=)` accepts
         return f"{value.total_seconds():g}s"
     return str(value)  # pragma: no cover
+
+
+def _segments_to_yaml(segments: Any, warnings_out: list[str]) -> Any:
+    """Convert a `segments=` value for `to_yaml()`.
+
+    YAML has no tuples, so each `(column, value)` segment is written as a two-item list inside an
+    outer list (e.g., `[[region, North]]`). This keeps it distinct from a list of column names
+    (e.g., `[region, quarter]`), which `yaml_interrogate()` reads back the same way.
+    """
+    items = [segments] if isinstance(segments, (str, tuple)) else list(segments)
+    result = [
+        item if isinstance(item, str) else [_value_to_yaml(v, warnings_out) for v in item]
+        for item in items
+    ]
+    return result[0] if isinstance(segments, str) else result
 
 
 def _schema_to_yaml(schema: Schema | None) -> dict[str, Any]:
@@ -11267,7 +11369,12 @@ class Validate:
             expression for a Polars table, an Ibis expression for an Ibis table, or a PySpark
             column for a PySpark DataFrame. A function (such as a lambda) can also be given; it
             receives the table and should return one of those expressions or a boolean Series
-            (e.g., `lambda df: df["a"] > 1` for a pandas DataFrame).
+            (e.g., `lambda df: df["a"] > 1` for a pandas DataFrame). For Polars, Narwhals, and
+            Ibis expressions, the columns used in the expression are shown in the validation
+            report, as is any name given to the expression (e.g., through `.alias("a_is_int")`),
+            which helps to tell apart several `col_vals_expr()` steps. The expression as written
+            in the code (when its source text is available, which requires Python 3.11 or later)
+            appears in a note in the report footer.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -11480,6 +11587,8 @@ class Validate:
             brief=brief,
             active=active,
             dimension=dimension,
+            # Keep the expression as written by the user so it can be shown in a report note
+            expr_source=_get_caller_arg_source(method_name="col_vals_expr", arg_name="expr"),
         )
 
         self._add_validation(validation_info=val_info)
@@ -13646,7 +13755,7 @@ class Validate:
             .prompt(
                 prompt="Each row should have a valid email address and a non-empty name",
                 columns_subset=["email", "name"],  # Only check these columns
-                model="openai:gpt-4o-mini",
+                model="openai:gpt-6-luna",
             )
             .interrogate()
         )
@@ -13682,7 +13791,7 @@ class Validate:
             .prompt(
                 prompt="Do all the phone numbers include an area code?",
                 columns_subset="phone_number",  # Only check the `phone_number` column
-                model="openai:gpt-4o",
+                model="openai:gpt-6-luna",
                 batch_size=500,
                 max_concurrent=5,
                 thresholds=pb.Thresholds(warning=0.1, error=0.2, critical=0.3),
@@ -13816,7 +13925,8 @@ class Validate:
         [`Schema`](`pointblank.Schema`) class. That class object is the expectation for the actual
         schema of the target table. The validation step operates over a single test unit, which is
         whether the schema matches that of the table (within the constraints enforced by the
-        `complete=`, and `in_order=` options).
+        `complete=`, and `in_order=` options). Every column in the schema must be present in the
+        table, so a schema that names the same column more than once never matches.
 
         Parameters
         ----------
@@ -13824,9 +13934,9 @@ class Validate:
             A `Schema` object that represents the expected schema of the table. This object is
             generated by the [`Schema`](`pointblank.Schema`) class.
         complete
-            Should the schema match be complete? If `True`, then the target table must have all
-            columns specified in the schema. If `False`, then the table can have additional columns
-            not in the schema (i.e., the schema is a subset of the target table's columns).
+            Should the schema match be complete? If `True`, then the schema must account for every
+            column in the target table. If `False`, then the table can have additional columns not
+            in the schema (i.e., the schema is a subset of the target table's columns).
         in_order
             Should the schema match be in order? If `True`, then the columns in the schema must
             appear in the same order as they do in the target table. If `False`, then the order of
@@ -16488,6 +16598,17 @@ class Validate:
                     key="missing_spec", markdown=missing_note[0], text=missing_note[1]
                 )
 
+            # Show the expression of a `col_vals_expr()` step as written by the user (only
+            # available when its source text could be captured), placed within a disclosure
+            if validation.expr_source is not None:
+                validation._add_note(
+                    key="expr",
+                    markdown=_create_expr_source_note_html(
+                        expr_source=validation.expr_source, locale=self.locale
+                    ),
+                    text=f"Expression: {validation.expr_source}",
+                )
+
             # ------------------------------------------------
             # Bypassing the validation step if conditions met
             # ------------------------------------------------
@@ -16940,13 +17061,17 @@ class Validate:
                             )
 
                     elif assertion_type == "col_pct_null":
-                        result_bool = col_pct_null(
+                        pct_null_result = col_pct_null_details(
                             data_tbl=data_tbl_step,
                             column=column,
                             p=value["p"],
                             bound_finder=value["bound_finder"],
                         )
 
+                        # Store the observed null count for the step report
+                        validation.val_info = pct_null_result
+
+                        result_bool = pct_null_result["passed"]
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
@@ -16955,7 +17080,7 @@ class Validate:
                         results_tbl = None
 
                     elif assertion_type == "col_pct_missing":
-                        result_bool = col_pct_missing(
+                        pct_missing_result = col_pct_missing_details(
                             data_tbl=data_tbl_step,
                             column=column,
                             sentinels=value["sentinels"],
@@ -16963,6 +17088,10 @@ class Validate:
                             max_pct=value["max_pct"],
                         )
 
+                        # Store the observed missing-value count for the step report
+                        validation.val_info = pct_missing_result
+
+                        result_bool = pct_missing_result["passed"]
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
@@ -16999,11 +17128,15 @@ class Validate:
                         )
 
                     elif assertion_type == "col_exists":
-                        result_bool = col_exists(
+                        col_exists_result = col_exists_details(
                             data_tbl=data_tbl_step,
                             column=column,
                         )
 
+                        # Store the table's columns for the step report
+                        validation.val_info = col_exists_result
+
+                        result_bool = col_exists_result["passed"]
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
@@ -17056,13 +17189,17 @@ class Validate:
                         results_tbl = None
 
                     elif assertion_type == "row_count_match":
-                        result_bool = row_count_match(
+                        row_count_result = row_count_match_details(
                             data_tbl=data_tbl_step,
                             count=value["count"],
                             inverse=value["inverse"],
                             abs_tol_bounds=value["abs_tol_bounds"],
                         )
 
+                        # Store the observed row count for the step report
+                        validation.val_info = row_count_result
+
+                        result_bool = row_count_result["passed"]
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
@@ -17071,10 +17208,14 @@ class Validate:
                         results_tbl = None
 
                     elif assertion_type == "col_count_match":
-                        result_bool = col_count_match(
+                        col_count_result = col_count_match_details(
                             data_tbl=data_tbl_step, count=value["count"], inverse=value["inverse"]
                         )
 
+                        # Store the observed column count for the step report
+                        validation.val_info = col_count_result
+
+                        result_bool = col_count_result["passed"]
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
@@ -19194,7 +19335,19 @@ class Validate:
     def _serialize_steps(self, warnings_out: list[str]) -> list[tuple[str, dict[str, Any]]]:
         """Build the coalesced `(method, kwargs)` list for this plan (shared by to_code/to_yaml)."""
         steps: list[tuple[str, dict[str, Any]]] = []
+        prev_vi: _ValidationInfo | None = None
         for vi in self.validation_info:
+            # Steps expanded from a single segmented step (at interrogation) share an `i_o`, and
+            # are serialized once with their original `segments=` value
+            is_segment_copy = (
+                vi.segments_spec is not None
+                and prev_vi is not None
+                and prev_vi.segments_spec is not None
+                and prev_vi.i_o == vi.i_o
+            )
+            prev_vi = vi
+            if is_segment_copy:
+                continue
             step = _validation_info_to_step(
                 vi,
                 global_thresholds=self.thresholds,
@@ -19387,7 +19540,12 @@ class Validate:
                 yaml_steps.append(method)
                 continue
             yaml_params = {
-                key: _value_to_yaml(value, warnings_out) for key, value in params.items()
+                key: (
+                    _segments_to_yaml(value, warnings_out)
+                    if key == "segments"
+                    else _value_to_yaml(value, warnings_out)
+                )
+                for key, value in params.items()
             }
             yaml_steps.append({method: yaml_params})
         config["steps"] = yaml_steps
@@ -20256,7 +20414,8 @@ class Validate:
 
         So long as these conditions are met, the data will be split into two constituent tables: one
         with the rows that passed all validation steps and another with the rows that failed at
-        least one validation step.
+        least one validation step. Steps that use `segments=` are included, with each segment's
+        results counting only for the rows in that segment.
 
         Parameters
         ----------
@@ -20322,19 +20481,18 @@ class Validate:
         # Keep only the validation steps that:
         # - are row-based (included in `ROW_BASED_VALIDATION_TYPES`)
         # - are `active`
+        # - have no `pre=` (it can change the rows, so the results may not line up with the data)
         validation_info = [
             validation
             for validation in self.validation_info
             if validation.active
+            and validation.pre is None
             and (
                 validation.assertion_type in ROW_BASED_VALIDATION_TYPES
                 # `tbl_match()` steps take part when a row-aligned result table is available
                 or (validation.assertion_type == "tbl_match" and validation.tbl_checked is not None)
             )
         ]
-
-        # TODO: ensure that the stored evaluation tables across all steps have not been mutated
-        # from the original table (via any `pre=` functions)
 
         # Obtain the validation steps that are to be used for sundering
         validation_steps_i = [validation.assertion_type for validation in validation_info]
@@ -20351,45 +20509,39 @@ class Validate:
 
         data_nw = _with_row_index(self.data, name=index_name)
 
-        # Get all validation step result tables and join together the `pb_is_good_` columns
-        # ensuring that the columns are named uniquely (e.g., `pb_is_good_1`, `pb_is_good_2`, ...)
-        # and that the index is reset
-        labeled_tbl_nw: nw.DataFrame | nw.LazyFrame | None = None
-        for i, validation in enumerate(validation_info):
-            # Add row numbers to the results table
-            results_tbl = _with_row_index(validation.tbl_checked, name=index_name)
-
-            # Add numerical suffix to the `pb_is_good_` column to make it unique
-            results_tbl = results_tbl.select([index_name, "pb_is_good_"]).rename(
-                {"pb_is_good_": f"pb_is_good_{i}"}
+        # Collect the numbers of the rows that failed in each validation step (a missing result
+        # doesn't count as a failure; e.g., a row outside a segmented step's segment)
+        failed_rows = []
+        for validation in validation_info:
+            # Add row numbers to the results table (put on the same backend as the data first, as
+            # some steps materialize their results, and eager and lazy tables can't be joined)
+            results_tbl = _with_row_index(
+                _results_on_data_backend(validation.tbl_checked, data_nw), name=index_name
             )
 
-            # Add the results table to the list of tables
-            if labeled_tbl_nw is None:
-                labeled_tbl_nw = results_tbl
-            else:
-                labeled_tbl_nw = labeled_tbl_nw.join(results_tbl, on=index_name, how="left")
+            # A segmented step's results only hold the rows of its segment, numbered from 0, so
+            # replace those numbers with the rows' numbers in the whole table
+            if validation.segments is not None:
+                results_tbl = _results_with_data_row_index(
+                    results_tbl, data_nw, segments=validation.segments, index_name=index_name
+                )
 
-        # Get list of columns that are the `pb_is_good_` columns
-        pb_is_good_cols = [f"pb_is_good_{i}" for i in range(len(validation_steps_i))]
+            # The results can be an `object` column in pandas, so they're made Boolean first
+            is_good = nw.col("pb_is_good_").fill_null(True).cast(nw.Boolean)
+            failed_rows.append(results_tbl.filter(~is_good).select(index_name))
 
-        # Determine the rows that passed all validation steps by checking if all `pb_is_good_`
-        # columns are `True`; joins don't guarantee row order (e.g., Polars >= 2.0 collects
-        # LazyFrames with the streaming engine), so the original order is restored via the index
-        labeled_tbl_nw = (
-            labeled_tbl_nw.with_columns(
-                pb_is_good_all=nw.all_horizontal(pb_is_good_cols, ignore_nulls=True)
-            )
-            .join(data_nw, on=index_name, how="left")
+        # The failing rows of all steps are combined at once (rather than joining the steps'
+        # results one by one), so that the query for a database table doesn't nest more deeply with
+        # every step (SQLite versions before 3.46 can't parse deeply nested queries)
+        failed_rows = nw.concat(failed_rows, how="vertical")
+
+        # The rows that passed are those that failed in no step; joins don't guarantee row order
+        # (e.g., Polars >= 2.0 collects LazyFrames with the streaming engine), so the original
+        # order is restored via the index
+        sundered_tbl = (
+            data_nw.join(failed_rows, on=index_name, how="anti" if type == "pass" else "semi")
             .sort(index_name)
             .drop(index_name)
-        )
-
-        bool_val = True if type == "pass" else False
-
-        sundered_tbl = (
-            labeled_tbl_nw.filter(nw.col("pb_is_good_all") == bool_val)
-            .drop(pb_is_good_cols + ["pb_is_good_all"])
             .to_native()
         )
 
@@ -20870,6 +21022,15 @@ class Validate:
         # Process the `type_upd` entry
         # ------------------------------------------------
 
+        # Aliased `col_vals_expr()` expressions show their name in the step text (e.g.,
+        # `col_vals_expr(a_mod_1)`), which helps to tell apart several such steps
+        assertion_arg_str = [
+            _get_expr_alias(value) if assertion_type == "col_vals_expr" else None
+            for assertion_type, value in zip(
+                validation_info_dict["assertion_type"], validation_info_dict["values"]
+            )
+        ]
+
         # Add the `type_upd` entry to the dictionary
         validation_info_dict["type_upd"] = _transform_assertion_str(
             assertion_str=validation_info_dict["assertion_type"],
@@ -20877,6 +21038,7 @@ class Validate:
             autobrief_str=validation_info_dict["autobrief"],
             segmentation_str=validation_info_dict["segments"],
             lang=lang,
+            assertion_arg_str=assertion_arg_str,
         )
 
         # Remove the `brief` entry from the dictionary
@@ -20905,11 +21067,14 @@ class Validate:
 
             column_text = None
 
-            if assertion_type[i] in [
+            if assertion_type[i] == "col_vals_expr":
+                # Use the columns referenced in the expression (where these can be determined)
+                expr_columns = _get_expr_root_names(validation_info_dict["values"][i])
+                column_text = ", ".join(expr_columns) if expr_columns else "&mdash;"
+            elif assertion_type[i] in [
                 "col_schema_match",
                 "row_count_match",
                 "col_count_match",
-                "col_vals_expr",
             ]:
                 column_text = "&mdash;"
             elif assertion_type[i] in ["rows_distinct", "rows_complete", "prompt"]:
@@ -21783,7 +21948,12 @@ class Validate:
         - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
         - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
         - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
+        - [`col_vals_str_len()`](`pointblank.Validate.col_vals_str_len`)
+        - [`col_vals_in_table()`](`pointblank.Validate.col_vals_in_table`)
         - [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`)
+        - [`col_missing_coded()`](`pointblank.Validate.col_missing_coded`)
+        - [`col_missing_only_coded()`](`pointblank.Validate.col_missing_only_coded`)
+        - [`col_missing_consistent()`](`pointblank.Validate.col_missing_consistent`)
         - [`conjointly()`](`pointblank.Validate.conjointly`)
         - [`prompt()`](`pointblank.Validate.prompt`)
         - [`rows_complete()`](`pointblank.Validate.rows_complete`)
@@ -21795,6 +21965,29 @@ class Validate:
         The [`col_schema_match()`](`pointblank.Validate.col_schema_match`) validation step will
         produce a report that shows the schema of the data table and the schema of the validation
         step. The report will indicate whether the schemas match or not.
+
+        The [`tbl_match()`](`pointblank.Validate.tbl_match`) and
+        [`tbl_reconcile()`](`pointblank.Validate.tbl_reconcile`) validation steps will produce a
+        report comparing the target table to the comparison table, with samples of the rows (or key
+        groups) that differ.
+
+        The remaining validation steps check the table, or a column, as a whole. Each produces a
+        summary report with the measured value(s) beside the expected value(s):
+
+        - the aggregate methods (e.g., [`col_sum_gt()`](`pointblank.Validate.col_sum_gt`),
+          [`col_avg_eq()`](`pointblank.Validate.col_avg_eq`),
+          [`col_sd_le()`](`pointblank.Validate.col_sd_le`)): the computed aggregate value
+        - [`col_exists()`](`pointblank.Validate.col_exists`): the column's position in the table
+          (and, if it's missing, the closest-matching column name)
+        - [`row_count_match()`](`pointblank.Validate.row_count_match`) and
+          [`col_count_match()`](`pointblank.Validate.col_count_match`): the row or column count
+        - [`col_pct_null()`](`pointblank.Validate.col_pct_null`) and
+          [`col_pct_missing()`](`pointblank.Validate.col_pct_missing`): the number and percentage
+          of null or missing values
+        - [`data_freshness()`](`pointblank.Validate.data_freshness`): the most recent datetime
+          value and its age
+        - [`specially()`](`pointblank.Validate.specially`): the number of passing and failing test
+          units
 
         Examples
         --------
@@ -22003,31 +22196,13 @@ class Validate:
             )
 
         elif assertion_type == "col_schema_match":
-            # Get the parameters for column-schema matching
-            values_dict = validation_step["values"]
-
-            # complete = values_dict["complete"]
-            in_order = values_dict["in_order"]
-
-            # CASE I: where ordering of columns is required (`in_order=True`)
-            if in_order:
-                step_report = _step_report_schema_in_order(
-                    step=i,
-                    schema_info=val_info,
-                    header=header,
-                    lang=lang,
-                    debug_return_df=debug_return_df,
-                )
-
-            # CASE II: where ordering of columns is not required (`in_order=False`)
-            if not in_order:
-                step_report = _step_report_schema_any_order(
-                    step=i,
-                    schema_info=val_info,
-                    header=header,
-                    lang=lang,
-                    debug_return_df=debug_return_df,
-                )
+            step_report = _step_report_schema(
+                step=i,
+                schema_info=val_info,
+                header=header,
+                lang=lang,
+                debug_return_df=debug_return_df,
+            )
 
         elif assertion_type in ("tbl_match", "tbl_reconcile"):
             comparison = (val_info or {}).get("comparison")
@@ -22053,6 +22228,20 @@ class Validate:
                 column=column,
                 values=values,
                 all_passed=all_passed,
+                val_info=val_info,
+                header=header,
+                lang=lang,
+            )
+
+        elif assertion_type in TABLE_LEVEL_STEP_REPORT_TYPES:
+            step_report = _step_report_table_level(
+                assertion_type=assertion_type,
+                i=i,
+                column=column,
+                values=values,
+                all_passed=all_passed,
+                n=n,
+                n_failed=n_failed,
                 val_info=val_info,
                 header=header,
                 lang=lang,
@@ -22242,6 +22431,19 @@ class Validate:
                 "column": [
                     ", ".join(str(c) for c in col) if isinstance(col, (list, tuple)) else col
                     for col in columns
+                ],
+            }
+
+        # Normalize `segments`: after interrogation, each segmented step holds a `(column, value)`
+        # pair (a list in the JSON report), which can't go into the string-typed column. It's
+        # only used for the `segmented` flag, so any non-null value is kept as JSON text.
+        segments = final_report.get("segments")
+        if isinstance(segments, list):
+            final_report = {
+                **final_report,
+                "segments": [
+                    s if s is None or isinstance(s, str) else json.dumps(s, default=str)
+                    for s in segments
                 ],
             }
 
@@ -22637,6 +22839,7 @@ class Validate:
                 new_validation = copy.deepcopy(validation)
 
                 new_validation.segments = seg
+                new_validation.segments_spec = segments_expr
 
                 expanded_validation_info.append(new_validation)
 
@@ -22750,6 +22953,79 @@ class Validate:
             return "some failing"
         else:
             return "all passed"
+
+
+def _results_on_data_backend(results_tbl: Any, data_nw: Any) -> Any:
+    """
+    Put a step's results table on the same backend as the target table, so the two can be joined.
+
+    Most steps give their results on the target table's backend, but some materialize them: e.g.,
+    `col_vals_in_table()` and the checksum specs of `col_vals_within_spec()` give an eager table for
+    a database table, and `conjointly()` does for a Polars LazyFrame. An eager result for a
+    database (Ibis) table becomes a memtable, cast to the table's column types so that the rows are
+    numbered in the same order by `_with_row_index()`.
+    """
+    results_nw = nw.from_native(results_tbl)
+    data_impl = data_nw.implementation
+    results_eager = isinstance(results_nw, nw.DataFrame)
+
+    if results_nw.implementation == data_impl and results_eager == isinstance(
+        data_nw, nw.DataFrame
+    ):
+        return results_tbl
+
+    if isinstance(data_nw, nw.DataFrame):
+        results_df = results_nw if results_eager else results_nw.collect()
+        if data_impl == nw.Implementation.PANDAS:
+            return results_df.to_pandas()
+        if data_impl == nw.Implementation.POLARS:
+            return results_df.to_polars()
+        return results_tbl  # pragma: no cover
+
+    if not results_eager:
+        return results_tbl  # pragma: no cover
+
+    if data_impl == nw.Implementation.POLARS:
+        return results_nw.to_polars().lazy()
+
+    if data_impl == nw.Implementation.IBIS:
+        import ibis
+
+        memtable = ibis.memtable(results_nw.to_native())
+        data_schema = data_nw.to_native().schema()
+        return memtable.cast({c: data_schema[c] for c in memtable.columns if c in data_schema})
+
+    return results_tbl  # pragma: no cover
+
+
+def _results_with_data_row_index(
+    results_nw: Any, data_nw: Any, segments: Any, index_name: str
+) -> Any:
+    """
+    Number the rows of a segmented step's results by their rows in the whole target table.
+
+    The step was checked on the segment's rows only (`_apply_segments()`), so the k-th row of its
+    results is the k-th row of the segment. Filtering the indexed target table the same way gives
+    each of those rows its number in the whole table. The segment's rows are numbered in the order
+    of that number, which is the order in which `_with_row_index()` numbers the results (by
+    position, or for a database table by sorting on the same columns).
+    """
+    import warnings
+
+    position_name = "pb_segment_row_"
+
+    # The segment is applied again here, so don't repeat any warning it gave at interrogation
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        segment_rows = nw.from_native(_apply_segments(data_nw.to_native(), segments))
+
+    segment_index = _with_row_index(segment_rows.select(index_name), name=position_name)
+
+    return (
+        results_nw.rename({index_name: position_name})
+        .join(segment_index, on=position_name, how="inner")
+        .drop(position_name)
+    )
 
 
 def _normalize_reporting_language(lang: str | None) -> str:
@@ -25173,12 +25449,29 @@ def _transform_assertion_str(
     autobrief_str: list[str],
     segmentation_str: list[tuple | None],
     lang: str,
+    assertion_arg_str: list[str | None] | None = None,
 ) -> list[str]:
     # Get the SVG icons for the assertion types
     svg_icon = _get_assertion_icon(icon=assertion_str)
 
-    # Append `()` to the `assertion_str`
-    assertion_str = [x + "()" for x in assertion_str]
+    # Append `()` to the `assertion_str`, placing any argument text (e.g., the name of an aliased
+    # `col_vals_expr()` expression) inside the parentheses; a long argument is truncated with an
+    # ellipsis so that the step text stays on one line (the full text is available on hover)
+    if assertion_arg_str is None:
+        assertion_arg_str = [None] * len(assertion_str)
+    assertion_nchar = [
+        len(x) + 2 + (len(arg) if arg else 0) for x, arg in zip(assertion_str, assertion_arg_str)
+    ]
+    assertion_str = [
+        (
+            f"{x}(<span title='{html_module.escape(arg, quote=True)}' style='display: inline-block; "
+            "max-width: 50px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; "
+            f"vertical-align: bottom;'>{html_module.escape(arg)}</span>)"
+        )
+        if arg
+        else f"{x}()"
+        for x, arg in zip(assertion_str, assertion_arg_str)
+    ]
 
     # Make every None value in `brief_str` an empty string
     brief_str = ["" if x is None else x for x in brief_str]
@@ -25209,12 +25502,9 @@ def _transform_assertion_str(
             for x in brief_str
         ]
 
-    # Obtain the number of characters contained in the assertion
-    # string; this is important for sizing components appropriately
-    assertion_type_nchar = [len(x) for x in assertion_str]
-
-    # Declare the text size based on the length of `assertion_str`
-    text_size = [10 if nchar + 2 >= 20 else 11 for nchar in assertion_type_nchar]
+    # Declare the text size based on the number of characters in the assertion string (counted
+    # before any HTML escaping)
+    text_size = [10 if nchar + 2 >= 20 else 11 for nchar in assertion_nchar]
 
     # Prepare the CSS style for right-to-left languages
     rtl_css_style = " direction: rtl;" if lang in RTL_LANGUAGES else ""
@@ -26399,17 +26689,27 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
         # Analyze what failed
         failures = []
 
-        # Check column count mismatch
+        from pointblank.schema import _match_schema_columns, _schema_columns_out_of_order
+
+        matches = _match_schema_columns(
+            target_schema=target_schema,
+            expect_schema=expect_schema,
+            case_sensitive_colnames=params["case_sensitive_colnames"],
+            case_sensitive_dtypes=params["case_sensitive_dtypes"],
+            full_match_dtypes=params["full_match_dtypes"],
+        )
+
+        # Check column count mismatch (only a problem if the schema should be complete)
         n_expect = len(expect_schema)
         n_target = len(target_schema)
-        if n_expect != n_target:
+        if params["complete"] and n_expect != n_target:
             count_mismatch_text = VALIDATION_REPORT_TEXT["note_schema_column_count_mismatch"].get(
                 locale, VALIDATION_REPORT_TEXT["note_schema_column_count_mismatch"]["en"]
             )
             failures.append(count_mismatch_text.format(n_expect=n_expect, n_target=n_target))
 
-        # Check for unmatched columns
-        unmatched_cols = [col for col, info in columns_dict.items() if not info["colname_matched"]]
+        # Check for unmatched columns (including any repeating an earlier schema column)
+        unmatched_cols = [m for m in matches if m["target_index"] is None]
         if unmatched_cols:
             unmatched_text = VALIDATION_REPORT_TEXT["note_schema_unmatched_columns"].get(
                 locale, VALIDATION_REPORT_TEXT["note_schema_unmatched_columns"]["en"]
@@ -26418,11 +26718,7 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
 
         # Check for wrong order (if in_order=True)
         if params["in_order"]:
-            wrong_order = [
-                col
-                for col, info in columns_dict.items()
-                if info["colname_matched"] and not info["index_matched"]
-            ]
+            wrong_order = _schema_columns_out_of_order(matches, packed=params["complete"])
             if wrong_order:
                 wrong_order_text = VALIDATION_REPORT_TEXT["note_schema_wrong_order"].get(
                     locale, VALIDATION_REPORT_TEXT["note_schema_wrong_order"]["en"]
@@ -26431,9 +26727,11 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
 
         # Check for dtype mismatches
         dtype_mismatches = [
-            col
-            for col, info in columns_dict.items()
-            if info["colname_matched"] and info["dtype_present"] and not info["dtype_matched"]
+            m
+            for m in matches
+            if m["target_index"] is not None
+            and m["dtype_input"] is not None
+            and not m["dtype_matched"]
         ]
         if dtype_mismatches:
             dtype_mismatch_text = VALIDATION_REPORT_TEXT["note_schema_dtype_mismatch"].get(
@@ -26448,17 +26746,10 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
         else:
             summary = f'<span style="color:#FF3300;">✗</span> {failed_text}.'  # pragma: no cover
 
-    # Generate the step report table using the existing function
-    # We'll call either _step_report_schema_in_order or _step_report_schema_any_order
-    # depending on the in_order parameter
-    if in_order:  # pragma: no cover
-        step_report_gt = _step_report_schema_in_order(  # pragma: no cover
-            step=1, schema_info=schema_info, header=None, lang=locale, debug_return_df=False
-        )
-    else:
-        step_report_gt = _step_report_schema_any_order(
-            step=1, schema_info=schema_info, header=None, lang=locale, debug_return_df=False
-        )
+    # Generate the step report table (without its header)
+    step_report_gt = _step_report_schema(
+        step=1, schema_info=schema_info, header=None, lang=locale, debug_return_df=False
+    )
 
     # Generate the settings HTML using the existing function
     settings_html = _create_col_schema_match_params_html(
@@ -26499,6 +26790,49 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
 {step_report_html}
 
 </div>
+</details>
+"""
+
+    return note_html.strip()
+
+
+def _create_expr_source_note_html(expr_source: str, locale: str = "en") -> str:
+    """
+    Create an HTML note showing the source text of a `col_vals_expr()` expression.
+
+    A short, single-line expression is shown in full. A longer one is shown as a truncated
+    preview, with the full text placed in a collapsed disclosure so that it doesn't take up space
+    in the report footer until it's opened.
+    """
+
+    def _md_safe(text: str) -> str:
+        # The notes are rendered as Markdown, so characters having a meaning in Markdown (and line
+        # breaks, which could otherwise end the HTML block) are written as character references
+        return html_module.escape(text).translate(
+            {ord(char): f"&#{ord(char)};" for char in "\n*_`\\[]!#~|"}
+        )
+
+    code_style = "font-family: 'IBM Plex Mono', monospace; font-size: 11px;"
+
+    if "\n" not in expr_source and len(expr_source) <= 80:
+        return f'<code style="{code_style}">{_md_safe(expr_source)}</code>'
+
+    disclosure_text = VALIDATION_REPORT_TEXT["note_expr_source_disclosure"].get(
+        locale, VALIDATION_REPORT_TEXT["note_expr_source_disclosure"]["en"]
+    )
+
+    # Collapse the whitespace of a multi-line expression for the preview
+    preview = " ".join(expr_source.split())
+    preview = re.sub(r"\s+([)\]}])", r"\1", re.sub(r"([(\[{])\s+", r"\1", preview))
+    if len(preview) > 60:
+        preview = preview[:60].rstrip() + "…"
+
+    note_html = f"""
+<code style="{code_style}">{_md_safe(preview)}</code>
+
+<details style="margin-top: 2px; margin-bottom: 8px; font-size: 12px; text-indent: 12px;">
+<summary style="cursor: pointer; font-weight: bold; color: #555;">{disclosure_text}</summary>
+<pre style="margin-top: 4px; margin-left: 15px; padding: 6px 10px; background-color: #F6F6F6; border-radius: 3px; {code_style} text-indent: 0; white-space: pre; overflow-x: auto;">{_md_safe(expr_source)}</pre>
 </details>
 """
 
@@ -26612,6 +26946,14 @@ def _step_report_row_based(
         cols = ", ".join(column) if isinstance(column, (list, tuple)) else str(column)
         reason = values.get("when_reason") if isinstance(values, dict) else None
         text = f"consistent &ldquo;{reason}&rdquo; across {{{cols}}}"
+    elif assertion_type == "conjointly":
+        # Name each expression by its function name, numbering any anonymous (lambda) ones
+        exprs = values.get("expressions", ()) if isinstance(values, dict) else ()
+        names = []
+        for k, expr in enumerate(exprs, start=1):
+            name = getattr(expr, "__name__", None)
+            names.append(name if name and name != "<lambda>" else f"expr_{k}")
+        text = f"CONJOINTLY({html_module.escape(', '.join(names))})"
     else:
         # Fallback for any other assertion type: show the assertion type name
         text = str(assertion_type)  # pragma: no cover
@@ -26657,15 +26999,17 @@ def _step_report_row_based(
         assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
 
         # Use 'success_statement_no_column' for col_vals_expr() since it doesn't target
-        # a specific column (or when the column isn't in the table, e.g., created by `pre=`)
-        if assertion_type == "col_vals_expr" or column_position is None:
-            success_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(
-                n=n
-            )  # pragma: no cover
+        # a specific column (or when the column isn't in the table, e.g., created by `pre=`, or
+        # there are several columns, as with `col_missing_consistent()`)
+        if (
+            assertion_type == "col_vals_expr"
+            or column_position is None
+            or isinstance(column_position, list)
+        ):
+            success_stmt = _step_report_success_stmt(n=n, lang=lang)
         else:
-            success_stmt = STEP_REPORT_TEXT["success_statement"][lang].format(
-                n=n,
-                column_position=column_position,
+            success_stmt = _step_report_success_stmt(
+                n=n, lang=lang, column_position=column_position
             )
         preview_stmt = STEP_REPORT_TEXT["preview_statement"][lang]
 
@@ -26738,20 +27082,24 @@ def _step_report_row_based(
                 locations=loc.column_labels(columns=column),
             )
 
-            not_shown = ""
-            shown_failures = STEP_REPORT_TEXT["shown_failures"][lang]
+            # The note on the failures in red follows the row count (with a separating space)
+            shown_failures = " " + STEP_REPORT_TEXT["shown_failures"][lang]
         else:
             step_report = extract_tbl
-            not_shown = STEP_REPORT_TEXT["not_shown"][lang]
             shown_failures = ""
 
-        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i)
+        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CROSS_MARK_SPAN
         assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
         failure_rate_metrics = f"<strong>{n_failed}</strong> / <strong>{n}</strong>"
 
         # Use failure_rate_summary_no_column for col_vals_expr since it doesn't target a specific column
-        # (or when the column isn't in the table, e.g., created by `pre=`)
-        if assertion_type == "col_vals_expr" or column_position is None:
+        # (or when the column isn't in the table, e.g., created by `pre=`, or there are several
+        # columns, as with `col_missing_consistent()`)
+        if (
+            assertion_type == "col_vals_expr"
+            or column_position is None
+            or isinstance(column_position, list)
+        ):
             failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_no_column"][lang].format(
                 failure_rate=failure_rate_metrics
             )
@@ -26769,7 +27117,8 @@ def _step_report_row_based(
 
         else:
             extract_length_resolved = extract_length
-            extract_text = STEP_REPORT_TEXT["extract_text_all"][lang].format(
+            key = "extract_text_one" if extract_length == 1 else "extract_text_all"
+            extract_text = STEP_REPORT_TEXT[key][lang].format(
                 extract_length_resolved=extract_length_resolved, shown_failures=shown_failures
             )
 
@@ -26782,7 +27131,7 @@ def _step_report_row_based(
             f"position: relative; bottom: 1px;'>{text}</code></span>"
             "</div>"
             "<div style='padding-top: 7px;'>"
-            f"{failure_rate_stmt} {not_shown}"
+            f"{failure_rate_stmt}"
             "</div>"
             f"{extract_text}"
             "</div>"
@@ -26832,6 +27181,17 @@ def _step_report_rows_distinct(
         columns_list = ", ".join(column)
         text = STEP_REPORT_TEXT["rows_distinct_subset"][lang].format(columns_subset=columns_list)
 
+    # Show the assertion text in a code box after the `ASSERTION` label (as in other step reports)
+    assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
+    text = (
+        f"{assertion_header_text} <span style='border-style: solid; border-width: thin; "
+        "border-color: lightblue; padding-left: 2px; padding-right: 2px;'>"
+        "<code style='color: #303030; background-color: transparent; "
+        "position: relative; bottom: 1px;'>"
+        f"<code style='color: #303030; font-family: monospace; font-size: smaller;'>{text}</code>"
+        "</code></span>"
+    )
+
     if all_passed:
         step_report = tbl_preview
 
@@ -26840,10 +27200,7 @@ def _step_report_rows_distinct(
 
         title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
 
-        success_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(
-            n=n,
-            column_position=column_position,
-        )
+        success_stmt = _step_report_success_stmt(n=n, lang=lang)
         preview_stmt = STEP_REPORT_TEXT["preview_statement"][lang]
 
         details = (
@@ -26890,7 +27247,7 @@ def _step_report_rows_distinct(
             mark_missing_values=False,
         )
 
-        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i)
+        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CROSS_MARK_SPAN
         failure_rate_metrics = f"<strong>{n_failed}</strong> / <strong>{n}</strong>"
 
         failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_rows_distinct"][lang].format(
@@ -26902,6 +27259,13 @@ def _step_report_rows_distinct(
             extract_length_resolved = limit
             extract_text = STEP_REPORT_TEXT["extract_text_first_rows_distinct"][lang].format(
                 extract_length_resolved=extract_length_resolved
+            )
+
+        elif extract_length == 1:  # pragma: no cover
+            # Duplicated rows come in at least pairs, so this guards an unexpected extract
+            extract_length_resolved = extract_length
+            extract_text = STEP_REPORT_TEXT["extract_text_one"][lang].format(
+                extract_length_resolved=extract_length_resolved, shown_failures=""
             )
 
         else:
@@ -26958,10 +27322,6 @@ def _step_report_aggregate(
     This creates a 1-row table showing the computed aggregate value vs. the target value,
     along with tolerance and pass/fail status.
     """
-
-    # Determine whether the `lang` value represents a right-to-left language
-    is_rtl_lang = lang in RTL_LANGUAGES
-    direction_rtl = " direction: rtl;" if is_rtl_lang else ""
 
     # Parse assertion type to get aggregate function and comparison operator
     # Format: col_{agg}_{comp} (e.g., col_sum_eq, col_avg_gt, col_sd_le)
@@ -27035,14 +27395,6 @@ def _step_report_aggregate(
     else:
         difference = None  # pragma: no cover
 
-    # Format values for display
-    def format_value(v) -> str:  # pragma: no cover
-        if v is None:  # pragma: no cover
-            return "&mdash;"  # pragma: no cover
-        if isinstance(v, float):  # pragma: no cover
-            return f"{v:,.6g}"  # pragma: no cover
-        return f"{v:,}"  # pragma: no cover
-
     # Format tolerance for display
     if tol == 0:
         tol_display = "&mdash;"
@@ -27066,13 +27418,103 @@ def _step_report_aggregate(
     else:
         diff_display = "&mdash;"  # pragma: no cover
 
-    # Create pass/fail indicator
     if all_passed:
-        status_html = CHECK_MARK_SPAN
-        status_color = "#4CA64C"
+        result_stmt = STEP_REPORT_TEXT.get("agg_success_statement", {}).get(
+            lang,
+            f"The aggregate value for column <code>{column_display}</code> satisfies the condition.",
+        )
     else:
-        status_html = CROSS_MARK_SPAN
-        status_color = "#CF142B"
+        result_stmt = STEP_REPORT_TEXT.get("agg_failure_statement", {}).get(
+            lang,
+            f"The aggregate value for column <code>{column_display}</code> does not satisfy the condition.",
+        )
+    if isinstance(result_stmt, str) and "{column}" in result_stmt:
+        result_stmt = result_stmt.format(column=column_display)
+
+    return _step_report_summary(
+        i=i,
+        cells=[
+            ("actual", "ACTUAL", _step_report_fmt_value(actual), "200px"),
+            ("target", "EXPECTED", _step_report_fmt_value(target), "200px"),
+            ("tolerance", "TOL", tol_display, "150px"),
+            ("difference", "DIFFERENCE", diff_display, "200px"),
+        ],
+        all_passed=all_passed,
+        assertion_text=assertion_text,
+        result_stmt=result_stmt,
+        header=header,
+        lang=lang,
+    )
+
+
+# Width (in px) of the step reports that don't show the target table's columns (summary and table
+# comparison reports), matching that of the `col_schema_match()` step reports
+STEP_REPORT_WIDTH = 900
+
+
+def _step_report_success_stmt(n: int, lang: str, column_position: int | None = None) -> str:
+    """
+    Get the statement that all `n` test units passed (in the column at `column_position`, if
+    given), using the singular form of the statement for a single test unit.
+    """
+    key = "success_statement" if column_position is not None else "success_statement_no_column"
+    if n == 1:
+        key += "_one"
+    return STEP_REPORT_TEXT[key][lang].format(n=n, column_position=column_position)
+
+
+def _step_report_fmt_value(v: Any) -> str:
+    """
+    Format a number (or `None`) for a cell of a summary step report.
+    """
+    if v is None:
+        return "&mdash;"
+    if isinstance(v, float):
+        return f"{v:,.6g}"
+    return f"{v:,}"
+
+
+def _step_report_fmt_pct(p: float | None) -> str:
+    """
+    Format a fraction (or `None`) as a percentage for a cell of a summary step report.
+    """
+    if p is None:
+        return "&mdash;"
+    return f"{p * 100:,.4g}%"
+
+
+def _step_report_md_escape(text: Any) -> str:
+    """
+    Escape text (e.g., a column name) for a Markdown-formatted cell of a summary step report.
+    """
+    return re.sub(r"([!-/:-@\[-`{-~])", r"\\\1", str(text))
+
+
+def _step_report_summary(
+    i: int,
+    cells: list[tuple[str, str, str, str]],
+    all_passed: bool,
+    assertion_text: str,
+    result_stmt: str,
+    header: str | None,
+    lang: str,
+) -> GT:
+    """
+    Generate a summary step report: a 1-row table of the step's measured and expected values
+    (followed by a pass/fail status cell) under the standard step-report header.
+
+    Each item in `cells` is a tuple of the column ID, column label, Markdown-formatted cell value,
+    and relative column width (in px). The table has a fixed width (the same as that of the
+    `col_schema_match()` step reports) and the widths are scaled to fill it. The `assertion_text`
+    (HTML) is shown in the header after the `ASSERTION` label, followed by the `result_stmt` (HTML).
+    """
+
+    # Determine whether the `lang` value represents a right-to-left language
+    is_rtl_lang = lang in RTL_LANGUAGES
+    direction_rtl = " direction: rtl;" if is_rtl_lang else ""
+
+    # Create pass/fail indicator
+    status_html = CHECK_MARK_SPAN if all_passed else CROSS_MARK_SPAN
 
     # Select DataFrame library (prefer Polars, fall back to Pandas)
     if _is_lib_present("polars"):
@@ -27088,15 +27530,18 @@ def _step_report_aggregate(
             "Neither Polars nor Pandas is available for step report generation"
         )  # pragma: no cover
 
+    value_columns = [key for key, _, _, _ in cells]
+
+    # Scale the column widths so that, with the status column, they fill the fixed table width
+    status_width = 50
+    weights = [int(width.removesuffix("px")) for _, _, _, width in cells]
+    available = STEP_REPORT_WIDTH - status_width
+    col_widths = [available * weight // sum(weights) for weight in weights]
+    col_widths[-1] += available - sum(col_widths)
+
     # Create the data for the 1-row table
     report_data = df_lib.DataFrame(
-        {
-            "actual": [format_value(actual)],
-            "target": [format_value(target)],
-            "tolerance": [tol_display],
-            "difference": [diff_display],
-            "status": [status_html],
-        }
+        {**{key: [value] for key, _, value, _ in cells}, "status": [status_html]}
     )
 
     # Create GT table with styling matching preview() and other step reports
@@ -27104,18 +27549,12 @@ def _step_report_aggregate(
         GT(report_data, id="pb_step_tbl")
         .opt_table_font(font=google_font(name="IBM Plex Sans"))
         .opt_align_table_header(align="left")
-        .cols_label(
-            actual="ACTUAL",
-            target="EXPECTED",
-            tolerance="TOL",
-            difference="DIFFERENCE",
-            status="",
-        )
+        .cols_label(**{key: label for key, label, _, _ in cells}, status="")
         .cols_align(align="center")
-        .fmt_markdown(columns=["actual", "target", "tolerance", "difference", "status"])
+        .fmt_markdown(columns=value_columns + ["status"])
         .tab_style(
             style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="13px"),
-            locations=loc.body(columns=["actual", "target", "tolerance", "difference"]),
+            locations=loc.body(columns=value_columns),
         )
         .tab_style(
             style=style.text(size="13px"),
@@ -27141,11 +27580,8 @@ def _step_report_aggregate(
         )
         .cols_width(
             cases={
-                "actual": "200px",
-                "target": "200px",
-                "tolerance": "150px",
-                "difference": "200px",
-                "status": "50px",
+                **{key: f"{width}px" for key, width in zip(value_columns, col_widths)},
+                "status": f"{status_width}px",
             }
         )
     )
@@ -27185,22 +27621,7 @@ def _step_report_aggregate(
         f"{assertion_text}</code>"
     )
 
-    if all_passed:
-        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
-        result_stmt = STEP_REPORT_TEXT.get("agg_success_statement", {}).get(
-            lang,
-            f"The aggregate value for column <code>{column_display}</code> satisfies the condition.",
-        )
-        if isinstance(result_stmt, str) and "{column}" in result_stmt:
-            result_stmt = result_stmt.format(column=column_display)
-    else:
-        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CROSS_MARK_SPAN
-        result_stmt = STEP_REPORT_TEXT.get("agg_failure_statement", {}).get(
-            lang,
-            f"The aggregate value for column <code>{column_display}</code> does not satisfy the condition.",
-        )
-        if isinstance(result_stmt, str) and "{column}" in result_stmt:
-            result_stmt = result_stmt.format(column=column_display)
+    title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + status_html
 
     details = (
         f"<div style='font-size: 13.6px; {direction_rtl}'>"
@@ -27232,6 +27653,201 @@ def _step_report_aggregate(
     return step_report
 
 
+def _step_report_table_level(
+    assertion_type: str,
+    i: int,
+    column: Any,
+    values: Any,
+    all_passed: bool,
+    n: int,
+    n_failed: int,
+    val_info: dict | None,
+    header: str | None,
+    lang: str,
+) -> GT:
+    """
+    Generate a summary step report for a validation step that doesn't check values row by row
+    (`col_exists()`, `row_count_match()`, `col_count_match()`, `col_pct_null()`,
+    `col_pct_missing()`, `data_freshness()`, and `specially()`).
+
+    The report is a 1-row table with the measured and expected values for the step.
+    """
+    info = val_info or {}
+    params = values if isinstance(values, dict) else {}
+    column_html = html_module.escape(str(column)) if column is not None else ""
+
+    if assertion_type == "col_exists":
+        tbl_columns = info.get("tbl_columns") or []
+        found = column in tbl_columns
+        assertion_text = f"EXISTS({column_html})"
+        cells = [
+            ("column", "COLUMN", _step_report_md_escape(column), "200px"),
+            (
+                "position",
+                "POSITION",
+                _step_report_fmt_value(tbl_columns.index(column) + 1 if found else None),
+                "120px",
+            ),
+            (
+                "tbl_columns",
+                "TABLE COLUMNS",
+                _step_report_fmt_value(len(tbl_columns) if "tbl_columns" in info else None),
+                "150px",
+            ),
+        ]
+        if not found:
+            # Suggest the table column with the most similar name (e.g., a case mismatch or typo)
+            close_matches = difflib.get_close_matches(str(column), tbl_columns, n=1, cutoff=0.6)
+            if not close_matches:
+                close_matches = [c for c in tbl_columns if c.lower() == str(column).lower()][:1]
+            cells.append(
+                (
+                    "closest_match",
+                    "CLOSEST MATCH",
+                    _step_report_md_escape(close_matches[0]) if close_matches else "&mdash;",
+                    "200px",
+                )
+            )
+
+    elif assertion_type in ("row_count_match", "col_count_match"):
+        count = info.get("count", params.get("count"))
+        operator = "&ne;" if info.get("inverse", params.get("inverse")) else "="
+        noun = "ROWS" if assertion_type == "row_count_match" else "COLUMNS"
+        assertion_text = f"{noun} {operator} {_step_report_fmt_value(count)}"
+        actual = info.get("actual")
+        cells = [
+            ("actual", "ACTUAL", _step_report_fmt_value(actual), "200px"),
+            ("target", "EXPECTED", _step_report_fmt_value(count), "200px"),
+        ]
+        if assertion_type == "row_count_match":
+            lower_tol, upper_tol = params.get("abs_tol_bounds", (0, 0))
+            if lower_tol == 0 and upper_tol == 0:
+                tol_display = "&mdash;"
+            elif lower_tol == upper_tol:
+                tol_display = f"&plusmn;{lower_tol:,}"
+            else:
+                tol_display = f"(-{lower_tol:,}, +{upper_tol:,})"
+            cells.append(("tolerance", "TOL", tol_display, "150px"))
+        if actual is not None and count is not None:
+            difference = actual - count
+            diff_display = f"+{difference:,}" if difference > 0 else f"{difference:,}"
+        else:
+            diff_display = "&mdash;"
+        cells.append(("difference", "DIFFERENCE", diff_display, "200px"))
+
+    elif assertion_type == "col_pct_null":
+        p = info.get("p", params.get("p"))
+        assertion_text = f"PCT_NULL({column_html}) = {_step_report_fmt_pct(p)}"
+        n_null = info.get("n_null")
+        total_rows = info.get("total_rows")
+        min_null = info.get("min_null")
+        max_null = info.get("max_null")
+        if min_null is None or max_null is None:
+            allowed_display = "&mdash;"
+        elif min_null == max_null:
+            allowed_display = _step_report_fmt_value(min_null)
+        else:
+            allowed_display = (
+                f"{_step_report_fmt_value(max(min_null, 0))}&ndash;"
+                f"{_step_report_fmt_value(max_null)}"
+            )
+        cells = [
+            ("n_null", "NULLS", _step_report_fmt_value(n_null), "120px"),
+            ("total_rows", "ROWS", _step_report_fmt_value(total_rows), "120px"),
+            (
+                "actual",
+                "ACTUAL",
+                _step_report_fmt_pct(n_null / total_rows if total_rows else None),
+                "150px",
+            ),
+            ("target", "EXPECTED", _step_report_fmt_pct(p), "150px"),
+            ("allowed", "ALLOWED NULLS", allowed_display, "150px"),
+        ]
+
+    elif assertion_type == "col_pct_missing":
+        max_pct = info.get("max_pct", params.get("max_pct"))
+        qualifiers = [
+            f"{key}={html_module.escape(repr(params[key]))}"
+            for key in ("reason", "category")
+            if params.get(key) is not None
+        ]
+        assertion_text = (
+            f"PCT_MISSING({', '.join([column_html] + qualifiers)}) "
+            f"&le; {_step_report_fmt_pct(max_pct)}"
+        )
+        cells = [
+            ("n_missing", "MISSING", _step_report_fmt_value(info.get("n_missing")), "120px"),
+            ("total_rows", "ROWS", _step_report_fmt_value(info.get("total_rows")), "120px"),
+            ("actual", "ACTUAL", _step_report_fmt_pct(info.get("pct_missing")), "150px"),
+            ("target", "MAX", _step_report_fmt_pct(max_pct), "150px"),
+        ]
+
+    elif assertion_type == "data_freshness":
+        max_age = info.get("max_age", params.get("max_age"))
+        max_age_display = _format_timedelta(max_age) if max_age is not None else "&mdash;"
+        assertion_text = f"AGE(MAX({column_html})) &le; {max_age_display}"
+
+        def format_datetime(dt: Any) -> str:
+            if dt is None:
+                return "&mdash;"
+            if isinstance(dt, datetime.datetime):
+                dt = dt.replace(microsecond=0)
+            return _step_report_md_escape(dt)
+
+        age = info.get("age")
+        cells = [
+            ("max_datetime", "MOST RECENT", format_datetime(info.get("max_datetime")), "220px"),
+            (
+                "reference_time",
+                "REFERENCE TIME",
+                format_datetime(info.get("reference_time")),
+                "220px",
+            ),
+            ("age", "AGE", _format_timedelta(age) if age is not None else "&mdash;", "120px"),
+            ("max_age", "MAX AGE", max_age_display, "120px"),
+        ]
+
+    else:  # assertion_type == "specially"
+        fn_name = getattr(values, "__name__", None)
+        if not fn_name or fn_name == "<lambda>":
+            fn_name = "expr"
+        assertion_text = f"SPECIALLY({html_module.escape(fn_name)})"
+        cells = [
+            ("n", "TEST UNITS", _step_report_fmt_value(n), "150px"),
+            (
+                "n_passed",
+                "PASSED",
+                _step_report_fmt_value(
+                    n - n_failed if n is not None and n_failed is not None else None
+                ),
+                "150px",
+            ),
+            ("n_failed", "FAILED", _step_report_fmt_value(n_failed), "150px"),
+        ]
+
+    if assertion_type != "specially":
+        # These steps have a single test unit, so state the outcome rather than count test units
+        result_stmt = STEP_REPORT_TEXT[
+            "table_check_success_statement" if all_passed else "table_check_failure_statement"
+        ][lang]
+    elif all_passed:
+        result_stmt = _step_report_success_stmt(n=n, lang=lang)
+    else:
+        result_stmt = STEP_REPORT_TEXT["failure_rate_summary_no_column"][lang].format(
+            failure_rate=f"<strong>{n_failed}</strong> / <strong>{n}</strong>"
+        )
+
+    return _step_report_summary(
+        i=i,
+        cells=cells,
+        all_passed=all_passed,
+        assertion_text=assertion_text,
+        result_stmt=result_stmt,
+        header=header,
+        lang=lang,
+    )
+
+
 def _step_report_tbl_match(
     comparison: Any,
     i: int,
@@ -27249,7 +27865,10 @@ def _step_report_tbl_match(
     """
     from pointblank._compare_report import _comparison_report, _header_html
 
-    step_report = _comparison_report(comparison, limit=limit, lang=lang, locale=locale)
+    # Give the report a fixed width (the comparison report otherwise fills its container)
+    step_report = _comparison_report(comparison, limit=limit, lang=lang, locale=locale).tab_options(
+        table_width=f"{STEP_REPORT_WIDTH}px"
+    )
 
     # If no header requested, return the comparison report with its own header
     if header is None:
@@ -27266,6 +27885,10 @@ def _step_report_tbl_match(
                 continue
             settings.append(f"{name}={setting!r}")
     assertion_text = html_module.escape(f"{assertion_type}({', '.join(settings)})")
+    assertion_text = (
+        "<code style='color: #303030; font-family: monospace; font-size: smaller;'>"
+        f"{assertion_text}</code>"
+    )
 
     assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
     mark = CHECK_MARK_SPAN if all_passed else CROSS_MARK_SPAN
@@ -27306,182 +27929,185 @@ def _pl_concat_horizontal(frames: list[Any]) -> Any:
     return pl.concat(frames, how=how)
 
 
-def _step_report_schema_in_order(
+def _format_schema_dtypes(dtypes: list[str] | None, matched_pos: int | None) -> str:
+    """
+    Format the dtypes supplied for a schema column, underlining the one that matched when there
+    are several to choose from.
+    """
+
+    if dtypes is None:
+        return "&mdash;"
+
+    if len(dtypes) == 1 or matched_pos is None:
+        return " | ".join(dtypes)
+
+    return " | ".join(
+        (
+            '<span style="text-decoration: underline; text-decoration-color: #4CA64C; '
+            f'text-underline-offset: 3px;">{dtype}</span>'
+            if i == matched_pos
+            else dtype
+        )
+        for i, dtype in enumerate(dtypes)
+    )
+
+
+def _step_report_schema(
     step: int, schema_info: dict, header: str | None, lang: str, debug_return_df: bool = False
 ) -> GT | Any:
     """
-    This is the case for schema validation where the schema is supposed to have the same column
-    order as the target table.
+    The step report for `col_schema_match()`.
+
+    Each row is a column of the target table (in table order) alongside the schema column that
+    matched it and that column's position in the schema. With `in_order=True`, the matched schema
+    columns are instead placed in schema order (in the rows of the target columns they matched,
+    or from the top with `complete=True` as well), so that columns out of order sit alongside the
+    wrong target columns. Schema columns that
+    matched nothing (because they aren't in the table, or because they repeat an earlier schema
+    column) follow in extra rows. A schema column is marked as incorrect if it matched nothing or,
+    with `in_order=True`, if it's out of order. A table column left out of the schema is marked
+    as incorrect only with `complete=True`. A dtype is only scored when its column is correct
+    (otherwise it's marked with a dash).
     """
 
-    # Determine whether the `lang` value represents a right-to-left language
-    is_rtl_lang = lang in RTL_LANGUAGES
-    direction_rtl = " direction: rtl;" if is_rtl_lang else ""
+    from pointblank.schema import _match_schema_columns, _schema_columns_out_of_order
 
     all_passed = schema_info["passed"]
-    complete = schema_info["params"]["complete"]
+    params = schema_info["params"]
+    complete = params["complete"]
+    in_order = params["in_order"]
 
     expect_schema = schema_info["expect_schema"]
     target_schema = schema_info["target_schema"]
 
-    # Get the expected column names from the expected and target schemas
-    colnames_exp = [x[0] for x in expect_schema]
-    colnames_tgt = [x[0] for x in target_schema]
-    dtypes_tgt = [str(x[1]) for x in target_schema]
+    matches = _match_schema_columns(
+        target_schema=target_schema,
+        expect_schema=expect_schema,
+        case_sensitive_colnames=params["case_sensitive_colnames"],
+        case_sensitive_dtypes=params["case_sensitive_dtypes"],
+        full_match_dtypes=params["full_match_dtypes"],
+    )
+    # With `complete=True` as well, the schema should be the table itself, so the schema columns
+    # are laid out from the top, each in the row of its own position (and any table columns left
+    # over are at the bottom)
+    packed = in_order and complete
+    out_of_order = _schema_columns_out_of_order(matches, packed=packed) if in_order else set()
 
-    # Extract the dictionary of expected columns, their data types, whether the column matched
-    # a target column, and whether the data type matched the target data type
-    exp_columns_dict = schema_info["columns"]
+    # Without `in_order=True` an order that differs from the table's isn't a failure, but those
+    # columns are still pointed out
+    reordered = set() if in_order else _schema_columns_out_of_order(matches)
 
-    # Create a Polars DF with the target table columns and dtypes
+    matched = [(i, m) for i, m in enumerate(matches) if m["target_index"] is not None]
+    unmatched = [i for i, m in enumerate(matches) if m["target_index"] is None]
+
+    # The layout of the rows, as pairs of a target column and a schema column (either of which may
+    # be absent). Normally there's a row per target column, with the schema column matched to it,
+    # and then rows for any schema columns that matched nothing. With `in_order=True` the matched
+    # schema columns fill the rows of their target columns in schema order instead, so a column out
+    # of order sits alongside the target column in its place. With `complete=True` as well, each
+    # schema column is in the row of its own position.
+    n_target = len(target_schema)
+
+    if packed:
+        layout = [
+            (k if k < n_target else None, k if k < len(matches) else None)
+            for k in range(max(n_target, len(matches)))
+        ]
+    else:
+        if in_order:
+            slots = sorted(m["target_index"] for _, m in matched)
+            schema_for_target = {slot: i for slot, (i, _) in zip(slots, matched)}
+        else:
+            schema_for_target = {m["target_index"]: i for i, m in matched}
+
+        layout = [(j, schema_for_target.get(j)) for j in range(n_target)]
+        layout += [(None, i) for i in unmatched]
+
+    def schema_cells(i: int, m: dict, name_correct: bool) -> dict:
+        # The dtype is only scored when the column is correct, since an unmatched or out-of-order
+        # column isn't alongside its own target column
+        if m["dtype_input"] is None:
+            dtype_correct = ""
+        elif not name_correct:
+            dtype_correct = "&mdash;"
+        else:
+            dtype_correct = CHECK_MARK_SPAN if m["dtype_matched"] else CROSS_MARK_SPAN
+
+        return {
+            "index_exp": i + 1,
+            "col_name_exp": m["colname"],
+            "col_name_exp_correct": CHECK_MARK_SPAN if name_correct else CROSS_MARK_SPAN,
+            "dtype_exp": _format_schema_dtypes(
+                m["dtype_input"], m["dtype_matched_pos"] if name_correct else None
+            ),
+            "dtype_exp_correct": dtype_correct,
+        }
+
+    rows = []
+    row_kinds = []
+
+    for j, i in layout:
+        if j is None:
+            row = {"index_target": None, "col_name_target": "", "dtype_target": ""}
+        else:
+            colname_tgt, dtype_tgt = target_schema[j]
+            row = {
+                "index_target": j + 1,
+                "col_name_target": colname_tgt,
+                "dtype_target": str(dtype_tgt),
+            }
+
+        if i is None:
+            # A target column left out of the schema is only a problem if it should be complete
+            row.update(
+                {
+                    "index_exp": None,
+                    "col_name_exp": "",
+                    "col_name_exp_correct": "",
+                    "dtype_exp": "",
+                    "dtype_exp_correct": "",
+                }
+            )
+            row_kinds.append("missing" if complete else "skipped")
+        else:
+            m = matches[i]
+            found = m["target_index"] is not None
+            row.update(schema_cells(i, m, name_correct=found and i not in out_of_order))
+            if j is None:
+                row_kinds.append("unmatched")
+            elif not found:
+                row_kinds.append("not_found")
+            elif i in out_of_order:
+                row_kinds.append("out_of_order")
+            elif i in reordered:
+                row_kinds.append("reordered")
+            else:
+                row_kinds.append("matched")
+
+        rows.append(row)
+
+    def rows_of_kind(kind: str) -> list[int]:
+        return [k for k, x in enumerate(row_kinds) if x == kind]
+
     import polars as pl
 
-    # Create a DataFrame for the LHS of the table
-    schema_tbl = pl.DataFrame(
-        {
-            "index_target": range(1, len(colnames_tgt) + 1),
-            "col_name_target": colnames_tgt,
-            "dtype_target": dtypes_tgt,
-        }
+    target_cols = ["index_target", "col_name_target", "dtype_target"]
+    schema_cols = [
+        "index_exp",
+        "col_name_exp",
+        "col_name_exp_correct",
+        "dtype_exp",
+        "dtype_exp_correct",
+    ]
+
+    schema_combined = pl.DataFrame(
+        rows,
+        schema={
+            col: pl.Int64 if col.startswith("index_") else pl.String
+            for col in target_cols + schema_cols
+        },
+        orient="row",
     )
-
-    # Is the number of column names supplied equal to the number of columns in the
-    # target table?
-    if len(expect_schema) > len(target_schema):
-        schema_length = "longer"
-        # Get indices of the extra rows in the schema table
-        extra_rows_i = list(range(len(target_schema), len(expect_schema)))
-    elif len(expect_schema) < len(target_schema):
-        schema_length = "shorter"
-        # Get indices of the extra rows (on the target side) in the schema table
-        extra_rows_i = list(range(len(expect_schema), len(target_schema)))
-    else:
-        schema_length = "equal"
-        extra_rows_i = []
-
-    # For the right-hand side of the table, we need to find out if the expected column names matched
-    col_name_exp = []
-    col_exp_correct = []
-    dtype_exp = []
-    dtype_exp_correct = []
-
-    for i in range(len(expect_schema)):
-        #
-        # `col_name_exp` values
-        #
-
-        # Get the column name from expect_schema (which can have duplicates)
-        column_name_exp_i = expect_schema[i][0]
-        col_name_exp.append(column_name_exp_i)
-
-        # Check if this column exists in exp_columns_dict (it might not if it's a duplicate)
-        # For duplicates, we need to handle them specially
-        if column_name_exp_i not in exp_columns_dict:  # pragma: no cover
-            # This is a duplicate or invalid column, mark it as incorrect
-            col_exp_correct.append(CROSS_MARK_SPAN)  # pragma: no cover
-
-            # For dtype, check if there's a dtype specified in the schema
-            if len(expect_schema[i]) > 1:  # pragma: no cover
-                dtype_value = expect_schema[i][1]  # pragma: no cover
-                if isinstance(dtype_value, list):  # pragma: no cover
-                    dtype_exp.append(" | ".join(dtype_value))  # pragma: no cover
-                else:  # pragma: no cover
-                    dtype_exp.append(str(dtype_value))  # pragma: no cover
-            else:  # pragma: no cover
-                dtype_exp.append("&mdash;")  # pragma: no cover
-
-            dtype_exp_correct.append("&mdash;")  # pragma: no cover
-            continue  # pragma: no cover
-
-        #
-        # `col_exp_correct` values
-        #
-
-        if (
-            exp_columns_dict[column_name_exp_i]["colname_matched"]
-            and exp_columns_dict[column_name_exp_i]["index_matched"]
-        ):
-            col_exp_correct.append(CHECK_MARK_SPAN)
-        else:
-            col_exp_correct.append(CROSS_MARK_SPAN)
-
-        #
-        # `dtype_exp` values
-        #
-
-        if not exp_columns_dict[column_name_exp_i]["dtype_present"]:
-            dtype_exp.append("&mdash;")
-
-        elif len(exp_columns_dict[column_name_exp_i]["dtype_input"]) > 1:
-            # Case where there are multiple dtypes provided for the column in the schema (i.e.,
-            # there are multiple attempts to match the dtype)
-
-            # Get the dtypes for the column, this is a list of at least two dtypes
-            dtype = exp_columns_dict[column_name_exp_i]["dtype_input"]
-
-            if (
-                exp_columns_dict[column_name_exp_i]["dtype_matched_pos"] is not None
-                and exp_columns_dict[column_name_exp_i]["colname_matched"]
-                and exp_columns_dict[column_name_exp_i]["index_matched"]
-            ):
-                # Only underline the matched dtype under the conditions that the column name is
-                # matched correctly (name and index)
-
-                pos = exp_columns_dict[column_name_exp_i]["dtype_matched_pos"]
-
-                # Combine the dtypes together with pipes but underline the matched dtype in
-                # green with an HTML span tag and style attribute
-                dtype = [
-                    (
-                        '<span style="text-decoration: underline; text-decoration-color: #4CA64C; '
-                        f'text-underline-offset: 3px;">{dtype[i]}</span>'
-                        if i == pos
-                        else dtype[i]
-                    )
-                    for i in range(len(dtype))
-                ]
-                dtype = " | ".join(dtype)
-                dtype_exp.append(dtype)
-
-            else:
-                # If the column name or index did not match (or if it did and none of the dtypes
-                # matched), then join the dtypes together with pipes with further decoration
-
-                dtype = " | ".join(dtype)
-                dtype_exp.append(dtype)
-
-        else:
-            dtype = exp_columns_dict[column_name_exp_i]["dtype_input"][0]
-            dtype_exp.append(dtype)
-
-        #
-        # `dtype_exp_correct` values
-        #
-
-        if (
-            not exp_columns_dict[column_name_exp_i]["colname_matched"]
-            or not exp_columns_dict[column_name_exp_i]["index_matched"]
-        ):
-            dtype_exp_correct.append("&mdash;")
-        elif not exp_columns_dict[column_name_exp_i]["dtype_present"]:
-            dtype_exp_correct.append("")
-        elif exp_columns_dict[column_name_exp_i]["dtype_matched"]:
-            dtype_exp_correct.append(CHECK_MARK_SPAN)
-        else:
-            dtype_exp_correct.append(CROSS_MARK_SPAN)
-
-    schema_exp = pl.DataFrame(
-        {
-            "index_exp": range(1, len(colnames_exp) + 1),
-            "col_name_exp": colnames_exp,
-            "col_name_exp_correct": col_exp_correct,
-            "dtype_exp": dtype_exp,
-            "dtype_exp_correct": dtype_exp_correct,
-        }
-    )
-
-    # Concatenate the tables horizontally
-    schema_combined = _pl_concat_horizontal([schema_tbl, schema_exp])
 
     # Return the DataFrame if the `debug_return_df` parameter is set to True
     if debug_return_df:
@@ -27522,6 +28148,7 @@ def _step_report_schema_in_order(
                 "dtype_exp_correct": "30px",
             }
         )
+        .cols_align(align="right", columns=["index_target", "index_exp"])
         .tab_style(
             style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="13px"),
             locations=loc.body(
@@ -27542,31 +28169,12 @@ def _step_report_schema_in_order(
                 columns=["col_name_target", "dtype_target", "col_name_exp", "dtype_exp"]
             ),
         )
-        .tab_spanner(
-            label=target_str,
-            columns=["index_target", "col_name_target", "dtype_target"],
-        )
-        .tab_spanner(
-            label=expected_str,
-            columns=[
-                "index_exp",
-                "col_name_exp",
-                "col_name_exp_correct",
-                "dtype_exp",
-                "dtype_exp_correct",
-            ],
-        )
+        .tab_spanner(label=target_str, columns=target_cols)
+        .tab_spanner(label=expected_str, columns=schema_cols)
+        .sub_missing(columns="index_target", missing_text="")
         .sub_missing(
-            columns=[
-                "index_target",
-                "col_name_target",
-                "dtype_target",
-                "index_exp",
-                "col_name_exp",
-                "col_name_exp_correct",
-                "dtype_exp",
-                "dtype_exp_correct",
-            ],
+            columns="index_exp",
+            rows=[k for k, x in enumerate(row_kinds) if x not in ("missing", "skipped")],
             missing_text="",
         )
         .tab_source_note(
@@ -27581,41 +28189,74 @@ def _step_report_schema_in_order(
         .tab_options(source_notes_font_size="12px")
     )
 
-    if schema_length == "shorter":
-        # Add background color to the missing column on the exp side
-        step_report = step_report.tab_style(
-            style=style.fill(color="#FFC1C159"),
-            locations=loc.body(
-                columns=[
-                    "index_exp",
-                    "col_name_exp",
-                    "col_name_exp_correct",
-                    "dtype_exp",
-                    "dtype_exp_correct",
-                ],
-                rows=extra_rows_i,
+    # A table column missing from a complete schema gets a red fill on the schema side, with a
+    # cross in place of the schema position and a line struck through the rest of the row (drawn
+    # as a cell background so that it's continuous across the cells)
+    if rows_of_kind("missing"):
+        step_report = (
+            step_report.sub_missing(
+                columns="index_exp",
+                rows=rows_of_kind("missing"),
+                missing_text=html(CROSS_MARK_SPAN),
+            )
+            .tab_style(
+                style=style.fill(color="#FFC1C159"),
+                locations=loc.body(columns=schema_cols, rows=rows_of_kind("missing")),
+            )
+            .tab_style(
+                style=style.css(
+                    "background-image: linear-gradient(#CF142B, #CF142B); "
+                    "background-size: 100% 1px; background-position: center; "
+                    "background-repeat: no-repeat;"
+                ),
+                locations=loc.body(columns=schema_cols[1:], rows=rows_of_kind("missing")),
+            )
+        )
+
+    # A table column that a schema (not needing to be complete) leaves out is allowed, so it just
+    # gets a quiet blue dot in place of the schema position
+    if rows_of_kind("skipped"):
+        step_report = step_report.sub_missing(
+            columns="index_exp",
+            rows=rows_of_kind("skipped"),
+            missing_text=html(
+                "<span style='display: inline-block; width: 5px; height: 5px; "
+                "border-radius: 50%; background-color: #336699; vertical-align: middle;'></span>"
             ),
         )
 
-    if schema_length == "longer":
-        # Add background color to the missing column on the target side
+    # The schema position of an out-of-order column is shown in red
+    if rows_of_kind("out_of_order"):
+        step_report = step_report.tab_style(
+            style=style.text(color="#CF142B", weight="bold"),
+            locations=loc.body(columns="index_exp", rows=rows_of_kind("out_of_order")),
+        )
+
+    # The schema position of a column in a different order (when that's allowed) is shown in blue
+    # with a dot beside it, to draw attention to it without marking it as a failure
+    if rows_of_kind("reordered"):
+        step_report = step_report.text_transform(
+            locations=loc.body(columns="index_exp", rows=rows_of_kind("reordered")),
+            fn=lambda x: (
+                "<span style='display: inline-block; width: 5px; height: 5px; "
+                "border-radius: 50%; background-color: #336699; margin-right: 4px; "
+                f"vertical-align: middle;'></span>{x}"
+            ),
+        ).tab_style(
+            style=style.text(color="#336699", weight="bold"),
+            locations=loc.body(columns="index_exp", rows=rows_of_kind("reordered")),
+        )
+
+    # Schema columns that matched nothing come after the table columns, so the table side of
+    # those rows gets a gray fill and a border marks the end of the table columns
+    if rows_of_kind("unmatched"):
         step_report = step_report.tab_style(
             style=style.fill(color="#F3F3F3"),
-            locations=loc.body(
-                columns=[
-                    "index_target",
-                    "col_name_target",
-                    "dtype_target",
-                ],
-                rows=extra_rows_i,
-            ),
-        )
-
-        # Add a border below the row that terminates the target table schema
-        step_report = step_report.tab_style(
+            locations=loc.body(columns=target_cols, rows=rows_of_kind("unmatched")),
+        ).tab_style(
             style=style.borders(sides="bottom", color="#6699CC80", style="solid", weight="1px"),
             locations=loc.body(
-                rows=len(colnames_tgt) - 1  # ty: ignore (bug in GT, should allow an int)
+                rows=len(target_schema) - 1  # ty: ignore (bug in GT, should allow an int)
             ),
         )
 
@@ -27627,11 +28268,6 @@ def _step_report_schema_in_order(
     if header is None:
         return step_report
 
-    # Get the other parameters for the `col_schema_match()` function
-    case_sensitive_colnames = schema_info["params"]["case_sensitive_colnames"]
-    case_sensitive_dtypes = schema_info["params"]["case_sensitive_dtypes"]
-    full_match_dtypes = schema_info["params"]["full_match_dtypes"]
-
     # Get the passing symbol for the step
     passing_symbol = CHECK_MARK_SPAN if all_passed else CROSS_MARK_SPAN
 
@@ -27642,436 +28278,10 @@ def _step_report_schema_in_order(
     details = _create_col_schema_match_params_html(
         lang=lang,
         complete=complete,
-        in_order=True,
-        case_sensitive_colnames=case_sensitive_colnames,
-        case_sensitive_dtypes=case_sensitive_dtypes,
-        full_match_dtypes=full_match_dtypes,
-    )
-
-    # Generate the default template text for the header when `":default:"` is used
-    if header == ":default:":
-        header = "{title}{details}"
-
-    # Use commonmark to convert the header text to HTML
-    header = commonmark.commonmark(header)
-
-    # Place any templated text in the header
-    header = header.format(title=title, details=details)
-
-    # Create the header with `header` string
-    step_report = step_report.tab_header(title=md(header))
-
-    return step_report
-
-
-def _step_report_schema_any_order(
-    step: int, schema_info: dict, header: str | None, lang: str, debug_return_df: bool = False
-) -> GT | pl.DataFrame:
-    """
-    This is the case for schema validation where the schema is permitted to not have to be in the
-    same column order as the target table.
-    """
-
-    # Determine whether the `lang` value represents a right-to-left language
-    is_rtl_lang = lang in RTL_LANGUAGES
-    direction_rtl = " direction: rtl;" if is_rtl_lang else ""
-
-    all_passed = schema_info["passed"]
-    complete = schema_info["params"]["complete"]
-
-    expect_schema = schema_info["expect_schema"]
-    target_schema = schema_info["target_schema"]
-
-    columns_found = schema_info["columns_found"]
-    columns_not_found = schema_info["columns_not_found"]
-    colnames_exp_unmatched = schema_info["columns_unmatched"]
-
-    # Get the expected column names from the expected and target schemas
-    colnames_exp = [x[0] for x in expect_schema]
-    colnames_tgt = [x[0] for x in target_schema]
-    dtypes_tgt = [str(x[1]) for x in target_schema]
-
-    # Extract the dictionary of expected columns, their data types, whether the column matched
-    # a target column, and whether the data type matched the target data type
-    exp_columns_dict = schema_info["columns"]
-
-    index_target = range(1, len(colnames_tgt) + 1)
-
-    # Create a Polars DF with the target table columns and dtypes
-    import polars as pl
-
-    # Create a DataFrame for the LHS of the table
-    schema_tbl = pl.DataFrame(
-        {
-            "index_target": index_target,
-            "col_name_target": colnames_tgt,
-            "dtype_target": dtypes_tgt,
-        }
-    )
-
-    # For the right-hand side of the table, we need to find out if the expected column names matched
-    # in any order, this involves iterating over the target colnames first, seeing if there is a
-    # match in the expected colnames, and then checking if the dtype matches
-    index_exp = []
-    col_name_exp = []
-    col_exp_correct = []
-    dtype_exp = []
-    dtype_exp_correct = []
-
-    # Get keys of the `exp_columns_dict` dictionary (remove the unmatched columns
-    # of `colnames_exp_unmatched`)
-    exp_columns_dict_keys = list(exp_columns_dict.keys())
-
-    for colname_unmatched in colnames_exp_unmatched:
-        exp_columns_dict_keys.remove(colname_unmatched)
-
-    for i in range(len(colnames_tgt)):
-        # If there is no match in the expected column names, then the column name is not present
-        # and we need to fill in the values with empty strings
-
-        match_index = None
-
-        for key in exp_columns_dict_keys:
-            if colnames_tgt[i] in exp_columns_dict[key]["matched_to"]:
-                # Get the index of the key in the dictionary
-                match_index = exp_columns_dict_keys.index(key)
-                break
-
-        if match_index is not None:
-            # Get the column name which is the key of the dictionary at match_index
-            column_name_exp_i = list(exp_columns_dict.keys())[match_index]
-            col_name_exp.append(column_name_exp_i)
-
-            # Get the index number of the column name in the expected schema (1-indexed)
-            index_exp_i = colnames_exp.index(column_name_exp_i) + 1
-            index_exp.append(str(index_exp_i))
-
-        else:
-            index_exp.append("")
-            col_name_exp.append("")
-            col_exp_correct.append("")
-            dtype_exp.append("")
-            dtype_exp_correct.append("")
-            continue
-
-        #
-        # `col_exp_correct` values
-        #
-
-        if exp_columns_dict[column_name_exp_i]["colname_matched"]:
-            col_exp_correct.append(CHECK_MARK_SPAN)
-        else:
-            col_exp_correct.append(CROSS_MARK_SPAN)  # pragma: no cover
-
-        #
-        # `dtype_exp` values
-        #
-
-        if not exp_columns_dict[column_name_exp_i]["dtype_present"]:
-            dtype_exp.append("")  # pragma: no cover
-
-        elif len(exp_columns_dict[column_name_exp_i]["dtype_input"]) > 1:
-            dtype = exp_columns_dict[column_name_exp_i]["dtype_input"]
-
-            if exp_columns_dict[column_name_exp_i]["dtype_matched_pos"] is not None:
-                pos = exp_columns_dict[column_name_exp_i]["dtype_matched_pos"]
-
-                # Combine the dtypes together with pipes but underline the matched dtype in
-                # green with an HTML span tag and style attribute
-                dtype = [
-                    (
-                        '<span style="text-decoration: underline; text-decoration-color: #4CA64C; '
-                        f'text-underline-offset: 3px;">{dtype[i]}</span>'
-                        if i == pos
-                        else dtype[i]
-                    )
-                    for i in range(len(dtype))
-                ]
-                dtype = " | ".join(dtype)
-                dtype_exp.append(dtype)
-
-            else:
-                dtype = " | ".join(dtype)
-                dtype_exp.append(dtype)
-
-        else:
-            dtype = exp_columns_dict[column_name_exp_i]["dtype_input"][0]
-            dtype_exp.append(dtype)
-
-        #
-        # `dtype_exp_correct` values
-        #
-
-        if not exp_columns_dict[column_name_exp_i]["colname_matched"]:
-            dtype_exp_correct.append("&mdash;")  # pragma: no cover
-        elif not exp_columns_dict[column_name_exp_i]["dtype_present"]:
-            dtype_exp_correct.append("")  # pragma: no cover
-        elif exp_columns_dict[column_name_exp_i]["dtype_matched"]:
-            dtype_exp_correct.append(CHECK_MARK_SPAN)
-        else:
-            dtype_exp_correct.append(CROSS_MARK_SPAN)
-
-    # Create a DataFrame with the expected column names and dtypes
-    schema_exp = pl.DataFrame(
-        {
-            "index_exp": index_exp,
-            "col_name_exp": col_name_exp,
-            "col_name_exp_correct": col_exp_correct,
-            "dtype_exp": dtype_exp,
-            "dtype_exp_correct": dtype_exp_correct,
-        }
-    )
-
-    # If there are unmatched columns in the expected schema, then create a separate DataFrame
-    # for those entries and concatenate it with the `schema_combined` DataFrame
-    if len(colnames_exp_unmatched) > 0:
-        # Get the indices of the unmatched columns by comparing the `colnames_exp_unmatched`
-        # against the schema order
-        col_name_exp = []
-        col_exp_correct = []
-        dtype_exp = []
-        dtype_exp_correct = []
-
-        for i in range(len(colnames_exp_unmatched)):
-            #
-            # `col_name_exp` values
-            #
-
-            column_name_exp_i = colnames_exp_unmatched[i]
-            col_name_exp.append(column_name_exp_i)
-
-            #
-            # `col_exp_correct` values
-            #
-
-            col_exp_correct.append(CROSS_MARK_SPAN)
-
-            #
-            # `dtype_exp` values
-            #
-
-            if not exp_columns_dict[column_name_exp_i]["dtype_present"]:
-                dtype_exp.append("")  # pragma: no cover
-
-            elif len(exp_columns_dict[column_name_exp_i]["dtype_input"]) > 1:
-                dtype = exp_columns_dict[column_name_exp_i]["dtype_input"]  # pragma: no cover
-
-                if (
-                    exp_columns_dict[column_name_exp_i]["dtype_matched_pos"] is not None
-                ):  # pragma: no cover
-                    pos = exp_columns_dict[column_name_exp_i][
-                        "dtype_matched_pos"
-                    ]  # pragma: no cover
-
-                    # Combine the dtypes together with pipes but underline the matched dtype in
-                    # green with an HTML span tag and style attribute
-                    dtype = [
-                        (
-                            '<span style="text-decoration: underline; text-decoration-color: #4CA64C; '
-                            f'text-underline-offset: 3px;">{dtype[i]}</span>'
-                            if i == pos
-                            else dtype[i]
-                        )
-                        for i in range(len(dtype))
-                    ]  # pragma: no cover
-                    dtype = " | ".join(dtype)  # pragma: no cover
-                    dtype_exp.append(dtype)  # pragma: no cover
-
-                else:
-                    dtype = " | ".join(dtype)  # pragma: no cover
-                    dtype_exp.append(dtype)  # pragma: no cover
-
-            else:
-                dtype = exp_columns_dict[column_name_exp_i]["dtype_input"][0]
-                dtype_exp.append(dtype)
-
-            #
-            # `dtype_exp_correct` values
-            #
-
-            if not exp_columns_dict[column_name_exp_i]["colname_matched"]:
-                dtype_exp_correct.append("&mdash;")
-            elif not exp_columns_dict[column_name_exp_i]["dtype_present"]:  # pragma: no cover
-                dtype_exp_correct.append("")  # pragma: no cover
-            elif exp_columns_dict[column_name_exp_i]["dtype_matched"]:  # pragma: no cover
-                dtype_exp_correct.append(CHECK_MARK_SPAN)  # pragma: no cover
-            else:  # pragma: no cover
-                dtype_exp_correct.append(CROSS_MARK_SPAN)  # pragma: no cover
-
-        if len(columns_found) > 0:
-            # Get the last index of the columns found
-            last_index = columns_found[-1]
-
-            # Get the integer index of the last column found in the target schema
-            last_index_int = colnames_tgt.index(last_index)
-
-            # Generate the range and convert to strings
-            index_exp = [
-                str(i + len(columns_found) - 1)
-                for i in range(last_index_int, last_index_int + len(colnames_exp_unmatched))
-            ]
-
-        else:
-            index_exp = [
-                str(i) for i in range(1, len(colnames_exp_unmatched) + 1)
-            ]  # pragma: no cover
-
-        schema_exp_unmatched = pl.DataFrame(
-            {
-                "index_exp": index_exp,
-                "col_name_exp": col_name_exp,
-                "col_name_exp_correct": col_exp_correct,
-                "dtype_exp": dtype_exp,
-                "dtype_exp_correct": dtype_exp_correct,
-            }
-        )
-
-        # Combine this DataFrame to the `schema_exp` DataFrame
-        schema_exp = pl.concat([schema_exp, schema_exp_unmatched], how="vertical")
-
-    # Concatenate the tables horizontally
-    schema_combined = _pl_concat_horizontal([schema_tbl, schema_exp])
-
-    # Return the DataFrame if the `debug_return_df` parameter is set to True
-    if debug_return_df:
-        return schema_combined
-
-    target_str = STEP_REPORT_TEXT["schema_target"][lang]
-    expected_str = STEP_REPORT_TEXT["schema_expected"][lang]
-    column_str = STEP_REPORT_TEXT["schema_column"][lang]
-    data_type_str = STEP_REPORT_TEXT["schema_data_type"][lang]
-    supplied_column_schema_str = STEP_REPORT_TEXT["supplied_column_schema"][lang]
-
-    step_report = (
-        GT(schema_combined, id="pb_step_tbl")
-        .fmt_markdown(columns=None)
-        .opt_table_font(font=google_font(name="IBM Plex Sans"))
-        .opt_align_table_header(align="left")
-        .cols_label(
-            cases={
-                "index_target": "",
-                "col_name_target": column_str,
-                "dtype_target": data_type_str,
-                "index_exp": "",
-                "col_name_exp": column_str,
-                "col_name_exp_correct": "",
-                "dtype_exp": data_type_str,
-                "dtype_exp_correct": "",
-            }
-        )
-        .cols_width(
-            cases={
-                "index_target": "40px",
-                "col_name_target": "190px",
-                "dtype_target": "190px",
-                "index_exp": "40px",
-                "col_name_exp": "190px",
-                "col_name_exp_correct": "30px",
-                "dtype_exp": "190px",
-                "dtype_exp_correct": "30px",
-            }
-        )
-        .cols_align(align="right", columns="index_exp")
-        .tab_style(
-            style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="13px"),
-            locations=loc.body(
-                columns=["col_name_target", "dtype_target", "col_name_exp", "dtype_exp"]
-            ),
-        )
-        .tab_style(
-            style=style.text(size="13px"),
-            locations=loc.body(columns=["index_target", "index_exp"]),
-        )
-        .tab_style(
-            style=style.borders(sides="left", color="#E5E5E5", style="double", weight="3px"),
-            locations=loc.body(columns="index_exp"),
-        )
-        .tab_style(
-            style=style.css("white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"),
-            locations=loc.body(
-                columns=["col_name_target", "dtype_target", "col_name_exp", "dtype_exp"]
-            ),
-        )
-        .tab_spanner(
-            label=target_str,
-            columns=["index_target", "col_name_target", "dtype_target"],
-        )
-        .tab_spanner(
-            label=expected_str,
-            columns=[
-                "index_exp",
-                "col_name_exp",
-                "col_name_exp_correct",
-                "dtype_exp",
-                "dtype_exp_correct",
-            ],
-        )
-        .sub_missing(
-            columns=[
-                "index_target",
-                "col_name_target",
-                "dtype_target",
-                "index_exp",
-                "col_name_exp",
-                "col_name_exp_correct",
-                "dtype_exp",
-                "dtype_exp_correct",
-            ],
-            missing_text="",
-        )
-        .tab_source_note(
-            source_note=html(
-                f"<div style='padding-bottom: 2px;'>{supplied_column_schema_str}</div>"
-                "<div style='border-style: solid; border-width: thin; border-color: lightblue; "
-                "padding-left: 2px; padding-right: 2px; padding-bottom: 3px;'><code "
-                "style='color: #303030; font-family: monospace; font-size: 8px;'>"
-                f"{expect_schema}</code></div>"
-            )
-        )
-        .tab_options(source_notes_font_size="12px")
-    )
-
-    # Add background color to signify limits of target table schema (on LHS side)
-    if len(colnames_exp_unmatched) > 0:
-        step_report = step_report.tab_style(
-            style=style.fill(color="#F3F3F3"),
-            locations=loc.body(
-                columns=[
-                    "index_target",
-                    "col_name_target",
-                    "dtype_target",
-                ],
-                rows=pl.col("index_target").is_null(),
-            ),
-        )
-
-    # If the version of `great_tables` is `>=0.17.0` then disable Quarto table processing
-    if version("great_tables") >= "0.17.0":
-        step_report = step_report.tab_options(quarto_disable_processing=True)
-
-    # If `header` is None then don't add a header and just return the step report
-    if header is None:
-        return step_report
-
-    # Get the other parameters for the `col_schema_match()` function
-    case_sensitive_colnames = schema_info["params"]["case_sensitive_colnames"]
-    case_sensitive_dtypes = schema_info["params"]["case_sensitive_dtypes"]
-    full_match_dtypes = schema_info["params"]["full_match_dtypes"]
-
-    # Get the passing symbol for the step
-    passing_symbol = CHECK_MARK_SPAN if all_passed else CROSS_MARK_SPAN
-
-    # Generate the title for the step report
-    title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=step) + " " + passing_symbol
-
-    # Generate the details for the step report
-    details = _create_col_schema_match_params_html(
-        lang=lang,
-        complete=complete,
-        in_order=False,
-        case_sensitive_colnames=case_sensitive_colnames,
-        case_sensitive_dtypes=case_sensitive_dtypes,
-        full_match_dtypes=full_match_dtypes,
+        in_order=in_order,
+        case_sensitive_colnames=params["case_sensitive_colnames"],
+        case_sensitive_dtypes=params["case_sensitive_dtypes"],
+        full_match_dtypes=params["full_match_dtypes"],
     )
 
     # Generate the default template text for the header when `":default:"` is used

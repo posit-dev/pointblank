@@ -12,6 +12,11 @@ import pandas as pd
 import polars as pl
 import ibis
 
+# pandas 3 reads datetimes at microsecond resolution and gives strings its `str` dtype
+PD3 = int(pd.__version__.split(".")[0]) >= 3
+PD_STR = "str" if PD3 else "object"
+PD_UNIT = "us" if PD3 else "ns"
+
 
 TBL_LIST = [
     "tbl_pd",
@@ -100,17 +105,17 @@ def test_schema_single_column_equivalent_inputs():
 def test_schema_from_pd_table():
     schema = Schema(tbl=load_dataset(dataset="small_table", tbl_type="pandas"))
     assert schema.columns == [
-        ("date_time", "datetime64[ns]"),
-        ("date", "datetime64[ns]"),
+        ("date_time", f"datetime64[{PD_UNIT}]"),
+        ("date", f"datetime64[{PD_UNIT}]"),
         ("a", "int64"),
-        ("b", "object"),
+        ("b", PD_STR),
         ("c", "float64"),
         ("d", "float64"),
         ("e", "bool"),
-        ("f", "object"),
+        ("f", PD_STR),
     ]
 
-    assert str(type(schema.tbl)) == "<class 'pandas.core.frame.DataFrame'>"
+    assert isinstance(schema.tbl, pd.DataFrame)
 
 
 def test_schema_from_pl_table():
@@ -215,14 +220,14 @@ def test_get_dtype_list_small_table_pd():
     schema = Schema(tbl=load_dataset(dataset="small_table", tbl_type="pandas"))
 
     assert schema.get_dtype_list() == [
-        "datetime64[ns]",
-        "datetime64[ns]",
+        f"datetime64[{PD_UNIT}]",
+        f"datetime64[{PD_UNIT}]",
         "int64",
-        "object",
+        PD_STR,
         "float64",
         "float64",
         "bool",
-        "object",
+        PD_STR,
     ]
 
 
@@ -266,17 +271,17 @@ def test_get_dtype_list_game_revenue_pd():
     schema = Schema(tbl=load_dataset(dataset="game_revenue", tbl_type="pandas"))
 
     assert schema.get_dtype_list() == [
-        "object",
-        "object",
-        "datetime64[ns, UTC]",
-        "datetime64[ns, UTC]",
-        "object",
-        "object",
+        PD_STR,
+        PD_STR,
+        f"datetime64[{PD_UNIT}, UTC]",
+        f"datetime64[{PD_UNIT}, UTC]",
+        PD_STR,
+        PD_STR,
         "float64",
         "float64",
-        "datetime64[ns]",
-        "object",
-        "object",
+        f"datetime64[{PD_UNIT}]",
+        PD_STR,
+        PD_STR,
     ]
 
 
@@ -321,19 +326,19 @@ def test_schema_coercion_pd_to_pl():
     schema_pl = schema_pd.get_schema_coerced(to="polars")
 
     assert schema_pd.columns == [
-        ("date_time", "datetime64[ns]"),
-        ("date", "datetime64[ns]"),
+        ("date_time", f"datetime64[{PD_UNIT}]"),
+        ("date", f"datetime64[{PD_UNIT}]"),
         ("a", "int64"),
-        ("b", "object"),
+        ("b", PD_STR),
         ("c", "float64"),
         ("d", "float64"),
         ("e", "bool"),
-        ("f", "object"),
+        ("f", PD_STR),
     ]
 
     assert schema_pl.columns == [
-        ("date_time", "Datetime(time_unit='ns', time_zone=None)"),
-        ("date", "Datetime(time_unit='ns', time_zone=None)"),
+        ("date_time", f"Datetime(time_unit='{PD_UNIT}', time_zone=None)"),
+        ("date", f"Datetime(time_unit='{PD_UNIT}', time_zone=None)"),
         ("a", "Int64"),
         ("b", "String"),
         ("c", "Float64"),
@@ -364,14 +369,14 @@ def test_schema_coercion_pl_to_pd():
         ("date_time", "datetime64[us]"),
         ("date", "datetime64[ms]"),
         ("a", "int64"),
-        ("b", "object"),
+        ("b", PD_STR),
         ("c", "float64"),
         ("d", "float64"),
         ("e", "bool"),
-        ("f", "object"),
+        ("f", PD_STR),
     ]
 
-    assert str(type(schema_pd.tbl)) == "<class 'pandas.core.frame.DataFrame'>"
+    assert isinstance(schema_pd.tbl, pd.DataFrame)
 
 
 def test_schema_coercion_raises_no_tbl():

@@ -127,5 +127,14 @@ def test_nan_is_missing_in_col_vals_outside(tbl_type, na_pass) -> None:
 
     validation = pb.Validate(tbl).col_vals_outside("n", 0, 5, na_pass=na_pass).interrogate()
 
+
+# NaN is not a null in Polars and PyArrow, so col_vals_between() has to check it on its own.
+@pytest.mark.parametrize("tbl_type", TABLE_TYPES)
+@pytest.mark.parametrize("na_pass", [False, True])
+def test_nan_is_missing_in_col_vals_between(tbl_type, na_pass) -> None:
+    tbl = _table(tbl_type, {"n": [1.0, 7.0, NAN]})
+
+    validation = pb.Validate(tbl).col_vals_between("n", 0, 5, na_pass=na_pass).interrogate()
+
     # one of the two real values passes and the other fails; the NaN follows na_pass=
     assert _counts(validation) == ((2, 1) if na_pass else (1, 2))

@@ -116,6 +116,9 @@ playground*.qmd
 playground.html
 playground_files
 
+# Generated galleries of step reports (from `make gallery-schema`)
+scripts/*_gallery.html
+
 /.luarc.json
 
 docs/_site

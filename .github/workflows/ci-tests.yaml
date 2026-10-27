@@ -16,10 +16,14 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
-        # `locked` uses the versions in `uv.lock` (which pins the minimum supported Polars);
-        # `latest` upgrades Polars and Narwhals so that new releases are tested as they land
+        # `locked` resolves the newest versions allowed by `pyproject.toml` (`uv.lock` isn't
+        # committed); `minimum` resolves the lowest allowed version of every direct dependency so
+        # that the declared floors are actually tested; `latest` upgrades Polars and Narwhals so
+        # that new releases are tested as they land
         deps: ["locked"]
         include:
+          - python-version: "3.10"
+            deps: "minimum"
           - python-version: "3.13"
             deps: "latest"
       fail-fast: false
@@ -37,6 +41,13 @@ jobs:
           java-version: "11"
       - name: Install uv
         uses: astral-sh/setup-uv@v5
+      - name: Resolve the minimum supported versions of the direct dependencies
+        if: matrix.deps == 'minimum'
+        run: |
+          # Set for all later steps, so `uv run` in `make test` keeps the lowest resolution
+          echo "UV_RESOLUTION=lowest-direct" >> "$GITHUB_ENV"
+          UV_RESOLUTION=lowest-direct uv lock
+          UV_RESOLUTION=lowest-direct uv run --frozen python -c "import great_tables, narwhals, pandas, polars, duckdb, ibis; print(f'great-tables {great_tables.__version__}, narwhals {narwhals.__version__}, pandas {pandas.__version__}, polars {polars.__version__}, duckdb {duckdb.__version__}, ibis {ibis.__version__}')"
       - name: Upgrade Polars and Narwhals to their latest releases
         if: matrix.deps == 'latest'
         run: |
