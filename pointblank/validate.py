@@ -26,7 +26,7 @@ import narwhals as nw
 from great_tables import GT, from_column, google_font, html, loc, md, style, vals
 from great_tables.gt import _get_column_of_values
 from great_tables.vals import fmt_integer, fmt_number
-from importlib_resources import files
+from importlib.resources import files
 from narwhals.dependencies import is_narwhals_lazyframe, is_polars_lazyframe
 
 from pointblank._agg import (

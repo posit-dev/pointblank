@@ -14064,7 +14064,15 @@ def test_connection_string_invalid_table_name() -> None:
 
 
 def test_connection_string_backend_specific_error_guidance() -> None:
-    # Test BigQuery backend error (likely not installed in test environment)
+    # Test BigQuery backend error; with the backend installed, the connection would instead start
+    # Google's interactive login (a local web server that waits for a browser) and hang
+    try:
+        import google.cloud.bigquery  # noqa: F401
+    except ImportError:
+        pass
+    else:
+        pytest.skip("The BigQuery backend is installed")
+
     with pytest.raises(ConnectionError) as exc_info:
         Validate(data="bigquery://fake-project/fake-dataset::fake-table")
 
@@ -14937,7 +14945,8 @@ def test_get_dataframe_report_duckdb_with_non_string_values():
     assert stored[3] == '"[a-z]"'
     assert [None if v is None else json.loads(v) for v in stored] == expected
     assert report.to_polars()["values"].to_list() == stored
-    assert list(report.to_pandas()["values"]) == stored
+    # pandas 3's `str` dtype gives NaN for missing values
+    assert [None if pd.isna(v) else v for v in report.to_pandas()["values"]] == stored
 
 
 @pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])

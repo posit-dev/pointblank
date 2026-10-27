@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from importlib_resources import files
+from importlib.resources import files
 
 from pointblank._constants import MODEL_PROVIDERS
 from pointblank._utils_ai import (

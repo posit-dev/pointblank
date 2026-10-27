@@ -390,7 +390,7 @@ class SpeciallyValidation:
 
                 if last_col.dtype == bool or pd.api.types.is_bool_dtype(last_col):
                     # If the last column is a boolean column, rename it as `pb_is_good_`
-                    result.rename(columns={result.columns[-1]: "pb_is_good_"}, inplace=True)
+                    result = result.rename(columns={result.columns[-1]: "pb_is_good_"})
             elif "polars" in tbl_type:
                 # If it's a Polars DataFrame, check if the last column is a boolean column
                 last_col_name = result.columns[-1]
