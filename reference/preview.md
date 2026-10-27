@@ -178,7 +178,7 @@ pb.preview(game_revenue_pandas, columns_subset=["player_id", "item_name", "item_
 
 | PandasRows2,000Columns11 |  |  |  |
 |----|----|----|----|
-|  | player_id *object* | item_name *object* | item_revenue *float64* |
+|  | player_id *str* | item_name *str* | item_revenue *float64* |
 | 1 | ECPANOIXLZHF896 | offer2 | 8.99 |
 | 2 | ECPANOIXLZHF896 | gems3 | 22.49 |
 | 3 | ECPANOIXLZHF896 | gold7 | 107.99 |
@@ -198,7 +198,7 @@ pb.preview(game_revenue_pandas, n_head=2, n_tail=2, columns_subset=pb.starts_wit
 
 | PandasRows2,000Columns11 |  |  |  |
 |----|----|----|----|
-|  | session_id *object* | session_start *datetime64\[ns, UTC\]* | session_duration *float64* |
+|  | session_id *str* | session_start *datetime64\[us, UTC\]* | session_duration *float64* |
 | 1 | ECPANOIXLZHF896-eol2j8bs | 2015-01-01 01:31:03+00:00 | 16.3 |
 | 2 | ECPANOIXLZHF896-eol2j8bs | 2015-01-01 01:31:03+00:00 | 16.3 |
 | 1999 | RMOSWHJGELCI675-vbhcsmtr | 2015-01-21 02:39:48+00:00 | 8.4 |
@@ -217,7 +217,7 @@ pb.preview(
 
 | PandasRows2,000Columns11 |  |  |  |  |
 |----|----|----|----|----|
-|  | player_id *object* | item_type *object* | item_name *object* | item_revenue *float64* |
+|  | player_id *str* | item_type *str* | item_name *str* | item_revenue *float64* |
 | 1 | ECPANOIXLZHF896 | iap | offer2 | 8.99 |
 | 2 | ECPANOIXLZHF896 | iap | gems3 | 22.49 |
 | 1999 | RMOSWHJGELCI675 | iap | offer5 | 26.09 |

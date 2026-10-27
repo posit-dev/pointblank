@@ -119,7 +119,7 @@ validation.get_step_report(i=1)
 
 | Report for Validation Step 1 ✗ ASSERTION `d < 3500` **2** / **13** TEST UNIT FAILURES IN COLUMN **6** EXTRACT OF ALL **2** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
-|  | date_time *datetime64\[ns\]* | date *datetime64\[ns\]* | a *int64* | b *object* | c *float64* | d *float64* | e *bool* | f *object* |
+|  | date_time *datetime64\[us\]* | date *datetime64\[us\]* | a *int64* | b *str* | c *float64* | d *float64* | e *bool* | f *str* |
 | 2 | 2016-01-04 00:32:00 | 2016-01-04 00:00:00 | 3 | 5-egh-163 | 8.0 | 9999.99 | True | low |
 | 4 | 2016-01-06 17:23:00 | 2016-01-06 00:00:00 | 2 | 5-jdo-903 | None | 3892.4 | False | mid |
 
@@ -135,7 +135,7 @@ validation.get_step_report(i=4)
 
 | Report for Validation Step 4 ✓ ASSERTION `b matches regex [0-9]-[a-z]{3}-[0-9]{3}` **13** TEST UNITS *ALL PASSED* IN COLUMN **4** PREVIEW OF TARGET TABLE: |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
-|  | date_time *datetime64\[ns\]* | date *datetime64\[ns\]* | a *int64* | b *object* | c *float64* | d *float64* | e *bool* | f *object* |
+|  | date_time *datetime64\[us\]* | date *datetime64\[us\]* | a *int64* | b *str* | c *float64* | d *float64* | e *bool* | f *str* |
 | 1 | 2016-01-04 11:00:00 | 2016-01-04 00:00:00 | 2 | 1-bcd-345 | 3.0 | 3423.29 | True | high |
 | 2 | 2016-01-04 00:32:00 | 2016-01-04 00:00:00 | 3 | 5-egh-163 | 8.0 | 9999.99 | True | low |
 | 3 | 2016-01-05 13:32:00 | 2016-01-05 00:00:00 | 6 | 8-kdg-938 | 3.0 | 2343.23 | True | high |
@@ -155,7 +155,7 @@ validation.get_step_report(i=1, columns_subset=["a", "b", "c"])
 
 | Report for Validation Step 1 ✗ ASSERTION `d < 3500` **2** / **13** TEST UNIT FAILURES IN COLUMN **6** EXTRACT OF ALL **2** ROWS: |  |  |  |
 |----|----|----|----|
-|  | a *int64* | b *object* | c *float64* |
+|  | a *int64* | b *str* | c *float64* |
 | 2 | 3 | 5-egh-163 | 8.0 |
 | 4 | 2 | 5-jdo-903 | None |
 
@@ -167,7 +167,7 @@ validation.get_step_report(i=3, limit=5)
 
 | Report for Validation Step 3 ✗ ASSERTION `a > 3` **7** / **13** TEST UNIT FAILURES IN COLUMN **3** EXTRACT OF FIRST **5** ROWS (WITH TEST UNIT FAILURES IN RED): |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
-|  | date_time *datetime64\[ns\]* | date *datetime64\[ns\]* | a *int64* | b *object* | c *float64* | d *float64* | e *bool* | f *object* |
+|  | date_time *datetime64\[us\]* | date *datetime64\[us\]* | a *int64* | b *str* | c *float64* | d *float64* | e *bool* | f *str* |
 | 1 | 2016-01-04 11:00:00 | 2016-01-04 00:00:00 | 2 | 1-bcd-345 | 3.0 | 3423.29 | True | high |
 | 2 | 2016-01-04 00:32:00 | 2016-01-04 00:00:00 | 3 | 5-egh-163 | 8.0 | 9999.99 | True | low |
 | 4 | 2016-01-06 17:23:00 | 2016-01-06 00:00:00 | 2 | 5-jdo-903 | None | 3892.4 | False | mid |

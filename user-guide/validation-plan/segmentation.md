@@ -207,7 +207,7 @@ pb.preview(sales_data)
 
 | PandasRows100Columns7 |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|
-|  | region *object* | product_type *object* | units_sold *int64* | revenue *float64* | cost *float64* | profit *float64* | profit_margin *float64* |
+|  | region *str* | product_type *str* | units_sold *int64* | revenue *float64* | cost *float64* | profit *float64* | profit_margin *float64* |
 | 1 | East | Clothing | 55 | 8428.654356103547 | 1363.5197435071943 | 7065.134612596353 | 0.8382280627607168 |
 | 2 | South | Electronics | 7 | 6589.7066024003025 | 3824.069456121553 | 2765.6371462787497 | 0.41969048292246663 |
 | 3 | East | Food | 23 | 4680.5819759229435 | 4122.545156369359 | 558.0368195535848 | 0.11922381071929586 |
