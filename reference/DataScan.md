@@ -4,7 +4,7 @@ Get a summary of a dataset.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L29-L650)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L31-L712)
 
 ``` python
 DataScan(
@@ -90,6 +90,12 @@ For date/datetime columns, the following statistics are provided:
 
 - `min`: the minimum date/datetime in the column
 - `max`: the maximum date/datetime in the column
+
+Time columns get the same statistics.
+
+## Supported Column Types
+
+Numeric columns (integers, floats and decimals), string columns (including categorical and enum columns), date, datetime and time columns, and Boolean columns are summarized. Columns of other types (e.g., lists, arrays, structs, durations and binary data) can't be summarized, so they're listed in the report with no statistics, and in the JSON under `skipped_columns`. pandas stores decimals, times, and Booleans with missing values as `object` columns, which can't be summarized either.
 
 ## Returns
 

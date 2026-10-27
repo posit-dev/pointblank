@@ -4,7 +4,7 @@ Generate a column-level summary table of a dataset.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1158-L1250)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1225-L1325)
 
 ``` python
 col_summary_tbl(
@@ -42,6 +42,10 @@ Optionally, the name of the table could be provided as `tbl_name=`.
 
 `GT`  
 A GT object that displays the column-level summaries of the table.
+
+## Supported Column Types
+
+Numeric columns (integers, floats and decimals), string columns (including categorical and enum columns), date, datetime and time columns, and Boolean columns are summarized. Columns of other types (e.g., lists, arrays, structs, durations and binary data) can't be summarized, so they get a row marked *unsupported type* with no statistics. pandas stores decimals, times, and Booleans with missing values as `object` columns, which can't be summarized either.
 
 ## Supported Input Table Types
 

@@ -1647,6 +1647,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#counts-and-fractions-of-negative-zero-and-positive-values" id="toc-counts-and-fractions-of-negative-zero-and-positive-values" class="nav-link" data-scroll-target="#counts-and-fractions-of-negative-zero-and-positive-values">Counts And Fractions Of Negative, Zero, And Positive Values</a></li>
   <li><a href="#statistics-for-numerical-and-string-columns" id="toc-statistics-for-numerical-and-string-columns" class="nav-link" data-scroll-target="#statistics-for-numerical-and-string-columns">Statistics For Numerical And String Columns</a></li>
   <li><a href="#statistics-for-date-and-datetime-columns" id="toc-statistics-for-date-and-datetime-columns" class="nav-link" data-scroll-target="#statistics-for-date-and-datetime-columns">Statistics For Date And Datetime Columns</a></li>
+  <li><a href="#supported-column-types" id="toc-supported-column-types" class="nav-link" data-scroll-target="#supported-column-types">Supported Column Types</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   </ul>
 </nav>
@@ -1678,7 +1679,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L29-L650" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L31-L712" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataScan</span>(</span>
@@ -1783,6 +1784,11 @@ Optionally, the name of the table could be provided as <code>tbl_name</code>.
 <li><code>min</code>: the minimum date/datetime in the column</li>
 <li><code>max</code>: the maximum date/datetime in the column</li>
 </ul>
+<p>Time columns get the same statistics.</p>
+</section>
+<section id="supported-column-types" class="level2 doc-supported-column-types">
+<h2 class="doc-supported-column-types anchored" data-anchor-id="supported-column-types">Supported Column Types</h2>
+<p>Numeric columns (integers, floats and decimals), string columns (including categorical and enum columns), date, datetime and time columns, and Boolean columns are summarized. Columns of other types (e.g., lists, arrays, structs, durations and binary data) can’t be summarized, so they’re listed in the report with no statistics, and in the JSON under <code>skipped_columns</code>. pandas stores decimals, times, and Booleans with missing values as <code>object</code> columns, which can’t be summarized either.</p>
 </section>
 <section id="returns" class="level2 doc-returns">
 <h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
