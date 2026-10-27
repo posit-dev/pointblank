@@ -208,11 +208,17 @@ def test_get_column_dtype_pd(tbl_multiple_types_pd):
     assert _get_column_dtype(dfn=dfn, column="float") == "float64"
     assert _get_column_dtype(dfn=dfn, column="str") == "string"
     assert _get_column_dtype(dfn=dfn, column="bool") == "boolean"
-    assert _get_column_dtype(dfn=dfn, column="date") == "datetime(time_unit='ns', time_zone=none)"
+
+    # pandas 3 parses datetimes and timedeltas at microsecond (not nanosecond) resolution
+    unit = tbl_multiple_types_pd["datetime"].dt.unit
     assert (
-        _get_column_dtype(dfn=dfn, column="datetime") == "datetime(time_unit='ns', time_zone=none)"
+        _get_column_dtype(dfn=dfn, column="date") == f"datetime(time_unit='{unit}', time_zone=none)"
     )
-    assert _get_column_dtype(dfn=dfn, column="timedelta") == "duration(time_unit='ns')"
+    assert (
+        _get_column_dtype(dfn=dfn, column="datetime")
+        == f"datetime(time_unit='{unit}', time_zone=none)"
+    )
+    assert _get_column_dtype(dfn=dfn, column="timedelta") == f"duration(time_unit='{unit}')"
 
     assert _get_column_dtype(dfn=dfn, column="int", lowercased=False) == "Int64"
     assert _get_column_dtype(dfn=dfn, column="float", lowercased=False) == "Float64"
@@ -1083,6 +1089,12 @@ def test_with_row_index(tbl_type):
         assert result["y"].to_list() == [10, 20, 30, 40, 50]
 
 
+# Narwhals only exposes the nodes of an expression (needed to find its columns) in newer releases
+NW_EXPR_NODES = pytest.mark.skipif(
+    not hasattr(nw.col("a"), "_nodes"), reason="Narwhals version doesn't expose `Expr._nodes`"
+)
+
+
 @pytest.mark.parametrize(
     "expr, root_names, alias",
     [
@@ -1091,8 +1103,13 @@ def test_with_row_index(tbl_type):
         (pl.col("b") > pl.col("a") + pl.col("b"), ["b", "a"], None),
         (pl.all() > 0, [], None),
         (pl.lit(True), [], None),
-        (nw.col("a") > 1, ["a"], None),
-        (((nw.col("c") * 2 < nw.col("a")) & nw.col("c").is_null()).alias("x"), ["c", "a"], "x"),
+        pytest.param(nw.col("a") > 1, ["a"], None, marks=NW_EXPR_NODES),
+        pytest.param(
+            ((nw.col("c") * 2 < nw.col("a")) & nw.col("c").is_null()).alias("x"),
+            ["c", "a"],
+            "x",
+            marks=NW_EXPR_NODES,
+        ),
         (lambda df: df["a"] > 1, [], None),
         ("not an expression", [], None),
     ],
