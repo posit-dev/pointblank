@@ -4,7 +4,7 @@ Generate a column-level summary table of a dataset.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1225-L1325)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1230-L1330)
 
 ``` python
 col_summary_tbl(

@@ -4,7 +4,7 @@ Export the profile as a structured dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L539-L577)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L544-L582)
 
 ``` python
 DataScan.to_dict()
