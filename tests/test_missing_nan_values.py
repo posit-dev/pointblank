@@ -127,16 +127,25 @@ def test_missing_spec_checks_on_columns_that_cant_hold_nan(dtype) -> None:
     ] == [(4, 0), (4, 0), (3, 1), (3, 1), (1, 0)]
 
 
-# NaN is not a null in Polars and PyArrow, so col_vals_not_in_set() has to check it on its own.
-@pytest.mark.parametrize("tbl_type", TABLE_TYPES)
-@pytest.mark.parametrize("na_pass", [False, True])
-def test_nan_is_missing_in_col_vals_not_in_set(tbl_type, na_pass) -> None:
-    tbl = _table(tbl_type, {"n": [1.0, 7.0, NAN]})
+# NaN is not a null in Polars, PyArrow and DuckDB, so the set methods have to treat it as missing on
+# their own: it passes `col_vals_in_set()` only when `set=` contains `None`, and it passes
+# `col_vals_not_in_set()` only with `na_pass=True`
+@pytest.mark.parametrize("tbl_type", TABLE_TYPES + ["duckdb", "sqlite"])
+@pytest.mark.parametrize(
+    "method, set_values, kwargs, expected",
+    [
+        ("in_set", [1.0], {}, (1, 2)),
+        ("in_set", [1.0, None], {}, (2, 1)),
+        ("not_in_set", [1.0], {}, (1, 2)),
+        ("not_in_set", [1.0], {"na_pass": True}, (2, 1)),
+    ],
+    ids=["in_set", "in_set-none-in-set", "not_in_set", "not_in_set-na-pass"],
+)
+def test_nan_is_missing_in_set_checks(tbl_type, method, set_values, kwargs, expected) -> None:
+    validation = pb.Validate(_table(tbl_type, {"x": [1.0, 7.0, NAN]}))
+    getattr(validation, f"col_vals_{method}")("x", set_values, **kwargs)
 
-    validation = pb.Validate(tbl).col_vals_not_in_set("n", [1.0], na_pass=na_pass).interrogate()
-
-    # 1.0 is in the set (fails) and 7.0 is not (passes); the NaN follows na_pass=
-    assert _counts(validation) == ((2, 1) if na_pass else (1, 2))
+    assert _counts(validation.interrogate()) == expected
 
 
 # NaN is not a null in Polars, PyArrow and DuckDB, and it's greater than every number there, so
@@ -172,4 +181,3 @@ def test_nan_is_missing_in_range_checks(tbl_type, method, data, left, right, exp
         counts.append(_counts(validation.interrogate()))
 
     assert counts == expected
-
