@@ -1011,12 +1011,16 @@ def interrogate_between(
     high_val = _safe_modify_datetime_compare_val(nw_tbl, column, high_val)
 
     result_tbl = nw_tbl.with_columns(
-        pb_is_good_1=nw.col(column).is_null(),  # val is Null in Column
-        pb_is_good_2=(  # lb is Null in Column
-            nw.col(low.name).is_null() if isinstance(low, Column) else nw.lit(False)
+        pb_is_good_1=_safe_is_nan_or_null_expr(nw_tbl, nw.col(column), column),  # val is missing
+        pb_is_good_2=(  # lb is missing in Column
+            _safe_is_nan_or_null_expr(nw_tbl, nw.col(low.name), low.name)
+            if isinstance(low, Column)
+            else nw.lit(False)
         ),
-        pb_is_good_3=(  # ub is Null in Column
-            nw.col(high.name).is_null() if isinstance(high, Column) else nw.lit(False)
+        pb_is_good_3=(  # ub is missing in Column
+            _safe_is_nan_or_null_expr(nw_tbl, nw.col(high.name), high.name)
+            if isinstance(high, Column)
+            else nw.lit(False)
         ),
         pb_is_good_4=nw.lit(na_pass),  # Pass if any Null in lb, val, or ub
     )
@@ -1033,7 +1037,7 @@ def interrogate_between(
 
     result_tbl = result_tbl.with_columns(
         pb_is_good_5=(
-            nw.when(nw.col("pb_is_good_5").is_null())
+            nw.when(nw.col("pb_is_good_5").is_null() | nw.col("pb_is_good_1"))
             .then(nw.lit(False))
             .otherwise(nw.col("pb_is_good_5"))
         )
@@ -1041,7 +1045,7 @@ def interrogate_between(
 
     result_tbl = result_tbl.with_columns(
         pb_is_good_6=(
-            nw.when(nw.col("pb_is_good_6").is_null())
+            nw.when(nw.col("pb_is_good_6").is_null() | nw.col("pb_is_good_1"))
             .then(nw.lit(False))
             .otherwise(nw.col("pb_is_good_6"))
         )
