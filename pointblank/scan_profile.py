@@ -36,8 +36,10 @@ if TYPE_CHECKING:
     from narwhals.typing import Frame
 
 
-## Types that may cause unrecoverable errors and don't pose any value
-ILLEGAL_TYPES = ("struct",)
+## Types that may cause unrecoverable errors and don't pose any value. Nested types must be
+## caught here: their names include the inner type (e.g., `List(Int64)`), which would otherwise
+## route them to a scalar profile whose statistics cannot be computed on them
+ILLEGAL_TYPES = ("struct", "list", "array")
 
 
 class _TypeMap(Enum):  # ! ordered;

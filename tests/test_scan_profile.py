@@ -34,6 +34,11 @@ def test_typemap_is_illegal_struct():
     assert _TypeMap.is_illegal("Struct{'a': Int64}") is True
 
 
+@pytest.mark.parametrize("dtype", [nw.List(nw.Int64), nw.List(nw.String), nw.Array(nw.Int64, 2)])
+def test_typemap_is_illegal_list_and_array(dtype):
+    assert _TypeMap.is_illegal(dtype) is True
+
+
 def test_typemap_is_illegal_non_struct():
     assert _TypeMap.is_illegal("Int64") is False
     assert _TypeMap.is_illegal("String") is False
