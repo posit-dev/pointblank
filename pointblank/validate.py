@@ -6452,6 +6452,8 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+            A `NaN` in a float column also counts as missing on every backend, and that includes a
+            `NaN` in a column given to `value=` via [`col()`](`pointblank.col`).
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -6751,6 +6753,8 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+            A `NaN` in a float column also counts as missing on every backend, and that includes a
+            `NaN` in a column given to `value=` via [`col()`](`pointblank.col`).
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -7057,6 +7061,8 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+            A `NaN` in a float column also counts as missing on every backend, and that includes a
+            `NaN` in a column given to `value=` via [`col()`](`pointblank.col`).
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -7363,6 +7369,8 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+            A `NaN` in a float column also counts as missing on every backend, and that includes a
+            `NaN` in a column given to `value=` via [`col()`](`pointblank.col`).
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -7667,6 +7675,8 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+            A `NaN` in a float column also counts as missing on every backend, and that includes a
+            `NaN` in a column given to `value=` via [`col()`](`pointblank.col`).
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -7974,6 +7984,8 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+            A `NaN` in a float column also counts as missing on every backend, and that includes a
+            `NaN` in a column given to `value=` via [`col()`](`pointblank.col`).
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -8293,6 +8305,8 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+            A `NaN` in a float column also counts as missing on every backend, and that includes a
+            `NaN` in a bound column given to `left=` or `right=` via [`col()`](`pointblank.col`).
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -8628,6 +8642,8 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+            A `NaN` in a float column also counts as missing on every backend, and that includes a
+            `NaN` in a bound column given to `left=` or `right=` via [`col()`](`pointblank.col`).
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
