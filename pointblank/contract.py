@@ -49,7 +49,9 @@ class Step:
         The arguments for the validation method, given by keyword (e.g., `columns="amount"`,
         `value=0`). They're stored as given and passed to the method when the step is compiled, so
         a misspelled or missing argument raises a `TypeError` at that point rather than when the
-        step is created. Positional arguments aren't supported.
+        step is created. Positional arguments aren't supported. The one validation method that
+        takes positional arguments, `conjointly()`, receives its expressions as a list in `exprs=`
+        (e.g., `pb.Step("conjointly", exprs=[lambda df: pl.col("a") > 0])`).
 
     Returns
     -------
@@ -59,17 +61,17 @@ class Step:
     Writing Steps That Can Be Saved
     -------------------------------
     A contract's steps are written to YAML as a mapping from the method name to its arguments, so
-    a step can be saved and loaded back only if its arguments are plain data: strings, numbers,
-    booleans, lists, and dictionaries. Other objects are written with Python-specific YAML tags
-    that [`Contract.from_yaml()`](`pointblank.Contract.from_yaml`) won't read. Keep these in mind
-    for steps you plan to save:
+    a step can be saved only if its arguments are plain data: strings, numbers, booleans, dates,
+    lists, and dictionaries. Step-level thresholds are the exception, since a
+    [`Thresholds`](`pointblank.Thresholds`) object or a tuple is converted to a dictionary of
+    levels automatically. Other objects can't be saved, and
+    [`Contract.to_yaml()`](`pointblank.Contract.to_yaml`) raises a `ValueError` that names the
+    step and argument holding one. Keep these in mind for steps you plan to save:
 
     - name columns with strings or lists of strings, rather than with selectors like
     `pb.starts_with()` or `pb.col()`
-    - give step-level thresholds as a dictionary (e.g., `thresholds={"warning": 1, "error": 0.1}`)
-    or a single number, rather than as a [`Thresholds`](`pointblank.Thresholds`) object
-    - steps that take a Polars or other expression, such as `col_vals_expr`, can only be used in
-    contracts kept in Python
+    - steps that take an expression or a function, such as `col_vals_expr` and `conjointly`, can
+    only be used in contracts kept in Python
 
     All of these work when the step is used directly in Python.
 
@@ -194,9 +196,11 @@ class Step:
         each step takes in [`Contract.to_dict()`](`pointblank.Contract.to_dict`) and in contract
         YAML files, and [`from_dict()`](`pointblank.Step.from_dict`) reverses it.
 
-        The arguments are copied as they are, so the result is ready for JSON or YAML only if the
-        arguments are plain data (see the *Writing Steps That Can Be Saved* section of
-        [`Step`](`pointblank.Step`)).
+        Step-level thresholds given as a [`Thresholds`](`pointblank.Thresholds`) object or a
+        tuple are converted to a dictionary of levels (e.g., `{"warning": 1, "error": 0.1}`), which
+        the validation methods accept as well. The other arguments are copied as they are, so the
+        result is ready for JSON or YAML only if they are plain data (see the *Writing Steps That
+        Can Be Saved* section of [`Step`](`pointblank.Step`)).
 
         Returns
         -------
@@ -220,10 +224,25 @@ class Step:
         ```{python}
         pb.Step("rows_complete").to_dict()
         ```
+
+        Thresholds set on a step become a dictionary of the levels that are set:
+
+        ```{python}
+        pb.Step(
+            "col_vals_not_null", columns="email", thresholds=pb.Thresholds(warning=1, error=0.05)
+        ).to_dict()
+        ```
         """
-        if self.kwargs:
-            return {self.method: dict(self.kwargs)}
-        return {self.method: {}}
+        from pointblank.thresholds import Thresholds, _normalize_thresholds_creation
+
+        # Step-level thresholds are stored as a mapping of levels, a form that serializes cleanly
+        # (tuples would become lists in YAML, which the validation methods don't accept)
+        kwargs = dict(self.kwargs)
+        if isinstance(kwargs.get("thresholds"), (Thresholds, tuple)):
+            kwargs["thresholds"] = _thresholds_to_dict(
+                _normalize_thresholds_creation(kwargs["thresholds"])
+            )
+        return {self.method: kwargs}
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Step:
@@ -452,8 +471,7 @@ class Contract:
     - column-level checks: `col_exists` and `col_pct_null`
     - table-level checks: `col_schema_match`, `col_count_match`, `row_count_match`,
     `rows_distinct`, and `rows_complete`
-    - multi-condition checks: `conjointly` (accepted, but not usable yet: its expressions are
-    positional arguments, and a `Step` only stores keyword arguments)
+    - multi-condition checks: `conjointly`, with its expressions given as a list in `exprs=`
 
     Each takes the same arguments as the [`Validate`](`pointblank.Validate`) method of the same
     name. A step that names any other method is rejected with a `ValueError` when the contract is
@@ -470,12 +488,12 @@ class Contract:
     [`from_dict()`](`pointblank.Contract.from_dict`) work with dictionaries (useful for JSON or a
     configuration system). The schema is stored as a mapping of column names to type strings, the
     thresholds as a mapping of levels to values, and each step as a single-key mapping from method
-    name to arguments. For a contract to round-trip through YAML, step arguments must be plain
-    data (strings, numbers, booleans, lists, and dictionaries). Objects such as column selectors
-    (e.g., `pb.starts_with("amt_")`), `Thresholds` objects, and Polars expressions are written
-    with Python-specific YAML tags that [`from_yaml()`](`pointblank.Contract.from_yaml`) won't
-    read. Use column names and threshold dictionaries in steps you want to save, and keep
-    contracts that need other objects in Python.
+    name to arguments. Step arguments must be plain data (strings, numbers, booleans, dates,
+    lists, and dictionaries) for a contract to be written to YAML, although step-level
+    `Thresholds` objects and tuples are converted to dictionaries automatically. A contract with
+    other objects in its steps, such as a column selector (e.g., `pb.starts_with("amt_")`), a
+    Polars expression, or a function, can't be written: `to_yaml()` raises a `ValueError` that
+    says where the object is. Keep contracts like that in Python.
 
     Working With Other Pointblank Tools
     -----------------------------------
@@ -780,7 +798,13 @@ class Contract:
                     f"Validate object has no method '{step.method}'. "
                     f"This may indicate a version mismatch."
                 )
-            validation = method(**step.kwargs)
+            # `conjointly()` takes its expressions positionally, so a step stores them in `exprs=`
+            if step.method == "conjointly" and "exprs" in step.kwargs:
+                kwargs = dict(step.kwargs)
+                exprs = kwargs.pop("exprs")
+                validation = method(*exprs, **kwargs)
+            else:
+                validation = method(**step.kwargs)
 
         return validation
 
@@ -1232,11 +1256,10 @@ class Contract:
         equivalent `Contract`.
 
         Fields that aren't set, and the default `direction=` and `on_violation=` values, are left
-        out of the YAML (see [`to_dict()`](`pointblank.Contract.to_dict`)). For the YAML to be
-        readable by `from_yaml()`, step arguments must be plain data (strings, numbers, booleans,
-        lists, and dictionaries). Column selectors, `Thresholds` objects, and Polars expressions
-        are written with Python-specific YAML tags that `from_yaml()` won't read, and no error is
-        raised when they're written.
+        out of the YAML (see [`to_dict()`](`pointblank.Contract.to_dict`)). Step arguments must be
+        plain data (strings, numbers, booleans, dates, lists, and dictionaries) so that
+        `from_yaml()` can read them back. Step-level thresholds are converted to dictionaries
+        automatically, but column selectors, expressions, and functions can't be written.
 
         Parameters
         ----------
@@ -1248,6 +1271,13 @@ class Contract:
         -------
         str
             The YAML text. It's returned whether or not `path=` is given.
+
+        Raises
+        ------
+        ValueError
+            If a step argument can't be represented in YAML (for example, a column selector such
+            as `pb.starts_with("amt_")` or a Polars expression). The message names the step and
+            argument. Nothing is written to `path=` in this case.
 
         Examples
         --------
@@ -1292,8 +1322,8 @@ class Contract:
         """
         import yaml
 
-        data = {"contract": self.to_dict()}
-        yaml_str = yaml.dump(data, default_flow_style=False, sort_keys=False)
+        data = _to_yaml_data({"contract": self.to_dict()}, what=f"Contract '{self.name}'")
+        yaml_str = yaml.safe_dump(data, default_flow_style=False, sort_keys=False)
 
         if path is not None:
             from pathlib import Path
@@ -1320,14 +1350,23 @@ class Contract:
 
 
 def _schema_to_dict(schema: Schema) -> dict[str, Any]:
-    """Convert a Schema object to a dictionary representation."""
-    result = {}
+    """Convert a Schema object to a dictionary representation.
+
+    Each column maps to its dtype as a string, to a list of strings when alternative dtypes are
+    given, or to `None` when the schema only names the column.
+    """
+    from pointblank.schema import _dtype_candidates
+
+    result: dict[str, Any] = {}
     if schema.columns is not None:
-        for col_name, col_dtype in schema.columns:
-            if col_dtype is not None:
-                result[col_name] = str(col_dtype)
-            else:
+        for col in schema.columns:
+            col_name = col[0]
+            col_dtype = col[1] if len(col) > 1 else None
+            if col_dtype is None:
                 result[col_name] = None
+            else:
+                dtypes = _dtype_candidates(col_dtype)
+                result[col_name] = dtypes if isinstance(col_dtype, (list, tuple)) else dtypes[0]
     return result
 
 
@@ -1335,8 +1374,12 @@ def _dict_to_schema(data: dict[str, Any]) -> Schema:
     """Convert a dictionary to a Schema object."""
     from pointblank.schema import Schema
 
-    # Build kwargs for Schema: column_name=dtype_string
-    return Schema(**{col_name: dtype for col_name, dtype in data.items() if dtype is not None})
+    # Columns without a dtype are kept as name-only entries
+    return Schema(
+        columns=[
+            (col_name,) if dtype is None else (col_name, dtype) for col_name, dtype in data.items()
+        ]
+    )
 
 
 def _thresholds_to_dict(thresholds: Thresholds) -> dict[str, Any]:
@@ -1359,4 +1402,37 @@ def _dict_to_thresholds(data: dict[str, Any]) -> Thresholds:
         warning=data.get("warning"),
         error=data.get("error"),
         critical=data.get("critical"),
+    )
+
+
+def _to_yaml_data(value: Any, *, what: str, path: str = "") -> Any:
+    """Return a copy of `value` that `yaml.safe_load()` can read back after it's written.
+
+    Tuples become lists and numeric types that aren't built-in (e.g., NumPy scalars) become
+    `int` or `float`. Any other value that isn't plain data (a column selector, an expression, a
+    function, etc.) raises a `ValueError` naming where it was found, rather than being written
+    with a Python-specific YAML tag that can't be loaded.
+    """
+    import datetime
+    import numbers
+
+    if value is None or isinstance(value, (str, bool, datetime.date)):
+        return value
+    if isinstance(value, numbers.Integral):
+        return int(value)
+    if isinstance(value, numbers.Real):
+        return float(value)
+    if isinstance(value, (list, tuple)):
+        return [_to_yaml_data(v, what=what, path=f"{path}[{i}]") for i, v in enumerate(value)]
+    if isinstance(value, dict):
+        return {
+            k: _to_yaml_data(v, what=what, path=f"{path}.{k}" if path else str(k))
+            for k, v in value.items()
+        }
+
+    raise ValueError(
+        f"{what} can't be written to YAML: the value at `{path}` holds a "
+        f"`{type(value).__name__}` object, which can't be represented in YAML that can be read "
+        "back. Use plain values (strings, numbers, booleans, dates, lists, and dictionaries) "
+        "instead, for example a column name rather than a column selector."
     )
