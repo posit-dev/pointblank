@@ -773,9 +773,7 @@ def test_col_summary_tbl_empty_cells_show_dash(tbl_type):
 
     assert ">None<" not in body(tbl)
     assert body(tbl).count(">-<") > 0
-    if tbl_type == "pyarrow":
-        # (pandas has no date type, and some of its statistics differ with older Narwhals)
-        assert body(tbl).count(">-<") == body(df_pl).count(">-<")
+    assert body(tbl).count(">-<") == body(df_pl).count(">-<")
     # The `std` of `n` is still a number, so it's formatted (0.7071...)
     assert ">0.71<" in body(tbl)
 
