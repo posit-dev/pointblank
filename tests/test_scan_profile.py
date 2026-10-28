@@ -272,6 +272,51 @@ def test_string_profile_calc_stats():
     assert "iqr" in names
 
 
+@pytest.mark.parametrize(
+    "make_tbl",
+    [
+        pytest.param(lambda v: pl.DataFrame({"s": v}), id="polars"),
+        pytest.param(
+            lambda v: pl.DataFrame({"s": v}, schema={"s": pl.Categorical}), id="polars_cat"
+        ),
+        pytest.param(
+            lambda v: pl.DataFrame({"s": v}, schema={"s": pl.Enum(["x", "abc"])}), id="polars_enum"
+        ),
+        pytest.param(lambda v: pl.DataFrame({"s": v}).to_pandas(), id="pandas_object"),
+        pytest.param(
+            lambda v: pl.DataFrame({"s": v}).to_pandas().astype({"s": "category"}),
+            id="pandas_category",
+        ),
+        pytest.param(lambda v: pl.DataFrame({"s": v}).to_arrow(), id="pyarrow"),
+    ],
+)
+def test_string_profile_calc_stats_skips_missing(make_tbl):
+    # A missing value has no length; with pandas and Narwhals < 2.27, casting to a string used to
+    # turn it into "None" (object) or "nan" (category), counted as 4 or 3 characters
+    df = nw.from_native(make_tbl(["x", None, "abc"]))
+    sp = _StringProfile(colname="s", coltype=str(df.schema["s"]))
+    sp.sample_data = ["x"]
+    sp.calc_stats(df)
+    stats = {s.name: s.val for s in sp.statistics}
+    assert (stats["mean"], stats["min"], stats["max"]) == (2, 1, 3)
+    assert stats["std"] == pytest.approx(2**0.5)
+
+
+def test_string_profile_calc_stats_all_missing_pandas_object():
+    # With Narwhals < 2.27, the lengths of an all-missing `object` column are left as `object`,
+    # which `median` rejects; there are no lengths, so the stats are missing
+    import math
+
+    import pandas as pd
+
+    df = nw.from_native(pd.DataFrame({"s": pd.Series([None, None, None], dtype=object)}))
+    sp = _StringProfile(colname="s", coltype=str(df.schema["s"]))
+    sp.sample_data = []
+    sp.calc_stats(df)
+    stats = {s.name: s.val for s in sp.statistics}
+    assert all(math.isnan(stats[name]) for name in ("mean", "median", "min", "max"))
+
+
 def test_string_profile_type():
     assert _StringProfile._type is _TypeMap.STRING
 
