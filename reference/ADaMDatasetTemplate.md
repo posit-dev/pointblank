@@ -41,9 +41,15 @@ List of variable names that form the natural key.
 
 | Name | Description |
 |----|----|
+| [required_variables](#required_variables) | Get names of all required variables. |
 | [conditional_variables](#conditional_variables) | Get names of all conditionally required variables. |
 | [population_flags](#population_flags) | Get names of all population flag variables. |
-| [required_variables](#required_variables) | Get names of all required variables. |
+
+### required_variables
+
+Get names of all required variables.
+
+`required_variables: list[str]`
 
 ### conditional_variables
 
@@ -56,12 +62,6 @@ Get names of all conditionally required variables.
 Get names of all population flag variables.
 
 `population_flags: list[str]`
-
-### required_variables
-
-Get names of all required variables.
-
-`required_variables: list[str]`
 
 ## Methods
 

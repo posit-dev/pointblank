@@ -81,73 +81,36 @@ source_contract = pb.Contract(
 
 | Name | Description |
 |----|----|
-| [from_dict()](#from_dict) | Construct a Contract from a dictionary (e.g., parsed from YAML). |
-| [from_yaml()](#from_yaml) | Load a Contract from a YAML file. |
-| [to_dict()](#to_dict) | Serialize the Contract to a dictionary for YAML/JSON export. |
+| [validate()](#validate) | Compile and interrogate this Contract against the provided data. |
 | [to_validate()](#to_validate) | Compile this Contract into a Validate object ready for interrogation. |
 | [to_yaml()](#to_yaml) | Serialize this Contract to YAML. |
-| [validate()](#validate) | Compile and interrogate this Contract against the provided data. |
+| [from_yaml()](#from_yaml) | Load a Contract from a YAML file. |
+| [to_dict()](#to_dict) | Serialize the Contract to a dictionary for YAML/JSON export. |
+| [from_dict()](#from_dict) | Construct a Contract from a dictionary (e.g., parsed from YAML). |
 
-### from_dict()
+### validate()
 
-Construct a Contract from a dictionary (e.g., parsed from YAML).
+Compile and interrogate this Contract against the provided data.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L354-L412)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L298-L313)
 
 ``` python
-from_dict(data)
+validate(data)
 ```
+
+This is a convenience method that calls `to_validate(data).interrogate()`.
 
 #### Parameters
 
-`data: dict[str, Any]`  
-A dictionary representation of a contract.
+`data: IntoDataFrame`  
+The data table to validate against this contract.
 
 #### Returns
 
-`Contract`  
-A new Contract instance.
-
-### from_yaml()
-
-Load a Contract from a YAML file.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L414-L446)
-
-``` python
-from_yaml(path)
-```
-
-#### Parameters
-
-`path: str`  
-Path to the YAML file.
-
-#### Returns
-
-`Contract`  
-A new Contract instance.
-
-### to_dict()
-
-Serialize the Contract to a dictionary for YAML/JSON export.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L315-L352)
-
-``` python
-to_dict()
-```
-
-#### Returns
-
-`dict`  
-A dictionary representation of this contract.
+`Validate`  
+An interrogated Validate object with results.
 
 ### to_validate()
 
@@ -210,26 +173,63 @@ Optional file path. If provided, the YAML is written to this file. If None, the 
 `str`  
 The YAML representation of this contract.
 
-### validate()
+### from_yaml()
 
-Compile and interrogate this Contract against the provided data.
+Load a Contract from a YAML file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L298-L313)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L414-L446)
 
 ``` python
-validate(data)
+from_yaml(path)
 ```
-
-This is a convenience method that calls `to_validate(data).interrogate()`.
 
 #### Parameters
 
-`data: IntoDataFrame`  
-The data table to validate against this contract.
+`path: str`  
+Path to the YAML file.
 
 #### Returns
 
-`Validate`  
-An interrogated Validate object with results.
+`Contract`  
+A new Contract instance.
+
+### to_dict()
+
+Serialize the Contract to a dictionary for YAML/JSON export.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L315-L352)
+
+``` python
+to_dict()
+```
+
+#### Returns
+
+`dict`  
+A dictionary representation of this contract.
+
+### from_dict()
+
+Construct a Contract from a dictionary (e.g., parsed from YAML).
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L354-L412)
+
+``` python
+from_dict(data)
+```
+
+#### Parameters
+
+`data: dict[str, Any]`  
+A dictionary representation of a contract.
+
+#### Returns
+
+`Contract`  
+A new Contract instance.

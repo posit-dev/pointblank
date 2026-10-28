@@ -17395,93 +17395,9 @@ connect_to_table : Connect to a database table with full connection string docum
 Methods for the DataScan class
 
 
-DataScan.summary_data
-
 get_tabular_report(self, *, show_sample_data: 'bool' = False) -> 'GT'
 
-to_dict(self) -> 'dict[str, Any]'
-
-Export the profile as a structured dictionary.
-
-The returned dictionary contains metadata (table name, row count, column list) plus
-per-column profile entries with their data type, statistics, and sample data. This format is
-designed for round-trip persistence: save it with
-[`to_json()`](`pointblank.DataScan.to_json`) / `save_to_json()` and restore with
-[`from_dict()`](`pointblank.DataScan.from_dict`) / `from_json()` / `load_from_json()`.
-
-Returns
--------
-dict[str, Any]
-    A dictionary with keys `"metadata"` and `"columns"`.
-
-to_json(self) -> 'str'
-
-Export the profile as a JSON string.
-
-The JSON is structured for round-trip persistence. Use `from_json()` or `load_from_json()`
-to restore a `DataScan` from the output.
-
-Returns
--------
-str
-    A JSON string representing the profile.
-
-save_to_json(self, output_file: 'str') -> 'None'
-
-Save the profile to a JSON file.
-
-Parameters
-----------
-output_file
-    The path to the output JSON file.
-
-from_dict(d: 'dict[str, Any]') -> 'DataScan'
-
-Restore a `DataScan` from a dictionary.
-
-The dictionary is the one produced by [`to_dict()`](`pointblank.DataScan.to_dict`). This
-reconstructs the profile without needing the original data.
-
-Parameters
-----------
-d
-    A dictionary with `"metadata"` and `"columns"` keys, as produced by
-    [`to_dict()`](`pointblank.DataScan.to_dict`).
-
-Returns
--------
-DataScan
-    A restored `DataScan` instance.
-
-from_json(json_string: 'str') -> 'DataScan'
-
-Restore a `DataScan` from a JSON string.
-
-The JSON string is the one produced by [`to_json()`](`pointblank.DataScan.to_json`).
-
-Parameters
-----------
-json_string
-    A JSON string as produced by [`to_json()`](`pointblank.DataScan.to_json`).
-
-Returns
--------
-DataScan
-    A restored `DataScan` instance.
-
-load_from_json(input_file: 'str') -> 'DataScan'
-
-Load a `DataScan` from a JSON file produced by `save_to_json()`.
-
-Parameters
-----------
-input_file
-    The path to the JSON file.
-
-Returns
--------
-DataScan
-    A restored `DataScan` instance.
+DataScan.summary_data
 
 compare(self, baseline: 'DataScan') -> 'DataScanDiff'
 
@@ -17501,6 +17417,90 @@ Returns
 -------
 DataScanDiff
     An object describing the differences between the two scans.
+
+save_to_json(self, output_file: 'str') -> 'None'
+
+Save the profile to a JSON file.
+
+Parameters
+----------
+output_file
+    The path to the output JSON file.
+
+load_from_json(input_file: 'str') -> 'DataScan'
+
+Load a `DataScan` from a JSON file produced by `save_to_json()`.
+
+Parameters
+----------
+input_file
+    The path to the JSON file.
+
+Returns
+-------
+DataScan
+    A restored `DataScan` instance.
+
+to_json(self) -> 'str'
+
+Export the profile as a JSON string.
+
+The JSON is structured for round-trip persistence. Use `from_json()` or `load_from_json()`
+to restore a `DataScan` from the output.
+
+Returns
+-------
+str
+    A JSON string representing the profile.
+
+from_json(json_string: 'str') -> 'DataScan'
+
+Restore a `DataScan` from a JSON string.
+
+The JSON string is the one produced by [`to_json()`](`pointblank.DataScan.to_json`).
+
+Parameters
+----------
+json_string
+    A JSON string as produced by [`to_json()`](`pointblank.DataScan.to_json`).
+
+Returns
+-------
+DataScan
+    A restored `DataScan` instance.
+
+to_dict(self) -> 'dict[str, Any]'
+
+Export the profile as a structured dictionary.
+
+The returned dictionary contains metadata (table name, row count, column list) plus
+per-column profile entries with their data type, statistics, and sample data. This format is
+designed for round-trip persistence: save it with
+[`to_json()`](`pointblank.DataScan.to_json`) / `save_to_json()` and restore with
+[`from_dict()`](`pointblank.DataScan.from_dict`) / `from_json()` / `load_from_json()`.
+
+Returns
+-------
+dict[str, Any]
+    A dictionary with keys `"metadata"` and `"columns"`.
+
+from_dict(d: 'dict[str, Any]') -> 'DataScan'
+
+Restore a `DataScan` from a dictionary.
+
+The dictionary is the one produced by [`to_dict()`](`pointblank.DataScan.to_dict`). This
+reconstructs the profile without needing the original data.
+
+Parameters
+----------
+d
+    A dictionary with `"metadata"` and `"columns"` keys, as produced by
+    [`to_dict()`](`pointblank.DataScan.to_dict`).
+
+Returns
+-------
+DataScan
+    A restored `DataScan` instance.
 
 
 ## Table Comparison
@@ -17660,7 +17660,8 @@ The result of comparing a source table with a target table.
 
 `Comparison` objects are created by [`compare()`](`pointblank.compare`). They hold the row
 status counts, per-column mismatch counts, and the schema differences, and can retrieve samples
-of differing rows on demand.
+of differing rows on demand. A `Comparison` is truthy only when the tables match (see
+[`identical`](`pointblank.Comparison.identical`)), so `if pb.compare(a, b):` reads naturally.
 
 Attributes
 ----------
@@ -17669,7 +17670,7 @@ source_name, target_name
 keys
     The key columns used to align rows (empty for positional alignment).
 mode
-    `"keyed"` or `"positional"`.
+    `"keyed"`, `"positional"`, or `"multiset"` (for `keys="*"`).
 schema_diff
     A [`SchemaDiff`](`pointblank.SchemaDiff`) describing schema differences.
 n_source_rows, n_target_rows
@@ -17710,13 +17711,21 @@ reordered
 Methods for the Comparison class
 
 
-Comparison.n
+Comparison.identical
 
-The number of test units (aligned rows).
+`True` if the tables match under the comparison settings.
 
 Comparison.schema_ok
 
 `True` if the schemas match, or if schema differences are tolerated (`"common"`).
+
+Comparison.status_counts
+
+The number of test units with each row status.
+
+Comparison.n
+
+The number of test units (aligned rows).
 
 Comparison.n_passed
 
@@ -17725,18 +17734,6 @@ Test units that pass: matching rows (none, if the schema check fails).
 Comparison.n_failed
 
 Test units that fail: all non-matching rows (all rows, if the schema check fails).
-
-Comparison.identical
-
-`True` if the tables match under the comparison settings.
-
-Comparison.status_counts
-
-The number of test units with each row status.
-
-__bool__(self) -> 'bool'
-
-__repr__(self) -> 'str'
 
 rows(self, status: "Literal['changed', 'missing', 'extra', 'dup_key', 'match']", limit: 'int' = 100) -> 'Any'
 
@@ -17777,24 +17774,6 @@ Any
     values differ (`n_mismatch`), and that number as a fraction of matched rows
     (`f_mismatch`).
 
-to_dict(self, samples: 'bool' = True, limit: 'int' = 10) -> 'dict[str, Any]'
-
-Get the comparison results as a JSON-serializable dict.
-
-Parameters
-----------
-samples
-    Should samples of differing rows be included? Set to `False` when the data might
-    contain sensitive values (e.g., PII) and only counts and schema details may be stored.
-limit
-    The maximum number of sample rows per status.
-
-to_json(self, samples: 'bool' = True, limit: 'int' = 10, indent: 'int | None' = 2) -> 'str'
-
-Get the comparison results as a JSON string.
-
-The structure is the same as that of [`to_dict()`](`pointblank.Comparison.to_dict`).
-
 get_tabular_report(self, limit: 'int' = 10, title: 'str | None' = None, lang: 'str | None' = None, locale: 'str | None' = None) -> 'GT'
 
 Get a tabular report of the comparison.
@@ -17822,6 +17801,24 @@ Returns
 -------
 GT
     A Great Tables object.
+
+to_dict(self, samples: 'bool' = True, limit: 'int' = 10) -> 'dict[str, Any]'
+
+Get the comparison results as a JSON-serializable dict.
+
+Parameters
+----------
+samples
+    Should samples of differing rows be included? Set to `False` when the data might
+    contain sensitive values (e.g., PII) and only counts and schema details may be stored.
+limit
+    The maximum number of sample rows per status.
+
+to_json(self, samples: 'bool' = True, limit: 'int' = 10, indent: 'int | None' = 2) -> 'str'
+
+Get the comparison results as a JSON string.
+
+The structure is the same as that of [`to_dict()`](`pointblank.Comparison.to_dict`).
 
 
 ## Table Pre-checks

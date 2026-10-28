@@ -79,57 +79,13 @@ result = pipeline.run(data=raw_data, transform=my_transform)
 
 | Name | Description |
 |----|----|
-| [from_dict()](#from_dict) | Construct a Pipeline from a dictionary (e.g., parsed from YAML). |
-| [from_yaml()](#from_yaml) | Load a Pipeline from a YAML file. |
 | [run()](#run) | Run the full pipeline: validate source, transform, validate target. |
-| [to_dict()](#to_dict) | Serialize the Pipeline to a dictionary for YAML/JSON export. |
-| [to_yaml()](#to_yaml) | Serialize this Pipeline to YAML. |
 | [validate_source()](#validate_source) | Validate data against the source (inbound) contract. |
 | [validate_target()](#validate_target) | Validate data against the target (outbound) contract. |
-
-### from_dict()
-
-Construct a Pipeline from a dictionary (e.g., parsed from YAML).
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L449-L497)
-
-``` python
-from_dict(data)
-```
-
-#### Parameters
-
-`data: dict[str, Any]`  
-A dictionary representation of a pipeline.
-
-#### Returns
-
-`Pipeline`  
-A new Pipeline instance.
-
-### from_yaml()
-
-Load a Pipeline from a YAML file.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L499-L527)
-
-``` python
-from_yaml(path)
-```
-
-#### Parameters
-
-`path: str`  
-Path to the YAML file.
-
-#### Returns
-
-`Pipeline`  
-A new Pipeline instance.
+| [to_yaml()](#to_yaml) | Serialize this Pipeline to YAML. |
+| [from_yaml()](#from_yaml) | Load a Pipeline from a YAML file. |
+| [to_dict()](#to_dict) | Serialize the Pipeline to a dictionary for YAML/JSON export. |
+| [from_dict()](#from_dict) | Construct a Pipeline from a dictionary (e.g., parsed from YAML). |
 
 ### run()
 
@@ -158,45 +114,6 @@ A callable that transforms the source data into target data. Must accept the dat
 
 `PipelineResult`  
 A result object containing both validations and the transform output.
-
-### to_dict()
-
-Serialize the Pipeline to a dictionary for YAML/JSON export.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L418-L447)
-
-``` python
-to_dict()
-```
-
-#### Returns
-
-`dict`  
-A dictionary representation of this pipeline.
-
-### to_yaml()
-
-Serialize this Pipeline to YAML.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L529-L556)
-
-``` python
-to_yaml(path=None)
-```
-
-#### Parameters
-
-`path: str | None = None`  
-Optional file path. If provided, the YAML is written to this file. If None, the YAML string is returned.
-
-#### Returns
-
-`str`  
-The YAML representation of this pipeline.
 
 ### validate_source()
 
@@ -257,3 +174,86 @@ If no target contract is defined.
 
 `RuntimeError`  
 If on_violation="raise" and validation fails.
+
+### to_yaml()
+
+Serialize this Pipeline to YAML.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L529-L556)
+
+``` python
+to_yaml(path=None)
+```
+
+#### Parameters
+
+`path: str | None = None`  
+Optional file path. If provided, the YAML is written to this file. If None, the YAML string is returned.
+
+#### Returns
+
+`str`  
+The YAML representation of this pipeline.
+
+### from_yaml()
+
+Load a Pipeline from a YAML file.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L499-L527)
+
+``` python
+from_yaml(path)
+```
+
+#### Parameters
+
+`path: str`  
+Path to the YAML file.
+
+#### Returns
+
+`Pipeline`  
+A new Pipeline instance.
+
+### to_dict()
+
+Serialize the Pipeline to a dictionary for YAML/JSON export.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L418-L447)
+
+``` python
+to_dict()
+```
+
+#### Returns
+
+`dict`  
+A dictionary representation of this pipeline.
+
+### from_dict()
+
+Construct a Pipeline from a dictionary (e.g., parsed from YAML).
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L449-L497)
+
+``` python
+from_dict(data)
+```
+
+#### Parameters
+
+`data: dict[str, Any]`  
+A dictionary representation of a pipeline.
+
+#### Returns
+
+`Pipeline`  
+A new Pipeline instance.

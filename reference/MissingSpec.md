@@ -76,29 +76,17 @@ age_missing.values_for_category("item_nonresponse")  # [-98, -97]
 
 | Name | Description |
 |----|----|
-| [from_cdisc()](#from_cdisc) | Alias for [`from_cdisc_null_flavors()`](../reference/MissingSpec.md#pointblank.MissingSpec.from_cdisc_null_flavors). |
 | [from_cdisc_null_flavors()](#from_cdisc_null_flavors) | Create a [MissingSpec](../reference/MissingSpec.md#pointblank.MissingSpec) for the standard HL7/CDISC *null flavors*. |
+| [from_cdisc()](#from_cdisc) | Alias for [`from_cdisc_null_flavors()`](../reference/MissingSpec.md#pointblank.MissingSpec.from_cdisc_null_flavors). |
 | [from_sas()](#from_sas) | Create a [MissingSpec](../reference/MissingSpec.md#pointblank.MissingSpec) for SAS special missing values. |
 | [from_spss()](#from_spss) | Create a [MissingSpec](../reference/MissingSpec.md#pointblank.MissingSpec) from SPSS-style user-defined missing values. |
 | [from_variable_metadata()](#from_variable_metadata) | Create a [MissingSpec](../reference/MissingSpec.md#pointblank.MissingSpec) from an imported variable's metadata. |
 | [is_missing()](#is_missing) | Check whether a value should be considered missing under this spec. |
 | [reason_for()](#reason_for) | Get the reason label for a specific value. |
-| [reasons_list()](#reasons_list) | Get the distinct reason labels defined by this spec. |
 | [sentinel_values()](#sentinel_values) | Get all sentinel values that encode missingness. |
-| [values_for_category()](#values_for_category) | Get all sentinel values whose reason falls in a given category. |
+| [reasons_list()](#reasons_list) | Get the distinct reason labels defined by this spec. |
 | [values_for_reason()](#values_for_reason) | Get all sentinel values that correspond to a given reason. |
-
-### from_cdisc()
-
-Alias for [`from_cdisc_null_flavors()`](../reference/MissingSpec.md#pointblank.MissingSpec.from_cdisc_null_flavors).
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L328-L331)
-
-``` python
-from_cdisc(**kwargs)
-```
+| [values_for_category()](#values_for_category) | Get all sentinel values whose reason falls in a given category. |
 
 ### from_cdisc_null_flavors()
 
@@ -141,6 +129,18 @@ import pointblank as pb
 
 cdisc_missing = pb.MissingSpec.from_cdisc_null_flavors()
 cdisc_missing.reason_for("NASK")   # "not_asked"
+```
+
+### from_cdisc()
+
+Alias for [`from_cdisc_null_flavors()`](../reference/MissingSpec.md#pointblank.MissingSpec.from_cdisc_null_flavors).
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L328-L331)
+
+``` python
+from_cdisc(**kwargs)
 ```
 
 ### from_sas()
@@ -329,23 +329,6 @@ A value from the data.
 `str | None`  
 The reason label if `value` is a declared sentinel value, `null_reason` if `value` is `None` and `null_is_missing=True`, or `None` if the value is not considered missing.
 
-### reasons_list()
-
-Get the distinct reason labels defined by this spec.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L252-L266)
-
-``` python
-reasons_list()
-```
-
-#### Returns
-
-`list[str]`  
-The distinct reason labels (in first-seen order), including `null_reason` when `null_is_missing=True`.
-
 ### sentinel_values()
 
 Get all sentinel values that encode missingness.
@@ -363,27 +346,22 @@ sentinel_values()
 `list`  
 The keys of `reasons` (the actual values in the data that represent missingness). Note that this does *not* include `None` even when `null_is_missing=True`; use [`is_missing()`](../reference/MissingSpec.md#pointblank.MissingSpec.is_missing) to test individual values.
 
-### values_for_category()
+### reasons_list()
 
-Get all sentinel values whose reason falls in a given category.
+Get the distinct reason labels defined by this spec.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L233-L250)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L252-L266)
 
 ``` python
-values_for_category(category)
+reasons_list()
 ```
-
-#### Parameters
-
-`category: str`  
-A category name defined in `categories`.
 
 #### Returns
 
-`list`  
-All sentinel values whose reason label is in the given category. Returns an empty list if `categories` is `None` or the category is undefined.
+`list[str]`  
+The distinct reason labels (in first-seen order), including `null_reason` when `null_is_missing=True`.
 
 ### values_for_reason()
 
@@ -406,3 +384,25 @@ A reason label.
 
 `list`  
 All sentinel values mapped to `reason`.
+
+### values_for_category()
+
+Get all sentinel values whose reason falls in a given category.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L233-L250)
+
+``` python
+values_for_category(category)
+```
+
+#### Parameters
+
+`category: str`  
+A category name defined in `categories`.
+
+#### Returns
+
+`list`  
+All sentinel values whose reason label is in the given category. Returns an empty list if `categories` is `None` or the category is undefined.

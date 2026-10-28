@@ -4,13 +4,13 @@ The result of comparing a source table with a target table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L490-L1515)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L490-L1516)
 
 ``` python
 Comparison()
 ```
 
-[Comparison](../reference/Comparison.md#pointblank.Comparison) objects are created by [`compare()`](../reference/compare.md#pointblank.compare). They hold the row status counts, per-column mismatch counts, and the schema differences, and can retrieve samples of differing rows on demand.
+[Comparison](../reference/Comparison.md#pointblank.Comparison) objects are created by [`compare()`](../reference/compare.md#pointblank.compare). They hold the row status counts, per-column mismatch counts, and the schema differences, and can retrieve samples of differing rows on demand. A [Comparison](../reference/Comparison.md#pointblank.Comparison) is truthy only when the tables match (see [`identical`](../reference/Comparison.identical.md#pointblank.Comparison.identical)), so `if pb.compare(a, b):` reads naturally.
 
 ## Attributes
 
@@ -21,7 +21,7 @@ Labels for the two tables.
 The key columns used to align rows (empty for positional alignment).
 
 `mode`  
-`"keyed"` or `"positional"`.
+`"keyed"`, `"positional"`, or `"multiset"` (for `keys="*"`).
 
 `schema_diff`  
 A [`SchemaDiff`](../reference/SchemaDiff.md#pointblank.SchemaDiff) describing schema differences.

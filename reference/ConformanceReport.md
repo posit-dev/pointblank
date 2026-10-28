@@ -44,9 +44,15 @@ The `NativeConformanceResult` produced by the rules engine (native form only).
 
 | Name | Description |
 |----|----|
+| [n_datasets](#n_datasets) | Number of datasets validated. |
 | [is_core](#is_core) | Whether this report wraps CDISC CORE engine results (vs. built-in engine results). |
 | [is_rules](#is_rules) | Whether this report was produced by Pointblank's built-in rule-based conformance engine. |
-| [n_datasets](#n_datasets) | Number of datasets validated. |
+
+### n_datasets
+
+Number of datasets validated.
+
+`n_datasets: int`
 
 ### is_core
 
@@ -60,28 +66,22 @@ Whether this report was produced by Pointblank's built-in rule-based conformance
 
 `is_rules: bool`
 
-### n_datasets
-
-Number of datasets validated.
-
-`n_datasets: int`
-
 ## Methods
 
 | Name | Description |
 |----|----|
 | [all_passed()](#all_passed) | Whether the run reported no conformance failures. |
+| [summary()](#summary) | Return a summary of the conformance run. |
+| [get_tabular_report()](#get_tabular_report) | Build a rule-level conformance summary table as a styled Great Tables object. |
+| [get_findings_table()](#get_findings_table) | Build a record-level findings table as a styled Great Tables object. |
+| [rules()](#rules) | Return the per-rule run results. |
+| [issues()](#issues) | Return the conformance issues found. |
 | [findings()](#findings) | Return the row-level findings. |
 | [findings_df()](#findings_df) | Return all row-level findings as a Polars DataFrame. |
-| [from_core_report()](#from_core_report) | Build a CORE-backed [ConformanceReport](../reference/ConformanceReport.md#pointblank.ConformanceReport) from a CDISC CORE JSON report. |
-| [get_findings_table()](#get_findings_table) | Build a record-level findings table as a styled Great Tables object. |
-| [get_tabular_report()](#get_tabular_report) | Build a rule-level conformance summary table as a styled Great Tables object. |
 | [get_validation()](#get_validation) | Get the [Validate](../reference/Validate.md#pointblank.Validate) object for a single dataset (case-insensitive). |
-| [issues()](#issues) | Return the conformance issues found. |
-| [rules()](#rules) | Return the per-rule run results. |
-| [summary()](#summary) | Return a summary of the conformance run. |
-| [to_excel()](#to_excel) | Save the conformance report as an Excel workbook. |
 | [to_json()](#to_json) | Save the conformance report as a JSON file. |
+| [to_excel()](#to_excel) | Save the conformance report as an Excel workbook. |
+| [from_core_report()](#from_core_report) | Build a CORE-backed [ConformanceReport](../reference/ConformanceReport.md#pointblank.ConformanceReport) from a CDISC CORE JSON report. |
 
 ### all_passed()
 
@@ -96,6 +96,161 @@ all_passed()
 ```
 
 For built-in engine reports, this is `True` when every check in every dataset passed with no failing test units. For CORE reports, this is `True` when no rule reported an issue or execution error.
+
+### summary()
+
+Return a summary of the conformance run.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1023-L1075)
+
+``` python
+summary()
+```
+
+#### Returns
+
+`dict`  
+For a **built-in engine** report, a mapping of dataset name to a dict with keys `n_steps`, `n_steps_failed`, `n_failed` (failing test units), and `all_passed`.
+
+For a **CORE** report, a single dict with keys `standard`, `version`, `engine_version`, `n_rules`, [status_counts](../reference/Comparison.status_counts.md#pointblank.Comparison.status_counts) (rule counts by run status), `n_issues` (total reported issues), [n_datasets](../reference/ConformanceReport.md#pointblank.ConformanceReport.n_datasets), and `all_passed`.
+
+### get_tabular_report()
+
+Build a rule-level conformance summary table as a styled Great Tables object.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1627-L1841)
+
+``` python
+get_tabular_report()
+```
+
+Returns one row per rule in the catalog, summarizing whether each rule passed, failed, was not applicable, or could not be evaluated. This is the high-level overview; use [get_findings_table()](../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table) or [findings_df()](../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) to drill into the individual failing records.
+
+#### Table Layout
+
+Each row contains:
+
+- A colored status bar on the left edge: green for pass, red for fail, amber for error, and grey for not-applicable or not-supported.
+- `Rule` -- CDISC CORE rule identifier (e.g., `"SDTM-007"`).
+- `Domain` -- The SDTM domain(s) the rule targets. Rules that apply to every domain show a comma-separated list; rules targeting all SUPP- datasets show `"SUPP--"`.
+- `Type` -- The rule category: `Record`, `Variable`, `Metadata`, `Domain`, `Dataset`, `Define`, or [Codelist](../reference/Codelist.md#pointblank.Codelist).
+- `Issues` -- Count of failing records or dataset-level violations. Shown in bold red when non-zero. This count always reflects the true total, even when the findings table caps display at 100 rows per rule.
+- `Description` -- Human-readable explanation of what the rule checks.
+
+Rows are sorted by severity: failing rules appear first, followed by errors, passing rules, not-applicable rules, and unsupported rule types.
+
+The table header shows `"CDISC Conformance"` with a `PASS` or `FAIL` badge, and a subtitle line with the standard, version, and a count breakdown (e.g., `SDTMIG 3-4 · 410 passed · 4 failed · 12 n/a`).
+
+#### Returns
+
+`GT`  
+A styled `great_tables.GT` object set in IBM Plex Sans / IBM Plex Mono. Renders automatically in Jupyter and Quarto notebooks; call `._repr_html_()` to get the HTML string directly. This is the same object produced by `_repr_html_()`.
+
+#### Raises
+
+`TypeError`  
+If called on a CDISC CORE-backed report. The tabular report is only available for built-in engine results.
+
+### get_findings_table()
+
+Build a record-level findings table as a styled Great Tables object.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1465-L1625)
+
+``` python
+get_findings_table()
+```
+
+Returns one row per failing record captured by Pointblank's built-in rules engine. This is the drill-down companion to [`get_tabular_report()`](../reference/ConformanceReport.md#pointblank.ConformanceReport.get_tabular_report): where the tabular report shows one row per rule with an aggregate issue count, the findings table shows the individual offending records so reviewers can trace violations back to specific subjects and variables.
+
+#### Table Layout
+
+The table has two column spanners:
+
+- **Rule**: `Domain` and `Description` identify which rule fired and in which domain.
+
+- **Finding**: `USUBJID`, `Column`, `Row`, and `Value` identify the specific record.
+
+  - `USUBJID`: the unique subject identifier (e.g., `"CDISCPILOT01-01-001"`).
+  - `Column`: the variable that violated the rule (e.g., `"SEX"`).
+  - `Row`: 1-based row number of the failing record in the source domain dataset.
+  - `Value`: the actual value found in `Column` for that row.
+
+The header shows the standard and version (e.g., `SDTMIG 3-4`) alongside a breakdown of how many rules passed, failed, and were not applicable across the full run.
+
+A narrow red bar on the left edge of each row marks it as a failure, consistent with the color coding in `get_tabular_report()`.
+
+#### Findings Cap
+
+At most 100 findings per rule are shown. When a rule has more than 100 failing records the table shows the first 100; the true total is always visible in `get_tabular_report()`.
+
+#### Returns
+
+`GT`  
+A styled `great_tables.GT` object. Renders automatically in Jupyter and Quarto notebooks.
+
+#### Raises
+
+`TypeError`  
+If called on a CDISC CORE-backed report. The findings table is only available for built-in engine results.
+
+`ValueError`  
+If there are no row-level findings to display (i.e., all applicable rules passed).
+
+### rules()
+
+Return the per-rule run results.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1162-L1181)
+
+``` python
+rules(status=None)
+```
+
+For CORE reports, returns `CoreRuleResult` objects. For built-in engine reports, returns `NativeRuleResult` objects. For Validate-based reports, returns an empty list.
+
+#### Parameters
+
+`status: str | None = None`  
+Optional status filter. For CORE: e.g. `"SUCCESS"`, `"SKIPPED"`. For built-in engine reports: `"pass"`, `"fail"`, `"error"`, `"not_applicable"`, `"not_supported"`.
+
+### issues()
+
+Return the conformance issues found.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1077-L1147)
+
+``` python
+issues(
+    severity=None,
+    status=None,
+)
+```
+
+#### Parameters
+
+`severity: str | None = None`  
+(Built-in engine reports only.) Optional severity filter: `"warning"`, `"error"`, or `"critical"`. Requires thresholds to have been set on the run. If `None`, all steps with failing test units are returned.
+
+`status: str | None = None`  
+(CORE reports only.) Optional rule-status filter, e.g. `"ISSUE REPORTED"` or `"EXECUTION ERROR"`. If `None`, all reported issues are returned.
+
+#### Returns
+
+`list[dict]`  
+For a **built-in engine** report, one dict per failing step, with keys `dataset`, `step`, `assertion`, `column`, `n_failed`, `n`, and `severity`.
+
+For a **CORE** report, one dict per (dataset, rule) with reported issues, with keys `dataset`, `rule_id`, `message`, [issues](../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) (count), and `status`.
 
 ### findings()
 
@@ -151,125 +306,6 @@ Returns an empty DataFrame (with the same schema) when all rules pass.
 `TypeError`  
 If called on a CDISC CORE-backed report. Use [findings()](../reference/ConformanceReport.md#pointblank.ConformanceReport.findings) instead, which returns a list of `CoreFinding` objects.
 
-### from_core_report()
-
-Build a CORE-backed [ConformanceReport](../reference/ConformanceReport.md#pointblank.ConformanceReport) from a CDISC CORE JSON report.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L961-L988)
-
-``` python
-from_core_report(
-    report,
-    package=None,
-    agency=None,
-)
-```
-
-#### Parameters
-
-`report: dict | ParsedCoreReport`  
-Either a raw CORE JSON report (`dict`, as produced by `core validate -of JSON`) or an already-parsed `ParsedCoreReport`.
-
-`package: SubmissionPackage | None = None`  
-The [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage) the run was produced from, if any.
-
-`agency: str | None = None`  
-The agency rule-set selector used for the run.
-
-#### Returns
-
-`ConformanceReport`  
-A report in CORE form ([is_core](../reference/ConformanceReport.md#pointblank.ConformanceReport.is_core) is `True`).
-
-### get_findings_table()
-
-Build a record-level findings table as a styled Great Tables object.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1465-L1625)
-
-``` python
-get_findings_table()
-```
-
-Returns one row per failing record captured by Pointblank's built-in rules engine. This is the drill-down companion to [`get_tabular_report()`](../reference/ConformanceReport.md#pointblank.ConformanceReport.get_tabular_report): where the tabular report shows one row per rule with an aggregate issue count, the findings table shows the individual offending records so reviewers can trace violations back to specific subjects and variables.
-
-#### Table Layout
-
-The table has two column spanners:
-
-- **Rule**: `Domain` and `Description` identify which rule fired and in which domain.
-
-- **Finding**: `USUBJID`, `Column`, `Row`, and `Value` identify the specific record.
-
-  - `USUBJID`: the unique subject identifier (e.g., `"CDISCPILOT01-01-001"`).
-  - `Column`: the variable that violated the rule (e.g., `"SEX"`).
-  - `Row`: 1-based row number of the failing record in the source domain dataset.
-  - `Value`: the actual value found in `Column` for that row.
-
-The header shows the standard and version (e.g., `SDTMIG 3-4`) alongside a breakdown of how many rules passed, failed, and were not applicable across the full run.
-
-A narrow red bar on the left edge of each row marks it as a failure, consistent with the color coding in `get_tabular_report()`.
-
-#### Findings Cap
-
-At most 100 findings per rule are shown. When a rule has more than 100 failing records the table shows the first 100; the true total is always visible in `get_tabular_report()`.
-
-#### Returns
-
-`GT`  
-A styled `great_tables.GT` object. Renders automatically in Jupyter and Quarto notebooks.
-
-#### Raises
-
-`TypeError`  
-If called on a CDISC CORE-backed report. The findings table is only available for built-in engine results.
-
-`ValueError`  
-If there are no row-level findings to display (i.e., all applicable rules passed).
-
-### get_tabular_report()
-
-Build a rule-level conformance summary table as a styled Great Tables object.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1627-L1841)
-
-``` python
-get_tabular_report()
-```
-
-Returns one row per rule in the catalog, summarizing whether each rule passed, failed, was not applicable, or could not be evaluated. This is the high-level overview; use [get_findings_table()](../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table) or [findings_df()](../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) to drill into the individual failing records.
-
-#### Table Layout
-
-Each row contains:
-
-- A colored status bar on the left edge: green for pass, red for fail, amber for error, and grey for not-applicable or not-supported.
-- `Rule` -- CDISC CORE rule identifier (e.g., `"SDTM-007"`).
-- `Domain` -- The SDTM domain(s) the rule targets. Rules that apply to every domain show a comma-separated list; rules targeting all SUPP- datasets show `"SUPP--"`.
-- `Type` -- The rule category: `Record`, `Variable`, `Metadata`, `Domain`, `Dataset`, `Define`, or [Codelist](../reference/Codelist.md#pointblank.Codelist).
-- `Issues` -- Count of failing records or dataset-level violations. Shown in bold red when non-zero. This count always reflects the true total, even when the findings table caps display at 100 rows per rule.
-- `Description` -- Human-readable explanation of what the rule checks.
-
-Rows are sorted by severity: failing rules appear first, followed by errors, passing rules, not-applicable rules, and unsupported rule types.
-
-The table header shows `"CDISC Conformance"` with a `PASS` or `FAIL` badge, and a subtitle line with the standard, version, and a count breakdown (e.g., `SDTMIG 3-4 · 410 passed · 4 failed · 12 n/a`).
-
-#### Returns
-
-`GT`  
-A styled `great_tables.GT` object set in IBM Plex Sans / IBM Plex Mono. Renders automatically in Jupyter and Quarto notebooks; call `._repr_html_()` to get the HTML string directly. This is the same object produced by `_repr_html_()`.
-
-#### Raises
-
-`TypeError`  
-If called on a CDISC CORE-backed report. The tabular report is only available for built-in engine results.
-
 ### get_validation()
 
 Get the [Validate](../reference/Validate.md#pointblank.Validate) object for a single dataset (case-insensitive).
@@ -282,73 +318,29 @@ Usage
 get_validation(name)
 ```
 
-### issues()
+### to_json()
 
-Return the conformance issues found.
+Save the conformance report as a JSON file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1077-L1147)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1192-L1260)
 
 ``` python
-issues(
-    severity=None,
-    status=None,
-)
+to_json(path)
 ```
+
+For CORE reports the output mirrors the original CORE JSON structure (`Conformance_Details`, `Dataset_Details`, `Issue_Summary`, `Issue_Details`, `Rules_Report`), making the file readable by anything that parses a standard CORE report. For built-in engine reports the file contains `summary` and [issues](../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) keys.
 
 #### Parameters
 
-`severity: str | None = None`  
-(Built-in engine reports only.) Optional severity filter: `"warning"`, `"error"`, or `"critical"`. Requires thresholds to have been set on the run. If `None`, all steps with failing test units are returned.
-
-`status: str | None = None`  
-(CORE reports only.) Optional rule-status filter, e.g. `"ISSUE REPORTED"` or `"EXECUTION ERROR"`. If `None`, all reported issues are returned.
+`path: str | Path`  
+Destination path (including filename). Parent directories are created if needed.
 
 #### Returns
 
-`list[dict]`  
-For a **built-in engine** report, one dict per failing step, with keys `dataset`, `step`, `assertion`, `column`, `n_failed`, `n`, and `severity`.
-
-For a **CORE** report, one dict per (dataset, rule) with reported issues, with keys `dataset`, `rule_id`, `message`, [issues](../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) (count), and `status`.
-
-### rules()
-
-Return the per-rule run results.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1162-L1181)
-
-``` python
-rules(status=None)
-```
-
-For CORE reports, returns `CoreRuleResult` objects. For built-in engine reports, returns `NativeRuleResult` objects. For Validate-based reports, returns an empty list.
-
-#### Parameters
-
-`status: str | None = None`  
-Optional status filter. For CORE: e.g. `"SUCCESS"`, `"SKIPPED"`. For built-in engine reports: `"pass"`, `"fail"`, `"error"`, `"not_applicable"`, `"not_supported"`.
-
-### summary()
-
-Return a summary of the conformance run.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1023-L1075)
-
-``` python
-summary()
-```
-
-#### Returns
-
-`dict`  
-For a **built-in engine** report, a mapping of dataset name to a dict with keys `n_steps`, `n_steps_failed`, `n_failed` (failing test units), and `all_passed`.
-
-For a **CORE** report, a single dict with keys `standard`, `version`, `engine_version`, `n_rules`, [status_counts](../reference/Comparison.status_counts.md#pointblank.Comparison.status_counts) (rule counts by run status), `n_issues` (total reported issues), [n_datasets](../reference/ConformanceReport.md#pointblank.ConformanceReport.n_datasets), and `all_passed`.
+`Path`  
+The path written.
 
 ### to_excel()
 
@@ -381,26 +373,34 @@ The path written.
 `ImportError`  
 If `openpyxl` or `pandas` are not installed.
 
-### to_json()
+### from_core_report()
 
-Save the conformance report as a JSON file.
+Build a CORE-backed [ConformanceReport](../reference/ConformanceReport.md#pointblank.ConformanceReport) from a CDISC CORE JSON report.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1192-L1260)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L961-L988)
 
 ``` python
-to_json(path)
+from_core_report(
+    report,
+    package=None,
+    agency=None,
+)
 ```
-
-For CORE reports the output mirrors the original CORE JSON structure (`Conformance_Details`, `Dataset_Details`, `Issue_Summary`, `Issue_Details`, `Rules_Report`), making the file readable by anything that parses a standard CORE report. For built-in engine reports the file contains `summary` and [issues](../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) keys.
 
 #### Parameters
 
-`path: str | Path`  
-Destination path (including filename). Parent directories are created if needed.
+`report: dict | ParsedCoreReport`  
+Either a raw CORE JSON report (`dict`, as produced by `core validate -of JSON`) or an already-parsed `ParsedCoreReport`.
+
+`package: SubmissionPackage | None = None`  
+The [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage) the run was produced from, if any.
+
+`agency: str | None = None`  
+The agency rule-set selector used for the run.
 
 #### Returns
 
-`Path`  
-The path written.
+`ConformanceReport`  
+A report in CORE form ([is_core](../reference/ConformanceReport.md#pointblank.ConformanceReport.is_core) is `True`).

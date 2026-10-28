@@ -45,9 +45,15 @@ List of variable names that form the natural key.
 
 | Name | Description |
 |----|----|
+| [required_variables](#required_variables) | Get names of all required variables. |
 | [expected_variables](#expected_variables) | Get names of all expected (Exp core) variables. |
 | [identifier_variables](#identifier_variables) | Get names of all Identifier-role variables. |
-| [required_variables](#required_variables) | Get names of all required variables. |
+
+### required_variables
+
+Get names of all required variables.
+
+`required_variables: list[str]`
 
 ### expected_variables
 
@@ -60,12 +66,6 @@ Get names of all expected (Exp core) variables.
 Get names of all Identifier-role variables.
 
 `identifier_variables: list[str]`
-
-### required_variables
-
-Get names of all required variables.
-
-`required_variables: list[str]`
 
 ## Methods
 

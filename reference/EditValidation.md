@@ -86,13 +86,32 @@ plan = edited.accept()      # a Validate you can .interrogate()
 
 | Name | Description |
 |----|----|
-| [accept()](#accept) | Execute the revised plan and return the resulting [Validate](../reference/Validate.md#pointblank.Validate) object. |
-| [changed_steps()](#changed_steps) | Return a structured, step-level list of the changes between the plans. |
-| [diff()](#diff) | Return a unified textual diff of the original plan versus the revised plan. |
-| [from_plans()](#from_plans) | Build an [EditValidation](../reference/EditValidation.md#pointblank.EditValidation) from two known plans, without calling a model. |
 | [review()](#review) | Return a `great_tables` GT object summarizing the step-level changes. |
+| [accept()](#accept) | Execute the revised plan and return the resulting [Validate](../reference/Validate.md#pointblank.Validate) object. |
+| [diff()](#diff) | Return a unified textual diff of the original plan versus the revised plan. |
+| [changed_steps()](#changed_steps) | Return a structured, step-level list of the changes between the plans. |
 | [to_code()](#to_code) | Return the revised validation plan as Python code. |
 | [validate_syntax()](#validate_syntax) | Return whether the revised plan parses and uses only known validation methods. |
+| [from_plans()](#from_plans) | Build an [EditValidation](../reference/EditValidation.md#pointblank.EditValidation) from two known plans, without calling a model. |
+
+### review()
+
+Return a `great_tables` GT object summarizing the step-level changes.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L407-L456)
+
+``` python
+review()
+```
+
+This renders the added, removed, and modified steps side by side for quick human review before accepting the edit. It pairs with [`accept()`](../reference/EditValidation.md#pointblank.EditValidation.accept): review the change, then accept it.
+
+#### Returns
+
+`GT`  
+A `great_tables` table with one row per changed step.
 
 ### accept()
 
@@ -118,6 +137,18 @@ The data table to bind to the plan's `your_data` placeholder. If omitted, the `d
 `Validate`  
 The revised validation plan as a [Validate](../reference/Validate.md#pointblank.Validate) object.
 
+### diff()
+
+Return a unified textual diff of the original plan versus the revised plan.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L370-L385)
+
+``` python
+diff()
+```
+
 ### changed_steps()
 
 Return a structured, step-level list of the changes between the plans.
@@ -137,16 +168,28 @@ Unlike [`diff()`](../reference/EditValidation.md#pointblank.EditValidation.diff)
 `list[dict]`  
 One record per changed step, e.g. `[{"action": "modify", "method": "col_vals_gt", "old": "col_vals_gt(columns="d", " "value=100)", "new": "col_vals_gt(columns="d", value=50)"}]`.
 
-### diff()
+### to_code()
 
-Return a unified textual diff of the original plan versus the revised plan.
+Return the revised validation plan as Python code.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L370-L385)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L361-L363)
 
 ``` python
-diff()
+to_code()
+```
+
+### validate_syntax()
+
+Return whether the revised plan parses and uses only known validation methods.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L365-L368)
+
+``` python
+validate_syntax()
 ```
 
 ### from_plans()
@@ -193,47 +236,4 @@ v2 = pb.Validate(data=pb.load_dataset("small_table")).col_vals_gt(columns="d", v
 
 comparison = pb.EditValidation.from_plans(v1, v2)
 print(comparison.diff())
-```
-
-### review()
-
-Return a `great_tables` GT object summarizing the step-level changes.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L407-L456)
-
-``` python
-review()
-```
-
-This renders the added, removed, and modified steps side by side for quick human review before accepting the edit. It pairs with [`accept()`](../reference/EditValidation.md#pointblank.EditValidation.accept): review the change, then accept it.
-
-#### Returns
-
-`GT`  
-A `great_tables` table with one row per changed step.
-
-### to_code()
-
-Return the revised validation plan as Python code.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L361-L363)
-
-``` python
-to_code()
-```
-
-### validate_syntax()
-
-Return whether the revised plan parses and uses only known validation methods.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L365-L368)
-
-``` python
-validate_syntax()
 ```

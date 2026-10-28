@@ -91,11 +91,11 @@ Lazily imports the Define-XML document (via [`import_metadata()`](../reference/i
 | Name | Description |
 |----|----|
 | [from_folder()](#from_folder) | Build a [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage) by ingesting a folder of datasets. |
-| [get_dataset()](#get_dataset) | Get a dataset by name (case-insensitive). |
-| [orphan_ids()](#orphan_ids) | Find values of `column` in `child` that do not exist in `parent`. |
-| [subject_ids()](#subject_ids) | Get the set of `USUBJID` values in a dataset. |
-| [summary()](#summary) | Return a human-readable summary of the package contents. |
 | [validate_conformance()](#validate_conformance) | Validate CDISC conformance across the whole submission package. |
+| [get_dataset()](#get_dataset) | Get a dataset by name (case-insensitive). |
+| [subject_ids()](#subject_ids) | Get the set of `USUBJID` values in a dataset. |
+| [orphan_ids()](#orphan_ids) | Find values of `column` in `child` that do not exist in `parent`. |
+| [summary()](#summary) | Return a human-readable summary of the package contents. |
 
 ### from_folder()
 
@@ -142,101 +142,6 @@ Optional study identifier.
 
 `SubmissionPackage`  
 A package populated with the folder's datasets.
-
-### get_dataset()
-
-Get a dataset by name (case-insensitive).
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L306-L327)
-
-``` python
-get_dataset(name)
-```
-
-#### Parameters
-
-`name: str`  
-The dataset name / domain code.
-
-#### Returns
-
-`Any`  
-The dataset (DataFrame).
-
-#### Raises
-
-`KeyError`  
-If no dataset with that name exists.
-
-### orphan_ids()
-
-Find values of `column` in `child` that do not exist in `parent`.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L375-L397)
-
-``` python
-orphan_ids(
-    child,
-    parent="DM",
-    column="USUBJID",
-)
-```
-
-This is the referential-integrity operator: e.g., subjects appearing in a finding domain that have no corresponding record in DM.
-
-#### Parameters
-
-`child: str`  
-The referencing dataset (e.g., `"AE"`).
-
-`parent: str = "DM"`  
-The referenced dataset (e.g., `"DM"`). Defaults to `"DM"`.
-
-`column: str = "USUBJID"`  
-The key column to check. Defaults to `"USUBJID"`.
-
-#### Returns
-
-`set`  
-The set of orphaned values (present in `child.column` but not `parent.column`).
-
-### subject_ids()
-
-Get the set of `USUBJID` values in a dataset.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L355-L373)
-
-``` python
-subject_ids(dataset="DM")
-```
-
-#### Parameters
-
-`dataset: str = "DM"`  
-The dataset to read subject IDs from. Defaults to `"DM"` (the reference set of all enrolled subjects).
-
-#### Returns
-
-`set`  
-The set of non-null `USUBJID` values, or an empty set if the dataset or column is absent.
-
-### summary()
-
-Return a human-readable summary of the package contents.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L826-L837)
-
-``` python
-summary()
-```
 
 ### validate_conformance()
 
@@ -317,3 +222,98 @@ Optional agency rule-set selector (`"FDA"`, `"PMDA"`, or `None` for CDISC base r
 
 `ConformanceReport`  
 A built-in engine report (per-dataset validations) or a CORE-form report, depending on `engine`.
+
+### get_dataset()
+
+Get a dataset by name (case-insensitive).
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L306-L327)
+
+``` python
+get_dataset(name)
+```
+
+#### Parameters
+
+`name: str`  
+The dataset name / domain code.
+
+#### Returns
+
+`Any`  
+The dataset (DataFrame).
+
+#### Raises
+
+`KeyError`  
+If no dataset with that name exists.
+
+### subject_ids()
+
+Get the set of `USUBJID` values in a dataset.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L355-L373)
+
+``` python
+subject_ids(dataset="DM")
+```
+
+#### Parameters
+
+`dataset: str = "DM"`  
+The dataset to read subject IDs from. Defaults to `"DM"` (the reference set of all enrolled subjects).
+
+#### Returns
+
+`set`  
+The set of non-null `USUBJID` values, or an empty set if the dataset or column is absent.
+
+### orphan_ids()
+
+Find values of `column` in `child` that do not exist in `parent`.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L375-L397)
+
+``` python
+orphan_ids(
+    child,
+    parent="DM",
+    column="USUBJID",
+)
+```
+
+This is the referential-integrity operator: e.g., subjects appearing in a finding domain that have no corresponding record in DM.
+
+#### Parameters
+
+`child: str`  
+The referencing dataset (e.g., `"AE"`).
+
+`parent: str = "DM"`  
+The referenced dataset (e.g., `"DM"`). Defaults to `"DM"`.
+
+`column: str = "USUBJID"`  
+The key column to check. Defaults to `"USUBJID"`.
+
+#### Returns
+
+`set`  
+The set of orphaned values (present in `child.column` but not `parent.column`).
+
+### summary()
+
+Return a human-readable summary of the package contents.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L826-L837)
+
+``` python
+summary()
+```

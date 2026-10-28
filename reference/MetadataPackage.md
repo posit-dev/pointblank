@@ -37,8 +37,8 @@ Package/study version.
 |----|----|
 | [get_domain()](#get_domain) | Get metadata for a specific domain/dataset. |
 | [keys()](#keys) | Get the names of all datasets/domains. |
-| [summary()](#summary) | Return a human-readable summary of the package. |
 | [values()](#values) | Get all MetadataImport objects. |
+| [summary()](#summary) | Return a human-readable summary of the package. |
 
 ### get_domain()
 
@@ -79,6 +79,18 @@ Usage
 keys()
 ```
 
+### values()
+
+Get all MetadataImport objects.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L532-L534)
+
+``` python
+values()
+```
+
 ### summary()
 
 Return a human-readable summary of the package.
@@ -95,15 +107,3 @@ summary()
 
 `str`  
 Formatted summary string.
-
-### values()
-
-Get all MetadataImport objects.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L532-L534)
-
-``` python
-values()
-```

@@ -394,30 +394,30 @@ List all tables in a database from a connection string.
 
 Methods for the DataScan class
 
-[DataScan.summary_data](DataScan.summary_data.md#pointblank.DataScan.summary_data)  
-
 [DataScan.get_tabular_report()](DataScan.get_tabular_report.md#pointblank.DataScan.get_tabular_report)  
 
-[DataScan.to_dict()](DataScan.to_dict.md#pointblank.DataScan.to_dict)  
-Export the profile as a structured dictionary.
+[DataScan.summary_data](DataScan.summary_data.md#pointblank.DataScan.summary_data)  
 
-[DataScan.to_json()](DataScan.to_json.md#pointblank.DataScan.to_json)  
-Export the profile as a JSON string.
+[DataScan.compare()](DataScan.compare.md#pointblank.DataScan.compare)  
+Compare this scan against a baseline and return the differences.
 
 [DataScan.save_to_json()](DataScan.save_to_json.md#pointblank.DataScan.save_to_json)  
 Save the profile to a JSON file.
 
-[DataScan.from_dict()](DataScan.from_dict.md#pointblank.DataScan.from_dict)  
-Restore a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a dictionary.
+[DataScan.load_from_json()](DataScan.load_from_json.md#pointblank.DataScan.load_from_json)  
+Load a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a JSON file produced by [save_to_json()](../reference/DataScan.save_to_json.md#pointblank.DataScan.save_to_json).
+
+[DataScan.to_json()](DataScan.to_json.md#pointblank.DataScan.to_json)  
+Export the profile as a JSON string.
 
 [DataScan.from_json()](DataScan.from_json.md#pointblank.DataScan.from_json)  
 Restore a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a JSON string.
 
-[DataScan.load_from_json()](DataScan.load_from_json.md#pointblank.DataScan.load_from_json)  
-Load a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a JSON file produced by [save_to_json()](../reference/DataScan.save_to_json.md#pointblank.DataScan.save_to_json).
+[DataScan.to_dict()](DataScan.to_dict.md#pointblank.DataScan.to_dict)  
+Export the profile as a structured dictionary.
 
-[DataScan.compare()](DataScan.compare.md#pointblank.DataScan.compare)  
-Compare this scan against a baseline and return the differences.
+[DataScan.from_dict()](DataScan.from_dict.md#pointblank.DataScan.from_dict)  
+Restore a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a dictionary.
 
 ## Table Comparison
 
@@ -436,11 +436,17 @@ Differences between the schemas of the source and target tables.
 
 Methods for the Comparison class
 
-[Comparison.n](Comparison.n.md#pointblank.Comparison.n)  
-The number of test units (aligned rows).
+[Comparison.identical](Comparison.identical.md#pointblank.Comparison.identical)  
+`True` if the tables match under the comparison settings.
 
 [Comparison.schema_ok](Comparison.schema_ok.md#pointblank.Comparison.schema_ok)  
 `True` if the schemas match, or if schema differences are tolerated (`"common"`).
+
+[Comparison.status_counts](Comparison.status_counts.md#pointblank.Comparison.status_counts)  
+The number of test units with each row status.
+
+[Comparison.n](Comparison.n.md#pointblank.Comparison.n)  
+The number of test units (aligned rows).
 
 [Comparison.n_passed](Comparison.n_passed.md#pointblank.Comparison.n_passed)  
 Test units that pass: matching rows (none, if the schema check fails).
@@ -448,30 +454,20 @@ Test units that pass: matching rows (none, if the schema check fails).
 [Comparison.n_failed](Comparison.n_failed.md#pointblank.Comparison.n_failed)  
 Test units that fail: all non-matching rows (all rows, if the schema check fails).
 
-[Comparison.identical](Comparison.identical.md#pointblank.Comparison.identical)  
-`True` if the tables match under the comparison settings.
-
-[Comparison.status_counts](Comparison.status_counts.md#pointblank.Comparison.status_counts)  
-The number of test units with each row status.
-
-[Comparison.\_\_bool\_\_()](Comparison.__bool__.md#pointblank.Comparison.__bool__)  
-
-[Comparison.\_\_repr\_\_()](Comparison.__repr__.md#pointblank.Comparison.__repr__)  
-
 [Comparison.rows()](Comparison.rows.md#pointblank.Comparison.rows)  
 Get a sample of rows with a given status.
 
 [Comparison.column_summary()](Comparison.column_summary.md#pointblank.Comparison.column_summary)  
 Get a per-column summary of value mismatches.
 
+[Comparison.get_tabular_report()](Comparison.get_tabular_report.md#pointblank.Comparison.get_tabular_report)  
+Get a tabular report of the comparison.
+
 [Comparison.to_dict()](Comparison.to_dict.md#pointblank.Comparison.to_dict)  
 Get the comparison results as a JSON-serializable dict.
 
 [Comparison.to_json()](Comparison.to_json.md#pointblank.Comparison.to_json)  
 Get the comparison results as a JSON string.
-
-[Comparison.get_tabular_report()](Comparison.get_tabular_report.md#pointblank.Comparison.get_tabular_report)  
-Get a tabular report of the comparison.
 
 ## Table Pre-checks
 

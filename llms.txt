@@ -172,15 +172,15 @@
 #### DataScan Methods
 > Methods for the DataScan class
 
-- [DataScan.summary_data](https://posit-dev.github.io/pointblank/reference/DataScan.summary_data.html)
 - [DataScan.get_tabular_report](https://posit-dev.github.io/pointblank/reference/DataScan.get_tabular_report.html)
-- [DataScan.to_dict](https://posit-dev.github.io/pointblank/reference/DataScan.to_dict.html)
-- [DataScan.to_json](https://posit-dev.github.io/pointblank/reference/DataScan.to_json.html)
-- [DataScan.save_to_json](https://posit-dev.github.io/pointblank/reference/DataScan.save_to_json.html)
-- [DataScan.from_dict](https://posit-dev.github.io/pointblank/reference/DataScan.from_dict.html)
-- [DataScan.from_json](https://posit-dev.github.io/pointblank/reference/DataScan.from_json.html)
-- [DataScan.load_from_json](https://posit-dev.github.io/pointblank/reference/DataScan.load_from_json.html)
+- [DataScan.summary_data](https://posit-dev.github.io/pointblank/reference/DataScan.summary_data.html)
 - [DataScan.compare](https://posit-dev.github.io/pointblank/reference/DataScan.compare.html)
+- [DataScan.save_to_json](https://posit-dev.github.io/pointblank/reference/DataScan.save_to_json.html)
+- [DataScan.load_from_json](https://posit-dev.github.io/pointblank/reference/DataScan.load_from_json.html)
+- [DataScan.to_json](https://posit-dev.github.io/pointblank/reference/DataScan.to_json.html)
+- [DataScan.from_json](https://posit-dev.github.io/pointblank/reference/DataScan.from_json.html)
+- [DataScan.to_dict](https://posit-dev.github.io/pointblank/reference/DataScan.to_dict.html)
+- [DataScan.from_dict](https://posit-dev.github.io/pointblank/reference/DataScan.from_dict.html)
 
 #### Table Comparison
 > Compare two tables row by row. `compare()` aligns the rows of a source and a target table (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus schema differences. The result is a `Comparison` object with counts, row samples, and a tabular report. The same comparison is available as a validation step through `Validate.tbl_match()`, and `Validate.tbl_reconcile()` compares aggregates (e.g., totals per group) instead of rows.
@@ -193,19 +193,17 @@
 #### Comparison Methods
 > Methods for the Comparison class
 
-- [Comparison.n](https://posit-dev.github.io/pointblank/reference/Comparison.n.html)
+- [Comparison.identical](https://posit-dev.github.io/pointblank/reference/Comparison.identical.html)
 - [Comparison.schema_ok](https://posit-dev.github.io/pointblank/reference/Comparison.schema_ok.html)
+- [Comparison.status_counts](https://posit-dev.github.io/pointblank/reference/Comparison.status_counts.html)
+- [Comparison.n](https://posit-dev.github.io/pointblank/reference/Comparison.n.html)
 - [Comparison.n_passed](https://posit-dev.github.io/pointblank/reference/Comparison.n_passed.html)
 - [Comparison.n_failed](https://posit-dev.github.io/pointblank/reference/Comparison.n_failed.html)
-- [Comparison.identical](https://posit-dev.github.io/pointblank/reference/Comparison.identical.html)
-- [Comparison.status_counts](https://posit-dev.github.io/pointblank/reference/Comparison.status_counts.html)
-- [Comparison.__bool__](https://posit-dev.github.io/pointblank/reference/Comparison.__bool__.html)
-- [Comparison.__repr__](https://posit-dev.github.io/pointblank/reference/Comparison.__repr__.html)
 - [Comparison.rows](https://posit-dev.github.io/pointblank/reference/Comparison.rows.html)
 - [Comparison.column_summary](https://posit-dev.github.io/pointblank/reference/Comparison.column_summary.html)
+- [Comparison.get_tabular_report](https://posit-dev.github.io/pointblank/reference/Comparison.get_tabular_report.html)
 - [Comparison.to_dict](https://posit-dev.github.io/pointblank/reference/Comparison.to_dict.html)
 - [Comparison.to_json](https://posit-dev.github.io/pointblank/reference/Comparison.to_json.html)
-- [Comparison.get_tabular_report](https://posit-dev.github.io/pointblank/reference/Comparison.get_tabular_report.html)
 
 #### Table Pre-checks
 > Helper functions for use with the `active=` parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.

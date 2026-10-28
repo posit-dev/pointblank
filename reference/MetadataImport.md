@@ -79,39 +79,61 @@ Get the list of all variable names.
 
 | Name | Description |
 |----|----|
-| [get_codelist()](#get_codelist) | Get a specific codelist by name. |
+| [to_validate()](#to_validate) | Generate a [Validate](../reference/Validate.md#pointblank.Validate) workflow from the imported metadata. |
+| [to_schema()](#to_schema) | Convert imported metadata to a Pointblank [Schema](../reference/Schema.md#pointblank.Schema) with `Field` objects. |
 | [get_variable()](#get_variable) | Get metadata for a specific variable by name. |
+| [get_codelist()](#get_codelist) | Get a specific codelist by name. |
 | [missing_specs()](#missing_specs) | Auto-generate [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) objects for all variables. |
 | [summary()](#summary) | Return a human-readable summary of the imported metadata. |
-| [to_schema()](#to_schema) | Convert imported metadata to a Pointblank [Schema](../reference/Schema.md#pointblank.Schema) with `Field` objects. |
-| [to_validate()](#to_validate) | Generate a [Validate](../reference/Validate.md#pointblank.Validate) workflow from the imported metadata. |
 
-### get_codelist()
+### to_validate()
 
-Get a specific codelist by name.
+Generate a [Validate](../reference/Validate.md#pointblank.Validate) workflow from the imported metadata.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L406-L426)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L328-L348)
 
 ``` python
-get_codelist(name)
+to_validate(
+    data,
+    **kwargs,
+)
 ```
+
+Creates validation steps for all constraints found in the metadata: value ranges, allowed values, required fields, string lengths, etc.
 
 #### Parameters
 
-`name: str`  
-The codelist name or identifier.
+`data: Any`  
+The DataFrame or table to validate.
+
+`**kwargs: Any`  
+Additional keyword arguments passed to the [Validate](../reference/Validate.md#pointblank.Validate) constructor.
 
 #### Returns
 
-`Codelist`  
-The requested codelist.
+`Validate`  
+A configured (but not yet interrogated) [Validate](../reference/Validate.md#pointblank.Validate) object.
 
-#### Raises
+### to_schema()
 
-`KeyError`  
-If no codelist with that name exists.
+Convert imported metadata to a Pointblank [Schema](../reference/Schema.md#pointblank.Schema) with `Field` objects.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L313-L326)
+
+``` python
+to_schema()
+```
+
+Maps variable metadata to appropriate `Field` types with constraints (min/max, allowed values, nullable, etc.).
+
+#### Returns
+
+`Schema`  
+A Pointblank [Schema](../reference/Schema.md#pointblank.Schema) object with typed fields.
 
 ### get_variable()
 
@@ -139,6 +161,33 @@ The metadata for the named variable.
 
 `KeyError`  
 If no variable with that name exists.
+
+### get_codelist()
+
+Get a specific codelist by name.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L406-L426)
+
+``` python
+get_codelist(name)
+```
+
+#### Parameters
+
+`name: str`  
+The codelist name or identifier.
+
+#### Returns
+
+`Codelist`  
+The requested codelist.
+
+#### Raises
+
+`KeyError`  
+If no codelist with that name exists.
 
 ### missing_specs()
 
@@ -187,52 +236,3 @@ summary()
 
 `str`  
 Formatted summary string.
-
-### to_schema()
-
-Convert imported metadata to a Pointblank [Schema](../reference/Schema.md#pointblank.Schema) with `Field` objects.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L313-L326)
-
-``` python
-to_schema()
-```
-
-Maps variable metadata to appropriate `Field` types with constraints (min/max, allowed values, nullable, etc.).
-
-#### Returns
-
-`Schema`  
-A Pointblank [Schema](../reference/Schema.md#pointblank.Schema) object with typed fields.
-
-### to_validate()
-
-Generate a [Validate](../reference/Validate.md#pointblank.Validate) workflow from the imported metadata.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L328-L348)
-
-``` python
-to_validate(
-    data,
-    **kwargs,
-)
-```
-
-Creates validation steps for all constraints found in the metadata: value ranges, allowed values, required fields, string lengths, etc.
-
-#### Parameters
-
-`data: Any`  
-The DataFrame or table to validate.
-
-`**kwargs: Any`  
-Additional keyword arguments passed to the [Validate](../reference/Validate.md#pointblank.Validate) constructor.
-
-#### Returns
-
-`Validate`  
-A configured (but not yet interrogated) [Validate](../reference/Validate.md#pointblank.Validate) object.

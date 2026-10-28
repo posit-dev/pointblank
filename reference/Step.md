@@ -42,8 +42,25 @@ step = pb.Step("col_vals_regex", columns="email", pattern=r"^[^@]+@[^@]+\.[^@]+$
 
 | Name | Description |
 |----|----|
-| [from_dict()](#from_dict) | Construct a Step from a dictionary (e.g., parsed from YAML). |
 | [to_dict()](#to_dict) | Serialize the Step to a dictionary for YAML/JSON export. |
+| [from_dict()](#from_dict) | Construct a Step from a dictionary (e.g., parsed from YAML). |
+
+### to_dict()
+
+Serialize the Step to a dictionary for YAML/JSON export.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L64-L74)
+
+``` python
+to_dict()
+```
+
+#### Returns
+
+`dict`  
+A dictionary representation of this step.
 
 ### from_dict()
 
@@ -66,20 +83,3 @@ A dictionary with a single key (the method name) mapping to its kwargs dict.
 
 `Step`  
 A new Step instance.
-
-### to_dict()
-
-Serialize the Step to a dictionary for YAML/JSON export.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L64-L74)
-
-``` python
-to_dict()
-```
-
-#### Returns
-
-`dict`  
-A dictionary representation of this step.

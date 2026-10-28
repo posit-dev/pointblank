@@ -31,8 +31,8 @@ Whether this adapter supports exporting to the format.
 | Name | Description |
 |----|----|
 | [detect()](#detect) | Return True if this adapter can handle the given source. |
-| [export_contract()](#export_contract) | Export to the external format. |
 | [import_contract()](#import_contract) | Import from the external format. |
+| [export_contract()](#export_contract) | Export to the external format. |
 
 ### detect()
 
@@ -55,6 +55,34 @@ A file path string, dict, or Python object to inspect.
 
 `bool`  
 True if this adapter can handle the source.
+
+### import_contract()
+
+Import from the external format.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L270-L285)
+
+``` python
+import_contract(
+    source,
+    **kwargs,
+)
+```
+
+#### Parameters
+
+`source: Any`  
+The source to import from (file path, dict, or Python object).
+
+`**kwargs: Any`  
+Format-specific options.
+
+#### Returns
+
+`ContractImport`  
+The import result with columns, constraints, and metadata.
 
 ### export_contract()
 
@@ -87,31 +115,3 @@ Format-specific options.
 
 `str | dict`  
 The exported content (string or dict), also written to file if destination given.
-
-### import_contract()
-
-Import from the external format.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L270-L285)
-
-``` python
-import_contract(
-    source,
-    **kwargs,
-)
-```
-
-#### Parameters
-
-`source: Any`  
-The source to import from (file path, dict, or Python object).
-
-`**kwargs: Any`  
-Format-specific options.
-
-#### Returns
-
-`ContractImport`  
-The import result with columns, constraints, and metadata.

@@ -43,26 +43,26 @@ Whether additional values beyond the codelist are allowed.
 
 | Name | Description |
 |----|----|
-| [extended_values()](#extended_values) | Get the values that extend an extensible codelist (sponsor extensions). |
-| [to_dict()](#to_dict) | Get a value → label mapping. |
 | [to_set()](#to_set) | Get the list of valid values (for col_vals_in_set). |
+| [to_dict()](#to_dict) | Get a value → label mapping. |
+| [extended_values()](#extended_values) | Get the values that extend an extensible codelist (sponsor extensions). |
 
-### extended_values()
+### to_set()
 
-Get the values that extend an extensible codelist (sponsor extensions).
+Get the list of valid values (for col_vals_in_set).
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L90-L99)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L80-L88)
 
 ``` python
-extended_values()
+to_set()
 ```
 
 #### Returns
 
 `list`  
-The values of the entries marked as extended (e.g., with `def:ExtendedValue="Yes"` in Define-XML).
+All non-deprecated values in the codelist.
 
 ### to_dict()
 
@@ -81,19 +81,19 @@ to_dict()
 `dict`  
 Mapping of value to human-readable label.
 
-### to_set()
+### extended_values()
 
-Get the list of valid values (for col_vals_in_set).
+Get the values that extend an extensible codelist (sponsor extensions).
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L80-L88)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L90-L99)
 
 ``` python
-to_set()
+extended_values()
 ```
 
 #### Returns
 
 `list`  
-All non-deprecated values in the codelist.
+The values of the entries marked as extended (e.g., with `def:ExtendedValue="Yes"` in Define-XML).

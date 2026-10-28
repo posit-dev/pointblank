@@ -4,7 +4,7 @@ Get the comparison results as a JSON-serializable dict.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L1424-L1467)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L1425-L1468)
 
 ``` python
 Comparison.to_dict(

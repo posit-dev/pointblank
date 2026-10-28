@@ -51,28 +51,39 @@ Fraction of source constraints successfully mapped (`0.0` to `1.0`).
 
 | Name | Description |
 |----|----|
-| [summary()](#summary) | Return a human-readable summary of what was imported. |
+| [to_validate()](#to_validate) | Build a Validate object from the imported contract. |
 | [to_contract()](#to_contract) | Build a Contract object from the imported data. |
 | [to_python()](#to_python) | Generate Python code string for the validation workflow. |
-| [to_validate()](#to_validate) | Build a Validate object from the imported contract. |
 | [to_yaml()](#to_yaml) | Generate Pointblank YAML configuration string. |
+| [summary()](#summary) | Return a human-readable summary of what was imported. |
 
-### summary()
+### to_validate()
 
-Return a human-readable summary of what was imported.
+Build a Validate object from the imported contract.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L195-L221)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L70-L104)
 
 ``` python
-summary()
+to_validate(
+    data,
+    **kwargs,
+)
 ```
+
+#### Parameters
+
+`data: Any`  
+The data table to validate.
+
+`**kwargs: Any`  
+Additional keyword arguments passed to the Validate constructor.
 
 #### Returns
 
-`str`  
-A formatted summary string.
+`Validate`  
+A Validate object with all imported checks applied (not yet interrogated).
 
 ### to_contract()
 
@@ -119,34 +130,6 @@ to_python()
 `str`  
 Python source code that recreates the validation.
 
-### to_validate()
-
-Build a Validate object from the imported contract.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L70-L104)
-
-``` python
-to_validate(
-    data,
-    **kwargs,
-)
-```
-
-#### Parameters
-
-`data: Any`  
-The data table to validate.
-
-`**kwargs: Any`  
-Additional keyword arguments passed to the Validate constructor.
-
-#### Returns
-
-`Validate`  
-A Validate object with all imported checks applied (not yet interrogated).
-
 ### to_yaml()
 
 Generate Pointblank YAML configuration string.
@@ -163,3 +146,20 @@ to_yaml()
 
 `str`  
 YAML representation of the validation.
+
+### summary()
+
+Return a human-readable summary of what was imported.
+
+Usage
+
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L195-L221)
+
+``` python
+summary()
+```
+
+#### Returns
+
+`str`  
+A formatted summary string.
