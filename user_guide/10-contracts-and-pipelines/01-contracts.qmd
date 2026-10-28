@@ -134,8 +134,9 @@ reconstructed anywhere. The `method` field corresponds directly to a validation 
 
 ### Available Methods
 
-Any validation method from the `Validate` class can be used in a Step. Here are the most common
-ones for contract definitions:
+A Step can use most of the core validation methods of the `Validate` class (the full list is in the
+[`Contract`](`Contract`) reference). A Step that names any other method is rejected when the
+contract is created. Here are the most common ones for contract definitions:
 
 | Method | Purpose |
 |--------|---------|
