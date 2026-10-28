@@ -284,6 +284,8 @@ reference:
             - detect
             - import_contract
             - export_contract
+        - name: adapters.MappedConstraint
+          members: false
 
     - title: Validation Steps
       desc: >
