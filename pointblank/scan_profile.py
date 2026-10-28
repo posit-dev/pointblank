@@ -12,6 +12,7 @@ from narwhals.dataframe import DataFrame
 from narwhals.dependencies import is_narwhals_lazyframe
 
 from pointblank._constants import SVG_ICONS_FOR_DATA_TYPES
+from pointblank._interrogation import _string_expr
 from pointblank._utils import transpose_dicts
 from pointblank.scan_profile_stats import (
     FreqStat,
@@ -186,7 +187,13 @@ class _StringProfile(ColumnProfile):
     _type: _TypeMap = _TypeMap.STRING
 
     def calc_stats(self, data: Frame) -> None:
-        str_data = data.select(nw.all().cast(nw.String).str.len_chars())
+        # `_string_expr()` casts only Categorical and Enum columns, keeping missing values missing
+        # (a plain cast turns them into "None" or "nan" on pandas with Narwhals < 2.27)
+        str_data = data.select(_string_expr(data, self.colname).str.len_chars().alias(self.colname))
+        if not str_data.collect_schema()[self.colname].is_numeric():
+            # With Narwhals < 2.27, the lengths of an all-missing pandas `object` column are left
+            # as `object` (the old cast made them "None", 4 characters each)
+            str_data = str_data.with_columns(nw.col(self.colname).cast(nw.Float64))
 
         # TODO: We should get an FreqStat here; estimate cardinality first
 
