@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 from importlib import import_module
 from pathlib import Path
@@ -1563,6 +1564,27 @@ def validate_yaml(yaml: Union[str, Path]) -> None:
     return None
 
 
+def _data_source_code(spec: str, df_library: str) -> tuple[str, str | None]:
+    """
+    Python code that loads a `tbl:` or `reference:` data source as `yaml_interrogate()` does.
+
+    Follows `YAMLValidator._load_data_source()` without reading anything: a CSV file is read with
+    `df_library`, other paths, globs, URLs and connection strings are passed to `Validate` as
+    strings (which it loads in the same way), and a bare name is a `load_dataset()` dataset.
+    Returns the code and the import alias it needs (`"pl"`, `"pd"` or `None`).
+    """
+    is_dataset_name = re.fullmatch(r"[A-Za-z_]\w*", spec) is not None and not Path(spec).exists()
+    if is_dataset_name:
+        return f'pb.load_dataset("{spec}", tbl_type="{df_library}")', None
+    quoted = json.dumps(spec)
+    if spec.endswith(".csv") and "://" not in spec:
+        if df_library == "polars":
+            return f"pl.read_csv({quoted})", "pl"
+        if df_library == "pandas":
+            return f"pd.read_csv({quoted})", "pd"
+    return quoted, None
+
+
 def yaml_to_python(yaml: Union[str, Path]) -> str:
     """Convert YAML validation configuration to equivalent Python code.
 
@@ -1654,6 +1676,11 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
 
     The generated code includes all configuration parameters, thresholds, and maintains the exact
     same validation logic as the original YAML workflow.
+
+    The `tbl` and `reference` data sources are loaded as `yaml_interrogate()` loads them: a
+    dataset name becomes a `pb.load_dataset()` call, a CSV file is read with the `df_library`
+    library (e.g., `pl.read_csv()`), and other file paths and connection strings are passed to
+    `Validate` as strings.
 
     Governance metadata (`owner`, `consumers`, `version`) and `reference` are also rendered
     in the generated Python code:
@@ -1785,12 +1812,10 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
     if original_tbl_expression:
         validate_args.append(f"data={original_tbl_expression}")
     elif isinstance(tbl_spec, str):
-        if tbl_spec.endswith((".csv", ".parquet")):
-            # File loading
-            validate_args.append(f'data=pb.load_dataset("{tbl_spec}", tbl_type="{df_library}")')
-        else:
-            # Dataset loading
-            validate_args.append(f'data=pb.load_dataset("{tbl_spec}", tbl_type="{df_library}")')
+        tbl_code, tbl_import = _data_source_code(tbl_spec, df_library)
+        validate_args.append(f"data={tbl_code}")
+        needs_polars_import = needs_polars_import or tbl_import == "pl"
+        needs_pandas_import = needs_pandas_import or tbl_import == "pd"
     else:
         # Fallback to placeholder if we couldn't extract the original expression
         validate_args.append("data=<python_expression_result>")  # pragma: no cover
@@ -1871,14 +1896,10 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
         if original_reference_expression:
             validate_args.append(f"reference={original_reference_expression}")
         elif isinstance(ref_spec, str):
-            if ref_spec.endswith((".csv", ".parquet")):
-                validate_args.append(
-                    f'reference=pb.load_dataset("{ref_spec}", tbl_type="{df_library}")'
-                )
-            else:
-                validate_args.append(
-                    f'reference=pb.load_dataset("{ref_spec}", tbl_type="{df_library}")'
-                )
+            ref_code, ref_import = _data_source_code(ref_spec, df_library)
+            validate_args.append(f"reference={ref_code}")
+            needs_polars_import = needs_polars_import or ref_import == "pl"
+            needs_pandas_import = needs_pandas_import or ref_import == "pd"
 
     # Create the `pb.Validate()` call
     if len(validate_args) == 1:
