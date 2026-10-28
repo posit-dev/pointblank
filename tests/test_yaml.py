@@ -3492,7 +3492,9 @@ def test_yaml_to_python_file_loading_csv():
     """
 
     result = yaml_to_python(yaml_content)
-    assert 'pb.load_dataset("test_data.csv"' in result
+    assert 'data=pl.read_csv("test_data.csv")' in result
+    assert "import polars as pl" in result
+    assert "load_dataset" not in result
 
 
 def test_yaml_to_python_file_loading_parquet():
@@ -3504,7 +3506,80 @@ def test_yaml_to_python_file_loading_parquet():
     """
 
     result = yaml_to_python(yaml_content)
-    assert 'pb.load_dataset("test_data.parquet"' in result
+    assert 'data="test_data.parquet"' in result
+    assert "load_dataset" not in result
+
+
+@pytest.mark.parametrize("df_library", ["polars", "pandas"])
+@pytest.mark.parametrize("source", ["csv", "parquet", "duckdb"])
+def test_yaml_to_python_data_sources_run(tmp_path, source, df_library):
+    # File paths and connection strings in `tbl:` and `reference:` give code that loads them as
+    # `yaml_interrogate()` does (they used to become `pb.load_dataset("<path>")`, which fails)
+    import polars as pl
+
+    tbl = pl.DataFrame({"a": [1, 2, 3]})
+    if source == "csv":
+        tbl.write_csv(tmp_path / "tbl.csv")
+        tbl_spec = str(tmp_path / "tbl.csv")
+    elif source == "parquet":
+        tbl.write_parquet(tmp_path / "tbl.parquet")
+        tbl_spec = str(tmp_path / "tbl.parquet")
+    else:
+        import duckdb
+
+        con = duckdb.connect(str(tmp_path / "tbl.ddb"))
+        con.execute("CREATE TABLE tbl AS SELECT * FROM (VALUES (1), (2), (3)) AS v(a)")
+        con.close()
+        tbl_spec = f"duckdb:///{tmp_path / 'tbl.ddb'}::tbl"
+    pl.DataFrame({"a": [1, 2, 4]}).write_csv(tmp_path / "ref.csv")
+
+    yaml_content = f"""
+    tbl: {tbl_spec}
+    df_library: {df_library}
+    reference: {tmp_path / "ref.csv"}
+    steps:
+    - col_sum_eq:
+        columns: a
+        value:
+          python: pb.ref("a")
+    - col_vals_gt:
+        columns: a
+        value: 1
+    """
+
+    rebuilt = _exec_yaml_to_python(yaml_content)
+    expected = yaml_interrogate(yaml_content).n_failed(scalar=False)
+    assert expected == {1: 1, 2: 1}
+    assert rebuilt.n_failed(scalar=False) == expected
+
+
+@pytest.mark.parametrize(
+    "spec, df_library, expected",
+    [
+        ("small_table", "pandas", ('pb.load_dataset("small_table", tbl_type="pandas")', None)),
+        ("data/t.csv", "polars", ('pl.read_csv("data/t.csv")', "pl")),
+        ("data/t.csv", "pandas", ('pd.read_csv("data/t.csv")', "pd")),
+        # DuckDB reads a CSV path itself, as `yaml_interrogate()` does
+        ("data/t.csv", "duckdb", ('"data/t.csv"', None)),
+        ("https://example.com/t.csv", "polars", ('"https://example.com/t.csv"', None)),
+        ("data/*.parquet", "polars", ('"data/*.parquet"', None)),
+        ("duckdb:///f.ddb::t", "polars", ('"duckdb:///f.ddb::t"', None)),
+        ("C:\\data\\t.parquet", "polars", ('"C:\\\\data\\\\t.parquet"', None)),
+    ],
+)
+def test_data_source_code(spec, df_library, expected):
+    from pointblank.yaml import _data_source_code
+
+    assert _data_source_code(spec, df_library) == expected
+
+
+def test_data_source_code_existing_directory_is_a_path(tmp_path, monkeypatch):
+    # A bare name that exists on disk (e.g., a directory of Parquet files) is a path, not a dataset
+    from pointblank.yaml import _data_source_code
+
+    (tmp_path / "parts").mkdir()
+    monkeypatch.chdir(tmp_path)
+    assert _data_source_code("parts", "polars") == ('"parts"', None)
 
 
 def test_yaml_to_python_with_lang():
