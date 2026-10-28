@@ -47,7 +47,7 @@ that each key's rows from both files land in the same chunk. That's a lot of cod
 
 ## How Pointblank Approaches It
 
-Three things make `compare()` suitable for large files:
+Three things make [`compare()`](`pointblank.compare`) suitable for large files:
 
 1. **Files are scanned, not loaded.** CSV and Parquet paths are read lazily (with Polars, or
    DuckDB), so the comparison is a query plan rather than two DataFrames in memory.

@@ -114,8 +114,9 @@ scan = pb.DataScan(data=small_table, tbl_name="small_table")
 ```
 
 The `DataScan` object computes the same column-level statistics shown in the summary table. You can
-access the profile as a dictionary with `to_dict()`, export it as JSON with `to_json()`, or render
-the same tabular report with `get_tabular_report()`.
+access the profile as a dictionary with [`to_dict()`](`DataScan.to_dict`), export it as JSON with
+[`to_json()`](`DataScan.to_json`), or render the same tabular report with
+[`get_tabular_report()`](`DataScan.get_tabular_report`).
 
 ## Saving and Loading Profiles
 
@@ -136,15 +137,16 @@ loaded = pb.DataScan.load_from_json("small_table_profile.json")
 os.remove("small_table_profile.json")
 ```
 
-The `from_json()` classmethod works with JSON strings directly, and `from_dict()` accepts the
-dictionary format produced by `to_dict()`. All three approaches produce a fully restored `DataScan`
-that retains the column names, types, statistics, and sample data from the original scan.
+The `from_json()` classmethod works with JSON strings directly, and
+[`from_dict()`](`DataScan.from_dict`) accepts the dictionary format produced by `to_dict()`. All
+three approaches produce a fully restored `DataScan` that retains the column names, types,
+statistics, and sample data from the original scan.
 
 ## Comparing Profiles for Drift
 
 When your data changes over time, you can compare two `DataScan` profiles to detect drift. The
-`compare()` method identifies schema changes (columns added, removed, or with changed types) and
-statistical shifts in common columns.
+[`compare()`](`DataScan.compare`) method identifies schema changes (columns added, removed, or with
+changed types) and statistical shifts in common columns.
 
 ```{python}
 import polars as pl
@@ -178,8 +180,8 @@ print("Columns added:", diff.columns_added)
 print("Row count (baseline vs current):", diff.row_count_diff)
 ```
 
-You can also get the full comparison as a dictionary with `to_dict()`, or view it as a styled
-report:
+You can also get the full comparison as a dictionary with [`to_dict()`](`DataScanDiff.to_dict`), or
+view it as a styled report:
 
 ```{python}
 diff.get_tabular_report()
@@ -229,7 +231,7 @@ diff = current.compare(baseline)
 diff.get_tabular_report()
 ```
 
-The drift scores are also available programmatically through `to_dict()`:
+The drift scores are also available programmatically through [`to_dict()`](`DataScanDiff.to_dict`):
 
 ```{python}
 drift = diff.to_dict().get("drift_scores", {})

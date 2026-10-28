@@ -16,10 +16,11 @@ Frictionless Table Schemas for open data, dbt `schema.yml` files for analytics p
 data contracts for cross-team governance. Rather than manually rewriting these specifications as
 Pointblank validation steps, you can **import** them directly.
 
-The `import_contract()` function reads an external schema definition and produces a `ContractImport`
-object containing everything Pointblank needs to validate data: column types, constraints, and
-mapped validation steps. From there you can create a `Validate` workflow, a `Contract` object,
-generate equivalent Python code, or produce a YAML definition, all with a single function call.
+The [`import_contract()`](`pointblank.import_contract`) function reads an external schema definition
+and produces a `ContractImport` object containing everything Pointblank needs to validate data:
+column types, constraints, and mapped validation steps. From there you can create a `Validate`
+workflow, a `Contract` object, generate equivalent Python code, or produce a YAML definition, all
+with a single function call.
 
 ## Quick Start
 
@@ -573,7 +574,7 @@ files rather than Python code.
 ## Exporting Contracts
 
 The reverse operation (taking a Pointblank `Contract` or `Validate` object and writing it out in
-an external format) is handled by `export_contract()`:
+an external format) is handled by [`export_contract()`](`pointblank.export_contract`):
 
 ```{python}
 # Create a contract

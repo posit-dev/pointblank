@@ -441,16 +441,18 @@ report = ConformanceReport.from_core_report(raw, agency="FDA")
 print(report)
 ```
 
-**Overall result.** `all_passed()` returns `True` when no rules reported issues; `is_core`
-confirms the report originated from the CORE engine rather than the built-in engine:
+**Overall result.** [`all_passed()`](`ConformanceReport.all_passed`) returns `True` when no rules
+reported issues; `is_core` confirms the report originated from the CORE engine rather than the
+built-in engine:
 
 ```{python}
 print("All passed:", report.all_passed())
 print("Is CORE report:", report.is_core)
 ```
 
-**Summary dictionary.** `summary()` returns run provenance and rule counts as a plain dictionary,
-useful for logging, assertions in CI scripts, or building a custom status page:
+**Summary dictionary.** [`summary()`](`ConformanceReport.summary`) returns run provenance and rule
+counts as a plain dictionary, useful for logging, assertions in CI scripts, or building a custom
+status page:
 
 ```{python}
 s = report.summary()
@@ -546,8 +548,8 @@ output, and Excel for spreadsheet-based review workflows.
 
 ### JSON
 
-`to_json()` saves the report as a JSON file. For CORE reports the structure mirrors CORE's native
-output and is parseable by `parse_core_report()`:
+[`to_json()`](`ConformanceReport.to_json`) saves the report as a JSON file. For CORE reports the
+structure mirrors CORE's native output and is parseable by `parse_core_report()`:
 
 ```{python}
 import tempfile

@@ -23,8 +23,9 @@ data you expect) and a *target* table (the data you want to check), and you want
 - which records have values that differ, and in which columns
 - whether the columns themselves (names, types, order) changed
 
-Pointblank answers all of these with the `compare()` function, and the same comparison is available
-as a validation step through `Validate.tbl_match()` and on the command line through `pb compare`.
+Pointblank answers all of these with the [`compare()`](`pointblank.compare`) function, and the same
+comparison is available as a validation step through `Validate.tbl_match()` and on the command line
+through `pb compare`.
 
 ## A First Comparison
 
@@ -293,9 +294,10 @@ of their own, which is matched with the other table's null-key group.
 
 ## Exporting the Results
 
-The results can be serialized with `to_dict()` or `to_json()`, which include the counts, the schema
-differences, and (by default) samples of the differing rows. If the data could contain sensitive
-values, leave the samples out:
+The results can be serialized with [`to_dict()`](`Comparison.to_dict`) or
+[`to_json()`](`Comparison.to_json`), which include the counts, the schema differences, and (by
+default) samples of the differing rows. If the data could contain sensitive values, leave the
+samples out:
 
 ```{python}
 print(comparison.to_json(samples=False))

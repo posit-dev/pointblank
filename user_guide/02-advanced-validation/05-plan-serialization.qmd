@@ -23,8 +23,8 @@ Three methods do this:
 The first two are ordinary, deterministic utilities that round-trip through Pointblank itself.
 `to_json_schema()` produces a standard that tools in many ecosystems can consume. All three are
 useful for sharing plans, reviewing changes in a diff, and persisting a plan alongside its results.
-`to_code()` and `to_yaml()` are also the foundation for the
-[AI Validation Editor](ai-validation-editor.qmd), which sends the current plan to a model as
+[`to_code()`](`Validate.to_code`) and [`to_yaml()`](`Validate.to_yaml`) are also the foundation for
+the [AI Validation Editor](ai-validation-editor.qmd), which sends the current plan to a model as
 editable code.
 
 ## Rendering a Plan as Python Code
@@ -216,13 +216,13 @@ that consumes JSON Schema files.
 
 ### Relationship to `export_contract()`
 
-Under the hood, `to_json_schema()` delegates to the [`export_contract()`](`export_contract`)
-function with `format="json_schema"`. The convenience method adds type enrichment from the data and
-handles file output. If you need the raw adapter behavior (for example, to export without type
-enrichment, or to work with a `Contract` object rather than a `Validate` object), use
-`export_contract()` directly. See the
-[Importing and Exporting Contracts](../10-contracts-and-pipelines/04-importing-contracts.qmd) guide
-for the full story on contract adapters.
+Under the hood, `to_json_schema()` delegates to the
+[`export_contract()`](`pointblank.export_contract`) function with `format="json_schema"`. The
+convenience method adds type enrichment from the data and handles file output. If you need the raw
+adapter behavior (for example, to export without type enrichment, or to work with a `Contract`
+object rather than a `Validate` object), use `export_contract()` directly. See the [Importing and
+Exporting Contracts](../10-contracts-and-pipelines/04-importing-contracts.qmd) guide for the full
+story on contract adapters.
 
 ## Conclusion
 

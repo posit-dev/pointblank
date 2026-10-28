@@ -118,9 +118,9 @@ Column comparison
 Column selection
 : How you tell a **validation step** which columns to check. You can give a single column name, a
   list of names, or a helper that picks columns for you: `starts_with()`, `ends_with()`,
-  `contains()`, `matches()`, `everything()`, `first_n()`, or `last_n()`. Helpers can be combined
-  inside `col()` using `&` (and), `|` (or), and `-` (but not). Each column that's picked gets its
-  own step. [Learn more](../validation-plan/column-selection-patterns.qmd).
+  `contains()`, [`matches()`](`pointblank.matches`), `everything()`, `first_n()`, or `last_n()`.
+  Helpers can be combined inside `col()` using `&` (and), `|` (or), and `-` (but not). Each column
+  that's picked gets its own step. [Learn more](../validation-plan/column-selection-patterns.qmd).
 
 Column summary table
 : A table that describes each column of your data: its type, how many values are missing, how many
@@ -163,24 +163,25 @@ Contract
   expected columns and their types), a list of rules, and details like the owner and version. You
   create one with the `Contract` class and check a table against it with `.validate(data)`.
   Contracts can be saved as YAML, imported from other formats (such as JSON Schema, Frictionless,
-  dbt, and ODCS) with `import_contract()`, and exported with `export_contract()`. See also
-  **pipeline**, **contract import**, and **violation handling**. [Learn
-  more](../contracts-and-pipelines/contracts.qmd).
+  dbt, and ODCS) with [`import_contract()`](`pointblank.import_contract`), and exported with
+  [`export_contract()`](`pointblank.export_contract`). See also **pipeline**, **contract import**,
+  and **violation handling**. [Learn more](../contracts-and-pipelines/contracts.qmd).
 
 Contract adapter
 : The part of Pointblank that translates between a **contract** and one outside format. There are
   built-in adapters for JSON Schema, Frictionless, dbt, and ODCS, and `list_adapters()` shows which
   ones are available. For another format, you can write your own adapter by making a subclass of
-  `ContractAdapter` and registering it with `@register_adapter`. `import_contract()` and
-  `export_contract()` can then use it like any other. [Learn
+  `ContractAdapter` and registering it with `@register_adapter`.
+  [`import_contract()`](`pointblank.import_contract`) and
+  [`export_contract()`](`pointblank.export_contract`) can then use it like any other. [Learn
   more](../contracts-and-pipelines/custom-adapters.qmd).
 
 Contract import
-: What you get back from `import_contract()`: a `ContractImport` object holding the checks that
-  were translated from an outside format. Nothing is checked yet. Its `coverage` is the share of
-  the outside rules that could be translated, and `warnings` lists any that couldn't. From there,
-  `to_validate(data)` gives a **validation plan**, `to_contract()` gives a **contract**, and
-  `to_python()` or `to_yaml()` give code. [Learn
+: What you get back from [`import_contract()`](`pointblank.import_contract`): a `ContractImport`
+  object holding the checks that were translated from an outside format. Nothing is checked yet. Its
+  `coverage` is the share of the outside rules that could be translated, and `warnings` lists any
+  that couldn't. From there, `to_validate(data)` gives a **validation plan**, `to_contract()` gives
+  a **contract**, and `to_python()` or [`to_yaml()`](`ContractImport.to_yaml`) give code. [Learn
   more](../contracts-and-pipelines/importing-contracts.qmd).
 
 Controlled terminology (CT)
@@ -374,11 +375,12 @@ OpenTelemetry integration
   more](../integrations/otel-integration.qmd).
 
 Partitions
-: A way to compare tables that are too large to fit in memory. With `partitions=N`, `compare()`
-  (and `tbl_match()` and `tbl_reconcile()`) works through the tables in N passes, each covering a
-  share of the keys from both tables. The results are the same as in a single pass, but less memory
-  is needed at once. More partitions use less memory but take longer. See also **table
-  comparison**. [Learn more](../table-comparison/comparing-large-files.qmd).
+: A way to compare tables that are too large to fit in memory. With `partitions=N`,
+  [`compare()`](`pointblank.compare`) (and `tbl_match()` and `tbl_reconcile()`) works through the
+  tables in N passes, each covering a share of the keys from both tables. The results are the same
+  as in a single pass, but less memory is needed at once. More partitions use less memory but take
+  longer. See also **table comparison**. [Learn
+  more](../table-comparison/comparing-large-files.qmd).
 
 Pipeline
 : A data-processing step with **contracts** on both sides. A `Pipeline` checks the incoming data
@@ -457,11 +459,11 @@ Report language
   [Learn more](../validation-plan/briefs.qmd).
 
 Round trip
-: Turning something into another form and back again, ending up with the same thing. For example,
-  a **validation plan** saved with `to_yaml()` and loaded again with `yaml_interrogate()`, or a
-  **contract** imported from JSON Schema and exported back. Anything that both forms can express
-  survives the round trip. Things that only one form can express, such as a `pre=` function, are
-  replaced with a placeholder or left out. [Learn
+: Turning something into another form and back again, ending up with the same thing. For example, a
+  **validation plan** saved with [`to_yaml()`](`Validate.to_yaml`) and loaded again with
+  `yaml_interrogate()`, or a **contract** imported from JSON Schema and exported back. Anything that
+  both forms can express survives the round trip. Things that only one form can express, such as a
+  `pre=` function, are replaced with a placeholder or left out. [Learn
   more](../advanced-validation/plan-serialization.qmd).
 
 Row-based check
@@ -535,9 +537,9 @@ Specification check
 
 Status check
 : A method that tells you how a validation went, as `True` or `False`, without stopping your code.
-  `all_passed()` tells you whether every **test unit** passed, and `above_threshold()`,
-  `warning()`, `error()`, and `critical()` tell you whether **threshold** levels were reached. See
-  also **assertion**. [Learn more](../advanced-validation/assertions.qmd).
+  [`all_passed()`](`Validate.all_passed`) tells you whether every **test unit** passed, and
+  `above_threshold()`, `warning()`, `error()`, and `critical()` tell you whether **threshold**
+  levels were reached. See also **assertion**. [Learn more](../advanced-validation/assertions.qmd).
 
 Step
 : Usually short for **validation step**. In a **contract**, the `Step` class describes one
@@ -560,16 +562,17 @@ Sundering
   more](../post-interrogation/sundering.qmd).
 
 Table comparison
-: Finding the differences between two tables. `compare()` matches up the rows of a source table
-  and a target table, gives each row a **row status** (such as `changed` or `missing`), and reports
-  any differences in their columns. It returns a `Comparison` object, which counts as `True` only
-  if the tables match. Rows can be matched by key columns (`keys="id"`), by position (the default),
-  or regardless of order (`keys="*"`), and small differences can be allowed with `tolerance=` or
-  ignored with `normalize=` (for example, letter case). As a **validation step**, `tbl_match()`
-  runs the same comparison with each row as a **test unit**, and `tbl_reconcile()` compares totals
-  instead (see **reconciliation**). From the **CLI**, use `pb compare`. To check only the number of
-  rows or columns, use `row_count_match()` or `col_count_match()`. See also **source and target**
-  and **partitions**. [Learn more](../table-comparison/comparing-tables.qmd).
+: Finding the differences between two tables. [`compare()`](`pointblank.compare`) matches up the
+  rows of a source table and a target table, gives each row a **row status** (such as `changed` or
+  `missing`), and reports any differences in their columns. It returns a `Comparison` object, which
+  counts as `True` only if the tables match. Rows can be matched by key columns (`keys="id"`), by
+  position (the default), or regardless of order (`keys="*"`), and small differences can be allowed
+  with `tolerance=` or ignored with `normalize=` (for example, letter case). As a **validation
+  step**, `tbl_match()` runs the same comparison with each row as a **test unit**, and
+  `tbl_reconcile()` compares totals instead (see **reconciliation**). From the **CLI**, use
+  `pb compare`. To check only the number of rows or columns, use `row_count_match()` or
+  `col_count_match()`. See also **source and target** and **partitions**. [Learn
+  more](../table-comparison/comparing-tables.qmd).
 
 Test data generation
 : Making realistic fake tables for testing and demos. You describe each column in a `Schema` with
