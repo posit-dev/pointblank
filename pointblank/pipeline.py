@@ -539,11 +539,20 @@ class Pipeline:
         -------
         str
             The YAML representation of this pipeline.
+
+        Raises
+        ------
+        ValueError
+            If a contract step argument can't be represented in YAML (for example, a column
+            selector or a Polars expression). See
+            [`Contract.to_yaml()`](`pointblank.Contract.to_yaml`).
         """
         import yaml
 
-        data = self.to_dict()
-        yaml_str = yaml.dump(data, default_flow_style=False, sort_keys=False)
+        from pointblank.contract import _to_yaml_data
+
+        data = _to_yaml_data(self.to_dict(), what="Pipeline")
+        yaml_str = yaml.safe_dump(data, default_flow_style=False, sort_keys=False)
 
         if path is not None:
             from pathlib import Path
