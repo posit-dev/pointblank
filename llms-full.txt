@@ -1579,85 +1579,442 @@ Contract(name: 'str', direction: "Literal['source', 'target']" = 'source', schem
 
 A declarative boundary contract for pipeline data.
 
-A Contract defines what data must look like at a specific point in a pipeline.
-It combines a Schema (structural expectations) with validation Steps (semantic
-expectations) and metadata (ownership, versioning, directionality).
+A `Contract` is a written-down agreement about what a table must look like at a specific point
+in a data pipeline. It bundles three things into one object: a
+[`Schema`](`pointblank.Schema`) with the expected column names and types (the structural
+expectations), a list of [`Step`](`pointblank.Step`) objects with the rules the values must
+follow (the semantic expectations), and metadata saying who owns the data, who depends on it,
+and which version of the agreement is in force.
+
+With a plain [`Validate`](`pointblank.Validate`) chain, the rules exist only as code that runs
+against one table. A contract holds the same rules as data. It isn't tied to any table, so you
+can apply it to each day's delivery of a feed, check it into version control, review changes to
+it like any other change, and share it as a YAML file. Teams on both sides of a handoff can
+then refer to the same definition of "valid". The producer of a table can check its output
+against the contract before publishing, and the consumer can check its input against the same
+contract on arrival.
+
+Use a contract when the expectations matter more than any one validation run: data crossing a
+team or system boundary, inputs and outputs of a scheduled job, or a dataset with named owners
+and downstream consumers. For a one-off look at a table, a `Validate` chain is simpler.
+
+Validating data against a contract gives you an ordinary interrogated `Validate` object. That
+means everything you already use with validations works here: the tabular report, step reports,
+[`all_passed()`](`pointblank.Validate.all_passed`),
+[`assert_passing()`](`pointblank.Validate.assert_passing`), data extracts, and so on.
 
 Parameters
 ----------
 name
-    A human-readable name for this contract (e.g., "raw_clickstream_feed").
+    A short, unique name for the contract (e.g., `"raw_clickstream_feed"`). It becomes the
+    table name in the validation report and is part of the report label. It must be a non-empty
+    string.
 direction
-    Either "source" (inbound data) or "target" (outbound data product).
-    This is metadata for reporting and does not change validation behavior.
+    Where the contract sits relative to a transformation: `"source"` (the default) for data
+    flowing in, or `"target"` for the data product flowing out. The direction is descriptive
+    metadata that appears in violation messages from
+    [`Pipeline`](`pointblank.Pipeline`). It doesn't change what gets checked.
 schema
-    A Schema object defining expected column names and types.
+    An optional [`Schema`](`pointblank.Schema`) giving the expected column names and data types.
+    When a schema is given, it's checked first, with
+    [`col_schema_match()`](`pointblank.Validate.col_schema_match`) and its default settings.
+    These defaults are strict: the table must have exactly the schema's columns, in the same
+    order, with matching types.
 steps
-    A list of Step objects defining validation rules beyond schema checks.
+    A list of [`Step`](`pointblank.Step`) objects, each naming a validation method and its
+    arguments (e.g., `pb.Step("col_vals_gt", columns="amount", value=0)`). They run in list
+    order after the schema check. Only a subset of validation methods can be used. See the
+    *Supported Step Methods* section below.
 version
-    Semantic version string for tracking contract evolution.
+    A version string for the contract, such as `"1.2.0"`. Semantic versioning is a good
+    convention, but any string is accepted. The version is added to the report label (e.g.,
+    `"Contract: orders v1.2.0"`) and recorded in the report's governance metadata.
 owner
-    Who is responsible for maintaining this contract.
+    The person or team responsible for the contract and the data it describes. It's recorded in
+    the report's governance metadata.
 consumers
-    Who depends on data conforming to this contract.
+    Who depends on data meeting this contract, as a string or a list of strings. It's recorded
+    in the report's governance metadata.
 description
-    Optional longer description of the contract's purpose.
+    An optional longer description of the contract's purpose. It's kept with the contract and
+    serialized with it, but doesn't appear in validation reports.
 thresholds
-    Default thresholds for this contract's validations.
+    Default [`Thresholds`](`pointblank.Thresholds`) for the validation built from this contract.
+    These set when a failing step is considered a 'warning', 'error', or 'critical' issue. If
+    the contract is used in a `Pipeline` that has its own thresholds, the pipeline's thresholds
+    take precedence.
 on_violation
-    What to do when the contract is violated: "warn", "raise", or "log".
-    Default is "warn".
+    What a [`Pipeline`](`pointblank.Pipeline`) should do when data fails this contract:
+    `"warn"` (the default) issues a `UserWarning`, `"raise"` raises a `RuntimeError`, and
+    `"log"` writes a warning to the `"pointblank.contract"` logger. This setting applies only
+    when the contract is enforced through a `Pipeline`. Calling
+    [`validate()`](`pointblank.Contract.validate`) directly always returns the validation
+    without warning or raising, so check the result yourself (e.g., with
+    [`assert_passing()`](`pointblank.Validate.assert_passing`)).
+
+Returns
+-------
+Contract
+    A `Contract` object. Apply it to data with
+    [`validate()`](`pointblank.Contract.validate`), or with
+    [`to_validate()`](`pointblank.Contract.to_validate`) when you want to add more steps before
+    interrogating.
+
+How a Contract Becomes a Validation
+-----------------------------------
+A contract holds no data and runs nothing until it's applied to a table. Calling
+[`to_validate()`](`pointblank.Contract.to_validate`) (or
+[`validate()`](`pointblank.Contract.validate`), which also interrogates) compiles the
+contract into a `Validate` object:
+
+1. a `Validate` is created for the table, with `tbl_name=` set to the contract name, a label of
+the form `"Contract: <name> v<version>"`, and the contract's `thresholds=`, `owner=`,
+`consumers=`, and `version=`
+2. if the contract has a schema, a `col_schema_match()` step is added first
+3. each [`Step`](`pointblank.Step`) is added in order, by calling the validation method it
+names with its stored arguments
+
+A step that lists several columns expands into one validation step per column, just as it would
+in a `Validate` chain. Mistakes in a step's arguments (a misspelled parameter name, for example)
+surface when the contract is compiled, not when it's created.
+
+Supported Step Methods
+----------------------
+These validation methods can be used in a contract's steps:
+
+- column value checks: `col_vals_gt`, `col_vals_lt`, `col_vals_ge`, `col_vals_le`,
+`col_vals_eq`, `col_vals_ne`, `col_vals_between`, `col_vals_outside`, `col_vals_in_set`,
+`col_vals_not_in_set`, `col_vals_increasing`, `col_vals_decreasing`, `col_vals_null`,
+`col_vals_not_null`, `col_vals_regex`, `col_vals_within_spec`, and `col_vals_expr`
+- column-level checks: `col_exists` and `col_pct_null`
+- table-level checks: `col_schema_match`, `col_count_match`, `row_count_match`,
+`rows_distinct`, and `rows_complete`
+- multi-condition checks: `conjointly`, with its expressions given as a list in `exprs=`
+
+Each takes the same arguments as the [`Validate`](`pointblank.Validate`) method of the same
+name. A step that names any other method is rejected with a `ValueError` when the contract is
+created. For steps that a contract can't express, compile the contract with
+[`to_validate()`](`pointblank.Contract.to_validate`) and chain the extra methods onto the
+result.
+
+Serialization
+-------------
+Contracts are meant to live outside your code, so they round-trip through YAML and plain
+dictionaries. [`to_yaml()`](`pointblank.Contract.to_yaml`) and
+[`from_yaml()`](`pointblank.Contract.from_yaml`) work with YAML files, and
+[`to_dict()`](`pointblank.Contract.to_dict`) and
+[`from_dict()`](`pointblank.Contract.from_dict`) work with dictionaries (useful for JSON or a
+configuration system). The schema is stored as a mapping of column names to type strings, the
+thresholds as a mapping of levels to values, and each step as a single-key mapping from method
+name to arguments. Step arguments must be plain data (strings, numbers, booleans, dates,
+lists, and dictionaries) for a contract to be written to YAML, although step-level
+`Thresholds` objects and tuples are converted to dictionaries automatically. A contract with
+other objects in its steps, such as a column selector (e.g., `pb.starts_with("amt_")`), a
+Polars expression, or a function, can't be written: `to_yaml()` raises a `ValueError` that
+says where the object is. Keep contracts like that in Python.
+
+Working With Other Pointblank Tools
+-----------------------------------
+A contract is the building block for several other parts of the API:
+
+- [`Pipeline`](`pointblank.Pipeline`) pairs a source contract and a target contract around a
+transformation function. It validates the input, runs the transformation, validates the output,
+and applies each contract's `on_violation=` setting. The results come back in a
+[`PipelineResult`](`pointblank.PipelineResult`).
+- [`export_contract()`](`pointblank.export_contract`) converts a contract into an external
+format (JSON Schema, Frictionless Table Schema, dbt, or the Open Data Contract Standard), and
+[`import_contract()`](`pointblank.import_contract`) reads one of those formats. Call
+[`to_contract()`](`pointblank.ContractImport.to_contract`) on the result to get a `Contract`.
+Each format supports a different set of rules, so checks with no equivalent in the target
+format are left out of the export.
+- Because [`to_validate()`](`pointblank.Contract.to_validate`) returns an ordinary `Validate`
+object, a contract can be combined with reusable [`Steps`](`pointblank.Steps`) libraries
+through [`Validate.add_steps()`](`pointblank.Validate.add_steps`).
 
 Examples
 --------
-```python
+```{python}
+#| echo: false
+#| output: false
 import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
 
-source_contract = pb.Contract(
-    name="raw_sales_feed",
-    direction="source",
+Let's write a contract for a daily orders extract. The schema fixes the four columns and their
+types, and the steps say that IDs must be present, each order must appear once, amounts must
+be positive, and the status must be one of three known values. Ownership and versioning go in
+the metadata, and the thresholds flag any failing test unit as a warning and a failure rate of
+10% or more as an error.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+orders_contract = pb.Contract(
+    name="orders",
+    version="1.2.0",
+    owner="sales-data-team",
+    consumers=["finance", "analytics"],
+    description="Daily order extract delivered by the sales platform.",
     schema=pb.Schema(
         order_id="String",
-        amount_cents="Int64",
-        currency="String",
+        customer_id="Int64",
+        amount="Float64",
+        status="String",
     ),
     steps=[
-        pb.Step("col_vals_not_null", columns=["order_id", "amount_cents"]),
-        pb.Step("rows_distinct", columns=["order_id"]),
+        pb.Step("col_vals_not_null", columns=["order_id", "customer_id"]),
+        pb.Step("rows_distinct", columns_subset=["order_id"]),
+        pb.Step("col_vals_gt", columns="amount", value=0),
+        pb.Step("col_vals_in_set", columns="status", set=["pending", "shipped", "delivered"]),
     ],
-    version="1.0.0",
-    owner="data-platform-team",
+    thresholds=pb.Thresholds(warning=1, error=0.10),
+)
+
+orders_contract
+```
+
+The contract itself is just a definition. Printing it shows a short summary: the name,
+direction, version, whether a schema is set, and the number of steps.
+
+Now let's apply the contract to a day's extract that meets every expectation. The
+[`validate()`](`pointblank.Contract.validate`) method compiles the contract against the table
+and interrogates it, returning a `Validate` object that displays as a validation report.
+
+```{python}
+orders_day_1 = pl.DataFrame(
+    {
+        "order_id": ["A1", "A2", "A3", "A4"],
+        "customer_id": [101, 102, 101, 103],
+        "amount": [25.00, 110.50, 42.00, 8.99],
+        "status": ["pending", "shipped", "delivered", "shipped"],
+    }
+)
+
+orders_contract.validate(orders_day_1)
+```
+
+The report header shows the label built from the contract (`Contract: orders v1.2.0`) along
+with the owner, consumers, and version. The first step is the schema check, followed by one step
+per contract rule. The `col_vals_not_null` step names two columns, so it becomes two validation
+steps. All six steps pass.
+
+The next day's extract has problems: a missing customer ID, a repeated order ID, a negative
+amount, and a status the contract doesn't allow. The same contract catches all of them.
+
+```{python}
+orders_day_2 = pl.DataFrame(
+    {
+        "order_id": ["A5", "A6", "A6", "A8"],
+        "customer_id": [104, None, 101, 105],
+        "amount": [25.00, -5.00, 42.00, 8.99],
+        "status": ["pending", "shipped", "returned", "shipped"],
+    }
+)
+
+validation = orders_contract.validate(orders_day_2)
+
+validation
+```
+
+The schema still matches, but four of the rule steps have failing test units. With only four
+rows, one failure is already 25% of the table, so those steps exceed both the warning and the
+error thresholds. The `rows_distinct` step counts two failures because both rows with order
+`"A6"` are duplicates. Since the result is an ordinary `Validate` object, you can check it in
+code, for example to stop a scheduled job:
+
+```{python}
+validation.all_passed()
+```
+
+To share the contract with another team or keep it under version control, write it out as YAML.
+Called without a path, [`to_yaml()`](`pointblank.Contract.to_yaml`) returns the YAML text.
+
+```{python}
+print(orders_contract.to_yaml())
+```
+
+The YAML lists the metadata, schema, steps, and thresholds in a form that's easy to read and
+review. [`from_yaml()`](`pointblank.Contract.from_yaml`) reads it back into an equivalent
+`Contract`.
+
+Finally, a contract can be the starting point for a stricter, local validation. Here,
+[`to_validate()`](`pointblank.Contract.to_validate`) compiles the contract without
+interrogating, and we add one more check (orders of 100 or less) before calling
+[`interrogate()`](`pointblank.Validate.interrogate`).
+
+```{python}
+(
+    orders_contract.to_validate(orders_day_1)
+    .col_vals_le(columns="amount", value=100)
+    .interrogate()
 )
 ```
 
+The six contract steps pass as before, and the added seventh step flags the order of 110.50.
+The contract itself is unchanged, so other users of it aren't affected by the extra rule.
+
+See Also
+--------
+Step : A single declarative validation step, used in a contract's `steps=`.
+Schema : The column names and types used in a contract's `schema=`.
+Pipeline : Enforce source and target contracts around a transformation.
+export_contract : Convert a contract to JSON Schema, Frictionless, dbt, or ODCS.
+import_contract : Read an external contract format, then call `to_contract()` on the result.
+
 Step(method: 'str', **kwargs: 'Any') -> 'None'
 
-A single validation step in a Contract, defined declaratively.
+A single validation step, stored as data.
 
-This is the declarative equivalent of calling a validation method on Validate.
-Steps are stored as data and compiled into Validate method calls at enforcement time.
+A `Step` records one validation rule: the name of a [`Validate`](`pointblank.Validate`)
+validation method and the keyword arguments to call it with. `pb.Step("col_vals_gt",
+columns="amount", value=0)` describes the same check as
+`Validate.col_vals_gt(columns="amount", value=0)`, but nothing runs when the step is created.
+The step is a small, inert value that's applied later, when it's compiled into a validation
+for a specific table.
+
+Holding a rule as data rather than as a method call makes it possible to keep rules apart from
+the code that runs them. Steps can be collected into a [`Contract`](`pointblank.Contract`),
+written to YAML or JSON and read back, compared with each other, or built from configuration
+files and external schema formats. The steps in a contract imported with
+[`import_contract()`](`pointblank.import_contract`), for example, are `Step` objects
+generated from the source format.
+
+The step's parts are available as the `method` attribute (the method name) and the `kwargs`
+attribute (a dictionary of arguments). Two steps are equal when both their method names and
+arguments are equal.
 
 Parameters
 ----------
 method
-    The validation method name (e.g., "col_vals_gt", "rows_distinct").
+    The name of the validation method to call, such as `"col_vals_gt"` or `"rows_distinct"`.
+    A `Step` doesn't check the name itself. A [`Contract`](`pointblank.Contract`) accepts only
+    its supported methods (listed in its *Supported Step Methods* section) and raises a
+    `ValueError` for any other name. Steps used through [`Steps`](`pointblank.Steps`) and
+    [`Validate.add_steps()`](`pointblank.Validate.add_steps`) can name any validation method.
 **kwargs
-    All parameters that would be passed to the corresponding Validate method.
+    The arguments for the validation method, given by keyword (e.g., `columns="amount"`,
+    `value=0`). They're stored as given and passed to the method when the step is compiled, so
+    a misspelled or missing argument raises a `TypeError` at that point rather than when the
+    step is created. Positional arguments aren't supported. The one validation method that
+    takes positional arguments, `conjointly()`, receives its expressions as a list in `exprs=`
+    (e.g., `pb.Step("conjointly", exprs=[lambda df: pl.col("a") > 0])`).
+
+Returns
+-------
+Step
+    A `Step` object.
+
+Writing Steps That Can Be Saved
+-------------------------------
+A contract's steps are written to YAML as a mapping from the method name to its arguments, so
+a step can be saved only if its arguments are plain data: strings, numbers, booleans, dates,
+lists, and dictionaries. Step-level thresholds are the exception, since a
+[`Thresholds`](`pointblank.Thresholds`) object or a tuple is converted to a dictionary of
+levels automatically. Other objects can't be saved, and
+[`Contract.to_yaml()`](`pointblank.Contract.to_yaml`) raises a `ValueError` that names the
+step and argument holding one. Keep these in mind for steps you plan to save:
+
+- name columns with strings or lists of strings, rather than with selectors like
+`pb.starts_with()` or `pb.col()`
+- steps that take an expression or a function, such as `col_vals_expr` and `conjointly`, can
+only be used in contracts kept in Python
+
+All of these work when the step is used directly in Python.
+
+Steps and the Steps Class
+-------------------------
+[`Steps`](`pointblank.Steps`) is a fluent builder for lists of `Step` objects. It has a
+method for each validation method (`pb.Steps().col_vals_gt(columns="amount", value=0)`), so
+you get the real method signatures, with argument names and defaults, while writing the
+steps. Use `Step` when the method name and arguments are data (when they come from a
+configuration file, for example) or when building a contract's `steps=` list. A list of
+`Step` objects can also be turned into a `Steps` object with `pb.Steps(steps=...)` and added
+to any validation with [`Validate.add_steps()`](`pointblank.Validate.add_steps`).
 
 Examples
 --------
-```python
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's create a step that checks that ages fall between 0 and 120. Printing it shows the method
+name and the stored arguments.
+
+```{python}
 import pointblank as pb
 
-# A step that checks column values are greater than 0
-step = pb.Step("col_vals_gt", columns="amount", value=0)
+age_step = pb.Step("col_vals_between", columns="age", left=0, right=120)
 
-# A step that checks rows are distinct by a key column
-step = pb.Step("rows_distinct", columns=["order_id"])
-
-# A step that checks a regex pattern
-step = pb.Step("col_vals_regex", columns="email", pattern=r"^[^@]+@[^@]+\.[^@]+$")
+age_step
 ```
+
+The two parts of the step are available as attributes:
+
+```{python}
+print(age_step.method)
+print(age_step.kwargs)
+```
+
+Steps are normally used in groups. Here are three more rules for a table of patients: each
+patient ID must appear only once, IDs must follow a pattern, and the `visit` column must be
+present. Note that `rows_distinct` takes `columns_subset=` rather than `columns=`, because
+each step's arguments are exactly those of its `Validate` method.
+
+```{python}
+patient_steps = [
+    pb.Step("rows_distinct", columns_subset="patient_id"),
+    pb.Step("col_vals_regex", columns="patient_id", pattern=r"^PT-\d{3}$"),
+    pb.Step("col_exists", columns="visit"),
+    age_step,
+]
+```
+
+Placing the steps in a [`Contract`](`pointblank.Contract`) lets us apply them to a table. The
+steps run in the order they're listed.
+
+```{python}
+import polars as pl
+
+patients = pl.DataFrame(
+    {
+        "patient_id": ["PT-001", "PT-002", "PT-003", "PT-03"],
+        "age": [34, 51, 130, 28],
+        "visit": [1, 1, 2, 1],
+    }
+)
+
+patients_contract = pb.Contract(name="patients", steps=patient_steps)
+
+patients_contract.validate(patients)
+```
+
+The ID check flags `"PT-03"`, which is missing a digit, and the age check flags the value
+`130`. The other two steps pass.
+
+The same steps can be added to an ordinary validation by wrapping them in a
+[`Steps`](`pointblank.Steps`) object. That route also accepts validation methods that
+contracts don't support, such as
+[`col_vals_str_len()`](`pointblank.Validate.col_vals_str_len`):
+
+```{python}
+id_length_step = pb.Step("col_vals_str_len", columns="patient_id", min_val=6, max_val=6)
+
+(
+    pb.Validate(data=patients, tbl_name="patients")
+    .add_steps(pb.Steps(steps=patient_steps + [id_length_step]))
+    .interrogate()
+)
+```
+
+See Also
+--------
+Contract : Collect steps, a schema, and metadata into a reusable contract.
+Steps : Build lists of steps with the signatures of the validation methods.
+Validate.add_steps : Add steps from a `Steps` object to a validation.
 
 Steps(steps: 'list[Step] | None' = None) -> 'None'
 
@@ -37006,8 +37363,9 @@ reconstructed anywhere. The `method` field corresponds directly to a validation 
 
 ### Available Methods
 
-Any validation method from the `Validate` class can be used in a Step. Here are the most common
-ones for contract definitions:
+A Step can use most of the core validation methods of the `Validate` class (the full list is in the
+[`Contract`](`Contract`) reference). A Step that names any other method is rejected when the
+contract is created. Here are the most common ones for contract definitions:
 
 | Method | Purpose |
 |--------|---------|

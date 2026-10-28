@@ -120,7 +120,7 @@ Because steps are data (not function calls), they serialize cleanly to YAML/JSON
 
 ### Available Methods
 
-Any validation method from the [Validate](../../reference/Validate.md#pointblank.Validate) class can be used in a Step. Here are the most common ones for contract definitions:
+A Step can use most of the core validation methods of the [Validate](../../reference/Validate.md#pointblank.Validate) class (the full list is in the [`Contract`](../../reference/Contract.md#pointblank.Contract) reference). A Step that names any other method is rejected when the contract is created. Here are the most common ones for contract definitions:
 
 | Method | Purpose |
 |----|----|

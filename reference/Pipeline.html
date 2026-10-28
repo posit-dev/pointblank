@@ -1672,7 +1672,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L126-L568" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L126-L577" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Pipeline</span>(</span>
@@ -1942,7 +1942,7 @@ If on_violation=“raise” and validation fails.
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L529-L556" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L529-L565" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb6"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_yaml</span>(<span class="va">path</span><span class="op">=</span><span class="cn">None</span>)</span></code></pre></div>
@@ -1965,6 +1965,17 @@ Optional file path. If provided, the YAML is written to this file. If None, the 
 <dt><code> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
 The YAML representation of this pipeline.
+</dd>
+</dl>
+</div>
+</section>
+<section id="raises-2" class="level4 doc-raises">
+<h4 class="doc-raises anchored" data-anchor-id="raises-2">Raises</h4>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
+<dd>
+If a contract step argument can’t be represented in YAML (for example, a column selector or a Polars expression). See <a href="../reference/Contract.html#pointblank.Contract.to_yaml" class="gdls-link"><code>Contract.to_yaml()</code></a>.
 </dd>
 </dl>
 </div>

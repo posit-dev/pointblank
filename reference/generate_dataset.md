@@ -4,7 +4,7 @@ Generate synthetic test data from a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1296-L1565)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1313-L1582)
 
 ``` python
 generate_dataset(
@@ -179,7 +179,7 @@ pb.preview(pb.generate_dataset(schema, n=50, seed=23, output="pandas"))
 
 | PandasRows50Columns3 |                     |                      |               |
 |----------------------|---------------------|----------------------|---------------|
-|                      | name *object*       | age *int64*          | active *bool* |
+|                      | name *str*          | age *int64*          | active *bool* |
 | 1                    | 51fbLtByHw          | -1406612057389349638 | False         |
 | 2                    | UmrCa               | -2617964757147985650 | False         |
 | 3                    | ND5bgfTF            | -5681649629593590626 | False         |

@@ -4,7 +4,7 @@ Binds source and target contracts into a pipeline boundary enforcement unit.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L126-L568)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L126-L577)
 
 ``` python
 Pipeline(
@@ -181,7 +181,7 @@ Serialize this Pipeline to YAML.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L529-L556)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L529-L565)
 
 ``` python
 to_yaml(path=None)
@@ -196,6 +196,11 @@ Optional file path. If provided, the YAML is written to this file. If None, the 
 
 `str`  
 The YAML representation of this pipeline.
+
+#### Raises
+
+`ValueError`  
+If a contract step argument can't be represented in YAML (for example, a column selector or a Polars expression). See [`Contract.to_yaml()`](../reference/Contract.md#pointblank.Contract.to_yaml).
 
 ### from_yaml()
 

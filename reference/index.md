@@ -36,7 +36,7 @@ Use [Contract](../reference/Contract.md#pointblank.Contract) and [Step](../refer
 A declarative boundary contract for pipeline data.
 
 [Step](Step.md#pointblank.Step)  
-A single validation step in a Contract, defined declaratively.
+A single validation step, stored as data.
 
 [Steps](Steps.md#pointblank.Steps)  
 A reusable collection of validation step definitions.
