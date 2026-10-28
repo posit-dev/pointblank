@@ -4,7 +4,7 @@ Convert YAML validation configuration to equivalent Python code.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1566-L2094)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1588-L2115)
 
 ``` python
 yaml_to_python(yaml)
@@ -112,6 +112,8 @@ print(python_code)
     ```
 
 The generated code includes all configuration parameters, thresholds, and maintains the exact same validation logic as the original YAML workflow.
+
+The `tbl` and `reference` data sources are loaded as [yaml_interrogate()](../reference/yaml_interrogate.md#pointblank.yaml_interrogate) loads them: a dataset name becomes a `pb.load_dataset()` call, a CSV file is read with the `df_library` library (e.g., `pl.read_csv()`), and other file paths and connection strings are passed to [Validate](../reference/Validate.md#pointblank.Validate) as strings.
 
 Governance metadata (`owner`, `consumers`, `version`) and `reference` are also rendered in the generated Python code:
 

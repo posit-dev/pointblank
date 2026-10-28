@@ -18650,6 +18650,11 @@ print(python_code)
 The generated code includes all configuration parameters, thresholds, and maintains the exact
 same validation logic as the original YAML workflow.
 
+The `tbl` and `reference` data sources are loaded as `yaml_interrogate()` loads them: a
+dataset name becomes a `pb.load_dataset()` call, a CSV file is read with the `df_library`
+library (e.g., `pl.read_csv()`), and other file paths and connection strings are passed to
+`Validate` as strings.
+
 Governance metadata (`owner`, `consumers`, `version`) and `reference` are also rendered
 in the generated Python code:
 
