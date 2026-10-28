@@ -2321,85 +2321,361 @@ remaining amount check and reaches the error threshold.
 
 Pipeline(source: 'Contract | None' = None, target: 'Contract | None' = None, thresholds: 'Thresholds | None' = None, actions: 'Actions | None' = None, final_actions: 'FinalActions | None' = None, label: 'str | None' = None, short_circuit: 'bool' = True) -> None
 
-Binds source and target contracts into a pipeline boundary enforcement unit.
+Enforce data contracts at both ends of a data transformation.
 
-A Pipeline enforces data quality at both the ingestion point ("boundary in") and
-the output point ("boundary out") of a data transformation. It validates that data
-entering a pipeline meets source contract requirements, and that data leaving meets
-target contract requirements.
+Most data problems are introduced at a boundary: an upstream system starts sending nulls or a
+new category, or a transformation step drops, duplicates, or miscalculates rows. A `Pipeline`
+guards those boundaries. It pairs a *source* [`Contract`](`pointblank.Contract`), describing
+the data a transformation expects to receive, with a *target* contract, describing the data it
+promises to produce. Data is validated against the source contract on the way in and against
+the target contract on the way out, so a failure tells you whether the input was bad or the
+transformation went wrong.
+
+The pipeline doesn't run or schedule your transformation logic beyond calling the function you
+give it. The transformation can use any DataFrame library, and the pipeline can sit inside any
+orchestration tool. You can also check just one boundary with
+[`validate_source()`](`pointblank.Pipeline.validate_source`) or
+[`validate_target()`](`pointblank.Pipeline.validate_target`), for example when the
+transformation runs somewhere else. Only one of the two contracts is required, so a pipeline
+can also act as an ingestion guard (source only) or an output guard (target only).
 
 Parameters
 ----------
 source
-    The source (inbound) Contract.
+    The [`Contract`](`pointblank.Contract`) that incoming data must meet. Leave it as `None`
+    for a pipeline that only checks output.
 target
-    The target (outbound) Contract, or None if only validating inbound data.
+    The [`Contract`](`pointblank.Contract`) that the transformed data must meet. Leave it as
+    `None` for a pipeline that only checks input. At least one of `source=` and `target=` must
+    be given.
 thresholds
-    Global thresholds applied to both boundary validations (overrides contract-level
-    thresholds).
+    [`Thresholds`](`pointblank.Thresholds`) to use for both boundary validations. When given,
+    they replace each contract's own `thresholds=` (they aren't merged), which lets the same
+    contracts be applied more or less strictly in different settings. Thresholds set on
+    individual steps still take precedence. Thresholds determine the warning, error, and
+    critical levels shown in the reports and the [`Actions`](`pointblank.Actions`) they
+    trigger, but not whether a boundary passes (see *Passing and Failing* below).
 actions
-    Actions triggered on threshold exceedance at either boundary.
+    [`Actions`](`pointblank.Actions`) to take when a step in either boundary validation reaches
+    a threshold level. The same actions are used for both boundaries.
 final_actions
-    Actions triggered after both validations complete.
+    [`FinalActions`](`pointblank.FinalActions`) to run when a boundary validation finishes.
+    They run once for each boundary that's validated, so twice in a full run.
 label
-    A label for this pipeline (used in reports).
+    A label for the pipeline. Each boundary validation is labeled `"<label> [source]"` or
+    `"<label> [target]"`. Without a label, the contract name is used instead, as in
+    `"Pipeline: raw_orders [source]"`.
 short_circuit
-    If True (default), skip the transform and target validation when source validation
-    fails critically. Set to False to always run both validations.
+    Whether [`run()`](`pointblank.Pipeline.run`) should stop when the source validation fails.
+    With `True` (the default), the transformation isn't called and the target isn't validated,
+    so bad input never reaches your transformation code or anything it writes to. Use `False`
+    to always run the transformation and validate both boundaries, for example to see every
+    problem at once while developing.
+
+Returns
+-------
+Pipeline
+    A `Pipeline` object. Use [`run()`](`pointblank.Pipeline.run`) to validate, transform, and
+    validate again in one call, getting back a [`PipelineResult`](`pointblank.PipelineResult`).
+
+Raises
+------
+TypeError
+    If `source=` or `target=` is given and isn't a `Contract`.
+ValueError
+    If neither `source=` nor `target=` is given.
+
+How a Pipeline Runs
+-------------------
+Calling [`run()`](`pointblank.Pipeline.run`) with a table and a transformation function goes
+through these steps:
+
+1. the source contract is compiled into a [`Validate`](`pointblank.Validate`) object for the
+table and interrogated
+2. if the source validation has any failing test units and `short_circuit=True`, the run stops
+here
+3. the transformation function is called with the original table, and its output is kept
+4. the target contract is compiled for the output and interrogated
+
+Each boundary validation is built the same way as in
+[`Contract.to_validate()`](`pointblank.Contract.to_validate`): the table name is the contract
+name, the contract's owner, consumers, and version are recorded, the schema check (if any)
+comes first, and the steps follow in order. The pipeline adds its own label, thresholds, and
+actions. If one of the contracts is missing, its boundary is simply skipped.
+
+Passing and Failing
+-------------------
+A boundary *passes* only when every test unit in every step passes, which is the same test as
+[`Validate.all_passed()`](`pointblank.Validate.all_passed`). Thresholds don't change this: a
+single failing row makes the boundary fail, even if it's well below the warning level. For
+decisions based on threshold levels instead, inspect the boundary validations directly, for
+example with [`above_threshold()`](`pointblank.Validate.above_threshold`).
+
+When a boundary fails, the pipeline applies that contract's `on_violation=` setting. With
+`"warn"` (the default), a `UserWarning` is issued. With `"log"`, a warning-level message is
+written to the `"pointblank.contract"` logger. With `"raise"`,
+[`validate_source()`](`pointblank.Pipeline.validate_source`) and
+[`validate_target()`](`pointblank.Pipeline.validate_target`) raise a `RuntimeError`.
+[`run()`](`pointblank.Pipeline.run`) is different: it always returns a
+[`PipelineResult`](`pointblank.PipelineResult`) so that both validations can be inspected, so
+a `"raise"` violation is recorded in the result without an exception or warning. To stop a job
+after `run()`, check [`PipelineResult.passed`](`pointblank.PipelineResult.passed`).
+
+Serialization
+-------------
+A pipeline can be stored as YAML with [`to_yaml()`](`pointblank.Pipeline.to_yaml`) and read
+back with [`from_yaml()`](`pointblank.Pipeline.from_yaml`), or converted to and from a
+dictionary with [`to_dict()`](`pointblank.Pipeline.to_dict`) and
+[`from_dict()`](`pointblank.Pipeline.from_dict`). The stored form holds the label, thresholds,
+and `short_circuit=` setting under a `pipeline` key, plus the two contracts under `source` and
+`target`. Actions and final actions are functions or messages tied to your environment, so
+they aren't stored. Pass them again when you recreate the pipeline. The transformation isn't
+part of the pipeline either: it's given to `run()` each time.
 
 Examples
 --------
-```python
+```{python}
+#| echo: false
+#| output: false
 import pointblank as pb
-
-source_contract = pb.Contract(
-    name="raw_data",
-    direction="source",
-    steps=[pb.Step("col_vals_not_null", columns=["id"])],
+import warnings
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+warnings.formatwarning = lambda message, category, *args, **kwargs: (
+    f"{category.__name__}: {message}\n"
 )
-
-target_contract = pb.Contract(
-    name="clean_data",
-    direction="target",
-    steps=[pb.Step("col_vals_not_null", columns=pb.everything())],
-)
-
-pipeline = pb.Pipeline(
-    source=source_contract,
-    target=target_contract,
-)
-
-# Validate source data
-source_result = pipeline.validate_source(raw_data)
-
-# Validate target data
-target_result = pipeline.validate_target(clean_data)
-
-# Or do it all in one shot
-result = pipeline.run(data=raw_data, transform=my_transform)
 ```
+
+Let's build a pipeline around a transformation that prepares raw order records for reporting.
+The raw records store amounts in cents with lowercase currency codes. The source contract says
+what the transformation needs from them: an order ID on every record, no negative amounts, and
+a known currency.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+raw_orders_contract = pb.Contract(
+    name="raw_orders",
+    steps=[
+        pb.Step("col_vals_not_null", columns="order_id"),
+        pb.Step("col_vals_ge", columns="amount_cents", value=0),
+        pb.Step("col_vals_in_set", columns="currency", set=["usd", "eur", "gbp"]),
+    ],
+)
+```
+
+The target contract describes what the transformation promises to deliver: a fixed schema,
+one row per order, positive amounts, and uppercase currency codes.
+
+```{python}
+orders_contract = pb.Contract(
+    name="orders",
+    direction="target",
+    schema=pb.Schema(order_id="String", amount="Float64", currency="String"),
+    steps=[
+        pb.Step("rows_distinct", columns_subset="order_id"),
+        pb.Step("col_vals_gt", columns="amount", value=0),
+        pb.Step("col_vals_in_set", columns="currency", set=["USD", "EUR", "GBP"]),
+    ],
+)
+
+pipeline = pb.Pipeline(source=raw_orders_contract, target=orders_contract, label="Orders")
+
+pipeline
+```
+
+The transformation is an ordinary function that takes a table and returns a table. This one
+removes zero-amount test orders, converts cents to whole currency units, and uppercases the
+currency codes.
+
+```{python}
+def prepare_orders(df: pl.DataFrame) -> pl.DataFrame:
+    return df.filter(pl.col("amount_cents") > 0).select(
+        "order_id",
+        amount=pl.col("amount_cents") / 100,
+        currency=pl.col("currency").str.to_uppercase(),
+    )
+```
+
+Now we can give the pipeline a day of raw orders and the transformation function.
+[`run()`](`pointblank.Pipeline.run`) validates the input, transforms it, and validates the
+output.
+
+```{python}
+raw_orders = pl.DataFrame(
+    {
+        "order_id": ["A1", "A2", "A3", "A4"],
+        "amount_cents": [2500, 0, 11050, 899],
+        "currency": ["usd", "eur", "usd", "gbp"],
+    }
+)
+
+result = pipeline.run(data=raw_orders, transform=prepare_orders)
+
+result
+```
+
+Both boundaries pass, so the [`PipelineResult`](`pointblank.PipelineResult`) reports
+`passed=True`. Its `transform_output` attribute holds the prepared table, ready to be written
+out:
+
+```{python}
+result.transform_output
+```
+
+Each boundary validation is kept as an interrogated `Validate` object, so the full report is
+available. Here's the target validation, with the label built from the pipeline label and the
+contract's direction.
+
+```{python}
+result.target_validation
+```
+
+The next day's raw orders have problems: a record with no order ID, a negative amount, and a
+currency the transformation can't handle. Since `short_circuit=` is `True` by default, the
+pipeline stops after the source validation fails. The source contract uses the default
+`on_violation="warn"`, so a warning is also issued.
+
+```{python}
+bad_raw_orders = pl.DataFrame(
+    {
+        "order_id": ["B1", None, "B3", "B4"],
+        "amount_cents": [1200, 3400, -500, 760],
+        "currency": ["usd", "usd", "cad", "eur"],
+    }
+)
+
+result = pipeline.run(data=bad_raw_orders, transform=prepare_orders)
+
+print(f"passed: {result.passed}")
+print(f"transform output: {result.transform_output}")
+```
+
+The transformation never ran, so there's no output and no target validation. The source
+validation shows why the input was rejected, with one failing test unit in each step:
+
+```{python}
+result.source_validation
+```
+
+See Also
+--------
+PipelineResult : The result of `run()`, holding both boundary validations.
+Contract : Define the source and target contracts.
+Step : A single validation rule within a contract.
 
 PipelineResult(source_validation: 'Validate | None' = None, target_validation: 'Validate | None' = None, transform_output: 'Any' = None, _source_passed: 'bool | None' = None, _target_passed: 'bool | None' = None) -> None
 
-Result of a pipeline boundary validation run.
+The outcome of running a data pipeline.
 
-Contains the validation results for both source and target boundaries,
-plus metadata about the run.
+A `PipelineResult` is what [`Pipeline.run()`](`pointblank.Pipeline.run`) returns. It collects
+everything a run produced: the interrogated validation for each boundary, the transformed data,
+and pass/fail properties for a quick go/no-go decision. Keeping all of it in one object means
+the code that runs a pipeline can decide what to do next (publish the output, stop the job, or
+alert someone) and still have the full reports at hand to explain the decision.
+
+You don't normally create a `PipelineResult` yourself. Get one from `run()` and read its
+attributes and properties.
 
 Attributes
 ----------
 source_validation
-    The Validate object for the source boundary (or None if no source contract).
+    The interrogated [`Validate`](`pointblank.Validate`) object for the source boundary, or
+    `None` if the pipeline has no source contract. Display it to see the validation report, or
+    use any of its methods (e.g., [`get_step_report()`](`pointblank.Validate.get_step_report`)
+    or [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`)) to dig into
+    failures.
 target_validation
-    The Validate object for the target boundary (or None if no target contract).
+    The interrogated `Validate` object for the target boundary. It's `None` if the pipeline
+    has no target contract, or if the run stopped after a failing source validation (with
+    `short_circuit=True`).
 transform_output
-    The transformed data (only available when using `Pipeline.run()`).
-passed
-    True only if BOTH boundary validations pass (no critical failures).
-source_passed
-    True if the source boundary validation passes.
-target_passed
-    True if the target boundary validation passes.
+    The table returned by the transformation function, or `None` if the run stopped before
+    the transformation was called. This is the data to publish when the result passes.
+
+Passing and Failing
+-------------------
+The [`passed`](`pointblank.PipelineResult.passed`),
+[`source_passed`](`pointblank.PipelineResult.source_passed`), and
+[`target_passed`](`pointblank.PipelineResult.target_passed`) properties give a boolean verdict.
+A boundary passes when every test unit in every step passes (the same test as
+[`Validate.all_passed()`](`pointblank.Validate.all_passed`)), so thresholds don't affect it. A
+boundary that wasn't validated counts as passing. That covers a pipeline without that
+contract, and also a target that was skipped because the source failed: in that case
+`target_passed` is `True`, but `passed` is still `False` because of the source. For a verdict
+based on threshold levels instead, use the validations directly, for example with
+[`above_threshold()`](`pointblank.Validate.above_threshold`).
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+import warnings
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+warnings.formatwarning = lambda message, category, *args, **kwargs: (
+    f"{category.__name__}: {message}\n"
+)
+```
+
+Let's run a small pipeline that turns raw temperature readings in Fahrenheit into Celsius. The
+source contract requires a station for every reading, and the target contract requires
+temperatures in a plausible range.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+pipeline = pb.Pipeline(
+    source=pb.Contract(
+        name="raw_readings", steps=[pb.Step("col_vals_not_null", columns="station")]
+    ),
+    target=pb.Contract(
+        name="readings",
+        direction="target",
+        steps=[pb.Step("col_vals_between", columns="temp_c", left=-60, right=60)],
+    ),
+)
+
+raw_readings = pl.DataFrame({"station": ["N1", "N2", "S1"], "temp_f": [68.0, 41.0, 95.0]})
+
+result = pipeline.run(
+    data=raw_readings,
+    transform=lambda df: df.select("station", temp_c=(pl.col("temp_f") - 32) * 5 / 9),
+)
+
+result
+```
+
+Printing the result shows which boundaries were validated and whether the run passed. In a
+scheduled job, `passed` is the natural thing to branch on:
+
+```{python}
+if result.passed:
+    print(result.transform_output)
+else:
+    print("Not publishing: the pipeline failed.")
+```
+
+For a plain-text summary of both boundaries, suitable for a log or a notification, use
+[`get_report()`](`pointblank.PipelineResult.get_report`):
+
+```{python}
+print(result.get_report())
+```
+
+The full validation report for either boundary is in `source_validation` or
+`target_validation`:
+
+```{python}
+result.target_validation
+```
+
+See Also
+--------
+Pipeline : Define the boundaries and run the transformation.
+Validate.all_passed : The test used to decide whether a boundary passes.
 
 
 ## Contract Import/Export

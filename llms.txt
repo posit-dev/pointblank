@@ -27,8 +27,8 @@
 - [Step](https://posit-dev.github.io/pointblank/reference/Step.html): A single validation step, stored as data
 - [Steps](https://posit-dev.github.io/pointblank/reference/Steps.html): A reusable collection of validation step definitions
 - [Validate.add_steps](https://posit-dev.github.io/pointblank/reference/Validate.add_steps.html)
-- [Pipeline](https://posit-dev.github.io/pointblank/reference/Pipeline.html): Binds source and target contracts into a pipeline boundary enforcement unit
-- [PipelineResult](https://posit-dev.github.io/pointblank/reference/PipelineResult.html): Result of a pipeline boundary validation run
+- [Pipeline](https://posit-dev.github.io/pointblank/reference/Pipeline.html): Enforce data contracts at both ends of a data transformation
+- [PipelineResult](https://posit-dev.github.io/pointblank/reference/PipelineResult.html): The outcome of running a data pipeline
 
 #### Contract Import/Export
 > Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use `import_contract()` as the entry point, `export_contract()` for the reverse, and `register_adapter()` to add support for custom formats.

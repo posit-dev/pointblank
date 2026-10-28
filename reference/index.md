@@ -45,10 +45,10 @@ A reusable collection of validation step definitions.
 Add the steps from one or more [Steps](../reference/Steps.md#pointblank.Steps) collections to the validation.
 
 [Pipeline](Pipeline.md#pointblank.Pipeline)  
-Binds source and target contracts into a pipeline boundary enforcement unit.
+Enforce data contracts at both ends of a data transformation.
 
 [PipelineResult](PipelineResult.md#pointblank.PipelineResult)  
-Result of a pipeline boundary validation run.
+The outcome of running a data pipeline.
 
 ## Contract Import/Export
 
