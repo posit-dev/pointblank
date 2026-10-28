@@ -6,7 +6,8 @@ from unittest.mock import patch
 
 import narwhals as nw
 from pointblank.schema import Schema, _check_schema_match
-from pointblank.validate import load_dataset
+from pointblank.validate import Validate, load_dataset
+from pointblank.field import float_field, string_field
 
 import pandas as pd
 import polars as pl
@@ -584,3 +585,25 @@ def test_get_schema_coerced_unsupported_type():
     schema = Schema(tbl=df)
     with pytest.raises(ValueError, match="Cannot coerce schema"):
         schema.get_schema_coerced(to="dask")
+
+
+@pytest.mark.parametrize(
+    "schema",
+    [
+        Schema(a=pl.Float64, b=pl.String),
+        Schema(a=pl.Float64(), b=pl.String()),
+        Schema(a=[pl.Int64, pl.Float64], b="String"),
+        Schema(columns=[("a", (pl.Int64, "Float64")), ("b", pl.String)]),
+        Schema(a=float_field(), b=string_field()),
+    ],
+)
+def test_col_schema_match_with_dtype_objects(schema):
+    # Dtypes given as library dtype objects or `Field`s are compared by their string form
+    tbl = pl.DataFrame({"a": [1.0], "b": ["x"]})
+    assert Validate(tbl).col_schema_match(schema).interrogate().all_passed()
+
+
+def test_col_schema_match_with_dtype_object_mismatch():
+    tbl = pl.DataFrame({"a": [1.0], "b": ["x"]})
+    schema = Schema(a=pl.Int64, b=pl.String)
+    assert not Validate(tbl).col_schema_match(schema).interrogate().all_passed()
