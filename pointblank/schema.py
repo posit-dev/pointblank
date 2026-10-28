@@ -1115,6 +1115,23 @@ def _get_schema_validation_info(
     return schema_info
 
 
+def _dtype_candidates(dtype: Any) -> list[str]:
+    """
+    Normalize a schema column's dtype specification to a list of dtype strings.
+
+    A specification can be a single dtype or a list (or tuple) of alternatives. Each dtype can
+    be a string, a `Field` (its `dtype` is used), or a library dtype object such as Polars'
+    `pl.Float64` or `pl.Datetime("us")`, which is converted with `str()`.
+    """
+    from pointblank.field import Field
+
+    candidates = list(dtype) if isinstance(dtype, (list, tuple)) else [dtype]
+
+    return [
+        x if isinstance(x, str) else x.dtype if isinstance(x, Field) else str(x) for x in candidates
+    ]
+
+
 def _match_schema_columns(
     target_schema: list[tuple],
     expect_schema: list[tuple],
@@ -1140,7 +1157,7 @@ def _match_schema_columns(
         - matched_to: str | None        # Name of the matched target column
         - target_index: int | None      # Position (0-based) of the matched target column
         - duplicate: bool               # Whether the name repeats an earlier schema column
-        - dtype_input: list[str] | None # dtypes supplied for the column (as supplied)
+        - dtype_input: list[str] | None # dtypes supplied for the column (as strings)
         - dtype_matched: bool           # Whether any supplied dtype matches the target dtype
         - dtype_matched_pos: int | None # Position of the first matching supplied dtype
     """
@@ -1174,7 +1191,7 @@ def _match_schema_columns(
 
         dtype_input = None
         if len(col) > 1 and col[1] is not None:
-            dtype_input = [col[1]] if isinstance(col[1], str) else list(col[1])
+            dtype_input = _dtype_candidates(col[1])
 
         dtype_matched_pos = None
         if target_index is not None and dtype_input is not None:
