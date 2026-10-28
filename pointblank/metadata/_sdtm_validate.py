@@ -38,8 +38,9 @@ def sdtm_to_metadata(
 ) -> MetadataImport:
     """Convert an SDTM domain template to a `MetadataImport` object.
 
-    This allows using the standard metadata pipeline (`to_schema`, `to_validate`) with SDTM domain
-    specifications.
+    This allows using the standard metadata pipeline
+    ([`to_schema()`](`pointblank.MetadataImport.to_schema`),
+    [`to_validate()`](`pointblank.MetadataImport.to_validate`)) with SDTM domain specifications.
 
     Parameters
     ----------

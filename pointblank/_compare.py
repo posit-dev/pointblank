@@ -1467,7 +1467,11 @@ class Comparison:
         return out
 
     def to_json(self, samples: bool = True, limit: int = 10, indent: int | None = 2) -> str:
-        """Get the comparison results as a JSON string (see `to_dict()`)."""
+        """
+        Get the comparison results as a JSON string.
+
+        The structure is the same as that of [`to_dict()`](`pointblank.Comparison.to_dict`).
+        """
         return json.dumps(self.to_dict(samples=samples, limit=limit), indent=indent)
 
     def get_tabular_report(

@@ -46,8 +46,9 @@ class DataScan:
         - a sample of the data (the first 5 values)
         - statistics (if the column contains numbers, strings, or datetimes)
 
-    To obtain a dictionary representation of the summary, you can use the `to_dict()` method. To
-    get a JSON representation of the summary, you can use the `to_json()` method. To save the JSON
+    To obtain a dictionary representation of the summary, you can use the
+    [`to_dict()`](`pointblank.DataScan.to_dict`) method. To get a JSON representation of the
+    summary, you can use the [`to_json()`](`pointblank.DataScan.to_json`) method. To save the JSON
     text to a file, the `save_to_json()` method could be used.
 
     :::{.callout-warning}
@@ -547,8 +548,9 @@ class DataScan:
 
         The returned dictionary contains metadata (table name, row count, column list) plus
         per-column profile entries with their data type, statistics, and sample data. This format is
-        designed for round-trip persistence: save it with `to_json()` / `save_to_json()` and restore
-        with `from_dict()` / `from_json()` / `load_from_json()`.
+        designed for round-trip persistence: save it with
+        [`to_json()`](`pointblank.DataScan.to_json`) / `save_to_json()` and restore with
+        [`from_dict()`](`pointblank.DataScan.from_dict`) / `from_json()` / `load_from_json()`.
 
         Returns
         -------
@@ -610,14 +612,16 @@ class DataScan:
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> DataScan:
         """
-        Restore a `DataScan` from a dictionary produced by `to_dict()`.
+        Restore a `DataScan` from a dictionary.
 
-        This reconstructs the profile without needing the original data.
+        The dictionary is the one produced by [`to_dict()`](`pointblank.DataScan.to_dict`). This
+        reconstructs the profile without needing the original data.
 
         Parameters
         ----------
         d
-            A dictionary with `"metadata"` and `"columns"` keys, as produced by `to_dict()`.
+            A dictionary with `"metadata"` and `"columns"` keys, as produced by
+            [`to_dict()`](`pointblank.DataScan.to_dict`).
 
         Returns
         -------
@@ -664,12 +668,14 @@ class DataScan:
     @classmethod
     def from_json(cls, json_string: str) -> DataScan:
         """
-        Restore a `DataScan` from a JSON string produced by `to_json()`.
+        Restore a `DataScan` from a JSON string.
+
+        The JSON string is the one produced by [`to_json()`](`pointblank.DataScan.to_json`).
 
         Parameters
         ----------
         json_string
-            A JSON string as produced by `to_json()`.
+            A JSON string as produced by [`to_json()`](`pointblank.DataScan.to_json`).
 
         Returns
         -------
@@ -702,7 +708,8 @@ class DataScan:
 
         The comparison covers schema changes (columns added, removed, or with changed types) and
         statistical drift for columns present in both scans. The returned `DataScanDiff` object
-        provides programmatic access to the results and a tabular report via `get_tabular_report()`.
+        provides programmatic access to the results and a tabular report via
+        [`get_tabular_report()`](`pointblank.DataScanDiff.get_tabular_report`).
 
         Parameters
         ----------
@@ -922,7 +929,8 @@ class DataScanDiff:
     The result of comparing two `DataScan` profiles.
 
     Created by calling `DataScan.compare()`. Provides programmatic access to schema changes and
-    per-column statistical drift, plus a tabular report via `get_tabular_report()`.
+    per-column statistical drift, plus a tabular report via
+    [`get_tabular_report()`](`pointblank.DataScanDiff.get_tabular_report`).
 
     Attributes
     ----------

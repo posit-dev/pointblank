@@ -1393,8 +1393,9 @@ class ConformanceReport:
 
         Only `RECORD_CHECK` and `DATASET_CONTENTS_CHECK` rules produce row-level findings; rules
         that check metadata or domain presence (e.g., `VARIABLE_METADATA_CHECK`,
-        `DOMAIN_PRESENCE_CHECK`) report a finding count in `get_tabular_report()` but do not appear
-        here. To see the visual findings table call `get_findings_table()` instead.
+        `DOMAIN_PRESENCE_CHECK`) report a finding count in
+        [`get_tabular_report()`](`pointblank.ConformanceReport.get_tabular_report`) but do not
+        appear here. To see the visual findings table call `get_findings_table()` instead.
 
         Findings are capped at **100 rows per rule** to bound memory use on large datasets. The
         `n_issues` value shown in `get_tabular_report()` always reflects the true total count for a
@@ -1465,10 +1466,11 @@ class ConformanceReport:
         """Build a record-level findings table as a styled Great Tables object.
 
         Returns one row per failing record captured by Pointblank's built-in rules engine. This is the
-        drill-down companion to `get_tabular_report()`: where the tabular report shows one
-        row per rule with an aggregate issue count, the findings table shows the individual
-        offending records so reviewers can trace violations back to specific subjects and
-        variables.
+        drill-down companion to
+        [`get_tabular_report()`](`pointblank.ConformanceReport.get_tabular_report`): where the
+        tabular report shows one row per rule with an aggregate issue count, the findings table
+        shows the individual offending records so reviewers can trace violations back to specific
+        subjects and variables.
 
         Table layout
         ------------

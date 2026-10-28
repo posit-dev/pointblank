@@ -2257,7 +2257,7 @@ def preview(
     ```
 
     Alternatively, we can use column selector functions like
-    [`starts_with()`](`pointblank.starts_with`) and [`matches()`](`pointblank.matches`)` to select
+    [`starts_with()`](`pointblank.starts_with`) and [`matches()`](`pointblank.matches`) to select
     columns based on text or patterns:
 
     ```{python}
@@ -18076,9 +18076,9 @@ class Validate:
         Raise an `AssertionError` if all tests are not passing.
 
         The `assert_passing()` method will raise an `AssertionError` if a test does not pass. This
-        method simply wraps `all_passed` for more ready use in test suites. The step number and
-        assertion made is printed in the `AssertionError` message if a failure occurs, ensuring
-        some details are preserved.
+        method simply wraps [`all_passed()`](`pointblank.Validate.all_passed`) for more ready use
+        in test suites. The step number and assertion made is printed in the `AssertionError`
+        message if a failure occurs, ensuring some details are preserved.
 
         If the validation has not yet been interrogated, this method will automatically call
         [`interrogate()`](`pointblank.Validate.interrogate`) with default parameters before checking
@@ -19513,8 +19513,9 @@ class Validate:
             The validation plan as a YAML string. The `tbl` field is set from `tbl_name` when
             available, otherwise to the placeholder `your_data`; set it to a loadable data
             source before passing the YAML to `yaml_interrogate()`. The `reference` field is
-            written the same way as in `to_code()`: a file path or connection string as-is, and
-            the placeholder `your_reference_data` (with a warning) for an in-memory table.
+            written the same way as in [`to_code()`](`pointblank.Validate.to_code`): a file path
+            or connection string as-is, and the placeholder `your_reference_data` (with a
+            warning) for an in-memory table.
 
         Notes on Fidelity
         -----------------
