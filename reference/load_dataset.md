@@ -83,7 +83,7 @@ pb.preview(game_revenue)
 
 | PandasRows2,000Columns11 |  |  |  |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|----|----|----|
-|  | player_id *str* | session_id *str* | session_start *datetime64\[us, UTC\]* | time *datetime64\[us, UTC\]* | item_type *str* | item_name *str* | item_revenue *float64* | session_duration *float64* | start_day *datetime64\[us\]* | acquisition *str* | country *str* |
+|  | player_id *object* | session_id *object* | session_start *datetime64\[ns, UTC\]* | time *datetime64\[ns, UTC\]* | item_type *object* | item_name *object* | item_revenue *float64* | session_duration *float64* | start_day *datetime64\[ns\]* | acquisition *object* | country *object* |
 | 1 | ECPANOIXLZHF896 | ECPANOIXLZHF896-eol2j8bs | 2015-01-01 01:31:03+00:00 | 2015-01-01 01:31:27+00:00 | iap | offer2 | 8.99 | 16.3 | 2015-01-01 00:00:00 | google | Germany |
 | 2 | ECPANOIXLZHF896 | ECPANOIXLZHF896-eol2j8bs | 2015-01-01 01:31:03+00:00 | 2015-01-01 01:36:57+00:00 | iap | gems3 | 22.49 | 16.3 | 2015-01-01 00:00:00 | google | Germany |
 | 3 | ECPANOIXLZHF896 | ECPANOIXLZHF896-eol2j8bs | 2015-01-01 01:31:03+00:00 | 2015-01-01 01:37:45+00:00 | iap | gold7 | 107.99 | 16.3 | 2015-01-01 00:00:00 | google | Germany |

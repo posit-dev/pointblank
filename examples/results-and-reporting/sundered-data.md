@@ -4,7 +4,7 @@
 
 | PandasRows4Columns8 |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
-|  | date_time *datetime64\[us\]* | date *datetime64\[us\]* | a *int64* | b *str* | c *float64* | d *float64* | e *bool* | f *str* |
+|  | date_time *datetime64\[ns\]* | date *datetime64\[ns\]* | a *int64* | b *object* | c *float64* | d *float64* | e *bool* | f *object* |
 | 1 | 2016-01-04 11:00:00 | 2016-01-04 00:00:00 | 2 | 1-bcd-345 | 3.0 | 3423.29 | True | high |
 | 2 | 2016-01-05 13:32:00 | 2016-01-05 00:00:00 | 6 | 8-kdg-938 | 3.0 | 2343.23 | True | high |
 | 3 | 2016-01-11 06:15:00 | 2016-01-11 00:00:00 | 4 | 2-dhe-923 | 4.0 | 3291.03 | True | mid |
@@ -36,7 +36,7 @@ Preview of Input Table
 
 | PandasRows13Columns8 |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
-|  | date_time *datetime64\[us\]* | date *datetime64\[us\]* | a *int64* | b *str* | c *float64* | d *float64* | e *bool* | f *str* |
+|  | date_time *datetime64\[ns\]* | date *datetime64\[ns\]* | a *int64* | b *object* | c *float64* | d *float64* | e *bool* | f *object* |
 | 1 | 2016-01-04 11:00:00 | 2016-01-04 00:00:00 | 2 | 1-bcd-345 | 3.0 | 3423.29 | True | high |
 | 2 | 2016-01-04 00:32:00 | 2016-01-04 00:00:00 | 3 | 5-egh-163 | 8.0 | 9999.99 | True | low |
 | 3 | 2016-01-05 13:32:00 | 2016-01-05 00:00:00 | 6 | 8-kdg-938 | 3.0 | 2343.23 | True | high |
