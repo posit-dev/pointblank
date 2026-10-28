@@ -102,7 +102,7 @@ Define-XML documents contain rich structural metadata. Pointblank extracts the f
 
 ### Controlled Terminology from Define-XML
 
-Define-XML documents embed the codelists that constrain variable values. When Pointblank parses a Define-XML, all codelists are extracted and linked to their respective variables. The [`to_validate()`](../../reference/MetadataImport.md#pointblank.MetadataImport.to_validate) method then generates [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) checks for each variable that references a codelist:
+Define-XML documents embed the codelists that constrain variable values. When Pointblank parses a Define-XML, all codelists are extracted and linked to their respective variables. The [`to_validate()`](../../reference/MetadataImport.md#pointblank.MetadataImport.to_validate) method then generates `col_vals_in_set()` checks for each variable that references a codelist:
 
 ``` python
 # Inspect codelists referenced by the Demographics domain
@@ -118,7 +118,7 @@ for cl_name, codelist in dm_meta.codelists.items():
 
 The `extensible` flag records an important distinction. Non-extensible codelists require strict adherence: any value not in the codelist is a conformance issue. Extensible codelists permit sponsor-defined additions, so a value outside the published set is not necessarily an error.
 
-Pointblank currently generates the same [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) check for both kinds of codelist. For extensible codelists you will typically want to relax that step to reflect that additions are allowed, for example by attaching a warning-level threshold to the step rather than treating every out-of-set value as a hard failure.
+Pointblank currently generates the same `col_vals_in_set()` check for both kinds of codelist. For extensible codelists you will typically want to relax that step to reflect that additions are allowed, for example by attaching a warning-level threshold to the step rather than treating every out-of-set value as a hard failure.
 
 ## CDISC Controlled Terminology Import
 
@@ -144,7 +144,7 @@ print(f"Extensible: {sex_codelist.extensible}")
     SEX values: ['F', 'M', 'U', 'UNDIFFERENTIATED']
     Extensible: False
 
-Once you have a codelist, its permitted values feed directly into a [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) check:
+Once you have a codelist, its permitted values feed directly into a `col_vals_in_set()` check:
 
 ``` python
 # Use the CT-derived value set in a validation
@@ -327,7 +327,7 @@ validation
 
 [TABLE]
 
-Three steps now report a failing unit: the [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) check on `USUBJID`, the [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) check on `DOMAIN`, and the ISO 8601 [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) check on `RFSTDTC`. Each failing step links to the specific rows so you can trace a conformance issue back to the offending records.
+Three steps now report a failing unit: the `col_vals_not_null()` check on `USUBJID`, the `col_vals_in_set()` check on `DOMAIN`, and the ISO 8601 `col_vals_regex()` check on `RFSTDTC`. Each failing step links to the specific rows so you can trace a conformance issue back to the offending records.
 
 ### Converting SDTM Templates to MetadataImport
 
@@ -550,14 +550,14 @@ for v in meta.variables:
 
 Frictionless constraints map directly onto Pointblank validation steps:
 
-| Frictionless constraint | Pointblank step |
-|----|----|
-| `"required": true` | [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) |
-| `"unique": true` | [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) |
-| `"minimum": 0` | `col_vals_ge(value=0)` |
-| `"maximum": 100` | `col_vals_le(value=100)` |
-| `"pattern": "..."` | `col_vals_regex(pattern="...")` |
-| `"enum": [...]` | `col_vals_in_set(set=[...])` |
+| Frictionless constraint | Pointblank step                 |
+|-------------------------|---------------------------------|
+| `"required": true`      | `col_vals_not_null()`           |
+| `"unique": true`        | `rows_distinct()`               |
+| `"minimum": 0`          | `col_vals_ge(value=0)`          |
+| `"maximum": 100`        | `col_vals_le(value=100)`        |
+| `"pattern": "..."`      | `col_vals_regex(pattern="...")` |
+| `"enum": [...]`         | `col_vals_in_set(set=[...])`    |
 
 The constraint mapping is direct and complete. Every constraint expressible in a Frictionless Table Schema has a corresponding Pointblank validation step, making the translation lossless.
 
@@ -672,7 +672,7 @@ print("boundary codes:", cdisc.values_for_category("boundary"))
     UNK  -> unknown
     boundary codes: ['PINF', 'NINF']
 
-This spec can be passed to [missing_vals_tbl()](../../reference/missing_vals_tbl.md#pointblank.missing_vals_tbl) for a reason-by-reason breakdown, or to the `col_vals_*()` and dedicated missingness validation methods ([col_pct_missing()](../../reference/Validate.col_pct_missing.md#pointblank.Validate.col_pct_missing), [col_missing_coded()](../../reference/Validate.col_missing_coded.md#pointblank.Validate.col_missing_coded), [col_missing_only_coded()](../../reference/Validate.col_missing_only_coded.md#pointblank.Validate.col_missing_only_coded), [col_missing_consistent()](../../reference/Validate.col_missing_consistent.md#pointblank.Validate.col_missing_consistent)) to validate data while accounting for the null flavor codes. See the *Missing Values Reporting* and *Validation Methods* articles for the full set of capabilities.
+This spec can be passed to [missing_vals_tbl()](../../reference/missing_vals_tbl.md#pointblank.missing_vals_tbl) for a reason-by-reason breakdown, or to the `col_vals_*()` and dedicated missingness validation methods (`col_pct_missing()`, `col_missing_coded()`, `col_missing_only_coded()`, `col_missing_consistent()`) to validate data while accounting for the null flavor codes. See the *Missing Values Reporting* and *Validation Methods* articles for the full set of capabilities.
 
 ## Conclusion
 

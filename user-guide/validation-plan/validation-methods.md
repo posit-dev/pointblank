@@ -337,7 +337,7 @@ validation
 
 [MissingSpec](../../reference/MissingSpec.md#pointblank.MissingSpec) also offers pre-built factories for common standards (e.g., `pb.MissingSpec.from_cdisc_null_flavors()`, `pb.MissingSpec.from_sas()`, `pb.MissingSpec.from_spss()`), and importing metadata from SPSS/Stata/SAS files can auto-generate specs via [`MetadataImport.missing_specs()`](../../reference/MetadataImport.md#pointblank.MetadataImport). For a fuller treatment of structured-missingness *reporting*, see the *Missing Values Reporting* article.
 
-### Referential Integrity with [col_vals_in_table()](../../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table)
+### Referential Integrity with `col_vals_in_table()`
 
 When your data spans multiple tables, you often need to verify that foreign key values in one table actually exist in another. The [`col_vals_in_table()`](../../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table) method handles this directly, checking each row's value (or composite key) against a reference table.
 
@@ -553,7 +553,7 @@ The [`Validate.col_schema_match()`](../../reference/Validate.col_schema_match.md
 
 These parameters all default to `True`, providing strict schema validation. Setting any to `False` relaxes the validation requirements, making the checks more flexible when exact matching isn't necessary or practical for your use case.
 
-### Comparing Tables with [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match)
+### Comparing Tables with `tbl_match()`
 
 The [`Validate.tbl_match()`](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) validation method provides a comprehensive way to verify that two tables are identical. It performs a progressive series of checks, from least to most stringent:
 
@@ -864,7 +864,7 @@ One powerful use case for [specially()](../../reference/Validate.specially.md#po
 
 #### Foreign Key Validation
 
-Verify that all keys in one dataset exist in another (this is equivalent to using [col_vals_in_table()](../../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table) but shown here for completeness):
+Verify that all keys in one dataset exist in another (this is equivalent to using `col_vals_in_table()` but shown here for completeness):
 
 ``` python
 # Create related datasets: Orders and OrderDetails

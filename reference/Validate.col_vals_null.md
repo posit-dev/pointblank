@@ -4,7 +4,7 @@ Validate whether values in a column are Null.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10076-L10330)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10154-L10408)
 
 ``` python
 Validate.col_vals_null(
@@ -19,7 +19,7 @@ Validate.col_vals_null(
 )
 ```
 
-The [col_vals_null()](../reference/Validate.col_vals_null.md#pointblank.Validate.col_vals_null) validation method checks whether column values in a table are Null. This validation will operate over the number of test units that is equal to the number of rows in the table.
+The `col_vals_null()` validation method checks whether column values in a table are Null. This validation will operate over the number of test units that is equal to the number of rows in the table.
 
 ## Parameters
 
@@ -135,7 +135,7 @@ validation
 
 [TABLE]
 
-Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using [col_vals_null()](../reference/Validate.col_vals_null.md#pointblank.Validate.col_vals_null). All test units passed, and there are no failing test units.
+Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using `col_vals_null()`. All test units passed, and there are no failing test units.
 
 Now, let's use that same set of values for a validation on column `b`.
 

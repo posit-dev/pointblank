@@ -12,30 +12,30 @@ Packaging fix release: no functional changes from v1.1.0.
 
 *2026-10-15* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v1.1.0)
 
-Pointblank `v1.1.0` adds table comparison and makes validation results more correct across backends. The new `pb.compare()` function, the [tbl_reconcile()](./reference/Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile) validation step, and the `pb compare` CLI command show exactly how two tables differ: row by row, column by column, and in aggregate. [tbl_match()](./reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) now runs on the same engine, with full step reports. This release also fixes how missing values, Ibis tables, and expression errors are handled in many validation methods. Steps that can't be evaluated now report an evaluation error instead of a misleading failure.
+Pointblank `v1.1.0` adds table comparison and makes validation results more correct across backends. The new `pb.compare()` function, the `tbl_reconcile()` validation step, and the `pb compare` CLI command show exactly how two tables differ: row by row, column by column, and in aggregate. `tbl_match()` now runs on the same engine, with full step reports. This release also fixes how missing values, Ibis tables, and expression errors are handled in many validation methods. Steps that can't be evaluated now report an evaluation error instead of a misleading failure.
 
 #### New Features
 
 - **Table comparison with `pb.compare()`** -- Aligns two tables by key, by position, or as multisets (`keys="*"`). Each row is classified as match, changed, missing, extra, or duplicate key, and schema differences are reported too. You can set numeric and datetime tolerances, normalize strings, map renamed columns with `column_map=`, and compare a subset of columns. The result is a [Comparison](./reference/Comparison.md#pointblank.Comparison) object with counts, row samples, a per-column summary, JSON export, and a Great Tables report in all 40 reporting languages. Inputs are scanned lazily, and `partitions=` limits memory use on very large tables. ([\#443](https://github.com/posit-dev/pointblank/issues/443))
-- **[tbl_reconcile()](./reference/Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile) validation step** -- Reconciles aggregates (sum, count, mean, min, max) between two tables, either by key group or as grand totals. ([\#443](https://github.com/posit-dev/pointblank/issues/443))
+- **`tbl_reconcile()` validation step** -- Reconciles aggregates (sum, count, mean, min, max) between two tables, either by key group or as grand totals. ([\#443](https://github.com/posit-dev/pointblank/issues/443))
 - **`pb compare` CLI command** -- Compares two tables from the command line, with HTML or JSON output, `--engine duckdb`, and exit codes for CI use (`0` match, `1` differences, `2` error). ([\#443](https://github.com/posit-dev/pointblank/issues/443))
-- **A richer [tbl_match()](./reference/Validate.tbl_match.md#pointblank.Validate.tbl_match)** -- Now uses the comparison engine and accepts the same settings. It gains a full step report, failing-row extracts from both tables, sundering, a compact settings badge, and `to_code()`/`to_yaml()` support. **Note:** each aligned row now counts as one test unit (before, the whole step was one unit), so fractional thresholds now refer to the share of failing rows. Pass/fail verdicts are unchanged. To fail on any difference as before, use `thresholds=1`. ([\#443](https://github.com/posit-dev/pointblank/issues/443))
+- **A richer `tbl_match()`** -- Now uses the comparison engine and accepts the same settings. It gains a full step report, failing-row extracts from both tables, sundering, a compact settings badge, and `to_code()`/`to_yaml()` support. **Note:** each aligned row now counts as one test unit (before, the whole step was one unit), so fractional thresholds now refer to the share of failing rows. Pass/fail verdicts are unchanged. To fail on any difference as before, use `thresholds=1`. ([\#443](https://github.com/posit-dev/pointblank/issues/443))
 
 #### Enhancements
 
 - Anthropic is no longer a required dependency. It's now installed only with the `pointblank[generate]` extra, so core installs are lighter. Thanks [@timkpaine](https://github.com/timkpaine)! ([\#437](https://github.com/posit-dev/pointblank/issues/437))
-- [col_vals_increasing()](./reference/Validate.col_vals_increasing.md#pointblank.Validate.col_vals_increasing) and [col_vals_decreasing()](./reference/Validate.col_vals_decreasing.md#pointblank.Validate.col_vals_decreasing) gain an `order_by=` parameter, so they now work on database tables, Ibis, and PySpark. Each value is now compared with the last non-missing value before it. ([\#451](https://github.com/posit-dev/pointblank/issues/451))
-- [col_vals_not_in_set()](./reference/Validate.col_vals_not_in_set.md#pointblank.Validate.col_vals_not_in_set) gains an `na_pass=` parameter. Both set-membership methods now document how they handle missing values and `NaN`. ([\#450](https://github.com/posit-dev/pointblank/issues/450))
-- `to_code()` and `to_yaml()` now include [col_vals_in_table()](./reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table) steps (with a placeholder for the reference table). ([\#461](https://github.com/posit-dev/pointblank/issues/461))
+- `col_vals_increasing()` and `col_vals_decreasing()` gain an `order_by=` parameter, so they now work on database tables, Ibis, and PySpark. Each value is now compared with the last non-missing value before it. ([\#451](https://github.com/posit-dev/pointblank/issues/451))
+- `col_vals_not_in_set()` gains an `na_pass=` parameter. Both set-membership methods now document how they handle missing values and `NaN`. ([\#450](https://github.com/posit-dev/pointblank/issues/450))
+- `to_code()` and `to_yaml()` now include `col_vals_in_table()` steps (with a placeholder for the reference table). ([\#461](https://github.com/posit-dev/pointblank/issues/461))
 - `col_vals_in_table(ref_table=)` now accepts file paths and connection strings. ([\#463](https://github.com/posit-dev/pointblank/issues/463))
-- [col_vals_in_table()](./reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table) now matches join key types across backends and handles numeric dtype mismatches in composite keys. ([\#431](https://github.com/posit-dev/pointblank/issues/431))
+- `col_vals_in_table()` now matches join key types across backends and handles numeric dtype mismatches in composite keys. ([\#431](https://github.com/posit-dev/pointblank/issues/431))
 - A `pre=` function with a `dfn` parameter now always receives a Narwhals DataFrame, whether it's a lambda, a named function, or another callable. This now also works with [col()](./reference/col.md#pointblank.col) selectors and `segments=`. ([\#458](https://github.com/posit-dev/pointblank/issues/458))
 
 #### Bug Fixes
 
 **Evaluation errors instead of misleading failures**
 
-- Invalid expressions in [col_vals_expr()](./reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) and [conjointly()](./reference/Validate.conjointly.md#pointblank.Validate.conjointly) are now reported as evaluation errors. ([\#448](https://github.com/posit-dev/pointblank/issues/448))
+- Invalid expressions in `col_vals_expr()` and `conjointly()` are now reported as evaluation errors. ([\#448](https://github.com/posit-dev/pointblank/issues/448))
 - Comparison steps on columns with incompatible types are now reported as evaluation errors. ([\#459](https://github.com/posit-dev/pointblank/issues/459))
 - [prompt()](./reference/Validate.prompt.md#pointblank.Validate.prompt) steps now record an evaluation error when an AI provider package is missing or every model request fails (e.g., an invalid API key). Before, every row was reported as failing. ([\#456](https://github.com/posit-dev/pointblank/issues/456))
 - Step reports now explain evaluation errors, and failing rows are now extracted for Ibis tables. ([\#452](https://github.com/posit-dev/pointblank/issues/452))
@@ -43,15 +43,15 @@ Pointblank `v1.1.0` adds table comparison and makes validation results more corr
 
 **Missing values**
 
-- Missing values now fail [col_vals_not_in_set()](./reference/Validate.col_vals_not_in_set.md#pointblank.Validate.col_vals_not_in_set) on every backend. Thanks [@raashish1601](https://github.com/raashish1601)! ([\#432](https://github.com/posit-dev/pointblank/issues/432))
-- [col_vals_eq()](./reference/Validate.col_vals_eq.md#pointblank.Validate.col_vals_eq) and [col_vals_ne()](./reference/Validate.col_vals_ne.md#pointblank.Validate.col_vals_ne) now count missing values consistently when comparing against another column. Thanks [@raashish1601](https://github.com/raashish1601)! ([\#433](https://github.com/posit-dev/pointblank/issues/433), [\#449](https://github.com/posit-dev/pointblank/issues/449))
-- Rows where a [col_vals_expr()](./reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) expression evaluates to null now count as failing. Thanks [@raashish1601](https://github.com/raashish1601)! ([\#435](https://github.com/posit-dev/pointblank/issues/435))
+- Missing values now fail `col_vals_not_in_set()` on every backend. Thanks [@raashish1601](https://github.com/raashish1601)! ([\#432](https://github.com/posit-dev/pointblank/issues/432))
+- `col_vals_eq()` and `col_vals_ne()` now count missing values consistently when comparing against another column. Thanks [@raashish1601](https://github.com/raashish1601)! ([\#433](https://github.com/posit-dev/pointblank/issues/433), [\#449](https://github.com/posit-dev/pointblank/issues/449))
+- Rows where a `col_vals_expr()` expression evaluates to null now count as failing. Thanks [@raashish1601](https://github.com/raashish1601)! ([\#435](https://github.com/posit-dev/pointblank/issues/435))
 
 **Backend support**
 
-- [col_vals_increasing()](./reference/Validate.col_vals_increasing.md#pointblank.Validate.col_vals_increasing) and [col_vals_decreasing()](./reference/Validate.col_vals_decreasing.md#pointblank.Validate.col_vals_decreasing) now support Polars LazyFrames. Thanks [@raashish1601](https://github.com/raashish1601)! ([\#434](https://github.com/posit-dev/pointblank/issues/434))
-- [tbl_match()](./reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) now materializes Ibis memtables and other Ibis backends. Thanks [@raashish1601](https://github.com/raashish1601)! ([\#436](https://github.com/posit-dev/pointblank/issues/436))
-- [conjointly()](./reference/Validate.conjointly.md#pointblank.Validate.conjointly) expressions now evaluate on Ibis tables. Thanks [@raashish1601](https://github.com/raashish1601)! ([\#438](https://github.com/posit-dev/pointblank/issues/438))
+- `col_vals_increasing()` and `col_vals_decreasing()` now support Polars LazyFrames. Thanks [@raashish1601](https://github.com/raashish1601)! ([\#434](https://github.com/posit-dev/pointblank/issues/434))
+- `tbl_match()` now materializes Ibis memtables and other Ibis backends. Thanks [@raashish1601](https://github.com/raashish1601)! ([\#436](https://github.com/posit-dev/pointblank/issues/436))
+- `conjointly()` expressions now evaluate on Ibis tables. Thanks [@raashish1601](https://github.com/raashish1601)! ([\#438](https://github.com/posit-dev/pointblank/issues/438))
 - `pb.load_dataset()` no longer raises a permission error for DuckDB datasets on Windows. Thanks [@matt-humphrey](https://github.com/matt-humphrey)! ([\#245](https://github.com/posit-dev/pointblank/issues/245))
 
 **Reports**
@@ -84,9 +84,9 @@ Pointblank `v1.0.1` is a maintenance release that makes Pointblank fully compati
 
 #### Bug Fixes
 
-- [col_vals_in_set()](./reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) and [col_vals_not_in_set()](./reference/Validate.col_vals_not_in_set.md#pointblank.Validate.col_vals_not_in_set) work again on Polars 2.0 when integer columns are checked against float values or float columns against integer values, including mixed sets such as `[1, 2.5]`. ([\#429](https://github.com/posit-dev/pointblank/issues/429), [\#430](https://github.com/posit-dev/pointblank/issues/430))
-- Step reports for [col_schema_match()](./reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) no longer raise a `ShapeError` on Polars 2.0 when the table and the expected schema have different numbers of columns. ([\#429](https://github.com/posit-dev/pointblank/issues/429))
-- Mismatches between integer, float and Decimal types no longer raise errors on Polars 2.0 in [col_vals_in_table()](./reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table), [col_pct_missing()](./reference/Validate.col_pct_missing.md#pointblank.Validate.col_pct_missing), [col_missing_only_coded()](./reference/Validate.col_missing_only_coded.md#pointblank.Validate.col_missing_only_coded), [col_missing_consistent()](./reference/Validate.col_missing_consistent.md#pointblank.Validate.col_missing_consistent), [missing_vals_tbl()](./reference/missing_vals_tbl.md#pointblank.missing_vals_tbl), the `missing=` argument of validation methods, segment groups, or the native CDISC conformance rule engine. ([\#430](https://github.com/posit-dev/pointblank/issues/430))
+- `col_vals_in_set()` and `col_vals_not_in_set()` work again on Polars 2.0 when integer columns are checked against float values or float columns against integer values, including mixed sets such as `[1, 2.5]`. ([\#429](https://github.com/posit-dev/pointblank/issues/429), [\#430](https://github.com/posit-dev/pointblank/issues/430))
+- Step reports for `col_schema_match()` no longer raise a `ShapeError` on Polars 2.0 when the table and the expected schema have different numbers of columns. ([\#429](https://github.com/posit-dev/pointblank/issues/429))
+- Mismatches between integer, float and Decimal types no longer raise errors on Polars 2.0 in `col_vals_in_table()`, `col_pct_missing()`, `col_missing_only_coded()`, `col_missing_consistent()`, [missing_vals_tbl()](./reference/missing_vals_tbl.md#pointblank.missing_vals_tbl), the `missing=` argument of validation methods, segment groups, or the native CDISC conformance rule engine. ([\#430](https://github.com/posit-dev/pointblank/issues/430))
 - [get_sundered_data()](./reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data) now returns rows in their original order for Polars LazyFrames. Polars 2.0's streaming engine could otherwise reorder them. ([\#430](https://github.com/posit-dev/pointblank/issues/430))
 - [get_data_extracts()](./reference/Validate.get_data_extracts.md#pointblank.Validate.get_data_extracts) now reports correct row numbers for Polars LazyFrames. Previously, rows were numbered by the sort order of the first column, on every Polars version. ([\#430](https://github.com/posit-dev/pointblank/issues/430))
 
@@ -98,12 +98,12 @@ Pointblank `v1.0.1` is a maintenance release that makes Pointblank fully compati
 
 *2026-10-06* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v1.0.0)
 
-Pointblank reaches `v1.0.0` with new ways to reuse and compose validation logic, a new string-length validation method, and full compatibility with Great Tables `v1.0.0`. The new [Steps](./reference/Steps.md#pointblank.Steps) builder and `Validate.add_steps()` let you define step libraries once and combine them across validation plans, with options to remap column names, override thresholds, or skip specific steps when importing. The new [col_vals_str_len()](./reference/Validate.col_vals_str_len.md#pointblank.Validate.col_vals_str_len) method checks that string lengths fall within minimum and/or maximum bounds. This release also restores validation reports under Great Tables `v1.0.0`, which now escapes HTML in table cells by default.
+Pointblank reaches `v1.0.0` with new ways to reuse and compose validation logic, a new string-length validation method, and full compatibility with Great Tables `v1.0.0`. The new [Steps](./reference/Steps.md#pointblank.Steps) builder and [Validate.add_steps()](./reference/Validate.add_steps.md#pointblank.Validate.add_steps) let you define step libraries once and combine them across validation plans, with options to remap column names, override thresholds, or skip specific steps when importing. The new `col_vals_str_len()` method checks that string lengths fall within minimum and/or maximum bounds. This release also restores validation reports under Great Tables `v1.0.0`, which now escapes HTML in table cells by default.
 
 #### New Features
 
-- **Composable validation steps**: the new `pb.Steps()` builder records validation steps without attaching them to a table, and `Validate.add_steps()` adds them to any validation plan. When importing steps, you can remap columns with `columns_map=`, override `thresholds=` or `active=`, and drop steps by name or position with `exclude=`. Existing [Validate](./reference/Validate.md#pointblank.Validate) objects can also serve as step sources, and [Steps](./reference/Steps.md#pointblank.Steps) objects show a formatted HTML summary in notebooks. A new *Composable Steps* article in the User Guide covers the workflow. ([\#424](https://github.com/posit-dev/pointblank/issues/424))
-- **[col_vals_str_len()](./reference/Validate.col_vals_str_len.md#pointblank.Validate.col_vals_str_len) validation method**: checks whether the character length of string values in one or more columns falls between `min_val=` and/or `max_val=`. It supports the usual `na_pass=`, `pre=`, `segments=`, `thresholds=`, and `actions=` options, has translated autobriefs, and is also available on [Steps](./reference/Steps.md#pointblank.Steps). ([\#422](https://github.com/posit-dev/pointblank/issues/422))
+- **Composable validation steps**: the new `pb.Steps()` builder records validation steps without attaching them to a table, and [Validate.add_steps()](./reference/Validate.add_steps.md#pointblank.Validate.add_steps) adds them to any validation plan. When importing steps, you can remap columns with `columns_map=`, override `thresholds=` or `active=`, and drop steps by name or position with `exclude=`. Existing [Validate](./reference/Validate.md#pointblank.Validate) objects can also serve as step sources, and [Steps](./reference/Steps.md#pointblank.Steps) objects show a formatted HTML summary in notebooks. A new *Composable Steps* article in the User Guide covers the workflow. ([\#424](https://github.com/posit-dev/pointblank/issues/424))
+- **`col_vals_str_len()` validation method**: checks whether the character length of string values in one or more columns falls between `min_val=` and/or `max_val=`. It supports the usual `na_pass=`, `pre=`, `segments=`, `thresholds=`, and `actions=` options, has translated autobriefs, and is also available on [Steps](./reference/Steps.md#pointblank.Steps). ([\#422](https://github.com/posit-dev/pointblank/issues/422))
 
 #### Bug Fixes
 
@@ -125,11 +125,11 @@ Pointblank reaches `v1.0.0` with new ways to reuse and compose validation logic,
 
 *2026-08-13* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.27.0)
 
-Pointblank `v0.27.0` brings referential integrity validation, statistical drift detection, and expanded data profiling capabilities. The new [col_vals_in_table()](./reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table) validation method enables cross-table foreign key checks, while [DataScan.compare()](./reference/DataScan.compare.md#pointblank.DataScan.compare) and the [DataScanDiff](./reference/DataScanDiff.md#pointblank.DataScanDiff) class make it possible to detect schema and statistical drift between data profiles over time. Several skills are now packaged with the library for immediate use, contract adapters received important additions and fixes, and the MCP integration has been cleaned up with a leaner dependency footprint.
+Pointblank `v0.27.0` brings referential integrity validation, statistical drift detection, and expanded data profiling capabilities. The new `col_vals_in_table()` validation method enables cross-table foreign key checks, while [DataScan.compare()](./reference/DataScan.compare.md#pointblank.DataScan.compare) and the [DataScanDiff](./reference/DataScanDiff.md#pointblank.DataScanDiff) class make it possible to detect schema and statistical drift between data profiles over time. Several skills are now packaged with the library for immediate use, contract adapters received important additions and fixes, and the MCP integration has been cleaned up with a leaner dependency footprint.
 
 #### New Features
 
-- **Referential integrity validation with [col_vals_in_table()](./reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table)** -- New validation method that checks whether each value (or composite key) in a column exists in a reference table column. Supports single and multi-column keys, `na_pass`, segmentation, and all standard thresholds and actions, making foreign key-style consistency checks a first-class validation step. ([\#419](https://github.com/posit-dev/pointblank/issues/419))
+- **Referential integrity validation with `col_vals_in_table()`** -- New validation method that checks whether each value (or composite key) in a column exists in a reference table column. Supports single and multi-column keys, `na_pass`, segmentation, and all standard thresholds and actions, making foreign key-style consistency checks a first-class validation step. ([\#419](https://github.com/posit-dev/pointblank/issues/419))
 
 - **Statistical drift measures via [DataScanDiff](./reference/DataScanDiff.md#pointblank.DataScanDiff)** -- `DataScan.compare(baseline)` now returns a [DataScanDiff](./reference/DataScanDiff.md#pointblank.DataScanDiff) object that provides programmatic access to schema changes (columns added, removed, or type-changed) and per-column statistical drift metrics -- Population Stability Index (PSI) for numeric and categorical columns, and Kolmogorov-Smirnov statistic for numerics (with a pure-Python fallback when SciPy is unavailable). Results are surfaced via `get_tabular_report()`, which renders a styled Great Tables report with schema and drift columns. ([\#421](https://github.com/posit-dev/pointblank/issues/421))
 
@@ -165,7 +165,7 @@ Pointblank `v0.26.0` is a major release focused on clinical data standards, data
 
 - **Schema enforcement API** -- A contract import/export system with a modular adapter architecture. `import_contract()` and `export_contract()` translate between external schema formats (JSON Schema, Frictionless Table Schema) and Pointblank validations or contracts. Custom adapters can be registered via the `[@register](https://github.com/register)_adapter` decorator. ([\#402](https://github.com/posit-dev/pointblank/issues/402))
 
-- **Structured missingness** -- A new [MissingSpec](./reference/MissingSpec.md#pointblank.MissingSpec) type maps sentinel values to reasons, and a `missing=` parameter on `col_vals_*()` methods excludes coded values from checks. Four dedicated validation steps are added: [col_pct_missing()](./reference/Validate.col_pct_missing.md#pointblank.Validate.col_pct_missing), [col_missing_coded()](./reference/Validate.col_missing_coded.md#pointblank.Validate.col_missing_coded), [col_missing_only_coded()](./reference/Validate.col_missing_only_coded.md#pointblank.Validate.col_missing_only_coded), and [col_missing_consistent()](./reference/Validate.col_missing_consistent.md#pointblank.Validate.col_missing_consistent). ([\#404](https://github.com/posit-dev/pointblank/issues/404))
+- **Structured missingness** -- A new [MissingSpec](./reference/MissingSpec.md#pointblank.MissingSpec) type maps sentinel values to reasons, and a `missing=` parameter on `col_vals_*()` methods excludes coded values from checks. Four dedicated validation steps are added: `col_pct_missing()`, `col_missing_coded()`, `col_missing_only_coded()`, and `col_missing_consistent()`. ([\#404](https://github.com/posit-dev/pointblank/issues/404))
 
 - **AI validation editor** -- The new [EditValidation](./reference/EditValidation.md#pointblank.EditValidation) class lets you modify an existing validation plan from a natural-language instruction, with [diff()](./reference/EditValidation.md#pointblank.EditValidation.diff), [changed_steps()](./reference/EditValidation.md#pointblank.EditValidation.changed_steps), [preview()](./reference/preview.md#pointblank.preview), and [accept()](./reference/EditValidation.md#pointblank.EditValidation.accept) methods for reviewing changes. Plan serialization via [Validate.to_code()](./reference/Validate.to_code.md#pointblank.Validate.to_code) and [Validate.to_yaml()](./reference/Validate.to_yaml.md#pointblank.Validate.to_yaml) is fully round-trippable. Also adds [Validate.suggest_improvements()](./reference/Validate.suggest_improvements.md#pointblank.Validate.suggest_improvements), [Validate.from_prompt()](./reference/Validate.from_prompt.md#pointblank.Validate.from_prompt), `Validate.from_plans()`, a syntax-lint guardrail with auto-reprompt, and a `pb edit` CLI command. ([\#408](https://github.com/posit-dev/pointblank/issues/408))
 
@@ -199,7 +199,7 @@ Pointblank `v0.25.0` introduces powerful new capabilities for data pipeline gove
 
 - Lazy frames are no longer prematurely collected during interrogation, preserving the performance benefits of deferred evaluation with Polars LazyFrames. ([\#398](https://github.com/posit-dev/pointblank/issues/398))
 
-- [rows_distinct()](./reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) now correctly handles rows containing null values instead of dropping them from validation results. ([\#399](https://github.com/posit-dev/pointblank/issues/399))
+- `rows_distinct()` now correctly handles rows containing null values instead of dropping them from validation results. ([\#399](https://github.com/posit-dev/pointblank/issues/399))
 
 - The MCP server now starts reliably across different versions of the `fastmcp` library by using version-aware instantiation with fallback strategies. ([\#400](https://github.com/posit-dev/pointblank/issues/400))
 
@@ -250,7 +250,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 - Expanded [generate_dataset()](./reference/generate_dataset.md#pointblank.generate_dataset) country support with 29 new countries (EC, PA, SA, UA, AM, AZ, BO, CM, DO, GE, GT, HN, IL, JM, JO, KH, KZ, LB, MD, MM, MZ, NP, PY, RS, RW, SV, TZ, UY, UZ), bringing the total to 100 supported countries, along with expanded street lists and normalized industry names across existing countries. ([\#370](https://github.com/posit-dev/pointblank/issues/370), [\#371](https://github.com/posit-dev/pointblank/issues/371))
 - Added [profile_fields()](./reference/profile_fields.md#pointblank.profile_fields) as a composite helper that creates a dictionary of person-profile `StringField` objects for direct unpacking into a [Schema()](./reference/Schema.md#pointblank.Schema). Supports three tiers (`"minimal"`, `"standard"`, `"full"`), name splitting, column include/exclude, and a `prefix=` parameter for namespacing. ([\#367](https://github.com/posit-dev/pointblank/issues/367))
-- Significantly expanded YAML workflow support with governance metadata (`owner`, `consumers`, `version`), `final_actions` and `reference` top-level keys, aggregate validation methods ([col_sum_gt](./reference/Validate.col_sum_gt.md#pointblank.Validate.col_sum_gt), [col_avg_le](./reference/Validate.col_avg_le.md#pointblank.Validate.col_avg_le), etc.), [col_pct_null](./reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null), [data_freshness](./reference/Validate.data_freshness.md#pointblank.Validate.data_freshness), shortcut syntax for the `active` parameter, unknown-key validation to catch typos, and YAML-to-Python roundtrip fidelity. ([\#369](https://github.com/posit-dev/pointblank/issues/369))
+- Significantly expanded YAML workflow support with governance metadata (`owner`, `consumers`, `version`), `final_actions` and `reference` top-level keys, aggregate validation methods ([col_sum_gt](./reference/Validate.col_sum_gt.md#pointblank.Validate.col_sum_gt), [col_avg_le](./reference/Validate.col_avg_le.md#pointblank.Validate.col_avg_le), etc.), `col_pct_null`, `data_freshness`, shortcut syntax for the `active` parameter, unknown-key validation to catch typos, and YAML-to-Python roundtrip fidelity. ([\#369](https://github.com/posit-dev/pointblank/issues/369))
 
 ### Bug Fixes
 
@@ -298,7 +298,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 ### New Features
 
 - We can now specify `owner`, `consumers`, and `version` metadata for data validations within the [Validate](./reference/Validate.md#pointblank.Validate) class. ([\#344](https://github.com/posit-dev/pointblank/issues/344))
-- The new [data_freshness()](./reference/Validate.data_freshness.md#pointblank.Validate.data_freshness) validation method has been added for easily checking the freshness of data. ([\#345](https://github.com/posit-dev/pointblank/issues/345))
+- The new `data_freshness()` validation method has been added for easily checking the freshness of data. ([\#345](https://github.com/posit-dev/pointblank/issues/345))
 
 ### Fixes
 
@@ -334,12 +334,12 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ### New Features
 
-- All [col_schema_match()](./reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) validation steps are now accompanied by notes that describe the results. ([\#325](https://github.com/posit-dev/pointblank/issues/325))
+- All `col_schema_match()` validation steps are now accompanied by notes that describe the results. ([\#325](https://github.com/posit-dev/pointblank/issues/325))
 - Notes appear in validation reports notes when columns are not found or none are resolved by use of column selectors. ([\#326](https://github.com/posit-dev/pointblank/issues/326))
 - Validation reports now have informative notes for steps that use the `pre=` parameter. ([\#328](https://github.com/posit-dev/pointblank/issues/328))
 - New options are available (in `get_tabular_report()` and globally in `config()`) for enabling/disabling validation report footer sections. ([\#327](https://github.com/posit-dev/pointblank/issues/327))
 - Added the `test-core` target for running core tests (large time savings compared to running all tests). ([\#331](https://github.com/posit-dev/pointblank/issues/331))
-- New validation method added, [col_pct_null()](./reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null), for checking the percentage of Null values in a column. ([\#290](https://github.com/posit-dev/pointblank/issues/290), [@tylerriccio33](https://github.com/tylerriccio33))
+- New validation method added, `col_pct_null()`, for checking the percentage of Null values in a column. ([\#290](https://github.com/posit-dev/pointblank/issues/290), [@tylerriccio33](https://github.com/tylerriccio33))
 
 ### Fixes
 
@@ -388,7 +388,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ### New Features
 
-- Several new validation methods were incorporated: [col_vals_within_spec()](./reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec), [col_vals_increasing()](./reference/Validate.col_vals_increasing.md#pointblank.Validate.col_vals_increasing), [col_vals_decreasing()](./reference/Validate.col_vals_decreasing.md#pointblank.Validate.col_vals_decreasing), and [tbl_match()](./reference/Validate.tbl_match.md#pointblank.Validate.tbl_match). ([\#304](https://github.com/posit-dev/pointblank/issues/304), [\#305](https://github.com/posit-dev/pointblank/issues/305), [\#306](https://github.com/posit-dev/pointblank/issues/306))
+- Several new validation methods were incorporated: `col_vals_within_spec()`, `col_vals_increasing()`, `col_vals_decreasing()`, and `tbl_match()`. ([\#304](https://github.com/posit-dev/pointblank/issues/304), [\#305](https://github.com/posit-dev/pointblank/issues/305), [\#306](https://github.com/posit-dev/pointblank/issues/306))
 - The option to ignore SSL verification was added to the [DraftValidation](./reference/DraftValidation.md#pointblank.DraftValidation) class via the new `verify_ssl=` parameter. ([\#302](https://github.com/posit-dev/pointblank/issues/302))
 - Added the (internal for now) 'notes' functionality for validation step, which will allow for useful information in individual validation steps to be available post-interrogation. ([\#303](https://github.com/posit-dev/pointblank/issues/303))
 
@@ -435,8 +435,8 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ### New Features
 
-- Add Enum support to [col_vals_in_set()](./reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) and [col_vals_not_in_set()](./reference/Validate.col_vals_not_in_set.md#pointblank.Validate.col_vals_not_in_set). ([\#280](https://github.com/posit-dev/pointblank/issues/280))
-- The [col_vals_regex()](./reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) validation method now has the `inverse=` parameter to enable negative regex matching. ([\#282](https://github.com/posit-dev/pointblank/issues/282))
+- Add Enum support to `col_vals_in_set()` and `col_vals_not_in_set()`. ([\#280](https://github.com/posit-dev/pointblank/issues/280))
+- The `col_vals_regex()` validation method now has the `inverse=` parameter to enable negative regex matching. ([\#282](https://github.com/posit-dev/pointblank/issues/282))
 
 ### Fixes
 
@@ -468,12 +468,12 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ### New Features
 
-- String-based comparisons are now possible in the [col_vals_eq()](./reference/Validate.col_vals_eq.md#pointblank.Validate.col_vals_eq) and [col_vals_ne()](./reference/Validate.col_vals_ne.md#pointblank.Validate.col_vals_ne) validation methods. ([\#272](https://github.com/posit-dev/pointblank/issues/272))
+- String-based comparisons are now possible in the `col_vals_eq()` and `col_vals_ne()` validation methods. ([\#272](https://github.com/posit-dev/pointblank/issues/272))
 
 ### Fixes
 
 - We can now enable passing of `NaN` values during interrogation when `na_pass=True`. ([\#271](https://github.com/posit-dev/pointblank/issues/271))
-- A [col_vals_expr()](./reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr)-based step can now be used with the [get_step_report()](./reference/Validate.get_step_report.md#pointblank.Validate.get_step_report) method. ([\#273](https://github.com/posit-dev/pointblank/issues/273))
+- A `col_vals_expr()`-based step can now be used with the [get_step_report()](./reference/Validate.get_step_report.md#pointblank.Validate.get_step_report) method. ([\#273](https://github.com/posit-dev/pointblank/issues/273))
 
 ### Chores
 
@@ -659,7 +659,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 - The [DataScan](./reference/DataScan.md#pointblank.DataScan) class was refactored to expose data and statistics consistently. ([@tylerriccio33](https://github.com/tylerriccio33), [\#94](https://github.com/posit-dev/pointblank/issues/94))
 - Pass/fail result counting during interrogation is now more computationally efficient. ([\#203](https://github.com/posit-dev/pointblank/issues/203))
-- Validation steps using [col_vals_expr()](./reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) can now correctly return data extracts (and produce a CSV button in the validation report table). ([@zilto](https://github.com/zilto), [\#197](https://github.com/posit-dev/pointblank/issues/197))
+- Validation steps using `col_vals_expr()` can now correctly return data extracts (and produce a CSV button in the validation report table). ([@zilto](https://github.com/zilto), [\#197](https://github.com/posit-dev/pointblank/issues/197))
 - A dependency on Pandas during the rendering validation report tables was eliminated. ([\#220](https://github.com/posit-dev/pointblank/issues/220))
 - An unwanted scrollbar in the API reference pages (obscuring text for parameters) was removed. ([@matt-humphrey](https://github.com/matt-humphrey), [\#218](https://github.com/posit-dev/pointblank/issues/218))
 
@@ -729,7 +729,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ### New Features
 
-- Added the [rows_complete()](./reference/Validate.rows_complete.md#pointblank.Validate.rows_complete) validation method, by [@rich-iannone](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/171
+- Added the `rows_complete()` validation method, by [@rich-iannone](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/171
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.9.0…v0.9.1](https://github.com/posit-dev/pointblank/compare/v0.9.0...v0.9.1)
 
@@ -750,7 +750,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ### New Features
 
-- Allow `None` in [col_vals_in_set()](./reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) by [@tylerriccio33](https://github.com/tylerriccio33), https://github.com/posit-dev/pointblank/pull/162
+- Allow `None` in `col_vals_in_set()` by [@tylerriccio33](https://github.com/tylerriccio33), https://github.com/posit-dev/pointblank/pull/162
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.8.6…v0.8.7](https://github.com/posit-dev/pointblank/compare/v0.8.6...v0.8.7)
 
@@ -760,7 +760,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ### New Features
 
-- Added the [conjointly()](./reference/Validate.conjointly.md#pointblank.Validate.conjointly) validation method, by [@rich-iannone](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/159, https://github.com/posit-dev/pointblank/pull/160)
+- Added the `conjointly()` validation method, by [@rich-iannone](https://github.com/rich-iannone) (https://github.com/posit-dev/pointblank/pull/159, https://github.com/posit-dev/pointblank/pull/160)
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.8.5…v0.8.6](https://github.com/posit-dev/pointblank/compare/v0.8.5...v0.8.6)
 
@@ -770,7 +770,7 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 
 ### New Features
 
-- Added step report functionality for [rows_distinct()](./reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) validation steps, by [@rich-iannone](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/157
+- Added step report functionality for `rows_distinct()` validation steps, by [@rich-iannone](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/157
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.8.4…v0.8.5](https://github.com/posit-dev/pointblank/compare/v0.8.4...v0.8.5)
 

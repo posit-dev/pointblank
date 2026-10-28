@@ -273,7 +273,7 @@ This is useful when working with data sources that might represent the same info
 
 ## Schema Validation Options
 
-When using [col_schema_match()](../../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match), you can customize validation behavior with several important options:
+When using `col_schema_match()`, you can customize validation behavior with several important options:
 
 | Option | Default | Description |
 |----|----|----|

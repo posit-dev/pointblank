@@ -695,7 +695,7 @@ The <code>pb</code> command, which you run in a terminal to use Pointblank witho
 </dd>
 <dt>Coded missing value</dt>
 <dd>
-A stand-in value, such as <code>-99</code> or <code>"UNK"</code>, that means a value is missing for a known reason (for example, the person refused to answer or wasn’t asked). The <a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> class lists which codes a column uses and what each one means. Validation methods like <a href="../../reference/Validate.col_missing_coded.html#pointblank.Validate.col_missing_coded" class="gdls-link gdls-code">col_missing_coded()</a> and the <strong>missing values table</strong> can then treat these codes as missing data. See also <strong>null flavor</strong>. <a href="../../user-guide/data-inspection/missing-vals-tbl.html">Learn more</a>.
+A stand-in value, such as <code>-99</code> or <code>"UNK"</code>, that means a value is missing for a known reason (for example, the person refused to answer or wasn’t asked). The <a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> class lists which codes a column uses and what each one means. Validation methods like <code>col_missing_coded()</code> and the <strong>missing values table</strong> can then treat these codes as missing data. See also <strong>null flavor</strong>. <a href="../../user-guide/data-inspection/missing-vals-tbl.html">Learn more</a>.
 </dd>
 <dt>Codelist</dt>
 <dd>
@@ -719,7 +719,7 @@ See <strong>table comparison</strong>.
 </dd>
 <dt>Composable steps</dt>
 <dd>
-A reusable set of <strong>validation steps</strong> that isn’t tied to any particular table. You build the set with the <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> class, using the same method names as <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a>, and add it to any validation with <code>Validate.add_steps()</code>. This lets you write common checks once and reuse them for many tables. <a href="../../user-guide/advanced-validation/composable-steps.html">Learn more</a>.
+A reusable set of <strong>validation steps</strong> that isn’t tied to any particular table. You build the set with the <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> class, using the same method names as <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a>, and add it to any validation with <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">Validate.add_steps()</a>. This lets you write common checks once and reuse them for many tables. <a href="../../user-guide/advanced-validation/composable-steps.html">Learn more</a>.
 </dd>
 <dt>Conformance report</dt>
 <dd>
@@ -727,7 +727,7 @@ The results of checking a set of clinical trial datasets against <strong>CDISC</
 </dd>
 <dt>Conjointly</dt>
 <dd>
-A single <strong>validation step</strong> that checks several conditions on each row at once. A row passes only if every condition is true for that row. This is different from adding one step per condition, where each condition is judged on its own. Added with <a href="../../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link gdls-code">conjointly()</a>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
+A single <strong>validation step</strong> that checks several conditions on each row at once. A row passes only if every condition is true for that row. This is different from adding one step per condition, where each condition is judged on its own. Added with <code>conjointly()</code>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
 </dd>
 <dt>Connection string</dt>
 <dd>
@@ -771,7 +771,7 @@ The rows that failed a <strong>validation step</strong>, saved during <strong>in
 </dd>
 <dt>Data freshness</dt>
 <dd>
-Whether a table has recent data. <a href="../../reference/Validate.data_freshness.html#pointblank.Validate.data_freshness" class="gdls-link gdls-code">data_freshness()</a> checks that the latest date or time in a column is no older than <code>max_age=</code>, given as text like <code>"6h"</code>, <code>"2d"</code>, or <code>"1d 12h"</code>. The <strong>validation report</strong> shows how old the data was, which helps tell a small delay from a pipeline that has stopped. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
+Whether a table has recent data. <code>data_freshness()</code> checks that the latest date or time in a column is no older than <code>max_age=</code>, given as text like <code>"6h"</code>, <code>"2d"</code>, or <code>"1d 12h"</code>. The <strong>validation report</strong> shows how old the data was, which helps tell a small delay from a pipeline that has stopped. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
 </dd>
 <dt>DataScan</dt>
 <dd>
@@ -811,7 +811,7 @@ The number a command gives back when it finishes, which scripts and CI systems u
 </dd>
 <dt>Expression check</dt>
 <dd>
-A <strong>validation step</strong> that checks each row against a condition written in your table library’s own syntax. For example, with Polars you might check <code>pl.col("end") &gt; pl.col("start")</code>. Added with <a href="../../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a>. <a href="../../user-guide/advanced-validation/expressions.html">Learn more</a>.
+A <strong>validation step</strong> that checks each row against a condition written in your table library’s own syntax. For example, with Polars you might check <code>pl.col("end") &gt; pl.col("start")</code>. Added with <code>col_vals_expr()</code>. <a href="../../user-guide/advanced-validation/expressions.html">Learn more</a>.
 </dd>
 <dt>Field</dt>
 <dd>
@@ -875,7 +875,7 @@ OpenTelemetry is a widely used standard for sending measurements from programs t
 </dd>
 <dt>Partitions</dt>
 <dd>
-A way to compare tables that are too large to fit in memory. With <code>partitions=N</code>, <a href="../../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a> (and <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> and <a href="../../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a>) works through the tables in N passes, each covering a share of the keys from both tables. The results are the same as in a single pass, but less memory is needed at once. More partitions use less memory but take longer. See also <strong>table comparison</strong>. <a href="../../user-guide/table-comparison/comparing-large-files.html">Learn more</a>.
+A way to compare tables that are too large to fit in memory. With <code>partitions=N</code>, <a href="../../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a> (and <code>tbl_match()</code> and <code>tbl_reconcile()</code>) works through the tables in N passes, each covering a share of the keys from both tables. The results are the same as in a single pass, but less memory is needed at once. More partitions use less memory but take longer. See also <strong>table comparison</strong>. <a href="../../user-guide/table-comparison/comparing-large-files.html">Learn more</a>.
 </dd>
 <dt>Pipeline</dt>
 <dd>
@@ -903,11 +903,11 @@ A way to write Python code inside a <strong>YAML workflow</strong>, for settings
 </dd>
 <dt>Quality dimension</dt>
 <dd>
-A category describing what kind of data quality a step measures. The categories are <em>completeness</em>, <em>validity</em>, <em>uniqueness</em>, <em>consistency</em>, <em>timeliness</em>, and <em>volume</em>. Each validation method has a default category (for example, <a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a> measures completeness), and you can change it with <code>dimension=</code>. Each dimension gets its own score, and together they make up the <strong>health score</strong>. <a href="../../user-guide/post-interrogation/quality-dimensions-and-scoring.html">Learn more</a>.
+A category describing what kind of data quality a step measures. The categories are <em>completeness</em>, <em>validity</em>, <em>uniqueness</em>, <em>consistency</em>, <em>timeliness</em>, and <em>volume</em>. Each validation method has a default category (for example, <code>col_vals_not_null()</code> measures completeness), and you can change it with <code>dimension=</code>. Each dimension gets its own score, and together they make up the <strong>health score</strong>. <a href="../../user-guide/post-interrogation/quality-dimensions-and-scoring.html">Learn more</a>.
 </dd>
 <dt>Reconciliation</dt>
 <dd>
-Checking that two tables add up to the same numbers even though their rows differ, for example that a summary table agrees with the detailed records it was built from. <a href="../../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a> groups both tables by the <code>keys=</code> columns, totals the <code>measures=</code> columns (with <code>agg="sum"</code> by default, or <code>"count"</code>, <code>"mean"</code>, <code>"min"</code>, or <code>"max"</code>), and compares the results group by group. Each group is one <strong>test unit</strong>. See also <strong>table comparison</strong>. <a href="../../user-guide/table-comparison/comparing-tables.html">Learn more</a>.
+Checking that two tables add up to the same numbers even though their rows differ, for example that a summary table agrees with the detailed records it was built from. <code>tbl_reconcile()</code> groups both tables by the <code>keys=</code> columns, totals the <code>measures=</code> columns (with <code>agg="sum"</code> by default, or <code>"count"</code>, <code>"mean"</code>, <code>"min"</code>, or <code>"max"</code>), and compares the results group by group. Each group is one <strong>test unit</strong>. See also <strong>table comparison</strong>. <a href="../../user-guide/table-comparison/comparing-tables.html">Learn more</a>.
 </dd>
 <dt>Reference data</dt>
 <dd>
@@ -915,7 +915,7 @@ A second table, such as last month’s data, that <strong>aggregate checks</stro
 </dd>
 <dt>Referential check</dt>
 <dd>
-A check that every value in a column also appears in a column of another table, for example that every <code>customer_id</code> in an orders table exists in the customers table. Added with <a href="../../reference/Validate.col_vals_in_table.html#pointblank.Validate.col_vals_in_table" class="gdls-link gdls-code">col_vals_in_table()</a>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
+A check that every value in a column also appears in a column of another table, for example that every <code>customer_id</code> in an orders table exists in the customers table. Added with <code>col_vals_in_table()</code>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
 </dd>
 <dt>Report language</dt>
 <dd>
@@ -927,7 +927,7 @@ Turning something into another form and back again, ending up with the same thin
 </dd>
 <dt>Row-based check</dt>
 <dd>
-A check on whole rows rather than on single values. <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> checks that no row appears more than once, and <a href="../../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" class="gdls-link gdls-code">rows_complete()</a> checks that no row has missing values. Both can look at just some of the columns with <code>columns_subset=</code>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
+A check on whole rows rather than on single values. <code>rows_distinct()</code> checks that no row appears more than once, and <code>rows_complete()</code> checks that no row has missing values. Both can look at just some of the columns with <code>columns_subset=</code>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
 </dd>
 <dt>Row status</dt>
 <dd>
@@ -935,7 +935,7 @@ The result for one row in a <strong>table comparison</strong>: <code>match</code
 </dd>
 <dt>Schema</dt>
 <dd>
-A description of the columns a table should have: their names and, optionally, their types. You write one with the <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> class and check a table against it with <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a>, with options for how strict to be about column order, capital letters, and types. <a href="../../reference/schema_from_tbl.html#pointblank.schema_from_tbl" class="gdls-link gdls-code">schema_from_tbl()</a> builds a schema from an existing table. <a href="../../user-guide/advanced-validation/schema-validation.html">Learn more</a>.
+A description of the columns a table should have: their names and, optionally, their types. You write one with the <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> class and check a table against it with <code>col_schema_match()</code>, with options for how strict to be about column order, capital letters, and types. <a href="../../reference/schema_from_tbl.html#pointblank.schema_from_tbl" class="gdls-link gdls-code">schema_from_tbl()</a> builds a schema from an existing table. <a href="../../user-guide/advanced-validation/schema-validation.html">Learn more</a>.
 </dd>
 <dt>Scorecard</dt>
 <dd>
@@ -963,11 +963,11 @@ See <strong>warning, error, and critical</strong>.
 </dd>
 <dt>Source and target</dt>
 <dd>
-The two sides of a <strong>table comparison</strong> or a <strong>pipeline</strong>. In a table comparison, the source is the table you start from and the target is the one checked against it. With <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a>, the table being validated is the target, and <code>tbl_compare=</code> is the source. In a pipeline, the source is the data going into your transformation and the target is what comes out, and each can have its own <strong>contract</strong>. A contract’s <code>direction=</code> (<code>"source"</code> or <code>"target"</code>) records which side it’s meant for. <a href="../../user-guide/contracts-and-pipelines/pipelines.html">Learn more</a>.
+The two sides of a <strong>table comparison</strong> or a <strong>pipeline</strong>. In a table comparison, the source is the table you start from and the target is the one checked against it. With <code>tbl_match()</code>, the table being validated is the target, and <code>tbl_compare=</code> is the source. In a pipeline, the source is the data going into your transformation and the target is what comes out, and each can have its own <strong>contract</strong>. A contract’s <code>direction=</code> (<code>"source"</code> or <code>"target"</code>) records which side it’s meant for. <a href="../../user-guide/contracts-and-pipelines/pipelines.html">Learn more</a>.
 </dd>
 <dt>Specification check</dt>
 <dd>
-A check that text values follow a well-known format, such as email addresses, URLs, postal codes, credit card numbers, ISBNs, VINs, or IBANs. Added with <a href="../../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link gdls-code">col_vals_within_spec()</a>, for example with <code>spec="email"</code> or <code>spec="postal_code[USA]"</code>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
+A check that text values follow a well-known format, such as email addresses, URLs, postal codes, credit card numbers, ISBNs, VINs, or IBANs. Added with <code>col_vals_within_spec()</code>, for example with <code>spec="email"</code> or <code>spec="postal_code[USA]"</code>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
 </dd>
 <dt>Status check</dt>
 <dd>
@@ -991,7 +991,7 @@ Splitting a table in two after validation: the rows that passed every row-by-row
 </dd>
 <dt>Table comparison</dt>
 <dd>
-Finding the differences between two tables. <a href="../../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a> matches up the rows of a source table and a target table, gives each row a <strong>row status</strong> (such as <code>changed</code> or <code>missing</code>), and reports any differences in their columns. It returns a <a href="../../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> object, which counts as <code>True</code> only if the tables match. Rows can be matched by key columns (<code>keys="id"</code>), by position (the default), or regardless of order (<code>keys="*"</code>), and small differences can be allowed with <code>tolerance=</code> or ignored with <code>normalize=</code> (for example, letter case). As a <strong>validation step</strong>, <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> runs the same comparison with each row as a <strong>test unit</strong>, and <a href="../../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a> compares totals instead (see <strong>reconciliation</strong>). From the <strong>CLI</strong>, use <code>pb compare</code>. To check only the number of rows or columns, use <a href="../../reference/Validate.row_count_match.html#pointblank.Validate.row_count_match" class="gdls-link gdls-code">row_count_match()</a> or <a href="../../reference/Validate.col_count_match.html#pointblank.Validate.col_count_match" class="gdls-link gdls-code">col_count_match()</a>. See also <strong>source and target</strong> and <strong>partitions</strong>. <a href="../../user-guide/table-comparison/comparing-tables.html">Learn more</a>.
+Finding the differences between two tables. <a href="../../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a> matches up the rows of a source table and a target table, gives each row a <strong>row status</strong> (such as <code>changed</code> or <code>missing</code>), and reports any differences in their columns. It returns a <a href="../../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> object, which counts as <code>True</code> only if the tables match. Rows can be matched by key columns (<code>keys="id"</code>), by position (the default), or regardless of order (<code>keys="*"</code>), and small differences can be allowed with <code>tolerance=</code> or ignored with <code>normalize=</code> (for example, letter case). As a <strong>validation step</strong>, <code>tbl_match()</code> runs the same comparison with each row as a <strong>test unit</strong>, and <code>tbl_reconcile()</code> compares totals instead (see <strong>reconciliation</strong>). From the <strong>CLI</strong>, use <code>pb compare</code>. To check only the number of rows or columns, use <code>row_count_match()</code> or <code>col_count_match()</code>. See also <strong>source and target</strong> and <strong>partitions</strong>. <a href="../../user-guide/table-comparison/comparing-tables.html">Learn more</a>.
 </dd>
 <dt>Test data generation</dt>
 <dd>
@@ -1003,7 +1003,7 @@ One of the sample tables that comes with Pointblank, loaded with <a href="../../
 </dd>
 <dt>Test unit</dt>
 <dd>
-A single thing that passes or fails in a <strong>validation step</strong>. When a step checks the values in a column, each value is one test unit, so checking a column in a 100-row table gives 100 test units. When a step checks the table or column as a whole (like <a href="../../reference/Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link gdls-code">col_exists()</a> or <a href="../../reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt" class="gdls-link gdls-code">col_sum_gt()</a>), there is just one test unit. The pass and fail counts in the <strong>validation report</strong> are counts of test units. <a href="../../user-guide/getting-started/quickstart.html">Learn more</a>.
+A single thing that passes or fails in a <strong>validation step</strong>. When a step checks the values in a column, each value is one test unit, so checking a column in a 100-row table gives 100 test units. When a step checks the table or column as a whole (like <code>col_exists()</code> or <a href="../../reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt" class="gdls-link gdls-code">col_sum_gt()</a>), there is just one test unit. The pass and fail counts in the <strong>validation report</strong> are counts of test units. <a href="../../user-guide/getting-started/quickstart.html">Learn more</a>.
 </dd>
 <dt>Threshold</dt>
 <dd>
@@ -1011,11 +1011,11 @@ A limit on how many failing <strong>test units</strong> a step can have before i
 </dd>
 <dt>Tolerance</dt>
 <dd>
-How far a result can be from the expected one and still pass. <strong>Aggregate checks</strong> and <a href="../../reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null" class="gdls-link gdls-code">col_pct_null()</a> take <code>tol=</code>: for example, <code>col_avg_eq(columns="x", value=10, tol=0.5)</code> passes for any average from 9.5 to 10.5. In a <strong>table comparison</strong>, <code>tolerance=</code> sets how much two values may differ, as an absolute amount (<code>atol</code>), as a share of the source value (<code>rtol</code>), or, for dates and times, as a length of time like <code>"1s"</code>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
+How far a result can be from the expected one and still pass. <strong>Aggregate checks</strong> and <code>col_pct_null()</code> take <code>tol=</code>: for example, <code>col_avg_eq(columns="x", value=10, tol=0.5)</code> passes for any average from 9.5 to 10.5. In a <strong>table comparison</strong>, <code>tolerance=</code> sets how much two values may differ, as an absolute amount (<code>atol</code>), as a share of the source value (<code>rtol</code>), or, for dates and times, as a length of time like <code>"1s"</code>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
 </dd>
 <dt>Trend check</dt>
 <dd>
-A check that a column’s values go up (<a href="../../reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link gdls-code">col_vals_increasing()</a>) or down (<a href="../../reference/Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link gdls-code">col_vals_decreasing()</a>) from one row to the next, as in a time series. Repeated values fail unless <code>allow_stationary=True</code>. Rows are compared in the table’s own order, or in the order given by <code>order_by=</code>, which database tables need since their rows have no fixed order. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
+A check that a column’s values go up (<code>col_vals_increasing()</code>) or down (<code>col_vals_decreasing()</code>) from one row to the next, as in a time series. Repeated values fail unless <code>allow_stationary=True</code>. Rows are compared in the table’s own order, or in the order given by <code>order_by=</code>, which database tables need since their rows have no fixed order. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
 </dd>
 <dt>Validate</dt>
 <dd>
@@ -1023,7 +1023,7 @@ The main class in Pointblank. A <a href="../../reference/Validate.html#pointblan
 </dd>
 <dt>Validation method</dt>
 <dd>
-A method of <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> that adds a check to the <strong>validation plan</strong>, such as <a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a> (values are greater than some number) or <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> (no duplicate rows). Each call adds one or more <strong>validation steps</strong>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
+A method of <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> that adds a check to the <strong>validation plan</strong>, such as <code>col_vals_gt()</code> (values are greater than some number) or <code>rows_distinct()</code> (no duplicate rows). Each call adds one or more <strong>validation steps</strong>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
 </dd>
 <dt>Validation plan</dt>
 <dd>

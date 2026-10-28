@@ -1326,7 +1326,7 @@ tr { background-color: transparent; }
 </div>
 </div>
 </div>
-<p>That’s it. The JSON Schema <code>minimum</code>, <code>maximum</code>, <code>enum</code>, <code>format</code>, and <code>required</code> keywords were automatically translated into the appropriate Pointblank validation steps. Each keyword becomes a dedicated validation check: <code>minimum</code> becomes <a href="../../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link gdls-code">col_vals_ge()</a>, <code>maximum</code> becomes <a href="../../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link gdls-code">col_vals_le()</a>, <code>enum</code> becomes <a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a>, and so on. The schema’s <code>required</code> array generates <a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a> steps for each listed field, ensuring that null values are caught at validation time.</p>
+<p>That’s it. The JSON Schema <code>minimum</code>, <code>maximum</code>, <code>enum</code>, <code>format</code>, and <code>required</code> keywords were automatically translated into the appropriate Pointblank validation steps. Each keyword becomes a dedicated validation check: <code>minimum</code> becomes <code>col_vals_ge()</code>, <code>maximum</code> becomes <code>col_vals_le()</code>, <code>enum</code> becomes <code>col_vals_in_set()</code>, and so on. The schema’s <code>required</code> array generates <code>col_vals_not_null()</code> steps for each listed field, ensuring that null values are caught at validation time.</p>
 </section>
 <section id="how-it-works" class="level1">
 <h1>How It Works</h1>
@@ -1490,27 +1490,27 @@ Coverage: 0%</code></pre>
 </tr>
 <tr class="even">
 <td><code>minimum</code></td>
-<td><a href="../../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link gdls-code">col_vals_ge()</a></td>
+<td><code>col_vals_ge()</code></td>
 </tr>
 <tr class="odd">
 <td><code>maximum</code></td>
-<td><a href="../../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link gdls-code">col_vals_le()</a></td>
+<td><code>col_vals_le()</code></td>
 </tr>
 <tr class="even">
 <td><code>exclusiveMinimum</code></td>
-<td><a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a></td>
+<td><code>col_vals_gt()</code></td>
 </tr>
 <tr class="odd">
 <td><code>exclusiveMaximum</code></td>
-<td><a href="../../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link gdls-code">col_vals_lt()</a></td>
+<td><code>col_vals_lt()</code></td>
 </tr>
 <tr class="even">
 <td><code>enum</code></td>
-<td><a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a></td>
+<td><code>col_vals_in_set()</code></td>
 </tr>
 <tr class="odd">
 <td><code>pattern</code></td>
-<td><a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a></td>
+<td><code>col_vals_regex()</code></td>
 </tr>
 <tr class="even">
 <td><code>format: "email"</code></td>
@@ -1526,11 +1526,11 @@ Coverage: 0%</code></pre>
 </tr>
 <tr class="odd">
 <td><code>const</code></td>
-<td><a href="../../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a></td>
+<td><code>col_vals_eq()</code></td>
 </tr>
 <tr class="even">
 <td><code>required</code> (array of field names)</td>
-<td><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a></td>
+<td><code>col_vals_not_null()</code></td>
 </tr>
 </tbody>
 </table>
@@ -1567,7 +1567,7 @@ Coverage: 0%</code></pre>
   col_vals_in_set({'columns': 'category', 'set': ['electronics', 'clothing', 'food', 'other']})</code></pre>
 </div>
 </div>
-<p>Each constraint from the JSON Schema has been translated into the corresponding Pointblank method call. The <code>pattern</code> keyword on the <code>sku</code> field became a <a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a> step, <code>exclusiveMinimum</code> became <a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a> (note the strict inequality), and the three <code>required</code> fields each generated a <a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a> step. You can iterate over <code>result.constraints</code> like this to verify the translation before running any validation.</p>
+<p>Each constraint from the JSON Schema has been translated into the corresponding Pointblank method call. The <code>pattern</code> keyword on the <code>sku</code> field became a <code>col_vals_regex()</code> step, <code>exclusiveMinimum</code> became <code>col_vals_gt()</code> (note the strict inequality), and the three <code>required</code> fields each generated a <code>col_vals_not_null()</code> step. You can iterate over <code>result.constraints</code> like this to verify the translation before running any validation.</p>
 </section>
 <section id="frictionless-data-table-schema" class="level2">
 <h2 class="anchored" data-anchor-id="frictionless-data-table-schema">Frictionless Data Table Schema</h2>
@@ -1587,27 +1587,27 @@ Coverage: 0%</code></pre>
 </tr>
 <tr class="even">
 <td><code>constraints.required: true</code></td>
-<td><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a></td>
+<td><code>col_vals_not_null()</code></td>
 </tr>
 <tr class="odd">
 <td><code>constraints.unique: true</code></td>
-<td><a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a></td>
+<td><code>rows_distinct()</code></td>
 </tr>
 <tr class="even">
 <td><code>constraints.minimum</code> / <code>maximum</code></td>
-<td><a href="../../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link gdls-code">col_vals_ge()</a> / <a href="../../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link gdls-code">col_vals_le()</a></td>
+<td><code>col_vals_ge()</code> / <code>col_vals_le()</code></td>
 </tr>
 <tr class="odd">
 <td><code>constraints.enum</code></td>
-<td><a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a></td>
+<td><code>col_vals_in_set()</code></td>
 </tr>
 <tr class="even">
 <td><code>constraints.pattern</code></td>
-<td><a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a></td>
+<td><code>col_vals_regex()</code></td>
 </tr>
 <tr class="odd">
 <td><code>primaryKey</code></td>
-<td><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a> + <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a></td>
+<td><code>col_vals_not_null()</code> + <code>rows_distinct()</code></td>
 </tr>
 <tr class="even">
 <td><code>foreignKeys</code></td>
@@ -1696,15 +1696,15 @@ Constraints: 2</code></pre>
 </tr>
 <tr class="even">
 <td><code>not_null</code> test</td>
-<td><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a></td>
+<td><code>col_vals_not_null()</code></td>
 </tr>
 <tr class="odd">
 <td><code>unique</code> test</td>
-<td><a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a></td>
+<td><code>rows_distinct()</code></td>
 </tr>
 <tr class="even">
 <td><code>accepted_values</code> test</td>
-<td><a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a></td>
+<td><code>col_vals_in_set()</code></td>
 </tr>
 <tr class="odd">
 <td><code>relationships</code> test</td>
@@ -1796,27 +1796,27 @@ Constraints: 2</code></pre>
 </tr>
 <tr class="even">
 <td><code>isNullable: false</code></td>
-<td><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a></td>
+<td><code>col_vals_not_null()</code></td>
 </tr>
 <tr class="odd">
 <td><code>isUnique: true</code></td>
-<td><a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a></td>
+<td><code>rows_distinct()</code></td>
 </tr>
 <tr class="even">
 <td><code>isPrimaryKey: true</code></td>
-<td><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a> + <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a></td>
+<td><code>col_vals_not_null()</code> + <code>rows_distinct()</code></td>
 </tr>
 <tr class="odd">
 <td><code>enum</code> / <a href="../../reference/MetadataPackage.html#pointblank.MetadataPackage.values" class="gdls-link gdls-code">values</a></td>
-<td><a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a></td>
+<td><code>col_vals_in_set()</code></td>
 </tr>
 <tr class="even">
 <td><code>pattern</code></td>
-<td><a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a></td>
+<td><code>col_vals_regex()</code></td>
 </tr>
 <tr class="odd">
 <td><code>minimum</code> / <code>maximum</code></td>
-<td><a href="../../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link gdls-code">col_vals_ge()</a> / <a href="../../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link gdls-code">col_vals_le()</a></td>
+<td><code>col_vals_ge()</code> / <code>col_vals_le()</code></td>
 </tr>
 <tr class="even">
 <td><code>minLength</code> / <code>maxLength</code></td>

@@ -4,7 +4,7 @@ Are column data not equal to a fixed value or data in another column?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L7343-L7647)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L7421-L7725)
 
 ``` python
 Validate.col_vals_ne(
@@ -22,7 +22,7 @@ Validate.col_vals_ne(
 )
 ```
 
-The [col_vals_ne()](../reference/Validate.col_vals_ne.md#pointblank.Validate.col_vals_ne) validation method checks whether column values in a table are *not equal to* a specified `value=` (the exact comparison used in this function is `col_val != value`). The `value=` can be specified as a single, literal value or as a column name given in [`col()`](../reference/col.md#pointblank.col). This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+The `col_vals_ne()` validation method checks whether column values in a table are *not equal to* a specified `value=` (the exact comparison used in this function is `col_val != value`). The `value=` can be specified as a single, literal value or as a column name given in [`col()`](../reference/col.md#pointblank.col). This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
 
 ## Parameters
 
@@ -161,9 +161,9 @@ validation
 
 [TABLE]
 
-Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using [col_vals_ne()](../reference/Validate.col_vals_ne.md#pointblank.Validate.col_vals_ne). All test units passed, and there are no failing test units.
+Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using `col_vals_ne()`. All test units passed, and there are no failing test units.
 
-Aside from checking a column against a literal value, we can also use a column name in the `value=` argument (with the helper function [`col()`](../reference/col.md#pointblank.col) to perform a column-to-column comparison. For the next example, we'll use [col_vals_ne()](../reference/Validate.col_vals_ne.md#pointblank.Validate.col_vals_ne) to check whether the values in column `a` aren't equal to the values in column `b`.
+Aside from checking a column against a literal value, we can also use a column name in the `value=` argument (with the helper function [`col()`](../reference/col.md#pointblank.col) to perform a column-to-column comparison. For the next example, we'll use `col_vals_ne()` to check whether the values in column `a` aren't equal to the values in column `b`.
 
 ``` python
 validation = (

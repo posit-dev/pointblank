@@ -4,7 +4,7 @@ Validate whether the column count of the table matches a specified count.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14773-L14960)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14851-L15038)
 
 ``` python
 Validate.col_count_match(
@@ -19,7 +19,7 @@ Validate.col_count_match(
 )
 ```
 
-The [col_count_match()](../reference/Validate.col_count_match.md#pointblank.Validate.col_count_match) method checks whether the column count of the target table matches a specified count. This validation will operate over a single test unit, which is whether the column count matches the specified count.
+The `col_count_match()` method checks whether the column count of the target table matches a specified count. This validation will operate over a single test unit, which is whether the column count matches the specified count.
 
 We also have the option to invert the validation step by setting `inverse=True`. This will make the expectation that column row count of the target table *does not* match the specified count.
 

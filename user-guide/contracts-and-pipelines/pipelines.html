@@ -2311,7 +2311,7 @@ After buggy transform:
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The target validation shows exactly what went wrong</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>result.target_validation</span></code></pre></div>
 </div>
-<p>The target validation report above pinpoints the failure: the <a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null</a> step on the <code>amount</code> column fails because the buggy transform introduced nulls. This makes the root cause obvious and you can see exactly which contract step failed and trace it back to the transformation logic. Without the target contract, this bug would silently produce a table with missing values.</p>
+<p>The target validation report above pinpoints the failure: the <code>col_vals_not_null</code> step on the <code>amount</code> column fails because the buggy transform introduced nulls. This makes the root cause obvious and you can see exactly which contract step failed and trace it back to the transformation logic. Without the target contract, this bug would silently produce a table with missing values.</p>
 </section>
 <section id="working-with-pandas" class="level1">
 <h1>Working with Pandas</h1>

@@ -4,7 +4,7 @@ Validate whether the length of string values falls within specified bounds.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11167-L11364)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11245-L11442)
 
 ``` python
 Validate.col_vals_str_len(
@@ -23,7 +23,7 @@ Validate.col_vals_str_len(
 )
 ```
 
-The [col_vals_str_len()](../reference/Validate.col_vals_str_len.md#pointblank.Validate.col_vals_str_len) validation method checks whether the character length of string values in a column meets the specified minimum and/or maximum bounds. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+The `col_vals_str_len()` validation method checks whether the character length of string values in a column meets the specified minimum and/or maximum bounds. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
 
 ## Parameters
 

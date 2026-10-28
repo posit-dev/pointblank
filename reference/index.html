@@ -273,6 +273,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.add_steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.add_steps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Pipeline.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Pipeline</span></a>
   </div>
@@ -1685,7 +1691,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="contracts-and-pipelines" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="contracts-and-pipelines">Contracts and Pipelines</h2>
 <div class="doc-description">
-<p>Use <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> and <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">Step</a> to define declarative data quality contracts that specify what valid data looks like. Use <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> to build reusable step libraries with a fluent API and compose them into <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> plans via <code>add_steps()</code>. Use <a href="../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link gdls-code">Pipeline</a> to enforce contracts at both boundaries of a data transformation (source and target), producing a <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a> with full introspection into what passed and what failed.</p>
+<p>Use <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> and <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">Step</a> to define declarative data quality contracts that specify what valid data looks like. Use <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> to build reusable step libraries with a fluent API and compose them into <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> plans via <a href="../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a>. Use <a href="../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link gdls-code">Pipeline</a> to enforce contracts at both boundaries of a data transformation (source and target), producing a <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a> with full introspection into what passed and what failed.</p>
 </div>
 <dl>
 <dt><a href="../reference/Contract.html#pointblank.Contract" class="doc-class doc-label doc-label-dataclass">Contract</a></dt>
@@ -1699,6 +1705,10 @@ ul.task-list li input[type="checkbox"] {
 <dt><a href="../reference/Steps.html#pointblank.Steps" class="doc-class doc-label doc-label-class">Steps</a></dt>
 <dd>
 <p>A reusable collection of validation step definitions.</p>
+</dd>
+<dt><a href="../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="doc-function doc-label doc-label-method">Validate.add_steps()</a></dt>
+<dd>
+<p>Add the steps from one or more <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> collections to the validation.</p>
 </dd>
 <dt><a href="../reference/Pipeline.html#pointblank.Pipeline" class="doc-class doc-label doc-label-dataclass">Pipeline</a></dt>
 <dd>
@@ -2002,7 +2012,7 @@ ul.task-list li input[type="checkbox"] {
 </dd>
 <dt><a href="../reference/expr_col.html#pointblank.expr_col" class="doc-function doc-label doc-label-function">expr_col()</a></dt>
 <dd>
-<p>Create a column expression for use in <a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link gdls-code">conjointly()</a> validation.</p>
+<p>Create a column expression for use in <code>conjointly()</code> validation.</p>
 </dd>
 </dl>
 </section>

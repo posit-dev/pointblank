@@ -130,7 +130,7 @@ tbl: nycflights
 For more complex data loading, use the `python:` block syntax. This syntax can be used with several parameters throughout your YAML configuration:
 
 - `tbl`: For complex data source loading (as shown below)
-- `expr`: For custom validation expressions in [col_vals_expr](../../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr)
+- `expr`: For custom validation expressions in `col_vals_expr`
 - `pre`: For data preprocessing before validation steps
 - `actions`: For callable action functions ([warning](../../reference/Validate.warning.md#pointblank.Validate.warning), [error](../../reference/Validate.error.md#pointblank.Validate.error), [critical](../../reference/Validate.critical.md#pointblank.Validate.critical), and `default`)
 
@@ -322,7 +322,7 @@ steps:
 
 ### Schema Validations
 
-Schema validation ensures your data has the expected structure and column types. The [col_schema_match](../../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) validation method uses a `schema` key that contains a `columns` list, where each item in the list can specify a column name alone or a column name with its expected data type.
+Schema validation ensures your data has the expected structure and column types. The `col_schema_match` validation method uses a `schema` key that contains a `columns` list, where each item in the list can specify a column name alone or a column name with its expected data type.
 
 Each `column` entry can be specified as:
 
@@ -449,7 +449,7 @@ steps:
       brief: "Output matches expected results"
 ```
 
-The [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) validation performs comprehensive comparison including column count, row count, schema, and data values. It supports cross-backend validation (e.g., comparing Polars vs. Pandas DataFrames).
+The `tbl_match()` validation performs comprehensive comparison including column count, row count, schema, and data values. It supports cross-backend validation (e.g., comparing Polars vs. Pandas DataFrames).
 
 ### AI-Powered Validation
 
@@ -619,7 +619,7 @@ Note that you can use either the explicit `python:` block syntax or the shortcut
 
 ### Complex Expressions
 
-For advanced validation logic, use a [col_vals_expr](../../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) step with custom expressions:
+For advanced validation logic, use a `col_vals_expr` step with custom expressions:
 
 ``` yaml
 tbl: sales_data.csv
@@ -707,7 +707,7 @@ The `owner`, `consumers`, and `version` fields are forwarded to the [Validate](.
 
 Two additional validation methods support common data quality checks:
 
-**[data_freshness](../../reference/Validate.data_freshness.md#pointblank.Validate.data_freshness)**: Validate that a date/datetime column has recent data:
+**`data_freshness`**: Validate that a date/datetime column has recent data:
 
 ``` yaml
 steps:
@@ -716,7 +716,7 @@ steps:
       freshness: "24h"
 ```
 
-**[col_pct_null](../../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null)**: Validate that the percentage of null values is within bounds:
+**`col_pct_null`**: Validate that the percentage of null values is within bounds:
 
 ``` yaml
 steps:

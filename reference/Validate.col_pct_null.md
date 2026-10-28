@@ -4,7 +4,7 @@ Validate whether a column has a specific percentage of Null values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11807-L12114)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11885-L12192)
 
 ``` python
 Validate.col_pct_null(
@@ -19,7 +19,7 @@ Validate.col_pct_null(
 )
 ```
 
-The [col_pct_null()](../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null) validation method checks whether the percentage of Null values in a column matches a specified percentage `p=` (within an optional tolerance `tol=`). This validation operates at the column level, generating a single validation step per column that passes or fails based on whether the actual percentage of Null values falls within the acceptable range defined by `p ± tol`.
+The `col_pct_null()` validation method checks whether the percentage of Null values in a column matches a specified percentage `p=` (within an optional tolerance `tol=`). This validation operates at the column level, generating a single validation step per column that passes or fails based on whether the actual percentage of Null values falls within the acceptable range defined by `p ± tol`.
 
 ## Parameters
 
@@ -127,7 +127,7 @@ validation
 
 [TABLE]
 
-Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using [col_pct_null()](../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null). The validation passed since column `a` has no Null values.
+Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using `col_pct_null()`. The validation passed since column `a` has no Null values.
 
 Now, let's check that column `b` has exactly 50% Null values.
 

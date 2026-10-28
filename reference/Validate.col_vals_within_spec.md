@@ -4,7 +4,7 @@ Validate whether column values fit within a specification.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10867-L11165)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10945-L11243)
 
 ``` python
 Validate.col_vals_within_spec(
@@ -22,7 +22,7 @@ Validate.col_vals_within_spec(
 )
 ```
 
-The [col_vals_within_spec()](../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec) validation method checks whether column values in a table correspond to a specification (`spec=`) type (details of which are available in the *Specifications* section). Specifications include common data types like email addresses, URLs, postal codes, vehicle identification numbers (VINs), International Bank Account Numbers (IBANs), and more. This validation will operate over the number of test units that is equal to the number of rows in the table.
+The `col_vals_within_spec()` validation method checks whether column values in a table correspond to a specification (`spec=`) type (details of which are available in the *Specifications* section). Specifications include common data types like email addresses, URLs, postal codes, vehicle identification numbers (VINs), International Bank Account Numbers (IBANs), and more. This validation will operate over the number of test units that is equal to the number of rows in the table.
 
 ## Parameters
 

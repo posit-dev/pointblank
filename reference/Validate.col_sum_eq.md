@@ -21,7 +21,7 @@ Validate.col_sum_eq(
 
 The [col_sum_eq()](../reference/Validate.col_sum_eq.md#pointblank.Validate.col_sum_eq) validation method checks whether the sum of values in a column equals a specified `value=`. This is an aggregation-based validation where the entire column is reduced to a single sum value that is then compared against the target. The comparison used in this function is `sum(column) == value`.
 
-Unlike row-level validations (e.g., [col_vals_gt()](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt)), this method treats the entire column as a single test unit. The validation either passes completely (if the aggregated value satisfies the comparison) or fails completely.
+Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as a single test unit. The validation either passes completely (if the aggregated value satisfies the comparison) or fails completely.
 
 ## Parameters
 

@@ -4,7 +4,7 @@ Validate whether column values are not in a set of values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9284-L9612)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9362-L9690)
 
 ``` python
 Validate.col_vals_not_in_set(
@@ -22,7 +22,7 @@ Validate.col_vals_not_in_set(
 )
 ```
 
-The [col_vals_not_in_set()](../reference/Validate.col_vals_not_in_set.md#pointblank.Validate.col_vals_not_in_set) validation method checks whether column values in a table are *not* part of a specified `set=` of values. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+The `col_vals_not_in_set()` validation method checks whether column values in a table are *not* part of a specified `set=` of values. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
 
 ## Parameters
 
@@ -155,7 +155,7 @@ validation
 
 [TABLE]
 
-Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using [col_vals_not_in_set()](../reference/Validate.col_vals_not_in_set.md#pointblank.Validate.col_vals_not_in_set). All test units passed, and there are no failing test units.
+Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using `col_vals_not_in_set()`. All test units passed, and there are no failing test units.
 
 Now, let's use that same set of values for a validation on column `b`.
 
@@ -175,7 +175,7 @@ The validation table reports two failing test units. The specific failing cases 
 
 **Using Python Enums**
 
-Like [col_vals_in_set()](../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set), this method also supports Python Enum classes and instances:
+Like `col_vals_in_set()`, this method also supports Python Enum classes and instances:
 
 ``` python
 from enum import Enum

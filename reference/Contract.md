@@ -71,7 +71,7 @@ A [Contract](../reference/Contract.md#pointblank.Contract) object. Apply it to d
 A contract holds no data and runs nothing until it's applied to a table. Calling [`to_validate()`](../reference/Contract.md#pointblank.Contract.to_validate) (or [`validate()`](../reference/Contract.md#pointblank.Contract.validate), which also interrogates) compiles the contract into a [Validate](../reference/Validate.md#pointblank.Validate) object:
 
 1.  a [Validate](../reference/Validate.md#pointblank.Validate) is created for the table, with `tbl_name=` set to the contract name, a label of the form `"Contract: <name> v<version>"`, and the contract's `thresholds=`, `owner=`, `consumers=`, and `version=`
-2.  if the contract has a schema, a [col_schema_match()](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) step is added first
+2.  if the contract has a schema, a `col_schema_match()` step is added first
 3.  each [`Step`](../reference/Step.md#pointblank.Step) is added in order, by calling the validation method it names with its stored arguments
 
 A step that lists several columns expands into one validation step per column, just as it would in a [Validate](../reference/Validate.md#pointblank.Validate) chain. Mistakes in a step's arguments (a misspelled parameter name, for example) surface when the contract is compiled, not when it's created.
@@ -80,10 +80,10 @@ A step that lists several columns expands into one validation step per column, j
 
 These validation methods can be used in a contract's steps:
 
-- column value checks: [col_vals_gt](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), [col_vals_lt](../reference/Validate.col_vals_lt.md#pointblank.Validate.col_vals_lt), [col_vals_ge](../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge), [col_vals_le](../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le), [col_vals_eq](../reference/Validate.col_vals_eq.md#pointblank.Validate.col_vals_eq), [col_vals_ne](../reference/Validate.col_vals_ne.md#pointblank.Validate.col_vals_ne), [col_vals_between](../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between), [col_vals_outside](../reference/Validate.col_vals_outside.md#pointblank.Validate.col_vals_outside), [col_vals_in_set](../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set), [col_vals_not_in_set](../reference/Validate.col_vals_not_in_set.md#pointblank.Validate.col_vals_not_in_set), [col_vals_increasing](../reference/Validate.col_vals_increasing.md#pointblank.Validate.col_vals_increasing), [col_vals_decreasing](../reference/Validate.col_vals_decreasing.md#pointblank.Validate.col_vals_decreasing), [col_vals_null](../reference/Validate.col_vals_null.md#pointblank.Validate.col_vals_null), [col_vals_not_null](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null), [col_vals_regex](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex), [col_vals_within_spec](../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec), and [col_vals_expr](../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr)
-- column-level checks: [col_exists](../reference/Validate.col_exists.md#pointblank.Validate.col_exists) and [col_pct_null](../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null)
-- table-level checks: [col_schema_match](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match), [col_count_match](../reference/Validate.col_count_match.md#pointblank.Validate.col_count_match), [row_count_match](../reference/Validate.row_count_match.md#pointblank.Validate.row_count_match), [rows_distinct](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct), and [rows_complete](../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete)
-- multi-condition checks: [conjointly](../reference/Validate.conjointly.md#pointblank.Validate.conjointly), with its expressions given as a list in `exprs=`
+- column value checks: `col_vals_gt`, `col_vals_lt`, `col_vals_ge`, `col_vals_le`, `col_vals_eq`, `col_vals_ne`, `col_vals_between`, `col_vals_outside`, `col_vals_in_set`, `col_vals_not_in_set`, `col_vals_increasing`, `col_vals_decreasing`, `col_vals_null`, `col_vals_not_null`, `col_vals_regex`, `col_vals_within_spec`, and `col_vals_expr`
+- column-level checks: `col_exists` and `col_pct_null`
+- table-level checks: `col_schema_match`, `col_count_match`, `row_count_match`, `rows_distinct`, and `rows_complete`
+- multi-condition checks: `conjointly`, with its expressions given as a list in `exprs=`
 
 Each takes the same arguments as the [`Validate`](../reference/Validate.md#pointblank.Validate) method of the same name. A step that names any other method is rejected with a `ValueError` when the contract is created. For steps that a contract can't express, compile the contract with [`to_validate()`](../reference/Contract.md#pointblank.Contract.to_validate) and chain the extra methods onto the result.
 
@@ -97,7 +97,7 @@ A contract is the building block for several other parts of the API:
 
 - [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline) pairs a source contract and a target contract around a transformation function. It validates the input, runs the transformation, validates the output, and applies each contract's `on_violation=` setting. The results come back in a [`PipelineResult`](../reference/PipelineResult.md#pointblank.PipelineResult).
 - [`export_contract()`](../reference/export_contract.md#pointblank.export_contract) converts a contract into an external format (JSON Schema, Frictionless Table Schema, dbt, or the Open Data Contract Standard), and [`import_contract()`](../reference/import_contract.md#pointblank.import_contract) reads one of those formats. Call [`to_contract()`](../reference/ContractImport.md#pointblank.ContractImport.to_contract) on the result to get a [Contract](../reference/Contract.md#pointblank.Contract). Each format supports a different set of rules, so checks with no equivalent in the target format are left out of the export.
-- Because [`to_validate()`](../reference/Contract.md#pointblank.Contract.to_validate) returns an ordinary [Validate](../reference/Validate.md#pointblank.Validate) object, a contract can be combined with reusable [`Steps`](../reference/Steps.md#pointblank.Steps) libraries through `Validate.add_steps()`.
+- Because [`to_validate()`](../reference/Contract.md#pointblank.Contract.to_validate) returns an ordinary [Validate](../reference/Validate.md#pointblank.Validate) object, a contract can be combined with reusable [`Steps`](../reference/Steps.md#pointblank.Steps) libraries through [`Validate.add_steps()`](../reference/Validate.add_steps.md#pointblank.Validate.add_steps).
 
 ## Examples
 
@@ -152,7 +152,7 @@ orders_contract.validate(orders_day_1)
 
 [TABLE]
 
-The report header shows the label built from the contract (`Contract: orders v1.2.0`) along with the owner, consumers, and version. The first step is the schema check, followed by one step per contract rule. The [col_vals_not_null](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) step names two columns, so it becomes two validation steps. All six steps pass.
+The report header shows the label built from the contract (`Contract: orders v1.2.0`) along with the owner, consumers, and version. The first step is the schema check, followed by one step per contract rule. The `col_vals_not_null` step names two columns, so it becomes two validation steps. All six steps pass.
 
 The next day's extract has problems: a missing customer ID, a repeated order ID, a negative amount, and a status the contract doesn't allow. The same contract catches all of them.
 
@@ -173,7 +173,7 @@ validation
 
 [TABLE]
 
-The schema still matches, but four of the rule steps have failing test units. With only four rows, one failure is already 25% of the table, so those steps exceed both the warning and the error thresholds. The [rows_distinct](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step counts two failures because both rows with order `"A6"` are duplicates. Since the result is an ordinary [Validate](../reference/Validate.md#pointblank.Validate) object, you can check it in code, for example to stop a scheduled job:
+The schema still matches, but four of the rule steps have failing test units. With only four rows, one failure is already 25% of the table, so those steps exceed both the warning and the error thresholds. The `rows_distinct` step counts two failures because both rows with order `"A6"` are duplicates. Since the result is an ordinary [Validate](../reference/Validate.md#pointblank.Validate) object, you can check it in code, for example to stop a scheduled job:
 
 ``` python
 validation.all_passed()
@@ -353,7 +353,7 @@ to_validate(data)
 
 This method turns the contract into a [`Validate`](../reference/Validate.md#pointblank.Validate) object for the given table. The validation is set up with the contract's name, label, thresholds, and governance metadata (owner, consumers, and version). Then the schema check (if the contract has a schema) and each of the contract's steps are added in order. Nothing is checked yet: the plan runs when you call [`interrogate()`](../reference/Validate.interrogate.md#pointblank.Validate.interrogate) on it.
 
-Use this method instead of [`validate()`](../reference/Contract.md#pointblank.Contract.validate) when you want to do something with the plan before it runs. Most often that's adding checks that are local to one use of the data, or ones a contract can't express, such as [`col_vals_str_len()`](../reference/Validate.col_vals_str_len.md#pointblank.Validate.col_vals_str_len) or [`specially()`](../reference/Validate.specially.md#pointblank.Validate.specially). You can also attach [`Actions`](../reference/Actions.md#pointblank.Actions) and final actions this way, or combine the contract with a reusable [`Steps`](../reference/Steps.md#pointblank.Steps) library via `add_steps()`. The contract itself isn't changed, so these additions don't affect anyone else using it.
+Use this method instead of [`validate()`](../reference/Contract.md#pointblank.Contract.validate) when you want to do something with the plan before it runs. Most often that's adding checks that are local to one use of the data, or ones a contract can't express, such as [`col_vals_str_len()`](../reference/Validate.col_vals_str_len.md#pointblank.Validate.col_vals_str_len) or [`specially()`](../reference/Validate.specially.md#pointblank.Validate.specially). You can also attach [`Actions`](../reference/Actions.md#pointblank.Actions) and final actions this way, or combine the contract with a reusable [`Steps`](../reference/Steps.md#pointblank.Steps) library via [`add_steps()`](../reference/Validate.add_steps.md#pointblank.Validate.add_steps). The contract itself isn't changed, so these additions don't affect anyone else using it.
 
 #### Parameters
 
@@ -604,7 +604,7 @@ payments_contract.validate(payments)
 
 [TABLE]
 
-The report label, `Contract: payments v1.0.0`, comes from the file. The payment with an amount of `0.0` fails the [col_vals_gt](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) step and triggers the warning threshold.
+The report label, `Contract: payments v1.0.0`, comes from the file. The payment with an amount of `0.0` fails the `col_vals_gt` step and triggers the warning threshold.
 
 ### to_dict()
 

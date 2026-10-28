@@ -705,7 +705,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>Statistical software packages like SPSS, SAS, and Stata store rich metadata alongside data values. Variable labels describe what each column represents, value labels map numeric codes to meaningful categories, and missing value definitions distinguish between different reasons for absent data. This metadata represents a carefully curated description of data expectations, often built up over years of survey design and data management work.</p>
-<p>Pointblank can read this embedded metadata and translate it directly into validation rules. When you import a <code>.sav</code>, <code>.xpt</code>, or <code>.dta</code> file, Pointblank extracts the full metadata catalog and maps each element to the appropriate validation method. Value labels become <a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> checks, data types become schema constraints, and missing value codes inform how validation handles sentinel values.</p>
+<p>Pointblank can read this embedded metadata and translate it directly into validation rules. When you import a <code>.sav</code>, <code>.xpt</code>, or <code>.dta</code> file, Pointblank extracts the full metadata catalog and maps each element to the appropriate validation method. Value labels become <code>col_vals_in_set()</code> checks, data types become schema constraints, and missing value codes inform how validation handles sentinel values.</p>
 <section id="prerequisites" class="level1">
 <h1>Prerequisites</h1>
 <p>Reading metadata from statistical package files requires the <code>pyreadstat</code> library. This is an optional dependency that you can install separately:</p>
@@ -778,7 +778,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="value-labels-and-codelists" class="level2">
 <h2 class="anchored" data-anchor-id="value-labels-and-codelists">Value Labels and Codelists</h2>
-<p>SPSS value labels define the permitted values for categorical variables. For example, a variable <code>GENDER</code> might have labels <code>{1: "Male", 2: "Female", 3: "Non-binary"}</code>. Pointblank converts these into <a href="../../reference/Codelist.html#pointblank.Codelist" class="gdls-link gdls-code">Codelist</a> objects and generates <a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> checks:</p>
+<p>SPSS value labels define the permitted values for categorical variables. For example, a variable <code>GENDER</code> might have labels <code>{1: "Male", 2: "Female", 3: "Non-binary"}</code>. Pointblank converts these into <a href="../../reference/Codelist.html#pointblank.Codelist" class="gdls-link gdls-code">Codelist</a> objects and generates <code>col_vals_in_set()</code> checks:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(<span class="st">"demographics.sav"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect a specific variable's allowed values</span></span>
@@ -791,7 +791,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    values <span class="op">=</span> codelist.to_set()</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> codelist.to_dict()</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>cl_name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>labels<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
-<p>When validation is generated, each variable with value labels gets a <a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> step that ensures all data values appear in the labeled set. Values outside the set are flagged as failures in the validation report.</p>
+<p>When validation is generated, each variable with value labels gets a <code>col_vals_in_set()</code> step that ensures all data values appear in the labeled set. Values outside the set are flagged as failures in the validation report.</p>
 </section>
 <section id="missing-value-codes" class="level2">
 <h2 class="anchored" data-anchor-id="missing-value-codes">Missing Value Codes</h2>
@@ -930,7 +930,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="length-constraints" class="level2">
 <h2 class="anchored" data-anchor-id="length-constraints">Length Constraints</h2>
-<p>Character variables in SAS Transport files have defined maximum lengths. Pointblank captures these as <code>max_length</code> constraints on the <a href="../../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link gdls-code">VariableMetadata</a> object. When you call <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a>, variables with length constraints get a <a href="../../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a> step that checks string length does not exceed the specified maximum.</p>
+<p>Character variables in SAS Transport files have defined maximum lengths. Pointblank captures these as <code>max_length</code> constraints on the <a href="../../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link gdls-code">VariableMetadata</a> object. When you call <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a>, variables with length constraints get a <code>col_vals_expr()</code> step that checks string length does not exceed the specified maximum.</p>
 <p>This is particularly important for CDISC submissions where variable lengths are strictly defined in the submission specification. A variable defined as <code>$200.</code> (200 characters) must not contain values longer than 200 characters, and Pointblank will flag any violations.</p>
 </section>
 <section id="format-based-type-detection" class="level2">
@@ -1051,10 +1051,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Once you have imported metadata from any statistical package file, the workflow for generating validation is the same. The <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a> method examines every variable’s constraints and creates the appropriate validation steps.</p>
 <p>For a typical SPSS file with value labels and types defined, the generated validation includes:</p>
 <ol type="1">
-<li>A <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a> step verifying column names and data types</li>
-<li><a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> steps for every variable with value labels</li>
-<li><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a> steps for variables marked as required</li>
-<li><a href="../../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a> steps for variables with length constraints (from SAS Transport)</li>
+<li>A <code>col_schema_match()</code> step verifying column names and data types</li>
+<li><code>col_vals_in_set()</code> steps for every variable with value labels</li>
+<li><code>col_vals_not_null()</code> steps for variables marked as required</li>
+<li><code>col_vals_expr()</code> steps for variables with length constraints (from SAS Transport)</li>
 </ol>
 <div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>

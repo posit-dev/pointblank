@@ -4,7 +4,7 @@ Validate that column values exist in a reference table (referential integrity).
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14962-L15139)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15040-L15217)
 
 ``` python
 Validate.col_vals_in_table(
@@ -21,7 +21,7 @@ Validate.col_vals_in_table(
 )
 ```
 
-The [col_vals_in_table()](../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table) validation method checks whether each value (or composite key) in the specified column(s) of this table exists in the corresponding column(s) of a reference table. This is a referential integrity check: it catches orphaned foreign keys, broken references, and values that fall outside a controlled vocabulary maintained in another table.
+The `col_vals_in_table()` validation method checks whether each value (or composite key) in the specified column(s) of this table exists in the corresponding column(s) of a reference table. This is a referential integrity check: it catches orphaned foreign keys, broken references, and values that fall outside a controlled vocabulary maintained in another table.
 
 Each row is a test unit. Rows whose key values are found in the reference table pass. Rows with orphaned values fail. Failing rows are extractable via [get_data_extracts()](../reference/Validate.get_data_extracts.md#pointblank.Validate.get_data_extracts) just like any other column-level validation.
 

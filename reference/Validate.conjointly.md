@@ -4,7 +4,7 @@ Perform multiple row-wise validations for joint validity.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15798-L16067)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15876-L16145)
 
 ``` python
 Validate.conjointly(
@@ -18,7 +18,7 @@ Validate.conjointly(
 )
 ```
 
-The [conjointly()](../reference/Validate.conjointly.md#pointblank.Validate.conjointly) validation method checks whether each row in the table passes multiple validation conditions simultaneously. This enables compound validation logic where a test unit (typically a row) must satisfy all specified conditions to pass the validation.
+The `conjointly()` validation method checks whether each row in the table passes multiple validation conditions simultaneously. This enables compound validation logic where a test unit (typically a row) must satisfy all specified conditions to pass the validation.
 
 This method accepts multiple validation expressions as callables, which should return boolean expressions when applied to the data. You can use lambdas that incorporate Polars/Pandas/Ibis expressions (based on the target table type) or create more complex validation functions. The validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
 
@@ -113,7 +113,7 @@ Let's validate that the values in each row satisfy multiple conditions simultane
 2.  Column `b` should be less than 7
 3.  The sum of `a` and `b` should be less than the value in column `c`
 
-We'll use [conjointly()](../reference/Validate.conjointly.md#pointblank.Validate.conjointly) to check all these conditions together:
+We'll use `conjointly()` to check all these conditions together:
 
 ``` python
 validation = (

@@ -1055,7 +1055,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    owner<span class="op">=</span><span class="st">"data-platform-team"</span>,</span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<p>When a schema is defined, the contract automatically adds a <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a> step before all other validation steps. This means the schema check runs first, and if the table doesn’t have the right columns and types, you’ll know immediately.</p>
+<p>When a schema is defined, the contract automatically adds a <code>col_schema_match()</code> step before all other validation steps. This means the schema check runs first, and if the table doesn’t have the right columns and types, you’ll know immediately.</p>
 <div id="fd3329a9" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>orders <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
@@ -1722,47 +1722,47 @@ col_vals_gt
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a>, <a href="../../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link gdls-code">col_vals_lt()</a>, <a href="../../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link gdls-code">col_vals_ge()</a>, <a href="../../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link gdls-code">col_vals_le()</a></td>
+<td><code>col_vals_gt()</code>, <code>col_vals_lt()</code>, <code>col_vals_ge()</code>, <code>col_vals_le()</code></td>
 <td>Numeric bounds</td>
 </tr>
 <tr class="even">
-<td><a href="../../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link gdls-code">col_vals_between()</a>, <a href="../../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link gdls-code">col_vals_outside()</a></td>
+<td><code>col_vals_between()</code>, <code>col_vals_outside()</code></td>
 <td>Range checks</td>
 </tr>
 <tr class="odd">
-<td><a href="../../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a>, <a href="../../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link gdls-code">col_vals_ne()</a></td>
+<td><code>col_vals_eq()</code>, <code>col_vals_ne()</code></td>
 <td>Equality checks</td>
 </tr>
 <tr class="even">
-<td><a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a>, <a href="../../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link gdls-code">col_vals_not_in_set()</a></td>
+<td><code>col_vals_in_set()</code>, <code>col_vals_not_in_set()</code></td>
 <td>Categorical membership</td>
 </tr>
 <tr class="odd">
-<td><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a>, <a href="../../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link gdls-code">col_vals_null()</a></td>
+<td><code>col_vals_not_null()</code>, <code>col_vals_null()</code></td>
 <td>Null checks</td>
 </tr>
 <tr class="even">
-<td><a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a></td>
+<td><code>col_vals_regex()</code></td>
 <td>Pattern matching</td>
 </tr>
 <tr class="odd">
-<td><a href="../../reference/Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link gdls-code">col_exists()</a></td>
+<td><code>col_exists()</code></td>
 <td>Column presence</td>
 </tr>
 <tr class="even">
-<td><a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a></td>
+<td><code>rows_distinct()</code></td>
 <td>Uniqueness (use <code>columns_subset=</code>)</td>
 </tr>
 <tr class="odd">
-<td><a href="../../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" class="gdls-link gdls-code">rows_complete()</a></td>
+<td><code>rows_complete()</code></td>
 <td>No nulls in any column</td>
 </tr>
 <tr class="even">
-<td><a href="../../reference/Validate.row_count_match.html#pointblank.Validate.row_count_match" class="gdls-link gdls-code">row_count_match()</a></td>
+<td><code>row_count_match()</code></td>
 <td>Expected row count</td>
 </tr>
 <tr class="odd">
-<td><a href="../../reference/Validate.col_count_match.html#pointblank.Validate.col_count_match" class="gdls-link gdls-code">col_count_match()</a></td>
+<td><code>col_count_match()</code></td>
 <td>Expected column count</td>
 </tr>
 </tbody>

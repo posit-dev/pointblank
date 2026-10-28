@@ -885,7 +885,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">nonresponse</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">refused</span><span class="kw">,</span><span class="at"> dont_know</span><span class="kw">]</span></span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">null_is_missing</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">        # OPTIONAL (default true)</span></span>
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">null_reason</span><span class="kw">:</span><span class="at"> unknown</span><span class="co">         # OPTIONAL (default "unknown")</span></span></code></pre></div>
-<p>Steps reference a named spec by name through the <code>missing:</code> parameter. This works both on the <code>col_vals_*</code> methods (to exclude sentinel values from a check) and on the dedicated missingness methods (<a href="../../reference/Validate.col_pct_missing.html#pointblank.Validate.col_pct_missing" class="gdls-link gdls-code">col_pct_missing</a>, <a href="../../reference/Validate.col_missing_coded.html#pointblank.Validate.col_missing_coded" class="gdls-link gdls-code">col_missing_coded</a>, <a href="../../reference/Validate.col_missing_only_coded.html#pointblank.Validate.col_missing_only_coded" class="gdls-link gdls-code">col_missing_only_coded</a>, <a href="../../reference/Validate.col_missing_consistent.html#pointblank.Validate.col_missing_consistent" class="gdls-link gdls-code">col_missing_consistent</a>):</p>
+<p>Steps reference a named spec by name through the <code>missing:</code> parameter. This works both on the <code>col_vals_*</code> methods (to exclude sentinel values from a check) and on the dedicated missingness methods (<code>col_pct_missing</code>, <code>col_missing_coded</code>, <code>col_missing_only_coded</code>, <code>col_missing_consistent</code>):</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">missing_specs</span><span class="kw">:</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">standard_survey</span><span class="kw">:</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">reasons</span><span class="kw">:</span></span>
@@ -920,7 +920,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="column-value-validations">Column Value Validations</h2>
 <section id="comparison-methods" class="level3">
 <h3 class="anchored" data-anchor-id="comparison-methods">Comparison Methods</h3>
-<p><a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt</a>: are column data greater than a fixed value or data in another column?</p>
+<p><code>col_vals_gt</code>: are column data greater than a fixed value or data in another column?</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_gt</span><span class="kw">:</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span><span class="co">                         # REQUIRED: Comparison value</span></span>
@@ -936,31 +936,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb13"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_gt</span><span class="kw">:</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> pb.col("other_column")</span><span class="co">      # Same as `value: {python: pb.col("other_column")}`</span></span></code></pre></div>
-<p><a href="../../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link gdls-code">col_vals_lt</a>: are column data less than a fixed value or data in another column?</p>
+<p><code>col_vals_lt</code>: are column data less than a fixed value or data in another column?</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_lt</span><span class="kw">:</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">na_pass</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">    # ... (same parameters as col_vals_gt)</span></span></code></pre></div>
-<p><a href="../../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link gdls-code">col_vals_ge</a>: are column data greater than or equal to a fixed value or data in another column?</p>
+<p><code>col_vals_ge</code>: are column data greater than or equal to a fixed value or data in another column?</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_ge</span><span class="kw">:</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">na_pass</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">    # ... (same parameters as col_vals_gt)</span></span></code></pre></div>
-<p><a href="../../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link gdls-code">col_vals_le</a>: are column data less than or equal to a fixed value or data in another column?</p>
+<p><code>col_vals_le</code>: are column data less than or equal to a fixed value or data in another column?</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_le</span><span class="kw">:</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">na_pass</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co">    # ... (same parameters as col_vals_gt)</span></span></code></pre></div>
-<p><a href="../../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq</a>: are column data equal to a fixed value or data in another column?</p>
+<p><code>col_vals_eq</code>: are column data equal to a fixed value or data in another column?</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_eq</span><span class="kw">:</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="st">"expected_value"</span></span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">na_pass</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">    # ... (same parameters as col_vals_gt)</span></span></code></pre></div>
-<p><a href="../../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link gdls-code">col_vals_ne</a>: are column data not equal to a fixed value or data in another column?</p>
+<p><code>col_vals_ne</code>: are column data not equal to a fixed value or data in another column?</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_ne</span><span class="kw">:</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="st">"forbidden_value"</span></span>
@@ -969,7 +969,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="range-methods" class="level3">
 <h3 class="anchored" data-anchor-id="range-methods">Range Methods</h3>
-<p><a href="../../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link gdls-code">col_vals_between</a>: are column data between two specified values (inclusive)?</p>
+<p><code>col_vals_between</code>: are column data between two specified values (inclusive)?</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_between</span><span class="kw">:</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">left</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span><span class="co">                            # REQUIRED: Lower bound</span></span>
@@ -983,7 +983,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
 <span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
 <span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Values between 0 and 100"</span><span class="co">  # OPTIONAL: Step description</span></span></code></pre></div>
-<p><a href="../../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link gdls-code">col_vals_outside</a>: are column data outside of two specified values?</p>
+<p><code>col_vals_outside</code>: are column data outside of two specified values?</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_outside</span><span class="kw">:</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">left</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
@@ -994,7 +994,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="set-membership-methods" class="level3">
 <h3 class="anchored" data-anchor-id="set-membership-methods">Set Membership Methods</h3>
-<p><a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set</a>: are column data part of a specified set of values?</p>
+<p><code>col_vals_in_set</code>: are column data part of a specified set of values?</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_in_set</span><span class="kw">:</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">set</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">value1</span><span class="kw">,</span><span class="at"> value2</span><span class="kw">,</span><span class="at"> value3</span><span class="kw">]</span><span class="co">      # REQUIRED: Allowed values</span></span>
@@ -1006,7 +1006,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
 <span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
 <span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Values in allowed set"</span><span class="co">     # OPTIONAL: Step description</span></span></code></pre></div>
-<p><a href="../../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link gdls-code">col_vals_not_in_set</a>: are column data not part of a specified set of values?</p>
+<p><code>col_vals_not_in_set</code>: are column data not part of a specified set of values?</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_not_in_set</span><span class="kw">:</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">set</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">forbidden1</span><span class="kw">,</span><span class="at"> forbidden2</span><span class="kw">]</span><span class="co">      # REQUIRED: Forbidden values</span></span>
@@ -1015,7 +1015,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="null-value-methods" class="level3">
 <h3 class="anchored" data-anchor-id="null-value-methods">NULL Value Methods</h3>
-<p><a href="../../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link gdls-code">col_vals_null</a>: are column data null (missing)?</p>
+<p><code>col_vals_null</code>: are column data null (missing)?</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_null</span><span class="kw">:</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span><span class="co">                             # OPTIONAL: Data preprocessing</span></span>
@@ -1025,14 +1025,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
 <span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
 <span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Values must be NULL"</span><span class="co">       # OPTIONAL: Step description</span></span></code></pre></div>
-<p><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null</a>: are column data not null (not missing)?</p>
+<p><code>col_vals_not_null</code>: are column data not null (not missing)?</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_not_null</span><span class="kw">:</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">    # ... (same parameters as col_vals_null)</span></span></code></pre></div>
 </section>
 <section id="pattern-matching-methods" class="level3">
 <h3 class="anchored" data-anchor-id="pattern-matching-methods">Pattern Matching Methods</h3>
-<p><a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex</a>: do string-based column data match a regular expression?</p>
+<p><code>col_vals_regex</code>: do string-based column data match a regular expression?</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_regex</span><span class="kw">:</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">pattern</span><span class="kw">:</span><span class="at"> </span><span class="st">"^[A-Z]{2,3}$"</span><span class="co">            # REQUIRED: Regular expression pattern</span></span>
@@ -1044,7 +1044,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
 <span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
 <span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Values match pattern"</span><span class="co">      # OPTIONAL: Step description</span></span></code></pre></div>
-<p><a href="../../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link gdls-code">col_vals_within_spec</a>: do column data conform to a specification (email, URL, postal codes, etc.)?</p>
+<p><code>col_vals_within_spec</code>: do column data conform to a specification (email, URL, postal codes, etc.)?</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_within_spec</span><span class="kw">:</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec</span><span class="kw">:</span><span class="at"> </span><span class="st">"email"</span><span class="co">                      # REQUIRED: Specification type</span></span>
@@ -1087,7 +1087,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_within_spec</span><span class="kw">:</span></span>
 <span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> account_number</span></span>
 <span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec</span><span class="kw">:</span><span class="at"> </span><span class="st">"iban[DE]"</span></span></code></pre></div>
-<p><a href="../../reference/Validate.col_vals_str_len.html#pointblank.Validate.col_vals_str_len" class="gdls-link gdls-code">col_vals_str_len</a>: are string lengths within a range?</p>
+<p><code>col_vals_str_len</code>: are string lengths within a range?</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_str_len</span><span class="kw">:</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">min_val</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span><span class="co">                         # OPTIONAL: Minimum length (at least one bound needed)</span></span>
@@ -1096,7 +1096,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="custom-expression-methods" class="level3">
 <h3 class="anchored" data-anchor-id="custom-expression-methods">Custom Expression Methods</h3>
-<p><a href="../../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr</a>: do column data agree with a predicate expression?</p>
+<p><code>col_vals_expr</code>: do column data agree with a predicate expression?</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_expr</span><span class="kw">:</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">expr</span><span class="kw">:</span><span class="co">                              # REQUIRED: Custom validation expression</span></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">      python</span><span class="kw">: </span><span class="ch">|</span></span>
@@ -1113,7 +1113,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="trend-validation-methods" class="level3">
 <h3 class="anchored" data-anchor-id="trend-validation-methods">Trend Validation Methods</h3>
-<p><a href="../../reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing" class="gdls-link gdls-code">col_vals_increasing</a>: are column data increasing row-by-row?</p>
+<p><code>col_vals_increasing</code>: are column data increasing row-by-row?</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_increasing</span><span class="kw">:</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">allow_stationary</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">            # OPTIONAL: Allow consecutive equal values (default: false)</span></span>
@@ -1151,7 +1151,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> temperature</span></span>
 <span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">decreasing_tol</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
 <span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Temperature trend (small drops allowed)"</span></span></code></pre></div>
-<p><a href="../../reference/Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing" class="gdls-link gdls-code">col_vals_decreasing</a>: are column data decreasing row-by-row?</p>
+<p><code>col_vals_decreasing</code>: are column data decreasing row-by-row?</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_decreasing</span><span class="kw">:</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">allow_stationary</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">            # OPTIONAL: Allow consecutive equal values (default: false)</span></span>
@@ -1192,7 +1192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="row-based-validations" class="level2">
 <h2 class="anchored" data-anchor-id="row-based-validations">Row-based Validations</h2>
-<p><a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct</a>: are row data distinct?</p>
+<p><code>rows_distinct</code>: are row data distinct?</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> rows_distinct</span><span class="co">                        # Simple form</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">rows_distinct</span><span class="kw">:</span><span class="co">                       # With parameters</span></span>
@@ -1204,7 +1204,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
 <span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
 <span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"No duplicate rows"</span><span class="co">         # OPTIONAL: Step description</span></span></code></pre></div>
-<p><a href="../../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" class="gdls-link gdls-code">rows_complete</a>: are row data complete?</p>
+<p><code>rows_complete</code>: are row data complete?</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> rows_complete</span><span class="co">                        # Simple form</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">rows_complete</span><span class="kw">:</span><span class="co">                       # With parameters</span></span>
@@ -1219,7 +1219,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="structure-validations" class="level2">
 <h2 class="anchored" data-anchor-id="structure-validations">Structure Validations</h2>
-<p><a href="../../reference/Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link gdls-code">col_exists</a>: does column exist in the table?</p>
+<p><code>col_exists</code>: does column exist in the table?</p>
 <div class="sourceCode" id="cb36"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_exists</span><span class="kw">:</span></span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">col1</span><span class="kw">,</span><span class="at"> col2</span><span class="kw">,</span><span class="at"> col3</span><span class="kw">]</span><span class="co">        # REQUIRED: Column(s) that must exist</span></span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
@@ -1227,7 +1227,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
 <span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
 <span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Required columns exist"</span><span class="co">    # OPTIONAL: Step description</span></span></code></pre></div>
-<p><a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match</a>: does the table have expected column names and data types?</p>
+<p><code>col_schema_match</code>: does the table have expected column names and data types?</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_schema_match</span><span class="kw">:</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">schema</span><span class="kw">:</span><span class="co">                            # REQUIRED: Expected schema</span></span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span></span>
@@ -1244,7 +1244,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
 <span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
 <span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Schema validation"</span><span class="co">         # OPTIONAL: Step description</span></span></code></pre></div>
-<p><a href="../../reference/Validate.row_count_match.html#pointblank.Validate.row_count_match" class="gdls-link gdls-code">row_count_match</a>: does the table have n rows?</p>
+<p><code>row_count_match</code>: does the table have n rows?</p>
 <div class="sourceCode" id="cb38"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">row_count_match</span><span class="kw">:</span></span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">count</span><span class="kw">:</span><span class="at"> </span><span class="dv">1000</span><span class="co">                        # REQUIRED: Expected row count</span></span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
@@ -1252,7 +1252,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
 <span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
 <span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Expected row count"</span><span class="co">        # OPTIONAL: Step description</span></span></code></pre></div>
-<p><a href="../../reference/Validate.col_count_match.html#pointblank.Validate.col_count_match" class="gdls-link gdls-code">col_count_match</a>: does the table have n columns?</p>
+<p><code>col_count_match</code>: does the table have n columns?</p>
 <div class="sourceCode" id="cb39"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_count_match</span><span class="kw">:</span></span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">count</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span><span class="co">                          # REQUIRED: Expected column count</span></span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
@@ -1260,7 +1260,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
 <span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
 <span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Expected column count"</span><span class="co">     # OPTIONAL: Step description</span></span></code></pre></div>
-<p><a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match</a>: does the table match a comparison table?</p>
+<p><code>tbl_match</code>: does the table match a comparison table?</p>
 <div class="sourceCode" id="cb40"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">tbl_match</span><span class="kw">:</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">tbl_compare</span><span class="kw">:</span><span class="co">                       # REQUIRED: Comparison table</span></span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="fu">      python</span><span class="kw">: </span><span class="ch">|</span></span>
@@ -1282,7 +1282,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Data match</strong>: values in corresponding cells are identical</li>
 </ol>
 <p>The validation fails at the first check that doesn’t pass, making it easy to diagnose mismatches. This operates over a single test unit (pass/fail for complete table match).</p>
-<p><strong>Cross-backend validation</strong>: <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> supports automatic backend coercion when comparing tables from different backends (e.g., Polars vs.&nbsp;Pandas, DuckDB vs.&nbsp;SQLite). The comparison table is automatically converted to match the target table’s backend.</p>
+<p><strong>Cross-backend validation</strong>: <code>tbl_match()</code> supports automatic backend coercion when comparing tables from different backends (e.g., Polars vs.&nbsp;Pandas, DuckDB vs.&nbsp;SQLite). The comparison table is automatically converted to match the target table’s backend.</p>
 <p>Examples:</p>
 <div class="sourceCode" id="cb41"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare against reference dataset</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">tbl_match</span><span class="kw">:</span></span>
@@ -1309,7 +1309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="special-validation-methods" class="level2">
 <h2 class="anchored" data-anchor-id="special-validation-methods">Special Validation Methods</h2>
-<p><a href="../../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link gdls-code">conjointly</a>: are multiple validations having a joint dependency?</p>
+<p><code>conjointly</code>: are multiple validations having a joint dependency?</p>
 <div class="sourceCode" id="cb42"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">conjointly</span><span class="kw">:</span></span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">expressions</span><span class="kw">:</span><span class="co">                       # REQUIRED: List of lambda expressions</span></span>
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">"lambda df: df['d'] &gt; df['a']"</span></span>
@@ -1428,16 +1428,16 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 </ul>
 <p><strong>When NOT to use AI validation:</strong></p>
 <ul>
-<li>Simple numeric comparisons (use <a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt</a>, <a href="../../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link gdls-code">col_vals_lt</a>, etc.)</li>
-<li>Exact pattern matching (use <a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex</a>)</li>
-<li>Schema validation (use <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match</a>)</li>
+<li>Simple numeric comparisons (use <code>col_vals_gt</code>, <code>col_vals_lt</code>, etc.)</li>
+<li>Exact pattern matching (use <code>col_vals_regex</code>)</li>
+<li>Schema validation (use <code>col_schema_match</code>)</li>
 <li>Performance-critical validations with large datasets</li>
 <li>When deterministic results are required</li>
 </ul>
 </section>
 <section id="data-quality-methods" class="level2">
 <h2 class="anchored" data-anchor-id="data-quality-methods">Data Quality Methods</h2>
-<p><a href="../../reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null" class="gdls-link gdls-code">col_pct_null</a>: is the percentage of null values in a column within bounds?</p>
+<p><code>col_pct_null</code>: is the percentage of null values in a column within bounds?</p>
 <div class="sourceCode" id="cb49"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_pct_null</span><span class="kw">:</span></span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
 <span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span><span class="co">                        # REQUIRED: Maximum allowed null fraction</span></span>
@@ -1446,7 +1446,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
 <span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
 <span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Null rate check"</span><span class="co">           # OPTIONAL: Step description</span></span></code></pre></div>
-<p><a href="../../reference/Validate.data_freshness.html#pointblank.Validate.data_freshness" class="gdls-link gdls-code">data_freshness</a>: is the data in a date/datetime column recent?</p>
+<p><code>data_freshness</code>: is the data in a date/datetime column recent?</p>
 <div class="sourceCode" id="cb50"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">data_freshness</span><span class="kw">:</span></span>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">date_column</span><span class="kw">]</span><span class="co">             # REQUIRED: Date/datetime column</span></span>
 <span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">freshness</span><span class="kw">:</span><span class="at"> </span><span class="st">"24h"</span><span class="co">                   # REQUIRED: Maximum age of data</span></span>

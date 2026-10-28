@@ -57,7 +57,7 @@ A few things to notice in the output:
 
 - The table-level configuration (`tbl_name`, `label`, `thresholds`) is reproduced on the `pb.Validate(...)` call.
 - The data source is rendered as the placeholder `your_data`, since the plan doesn't know the name of the variable your data lives in. Replace it with your actual data variable before running the code.
-- Adjacent steps that differ only by column are collapsed into a single call: the two [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) steps above become `col_vals_not_null(columns=["a", "b"])`. This keeps the output compact and diffs minimal.
+- Adjacent steps that differ only by column are collapsed into a single call: the two `col_vals_not_null()` steps above become `col_vals_not_null(columns=["a", "b"])`. This keeps the output compact and diffs minimal.
 - Only non-default arguments are emitted. A step-level threshold that matches the table-level default is omitted, `na_pass=True` appears only where it was set, and so on.
 
 The result is regular source you can paste into a script or notebook, commit to version control, or share with a colleague.
@@ -214,20 +214,20 @@ print(json.dumps(schema, indent=2))
 
 Each validation method is mapped to its closest JSON Schema keyword:
 
-| Pointblank method | JSON Schema keyword |
-|----|----|
-| [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) | `required` |
-| [col_vals_gt()](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) | `exclusiveMinimum` |
-| [col_vals_ge()](../../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge) | `minimum` |
-| [col_vals_lt()](../../reference/Validate.col_vals_lt.md#pointblank.Validate.col_vals_lt) | `exclusiveMaximum` |
-| [col_vals_le()](../../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le) | `maximum` |
-| [col_vals_eq()](../../reference/Validate.col_vals_eq.md#pointblank.Validate.col_vals_eq) | `const` |
-| [col_vals_between()](../../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between) | `minimum` + `maximum` |
-| [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) | `enum` |
-| [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) | `pattern` |
-| [col_vals_within_spec()](../../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec) | `format` |
+| Pointblank method        | JSON Schema keyword   |
+|--------------------------|-----------------------|
+| `col_vals_not_null()`    | `required`            |
+| `col_vals_gt()`          | `exclusiveMinimum`    |
+| `col_vals_ge()`          | `minimum`             |
+| `col_vals_lt()`          | `exclusiveMaximum`    |
+| `col_vals_le()`          | `maximum`             |
+| `col_vals_eq()`          | `const`               |
+| `col_vals_between()`     | `minimum` + `maximum` |
+| `col_vals_in_set()`      | `enum`                |
+| `col_vals_regex()`       | `pattern`             |
+| `col_vals_within_spec()` | `format`              |
 
-When the [Validate](../../reference/Validate.md#pointblank.Validate) object has data attached, the schema is automatically enriched with column type information (`"type": "integer"`, `"type": "string"`, etc.) inferred from the data. Steps that have no natural JSON Schema equivalent (e.g., [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct), [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match)) are silently skipped.
+When the [Validate](../../reference/Validate.md#pointblank.Validate) object has data attached, the schema is automatically enriched with column type information (`"type": "integer"`, `"type": "string"`, etc.) inferred from the data. Steps that have no natural JSON Schema equivalent (e.g., `rows_distinct()`, `tbl_match()`) are silently skipped.
 
 ### Writing to a File
 

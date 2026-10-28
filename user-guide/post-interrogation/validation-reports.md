@@ -125,10 +125,10 @@ The second column is unlabeled and contains the sequential step number, starting
 
 The TYPE column displays the validation method name along with an icon that visually represents the type of validation being performed. The validation method indicates what aspect of data quality is being checked, such as:
 
-- [col_vals_gt()](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt): column values greater than
-- [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set): column values in a set
-- [col_exists()](../../reference/Validate.col_exists.md#pointblank.Validate.col_exists): column existence check
-- [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct): row uniqueness check
+- `col_vals_gt()`: column values greater than
+- `col_vals_in_set()`: column values in a set
+- `col_exists()`: column existence check
+- `rows_distinct()`: row uniqueness check
 - and many others…
 
 When you provide a brief message (via `brief=True` for auto-generated briefs or `brief="custom text"` for custom messages), it appears within the TYPE column below the validation method name. These briefs provide human-readable explanations of what each validation step is checking, making the report more accessible to non-technical stakeholders.
@@ -155,11 +155,11 @@ validation_with_briefs
 
 [TABLE]
 
-In the above report, you'll see the custom brief message appear below the [col_vals_gt](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) method name in the first step, and an automatically generated brief below [col_vals_in_set](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) in the second step.
+In the above report, you'll see the custom brief message appear below the `col_vals_gt` method name in the first step, and an automatically generated brief below `col_vals_in_set` in the second step.
 
 #### COLUMNS
 
-The column(s) being validated in this step. For validation methods that don't target specific columns (like [row_count_match](../../reference/Validate.row_count_match.md#pointblank.Validate.row_count_match)), this will show an em dash (--).
+The column(s) being validated in this step. For validation methods that don't target specific columns (like `row_count_match`), this will show an em dash (--).
 
 #### VALUES
 

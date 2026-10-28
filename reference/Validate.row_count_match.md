@@ -4,7 +4,7 @@ Validate whether the row count of the table matches a specified count.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14165-L14395)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14243-L14473)
 
 ``` python
 Validate.row_count_match(
@@ -20,7 +20,7 @@ Validate.row_count_match(
 )
 ```
 
-The [row_count_match()](../reference/Validate.row_count_match.md#pointblank.Validate.row_count_match) method checks whether the row count of the target table matches a specified count. This validation will operate over a single test unit, which is whether the row count matches the specified count.
+The `row_count_match()` method checks whether the row count of the target table matches a specified count. This validation will operate over a single test unit, which is whether the row count matches the specified count.
 
 We also have the option to invert the validation step by setting `inverse=True`. This will make the expectation that the row count of the target table *does not* match the specified count.
 

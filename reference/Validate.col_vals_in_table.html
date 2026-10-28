@@ -311,6 +311,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.add_steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.add_steps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Pipeline.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Pipeline</span></a>
   </div>
@@ -1666,7 +1672,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14962-L15139" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15040-L15217" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">col_vals_in_table</span>(</span>
@@ -1683,7 +1689,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="../reference/Validate.col_vals_in_table.html#pointblank.Validate.col_vals_in_table" class="gdls-link gdls-code">col_vals_in_table()</a> validation method checks whether each value (or composite key) in the specified column(s) of this table exists in the corresponding column(s) of a reference table. This is a referential integrity check: it catches orphaned foreign keys, broken references, and values that fall outside a controlled vocabulary maintained in another table.</p>
+<p>The <code>col_vals_in_table()</code> validation method checks whether each value (or composite key) in the specified column(s) of this table exists in the corresponding column(s) of a reference table. This is a referential integrity check: it catches orphaned foreign keys, broken references, and values that fall outside a controlled vocabulary maintained in another table.</p>
 <p>Each row is a test unit. Rows whose key values are found in the reference table pass. Rows with orphaned values fail. Failing rows are extractable via <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link gdls-code">get_data_extracts()</a> just like any other column-level validation.</p>
 <p>Cross-backend matching is supported: the reference table can be from a different backend (e.g., a Polars DataFrame checked against a DuckDB table, or a MySQL table checked against a SQLite table). The lighter table is automatically materialized to match the heavier table’s backend before comparison.</p>
 </div>
@@ -1748,7 +1754,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Check that every <code>customer_id</code> in orders exists in the customers table:</p>
-<div id="cfd1dc2f" class="cell" data-execution_count="2">
+<div id="1323a295" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1934,7 +1940,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 <p>The last row fails because <code>customer_id=99</code> does not exist in the customers table.</p>
 <p>Composite foreign keys are also supported:</p>
-<div id="a3e2cf10" class="cell" data-execution_count="3">
+<div id="58b51092" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>catalog <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"region"</span>: [<span class="st">"US"</span>, <span class="st">"US"</span>, <span class="st">"EU"</span>],</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"sku"</span>: [<span class="st">"A1"</span>, <span class="st">"B2"</span>, <span class="st">"A1"</span>],</span>

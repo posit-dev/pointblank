@@ -311,6 +311,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.add_steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.add_steps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Pipeline.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Pipeline</span></a>
   </div>
@@ -1685,7 +1691,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-text">
 <p>The <a href="../reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt" class="gdls-link gdls-code">col_sum_gt()</a> validation method checks whether the sum of values in a column is greater than a specified <code>value=</code>. This is an aggregation-based validation where the entire column is reduced to a single sum value that is then compared against the target. The comparison used in this function is <code>sum(column) &gt; value</code>.</p>
-<p>Unlike row-level validations (e.g., <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a>), this method treats the entire column as a single test unit. The validation either passes completely (if the aggregated value satisfies the comparison) or fails completely.</p>
+<p>Unlike row-level validations (e.g., <code>col_vals_gt()</code>), this method treats the entire column as a single test unit. The validation either passes completely (if the aggregated value satisfies the comparison) or fails completely.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>

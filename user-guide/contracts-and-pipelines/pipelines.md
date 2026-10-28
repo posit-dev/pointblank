@@ -457,7 +457,7 @@ print(f"  Overall passed: {result.passed}")
 result.target_validation
 ```
 
-The target validation report above pinpoints the failure: the [col_vals_not_null](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) step on the `amount` column fails because the buggy transform introduced nulls. This makes the root cause obvious and you can see exactly which contract step failed and trace it back to the transformation logic. Without the target contract, this bug would silently produce a table with missing values.
+The target validation report above pinpoints the failure: the `col_vals_not_null` step on the `amount` column fails because the buggy transform introduced nulls. This makes the root cause obvious and you can see exactly which contract step failed and trace it back to the transformation logic. Without the target contract, this bug would silently produce a table with missing values.
 
 ## Working with Pandas
 

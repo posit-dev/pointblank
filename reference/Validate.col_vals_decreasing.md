@@ -4,7 +4,7 @@ Are column data decreasing by row?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9845-L10074)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9923-L10152)
 
 ``` python
 Validate.col_vals_decreasing(
@@ -24,7 +24,7 @@ Validate.col_vals_decreasing(
 )
 ```
 
-The [col_vals_decreasing()](../reference/Validate.col_vals_decreasing.md#pointblank.Validate.col_vals_decreasing) validation method checks whether column values in a table are decreasing when moving down a table. There are options for allowing missing values in the target column, allowing stationary phases (where consecutive values don't change), and even one for allowing increasing movements up to a certain threshold. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+The `col_vals_decreasing()` validation method checks whether column values in a table are decreasing when moving down a table. There are options for allowing missing values in the target column, allowing stationary phases (where consecutive values don't change), and even one for allowing increasing movements up to a certain threshold. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
 
 ## Parameters
 

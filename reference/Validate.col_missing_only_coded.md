@@ -4,7 +4,7 @@ Validate that a column contains only documented codes and legitimate values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12512-L12722)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12590-L12800)
 
 ``` python
 Validate.col_missing_only_coded(
@@ -23,7 +23,7 @@ Validate.col_missing_only_coded(
 )
 ```
 
-The [col_missing_only_coded()](../reference/Validate.col_missing_only_coded.md#pointblank.Validate.col_missing_only_coded) method checks that every value in a column is *accounted for*: it is either a declared missing-value code (a sentinel in the [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec), or a null when `null_is_missing=True`), or a legitimate "real" value. Legitimate real values are defined by `allowed=` (an explicit set) and/or a `[min_val, max_val]` range. Any value that is neither a documented code nor a legitimate real value is flagged -- this catches *undocumented* sentinel codes (e.g., a stray `-95`) that aren't part of the spec.
+The `col_missing_only_coded()` method checks that every value in a column is *accounted for*: it is either a declared missing-value code (a sentinel in the [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec), or a null when `null_is_missing=True`), or a legitimate "real" value. Legitimate real values are defined by `allowed=` (an explicit set) and/or a `[min_val, max_val]` range. Any value that is neither a documented code nor a legitimate real value is flagged -- this catches *undocumented* sentinel codes (e.g., a stray `-95`) that aren't part of the spec.
 
 At least one of `allowed=`, `min_val=`, or `max_val=` must be provided so that legitimate real values can be distinguished from undocumented codes. This validation operates over the number of test units equal to the number of rows in the table.
 

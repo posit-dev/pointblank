@@ -4,7 +4,7 @@ Validate column values using a custom expression.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11366-L11618)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11444-L11696)
 
 ``` python
 Validate.col_vals_expr(
@@ -19,12 +19,12 @@ Validate.col_vals_expr(
 )
 ```
 
-The [col_vals_expr()](../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) validation method checks whether column values in a table satisfy a custom `expr=` expression. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+The `col_vals_expr()` validation method checks whether column values in a table satisfy a custom `expr=` expression. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
 
 ## Parameters
 
 `expr: Any`  
-A column expression that will evaluate each row in the table, returning a boolean value per table row. A Narwhals column expression (e.g., `nw.col("a") > 1`) works with every table type. Otherwise, use an expression from the table's own library: a Polars expression for a Polars table, an Ibis expression for an Ibis table, or a PySpark column for a PySpark DataFrame. A function (such as a lambda) can also be given; it receives the table and should return one of those expressions or a boolean Series (e.g., `lambda df: df["a"] > 1` for a pandas DataFrame). For Polars, Narwhals, and Ibis expressions, the columns used in the expression are shown in the validation report, as is any name given to the expression (e.g., through `.alias("a_is_int")`), which helps to tell apart several [col_vals_expr()](../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) steps. The expression as written in the code (when its source text is available, which requires Python 3.11 or later) appears in a note in the report footer.
+A column expression that will evaluate each row in the table, returning a boolean value per table row. A Narwhals column expression (e.g., `nw.col("a") > 1`) works with every table type. Otherwise, use an expression from the table's own library: a Polars expression for a Polars table, an Ibis expression for an Ibis table, or a PySpark column for a PySpark DataFrame. A function (such as a lambda) can also be given; it receives the table and should return one of those expressions or a boolean Series (e.g., `lambda df: df["a"] > 1` for a pandas DataFrame). For Polars, Narwhals, and Ibis expressions, the columns used in the expression are shown in the validation report, as is any name given to the expression (e.g., through `.alias("a_is_int")`), which helps to tell apart several `col_vals_expr()` steps. The expression as written in the code (when its source text is available, which requires Python 3.11 or later) appears in a note in the report footer.
 
 `pre: Callable | None = None`  
 An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the *Preprocessing* section for more information on how to use this argument.
@@ -144,4 +144,4 @@ validation
 
 [TABLE]
 
-Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using [col_vals_expr()](../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr). All test units passed, with no failing test units.
+Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using `col_vals_expr()`. All test units passed, with no failing test units.

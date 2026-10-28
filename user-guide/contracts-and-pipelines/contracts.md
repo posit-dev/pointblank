@@ -77,7 +77,7 @@ order_contract = pb.Contract(
 )
 ```
 
-When a schema is defined, the contract automatically adds a [col_schema_match()](../../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) step before all other validation steps. This means the schema check runs first, and if the table doesn't have the right columns and types, you'll know immediately.
+When a schema is defined, the contract automatically adds a `col_schema_match()` step before all other validation steps. This means the schema check runs first, and if the table doesn't have the right columns and types, you'll know immediately.
 
 ``` python
 orders = pl.DataFrame(
@@ -124,17 +124,17 @@ A Step can use most of the core validation methods of the [Validate](../../refer
 
 | Method | Purpose |
 |----|----|
-| [col_vals_gt()](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), [col_vals_lt()](../../reference/Validate.col_vals_lt.md#pointblank.Validate.col_vals_lt), [col_vals_ge()](../../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge), [col_vals_le()](../../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le) | Numeric bounds |
-| [col_vals_between()](../../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between), [col_vals_outside()](../../reference/Validate.col_vals_outside.md#pointblank.Validate.col_vals_outside) | Range checks |
-| [col_vals_eq()](../../reference/Validate.col_vals_eq.md#pointblank.Validate.col_vals_eq), [col_vals_ne()](../../reference/Validate.col_vals_ne.md#pointblank.Validate.col_vals_ne) | Equality checks |
-| [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set), [col_vals_not_in_set()](../../reference/Validate.col_vals_not_in_set.md#pointblank.Validate.col_vals_not_in_set) | Categorical membership |
-| [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null), [col_vals_null()](../../reference/Validate.col_vals_null.md#pointblank.Validate.col_vals_null) | Null checks |
-| [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) | Pattern matching |
-| [col_exists()](../../reference/Validate.col_exists.md#pointblank.Validate.col_exists) | Column presence |
-| [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) | Uniqueness (use `columns_subset=`) |
-| [rows_complete()](../../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete) | No nulls in any column |
-| [row_count_match()](../../reference/Validate.row_count_match.md#pointblank.Validate.row_count_match) | Expected row count |
-| [col_count_match()](../../reference/Validate.col_count_match.md#pointblank.Validate.col_count_match) | Expected column count |
+| `col_vals_gt()`, `col_vals_lt()`, `col_vals_ge()`, `col_vals_le()` | Numeric bounds |
+| `col_vals_between()`, `col_vals_outside()` | Range checks |
+| `col_vals_eq()`, `col_vals_ne()` | Equality checks |
+| `col_vals_in_set()`, `col_vals_not_in_set()` | Categorical membership |
+| `col_vals_not_null()`, `col_vals_null()` | Null checks |
+| `col_vals_regex()` | Pattern matching |
+| `col_exists()` | Column presence |
+| `rows_distinct()` | Uniqueness (use `columns_subset=`) |
+| `rows_complete()` | No nulls in any column |
+| `row_count_match()` | Expected row count |
+| `col_count_match()` | Expected column count |
 
 ## Contract Metadata
 

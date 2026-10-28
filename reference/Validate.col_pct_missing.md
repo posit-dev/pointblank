@@ -4,7 +4,7 @@ Validate that the percentage of *structured* missing values stays within a limit
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12116-L12322)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12194-L12400)
 
 ``` python
 Validate.col_pct_missing(
@@ -21,7 +21,7 @@ Validate.col_pct_missing(
 )
 ```
 
-The [col_pct_missing()](../reference/Validate.col_pct_missing.md#pointblank.Validate.col_pct_missing) validation method checks whether the percentage of missing values in a column is at most `max_pct=`. Unlike [`col_pct_null()`](../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null), which only considers actual null values, this method uses a [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) to define which values count as missing: declared sentinel values (e.g., `-99` for `"refused"`) and, when `null_is_missing=True`, actual null values. This validation operates at the column level, generating a single validation step per column that passes when the missing percentage does not exceed `max_pct=`.
+The `col_pct_missing()` validation method checks whether the percentage of missing values in a column is at most `max_pct=`. Unlike [`col_pct_null()`](../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null), which only considers actual null values, this method uses a [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) to define which values count as missing: declared sentinel values (e.g., `-99` for `"refused"`) and, when `null_is_missing=True`, actual null values. This validation operates at the column level, generating a single validation step per column that passes when the missing percentage does not exceed `max_pct=`.
 
 You can narrow the check to a single reason (via `reason=`) or a category of reasons (via `category=`), making it possible to assert things like "at most 10% of values were refused" or "at most 15% are item nonresponse".
 

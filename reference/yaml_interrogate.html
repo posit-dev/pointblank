@@ -311,6 +311,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.add_steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.add_steps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Pipeline.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Pipeline</span></a>
   </div>
@@ -2409,7 +2415,7 @@ If the YAML is invalid, malformed, or execution fails. This includes syntax erro
 </div>
 </div>
 </div>
-<p>The validation table shows the results of our YAML-defined workflow. We can see that the <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> validation failed (because there are duplicate rows in the table), while the column existence checks passed.</p>
+<p>The validation table shows the results of our YAML-defined workflow. We can see that the <code>rows_distinct()</code> validation failed (because there are duplicate rows in the table), while the column existence checks passed.</p>
 <p>Now let’s create a more comprehensive validation workflow with thresholds and metadata:</p>
 <div id="274dfe1b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Advanced YAML configuration with thresholds and metadata</span></span>
@@ -2914,7 +2920,7 @@ Version: 2.1.0</code></pre>
 </section>
 <section id="data-freshness" class="level3">
 <h3 class="anchored" data-anchor-id="data-freshness">Data Freshness</h3>
-<p>Check that a date/datetime column has recent data using <a href="../reference/Validate.data_freshness.html#pointblank.Validate.data_freshness" class="gdls-link gdls-code">data_freshness</a>:</p>
+<p>Check that a date/datetime column has recent data using <code>data_freshness</code>:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span><span class="at"> events.csv</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">data_freshness</span><span class="kw">:</span></span>
@@ -2936,7 +2942,7 @@ Version: 2.1.0</code></pre>
 </section>
 <section id="null-percentage-check" class="level3">
 <h3 class="anchored" data-anchor-id="null-percentage-check">Null Percentage Check</h3>
-<p>Use <a href="../reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null" class="gdls-link gdls-code">col_pct_null</a> to validate that the percentage of null values in a column is within bounds:</p>
+<p>Use <code>col_pct_null</code> to validate that the percentage of null values in a column is within bounds:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_pct_null</span><span class="kw">:</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">a</span><span class="kw">,</span><span class="at"> b</span><span class="kw">]</span></span>

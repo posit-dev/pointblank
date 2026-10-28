@@ -1324,10 +1324,10 @@ Note
 <h3 class="anchored" data-anchor-id="type">TYPE</h3>
 <p>The TYPE column displays the validation method name along with an icon that visually represents the type of validation being performed. The validation method indicates what aspect of data quality is being checked, such as:</p>
 <ul>
-<li><a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a>: column values greater than</li>
-<li><a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a>: column values in a set</li>
-<li><a href="../../reference/Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link gdls-code">col_exists()</a>: column existence check</li>
-<li><a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a>: row uniqueness check</li>
+<li><code>col_vals_gt()</code>: column values greater than</li>
+<li><code>col_vals_in_set()</code>: column values in a set</li>
+<li><code>col_exists()</code>: column existence check</li>
+<li><code>rows_distinct()</code>: row uniqueness check</li>
 <li>and many others…</li>
 </ul>
 <p>When you provide a brief message (via <code>brief=True</code> for auto-generated briefs or <code>brief="custom text"</code> for custom messages), it appears within the TYPE column below the validation method name. These briefs provide human-readable explanations of what each validation step is checking, making the report more accessible to non-technical stakeholders.</p>
@@ -1550,11 +1550,11 @@ Note
 </div>
 </div>
 </div>
-<p>In the above report, you’ll see the custom brief message appear below the <a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt</a> method name in the first step, and an automatically generated brief below <a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set</a> in the second step.</p>
+<p>In the above report, you’ll see the custom brief message appear below the <code>col_vals_gt</code> method name in the first step, and an automatically generated brief below <code>col_vals_in_set</code> in the second step.</p>
 </section>
 <section id="columns" class="level3">
 <h3 class="anchored" data-anchor-id="columns">COLUMNS</h3>
-<p>The column(s) being validated in this step. For validation methods that don’t target specific columns (like <a href="../../reference/Validate.row_count_match.html#pointblank.Validate.row_count_match" class="gdls-link gdls-code">row_count_match</a>), this will show an em dash (—).</p>
+<p>The column(s) being validated in this step. For validation methods that don’t target specific columns (like <code>row_count_match</code>), this will show an em dash (—).</p>
 </section>
 <section id="values" class="level3">
 <h3 class="anchored" data-anchor-id="values">VALUES</h3>

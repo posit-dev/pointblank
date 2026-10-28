@@ -4,7 +4,7 @@ Validate whether rows in the table are distinct.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12724-L12976)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12802-L13054)
 
 ``` python
 Validate.rows_distinct(
@@ -19,7 +19,7 @@ Validate.rows_distinct(
 )
 ```
 
-The [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) method checks whether rows in the table are distinct. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+The `rows_distinct()` method checks whether rows in the table are distinct. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
 
 ## Parameters
 
@@ -122,7 +122,7 @@ pb.preview(tbl)
 | 3   | c              | c              | d              |
 | 4   | d              | d              | e              |
 
-Let's validate that the rows in the table are distinct with [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct). We'll determine if this validation had any failing test units (there are four test units, one for each row). A failing test units means that a given row is not distinct from every other row.
+Let's validate that the rows in the table are distinct with `rows_distinct()`. We'll determine if this validation had any failing test units (there are four test units, one for each row). A failing test units means that a given row is not distinct from every other row.
 
 ``` python
 validation = (

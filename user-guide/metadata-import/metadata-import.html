@@ -851,31 +851,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td><code>required=True</code></td>
-<td><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a></td>
+<td><code>col_vals_not_null()</code></td>
 </tr>
 <tr class="even">
 <td><code>unique=True</code></td>
-<td><a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a></td>
+<td><code>rows_distinct()</code></td>
 </tr>
 <tr class="odd">
 <td><code>min_val</code> / <code>max_val</code></td>
-<td><a href="../../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link gdls-code">col_vals_between()</a></td>
+<td><code>col_vals_between()</code></td>
 </tr>
 <tr class="even">
 <td><code>max_length</code></td>
-<td><a href="../../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a> (string length check)</td>
+<td><code>col_vals_expr()</code> (string length check)</td>
 </tr>
 <tr class="odd">
 <td><code>pattern</code></td>
-<td><a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a></td>
+<td><code>col_vals_regex()</code></td>
 </tr>
 <tr class="even">
 <td><code>allowed_values</code> or codelist</td>
-<td><a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a></td>
+<td><code>col_vals_in_set()</code></td>
 </tr>
 <tr class="odd">
 <td>Schema (column names + types)</td>
-<td><a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a></td>
+<td><code>col_schema_match()</code></td>
 </tr>
 </tbody>
 </table>
@@ -931,7 +931,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Get value-to-label mapping</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>sex_labels <span class="op">=</span> meta.codelists[<span class="st">"C66731"</span>].to_dict()</span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g., {"M": "Male", "F": "Female", "U": "Unknown", ...}</span></span></code></pre></div>
-<p>When <code>to_validate()</code> encounters a variable with a <code>codelist_ref</code>, it generates a <a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> step using the codelist’s values. For non-extensible codelists, any value outside the set is a failure. For extensible codelists, additional values are permitted (the check still runs but serves as documentation of expected values).</p>
+<p>When <code>to_validate()</code> encounters a variable with a <code>codelist_ref</code>, it generates a <code>col_vals_in_set()</code> step using the codelist’s values. For non-extensible codelists, any value outside the set is a failure. For extensible codelists, additional values are permitted (the check still runs but serves as documentation of expected values).</p>
 </section>
 <section id="handling-missing-value-codes" class="level1">
 <h1>Handling Missing Value Codes</h1>

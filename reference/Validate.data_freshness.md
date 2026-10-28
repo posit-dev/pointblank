@@ -4,7 +4,7 @@ Validate that data in a datetime column is not older than a specified maximum ag
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14397-L14771)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14475-L14849)
 
 ``` python
 Validate.data_freshness(
@@ -22,7 +22,7 @@ Validate.data_freshness(
 )
 ```
 
-The [data_freshness()](../reference/Validate.data_freshness.md#pointblank.Validate.data_freshness) validation method checks whether the most recent timestamp in the specified datetime column is within the allowed `max_age=` from the `reference_time=` (which defaults to the current time). This is useful for ensuring data pipelines are delivering fresh data and for enforcing data SLAs.
+The `data_freshness()` validation method checks whether the most recent timestamp in the specified datetime column is within the allowed `max_age=` from the `reference_time=` (which defaults to the current time). This is useful for ensuring data pipelines are delivering fresh data and for enforcing data SLAs.
 
 This method helps detect stale data by comparing the maximum (most recent) value in a datetime column against an expected freshness threshold.
 
@@ -159,7 +159,7 @@ If you're working with naive datetimes (which lack timezone information), always
 
 ## Examples
 
-The simplest use of [data_freshness()](../reference/Validate.data_freshness.md#pointblank.Validate.data_freshness) requires just two arguments: the `column=` containing your timestamps and `max_age=` specifying how old the data can be. In this first example, we create sample data with an `"updated_at"` column containing timestamps from 1, 12, and 20 hours ago. By setting `max_age="24 hours"`, we're asserting that the most recent timestamp should be within 24 hours of the current time. Since the newest record is only 1 hour old, this validation passes.
+The simplest use of `data_freshness()` requires just two arguments: the `column=` containing your timestamps and `max_age=` specifying how old the data can be. In this first example, we create sample data with an `"updated_at"` column containing timestamps from 1, 12, and 20 hours ago. By setting `max_age="24 hours"`, we're asserting that the most recent timestamp should be within 24 hours of the current time. Since the newest record is only 1 hour old, this validation passes.
 
 ``` python
 import pointblank as pb
@@ -187,7 +187,7 @@ validation
 
 [TABLE]
 
-The `max_age=` parameter accepts human-readable strings with various time units. You can chain multiple [data_freshness()](../reference/Validate.data_freshness.md#pointblank.Validate.data_freshness) calls to check different freshness thresholds simultaneously--useful for tiered SLAs where you might want warnings at 30 minutes but errors at 2 days.
+The `max_age=` parameter accepts human-readable strings with various time units. You can chain multiple `data_freshness()` calls to check different freshness thresholds simultaneously--useful for tiered SLAs where you might want warnings at 30 minutes but errors at 2 days.
 
 ``` python
 # Check data is fresh within different time windows

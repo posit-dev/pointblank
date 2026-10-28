@@ -10,12 +10,12 @@ Each validation step belongs to one of six data quality dimensions:
 
 | Dimension | What it measures | Example methods |
 |----|----|----|
-| **Completeness** | Presence of required values | [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null), [col_pct_null()](../../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null), [rows_complete()](../../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete) |
-| **Validity** | Values conform to rules, ranges, formats, or schema | [col_vals_gt()](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex), [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set), [col_schema_match()](../../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) |
-| **Uniqueness** | Absence of duplicate rows | [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) |
-| **Consistency** | Internal agreement across columns, rows, or tables | [conjointly()](../../reference/Validate.conjointly.md#pointblank.Validate.conjointly), [col_missing_consistent()](../../reference/Validate.col_missing_consistent.md#pointblank.Validate.col_missing_consistent), [col_vals_in_table()](../../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table), [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) |
-| **Timeliness** | Data recency / freshness | [data_freshness()](../../reference/Validate.data_freshness.md#pointblank.Validate.data_freshness) |
-| **Volume** | Expected row and column counts | [row_count_match()](../../reference/Validate.row_count_match.md#pointblank.Validate.row_count_match), [col_count_match()](../../reference/Validate.col_count_match.md#pointblank.Validate.col_count_match) |
+| **Completeness** | Presence of required values | `col_vals_not_null()`, `col_pct_null()`, `rows_complete()` |
+| **Validity** | Values conform to rules, ranges, formats, or schema | `col_vals_gt()`, `col_vals_regex()`, `col_vals_in_set()`, `col_schema_match()` |
+| **Uniqueness** | Absence of duplicate rows | `rows_distinct()` |
+| **Consistency** | Internal agreement across columns, rows, or tables | `conjointly()`, `col_missing_consistent()`, `col_vals_in_table()`, `tbl_match()` |
+| **Timeliness** | Data recency / freshness | `data_freshness()` |
+| **Volume** | Expected row and column counts | `row_count_match()`, `col_count_match()` |
 
 The dimension for each step is inferred from its assertion type, so existing validations gain dimensions with no changes on your part.
 

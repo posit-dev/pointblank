@@ -1,0 +1,2709 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<style>html:not(.theme-loaded){visibility:hidden}html:not(.theme-loaded) body{visibility:hidden;opacity:0}</style>
+<noscript><style>html:not(.theme-loaded),html:not(.theme-loaded) body{visibility:visible!important;opacity:1!important}</style></noscript>
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Add the steps from one or more Steps collections to the validation.">
+
+<title>Validate.add_steps() | Pointblank</title>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Validate.add_steps - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Validate.add_steps.html"}]</script>
+<meta property="og:type" content="website">
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-2cbc4fce51ec727eb1ce5774130eab4b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../gd-lightbox.css">
+<script defer="" src="../gd-lightbox.js"></script>
+<link rel="stylesheet" href="../gd-lightbox-compare.css">
+<script defer="" src="../gd-lightbox-compare.js"></script>
+<link rel="stylesheet" href="../gd-lightbox-annotate.css">
+<script defer="" src="../gd-lightbox-annotate.js"></script>
+<link rel="icon" type="image/x-icon" href="https://posit-dev.github.io/pointblank/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="https://posit-dev.github.io/pointblank/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://posit-dev.github.io/pointblank/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://posit-dev.github.io/pointblank/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://posit-dev.github.io/pointblank/apple-touch-icon.png">
+<meta name="gd-wide-layout" data-default="normal" data-min-viewport="1600">
+<style id="gd-wide-layout-vars">:root{--gd-wide-content-scale:1.5;--gd-wide-sidebar-scale:1.2;}</style>
+<script src="../theme-init.js"></script>
+<script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
+<script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
+<style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
+<meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+<meta name="gd-logo-tooltip" content="<code>v1.1.1</code><br>Released 2026-10-15">
+<link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.add_steps.html">
+<meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Validate.add_steps.html">
+<link rel="alternate" type="text/markdown" href="Validate.add_steps.md">
+
+
+<meta property="og:title" content="Validate.add_steps() | Pointblank">
+<meta property="og:description" content="Add the steps from one or more Steps collections to the validation.">
+<meta property="og:site_name" content="Pointblank">
+<meta name="twitter:title" content="Validate.add_steps() | Pointblank">
+<meta name="twitter:description" content="Add the steps from one or more Steps collections to the validation.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed doc-api-page doc-py-api-page quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
+    <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../user-guide/index.html"> 
+<span class="menu-text">User Guide</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../reference/index.html" aria-current="page"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../examples/index.html"> 
+<span class="menu-text">Demos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="497" data-forks="38"></span></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <h1 class="quarto-secondary-nav-title no-breadcrumbs"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.add_steps()</span></h1>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">API Index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Validate</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Thresholds.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Thresholds</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Actions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Actions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/FinalActions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">FinalActions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Schema.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Schema</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DraftValidation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DraftValidation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/EditValidation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EditValidation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/MissingSpec.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MissingSpec</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Contracts and Pipelines</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Contract.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Contract</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Step.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Step</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Steps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.add_steps.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Validate.add_steps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pipeline</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/PipelineResult.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PipelineResult</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Contract Import/Export</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/import_contract.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">import_contract</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/export_contract.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">export_contract</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/list_adapters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">list_adapters</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/register_adapter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">register_adapter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ContractImport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ContractImport</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ContractAdapter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ContractAdapter</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Validation Steps</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_gt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_gt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_lt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_lt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_ge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_ge</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_le.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_le</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_eq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_eq</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_ne.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_ne</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_between.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_between</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_outside.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_outside</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_in_set.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_in_set</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_not_in_set.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_not_in_set</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_increasing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_increasing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_decreasing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_decreasing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_null.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_null</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_not_null.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_not_null</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_regex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_regex</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_within_spec.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_within_spec</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_str_len.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_str_len</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_in_table.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_in_table</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_vals_expr.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_vals_expr</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_exists.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_exists</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_pct_null.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_pct_null</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_pct_missing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_pct_missing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_missing_coded.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_missing_coded</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_missing_only_coded.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_missing_only_coded</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_missing_consistent.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_missing_consistent</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.rows_distinct.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.rows_distinct</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.rows_complete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.rows_complete</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_schema_match.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_schema_match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.row_count_match.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.row_count_match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_count_match.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_count_match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.data_freshness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.data_freshness</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.tbl_match.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.tbl_match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.tbl_reconcile.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.tbl_reconcile</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.conjointly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.conjointly</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.specially.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.specially</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.prompt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.prompt</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Aggregation Steps</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sum_gt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_sum_gt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sum_lt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_sum_lt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sum_ge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_sum_ge</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sum_le.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_sum_le</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sum_eq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_sum_eq</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_avg_gt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_avg_gt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_avg_lt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_avg_lt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_avg_ge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_avg_ge</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_avg_le.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_avg_le</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_avg_eq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_avg_eq</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sd_gt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_sd_gt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sd_lt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_sd_lt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sd_ge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_sd_ge</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sd_le.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_sd_le</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.col_sd_eq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.col_sd_eq</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Column Selection</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/col.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">col</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/starts_with.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">starts_with</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ends_with.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ends_with</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/contains.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">contains</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/matches.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">matches</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/everything.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">everything</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/first_n.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">first_n</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/last_n.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">last_n</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/expr_col.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">expr_col</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Segment Groups</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/seg_group.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">seg_group</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Interrogation and Reporting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.interrogate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.interrogate</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.set_tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.set_tbl</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_tabular_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.get_tabular_report</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_step_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.get_step_report</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_json_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.get_json_report</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_dataframe_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.get_dataframe_report</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.to_code.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.to_code</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.to_yaml.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.to_yaml</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.to_json_schema.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.to_json_schema</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.suggest_improvements.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.suggest_improvements</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.from_prompt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.from_prompt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_sundered_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.get_sundered_data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_data_extracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.get_data_extracts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.all_passed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.all_passed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.assert_passing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.assert_passing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.assert_below_threshold.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.assert_below_threshold</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.assert_dimension_scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.assert_dimension_scores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.above_threshold.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.above_threshold</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_dimension_scores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.get_dimension_scores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_health_score.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.get_health_score</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.get_scorecard.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.get_scorecard</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.n.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.n</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.n_passed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.n_passed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.n_failed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.n_failed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.f_passed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.f_passed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.f_failed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.f_failed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.warning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.warning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.error.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.error</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.critical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.critical</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true">
+ <span class="menu-text">Inspection and Assistance</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DataScan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DataScan</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DataScanDiff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DataScanDiff</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/preview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">preview</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/col_summary_tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">col_summary_tbl</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/missing_vals_tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">missing_vals_tbl</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/load_dataset.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/get_data_path.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_data_path</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/connect_to_table.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">connect_to_table</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/print_database_tables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">print_database_tables</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="true">
+ <span class="menu-text">DataScan Methods</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DataScan.get_tabular_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DataScan.get_tabular_report</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DataScan.summary_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DataScan.summary_data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DataScan.compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DataScan.compare</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DataScan.save_to_json.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DataScan.save_to_json</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DataScan.load_from_json.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DataScan.load_from_json</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DataScan.to_json.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DataScan.to_json</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DataScan.from_json.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DataScan.from_json</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DataScan.to_dict.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DataScan.to_dict</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/DataScan.from_dict.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DataScan.from_dict</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="true">
+ <span class="menu-text">Table Comparison</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">compare</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/SchemaDiff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SchemaDiff</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="true">
+ <span class="menu-text">Comparison Methods</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.identical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.identical</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.schema_ok.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.schema_ok</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.status_counts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.status_counts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n_passed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n_passed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.n_failed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.n_failed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.rows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.rows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.column_summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.column_summary</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.get_tabular_report.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.get_tabular_report</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.to_dict.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.to_dict</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Comparison.to_json.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison.to_json</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="true">
+ <span class="menu-text">Table Pre-checks</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/has_columns.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">has_columns</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/has_rows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">has_rows</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="true">
+ <span class="menu-text">YAML</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/yaml_interrogate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">yaml_interrogate</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/validate_yaml.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">validate_yaml</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/yaml_to_python.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">yaml_to_python</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="true">
+ <span class="menu-text">Utility Functions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/get_column_count.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_column_count</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/get_row_count.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_row_count</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/get_action_metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_action_metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/get_validation_summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_validation_summary</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/write_file.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">write_file</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/read_file.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">read_file</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ref.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ref</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="true">
+ <span class="menu-text">Test Data Generation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-16" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/generate_dataset.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">generate_dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/schema_from_tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">schema_from_tbl</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/int_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">int_field</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/float_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">float_field</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/string_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">string_field</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/bool_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">bool_field</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/date_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">date_field</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/datetime_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">datetime_field</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/time_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">time_field</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/duration_field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">duration_field</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/profile_fields.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">profile_fields</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true">
+ <span class="menu-text">Prebuilt Actions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/send_slack_notification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">send_slack_notification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/emit_otel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">emit_otel</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="true">
+ <span class="menu-text">Metadata Import/Export</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-18" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/import_metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">import_metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/export_metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">export_metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MetadataImport</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/MetadataPackage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MetadataPackage</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/VariableMetadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">VariableMetadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Codelist.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Codelist</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/CodelistEntry.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CodelistEntry</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/MissingValueCode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MissingValueCode</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="true">
+ <span class="menu-text">SDTM Validation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/validate_sdtm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">validate_sdtm</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/validate_sdtm_structure.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">validate_sdtm_structure</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/sdtm_to_metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">sdtm_to_metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/get_sdtm_domain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_sdtm_domain</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/list_sdtm_domains.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">list_sdtm_domains</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/SDTMDomainTemplate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SDTMDomainTemplate</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/SDTMVariableSpec.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SDTMVariableSpec</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-20" role="navigation" aria-expanded="true">
+ <span class="menu-text">ADaM Validation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-20" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-20" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/validate_adam.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">validate_adam</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/validate_adam_structure.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">validate_adam_structure</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adam_to_metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adam_to_metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/get_adam_dataset.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_adam_dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/list_adam_datasets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">list_adam_datasets</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ADaMDatasetTemplate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ADaMDatasetTemplate</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ADaMVariableSpec.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ADaMVariableSpec</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-21" role="navigation" aria-expanded="true">
+ <span class="menu-text">CDISC Submission Conformance</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-21" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-21" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/validate_sdtmig.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">validate_sdtmig</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/validate_cdisc_submission.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">validate_cdisc_submission</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/SubmissionPackage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SubmissionPackage</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ConformanceReport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ConformanceReport</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-22" role="navigation" aria-expanded="true">
+ <span class="menu-text">Integrations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-22" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-22" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/integrations.otel.OTelExporter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">integrations.otel.OTelExporter</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block"><span class="doc-object-name doc-function doc-label doc-label-method">Validate.add_steps()</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="doc-subject">
+<p>Add the steps from one or more <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> collections to the validation.</p>
+</div>
+<div class="doc-usage-source">
+<p>Usage</p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6294-L6502" target="_blank" rel="noopener">Source</a></p>
+</div>
+<div class="doc-signature doc-function">
+<div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">add_steps</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span><span class="va">steps</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">active</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">thresholds</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">exclude</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">columns_map</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>This method appends previously recorded validation steps to the validation plan. The main source of steps is a <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link"><code>Steps</code></a> collection: a reusable group of steps built with the same methods as <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> but not attached to any table. Each recorded step is applied to this validation as if its method had been called directly, in the order the steps were recorded. Several collections can be added in one call, and the result can be chained with other validation methods, so shared steps and steps specific to this table can be combined in one plan. A <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object can also be given, in which case its steps are copied into this validation.</p>
+<p>Steps written for one table don’t always fit another one exactly. The optional arguments adapt the added steps without changing the collections themselves: <code>columns_map=</code> renames columns, <code>thresholds=</code> and <code>active=</code> replace those settings on every added step, and <code>exclude=</code> leaves out steps that don’t apply.</p>
+</div>
+<section id="parameters" class="level2 doc-parameters">
+<h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code><span class="doc-parameter-name">*steps</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Steps | Validate</span></code></dt>
+<dd>
+<p>One or more <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link"><code>Steps</code></a> or <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> objects whose steps should be added, in the order given.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">active</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool | Callable | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>Replace the <code>active=</code> setting of every added step. If <code>None</code> (the default), each step keeps its own setting. Use <code>False</code> to add the steps in an inactive state, or a callable (such as <a href="../reference/has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a>) to decide at interrogation time.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">thresholds</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int | float | bool | tuple | dict | Thresholds | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>Replace the <code>thresholds=</code> setting of every added step. If <code>None</code> (the default), each step keeps its own thresholds and otherwise uses the thresholds of this validation. Accepts the same values as the <code>thresholds=</code> argument of <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a>.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">exclude</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str | int] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>Steps to leave out, as a list of method names (e.g., <code>["col_vals_regex"]</code> skips every regex step) or of 1-based positions (e.g., <code>[2]</code> skips the second step). Positions count within each collection, so <code>[2]</code> skips the second step of every collection given.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">columns_map</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[str, str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+A dictionary that renames columns in the added steps, mapping the column names used in the collection to the names in this table (e.g., <code>{"customer_id": "cust_id"}</code>). It applies to column names given as strings or lists of strings in a step’s <code>columns=</code>, <code>column=</code>, or <code>columns_subset=</code> argument. Column selectors such as <a href="../reference/starts_with.html#pointblank.starts_with" class="gdls-link"><code>starts_with()</code></a> are left as they are.
+</dd>
+</dl>
+</div>
+</section>
+<section id="returns" class="level2 doc-returns">
+<h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">Validate</span></code></dt>
+<dd>
+The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with the steps added, for further method chaining.
+</dd>
+</dl>
+</div>
+</section>
+<section id="raises" class="level2 doc-raises">
+<h2 class="doc-raises anchored" data-anchor-id="raises">Raises</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
+<dd>
+<p>If no <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> or <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> objects are given.</p>
+</dd>
+<dt><code> <span class="doc-parameter-annotation">TypeError</span></code></dt>
+<dd>
+If an argument in <code>*steps</code> isn’t a <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> or <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, if an item in <code>exclude=</code> isn’t a string or an integer, or if a step’s arguments don’t fit its validation method.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s define two collections of steps for order data: one for completeness and one for valid amounts.</p>
+<div id="fa46e780" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>completeness <span class="op">=</span> (</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    pb.Steps()</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"order_id"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"email"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>valid_amounts <span class="op">=</span> (</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    pb.Steps()</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"amount"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    .col_vals_le(columns<span class="op">=</span><span class="st">"amount"</span>, value<span class="op">=</span><span class="dv">10_000</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<p>Both collections can be added to a validation of an orders table, along with a check that only applies to this table (the <code>region</code> values):</p>
+<div id="50dc2896" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>orders <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="st">"A1"</span>, <span class="st">"A2"</span>, <span class="va">None</span>, <span class="st">"A4"</span>],</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"email"</span>: [<span class="st">"a@x.com"</span>, <span class="va">None</span>, <span class="st">"c@z.com"</span>, <span class="st">"d@w.net"</span>],</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"amount"</span>: [<span class="fl">25.0</span>, <span class="fl">120.0</span>, <span class="fl">0.0</span>, <span class="fl">18_500.0</span>],</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"region"</span>: [<span class="st">"east"</span>, <span class="st">"west"</span>, <span class="st">"east"</span>, <span class="st">"north"</span>],</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>orders, tbl_name<span class="op">=</span><span class="st">"orders"</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    .add_steps(completeness, valid_amounts)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"region"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"east"</span>, <span class="st">"west"</span>])</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_tbl p { margin: 0; padding: 0; }
+ #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_left { text-align: left; }
+ #pb_tbl .gt_center { text-align: center; }
+ #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_tbl .gt_font_normal { font-weight: normal; }
+ #pb_tbl .gt_font_bold { font-weight: bold; }
+ #pb_tbl .gt_font_italic { font-style: italic; }
+ #pb_tbl .gt_super { font-size: 65%; }
+ #pb_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 0px" class="gt_table" aria-labelledby="pb_tbl-title" aria-describedby="pb_tbl-subtitle" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:4px;">
+  <col style="width:35px;">
+  <col style="width:190px;">
+  <col style="width:120px;">
+  <col style="width:120px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:65px;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_title gt_font_normal" id="pb_tbl-title" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-10-28|18:30:56</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">orders</span></div></div></td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>col_vals_not_null</title>
+    <g id="pb_tbl-type_upd-0-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-0-col_vals_not_null" transform="translate(0.000000, 0.551724)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="pb_tbl-type_upd-0-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M40.6120805,47.037834 C37.4692348,47.037834 35.0126139,45.9348613 33.712234,44.0140597 C32.4118541,45.9348613 29.9552331,47.037834 26.8123883,47.037834 C22.6574397,47.037834 16.0646712,43.4437723 16.0646712,33.8021619 C16.0646712,29.3401361 17.4715879,18.962166 30.5035862,18.962166 C30.9454018,18.962166 31.3057481,19.3225124 31.3057481,19.7643279 L31.3057481,21.3686518 C31.3057481,21.8104674 30.9454018,22.1708138 30.5035862,22.1708138 C26.6400486,22.1708138 22.4819668,25.8118774 22.4819668,33.8021619 C22.4819668,37.5090277 23.7635456,43.0270243 27.2949384,43.0270243 C29.795428,43.0270243 31.224279,40.4231312 32.0985095,38.2861221 C30.5067194,35.6101596 29.7014243,33.1034035 29.7014243,30.8347892 C29.7014243,25.6238707 31.8603677,23.7751377 33.712234,23.7751377 C35.5641002,23.7751377 37.7230437,25.6238707 37.7230437,30.8347892 C37.7230437,33.1347383 36.9396828,35.5788255 35.3290916,38.2861221 C36.6294715,41.4321009 38.243196,43.0270243 40.1295295,43.0270243 C43.6609223,43.0270243 44.9425012,37.5090277 44.9425012,33.8021619 C44.9425012,25.8118774 40.7844193,22.1708138 36.9208817,22.1708138 C36.4759329,22.1708138 36.1187198,21.8104674 36.1187198,21.3686518 L36.1187198,19.7643279 C36.1187198,19.3225124 36.4759329,18.962166 36.9208817,18.962166 C49.9528801,18.962166 51.3597967,29.3401361 51.3597967,33.8021619 C51.3597967,43.4437723 44.7670282,47.037834 40.6120805,47.037834 Z" id="pb_tbl-type_upd-0-omega" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M33,7.93597705 C33.2761424,7.93597705 33.5,8.15983467 33.5,8.43597705 L33.5,57.564023 C33.5,57.8401653 33.2761424,58.064023 33,58.064023 C32.7238576,58.064023 32.5,57.8401653 32.5,57.564023 L32.5,8.43597705 C32.5,8.15983467 32.7238576,7.93597705 33,7.93597705 Z" id="pb_tbl-type_upd-0-line_black" fill="#000000" transform="translate(33.000000, 33.000000) rotate(-320.000000) translate(-33.000000, -33.000000) "></path>
+            <polygon id="pb_tbl-type_upd-0-line_white" fill="#FFFFFF" transform="translate(34.899496, 32.153303) rotate(-320.000000) translate(-34.899496, -32.153303) " points="34.3994962 8.54160469 35.3994962 8.54160469 35.3994962 55.7650019 34.3994962 55.7650019"></polygon>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">order_id</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-0-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-0-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-0-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-0-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-0-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">4</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">3<br>0.75</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">1<br>0.25</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLG9yZGVyX2lkLGVtYWlsLGFtb3VudCxyZWdpb24KMywsY0B6LmNvbSwwLjAsZWFzdAo=" download="extract_0001.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">2</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>col_vals_not_null</title>
+    <g id="pb_tbl-type_upd-1-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-1-col_vals_not_null" transform="translate(0.000000, 0.551724)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="pb_tbl-type_upd-1-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M40.6120805,47.037834 C37.4692348,47.037834 35.0126139,45.9348613 33.712234,44.0140597 C32.4118541,45.9348613 29.9552331,47.037834 26.8123883,47.037834 C22.6574397,47.037834 16.0646712,43.4437723 16.0646712,33.8021619 C16.0646712,29.3401361 17.4715879,18.962166 30.5035862,18.962166 C30.9454018,18.962166 31.3057481,19.3225124 31.3057481,19.7643279 L31.3057481,21.3686518 C31.3057481,21.8104674 30.9454018,22.1708138 30.5035862,22.1708138 C26.6400486,22.1708138 22.4819668,25.8118774 22.4819668,33.8021619 C22.4819668,37.5090277 23.7635456,43.0270243 27.2949384,43.0270243 C29.795428,43.0270243 31.224279,40.4231312 32.0985095,38.2861221 C30.5067194,35.6101596 29.7014243,33.1034035 29.7014243,30.8347892 C29.7014243,25.6238707 31.8603677,23.7751377 33.712234,23.7751377 C35.5641002,23.7751377 37.7230437,25.6238707 37.7230437,30.8347892 C37.7230437,33.1347383 36.9396828,35.5788255 35.3290916,38.2861221 C36.6294715,41.4321009 38.243196,43.0270243 40.1295295,43.0270243 C43.6609223,43.0270243 44.9425012,37.5090277 44.9425012,33.8021619 C44.9425012,25.8118774 40.7844193,22.1708138 36.9208817,22.1708138 C36.4759329,22.1708138 36.1187198,21.8104674 36.1187198,21.3686518 L36.1187198,19.7643279 C36.1187198,19.3225124 36.4759329,18.962166 36.9208817,18.962166 C49.9528801,18.962166 51.3597967,29.3401361 51.3597967,33.8021619 C51.3597967,43.4437723 44.7670282,47.037834 40.6120805,47.037834 Z" id="pb_tbl-type_upd-1-omega" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M33,7.93597705 C33.2761424,7.93597705 33.5,8.15983467 33.5,8.43597705 L33.5,57.564023 C33.5,57.8401653 33.2761424,58.064023 33,58.064023 C32.7238576,58.064023 32.5,57.8401653 32.5,57.564023 L32.5,8.43597705 C32.5,8.15983467 32.7238576,7.93597705 33,7.93597705 Z" id="pb_tbl-type_upd-1-line_black" fill="#000000" transform="translate(33.000000, 33.000000) rotate(-320.000000) translate(-33.000000, -33.000000) "></path>
+            <polygon id="pb_tbl-type_upd-1-line_white" fill="#FFFFFF" transform="translate(34.899496, 32.153303) rotate(-320.000000) translate(-34.899496, -32.153303) " points="34.3994962 8.54160469 35.3994962 8.54160469 35.3994962 55.7650019 34.3994962 55.7650019"></polygon>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">email</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-1-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-1-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-1-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-1-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-1-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">4</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">3<br>0.75</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">1<br>0.25</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLG9yZGVyX2lkLGVtYWlsLGFtb3VudCxyZWdpb24KMixBMiwsMTIwLjAsd2VzdAo=" download="extract_0002.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">3</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_vals_gt</title>
+    <g id="pb_tbl-type_upd-2-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-2-col_vals_gt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="pb_tbl-type_upd-2-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M48.7619048,10 L15.2380953,10 C12.3466667,10 10,12.3466667 10,15.2380952 L10,48.7619048 C10,51.6533333 12.3466667,54 15.2380953,54 L48.7619048,54 C51.6533333,54 54,51.6533333 54,48.7619048 L54,15.2380952 C54,12.3466667 51.6533333,10 48.7619048,10 Z M25.2638095,44.3828571 L24.0695238,42.6647619 L39.5847619,32 L24.0695238,21.3352381 L25.2638095,19.6171429 L43.2828572,32 L25.2638095,44.3828571 Z" id="pb_tbl-type_upd-2-greater_than" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">amount</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">0</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-2-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-2-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-2-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-2-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-2-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">4</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">3<br>0.75</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">1<br>0.25</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLG9yZGVyX2lkLGVtYWlsLGFtb3VudCxyZWdpb24KMywsY0B6LmNvbSwwLjAsZWFzdAo=" download="extract_0003.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">4</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_vals_le</title>
+    <g id="pb_tbl-type_upd-3-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-3-col_vals_le" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="pb_tbl-type_upd-3-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M51,10 L13,10 C11.347656,10 10,11.347656 10,13 L10,51 C10,52.652344 11.347656,54 13,54 L51,54 C52.652344,54 54,52.652344 54,51 L54,13 C54,11.347656 52.652344,10 51,10 Z M40.515625,18.125 L41.484375,19.875 L25.058594,29 L41.484375,38.125 L40.515625,39.875 L20.941406,29 L40.515625,18.125 Z M43,46 L21,46 L21,44 L43,44 L43,46 Z" id="pb_tbl-type_upd-3-less_than_equal" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_le()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">amount</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">10000</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-3-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-3-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-3-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-3-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-3-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">4</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">3<br>0.75</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">1<br>0.25</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLG9yZGVyX2lkLGVtYWlsLGFtb3VudCxyZWdpb24KNCxBNCxkQHcubmV0LDE4NTAwLjAsbm9ydGgK" download="extract_0004.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">5</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>col_vals_in_set</title>
+    <g id="pb_tbl-type_upd-4-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-4-col_vals_in_set" transform="translate(0.000000, 0.172414)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="pb_tbl-type_upd-4-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M44.127969,41.1538382 L31.0814568,41.1538382 C29.9510748,41.1536429 28.8827052,40.9256134 27.9079888,40.5136953 C26.4467442,39.8960136 25.19849,38.8599685 24.3189894,37.5577099 C23.8792391,36.906727 23.5314818,36.1899233 23.2936866,35.4252675 C23.2130217,35.16589 23.1460289,34.9005554 23.0913409,34.6307286 L44.1278714,34.6307286 C45.028466,34.6306309 45.7586488,33.9004481 45.7586488,32.9998535 C45.7586488,32.0992589 45.028466,31.3690761 44.1278714,31.3690761 L23.0905596,31.3690761 C23.1990567,30.8337194 23.3597028,30.3180894 23.5675173,29.8264831 C24.185199,28.3652386 25.2212442,27.1169844 26.5236004,26.2374838 C27.1745833,25.7977334 27.891387,25.4499762 28.6560428,25.2122786 C29.4208939,24.9744833 30.2334994,24.8459665 31.0813591,24.8459665 L44.1277737,24.8459665 C45.0283683,24.8459665 45.7586488,24.1157837 45.7586488,23.2151891 C45.7586488,22.3145945 45.0283683,21.5844117 44.1277737,21.5844117 L31.0813591,21.5844117 C29.5096643,21.5844117 28.0039858,21.9038483 26.6373711,22.4820765 C24.5866678,23.3498583 22.8469049,24.7950871 21.6163267,26.616296 C20.3856508,28.4362354 19.665136,30.6413347 19.6658191,33.0000488 C19.6658191,34.5717436 19.9852563,36.0774222 20.5635822,37.4440369 C21.4312663,39.4947402 22.8765927,41.2345031 24.697704,42.4650813 C26.5176434,43.6957572 28.7227427,44.4155883 31.0814568,44.4155883 L44.1278714,44.4155883 C45.028466,44.4155883 45.7586488,43.6854055 45.7586488,42.7848109 C45.7586488,41.8842163 45.0285636,41.1538382 44.127969,41.1538382 Z" id="pb_tbl-type_upd-4-set_of" fill="#000000" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_in_set()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">region</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">east, west</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-4-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-4-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-4-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-4-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-4-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">4</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">3<br>0.75</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">1<br>0.25</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLG9yZGVyX2lkLGVtYWlsLGFtb3VudCxyZWdpb24KNCxBNCxkQHcubmV0LDE4NTAwLjAsbm9ydGgK" download="extract_0005.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>The first four steps come from the two collections, in order, and the fifth is the table-specific check. Each step finds one failing row.</p>
+<p>A table of refunds uses the same rules, but with different column names, no email column, and a stricter tolerance for failures. Here, <code>columns_map=</code> renames the columns, <code>exclude=</code> skips the second completeness step (the email check), and <code>thresholds=</code> makes any failure an error.</p>
+<div id="a395f634" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>refunds <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"refund_ref"</span>: [<span class="st">"R1"</span>, <span class="st">"R2"</span>, <span class="st">"R3"</span>], <span class="st">"refund_amt"</span>: [<span class="fl">15.0</span>, <span class="op">-</span><span class="fl">4.0</span>, <span class="fl">60.0</span>]}</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>refunds, tbl_name<span class="op">=</span><span class="st">"refunds"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    .add_steps(</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        completeness,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        valid_amounts,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        columns_map<span class="op">=</span>{<span class="st">"order_id"</span>: <span class="st">"refund_ref"</span>, <span class="st">"amount"</span>: <span class="st">"refund_amt"</span>},</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        exclude<span class="op">=</span>[<span class="dv">2</span>],</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>pb.Thresholds(error<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_tbl p { margin: 0; padding: 0; }
+ #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_left { text-align: left; }
+ #pb_tbl .gt_center { text-align: center; }
+ #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_tbl .gt_font_normal { font-weight: normal; }
+ #pb_tbl .gt_font_bold { font-weight: bold; }
+ #pb_tbl .gt_font_italic { font-style: italic; }
+ #pb_tbl .gt_super { font-size: 65%; }
+ #pb_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 0px" class="gt_table" aria-labelledby="pb_tbl-title" aria-describedby="pb_tbl-subtitle" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:4px;">
+  <col style="width:35px;">
+  <col style="width:190px;">
+  <col style="width:120px;">
+  <col style="width:120px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:65px;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_title gt_font_normal" id="pb_tbl-title" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-10-28|18:30:56</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">refunds</span></div></div></td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>col_vals_not_null</title>
+    <g id="pb_tbl-type_upd-0-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-0-col_vals_not_null" transform="translate(0.000000, 0.551724)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="pb_tbl-type_upd-0-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M40.6120805,47.037834 C37.4692348,47.037834 35.0126139,45.9348613 33.712234,44.0140597 C32.4118541,45.9348613 29.9552331,47.037834 26.8123883,47.037834 C22.6574397,47.037834 16.0646712,43.4437723 16.0646712,33.8021619 C16.0646712,29.3401361 17.4715879,18.962166 30.5035862,18.962166 C30.9454018,18.962166 31.3057481,19.3225124 31.3057481,19.7643279 L31.3057481,21.3686518 C31.3057481,21.8104674 30.9454018,22.1708138 30.5035862,22.1708138 C26.6400486,22.1708138 22.4819668,25.8118774 22.4819668,33.8021619 C22.4819668,37.5090277 23.7635456,43.0270243 27.2949384,43.0270243 C29.795428,43.0270243 31.224279,40.4231312 32.0985095,38.2861221 C30.5067194,35.6101596 29.7014243,33.1034035 29.7014243,30.8347892 C29.7014243,25.6238707 31.8603677,23.7751377 33.712234,23.7751377 C35.5641002,23.7751377 37.7230437,25.6238707 37.7230437,30.8347892 C37.7230437,33.1347383 36.9396828,35.5788255 35.3290916,38.2861221 C36.6294715,41.4321009 38.243196,43.0270243 40.1295295,43.0270243 C43.6609223,43.0270243 44.9425012,37.5090277 44.9425012,33.8021619 C44.9425012,25.8118774 40.7844193,22.1708138 36.9208817,22.1708138 C36.4759329,22.1708138 36.1187198,21.8104674 36.1187198,21.3686518 L36.1187198,19.7643279 C36.1187198,19.3225124 36.4759329,18.962166 36.9208817,18.962166 C49.9528801,18.962166 51.3597967,29.3401361 51.3597967,33.8021619 C51.3597967,43.4437723 44.7670282,47.037834 40.6120805,47.037834 Z" id="pb_tbl-type_upd-0-omega" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M33,7.93597705 C33.2761424,7.93597705 33.5,8.15983467 33.5,8.43597705 L33.5,57.564023 C33.5,57.8401653 33.2761424,58.064023 33,58.064023 C32.7238576,58.064023 32.5,57.8401653 32.5,57.564023 L32.5,8.43597705 C32.5,8.15983467 32.7238576,7.93597705 33,7.93597705 Z" id="pb_tbl-type_upd-0-line_black" fill="#000000" transform="translate(33.000000, 33.000000) rotate(-320.000000) translate(-33.000000, -33.000000) "></path>
+            <polygon id="pb_tbl-type_upd-0-line_white" fill="#FFFFFF" transform="translate(34.899496, 32.153303) rotate(-320.000000) translate(-34.899496, -32.153303) " points="34.3994962 8.54160469 35.3994962 8.54160469 35.3994962 55.7650019 34.3994962 55.7650019"></polygon>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">refund_ref</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-0-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-0-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-0-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-0-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-0-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">3</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">3<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center"><span style="color: #EBBC14;">○</span></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #EBBC14; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#EBBC14</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">2</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_vals_gt</title>
+    <g id="pb_tbl-type_upd-1-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-1-col_vals_gt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="pb_tbl-type_upd-1-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M48.7619048,10 L15.2380953,10 C12.3466667,10 10,12.3466667 10,15.2380952 L10,48.7619048 C10,51.6533333 12.3466667,54 15.2380953,54 L48.7619048,54 C51.6533333,54 54,51.6533333 54,48.7619048 L54,15.2380952 C54,12.3466667 51.6533333,10 48.7619048,10 Z M25.2638095,44.3828571 L24.0695238,42.6647619 L39.5847619,32 L24.0695238,21.3352381 L25.2638095,19.6171429 L43.2828572,32 L25.2638095,44.3828571 Z" id="pb_tbl-type_upd-1-greater_than" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">refund_amt</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">0</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-1-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-1-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-1-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-1-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-1-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">3</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">2<br>0.67</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">1<br>0.33</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center"><span style="color: #EBBC14;">●</span></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLHJlZnVuZF9yZWYscmVmdW5kX2FtdAoyLFIyLC00LjAK" download="extract_0002.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+  </tr>
+</tbody>
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
+<strong>Notes</strong>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(local_thresholds)</span> Step-specific thresholds set with <span style="font-family: monospace;"><span style="color: #EBBC14; font-weight: bold;">E</span>:1</span>.</p>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 2</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(local_thresholds)</span> Step-specific thresholds set with <span style="font-family: monospace;"><span style="color: #EBBC14; font-weight: bold;">E</span>:1</span>.</p></span></td></tr></tfoot>
+</table>
+
+</div>
+</div>
+</div>
+<p>Because positions count within each collection, <code>exclude=[2]</code> also skips the second step of <code>valid_amounts</code> (the upper limit on the amount). The negative refund fails the remaining amount check and reaches the error threshold.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/posit-dev\.github\.io\/pointblank");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Developed by <strong>Richard&nbsp;Iannone</strong>. Supported by <a href="https://posit.co"><strong>Posit&nbsp;Software,&nbsp;PBC</strong></a>.<br>Site created with <strong>Great&nbsp;Docs</strong>.</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script src="../github-widget.js"></script>
+<script src="../copy-page.js"></script>
+<script src="../sidebar-wrap.js"></script>
+<script src="../sidebar-float.js"></script>
+<script src="../sidebar-filter.js"></script>
+<script src="../dark-mode-toggle.js"></script>
+<script src="../back-to-top.js"></script>
+<script src="../on-this-page.js"></script>
+<script src="../keyboard-nav.js"></script>
+<script src="../copy-code.js"></script>
+<script src="../details.js"></script>
+<script src="../mermaid-renderer.js"></script>
+<script src="../reference-switcher.js"></script>
+<script src="../tooltips.js"></script>
+<script src="../color-swatch.js"></script>
+<script src="../responsive-tables.js"></script>
+<script src="../video-embed.js"></script>
+<script src="../navbar-widgets.js"></script>
+<script src="../wide-layout.js"></script>
+
+
+
+
+</body></html>

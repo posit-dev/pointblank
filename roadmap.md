@@ -81,7 +81,7 @@ Improve the existing `.prompt()` LLM-based validation method.
 
 Extend the existing [generate_dataset()](./reference/generate_dataset.md#pointblank.generate_dataset) capabilities.
 
-- Schema interoperability: use a [col_schema_match()](./reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) schema to generate test data
+- Schema interoperability: use a `col_schema_match()` schema to generate test data
 - Unified schema model bridging simple schemas (column/type pairs) and advanced schemas (with field constraints)
 - Edge case generation (nulls, boundaries, Unicode, etc.)
 - Hypothesis integration for property-based testing

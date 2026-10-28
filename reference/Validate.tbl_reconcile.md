@@ -4,7 +4,7 @@ Validate that aggregates of the target table reconcile with a comparison table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15504-L15796)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15582-L15874)
 
 ``` python
 Validate.tbl_reconcile(
@@ -24,7 +24,7 @@ Validate.tbl_reconcile(
 )
 ```
 
-The [tbl_reconcile()](../reference/Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile) method checks that the target table agrees with a comparison table (the *source*, or expected data) on aggregate values: totals, counts, averages, minimums, or maximums of *measure* columns, computed per group of *key* columns (or over the whole table). It's the check to reach for when the two tables don't have the same rows but must add up to the same numbers, for example a warehouse fact table against the source system it was loaded from, or a monthly summary against the detailed transactions.
+The `tbl_reconcile()` method checks that the target table agrees with a comparison table (the *source*, or expected data) on aggregate values: totals, counts, averages, minimums, or maximums of *measure* columns, computed per group of *key* columns (or over the whole table). It's the check to reach for when the two tables don't have the same rows but must add up to the same numbers, for example a warehouse fact table against the source system it was loaded from, or a monthly summary against the detailed transactions.
 
 Each key group is a test unit: it passes if the group is in both tables and all of its aggregates are equal (within the tolerance), and fails if an aggregate differs, if the group is missing from the target, or if it's an extra group in the target. To compare the rows themselves rather than aggregates, use [`tbl_match()`](../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match).
 

@@ -748,7 +748,7 @@ validation</code></pre>
 <ul>
 <li>The table-level configuration (<code>tbl_name</code>, <code>label</code>, <code>thresholds</code>) is reproduced on the <code>pb.Validate(...)</code> call.</li>
 <li>The data source is rendered as the placeholder <code>your_data</code>, since the plan doesn’t know the name of the variable your data lives in. Replace it with your actual data variable before running the code.</li>
-<li>Adjacent steps that differ only by column are collapsed into a single call: the two <a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a> steps above become <code>col_vals_not_null(columns=["a", "b"])</code>. This keeps the output compact and diffs minimal.</li>
+<li>Adjacent steps that differ only by column are collapsed into a single call: the two <code>col_vals_not_null()</code> steps above become <code>col_vals_not_null(columns=["a", "b"])</code>. This keeps the output compact and diffs minimal.</li>
 <li>Only non-default arguments are emitted. A step-level threshold that matches the table-level default is omitted, <code>na_pass=True</code> appears only where it was set, and so on.</li>
 </ul>
 <p>The result is regular source you can paste into a script or notebook, commit to version control, or share with a colleague.</p>
@@ -1279,48 +1279,48 @@ steps:
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a></td>
+<td><code>col_vals_not_null()</code></td>
 <td><code>required</code></td>
 </tr>
 <tr class="even">
-<td><a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a></td>
+<td><code>col_vals_gt()</code></td>
 <td><code>exclusiveMinimum</code></td>
 </tr>
 <tr class="odd">
-<td><a href="../../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link gdls-code">col_vals_ge()</a></td>
+<td><code>col_vals_ge()</code></td>
 <td><code>minimum</code></td>
 </tr>
 <tr class="even">
-<td><a href="../../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link gdls-code">col_vals_lt()</a></td>
+<td><code>col_vals_lt()</code></td>
 <td><code>exclusiveMaximum</code></td>
 </tr>
 <tr class="odd">
-<td><a href="../../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link gdls-code">col_vals_le()</a></td>
+<td><code>col_vals_le()</code></td>
 <td><code>maximum</code></td>
 </tr>
 <tr class="even">
-<td><a href="../../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a></td>
+<td><code>col_vals_eq()</code></td>
 <td><code>const</code></td>
 </tr>
 <tr class="odd">
-<td><a href="../../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link gdls-code">col_vals_between()</a></td>
+<td><code>col_vals_between()</code></td>
 <td><code>minimum</code> + <code>maximum</code></td>
 </tr>
 <tr class="even">
-<td><a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a></td>
+<td><code>col_vals_in_set()</code></td>
 <td><code>enum</code></td>
 </tr>
 <tr class="odd">
-<td><a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a></td>
+<td><code>col_vals_regex()</code></td>
 <td><code>pattern</code></td>
 </tr>
 <tr class="even">
-<td><a href="../../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link gdls-code">col_vals_within_spec()</a></td>
+<td><code>col_vals_within_spec()</code></td>
 <td><code>format</code></td>
 </tr>
 </tbody>
 </table>
-<p>When the <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object has data attached, the schema is automatically enriched with column type information (<code>"type": "integer"</code>, <code>"type": "string"</code>, etc.) inferred from the data. Steps that have no natural JSON Schema equivalent (e.g., <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a>, <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a>) are silently skipped.</p>
+<p>When the <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object has data attached, the schema is automatically enriched with column type information (<code>"type": "integer"</code>, <code>"type": "string"</code>, etc.) inferred from the data. Steps that have no natural JSON Schema equivalent (e.g., <code>rows_distinct()</code>, <code>tbl_match()</code>) are silently skipped.</p>
 <section id="writing-to-a-file" class="level2">
 <h2 class="anchored" data-anchor-id="writing-to-a-file">Writing to a File</h2>
 <p>Pass a <code>path=</code> argument to write the JSON Schema to disk. Parent directories are created automatically:</p>

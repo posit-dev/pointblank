@@ -78,13 +78,13 @@ The table below summarizes every key available inside the `contract:` block. Onl
 | `consumers` | No | List of teams or systems that depend on data conforming to this contract |
 | `description` | No | Longer prose describing the contract's purpose and context |
 | `on_violation` | No | Behavior when validation fails: `"warn"` (default), `"raise"`, or `"log"` |
-| `schema` | No | Column name -\> data type mapping; triggers a [col_schema_match()](../../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) check |
+| `schema` | No | Column name -\> data type mapping; triggers a `col_schema_match()` check |
 | `steps` | No | Ordered list of validation steps to execute |
 | `thresholds` | No | Threshold levels ([warning](../../reference/Validate.warning.md#pointblank.Validate.warning), [error](../../reference/Validate.error.md#pointblank.Validate.error), [critical](../../reference/Validate.critical.md#pointblank.Validate.critical)) as fractions or absolute counts |
 
 ### Step Syntax in YAML
 
-Steps are the heart of a contract. They define the actual validation rules that will be checked against your data. In YAML, each step is a list item whose key is the name of a Pointblank validation method (like [col_vals_gt](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) or [rows_distinct](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct)), and whose value is a dictionary of the arguments to pass to that method.
+Steps are the heart of a contract. They define the actual validation rules that will be checked against your data. In YAML, each step is a list item whose key is the name of a Pointblank validation method (like `col_vals_gt` or `rows_distinct`), and whose value is a dictionary of the arguments to pass to that method.
 
 This mapping is direct: the YAML step `col_vals_gt: {columns: amount, value: 0}` is exactly equivalent to calling `.col_vals_gt(columns="amount", value=0)` in Python. Here are examples covering the most common patterns:
 

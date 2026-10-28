@@ -5,7 +5,7 @@ When validation logic grows beyond a handful of checks, you often want to **reus
 - **[Step](../../reference/Step.md#pointblank.Step)** (singular): a declarative data object used inside [Contract](../../reference/Contract.md#pointblank.Contract) definitions
 - **[Steps](../../reference/Steps.md#pointblank.Steps)** (plural): a fluent builder that collects validation steps for use in any [Validate](../../reference/Validate.md#pointblank.Validate) plan
 
-This page focuses on [Steps](../../reference/Steps.md#pointblank.Steps) and the `Validate.add_steps()` method, which together let you define portable step libraries and compose them into readable, top-to-bottom validation plans.
+This page focuses on [Steps](../../reference/Steps.md#pointblank.Steps) and the [Validate.add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) method, which together let you define portable step libraries and compose them into readable, top-to-bottom validation plans.
 
 ## The Problem
 
@@ -30,7 +30,7 @@ This works but reads *inside-out*. With more than two or three groups, the nesti
 
 ## Building Step Libraries with [Steps](../../reference/Steps.md#pointblank.Steps)
 
-The [Steps](../../reference/Steps.md#pointblank.Steps) class lets you record validation steps without binding them to data, thresholds, or any other [Validate](../../reference/Validate.md#pointblank.Validate) configuration. You use the same method names and parameters you already know from [Validate](../../reference/Validate.md#pointblank.Validate) ([col_vals_gt()](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null), [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex), etc.), but instead of running the checks, [Steps](../../reference/Steps.md#pointblank.Steps) stores them for later use.
+The [Steps](../../reference/Steps.md#pointblank.Steps) class lets you record validation steps without binding them to data, thresholds, or any other [Validate](../../reference/Validate.md#pointblank.Validate) configuration. You use the same method names and parameters you already know from [Validate](../../reference/Validate.md#pointblank.Validate) (`col_vals_gt()`, `col_vals_not_null()`, `col_vals_regex()`, etc.), but instead of running the checks, [Steps](../../reference/Steps.md#pointblank.Steps) stores them for later use.
 
 The key benefit is **portability**: a [Steps](../../reference/Steps.md#pointblank.Steps) object can live in a shared Python module and be imported into any number of validation pipelines. The step definitions stay the same and only the data and configuration change at the point of use.
 
@@ -74,9 +74,9 @@ print(f"Number of steps: {len(completeness)}")
 
 In a Jupyter notebook or other rich-display environment, [Steps](../../reference/Steps.md#pointblank.Steps) renders as an HTML summary table.
 
-## Composing Plans with `add_steps()`
+## Composing Plans with [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps)
 
-The `add_steps()` method on [Validate](../../reference/Validate.md#pointblank.Validate) accepts one or more [Steps](../../reference/Steps.md#pointblank.Steps) objects and appends their recorded steps to the validation plan:
+The [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) method on [Validate](../../reference/Validate.md#pointblank.Validate) accepts one or more [Steps](../../reference/Steps.md#pointblank.Steps) objects and appends their recorded steps to the validation plan:
 
 ``` python
 orders = pl.DataFrame(
@@ -97,9 +97,9 @@ orders = pl.DataFrame(
 
 [TABLE]
 
-Because `add_steps()` returns the [Validate](../../reference/Validate.md#pointblank.Validate) object, it chains naturally and reads top-to-bottom.
+Because [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) returns the [Validate](../../reference/Validate.md#pointblank.Validate) object, it chains naturally and reads top-to-bottom.
 
-You can also mix `add_steps()` calls with regular validation method calls. This is useful when a pipeline needs a shared library of checks plus a few ad-hoc rules specific to that dataset:
+You can also mix [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) calls with regular validation method calls. This is useful when a pipeline needs a shared library of checks plus a few ad-hoc rules specific to that dataset:
 
 ``` python
 (
@@ -115,7 +115,7 @@ You can also mix `add_steps()` calls with regular validation method calls. This 
 
 ### Passing Multiple Sources
 
-The `add_steps()` method accepts any number of positional arguments. Each can be a [Steps](../../reference/Steps.md#pointblank.Steps) object or even a [Validate](../../reference/Validate.md#pointblank.Validate) object (more on that [below](#importing-steps-from-a-validate-object)). All steps are appended in order:
+The [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) method accepts any number of positional arguments. Each can be a [Steps](../../reference/Steps.md#pointblank.Steps) object or even a [Validate](../../reference/Validate.md#pointblank.Validate) object (more on that [below](#importing-steps-from-a-validate-object)). All steps are appended in order:
 
 ``` python
 all_checks = (
@@ -130,7 +130,7 @@ print(f"Total validation steps: {len(all_checks.validation_info)}")
 
 ## Selectors and Multi-Column Expansion
 
-One of the strengths of [Steps](../../reference/Steps.md#pointblank.Steps) is that step definitions are not locked to specific columns at definition time. When a step uses a column selector like [starts_with()](../../reference/starts_with.md#pointblank.starts_with) or a multi-column list, the columns are resolved when `add_steps()` applies them to the [Validate](../../reference/Validate.md#pointblank.Validate) plan, not when the [Steps](../../reference/Steps.md#pointblank.Steps) object is created. This means the same step library can validate tables with different schemas as long as they follow a common naming convention.
+One of the strengths of [Steps](../../reference/Steps.md#pointblank.Steps) is that step definitions are not locked to specific columns at definition time. When a step uses a column selector like [starts_with()](../../reference/starts_with.md#pointblank.starts_with) or a multi-column list, the columns are resolved when [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) applies them to the [Validate](../../reference/Validate.md#pointblank.Validate) plan, not when the [Steps](../../reference/Steps.md#pointblank.Steps) object is created. This means the same step library can validate tables with different schemas as long as they follow a common naming convention.
 
 ``` python
 products = pl.DataFrame(
@@ -159,9 +159,9 @@ price_checks = (
 
 The selector `starts_with("amt_")` is recorded verbatim in the [Steps](../../reference/Steps.md#pointblank.Steps) object and resolved when the steps are applied to the [Validate](../../reference/Validate.md#pointblank.Validate) plan. This means the same [Steps](../../reference/Steps.md#pointblank.Steps) object adapts to tables with different numbers of matching columns.
 
-## Overrides in `add_steps()`
+## Overrides in [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps)
 
-A shared step library represents a general-purpose set of checks, but individual pipelines often need to tweak how those checks are applied: tighter thresholds in production, certain checks disabled during development, or column names that differ across teams. Rather than creating a separate [Steps](../../reference/Steps.md#pointblank.Steps) object for every variation, `add_steps()` supports keyword arguments that modify the imported steps at the point of use, without changing the original [Steps](../../reference/Steps.md#pointblank.Steps) object.
+A shared step library represents a general-purpose set of checks, but individual pipelines often need to tweak how those checks are applied: tighter thresholds in production, certain checks disabled during development, or column names that differ across teams. Rather than creating a separate [Steps](../../reference/Steps.md#pointblank.Steps) object for every variation, [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) supports keyword arguments that modify the imported steps at the point of use, without changing the original [Steps](../../reference/Steps.md#pointblank.Steps) object.
 
 ### Conditional Inclusion with `active=`
 
@@ -275,7 +275,7 @@ The remapping applies to the `columns=`, `column=`, and `columns_subset=` parame
 
 ## Importing Steps from a [Validate](../../reference/Validate.md#pointblank.Validate) Object
 
-You don't always start from a [Steps](../../reference/Steps.md#pointblank.Steps) object. Sometimes you already have a [Validate](../../reference/Validate.md#pointblank.Validate) object with steps defined on it, perhaps loaded from a YAML file with `Validate.from_yaml()`, generated from a prompt with [Validate.from_prompt()](../../reference/Validate.from_prompt.md#pointblank.Validate.from_prompt), or simply built up in another part of your codebase. Rather than re-expressing those steps from scratch, you can pass the [Validate](../../reference/Validate.md#pointblank.Validate) object directly to `add_steps()` and its step definitions will be extracted and applied:
+You don't always start from a [Steps](../../reference/Steps.md#pointblank.Steps) object. Sometimes you already have a [Validate](../../reference/Validate.md#pointblank.Validate) object with steps defined on it, perhaps loaded from a YAML file with `Validate.from_yaml()`, generated from a prompt with [Validate.from_prompt()](../../reference/Validate.from_prompt.md#pointblank.Validate.from_prompt), or simply built up in another part of your codebase. Rather than re-expressing those steps from scratch, you can pass the [Validate](../../reference/Validate.md#pointblank.Validate) object directly to [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) and its step definitions will be extracted and applied:
 
 ``` python
 existing_plan = (
@@ -294,7 +294,7 @@ existing_plan = (
 
 [TABLE]
 
-When a [Validate](../../reference/Validate.md#pointblank.Validate) object is passed as a step source, `add_steps()` extracts its step definitions and applies them. The data, thresholds, and metadata from the source [Validate](../../reference/Validate.md#pointblank.Validate) are *not* carried over, only the step recipes.
+When a [Validate](../../reference/Validate.md#pointblank.Validate) object is passed as a step source, [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) extracts its step definitions and applies them. The data, thresholds, and metadata from the source [Validate](../../reference/Validate.md#pointblank.Validate) are *not* carried over, only the step recipes.
 
 > **Note**
 >
@@ -308,7 +308,7 @@ Pointblank has two similarly named classes that serve different purposes:
 |----|----|----|
 | **What it is** | A single step as a data object | A builder that collects multiple steps |
 | **How you create it** | `pb.Step("col_vals_gt", columns="x", value=0)` | `pb.Steps().col_vals_gt(columns="x", value=0)` |
-| **Primary use** | Inside `Contract(steps=[...])` | With `Validate.add_steps()` |
+| **Primary use** | Inside `Contract(steps=[...])` | With [Validate.add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) |
 | **API style** | Declarative (method name as string) | Fluent (same methods as [Validate](../../reference/Validate.md#pointblank.Validate)) |
 | **Composition** | List concatenation: `steps_a + steps_b` | Chaining: `.add_steps(a).add_steps(b)` |
 
@@ -387,6 +387,6 @@ The validation plan reads as a sequence of concerns: completeness first (with st
 
 ## Conclusion
 
-The [`Steps`](../../reference/Steps.md#pointblank.Steps) class and `Validate.add_steps()` method bring composability to Pointblank's validation workflows. By separating step *definitions* from step *execution*, you can build reusable rule libraries that stay portable across datasets, teams, and environments. The override parameters (`active=`, `thresholds=`, `exclude=`, and `columns_map=`) give each pipeline the flexibility to tailor shared checks without forking the underlying library.
+The [`Steps`](../../reference/Steps.md#pointblank.Steps) class and [`Validate.add_steps()`](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) method bring composability to Pointblank's validation workflows. By separating step *definitions* from step *execution*, you can build reusable rule libraries that stay portable across datasets, teams, and environments. The override parameters (`active=`, `thresholds=`, `exclude=`, and `columns_map=`) give each pipeline the flexibility to tailor shared checks without forking the underlying library.
 
 For a complementary approach to reusable validation rules, see [Data Contracts](../contracts-and-pipelines/contracts.md), which define expectations as declarative, serializable specifications using the [`Step`](../../reference/Step.md#pointblank.Step) class. Both approaches produce the same validation steps at interrogation time. Choose [Steps](../../reference/Steps.md#pointblank.Steps) for fluent, code-first composition and [Contract](../../reference/Contract.md#pointblank.Contract) for declarative, YAML-friendly definitions.

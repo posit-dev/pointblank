@@ -207,7 +207,7 @@ A key that appears more than once in either table can't be aligned unambiguously
 
 ## Table Comparison as a Validation Step
 
-The [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) validation method uses the same comparison, which makes it a validation step like any other: it can have thresholds and actions, and it shows up in the validation report. The table being validated is the target, and `tbl_compare=` is the source. Every aligned row is a *test unit*, so thresholds can be set as a proportion of rows:
+The `tbl_match()` validation method uses the same comparison, which makes it a validation step like any other: it can have thresholds and actions, and it shows up in the validation report. The table being validated is the target, and `tbl_compare=` is the source. Every aligned row is a *test unit*, so thresholds can be set as a proportion of rows:
 
 ``` python
 validation = (
@@ -223,7 +223,7 @@ validation
 
 > **Note**
 >
-> In Pointblank `v1.0.1` and earlier, [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) had a single test unit for the whole table. Steps still pass or fail in the same situations, but fractional thresholds now refer to the share of differing rows. To react to *any* difference, as before, use an absolute threshold of `1`.
+> In Pointblank `v1.0.1` and earlier, `tbl_match()` had a single test unit for the whole table. Steps still pass or fail in the same situations, but fractional thresholds now refer to the share of differing rows. To react to *any* difference, as before, use an absolute threshold of `1`.
 
 Three of the six aligned rows differ, exceeding both the 'warning' and 'error' thresholds. The step report holds the full comparison:
 
@@ -248,7 +248,7 @@ shape: (3, 8)
 | 1003 | "missing" | "Cho" | null | 12.75 | null | "pending" | null |
 | 1006 | "extra" | null | "Fay" | null | 18.25 | null | "pending" |
 
-All the comparison arguments (`keys=`, `tolerance=`, `schema=`, and so on) are available in [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match), and they can be written in YAML too:
+All the comparison arguments (`keys=`, `tolerance=`, `schema=`, and so on) are available in `tbl_match()`, and they can be written in YAML too:
 
 ``` yaml
 tbl: orders_target.csv
@@ -262,7 +262,7 @@ steps:
 
 ## Reconciling Aggregates
 
-Sometimes two tables shouldn't have the same rows but should add up to the same numbers: a warehouse table loaded from a source system, a summary table built from detailed transactions, or two systems that record the same activity at different levels of detail. For these, the [tbl_reconcile()](../../reference/Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile) validation method compares *aggregates* instead of rows. It groups both tables by the `keys=` columns, aggregates the `measures=` columns (with `agg="sum"` by default, or `"count"`, `"mean"`, `"min"`, or `"max"`), and compares the results group by group. Each group is a test unit.
+Sometimes two tables shouldn't have the same rows but should add up to the same numbers: a warehouse table loaded from a source system, a summary table built from detailed transactions, or two systems that record the same activity at different levels of detail. For these, the `tbl_reconcile()` validation method compares *aggregates* instead of rows. It groups both tables by the `keys=` columns, aggregates the `measures=` columns (with `agg="sum"` by default, or `"count"`, `"mean"`, `"min"`, or `"max"`), and compares the results group by group. Each group is a test unit.
 
 Here, the orders in the target have been loaded at a finer grain than in the source, so we reconcile the total amount per customer:
 
@@ -286,7 +286,7 @@ validation.get_step_report(i=1)
 
 [TABLE]
 
-`Ben`'s two order lines add up to more than his order in the source, `Cho` is missing, and `Fay` is new. Without `keys=`, [tbl_reconcile()](../../reference/Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile) compares grand totals (a single test unit), and `agg="count"` without `measures=` compares the number of rows in each group. Tolerances, `column_map=`, and `partitions=` work as they do in [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match). Rows with a null key form a group of their own, which is matched with the other table's null-key group.
+`Ben`'s two order lines add up to more than his order in the source, `Cho` is missing, and `Fay` is new. Without `keys=`, `tbl_reconcile()` compares grand totals (a single test unit), and `agg="count"` without `measures=` compares the number of rows in each group. Tolerances, `column_map=`, and `partitions=` work as they do in `tbl_match()`. Rows with a null key form a group of their own, which is matched with the other table's null-key group.
 
 ## Exporting the Results
 

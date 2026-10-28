@@ -311,6 +311,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.add_steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.add_steps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Pipeline.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Pipeline</span></a>
   </div>
@@ -1668,7 +1674,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14165-L14395" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14243-L14473" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">row_count_match</span>(</span>
@@ -1684,7 +1690,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="../reference/Validate.row_count_match.html#pointblank.Validate.row_count_match" class="gdls-link gdls-code">row_count_match()</a> method checks whether the row count of the target table matches a specified count. This validation will operate over a single test unit, which is whether the row count matches the specified count.</p>
+<p>The <code>row_count_match()</code> method checks whether the row count of the target table matches a specified count. This validation will operate over a single test unit, which is whether the row count matches the specified count.</p>
 <p>We also have the option to invert the validation step by setting <code>inverse=True</code>. This will make the expectation that the row count of the target table <em>does not</em> match the specified count.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
@@ -1763,7 +1769,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use the built in dataset <code>"small_table"</code>. The table can be obtained by calling <code>load_dataset("small_table")</code>.</p>
-<div id="2b0e97fa" class="cell" data-execution_count="2">
+<div id="bf59ce63" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(<span class="st">"small_table"</span>)</span>
@@ -1984,7 +1990,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>Let’s validate that the number of rows in the table matches a fixed value. In this case, we will use the value <code>13</code> as the expected row count.</p>
-<div id="10ba60cf" class="cell" data-execution_count="3">
+<div id="8552ff29" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>small_table)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .row_count_match(count<span class="op">=</span><span class="dv">13</span>)</span>
@@ -2151,7 +2157,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 <p>The validation table shows that the expectation value of <code>13</code> matches the actual count of rows in the target table. So, the single test unit passed.</p>
 <p>Let’s modify our example to show the different ways we can allow some tolerance to our validation by using the <code>tol</code> argument.</p>
-<div id="8921a5b1" class="cell" data-execution_count="4">
+<div id="8ba9e6bb" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>smaller_small_table <span class="op">=</span> small_table.sample(n <span class="op">=</span> <span class="dv">12</span>) <span class="co"># within the lower bound</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>smaller_small_table)</span>

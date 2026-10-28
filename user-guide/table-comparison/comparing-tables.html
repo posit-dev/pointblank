@@ -1155,7 +1155,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="table-comparison-as-a-validation-step" class="level1">
 <h1>Table Comparison as a Validation Step</h1>
-<p>The <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> validation method uses the same comparison, which makes it a validation step like any other: it can have thresholds and actions, and it shows up in the validation report. The table being validated is the target, and <code>tbl_compare=</code> is the source. Every aligned row is a <em>test unit</em>, so thresholds can be set as a proportion of rows:</p>
+<p>The <code>tbl_match()</code> validation method uses the same comparison, which makes it a validation step like any other: it can have thresholds and actions, and it shows up in the validation report. The table being validated is the target, and <code>tbl_compare=</code> is the source. Every aligned row is a <em>test unit</em>, so thresholds can be set as a proportion of rows:</p>
 <div id="997ab7c1" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>target, tbl_name<span class="op">=</span><span class="st">"orders"</span>, thresholds<span class="op">=</span>(<span class="fl">0.1</span>, <span class="fl">0.25</span>))</span>
@@ -1335,7 +1335,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>In Pointblank <code>v1.0.1</code> and earlier, <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> had a single test unit for the whole table. Steps still pass or fail in the same situations, but fractional thresholds now refer to the share of differing rows. To react to <em>any</em> difference, as before, use an absolute threshold of <code>1</code>.</p>
+<p>In Pointblank <code>v1.0.1</code> and earlier, <code>tbl_match()</code> had a single test unit for the whole table. Steps still pass or fail in the same situations, but fractional thresholds now refer to the share of differing rows. To react to <em>any</em> difference, as before, use an absolute threshold of <code>1</code>.</p>
 </div>
 </div>
 <p>Three of the six aligned rows differ, exceeding both the ‘warning’ and ‘error’ thresholds. The step report holds the full comparison:</p>
@@ -1470,7 +1470,7 @@ Note
 <small>shape: (3, 8)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>order_id</th><th>_status_</th><th>customer_source</th><th>customer_target</th><th>amount_source</th><th>amount_target</th><th>status_source</th><th>status_target</th></tr><tr><td>i64</td><td>str</td><td>str</td><td>str</td><td>f64</td><td>f64</td><td>str</td><td>str</td></tr></thead><tbody><tr><td>1002</td><td>"changed"</td><td>"Ben"</td><td>"Ben"</td><td>40.5</td><td>45.5</td><td>"shipped"</td><td>"shipped"</td></tr><tr><td>1003</td><td>"missing"</td><td>"Cho"</td><td>null</td><td>12.75</td><td>null</td><td>"pending"</td><td>null</td></tr><tr><td>1006</td><td>"extra"</td><td>null</td><td>"Fay"</td><td>null</td><td>18.25</td><td>null</td><td>"pending"</td></tr></tbody></table></div>
 </div>
 </div>
-<p>All the comparison arguments (<code>keys=</code>, <code>tolerance=</code>, <code>schema=</code>, and so on) are available in <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a>, and they can be written in YAML too:</p>
+<p>All the comparison arguments (<code>keys=</code>, <code>tolerance=</code>, <code>schema=</code>, and so on) are available in <code>tbl_match()</code>, and they can be written in YAML too:</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span><span class="at"> orders_target.csv</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">tbl_match</span><span class="kw">:</span></span>
@@ -1481,7 +1481,7 @@ Note
 </section>
 <section id="reconciling-aggregates" class="level1">
 <h1>Reconciling Aggregates</h1>
-<p>Sometimes two tables shouldn’t have the same rows but should add up to the same numbers: a warehouse table loaded from a source system, a summary table built from detailed transactions, or two systems that record the same activity at different levels of detail. For these, the <a href="../../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a> validation method compares <em>aggregates</em> instead of rows. It groups both tables by the <code>keys=</code> columns, aggregates the <code>measures=</code> columns (with <code>agg="sum"</code> by default, or <code>"count"</code>, <code>"mean"</code>, <code>"min"</code>, or <code>"max"</code>), and compares the results group by group. Each group is a test unit.</p>
+<p>Sometimes two tables shouldn’t have the same rows but should add up to the same numbers: a warehouse table loaded from a source system, a summary table built from detailed transactions, or two systems that record the same activity at different levels of detail. For these, the <code>tbl_reconcile()</code> validation method compares <em>aggregates</em> instead of rows. It groups both tables by the <code>keys=</code> columns, aggregates the <code>measures=</code> columns (with <code>agg="sum"</code> by default, or <code>"count"</code>, <code>"mean"</code>, <code>"min"</code>, or <code>"max"</code>), and compares the results group by group. Each group is a test unit.</p>
 <p>Here, the orders in the target have been loaded at a finer grain than in the source, so we reconcile the total amount per customer:</p>
 <div id="a27fef2d" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>order_lines <span class="op">=</span> pl.DataFrame(</span>
@@ -1614,7 +1614,7 @@ Note
 </div>
 </div>
 </div>
-<p><code>Ben</code>’s two order lines add up to more than his order in the source, <code>Cho</code> is missing, and <code>Fay</code> is new. Without <code>keys=</code>, <a href="../../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a> compares grand totals (a single test unit), and <code>agg="count"</code> without <code>measures=</code> compares the number of rows in each group. Tolerances, <code>column_map=</code>, and <code>partitions=</code> work as they do in <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a>. Rows with a null key form a group of their own, which is matched with the other table’s null-key group.</p>
+<p><code>Ben</code>’s two order lines add up to more than his order in the source, <code>Cho</code> is missing, and <code>Fay</code> is new. Without <code>keys=</code>, <code>tbl_reconcile()</code> compares grand totals (a single test unit), and <code>agg="count"</code> without <code>measures=</code> compares the number of rows in each group. Tolerances, <code>column_map=</code>, and <code>partitions=</code> work as they do in <code>tbl_match()</code>. Rows with a null key form a group of their own, which is matched with the other table’s null-key group.</p>
 </section>
 <section id="exporting-the-results" class="level1">
 <h1>Exporting the Results</h1>

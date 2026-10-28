@@ -308,6 +308,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.add_steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.add_steps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Pipeline.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Pipeline</span></a>
   </div>
@@ -1669,7 +1675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13441-L13926" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13519-L14004" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">prompt</span>(</span>
@@ -1690,7 +1696,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-text">
 <p>The <a href="../reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt()</a> validation method uses Large Language Models (LLMs) to validate rows of data based on natural language criteria. Similar to other Pointblank validation methods, this generates binary test results (pass/fail) that integrate seamlessly with the standard reporting framework.</p>
-<p>Like <code>col_vals_*()</code> methods, <a href="../reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt()</a> evaluates data against specific criteria, but instead of using programmatic rules, it uses natural language prompts interpreted by an LLM. Like <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> and <a href="../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" class="gdls-link gdls-code">rows_complete()</a>, it operates at the row level and allows you to specify a subset of columns for evaluation using <code>columns_subset=</code>.</p>
+<p>Like <code>col_vals_*()</code> methods, <a href="../reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt()</a> evaluates data against specific criteria, but instead of using programmatic rules, it uses natural language prompts interpreted by an LLM. Like <code>rows_distinct()</code> and <code>rows_complete()</code>, it operates at the row level and allows you to specify a subset of columns for evaluation using <code>columns_subset=</code>.</p>
 <p>The system automatically combines your validation criteria from the <code>prompt=</code> parameter with the necessary technical context, data formatting instructions, and response structure requirements. This is all so you only need to focus on describing your validation logic in plain language.</p>
 <p>Each row becomes a test unit that either passes or fails the validation criteria, producing the familiar True/False results that appear in Pointblank validation reports. This method is particularly useful for complex validation rules that are difficult to express with traditional validation methods, such as semantic checks, context-dependent validation, or subjective quality assessments.</p>
 </div>

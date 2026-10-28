@@ -4,7 +4,7 @@ Validate whether row data are complete by having no missing values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12978-L13230)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13056-L13308)
 
 ``` python
 Validate.rows_complete(
@@ -19,7 +19,7 @@ Validate.rows_complete(
 )
 ```
 
-The [rows_complete()](../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete) method checks whether rows in the table are complete. Completeness of a row means that there are no missing values within the row. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied). A subset of columns can be specified for the completeness check. If no subset is provided, all columns in the table will be used.
+The `rows_complete()` method checks whether rows in the table are complete. Completeness of a row means that there are no missing values within the row. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied). A subset of columns can be specified for the completeness check. If no subset is provided, all columns in the table will be used.
 
 ## Parameters
 
@@ -122,7 +122,7 @@ pb.preview(tbl)
 | 3   | c              | c              | d              |
 | 4   | d              | None           | None           |
 
-Let's validate that the rows in the table are complete with [rows_complete()](../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete). We'll determine if this validation had any failing test units (there are four test units, one for each row). A failing test units means that a given row is not complete (i.e., has at least one missing value).
+Let's validate that the rows in the table are complete with `rows_complete()`. We'll determine if this validation had any failing test units (there are four test units, one for each row). A failing test units means that a given row is not complete (i.e., has at least one missing value).
 
 ``` python
 validation = (

@@ -4,7 +4,7 @@ Validate that all missing values in a column are *coded* (no uncoded nulls).
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12324-L12510)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12402-L12588)
 
 ``` python
 Validate.col_missing_coded(
@@ -20,7 +20,7 @@ Validate.col_missing_coded(
 )
 ```
 
-The [col_missing_coded()](../reference/Validate.col_missing_coded.md#pointblank.Validate.col_missing_coded) validation method checks that every absent value in a column is expressed with an explicit missing-value code, rather than a raw null. Under the structured missingness model (see [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec)), every absence should carry a *reason* -- encoded as a sentinel value such as `-99` for `"not_asked"`. A raw null represents *uncoded* (unknown) missingness, so this validation treats raw nulls as failing test units while declared sentinel values and real values pass.
+The `col_missing_coded()` validation method checks that every absent value in a column is expressed with an explicit missing-value code, rather than a raw null. Under the structured missingness model (see [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec)), every absence should carry a *reason* -- encoded as a sentinel value such as `-99` for `"not_asked"`. A raw null represents *uncoded* (unknown) missingness, so this validation treats raw nulls as failing test units while declared sentinel values and real values pass.
 
 This validation operates over the number of test units equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
 

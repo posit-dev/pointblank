@@ -134,7 +134,7 @@ result
 
 [TABLE]
 
-The validation table shows the results of our YAML-defined workflow. We can see that the [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) validation failed (because there are duplicate rows in the table), while the column existence checks passed.
+The validation table shows the results of our YAML-defined workflow. We can see that the `rows_distinct()` validation failed (because there are duplicate rows in the table), while the column existence checks passed.
 
 Now let's create a more comprehensive validation workflow with thresholds and metadata:
 
@@ -257,7 +257,7 @@ The 15 available aggregate methods follow the pattern `col_{stat}_{comparator}` 
 
 ### Data Freshness
 
-Check that a date/datetime column has recent data using [data_freshness](../reference/Validate.data_freshness.md#pointblank.Validate.data_freshness):
+Check that a date/datetime column has recent data using `data_freshness`:
 
 ``` yaml
 tbl: events.csv
@@ -285,7 +285,7 @@ steps:
 
 ### Null Percentage Check
 
-Use [col_pct_null](../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null) to validate that the percentage of null values in a column is within bounds:
+Use `col_pct_null` to validate that the percentage of null values in a column is within bounds:
 
 ``` yaml
 steps:

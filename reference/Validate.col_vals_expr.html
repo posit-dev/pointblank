@@ -311,6 +311,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.add_steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.add_steps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Pipeline.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Pipeline</span></a>
   </div>
@@ -1670,7 +1676,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11366-L11618" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11444-L11696" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">col_vals_expr</span>(</span>
@@ -1685,7 +1691,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a> validation method checks whether column values in a table satisfy a custom <code>expr=</code> expression. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
+<p>The <code>col_vals_expr()</code> validation method checks whether column values in a table satisfy a custom <code>expr=</code> expression. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1693,7 +1699,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">expr</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>A column expression that will evaluate each row in the table, returning a boolean value per table row. A Narwhals column expression (e.g., <code>nw.col("a") &gt; 1</code>) works with every table type. Otherwise, use an expression from the table’s own library: a Polars expression for a Polars table, an Ibis expression for an Ibis table, or a PySpark column for a PySpark DataFrame. A function (such as a lambda) can also be given; it receives the table and should return one of those expressions or a boolean Series (e.g., <code>lambda df: df["a"] &gt; 1</code> for a pandas DataFrame). For Polars, Narwhals, and Ibis expressions, the columns used in the expression are shown in the validation report, as is any name given to the expression (e.g., through <code>.alias("a_is_int")</code>), which helps to tell apart several <a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a> steps. The expression as written in the code (when its source text is available, which requires Python 3.11 or later) appears in a note in the report footer.</p>
+<p>A column expression that will evaluate each row in the table, returning a boolean value per table row. A Narwhals column expression (e.g., <code>nw.col("a") &gt; 1</code>) works with every table type. Otherwise, use an expression from the table’s own library: a Polars expression for a Polars table, an Ibis expression for an Ibis table, or a PySpark column for a PySpark DataFrame. A function (such as a lambda) can also be given; it receives the table and should return one of those expressions or a boolean Series (e.g., <code>lambda df: df["a"] &gt; 1</code> for a pandas DataFrame). For Polars, Narwhals, and Ibis expressions, the columns used in the expression are shown in the validation report, as is any name given to the expression (e.g., through <code>.alias("a_is_int")</code>), which helps to tell apart several <code>col_vals_expr()</code> steps. The expression as written in the code (when its source text is available, which requires Python 3.11 or later) appears in a note in the report footer.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">pre</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1779,7 +1785,7 @@ segments=["region", "date"]</code></pre>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). The table is shown below:</p>
-<div id="7fd84db1" class="cell" data-execution_count="2">
+<div id="e3c1b71a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1920,7 +1926,7 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 <p>Let’s validate that the values in column <code>a</code> are all integers. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="83113a94" class="cell" data-execution_count="3">
+<div id="fe89c16d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_expr(expr<span class="op">=</span>pl.col(<span class="st">"a"</span>) <span class="op">%</span> <span class="dv">1</span> <span class="op">==</span> <span class="dv">0</span>)</span>
@@ -2082,7 +2088,7 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 </div>
-<p>Printing the <code>validation</code> object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using <a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr()</a>. All test units passed, with no failing test units.</p>
+<p>Printing the <code>validation</code> object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using <code>col_vals_expr()</code>. All test units passed, with no failing test units.</p>
 
 
 </section>

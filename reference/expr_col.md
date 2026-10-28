@@ -1,6 +1,6 @@
 # expr_col()
 
-Create a column expression for use in [conjointly()](../reference/Validate.conjointly.md#pointblank.Validate.conjointly) validation.
+Create a column expression for use in `conjointly()` validation.
 
 Usage
 

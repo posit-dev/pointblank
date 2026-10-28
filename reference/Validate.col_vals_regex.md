@@ -4,7 +4,7 @@ Validate whether column values match a regular expression pattern.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10588-L10865)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10666-L10943)
 
 ``` python
 Validate.col_vals_regex(
@@ -23,7 +23,7 @@ Validate.col_vals_regex(
 )
 ```
 
-The [col_vals_regex()](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) validation method checks whether column values in a table correspond to a `pattern=` matching expression. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+The `col_vals_regex()` validation method checks whether column values in a table correspond to a `pattern=` matching expression. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
 
 ## Parameters
 
@@ -148,7 +148,7 @@ validation
 
 [TABLE]
 
-Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using [col_vals_regex()](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex). All test units passed, and there are no failing test units.
+Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using `col_vals_regex()`. All test units passed, and there are no failing test units.
 
 Now, let's use the same regex for a validation on column `b`.
 

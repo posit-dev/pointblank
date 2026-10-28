@@ -311,6 +311,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.add_steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.add_steps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Pipeline.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Pipeline</span></a>
   </div>
@@ -1670,7 +1676,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15141-L15502" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15219-L15580" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">tbl_match</span>(</span>
@@ -1694,7 +1700,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> method compares the target table, row by row, against a comparison table that holds the expected data (the <em>source</em>). Rows of the two tables are aligned and every aligned row becomes a test unit: it passes if the row is present in both tables with equal values, and fails if its values changed, if it’s missing from the target, if it’s an extra row in the target, or if its key is duplicated. Schema differences (columns added, removed, retyped, or reordered) are checked too.</p>
+<p>The <code>tbl_match()</code> method compares the target table, row by row, against a comparison table that holds the expected data (the <em>source</em>). Rows of the two tables are aligned and every aligned row becomes a test unit: it passes if the row is present in both tables with equal values, and fails if its values changed, if it’s missing from the target, if it’s an extra row in the target, or if its key is duplicated. Schema differences (columns added, removed, retyped, or reordered) are checked too.</p>
 <p>Rows are aligned in one of three ways:</p>
 <ul>
 <li><strong>by key</strong> (<code>keys=</code> given): rows are matched on one or more key columns, so row order doesn’t matter; this is the most informative mode</li>
@@ -1803,7 +1809,7 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>In Pointblank <code>v1.0.1</code> and earlier, <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> had a single test unit that failed if the tables differed in any way. Whether a step passes or fails is unchanged, but the counts (<code>n</code>, <code>n_passed</code>, <code>n_failed</code>, and the fractions) now reflect rows. This changes the meaning of fractional thresholds: <code>thresholds=0.1</code> used to be exceeded by any difference, and is now exceeded only when at least 10% of the rows fail. To keep the earlier behavior of reacting to any difference, use an absolute threshold of <code>1</code> (e.g., <code>thresholds=1</code> or <code>Thresholds(warning=1)</code>).</p>
+<p>In Pointblank <code>v1.0.1</code> and earlier, <code>tbl_match()</code> had a single test unit that failed if the tables differed in any way. Whether a step passes or fails is unchanged, but the counts (<code>n</code>, <code>n_passed</code>, <code>n_failed</code>, and the fractions) now reflect rows. This changes the meaning of fractional thresholds: <code>thresholds=0.1</code> used to be exceeded by any difference, and is now exceeded only when at least 10% of the rows fail. To keep the earlier behavior of reacting to any difference, use an absolute threshold of <code>1</code> (e.g., <code>thresholds=1</code> or <code>Thresholds(warning=1)</code>).</p>
 </div>
 </div>
 <p>The data extract for the step (from <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a>) contains the failing rows of <em>both</em> tables: the key column(s), a <code>_status_</code> column (<code>"changed"</code>, <code>"missing"</code>, <code>"extra"</code>, or <code>"dup_key"</code>), and a pair of <code>&lt;column&gt;_source</code>/<code>&lt;column&gt;_target</code> columns for each compared column. For <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>get_sundered_data()</code></a>, target rows with a matching row in the comparison table pass; rows missing from the target can’t be part of the sundered data. Sundering for this step is available with in-memory tables (not lazy or database tables) and isn’t available in multiset mode.</p>
@@ -1834,8 +1840,8 @@ Important
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>For the examples here, we’ll create two simple tables to demonstrate the <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> validation.</p>
-<div id="5879177b" class="cell" data-execution_count="2">
+<p>For the examples here, we’ll create two simple tables to demonstrate the <code>tbl_match()</code> validation.</p>
+<div id="e7e5b8bb" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1973,7 +1979,7 @@ Important
 </div>
 </div>
 <p>Let’s validate that <code>tbl_1</code> matches <code>tbl_2</code>. Since these tables are identical, the validation should pass.</p>
-<div id="a5fe0915" class="cell" data-execution_count="3">
+<div id="98a80d9b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl_1)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .tbl_match(tbl_compare<span class="op">=</span>tbl_2)</span>
@@ -2144,7 +2150,7 @@ Important
 </div>
 <p>The validation table shows that all four test units (one per row) passed, indicating that the two tables match completely.</p>
 <p>Now, let’s compare against a table that has one different value, is missing a row, and has an extra row. Since the rows can be identified by column <code>a</code>, we’ll use it as the key.</p>
-<div id="e6f6ae15" class="cell" data-execution_count="4">
+<div id="34749970" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tbl_3 <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"a"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">5</span>],</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"b"</span>: [<span class="st">"w"</span>, <span class="st">"x"</span>, <span class="st">"z"</span>, <span class="st">"v"</span>],</span>
@@ -2320,7 +2326,7 @@ Important
 </div>
 </div>
 <p>Three of the five aligned rows failed: one changed, one missing from the target, and one extra. The step report shows exactly what differs.</p>
-<div id="261cc4d2" class="cell" data-execution_count="5">
+<div id="ea6a72d6" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

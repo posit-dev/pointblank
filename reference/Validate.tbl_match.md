@@ -4,7 +4,7 @@ Validate whether the target table matches a comparison table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15141-L15502)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15219-L15580)
 
 ``` python
 Validate.tbl_match(
@@ -28,7 +28,7 @@ Validate.tbl_match(
 )
 ```
 
-The [tbl_match()](../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) method compares the target table, row by row, against a comparison table that holds the expected data (the *source*). Rows of the two tables are aligned and every aligned row becomes a test unit: it passes if the row is present in both tables with equal values, and fails if its values changed, if it's missing from the target, if it's an extra row in the target, or if its key is duplicated. Schema differences (columns added, removed, retyped, or reordered) are checked too.
+The `tbl_match()` method compares the target table, row by row, against a comparison table that holds the expected data (the *source*). Rows of the two tables are aligned and every aligned row becomes a test unit: it passes if the row is present in both tables with equal values, and fails if its values changed, if it's missing from the target, if it's an extra row in the target, or if its key is duplicated. Schema differences (columns added, removed, retyped, or reordered) are checked too.
 
 Rows are aligned in one of three ways:
 
@@ -104,7 +104,7 @@ Because failures are counted per row, thresholds can be expressed as proportions
 
 > **Important**
 >
-> In Pointblank `v1.0.1` and earlier, [tbl_match()](../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) had a single test unit that failed if the tables differed in any way. Whether a step passes or fails is unchanged, but the counts (`n`, `n_passed`, `n_failed`, and the fractions) now reflect rows. This changes the meaning of fractional thresholds: `thresholds=0.1` used to be exceeded by any difference, and is now exceeded only when at least 10% of the rows fail. To keep the earlier behavior of reacting to any difference, use an absolute threshold of `1` (e.g., `thresholds=1` or `Thresholds(warning=1)`).
+> In Pointblank `v1.0.1` and earlier, `tbl_match()` had a single test unit that failed if the tables differed in any way. Whether a step passes or fails is unchanged, but the counts (`n`, `n_passed`, `n_failed`, and the fractions) now reflect rows. This changes the meaning of fractional thresholds: `thresholds=0.1` used to be exceeded by any difference, and is now exceeded only when at least 10% of the rows fail. To keep the earlier behavior of reacting to any difference, use an absolute threshold of `1` (e.g., `thresholds=1` or `Thresholds(warning=1)`).
 
 The data extract for the step (from [`get_data_extracts()`](../reference/Validate.get_data_extracts.md#pointblank.Validate.get_data_extracts)) contains the failing rows of *both* tables: the key column(s), a `_status_` column (`"changed"`, `"missing"`, `"extra"`, or `"dup_key"`), and a pair of `<column>_source`/`<column>_target` columns for each compared column. For [`get_sundered_data()`](../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data), target rows with a matching row in the comparison table pass; rows missing from the target can't be part of the sundered data. Sundering for this step is available with in-memory tables (not lazy or database tables) and isn't available in multiset mode.
 
@@ -139,7 +139,7 @@ Values in columns whose types differ are compared numerically when both columns 
 
 ## Examples
 
-For the examples here, we'll create two simple tables to demonstrate the [tbl_match()](../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) validation.
+For the examples here, we'll create two simple tables to demonstrate the `tbl_match()` validation.
 
 ``` python
 import pointblank as pb

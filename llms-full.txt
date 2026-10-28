@@ -2020,40 +2020,304 @@ Steps(steps: 'list[Step] | None' = None) -> 'None'
 
 A reusable collection of validation step definitions.
 
-A `Steps` object records validation steps without binding them to data, thresholds, or
-metadata. It mirrors the validation method API on
-[`Validate`](`pointblank.Validate`) so that defining steps feels identical, but
-the result is a portable recipe that can be imported into any number of pipelines via
-[`Validate.add_steps()`](`pointblank.Validate.add_steps`).
+A `Steps` object is a list of validation steps that isn't attached to any table. You build it
+with the same methods you'd call on a [`Validate`](`pointblank.Validate`) object
+(`col_vals_not_null()`, `rows_distinct()`, `col_vals_regex()`, and so on), but each call only
+records the step. Nothing is checked until the collection is added to a validation with
+[`Validate.add_steps()`](`pointblank.Validate.add_steps`) and that validation is
+interrogated.
+
+This makes it possible to write a group of checks once and use it in many places. Many tables
+share the same rules: every table with a customer ID needs that ID to be present and unique,
+and every table with an email column needs valid addresses. Without `Steps`, those rules get
+copied into each validation and drift apart over time. With `Steps`, you define them in one
+place (a shared module, for example), name them for what they check (`id_checks`,
+`contact_checks`), and add them to whichever validations need them. Each validation keeps its
+own table, thresholds, actions, and metadata, and can mix shared steps with its own.
+
+Since the methods have the same signatures as the `Validate` methods they mirror, you get the
+same argument names, defaults, and editor completion, and a misspelled argument raises a
+`TypeError` as soon as the step is recorded.
 
 Parameters
 ----------
 steps
-    An optional list of [`Step`](`pointblank.Step`) objects to initialize with.
+    An optional list of [`Step`](`pointblank.Step`) objects to start the collection with.
+    This is useful when step definitions come from data (a configuration file, for example)
+    rather than from method calls.
+
+Returns
+-------
+Steps
+    A `Steps` object. Add steps to it with its validation methods, and apply it with
+    [`Validate.add_steps()`](`pointblank.Validate.add_steps`).
+
+Recording Steps
+---------------
+Each validation method records one step and returns the same `Steps` object, so calls can be
+chained. All of the row-based and table-level validation methods are available, from
+`col_vals_gt()` to `tbl_reconcile()`. The aggregation methods (`col_sum_*()`, `col_avg_*()`,
+and `col_sd_*()`), `specially()`, and `prompt()` aren't, so add those directly to the
+validation.
+
+Because each method adds to the object it's called on, a collection isn't copied when you add
+to it. Calling a method on a shared collection (e.g., `extended = id_checks.col_exists(...)`)
+adds the step to `id_checks` itself, and `extended` is the same object. To build variations,
+keep the shared parts in separate collections and add several of them to a validation.
+
+Printing a `Steps` object lists its steps with the arguments that differ from the defaults,
+and `len()` gives the number of steps.
+
+Applying Steps to a Validation
+------------------------------
+[`Validate.add_steps()`](`pointblank.Validate.add_steps`) appends the recorded steps to a
+validation, in order, as if each method had been called on it directly. It takes any number of
+`Steps` objects (and also `Validate` objects, whose steps it copies), and has options for
+adapting the steps to the validation at hand:
+
+- `columns_map=` renames columns in the steps, so that the same collection works on tables that
+name a column differently (e.g., `{"customer_id": "cust_id"}`)
+- `thresholds=` and `active=` replace the thresholds and active state of every added step
+- `exclude=` skips steps by method name or by their 1-based position in a collection
+
+Steps, Step, and Contract
+-------------------------
+A [`Step`](`pointblank.Step`) is a single step stored as data: a method name and a dictionary
+of arguments. A `Steps` object holds a list of them, built with method calls instead. A
+[`Contract`](`pointblank.Contract`) also holds a list of `Step` objects, together with a schema
+and metadata (an owner, a version, consumers), and can be saved as YAML. Use `Steps` for
+reusable building blocks inside Python code, and a `Contract` for an agreement about a table
+that's shared, versioned, and enforced at a pipeline boundary. The two work together: a
+contract compiled with [`to_validate()`](`pointblank.Contract.to_validate`) is an ordinary
+validation, so collections can be added to it with `add_steps()`.
 
 Examples
 --------
-```python
+```{python}
+#| echo: false
+#| output: false
 import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
 
-completeness = (
+Let's build two collections of checks for customer data. The first covers identifiers (each
+customer ID must be present and appear only once), and the second covers contact details
+(email addresses must look valid, and the country must be one of three codes).
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+id_checks = (
     pb.Steps()
-    .col_vals_not_null(columns=pb.ends_with("_id"))
-    .col_vals_not_null(columns="email")
+    .col_vals_not_null(columns="customer_id")
+    .rows_distinct(columns_subset="customer_id")
 )
 
-positive_amounts = (
+contact_checks = (
     pb.Steps()
-    .col_vals_ge(columns=pb.starts_with("amt_"), value=0)
-    .col_vals_gt(columns="amt_total", value=0)
+    .col_vals_regex(columns="email", pattern=r"^[^@]+@[^@]+\.[a-z]+$")
+    .col_vals_in_set(columns="country", set=["CA", "MX", "US"])
 )
 
-validation = (
-    pb.Validate(data=orders, label="Order quality")
-    .add_steps(completeness, positive_amounts)
+id_checks
+```
+
+Displaying a collection lists its steps and their arguments. No table is involved yet.
+
+Now let's apply both collections to a table of customers from a CRM system. The validation is
+created as usual, and `add_steps()` appends the four recorded steps before interrogation.
+
+```{python}
+crm_customers = pl.DataFrame(
+    {
+        "customer_id": [1, 2, 3, 3, 5],
+        "email": ["a@x.com", "b@y.org", "c-at-z.com", "d@w.net", "e@v.io"],
+        "country": ["US", "CA", "US", "MX", "BR"],
+    }
+)
+
+(
+    pb.Validate(data=crm_customers, tbl_name="crm_customers")
+    .add_steps(id_checks, contact_checks)
     .interrogate()
 )
 ```
+
+The report has one step per recorded step, in the order they were added. Customer ID `3`
+appears twice, so both of its rows fail the `rows_distinct` step. The address `"c-at-z.com"`
+fails the email pattern, and the country `"BR"` isn't in the allowed set.
+
+The same collections can check a table from a billing system, where the ID column is called
+`cust_id`. The `columns_map=` argument renames the column in the added steps, and
+`thresholds=` gives every added step a warning threshold of one failing test unit.
+
+```{python}
+billing_accounts = pl.DataFrame(
+    {
+        "cust_id": [10, 11, None, 13],
+        "email": ["f@x.com", "g@y.com", "h@z.com", "i@w"],
+        "country": ["US", "US", "CA", "US"],
+    }
+)
+
+(
+    pb.Validate(data=billing_accounts, tbl_name="billing_accounts")
+    .add_steps(
+        id_checks,
+        contact_checks,
+        columns_map={"customer_id": "cust_id"},
+        thresholds=pb.Thresholds(warning=1),
+    )
+    .interrogate()
+)
+```
+
+The ID steps now check `cust_id`, and one account is missing its ID. The address `"i@w"`
+has no domain suffix, so it fails the email pattern. Both failing steps reach the warning
+threshold.
+
+See Also
+--------
+Validate.add_steps : Add the steps in one or more collections to a validation.
+Step : A single validation step stored as data.
+Contract : A schema, steps, and metadata that make up an agreement about a table.
+
+add_steps(self, *steps: 'Steps | Validate', active: 'bool | Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, exclude: 'list[str | int] | None' = None, columns_map: 'dict[str, str] | None' = None) -> 'Validate'
+
+Add the steps from one or more `Steps` collections to the validation.
+
+This method appends previously recorded validation steps to the validation plan. The main
+source of steps is a [`Steps`](`pointblank.Steps`) collection: a reusable group of steps
+built with the same methods as `Validate` but not attached to any table. Each recorded step
+is applied to this validation as if its method had been called directly, in the order the
+steps were recorded. Several collections can be added in one call, and the result can be
+chained with other validation methods, so shared steps and steps specific to this table
+can be combined in one plan. A `Validate` object can also be given, in which case its
+steps are copied into this validation.
+
+Steps written for one table don't always fit another one exactly. The optional arguments
+adapt the added steps without changing the collections themselves: `columns_map=` renames
+columns, `thresholds=` and `active=` replace those settings on every added step, and
+`exclude=` leaves out steps that don't apply.
+
+Parameters
+----------
+*steps
+    One or more [`Steps`](`pointblank.Steps`) or `Validate` objects whose steps should be
+    added, in the order given.
+active
+    Replace the `active=` setting of every added step. If `None` (the default), each step
+    keeps its own setting. Use `False` to add the steps in an inactive state, or a callable
+    (such as [`has_columns()`](`pointblank.has_columns`)) to decide at interrogation time.
+thresholds
+    Replace the `thresholds=` setting of every added step. If `None` (the default), each
+    step keeps its own thresholds and otherwise uses the thresholds of this validation.
+    Accepts the same values as the `thresholds=` argument of `Validate`.
+exclude
+    Steps to leave out, as a list of method names (e.g., `["col_vals_regex"]` skips every
+    regex step) or of 1-based positions (e.g., `[2]` skips the second step). Positions
+    count within each collection, so `[2]` skips the second step of every collection given.
+columns_map
+    A dictionary that renames columns in the added steps, mapping the column names used in
+    the collection to the names in this table (e.g., `{"customer_id": "cust_id"}`). It
+    applies to column names given as strings or lists of strings in a step's `columns=`,
+    `column=`, or `columns_subset=` argument. Column selectors such as
+    [`starts_with()`](`pointblank.starts_with`) are left as they are.
+
+Returns
+-------
+Validate
+    The `Validate` object with the steps added, for further method chaining.
+
+Raises
+------
+ValueError
+    If no `Steps` or `Validate` objects are given.
+TypeError
+    If an argument in `*steps` isn't a `Steps` or `Validate` object, if an item in
+    `exclude=` isn't a string or an integer, or if a step's arguments don't fit its
+    validation method.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's define two collections of steps for order data: one for completeness and one for
+valid amounts.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+completeness = (
+    pb.Steps()
+    .col_vals_not_null(columns="order_id")
+    .col_vals_not_null(columns="email")
+)
+
+valid_amounts = (
+    pb.Steps()
+    .col_vals_gt(columns="amount", value=0)
+    .col_vals_le(columns="amount", value=10_000)
+)
+```
+
+Both collections can be added to a validation of an orders table, along with a check
+that only applies to this table (the `region` values):
+
+```{python}
+orders = pl.DataFrame(
+    {
+        "order_id": ["A1", "A2", None, "A4"],
+        "email": ["a@x.com", None, "c@z.com", "d@w.net"],
+        "amount": [25.0, 120.0, 0.0, 18_500.0],
+        "region": ["east", "west", "east", "north"],
+    }
+)
+
+(
+    pb.Validate(data=orders, tbl_name="orders")
+    .add_steps(completeness, valid_amounts)
+    .col_vals_in_set(columns="region", set=["east", "west"])
+    .interrogate()
+)
+```
+
+The first four steps come from the two collections, in order, and the fifth is the
+table-specific check. Each step finds one failing row.
+
+A table of refunds uses the same rules, but with different column names, no email
+column, and a stricter tolerance for failures. Here, `columns_map=` renames the columns,
+`exclude=` skips the second completeness step (the email check), and `thresholds=` makes
+any failure an error.
+
+```{python}
+refunds = pl.DataFrame(
+    {"refund_ref": ["R1", "R2", "R3"], "refund_amt": [15.0, -4.0, 60.0]}
+)
+
+(
+    pb.Validate(data=refunds, tbl_name="refunds")
+    .add_steps(
+        completeness,
+        valid_amounts,
+        columns_map={"order_id": "refund_ref", "amount": "refund_amt"},
+        exclude=[2],
+        thresholds=pb.Thresholds(error=1),
+    )
+    .interrogate()
+)
+```
+
+Because positions count within each collection, `exclude=[2]` also skips the second step
+of `valid_amounts` (the upper limit on the amount). The negative refund fails the
+remaining amount check and reaches the error threshold.
 
 Pipeline(source: 'Contract | None' = None, target: 'Contract | None' = None, thresholds: 'Thresholds | None' = None, actions: 'Actions | None' = None, final_actions: 'FinalActions | None' = None, label: 'str | None' = None, short_circuit: 'bool' = True) -> None
 

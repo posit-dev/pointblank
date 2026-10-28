@@ -311,6 +311,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.add_steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.add_steps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Pipeline.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Pipeline</span></a>
   </div>
@@ -1669,7 +1675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15504-L15796" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15582-L15874" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">tbl_reconcile</span>(</span>
@@ -1689,7 +1695,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a> method checks that the target table agrees with a comparison table (the <em>source</em>, or expected data) on aggregate values: totals, counts, averages, minimums, or maximums of <em>measure</em> columns, computed per group of <em>key</em> columns (or over the whole table). It’s the check to reach for when the two tables don’t have the same rows but must add up to the same numbers, for example a warehouse fact table against the source system it was loaded from, or a monthly summary against the detailed transactions.</p>
+<p>The <code>tbl_reconcile()</code> method checks that the target table agrees with a comparison table (the <em>source</em>, or expected data) on aggregate values: totals, counts, averages, minimums, or maximums of <em>measure</em> columns, computed per group of <em>key</em> columns (or over the whole table). It’s the check to reach for when the two tables don’t have the same rows but must add up to the same numbers, for example a warehouse fact table against the source system it was loaded from, or a monthly summary against the detailed transactions.</p>
 <p>Each key group is a test unit: it passes if the group is in both tables and all of its aggregates are equal (within the tolerance), and fails if an aggregate differs, if the group is missing from the target, or if it’s an extra group in the target. To compare the rows themselves rather than aggregates, use <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link"><code>tbl_match()</code></a>.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
@@ -1789,7 +1795,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s reconcile a small table of loaded orders against the source system’s orders. The loaded table names the amount column differently, has a different number of rows (one order was split into two rows), and is missing the orders for one region.</p>
-<div id="c934c7f3" class="cell" data-execution_count="2">
+<div id="abb221d4" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1976,7 +1982,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>Of the four regions, <code>north</code> and <code>south</code> reconcile; <code>east</code> has a different total, and <code>west</code> is missing from the loaded orders. The step report shows the details:</p>
-<div id="57a0ac27" class="cell" data-execution_count="3">
+<div id="42f58462" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2087,7 +2093,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>Grand totals don’t need any keys. Here, the total amount matches within a tolerance of <code>20</code>, and so the step passes:</p>
-<div id="a2cb8867" class="cell" data-execution_count="4">
+<div id="518c55bf" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>loaded_orders)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .tbl_reconcile(</span>

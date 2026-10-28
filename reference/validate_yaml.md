@@ -178,10 +178,10 @@ Unknown top-level keys are rejected, which catches typos like `tbl_nmae` or `ste
 
 ## Supported Validation Methods
 
-In addition to all standard validation methods (e.g., [col_vals_gt](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), [rows_distinct](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct), [col_schema_match](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match)), the following methods are also supported:
+In addition to all standard validation methods (e.g., `col_vals_gt`, `rows_distinct`, `col_schema_match`), the following methods are also supported:
 
-- [col_pct_null](../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null): check the percentage of null values in a column
-- [data_freshness](../reference/Validate.data_freshness.md#pointblank.Validate.data_freshness): check that data is recent
+- `col_pct_null`: check the percentage of null values in a column
+- `data_freshness`: check that data is recent
 - aggregate methods: [col_sum_gt](../reference/Validate.col_sum_gt.md#pointblank.Validate.col_sum_gt), [col_sum_lt](../reference/Validate.col_sum_lt.md#pointblank.Validate.col_sum_lt), [col_sum_ge](../reference/Validate.col_sum_ge.md#pointblank.Validate.col_sum_ge), [col_sum_le](../reference/Validate.col_sum_le.md#pointblank.Validate.col_sum_le), [col_sum_eq](../reference/Validate.col_sum_eq.md#pointblank.Validate.col_sum_eq), [col_avg_gt](../reference/Validate.col_avg_gt.md#pointblank.Validate.col_avg_gt), [col_avg_lt](../reference/Validate.col_avg_lt.md#pointblank.Validate.col_avg_lt), [col_avg_ge](../reference/Validate.col_avg_ge.md#pointblank.Validate.col_avg_ge), [col_avg_le](../reference/Validate.col_avg_le.md#pointblank.Validate.col_avg_le), [col_avg_eq](../reference/Validate.col_avg_eq.md#pointblank.Validate.col_avg_eq), [col_sd_gt](../reference/Validate.col_sd_gt.md#pointblank.Validate.col_sd_gt), [col_sd_lt](../reference/Validate.col_sd_lt.md#pointblank.Validate.col_sd_lt), [col_sd_ge](../reference/Validate.col_sd_ge.md#pointblank.Validate.col_sd_ge), [col_sd_le](../reference/Validate.col_sd_le.md#pointblank.Validate.col_sd_le), [col_sd_eq](../reference/Validate.col_sd_eq.md#pointblank.Validate.col_sd_eq)
 
 ## See Also

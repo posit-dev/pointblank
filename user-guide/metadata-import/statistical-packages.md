@@ -2,7 +2,7 @@
 
 Statistical software packages like SPSS, SAS, and Stata store rich metadata alongside data values. Variable labels describe what each column represents, value labels map numeric codes to meaningful categories, and missing value definitions distinguish between different reasons for absent data. This metadata represents a carefully curated description of data expectations, often built up over years of survey design and data management work.
 
-Pointblank can read this embedded metadata and translate it directly into validation rules. When you import a `.sav`, `.xpt`, or `.dta` file, Pointblank extracts the full metadata catalog and maps each element to the appropriate validation method. Value labels become [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) checks, data types become schema constraints, and missing value codes inform how validation handles sentinel values.
+Pointblank can read this embedded metadata and translate it directly into validation rules. When you import a `.sav`, `.xpt`, or `.dta` file, Pointblank extracts the full metadata catalog and maps each element to the appropriate validation method. Value labels become `col_vals_in_set()` checks, data types become schema constraints, and missing value codes inform how validation handles sentinel values.
 
 ## Prerequisites
 
@@ -61,7 +61,7 @@ The `format="spss"` parameter is optional here because Pointblank auto-detects `
 
 ### Value Labels and Codelists
 
-SPSS value labels define the permitted values for categorical variables. For example, a variable `GENDER` might have labels `{1: "Male", 2: "Female", 3: "Non-binary"}`. Pointblank converts these into [Codelist](../../reference/Codelist.md#pointblank.Codelist) objects and generates [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) checks:
+SPSS value labels define the permitted values for categorical variables. For example, a variable `GENDER` might have labels `{1: "Male", 2: "Female", 3: "Non-binary"}`. Pointblank converts these into [Codelist](../../reference/Codelist.md#pointblank.Codelist) objects and generates `col_vals_in_set()` checks:
 
 ``` python
 meta = pb.import_metadata("demographics.sav")
@@ -78,7 +78,7 @@ for cl_name, codelist in meta.codelists.items():
     print(f"{cl_name}: {labels}")
 ```
 
-When validation is generated, each variable with value labels gets a [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) step that ensures all data values appear in the labeled set. Values outside the set are flagged as failures in the validation report.
+When validation is generated, each variable with value labels gets a `col_vals_in_set()` step that ensures all data values appear in the labeled set. Values outside the set are flagged as failures in the validation report.
 
 ### Missing Value Codes
 
@@ -174,7 +174,7 @@ for var in meta.variables:
 
 ### Length Constraints
 
-Character variables in SAS Transport files have defined maximum lengths. Pointblank captures these as `max_length` constraints on the [VariableMetadata](../../reference/VariableMetadata.md#pointblank.VariableMetadata) object. When you call [`to_validate()`](../../reference/MetadataImport.md#pointblank.MetadataImport.to_validate), variables with length constraints get a [col_vals_expr()](../../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) step that checks string length does not exceed the specified maximum.
+Character variables in SAS Transport files have defined maximum lengths. Pointblank captures these as `max_length` constraints on the [VariableMetadata](../../reference/VariableMetadata.md#pointblank.VariableMetadata) object. When you call [`to_validate()`](../../reference/MetadataImport.md#pointblank.MetadataImport.to_validate), variables with length constraints get a `col_vals_expr()` step that checks string length does not exceed the specified maximum.
 
 This is particularly important for CDISC submissions where variable lengths are strictly defined in the submission specification. A variable defined as `$200.` (200 characters) must not contain values longer than 200 characters, and Pointblank will flag any violations.
 
@@ -238,10 +238,10 @@ Once you have imported metadata from any statistical package file, the workflow 
 
 For a typical SPSS file with value labels and types defined, the generated validation includes:
 
-1.  A [col_schema_match()](../../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) step verifying column names and data types
-2.  [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) steps for every variable with value labels
-3.  [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) steps for variables marked as required
-4.  [col_vals_expr()](../../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) steps for variables with length constraints (from SAS Transport)
+1.  A `col_schema_match()` step verifying column names and data types
+2.  `col_vals_in_set()` steps for every variable with value labels
+3.  `col_vals_not_null()` steps for variables marked as required
+4.  `col_vals_expr()` steps for variables with length constraints (from SAS Transport)
 
 ``` python
 import pointblank as pb

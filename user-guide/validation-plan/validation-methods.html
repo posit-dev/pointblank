@@ -670,7 +670,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#checking-for-trending-values" id="toc-checking-for-trending-values" class="nav-link" data-scroll-target="#checking-for-trending-values">Checking for Trending Values</a></li>
   <li><a href="#handling-missing-values-with-na_pass" id="toc-handling-missing-values-with-na_pass" class="nav-link" data-scroll-target="#handling-missing-values-with-na_pass">Handling Missing Values with <code>na_pass=</code></a></li>
   <li><a href="#structured-missingness-with-missing" id="toc-structured-missingness-with-missing" class="nav-link" data-scroll-target="#structured-missingness-with-missing">Structured Missingness with <code>missing=</code></a></li>
-  <li><a href="#referential-integrity-with-col_vals_in_table" id="toc-referential-integrity-with-col_vals_in_table" class="nav-link" data-scroll-target="#referential-integrity-with-col_vals_in_table">Referential Integrity with col_vals_in_table()</a></li>
+  <li><a href="#referential-integrity-with-col_vals_in_table" id="toc-referential-integrity-with-col_vals_in_table" class="nav-link" data-scroll-target="#referential-integrity-with-col_vals_in_table">Referential Integrity with <code>col_vals_in_table()</code></a></li>
   </ul></li>
   <li><a href="#row-based-validations" id="toc-row-based-validations" class="nav-link" data-scroll-target="#row-based-validations">2. Row-based Validations</a>
   <ul class="collapse">
@@ -681,7 +681,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#checking-column-presence" id="toc-checking-column-presence" class="nav-link" data-scroll-target="#checking-column-presence">Checking Column Presence</a></li>
   <li><a href="#checking-the-table-schema" id="toc-checking-the-table-schema" class="nav-link" data-scroll-target="#checking-the-table-schema">Checking the Table Schema</a></li>
-  <li><a href="#comparing-tables-with-tbl_match" id="toc-comparing-tables-with-tbl_match" class="nav-link" data-scroll-target="#comparing-tables-with-tbl_match">Comparing Tables with tbl_match()</a></li>
+  <li><a href="#comparing-tables-with-tbl_match" id="toc-comparing-tables-with-tbl_match" class="nav-link" data-scroll-target="#comparing-tables-with-tbl_match">Comparing Tables with <code>tbl_match()</code></a></li>
   <li><a href="#checking-counts-of-row-and-columns" id="toc-checking-counts-of-row-and-columns" class="nav-link" data-scroll-target="#checking-counts-of-row-and-columns">Checking Counts of Row and Columns</a></li>
   <li><a href="#validating-data-freshness" id="toc-validating-data-freshness" class="nav-link" data-scroll-target="#validating-data-freshness">Validating Data Freshness</a></li>
   </ul></li>
@@ -3565,7 +3565,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> also offers pre-built factories for common standards (e.g., <code>pb.MissingSpec.from_cdisc_null_flavors()</code>, <code>pb.MissingSpec.from_sas()</code>, <code>pb.MissingSpec.from_spss()</code>), and importing metadata from SPSS/Stata/SAS files can auto-generate specs via <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport.missing_specs()</code></a>. For a fuller treatment of structured-missingness <em>reporting</em>, see the <em>Missing Values Reporting</em> article.</p>
 </section>
 <section id="referential-integrity-with-col_vals_in_table" class="level2">
-<h2 class="anchored" data-anchor-id="referential-integrity-with-col_vals_in_table">Referential Integrity with <a href="../../reference/Validate.col_vals_in_table.html#pointblank.Validate.col_vals_in_table" class="gdls-link gdls-code">col_vals_in_table()</a></h2>
+<h2 class="anchored" data-anchor-id="referential-integrity-with-col_vals_in_table">Referential Integrity with <code>col_vals_in_table()</code></h2>
 <p>When your data spans multiple tables, you often need to verify that foreign key values in one table actually exist in another. The <a href="../../reference/Validate.col_vals_in_table.html#pointblank.Validate.col_vals_in_table" class="gdls-link"><code>col_vals_in_table()</code></a> method handles this directly, checking each row’s value (or composite key) against a reference table.</p>
 <div id="a10ff87f" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -5522,7 +5522,7 @@ tr { background-color: transparent; }
 <p>These parameters all default to <code>True</code>, providing strict schema validation. Setting any to <code>False</code> relaxes the validation requirements, making the checks more flexible when exact matching isn’t necessary or practical for your use case.</p>
 </section>
 <section id="comparing-tables-with-tbl_match" class="level2">
-<h2 class="anchored" data-anchor-id="comparing-tables-with-tbl_match">Comparing Tables with <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a></h2>
+<h2 class="anchored" data-anchor-id="comparing-tables-with-tbl_match">Comparing Tables with <code>tbl_match()</code></h2>
 <p>The <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link"><code>Validate.tbl_match()</code></a> validation method provides a comprehensive way to verify that two tables are identical. It performs a progressive series of checks, from least to most stringent:</p>
 <ol type="1">
 <li>Column count match</li>
@@ -7589,7 +7589,7 @@ Tip
 <p>One powerful use case for <a href="../../reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link gdls-code">specially()</a> is validating relationships between multiple datasets. This is particularly valuable for conditional existence rules and cardinality relationships that span multiple tables.</p>
 <section id="foreign-key-validation" class="level3">
 <h3 class="anchored" data-anchor-id="foreign-key-validation">Foreign Key Validation</h3>
-<p>Verify that all keys in one dataset exist in another (this is equivalent to using <a href="../../reference/Validate.col_vals_in_table.html#pointblank.Validate.col_vals_in_table" class="gdls-link gdls-code">col_vals_in_table()</a> but shown here for completeness):</p>
+<p>Verify that all keys in one dataset exist in another (this is equivalent to using <code>col_vals_in_table()</code> but shown here for completeness):</p>
 <div id="381cff2d" class="cell" data-execution_count="36">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create related datasets: Orders and OrderDetails</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>orders <span class="op">=</span> pl.DataFrame({</span>

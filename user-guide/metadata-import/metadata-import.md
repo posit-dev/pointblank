@@ -81,15 +81,15 @@ The schema captures what the metadata says the table *should* look like, not wha
 
 The [`to_validate()`](../../reference/MetadataImport.md#pointblank.MetadataImport.to_validate) method is where all the power lives. It reads all constraints from the metadata and generates a complete [Validate](../../reference/Validate.md#pointblank.Validate) object with the appropriate validation steps. Each constraint type maps to a specific Pointblank method:
 
-| Metadata Constraint | Generated Validation Step |
-|----|----|
-| `required=True` | [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) |
-| `unique=True` | [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) |
-| `min_val` / `max_val` | [col_vals_between()](../../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between) |
-| `max_length` | [col_vals_expr()](../../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) (string length check) |
-| `pattern` | [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) |
-| `allowed_values` or codelist | [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) |
-| Schema (column names + types) | [col_schema_match()](../../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) |
+| Metadata Constraint           | Generated Validation Step               |
+|-------------------------------|-----------------------------------------|
+| `required=True`               | `col_vals_not_null()`                   |
+| `unique=True`                 | `rows_distinct()`                       |
+| `min_val` / `max_val`         | `col_vals_between()`                    |
+| `max_length`                  | `col_vals_expr()` (string length check) |
+| `pattern`                     | `col_vals_regex()`                      |
+| `allowed_values` or codelist  | `col_vals_in_set()`                     |
+| Schema (column names + types) | `col_schema_match()`                    |
 
 The generated workflow covers everything the metadata specifies. You can run it as-is for comprehensive validation, or add your own steps on top for business rules that go beyond what the metadata captures:
 
@@ -158,7 +158,7 @@ sex_labels = meta.codelists["C66731"].to_dict()
 # e.g., {"M": "Male", "F": "Female", "U": "Unknown", ...}
 ```
 
-When `to_validate()` encounters a variable with a `codelist_ref`, it generates a [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) step using the codelist's values. For non-extensible codelists, any value outside the set is a failure. For extensible codelists, additional values are permitted (the check still runs but serves as documentation of expected values).
+When `to_validate()` encounters a variable with a `codelist_ref`, it generates a `col_vals_in_set()` step using the codelist's values. For non-extensible codelists, any value outside the set is a failure. For extensible codelists, additional values are permitted (the check still runs but serves as documentation of expected values).
 
 ## Handling Missing Value Codes
 

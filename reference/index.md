@@ -30,7 +30,7 @@ Specification for structured missing values in a column.
 
 ## Contracts and Pipelines
 
-Use [Contract](../reference/Contract.md#pointblank.Contract) and [Step](../reference/Step.md#pointblank.Step) to define declarative data quality contracts that specify what valid data looks like. Use [Steps](../reference/Steps.md#pointblank.Steps) to build reusable step libraries with a fluent API and compose them into [Validate](../reference/Validate.md#pointblank.Validate) plans via `add_steps()`. Use [Pipeline](../reference/Pipeline.md#pointblank.Pipeline) to enforce contracts at both boundaries of a data transformation (source and target), producing a [PipelineResult](../reference/PipelineResult.md#pointblank.PipelineResult) with full introspection into what passed and what failed.
+Use [Contract](../reference/Contract.md#pointblank.Contract) and [Step](../reference/Step.md#pointblank.Step) to define declarative data quality contracts that specify what valid data looks like. Use [Steps](../reference/Steps.md#pointblank.Steps) to build reusable step libraries with a fluent API and compose them into [Validate](../reference/Validate.md#pointblank.Validate) plans via [add_steps()](../reference/Validate.add_steps.md#pointblank.Validate.add_steps). Use [Pipeline](../reference/Pipeline.md#pointblank.Pipeline) to enforce contracts at both boundaries of a data transformation (source and target), producing a [PipelineResult](../reference/PipelineResult.md#pointblank.PipelineResult) with full introspection into what passed and what failed.
 
 [Contract](Contract.md#pointblank.Contract)  
 A declarative boundary contract for pipeline data.
@@ -40,6 +40,9 @@ A single validation step, stored as data.
 
 [Steps](Steps.md#pointblank.Steps)  
 A reusable collection of validation step definitions.
+
+[Validate.add_steps()](Validate.add_steps.md#pointblank.Validate.add_steps)  
+Add the steps from one or more [Steps](../reference/Steps.md#pointblank.Steps) collections to the validation.
 
 [Pipeline](Pipeline.md#pointblank.Pipeline)  
 Binds source and target contracts into a pipeline boundary enforcement unit.
@@ -259,7 +262,7 @@ Select the first `n` columns in the column list.
 Select the last `n` columns in the column list.
 
 [expr_col()](expr_col.md#pointblank.expr_col)  
-Create a column expression for use in [conjointly()](../reference/Validate.conjointly.md#pointblank.Validate.conjointly) validation.
+Create a column expression for use in `conjointly()` validation.
 
 ## Segment Groups
 

@@ -4,7 +4,7 @@ Export this validation plan as a JSON Schema document.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19612-L19699)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19690-L19777)
 
 ``` python
 Validate.to_json_schema(path=None)
@@ -28,20 +28,20 @@ The JSON Schema document as a dictionary. This is a valid JSON Schema that can b
 
 The following validation methods have direct JSON Schema equivalents:
 
-| Pointblank method | JSON Schema keyword |
-|----|----|
-| [col_vals_not_null()](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) | `required` |
-| [col_vals_gt()](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) | `exclusiveMinimum` |
-| [col_vals_ge()](../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge) | `minimum` |
-| [col_vals_lt()](../reference/Validate.col_vals_lt.md#pointblank.Validate.col_vals_lt) | `exclusiveMaximum` |
-| [col_vals_le()](../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le) | `maximum` |
-| [col_vals_eq()](../reference/Validate.col_vals_eq.md#pointblank.Validate.col_vals_eq) | `const` |
-| [col_vals_in_set()](../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) | `enum` |
-| [col_vals_between()](../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between) | `minimum` + `maximum` |
-| [col_vals_regex()](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) | `pattern` |
-| [col_vals_within_spec()](../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec) | `format` |
+| Pointblank method        | JSON Schema keyword   |
+|--------------------------|-----------------------|
+| `col_vals_not_null()`    | `required`            |
+| `col_vals_gt()`          | `exclusiveMinimum`    |
+| `col_vals_ge()`          | `minimum`             |
+| `col_vals_lt()`          | `exclusiveMaximum`    |
+| `col_vals_le()`          | `maximum`             |
+| `col_vals_eq()`          | `const`               |
+| `col_vals_in_set()`      | `enum`                |
+| `col_vals_between()`     | `minimum` + `maximum` |
+| `col_vals_regex()`       | `pattern`             |
+| `col_vals_within_spec()` | `format`              |
 
-Steps with no JSON Schema equivalent (e.g., [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct), [tbl_match()](../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match), [col_vals_outside()](../reference/Validate.col_vals_outside.md#pointblank.Validate.col_vals_outside)) are silently skipped.
+Steps with no JSON Schema equivalent (e.g., `rows_distinct()`, `tbl_match()`, `col_vals_outside()`) are silently skipped.
 
 ## Examples
 

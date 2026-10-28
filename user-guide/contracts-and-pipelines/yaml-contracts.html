@@ -818,7 +818,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="even">
 <td><code>schema</code></td>
 <td>No</td>
-<td>Column name -&gt; data type mapping; triggers a <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a> check</td>
+<td>Column name -&gt; data type mapping; triggers a <code>col_schema_match()</code> check</td>
 </tr>
 <tr class="odd">
 <td><code>steps</code></td>
@@ -835,7 +835,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="step-syntax-in-yaml" class="level2">
 <h2 class="anchored" data-anchor-id="step-syntax-in-yaml">Step Syntax in YAML</h2>
-<p>Steps are the heart of a contract. They define the actual validation rules that will be checked against your data. In YAML, each step is a list item whose key is the name of a Pointblank validation method (like <a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt</a> or <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct</a>), and whose value is a dictionary of the arguments to pass to that method.</p>
+<p>Steps are the heart of a contract. They define the actual validation rules that will be checked against your data. In YAML, each step is a list item whose key is the name of a Pointblank validation method (like <code>col_vals_gt</code> or <code>rows_distinct</code>), and whose value is a dictionary of the arguments to pass to that method.</p>
 <p>This mapping is direct: the YAML step <code>col_vals_gt: {columns: amount, value: 0}</code> is exactly equivalent to calling <code>.col_vals_gt(columns="amount", value=0)</code> in Python. Here are examples covering the most common patterns:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">  # Step with keyword arguments</span></span>

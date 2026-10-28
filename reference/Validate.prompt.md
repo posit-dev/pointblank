@@ -4,7 +4,7 @@ Validate rows using AI/LLM-powered analysis.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13441-L13926)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13519-L14004)
 
 ``` python
 Validate.prompt(
@@ -26,7 +26,7 @@ Validate.prompt(
 
 The [prompt()](../reference/Validate.prompt.md#pointblank.Validate.prompt) validation method uses Large Language Models (LLMs) to validate rows of data based on natural language criteria. Similar to other Pointblank validation methods, this generates binary test results (pass/fail) that integrate seamlessly with the standard reporting framework.
 
-Like `col_vals_*()` methods, [prompt()](../reference/Validate.prompt.md#pointblank.Validate.prompt) evaluates data against specific criteria, but instead of using programmatic rules, it uses natural language prompts interpreted by an LLM. Like [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) and [rows_complete()](../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete), it operates at the row level and allows you to specify a subset of columns for evaluation using `columns_subset=`.
+Like `col_vals_*()` methods, [prompt()](../reference/Validate.prompt.md#pointblank.Validate.prompt) evaluates data against specific criteria, but instead of using programmatic rules, it uses natural language prompts interpreted by an LLM. Like `rows_distinct()` and `rows_complete()`, it operates at the row level and allows you to specify a subset of columns for evaluation using `columns_subset=`.
 
 The system automatically combines your validation criteria from the `prompt=` parameter with the necessary technical context, data formatting instructions, and response structure requirements. This is all so you only need to focus on describing your validation logic in plain language.
 

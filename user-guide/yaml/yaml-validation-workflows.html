@@ -1265,7 +1265,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>For more complex data loading, use the <code>python:</code> block syntax. This syntax can be used with several parameters throughout your YAML configuration:</p>
 <ul>
 <li><code>tbl</code>: For complex data source loading (as shown below)</li>
-<li><code>expr</code>: For custom validation expressions in <a href="../../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr</a></li>
+<li><code>expr</code>: For custom validation expressions in <code>col_vals_expr</code></li>
 <li><code>pre</code>: For data preprocessing before validation steps</li>
 <li><code>actions</code>: For callable action functions (<a href="../../reference/Validate.warning.html#pointblank.Validate.warning" class="gdls-link gdls-code">warning</a>, <a href="../../reference/Validate.error.html#pointblank.Validate.error" class="gdls-link gdls-code">error</a>, <a href="../../reference/Validate.critical.html#pointblank.Validate.critical" class="gdls-link gdls-code">critical</a>, and <code>default</code>)</li>
 </ul>
@@ -1442,7 +1442,7 @@ Q2 validation: True</code></pre>
 </section>
 <section id="schema-validations" class="level2">
 <h2 class="anchored" data-anchor-id="schema-validations">Schema Validations</h2>
-<p>Schema validation ensures your data has the expected structure and column types. The <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match</a> validation method uses a <code>schema</code> key that contains a <code>columns</code> list, where each item in the list can specify a column name alone or a column name with its expected data type.</p>
+<p>Schema validation ensures your data has the expected structure and column types. The <code>col_schema_match</code> validation method uses a <code>schema</code> key that contains a <code>columns</code> list, where each item in the list can specify a column name alone or a column name with its expected data type.</p>
 <p>Each <code>column</code> entry can be specified as:</p>
 <ul>
 <li><code>column_name</code>: column name as a scalar string (structure validation, no type checking)</li>
@@ -1550,7 +1550,7 @@ Q2 validation: True</code></pre>
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">        python</span><span class="kw">: </span><span class="ch">|</span></span>
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>          pb.load_dataset("expected_output", tbl_type="polars")</span>
 <span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Output matches expected results"</span></span></code></pre></div>
-<p>The <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> validation performs comprehensive comparison including column count, row count, schema, and data values. It supports cross-backend validation (e.g., comparing Polars vs.&nbsp;Pandas DataFrames).</p>
+<p>The <code>tbl_match()</code> validation performs comprehensive comparison including column count, row count, schema, and data values. It supports cross-backend validation (e.g., comparing Polars vs.&nbsp;Pandas DataFrames).</p>
 </section>
 <section id="ai-powered-validation" class="level2">
 <h2 class="anchored" data-anchor-id="ai-powered-validation">AI-Powered Validation</h2>
@@ -1697,7 +1697,7 @@ Q2 validation: True</code></pre>
 </section>
 <section id="complex-expressions" class="level2">
 <h2 class="anchored" data-anchor-id="complex-expressions">Complex Expressions</h2>
-<p>For advanced validation logic, use a <a href="../../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr</a> step with custom expressions:</p>
+<p>For advanced validation logic, use a <code>col_vals_expr</code> step with custom expressions:</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span><span class="at"> sales_data.csv</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">  # Custom business logic validation</span></span>
@@ -1776,12 +1776,12 @@ Q2 validation: True</code></pre>
 <section id="data-freshness-and-null-percentage" class="level2">
 <h2 class="anchored" data-anchor-id="data-freshness-and-null-percentage">Data Freshness and Null Percentage</h2>
 <p>Two additional validation methods support common data quality checks:</p>
-<p><strong><a href="../../reference/Validate.data_freshness.html#pointblank.Validate.data_freshness" class="gdls-link gdls-code">data_freshness</a></strong>: Validate that a date/datetime column has recent data:</p>
+<p><strong><code>data_freshness</code></strong>: Validate that a date/datetime column has recent data:</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">data_freshness</span><span class="kw">:</span></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> event_date</span></span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">freshness</span><span class="kw">:</span><span class="at"> </span><span class="st">"24h"</span></span></code></pre></div>
-<p><strong><a href="../../reference/Validate.col_pct_null.html#pointblank.Validate.col_pct_null" class="gdls-link gdls-code">col_pct_null</a></strong>: Validate that the percentage of null values is within bounds:</p>
+<p><strong><code>col_pct_null</code></strong>: Validate that the percentage of null values is within bounds:</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_pct_null</span><span class="kw">:</span></span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">email</span><span class="kw">,</span><span class="at"> phone</span><span class="kw">]</span></span>

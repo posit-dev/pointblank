@@ -21,7 +21,7 @@ Validate.col_avg_ge(
 
 The [col_avg_ge()](../reference/Validate.col_avg_ge.md#pointblank.Validate.col_avg_ge) validation method checks whether the average of values in a column is at least a specified `value=`. This is an aggregation-based validation where the entire column is reduced to a single average value that is then compared against the target. The comparison used in this function is `average(column) >= value`.
 
-Unlike row-level validations (e.g., [col_vals_gt()](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt)), this method treats the entire column as a single test unit. The validation either passes completely (if the aggregated value satisfies the comparison) or fails completely.
+Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as a single test unit. The validation either passes completely (if the aggregated value satisfies the comparison) or fails completely.
 
 ## Parameters
 

@@ -311,6 +311,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.add_steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.add_steps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Pipeline.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Pipeline</span></a>
   </div>
@@ -1678,7 +1684,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="doc-text">
 <p>Many of the validation methods (i.e., <code>col_vals_*()</code> methods) in Pointblank have a <code>value=</code> argument. These validations are comparisons between column values and a literal value, or, between column values and adjacent values in another column. The <a href="../reference/col.html#pointblank.col" class="gdls-link gdls-code">col()</a> helper function is used to specify that it is a column being referenced, not a literal value.</p>
 <p>The <a href="../reference/col.html#pointblank.col" class="gdls-link gdls-code">col()</a> doesn’t check that the column exists in the input table. It acts to signal that the value being compared is a column value. During validation (i.e., when <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> is called), Pointblank will then check that the column exists in the input table.</p>
-<p>For creating expressions to use with the <a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link gdls-code">conjointly()</a> validation method, use the <a href="../reference/expr_col.html#pointblank.expr_col" class="gdls-link"><code>expr_col()</code></a> function instead.</p>
+<p>For creating expressions to use with the <code>conjointly()</code> validation method, use the <a href="../reference/expr_col.html#pointblank.expr_col" class="gdls-link"><code>expr_col()</code></a> function instead.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -2974,7 +2980,7 @@ A column object or expression representing the column reference.
 <section id="see-also" class="level2 doc-see-also">
 <h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
 <dl>
-<dt><code>Create</code> a column expression for use in <a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link gdls-code">conjointly()</a> validation with the</dt>
+<dt><code>Create</code> a column expression for use in <code>conjointly()</code> validation with the</dt>
 <dd>
 
 </dd>

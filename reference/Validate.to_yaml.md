@@ -4,7 +4,7 @@ Serialize this validation plan to a [yaml_interrogate()](../reference/yaml_inter
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19495-L19610)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19573-L19688)
 
 ``` python
 Validate.to_yaml(path=None)
@@ -24,7 +24,7 @@ The validation plan as a YAML string. The `tbl` field is set from `tbl_name` whe
 
 ## Notes On Fidelity
 
-As with [`to_code()`](../reference/Validate.to_code.md#pointblank.Validate.to_code), steps carrying non-serializable Python objects (`pre=` callables, `actions=`, callable `active=`, and the expressions of [col_vals_expr()](../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr)/[conjointly()](../reference/Validate.conjointly.md#pointblank.Validate.conjointly)/[specially()](../reference/Validate.specially.md#pointblank.Validate.specially)) cannot be represented in YAML; a placeholder is emitted and a warning is raised.
+As with [`to_code()`](../reference/Validate.to_code.md#pointblank.Validate.to_code), steps carrying non-serializable Python objects (`pre=` callables, `actions=`, callable `active=`, and the expressions of `col_vals_expr()`/`conjointly()`/[specially()](../reference/Validate.specially.md#pointblank.Validate.specially)) cannot be represented in YAML; a placeholder is emitted and a warning is raised.
 
 ## Examples
 

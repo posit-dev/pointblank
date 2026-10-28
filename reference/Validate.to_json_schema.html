@@ -308,6 +308,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Validate.add_steps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validate.add_steps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Pipeline.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Pipeline</span></a>
   </div>
@@ -1664,7 +1670,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19612-L19699" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19690-L19777" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">to_json_schema</span>(<span class="va">path</span><span class="op">=</span><span class="cn">None</span>)</span></code></pre></div>
@@ -1707,48 +1713,48 @@ The JSON Schema document as a dictionary. This is a valid JSON Schema that can b
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a></td>
+<td><code>col_vals_not_null()</code></td>
 <td><code>required</code></td>
 </tr>
 <tr class="even">
-<td><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a></td>
+<td><code>col_vals_gt()</code></td>
 <td><code>exclusiveMinimum</code></td>
 </tr>
 <tr class="odd">
-<td><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link gdls-code">col_vals_ge()</a></td>
+<td><code>col_vals_ge()</code></td>
 <td><code>minimum</code></td>
 </tr>
 <tr class="even">
-<td><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link gdls-code">col_vals_lt()</a></td>
+<td><code>col_vals_lt()</code></td>
 <td><code>exclusiveMaximum</code></td>
 </tr>
 <tr class="odd">
-<td><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link gdls-code">col_vals_le()</a></td>
+<td><code>col_vals_le()</code></td>
 <td><code>maximum</code></td>
 </tr>
 <tr class="even">
-<td><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a></td>
+<td><code>col_vals_eq()</code></td>
 <td><code>const</code></td>
 </tr>
 <tr class="odd">
-<td><a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a></td>
+<td><code>col_vals_in_set()</code></td>
 <td><code>enum</code></td>
 </tr>
 <tr class="even">
-<td><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link gdls-code">col_vals_between()</a></td>
+<td><code>col_vals_between()</code></td>
 <td><code>minimum</code> + <code>maximum</code></td>
 </tr>
 <tr class="odd">
-<td><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a></td>
+<td><code>col_vals_regex()</code></td>
 <td><code>pattern</code></td>
 </tr>
 <tr class="even">
-<td><a href="../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link gdls-code">col_vals_within_spec()</a></td>
+<td><code>col_vals_within_spec()</code></td>
 <td><code>format</code></td>
 </tr>
 </tbody>
 </table>
-<p>Steps with no JSON Schema equivalent (e.g., <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a>, <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a>, <a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link gdls-code">col_vals_outside()</a>) are silently skipped.</p>
+<p>Steps with no JSON Schema equivalent (e.g., <code>rows_distinct()</code>, <code>tbl_match()</code>, <code>col_vals_outside()</code>) are silently skipped.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>

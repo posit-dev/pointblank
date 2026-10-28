@@ -48,7 +48,7 @@ result.to_validate(data=users).interrogate()
 
 [TABLE]
 
-That's it. The JSON Schema `minimum`, `maximum`, `enum`, `format`, and `required` keywords were automatically translated into the appropriate Pointblank validation steps. Each keyword becomes a dedicated validation check: `minimum` becomes [col_vals_ge()](../../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge), `maximum` becomes [col_vals_le()](../../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le), `enum` becomes [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set), and so on. The schema's `required` array generates [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) steps for each listed field, ensuring that null values are caught at validation time.
+That's it. The JSON Schema `minimum`, `maximum`, `enum`, `format`, and `required` keywords were automatically translated into the appropriate Pointblank validation steps. Each keyword becomes a dedicated validation check: `minimum` becomes `col_vals_ge()`, `maximum` becomes `col_vals_le()`, `enum` becomes `col_vals_in_set()`, and so on. The schema's `required` array generates `col_vals_not_null()` steps for each listed field, ensuring that null values are caught at validation time.
 
 ## How It Works
 
@@ -161,17 +161,17 @@ pb.list_adapters()
 | JSON Schema Keyword | Pointblank Method |
 |----|----|
 | `type: "integer"` / `"number"` / `"string"` / `"boolean"` | Schema dtype check |
-| `minimum` | [col_vals_ge()](../../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge) |
-| `maximum` | [col_vals_le()](../../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le) |
-| `exclusiveMinimum` | [col_vals_gt()](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) |
-| `exclusiveMaximum` | [col_vals_lt()](../../reference/Validate.col_vals_lt.md#pointblank.Validate.col_vals_lt) |
-| `enum` | [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) |
-| `pattern` | [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) |
+| `minimum` | `col_vals_ge()` |
+| `maximum` | `col_vals_le()` |
+| `exclusiveMinimum` | `col_vals_gt()` |
+| `exclusiveMaximum` | `col_vals_lt()` |
+| `enum` | `col_vals_in_set()` |
+| `pattern` | `col_vals_regex()` |
 | `format: "email"` | `col_vals_within_spec(spec="email")` |
 | `format: "uri"` | `col_vals_within_spec(spec="url")` |
 | `format: "ipv4"` / `"ipv6"` | `col_vals_within_spec(spec="ipv4"/"ipv6")` |
-| `const` | [col_vals_eq()](../../reference/Validate.col_vals_eq.md#pointblank.Validate.col_vals_eq) |
-| `required` (array of field names) | [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) |
+| `const` | `col_vals_eq()` |
+| `required` (array of field names) | `col_vals_not_null()` |
 
 **Importing from a file:**
 
@@ -211,7 +211,7 @@ for c in result.constraints:
       col_vals_not_null({'columns': 'category'})
       col_vals_in_set({'columns': 'category', 'set': ['electronics', 'clothing', 'food', 'other']})
 
-Each constraint from the JSON Schema has been translated into the corresponding Pointblank method call. The `pattern` keyword on the `sku` field became a [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) step, `exclusiveMinimum` became [col_vals_gt()](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) (note the strict inequality), and the three `required` fields each generated a [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) step. You can iterate over `result.constraints` like this to verify the translation before running any validation.
+Each constraint from the JSON Schema has been translated into the corresponding Pointblank method call. The `pattern` keyword on the `sku` field became a `col_vals_regex()` step, `exclusiveMinimum` became `col_vals_gt()` (note the strict inequality), and the three `required` fields each generated a `col_vals_not_null()` step. You can iterate over `result.constraints` like this to verify the translation before running any validation.
 
 ### Frictionless Data Table Schema
 
@@ -222,12 +222,12 @@ Each constraint from the JSON Schema has been translated into the corresponding 
 | Frictionless Feature | Pointblank Method |
 |----|----|
 | `type` | Schema dtype check |
-| `constraints.required: true` | [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) |
-| `constraints.unique: true` | [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) |
-| `constraints.minimum` / `maximum` | [col_vals_ge()](../../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge) / [col_vals_le()](../../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le) |
-| `constraints.enum` | [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) |
-| `constraints.pattern` | [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) |
-| `primaryKey` | [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) + [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) |
+| `constraints.required: true` | `col_vals_not_null()` |
+| `constraints.unique: true` | `rows_distinct()` |
+| `constraints.minimum` / `maximum` | `col_vals_ge()` / `col_vals_le()` |
+| `constraints.enum` | `col_vals_in_set()` |
+| `constraints.pattern` | `col_vals_regex()` |
+| `primaryKey` | `col_vals_not_null()` + `rows_distinct()` |
 | `foreignKeys` | ⚠ Warning (cross-table not yet supported) |
 
 **Importing a standalone Table Schema:**
@@ -303,13 +303,13 @@ The `resource=` parameter accepts either a string (the resource name) or an inte
 
 **Constraint mapping:**
 
-| dbt Feature | Pointblank Method |
-|----|----|
-| `data_type` | Schema dtype check |
-| `not_null` test | [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) |
-| `unique` test | [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) |
-| `accepted_values` test | [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) |
-| `relationships` test | Warning (cross-table not yet supported) |
+| dbt Feature            | Pointblank Method                       |
+|------------------------|-----------------------------------------|
+| `data_type`            | Schema dtype check                      |
+| `not_null` test        | `col_vals_not_null()`                   |
+| `unique` test          | `rows_distinct()`                       |
+| `accepted_values` test | `col_vals_in_set()`                     |
+| `relationships` test   | Warning (cross-table not yet supported) |
 
 Both the newer `data_tests` key (dbt v1.8+) and the legacy `tests` key are supported.
 
@@ -397,12 +397,12 @@ The [Open Data Contract Standard](https://github.com/bitol-io/open-data-contract
 | ODCS Feature | Pointblank Method |
 |----|----|
 | `logicalType` | Schema dtype check |
-| `isNullable: false` | [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) |
-| `isUnique: true` | [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) |
-| `isPrimaryKey: true` | [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) + [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) |
-| `enum` / [values](../../reference/MetadataPackage.md#pointblank.MetadataPackage.values) | [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) |
-| `pattern` | [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) |
-| `minimum` / `maximum` | [col_vals_ge()](../../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge) / [col_vals_le()](../../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le) |
+| `isNullable: false` | `col_vals_not_null()` |
+| `isUnique: true` | `rows_distinct()` |
+| `isPrimaryKey: true` | `col_vals_not_null()` + `rows_distinct()` |
+| `enum` / [values](../../reference/MetadataPackage.md#pointblank.MetadataPackage.values) | `col_vals_in_set()` |
+| `pattern` | `col_vals_regex()` |
+| `minimum` / `maximum` | `col_vals_ge()` / `col_vals_le()` |
 | `minLength` / `maxLength` | Warning (no direct equivalent) |
 | Custom checks / SodaCL | Warning (no automatic mapping) |
 

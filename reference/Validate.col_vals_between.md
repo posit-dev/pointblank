@@ -4,7 +4,7 @@ Do column data lie between two specified values or data in other columns?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L8267-L8602)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L8345-L8680)
 
 ``` python
 Validate.col_vals_between(
@@ -24,7 +24,7 @@ Validate.col_vals_between(
 )
 ```
 
-The [col_vals_between()](../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between) validation method checks whether column values in a table fall within a range. The range is specified with three arguments: `left=`, `right=`, and `inclusive=`. The `left=` and `right=` values specify the lower and upper bounds. These bounds can be specified as literal values or as column names provided within [`col()`](../reference/col.md#pointblank.col). The validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+The `col_vals_between()` validation method checks whether column values in a table fall within a range. The range is specified with three arguments: `left=`, `right=`, and `inclusive=`. The `left=` and `right=` values specify the lower and upper bounds. These bounds can be specified as literal values or as column names provided within [`col()`](../reference/col.md#pointblank.col). The validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
 
 ## Parameters
 
@@ -170,7 +170,7 @@ validation
 
 [TABLE]
 
-Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using [col_vals_between()](../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between). All test units passed, and there are no failing test units.
+Printing the `validation` object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using `col_vals_between()`. All test units passed, and there are no failing test units.
 
 Aside from checking a column against two literal values representing the lower and upper bounds, we can also provide column names to the `left=` and/or `right=` arguments (by using the helper function [`col()`](../reference/col.md#pointblank.col). In this way, we can perform three additional comparison types:
 
@@ -178,7 +178,7 @@ Aside from checking a column against two literal values representing the lower a
 2.  `left=literal`, `right=column`
 3.  `left=column`, `right=literal`
 
-For the next example, we'll use [col_vals_between()](../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between) to check whether the values in column `b` are between than corresponding values in columns `a` (lower bound) and `c` (upper bound).
+For the next example, we'll use `col_vals_between()` to check whether the values in column `b` are between than corresponding values in columns `a` (lower bound) and `c` (upper bound).
 
 ``` python
 validation = (

@@ -660,12 +660,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#the-problem" id="toc-the-problem" class="nav-link active" data-scroll-target="#the-problem">The Problem</a></li>
   <li><a href="#building-step-libraries-with-steps" id="toc-building-step-libraries-with-steps" class="nav-link" data-scroll-target="#building-step-libraries-with-steps">Building Step Libraries with Steps</a></li>
-  <li><a href="#composing-plans-with-add_steps" id="toc-composing-plans-with-add_steps" class="nav-link" data-scroll-target="#composing-plans-with-add_steps">Composing Plans with <code>add_steps()</code></a>
+  <li><a href="#composing-plans-with-add_steps" id="toc-composing-plans-with-add_steps" class="nav-link" data-scroll-target="#composing-plans-with-add_steps">Composing Plans with add_steps()</a>
   <ul class="collapse">
   <li><a href="#passing-multiple-sources" id="toc-passing-multiple-sources" class="nav-link" data-scroll-target="#passing-multiple-sources">Passing Multiple Sources</a></li>
   </ul></li>
   <li><a href="#selectors-and-multi-column-expansion" id="toc-selectors-and-multi-column-expansion" class="nav-link" data-scroll-target="#selectors-and-multi-column-expansion">Selectors and Multi-Column Expansion</a></li>
-  <li><a href="#overrides-in-add_steps" id="toc-overrides-in-add_steps" class="nav-link" data-scroll-target="#overrides-in-add_steps">Overrides in <code>add_steps()</code></a>
+  <li><a href="#overrides-in-add_steps" id="toc-overrides-in-add_steps" class="nav-link" data-scroll-target="#overrides-in-add_steps">Overrides in add_steps()</a>
   <ul class="collapse">
   <li><a href="#conditional-inclusion-with-active" id="toc-conditional-inclusion-with-active" class="nav-link" data-scroll-target="#conditional-inclusion-with-active">Conditional Inclusion with <code>active=</code></a></li>
   <li><a href="#threshold-override-with-thresholds" id="toc-threshold-override-with-thresholds" class="nav-link" data-scroll-target="#threshold-override-with-thresholds">Threshold Override with <code>thresholds=</code></a></li>
@@ -706,7 +706,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong><a href="../../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">Step</a></strong> (singular): a declarative data object used inside <a href="../../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> definitions</li>
 <li><strong><a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a></strong> (plural): a fluent builder that collects validation steps for use in any <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> plan</li>
 </ul>
-<p>This page focuses on <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> and the <code>Validate.add_steps()</code> method, which together let you define portable step libraries and compose them into readable, top-to-bottom validation plans.</p>
+<p>This page focuses on <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> and the <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">Validate.add_steps()</a> method, which together let you define portable step libraries and compose them into readable, top-to-bottom validation plans.</p>
 <section id="the-problem" class="level1">
 <h1>The Problem</h1>
 <p>Without composable steps, reusing validation logic means writing helper functions:</p>
@@ -726,7 +726,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="building-step-libraries-with-steps" class="level1">
 <h1>Building Step Libraries with <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a></h1>
-<p>The <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> class lets you record validation steps without binding them to data, thresholds, or any other <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> configuration. You use the same method names and parameters you already know from <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> (<a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a>, <a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a>, <a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a>, etc.), but instead of running the checks, <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> stores them for later use.</p>
+<p>The <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> class lets you record validation steps without binding them to data, thresholds, or any other <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> configuration. You use the same method names and parameters you already know from <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> (<code>col_vals_gt()</code>, <code>col_vals_not_null()</code>, <code>col_vals_regex()</code>, etc.), but instead of running the checks, <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> stores them for later use.</p>
 <p>The key benefit is <strong>portability</strong>: a <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object can live in a shared Python module and be imported into any number of validation pipelines. The step definitions stay the same and only the data and configuration change at the point of use.</p>
 <div id="41c05e22" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
@@ -767,8 +767,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>In a Jupyter notebook or other rich-display environment, <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> renders as an HTML summary table.</p>
 </section>
 <section id="composing-plans-with-add_steps" class="level1">
-<h1>Composing Plans with <code>add_steps()</code></h1>
-<p>The <code>add_steps()</code> method on <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> accepts one or more <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> objects and appends their recorded steps to the validation plan:</p>
+<h1>Composing Plans with <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a></h1>
+<p>The <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a> method on <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> accepts one or more <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> objects and appends their recorded steps to the validation plan:</p>
 <div id="2bb3b8b6" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>orders <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    {</span>
@@ -1113,8 +1113,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Because <code>add_steps()</code> returns the <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, it chains naturally and reads top-to-bottom.</p>
-<p>You can also mix <code>add_steps()</code> calls with regular validation method calls. This is useful when a pipeline needs a shared library of checks plus a few ad-hoc rules specific to that dataset:</p>
+<p>Because <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a> returns the <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, it chains naturally and reads top-to-bottom.</p>
+<p>You can also mix <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a> calls with regular validation method calls. This is useful when a pipeline needs a shared library of checks plus a few ad-hoc rules specific to that dataset:</p>
 <div id="e172ca5b" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>orders, label<span class="op">=</span><span class="st">"Orders (extended)"</span>)</span>
@@ -1413,7 +1413,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="passing-multiple-sources" class="level2">
 <h2 class="anchored" data-anchor-id="passing-multiple-sources">Passing Multiple Sources</h2>
-<p>The <code>add_steps()</code> method accepts any number of positional arguments. Each can be a <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object or even a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object (more on that <a href="#importing-steps-from-a-validate-object">below</a>). All steps are appended in order:</p>
+<p>The <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a> method accepts any number of positional arguments. Each can be a <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object or even a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object (more on that <a href="#importing-steps-from-a-validate-object">below</a>). All steps are appended in order:</p>
 <div id="67392c06" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>all_checks <span class="op">=</span> (</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>orders)</span>
@@ -1429,7 +1429,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="selectors-and-multi-column-expansion" class="level1">
 <h1>Selectors and Multi-Column Expansion</h1>
-<p>One of the strengths of <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> is that step definitions are not locked to specific columns at definition time. When a step uses a column selector like <a href="../../reference/starts_with.html#pointblank.starts_with" class="gdls-link gdls-code">starts_with()</a> or a multi-column list, the columns are resolved when <code>add_steps()</code> applies them to the <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> plan, not when the <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object is created. This means the same step library can validate tables with different schemas as long as they follow a common naming convention.</p>
+<p>One of the strengths of <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> is that step definitions are not locked to specific columns at definition time. When a step uses a column selector like <a href="../../reference/starts_with.html#pointblank.starts_with" class="gdls-link gdls-code">starts_with()</a> or a multi-column list, the columns are resolved when <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a> applies them to the <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> plan, not when the <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object is created. This means the same step library can validate tables with different schemas as long as they follow a common naming convention.</p>
 <div id="6911b00c" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>products <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    {</span>
@@ -1694,8 +1694,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The selector <code>starts_with("amt_")</code> is recorded verbatim in the <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object and resolved when the steps are applied to the <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> plan. This means the same <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object adapts to tables with different numbers of matching columns.</p>
 </section>
 <section id="overrides-in-add_steps" class="level1">
-<h1>Overrides in <code>add_steps()</code></h1>
-<p>A shared step library represents a general-purpose set of checks, but individual pipelines often need to tweak how those checks are applied: tighter thresholds in production, certain checks disabled during development, or column names that differ across teams. Rather than creating a separate <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object for every variation, <code>add_steps()</code> supports keyword arguments that modify the imported steps at the point of use, without changing the original <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object.</p>
+<h1>Overrides in <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a></h1>
+<p>A shared step library represents a general-purpose set of checks, but individual pipelines often need to tweak how those checks are applied: tighter thresholds in production, certain checks disabled during development, or column names that differ across teams. Rather than creating a separate <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object for every variation, <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a> supports keyword arguments that modify the imported steps at the point of use, without changing the original <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object.</p>
 <section id="conditional-inclusion-with-active" class="level2">
 <h2 class="anchored" data-anchor-id="conditional-inclusion-with-active">Conditional Inclusion with <code>active=</code></h2>
 <p>Add steps only when a condition is met, keeping the chain flat instead of wrapping in <code>if</code> blocks:</p>
@@ -2963,7 +2963,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="importing-steps-from-a-validate-object" class="level1">
 <h1>Importing Steps from a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> Object</h1>
-<p>You don’t always start from a <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object. Sometimes you already have a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with steps defined on it, perhaps loaded from a YAML file with <code>Validate.from_yaml()</code>, generated from a prompt with <a href="../../reference/Validate.from_prompt.html#pointblank.Validate.from_prompt" class="gdls-link gdls-code">Validate.from_prompt()</a>, or simply built up in another part of your codebase. Rather than re-expressing those steps from scratch, you can pass the <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object directly to <code>add_steps()</code> and its step definitions will be extracted and applied:</p>
+<p>You don’t always start from a <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object. Sometimes you already have a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with steps defined on it, perhaps loaded from a YAML file with <code>Validate.from_yaml()</code>, generated from a prompt with <a href="../../reference/Validate.from_prompt.html#pointblank.Validate.from_prompt" class="gdls-link gdls-code">Validate.from_prompt()</a>, or simply built up in another part of your codebase. Rather than re-expressing those steps from scratch, you can pass the <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object directly to <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a> and its step definitions will be extracted and applied:</p>
 <div id="61be54db" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>existing_plan <span class="op">=</span> (</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>orders)</span>
@@ -3222,7 +3222,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>When a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object is passed as a step source, <code>add_steps()</code> extracts its step definitions and applies them. The data, thresholds, and metadata from the source <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> are <em>not</em> carried over, only the step recipes.</p>
+<p>When a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object is passed as a step source, <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a> extracts its step definitions and applies them. The data, thresholds, and metadata from the source <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> are <em>not</em> carried over, only the step recipes.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -3262,7 +3262,7 @@ Note
 <tr class="odd">
 <td><strong>Primary use</strong></td>
 <td>Inside <code>Contract(steps=[...])</code></td>
-<td>With <code>Validate.add_steps()</code></td>
+<td>With <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">Validate.add_steps()</a></td>
 </tr>
 <tr class="even">
 <td><strong>API style</strong></td>
@@ -3765,7 +3765,7 @@ Note
 </section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>
-<p>The <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link"><code>Steps</code></a> class and <code>Validate.add_steps()</code> method bring composability to Pointblank’s validation workflows. By separating step <em>definitions</em> from step <em>execution</em>, you can build reusable rule libraries that stay portable across datasets, teams, and environments. The override parameters (<code>active=</code>, <code>thresholds=</code>, <code>exclude=</code>, and <code>columns_map=</code>) give each pipeline the flexibility to tailor shared checks without forking the underlying library.</p>
+<p>The <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link"><code>Steps</code></a> class and <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link"><code>Validate.add_steps()</code></a> method bring composability to Pointblank’s validation workflows. By separating step <em>definitions</em> from step <em>execution</em>, you can build reusable rule libraries that stay portable across datasets, teams, and environments. The override parameters (<code>active=</code>, <code>thresholds=</code>, <code>exclude=</code>, and <code>columns_map=</code>) give each pipeline the flexibility to tailor shared checks without forking the underlying library.</p>
 <p>For a complementary approach to reusable validation rules, see <a href="../../user-guide/contracts-and-pipelines/contracts.html">Data Contracts</a>, which define expectations as declarative, serializable specifications using the <a href="../../reference/Step.html#pointblank.Step" class="gdls-link"><code>Step</code></a> class. Both approaches produce the same validation steps at interrogation time. Choose <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> for fluent, code-first composition and <a href="../../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> for declarative, YAML-friendly definitions.</p>
 
 
