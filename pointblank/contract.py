@@ -17,32 +17,155 @@ __all__ = ["Step", "Contract"]
 
 @dataclass
 class Step:
-    """A single validation step in a Contract, defined declaratively.
+    """A single validation step, stored as data.
 
-    This is the declarative equivalent of calling a validation method on Validate.
-    Steps are stored as data and compiled into Validate method calls at enforcement time.
+    A `Step` records one validation rule: the name of a [`Validate`](`pointblank.Validate`)
+    validation method and the keyword arguments to call it with. `pb.Step("col_vals_gt",
+    columns="amount", value=0)` describes the same check as
+    `Validate.col_vals_gt(columns="amount", value=0)`, but nothing runs when the step is created.
+    The step is a small, inert value that's applied later, when it's compiled into a validation
+    for a specific table.
+
+    Holding a rule as data rather than as a method call makes it possible to keep rules apart from
+    the code that runs them. Steps can be collected into a [`Contract`](`pointblank.Contract`),
+    written to YAML or JSON and read back, compared with each other, or built from configuration
+    files and external schema formats. The steps in a contract imported with
+    [`import_contract()`](`pointblank.import_contract`), for example, are `Step` objects
+    generated from the source format.
+
+    The step's parts are available as the `method` attribute (the method name) and the `kwargs`
+    attribute (a dictionary of arguments). Two steps are equal when both their method names and
+    arguments are equal.
 
     Parameters
     ----------
     method
-        The validation method name (e.g., "col_vals_gt", "rows_distinct").
+        The name of the validation method to call, such as `"col_vals_gt"` or `"rows_distinct"`.
+        A `Step` doesn't check the name itself. A [`Contract`](`pointblank.Contract`) accepts only
+        its supported methods (listed in its *Supported Step Methods* section) and raises a
+        `ValueError` for any other name. Steps used through [`Steps`](`pointblank.Steps`) and
+        [`Validate.add_steps()`](`pointblank.Validate.add_steps`) can name any validation method.
     **kwargs
-        All parameters that would be passed to the corresponding Validate method.
+        The arguments for the validation method, given by keyword (e.g., `columns="amount"`,
+        `value=0`). They're stored as given and passed to the method when the step is compiled, so
+        a misspelled or missing argument raises a `TypeError` at that point rather than when the
+        step is created. Positional arguments aren't supported.
+
+    Returns
+    -------
+    Step
+        A `Step` object.
+
+    Writing Steps That Can Be Saved
+    -------------------------------
+    A contract's steps are written to YAML as a mapping from the method name to its arguments, so
+    a step can be saved and loaded back only if its arguments are plain data: strings, numbers,
+    booleans, lists, and dictionaries. Other objects are written with Python-specific YAML tags
+    that [`Contract.from_yaml()`](`pointblank.Contract.from_yaml`) won't read. Keep these in mind
+    for steps you plan to save:
+
+    - name columns with strings or lists of strings, rather than with selectors like
+    `pb.starts_with()` or `pb.col()`
+    - give step-level thresholds as a dictionary (e.g., `thresholds={"warning": 1, "error": 0.1}`)
+    or a single number, rather than as a [`Thresholds`](`pointblank.Thresholds`) object
+    - steps that take a Polars or other expression, such as `col_vals_expr`, can only be used in
+    contracts kept in Python
+
+    All of these work when the step is used directly in Python.
+
+    Steps and the Steps Class
+    -------------------------
+    [`Steps`](`pointblank.Steps`) is a fluent builder for lists of `Step` objects. It has a
+    method for each validation method (`pb.Steps().col_vals_gt(columns="amount", value=0)`), so
+    you get the real method signatures, with argument names and defaults, while writing the
+    steps. Use `Step` when the method name and arguments are data (when they come from a
+    configuration file, for example) or when building a contract's `steps=` list. A list of
+    `Step` objects can also be turned into a `Steps` object with `pb.Steps(steps=...)` and added
+    to any validation with [`Validate.add_steps()`](`pointblank.Validate.add_steps`).
 
     Examples
     --------
-    ```python
+    ```{python}
+    #| echo: false
+    #| output: false
+    import pointblank as pb
+    pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+    ```
+
+    Let's create a step that checks that ages fall between 0 and 120. Printing it shows the method
+    name and the stored arguments.
+
+    ```{python}
     import pointblank as pb
 
-    # A step that checks column values are greater than 0
-    step = pb.Step("col_vals_gt", columns="amount", value=0)
+    age_step = pb.Step("col_vals_between", columns="age", left=0, right=120)
 
-    # A step that checks rows are distinct by a key column
-    step = pb.Step("rows_distinct", columns_subset=["order_id"])
-
-    # A step that checks a regex pattern
-    step = pb.Step("col_vals_regex", columns="email", pattern=r"^[^@]+@[^@]+\\.[^@]+$")
+    age_step
     ```
+
+    The two parts of the step are available as attributes:
+
+    ```{python}
+    print(age_step.method)
+    print(age_step.kwargs)
+    ```
+
+    Steps are normally used in groups. Here are three more rules for a table of patients: each
+    patient ID must appear only once, IDs must follow a pattern, and the `visit` column must be
+    present. Note that `rows_distinct` takes `columns_subset=` rather than `columns=`, because
+    each step's arguments are exactly those of its `Validate` method.
+
+    ```{python}
+    patient_steps = [
+        pb.Step("rows_distinct", columns_subset="patient_id"),
+        pb.Step("col_vals_regex", columns="patient_id", pattern=r"^PT-\\d{3}$"),
+        pb.Step("col_exists", columns="visit"),
+        age_step,
+    ]
+    ```
+
+    Placing the steps in a [`Contract`](`pointblank.Contract`) lets us apply them to a table. The
+    steps run in the order they're listed.
+
+    ```{python}
+    import polars as pl
+
+    patients = pl.DataFrame(
+        {
+            "patient_id": ["PT-001", "PT-002", "PT-003", "PT-03"],
+            "age": [34, 51, 130, 28],
+            "visit": [1, 1, 2, 1],
+        }
+    )
+
+    patients_contract = pb.Contract(name="patients", steps=patient_steps)
+
+    patients_contract.validate(patients)
+    ```
+
+    The ID check flags `"PT-03"`, which is missing a digit, and the age check flags the value
+    `130`. The other two steps pass.
+
+    The same steps can be added to an ordinary validation by wrapping them in a
+    [`Steps`](`pointblank.Steps`) object. That route also accepts validation methods that
+    contracts don't support, such as
+    [`col_vals_str_len()`](`pointblank.Validate.col_vals_str_len`):
+
+    ```{python}
+    id_length_step = pb.Step("col_vals_str_len", columns="patient_id", min_val=6, max_val=6)
+
+    (
+        pb.Validate(data=patients, tbl_name="patients")
+        .add_steps(pb.Steps(steps=patient_steps + [id_length_step]))
+        .interrogate()
+    )
+    ```
+
+    See Also
+    --------
+    Contract : Collect steps, a schema, and metadata into a reusable contract.
+    Steps : Build lists of steps with the signatures of the validation methods.
+    Validate.add_steps : Add steps from a `Steps` object to a validation.
     """
 
     method: str
@@ -64,12 +187,39 @@ class Step:
         return self.method == other.method and self.kwargs == other.kwargs
 
     def to_dict(self) -> dict[str, Any]:
-        """Serialize the Step to a dictionary for YAML/JSON export.
+        """Convert the step to a dictionary.
+
+        The dictionary has a single key, the method name, whose value is a dictionary of the
+        step's arguments. A step with no arguments maps to an empty dictionary. This is the form
+        each step takes in [`Contract.to_dict()`](`pointblank.Contract.to_dict`) and in contract
+        YAML files, and [`from_dict()`](`pointblank.Step.from_dict`) reverses it.
+
+        The arguments are copied as they are, so the result is ready for JSON or YAML only if the
+        arguments are plain data (see the *Writing Steps That Can Be Saved* section of
+        [`Step`](`pointblank.Step`)).
 
         Returns
         -------
-        dict
-            A dictionary representation of this step.
+        dict[str, dict[str, Any]]
+            A single-key dictionary mapping the method name to its arguments.
+
+        Examples
+        --------
+        Let's convert a step that checks a value range.
+
+        ```{python}
+        import pointblank as pb
+
+        step = pb.Step("col_vals_between", columns="age", left=0, right=120)
+
+        step.to_dict()
+        ```
+
+        A step without arguments gives an empty dictionary of arguments:
+
+        ```{python}
+        pb.Step("rows_complete").to_dict()
+        ```
         """
         if self.kwargs:
             return {self.method: dict(self.kwargs)}
@@ -77,17 +227,68 @@ class Step:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Step:
-        """Construct a Step from a dictionary (e.g., parsed from YAML).
+        """Create a step from a dictionary.
+
+        This is the reverse of [`to_dict()`](`pointblank.Step.to_dict`). It's useful when step
+        definitions come from parsed YAML or JSON, a configuration system, or code that generates
+        rules. The dictionary must have exactly one key, the method name, whose value is a
+        dictionary of arguments. The value can also be `None` (an empty entry in YAML, such as
+        `rows_complete:`), which means the step has no arguments.
+
+        Neither the method name nor the arguments are checked here. As with steps created
+        directly, an unsupported method is rejected when the step is put into a
+        [`Contract`](`pointblank.Contract`), and argument mistakes surface when the step is
+        compiled into a validation.
 
         Parameters
         ----------
         data
-            A dictionary with a single key (the method name) mapping to its kwargs dict.
+            A single-key dictionary mapping a validation method name to a dictionary of its
+            arguments (or to `None`).
 
         Returns
         -------
         Step
-            A new Step instance.
+            A new `Step` object.
+
+        Raises
+        ------
+        ValueError
+            If the dictionary doesn't have exactly one key.
+        TypeError
+            If the value for the method name is neither a dictionary nor `None`.
+
+        Examples
+        --------
+        Let's parse a few step definitions written in YAML, as they might appear in a configuration
+        file, and turn each one into a `Step`.
+
+        ```{python}
+        import pointblank as pb
+        import yaml
+
+        steps_yaml = '''
+        - col_vals_not_null:
+            columns: [order_id, amount]
+        - col_vals_gt:
+            columns: amount
+            value: 0
+        - rows_complete:
+        '''
+
+        steps = [pb.Step.from_dict(d) for d in yaml.safe_load(steps_yaml)]
+
+        steps
+        ```
+
+        The `rows_complete:` entry has no value, so its step has no arguments. A step converted
+        with `to_dict()` and back is equal to the original:
+
+        ```{python}
+        step = pb.Step("col_vals_in_set", columns="status", set=["open", "closed"])
+
+        pb.Step.from_dict(step.to_dict()) == step
+        ```
         """
         if len(data) != 1:
             raise ValueError(
@@ -251,7 +452,8 @@ class Contract:
     - column-level checks: `col_exists` and `col_pct_null`
     - table-level checks: `col_schema_match`, `col_count_match`, `row_count_match`,
     `rows_distinct`, and `rows_complete`
-    - multi-condition checks: `conjointly`
+    - multi-condition checks: `conjointly` (accepted, but not usable yet: its expressions are
+    positional arguments, and a `Step` only stores keyword arguments)
 
     Each takes the same arguments as the [`Validate`](`pointblank.Validate`) method of the same
     name. A step that names any other method is rejected with a `ValueError` when the contract is
@@ -268,9 +470,12 @@ class Contract:
     [`from_dict()`](`pointblank.Contract.from_dict`) work with dictionaries (useful for JSON or a
     configuration system). The schema is stored as a mapping of column names to type strings, the
     thresholds as a mapping of levels to values, and each step as a single-key mapping from method
-    name to arguments. Arguments that aren't plain data, such as the expressions passed to
-    `col_vals_expr` or the functions passed to `conjointly`, can't be written to YAML, so keep
-    contracts that use them in Python.
+    name to arguments. For a contract to round-trip through YAML, step arguments must be plain
+    data (strings, numbers, booleans, lists, and dictionaries). Objects such as column selectors
+    (e.g., `pb.starts_with("amt_")`), `Thresholds` objects, and Polars expressions are written
+    with Python-specific YAML tags that [`from_yaml()`](`pointblank.Contract.from_yaml`) won't
+    read. Use column names and threshold dictionaries in steps you want to save, and keep
+    contracts that need other objects in Python.
 
     Working With Other Pointblank Tools
     -----------------------------------
@@ -1027,9 +1232,11 @@ class Contract:
         equivalent `Contract`.
 
         Fields that aren't set, and the default `direction=` and `on_violation=` values, are left
-        out of the YAML (see [`to_dict()`](`pointblank.Contract.to_dict`)). Steps must contain
-        plain data to be written: the expressions used by `col_vals_expr` and the functions used by
-        `conjointly` can't be represented in YAML.
+        out of the YAML (see [`to_dict()`](`pointblank.Contract.to_dict`)). For the YAML to be
+        readable by `from_yaml()`, step arguments must be plain data (strings, numbers, booleans,
+        lists, and dictionaries). Column selectors, `Thresholds` objects, and Polars expressions
+        are written with Python-specific YAML tags that `from_yaml()` won't read, and no error is
+        raised when they're written.
 
         Parameters
         ----------
