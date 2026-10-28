@@ -493,7 +493,8 @@ class Comparison:
 
     `Comparison` objects are created by [`compare()`](`pointblank.compare`). They hold the row
     status counts, per-column mismatch counts, and the schema differences, and can retrieve samples
-    of differing rows on demand.
+    of differing rows on demand. A `Comparison` is truthy only when the tables match (see
+    [`identical`](`pointblank.Comparison.identical`)), so `if pb.compare(a, b):` reads naturally.
 
     Attributes
     ----------
@@ -502,7 +503,7 @@ class Comparison:
     keys
         The key columns used to align rows (empty for positional alignment).
     mode
-        `"keyed"` or `"positional"`.
+        `"keyed"`, `"positional"`, or `"multiset"` (for `keys="*"`).
     schema_diff
         A [`SchemaDiff`](`pointblank.SchemaDiff`) describing schema differences.
     n_source_rows, n_target_rows
