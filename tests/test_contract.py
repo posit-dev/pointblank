@@ -864,3 +864,109 @@ class TestContractToDictAdditional:
         contract = Contract(name="check", direction="target")
         r = repr(contract)
         assert "direction='target'" in r
+
+
+class TestContractConjointly:
+    """`conjointly()` takes its expressions positionally, so a Step stores them in `exprs=`."""
+
+    def test_conjointly_step_compiles_and_runs(self):
+        df = pl.DataFrame({"a": [1, 5, 20]})
+        contract = Contract(
+            name="cj",
+            steps=[
+                Step(
+                    "conjointly",
+                    exprs=[lambda df: pl.col("a") > 0, lambda df: pl.col("a") < 10],
+                )
+            ],
+        )
+        validation = contract.validate(df)
+        assert validation.n_failed() == {1: 1}
+
+    def test_conjointly_step_kwargs_left_unchanged(self):
+        exprs = [lambda df: pl.col("a") > 0]
+        step = Step("conjointly", exprs=exprs, brief="positive")
+        Contract(name="cj", steps=[step]).to_validate(pl.DataFrame({"a": [1]}))
+        assert step.kwargs == {"exprs": exprs, "brief": "positive"}
+
+
+class TestContractSchemaDtypeObjects:
+    """Schemas given dtype objects (not strings) work in contracts and serialize as strings."""
+
+    def test_polars_dtype_class_and_instance(self):
+        df = pl.DataFrame({"a": [1.0], "b": ["x"]})
+        contract = Contract(name="s", schema=pb.Schema(a=pl.Float64, b=pl.String()))
+        assert contract.validate(df).all_passed()
+        assert contract.to_dict()["schema"] == {"a": "Float64", "b": "String"}
+
+    def test_dtype_alternatives_and_name_only_columns_round_trip(self):
+        df = pl.DataFrame({"a": [1.0], "b": ["x"]})
+        schema = pb.Schema(columns=[("a", [pl.Int64, "Float64"]), ("b",)])
+        d = _schema_to_dict(schema)
+        assert d == {"a": ["Int64", "Float64"], "b": None}
+        restored = _dict_to_schema(d)
+        assert restored.columns == [("a", ["Int64", "Float64"]), ("b",)]
+        assert Contract(name="s", schema=restored).validate(df).all_passed()
+
+
+class TestContractYamlSafety:
+    """`to_yaml()` writes only YAML that `from_yaml()` can load, or raises."""
+
+    def test_step_thresholds_object_and_tuple_become_dicts(self, tmp_path):
+        contract = Contract(
+            name="t",
+            steps=[
+                Step("col_vals_gt", columns="a", value=0, thresholds=pb.Thresholds(warning=1)),
+                Step("col_vals_lt", columns="a", value=9, thresholds=(1, 0.5)),
+            ],
+        )
+        assert contract.steps[0].to_dict() == {
+            "col_vals_gt": {"columns": "a", "value": 0, "thresholds": {"warning": 1}}
+        }
+        path = tmp_path / "c.yaml"
+        contract.to_yaml(path)
+        assert "!!python" not in path.read_text()
+        restored = Contract.from_yaml(path)
+        assert restored.steps[1].kwargs["thresholds"] == {"warning": 1, "error": 0.5}
+        validation = restored.validate(pl.DataFrame({"a": [1, -1, 10]}))
+        assert validation.warning() == {1: True, 2: True}
+
+    def test_numpy_scalars_and_dates_are_written_plainly(self, tmp_path):
+        import datetime
+
+        import numpy as np
+
+        contract = Contract(
+            name="t",
+            steps=[
+                Step("col_vals_gt", columns="a", value=np.int64(3)),
+                Step("col_vals_ge", columns="d", value=datetime.date(2024, 1, 1)),
+            ],
+        )
+        path = tmp_path / "c.yaml"
+        contract.to_yaml(path)
+        restored = Contract.from_yaml(path)
+        assert restored.steps[0].kwargs["value"] == 3
+        assert restored.steps[1].kwargs["value"] == datetime.date(2024, 1, 1)
+
+    @pytest.mark.parametrize(
+        "step, location",
+        [
+            (
+                Step("col_vals_gt", columns=pb.starts_with("a"), value=0),
+                "contract.steps[0].col_vals_gt.columns",
+            ),
+            (Step("col_vals_expr", expr=pl.col("a") > 0), "contract.steps[0].col_vals_expr.expr"),
+        ],
+    )
+    def test_non_plain_arguments_raise(self, step, location, tmp_path):
+        contract = Contract(name="bad", steps=[step])
+        path = tmp_path / "c.yaml"
+        with pytest.raises(ValueError, match=location.replace("[", r"\[").replace("]", r"\]")):
+            contract.to_yaml(path)
+        assert not path.exists()
+
+    def test_pipeline_to_yaml_raises_for_non_plain_arguments(self):
+        source = Contract(name="src", steps=[Step("col_vals_gt", columns=pb.col("a"), value=0)])
+        with pytest.raises(ValueError, match=r"source\.steps\[0\]\.col_vals_gt\.columns"):
+            pb.Pipeline(source=source).to_yaml()
