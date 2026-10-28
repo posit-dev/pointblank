@@ -261,7 +261,7 @@ By scanning the status indicators column, you can immediately identify which val
 
 ## Customizing the Report Title
 
-You can customize the validation report's title using the `title=` parameter in `get_tabular_report()`. This is particularly useful when generating multiple reports or when you want to provide more context:
+You can customize the validation report's title using the `title=` parameter in [`get_tabular_report()`](../../reference/Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report). This is particularly useful when generating multiple reports or when you want to provide more context:
 
 ``` python
 # Default title

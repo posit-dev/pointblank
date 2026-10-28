@@ -10,7 +10,7 @@ Usage
 Validate.assert_passing()
 ```
 
-The [assert_passing()](../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing) method will raise an `AssertionError` if a test does not pass. This method simply wraps `all_passed` for more ready use in test suites. The step number and assertion made is printed in the `AssertionError` message if a failure occurs, ensuring some details are preserved.
+The [assert_passing()](../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing) method will raise an `AssertionError` if a test does not pass. This method simply wraps [`all_passed()`](../reference/Validate.all_passed.md#pointblank.Validate.all_passed) for more ready use in test suites. The step number and assertion made is printed in the `AssertionError` message if a failure occurs, ensuring some details are preserved.
 
 If the validation has not yet been interrogated, this method will automatically call [`interrogate()`](../reference/Validate.interrogate.md#pointblank.Validate.interrogate) with default parameters before checking for passing tests.
 
@@ -48,14 +48,14 @@ validation.assert_passing()
 
     ---------------------------------------------------------------------------
     AssertionError                            Traceback (most recent call last)
-    /var/folders/s8/bj_jsx3d7jqd2btw7bwm6yx80000gp/T/ipykernel_52122/2424908189.py in ?()
+    Cell In[1], line 20
          16     .col_vals_in_set(columns="c", set=["a", "b"])
          17 )
          18 
          19 # No need to call [`interrogate()`](`pointblank.Validate.interrogate`) explicitly
     ---> 20 validation.assert_passing()
 
-    ~/py_projects/pointblank/pointblank/validate.py in ?(self)
+    File ~/work/pointblank/pointblank/pointblank/validate.py:18139, in Validate.assert_passing(self)
       18135             ]
       18136             msg = "The following assertions failed:\n" + "\n".join(
       18137                 [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]

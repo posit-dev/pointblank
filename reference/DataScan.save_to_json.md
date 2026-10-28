@@ -4,7 +4,7 @@ Save the profile to a JSON file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L598-L608)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L600-L610)
 
 ``` python
 DataScan.save_to_json(output_file)

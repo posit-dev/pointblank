@@ -4,7 +4,7 @@ Validate SDTM datasets against the SDTMIG rule catalog and return a conformance 
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2043-L2164)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2045-L2166)
 
 ``` python
 validate_sdtmig(

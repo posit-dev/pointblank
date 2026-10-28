@@ -86,7 +86,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-0158e586ba661c38853d0fb84a3c8340.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-2cbc4fce51ec727eb1ce5774130eab4b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -1694,7 +1694,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L919-L1921" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L919-L1923" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ConformanceReport</span>(</span>
@@ -1891,14 +1891,14 @@ The <code>NativeConformanceResult</code> produced by the rules engine (native fo
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1387-L1462" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1387-L1463" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb4"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">findings_df</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>Each row represents one failing record captured during the conformance run. Use this method for programmatic analysis (filtering by rule, grouping by subject, exporting to CSV, or joining back to the source datasets to investigate root causes).</p>
-<p>Only <code>RECORD_CHECK</code> and <code>DATASET_CONTENTS_CHECK</code> rules produce row-level findings; rules that check metadata or domain presence (e.g., <code>VARIABLE_METADATA_CHECK</code>, <code>DOMAIN_PRESENCE_CHECK</code>) report a finding count in <code>get_tabular_report()</code> but do not appear here. To see the visual findings table call <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link gdls-code">get_findings_table()</a> instead.</p>
+<p>Only <code>RECORD_CHECK</code> and <code>DATASET_CONTENTS_CHECK</code> rules produce row-level findings; rules that check metadata or domain presence (e.g., <code>VARIABLE_METADATA_CHECK</code>, <code>DOMAIN_PRESENCE_CHECK</code>) report a finding count in <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a> but do not appear here. To see the visual findings table call <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link gdls-code">get_findings_table()</a> instead.</p>
 <p>Findings are capped at <strong>100 rows per rule</strong> to bound memory use on large datasets. The <code>n_issues</code> value shown in <code>get_tabular_report()</code> always reflects the true total count for a rule, even when more than 100 records failed.</p>
 </div>
 <section id="returns" class="level4 doc-returns">
@@ -1990,13 +1990,13 @@ A report in CORE form (<a href="../reference/ConformanceReport.html#pointblank.C
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1464-L1623" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1465-L1625" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb6"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_findings_table</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Returns one row per failing record captured by Pointblank’s built-in rules engine. This is the drill-down companion to <code>get_tabular_report()</code>: where the tabular report shows one row per rule with an aggregate issue count, the findings table shows the individual offending records so reviewers can trace violations back to specific subjects and variables.</p>
+<p>Returns one row per failing record captured by Pointblank’s built-in rules engine. This is the drill-down companion to <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>: where the tabular report shows one row per rule with an aggregate issue count, the findings table shows the individual offending records so reviewers can trace violations back to specific subjects and variables.</p>
 </div>
 <section id="table-layout" class="level4 doc-table-layout">
 <h4 class="doc-table-layout anchored" data-anchor-id="table-layout">Table Layout</h4>
@@ -2052,7 +2052,7 @@ If there are no row-level findings to display (i.e., all applicable rules passed
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1625-L1839" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1627-L1841" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb7"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_tabular_report</span>()</span></code></pre></div>

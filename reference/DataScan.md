@@ -4,7 +4,7 @@ Get a summary of a dataset.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L31-L717)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L31-L724)
 
 ``` python
 DataScan(
@@ -26,7 +26,7 @@ The [DataScan](../reference/DataScan.md#pointblank.DataScan) class provides a wa
   - a sample of the data (the first 5 values)
   - statistics (if the column contains numbers, strings, or datetimes)
 
-To obtain a dictionary representation of the summary, you can use the `to_dict()` method. To get a JSON representation of the summary, you can use the `to_json()` method. To save the JSON text to a file, the [save_to_json()](../reference/DataScan.save_to_json.md#pointblank.DataScan.save_to_json) method could be used.
+To obtain a dictionary representation of the summary, you can use the [`to_dict()`](../reference/DataScan.to_dict.md#pointblank.DataScan.to_dict) method. To get a JSON representation of the summary, you can use the [`to_json()`](../reference/DataScan.to_json.md#pointblank.DataScan.to_json) method. To save the JSON text to a file, the [save_to_json()](../reference/DataScan.save_to_json.md#pointblank.DataScan.save_to_json) method could be used.
 
 > **Warning**
 >

@@ -4,7 +4,7 @@ Convert an SDTM domain template to a [MetadataImport](../reference/MetadataImpor
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_validate.py#L35-L88)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_validate.py#L35-L89)
 
 ``` python
 sdtm_to_metadata(
@@ -13,7 +13,7 @@ sdtm_to_metadata(
 )
 ```
 
-This allows using the standard metadata pipeline ([to_schema](../reference/MetadataImport.md#pointblank.MetadataImport.to_schema), `to_validate`) with SDTM domain specifications.
+This allows using the standard metadata pipeline ([`to_schema()`](../reference/MetadataImport.md#pointblank.MetadataImport.to_schema), [`to_validate()`](../reference/MetadataImport.md#pointblank.MetadataImport.to_validate)) with SDTM domain specifications.
 
 ## Parameters
 

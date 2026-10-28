@@ -6,7 +6,7 @@ Pointblank's metadata import system reads these external descriptions and conver
 
 ## Quick Start
 
-The fastest path from a metadata file to a running validation uses three steps: import the metadata, provide your data, and call `to_validate()`. Here is the basic pattern:
+The fastest path from a metadata file to a running validation uses three steps: import the metadata, provide your data, and call [`to_validate()`](../../reference/MetadataImport.md#pointblank.MetadataImport.to_validate). Here is the basic pattern:
 
 ``` python
 import pointblank as pb
@@ -79,7 +79,7 @@ The schema captures what the metadata says the table *should* look like, not wha
 
 ## Converting to a Validation Workflow
 
-The `to_validate()` method is where all the power lives. It reads all constraints from the metadata and generates a complete [Validate](../../reference/Validate.md#pointblank.Validate) object with the appropriate validation steps. Each constraint type maps to a specific Pointblank method:
+The [`to_validate()`](../../reference/MetadataImport.md#pointblank.MetadataImport.to_validate) method is where all the power lives. It reads all constraints from the metadata and generates a complete [Validate](../../reference/Validate.md#pointblank.Validate) object with the appropriate validation steps. Each constraint type maps to a specific Pointblank method:
 
 | Metadata Constraint | Generated Validation Step |
 |----|----|

@@ -21,7 +21,7 @@ This article looks at why the usual approaches struggle with this, and how to do
 
 ## How Pointblank Approaches It
 
-Three things make `compare()` suitable for large files:
+Three things make [`compare()`](../../reference/compare.md#pointblank.compare) suitable for large files:
 
 1.  **Files are scanned, not loaded.** CSV and Parquet paths are read lazily (with Polars, or DuckDB), so the comparison is a query plan rather than two DataFrames in memory.
 2.  **The work happens in the engine.** The join on the key, the per-column comparisons, and the counting are all done by the query engine. Python only receives the counts and small samples of the differing rows (the `limit=` of each sample).

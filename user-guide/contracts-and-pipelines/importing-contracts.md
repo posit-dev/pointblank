@@ -2,7 +2,7 @@
 
 Many teams already have data schemas defined in other tools: JSON Schema files for API validation, Frictionless Table Schemas for open data, dbt `schema.yml` files for analytics pipelines, or ODCS data contracts for cross-team governance. Rather than manually rewriting these specifications as Pointblank validation steps, you can **import** them directly.
 
-The `import_contract()` function reads an external schema definition and produces a [ContractImport](../../reference/ContractImport.md#pointblank.ContractImport) object containing everything Pointblank needs to validate data: column types, constraints, and mapped validation steps. From there you can create a [Validate](../../reference/Validate.md#pointblank.Validate) workflow, a [Contract](../../reference/Contract.md#pointblank.Contract) object, generate equivalent Python code, or produce a YAML definition, all with a single function call.
+The [`import_contract()`](../../reference/import_contract.md#pointblank.import_contract) function reads an external schema definition and produces a [ContractImport](../../reference/ContractImport.md#pointblank.ContractImport) object containing everything Pointblank needs to validate data: column types, constraints, and mapped validation steps. From there you can create a [Validate](../../reference/Validate.md#pointblank.Validate) workflow, a [Contract](../../reference/Contract.md#pointblank.Contract) object, generate equivalent Python code, or produce a YAML definition, all with a single function call.
 
 ## Quick Start
 
@@ -611,7 +611,7 @@ The YAML output follows Pointblank's validation YAML format, with each constrain
 
 ## Exporting Contracts
 
-The reverse operation (taking a Pointblank [Contract](../../reference/Contract.md#pointblank.Contract) or [Validate](../../reference/Validate.md#pointblank.Validate) object and writing it out in an external format) is handled by `export_contract()`:
+The reverse operation (taking a Pointblank [Contract](../../reference/Contract.md#pointblank.Contract) or [Validate](../../reference/Validate.md#pointblank.Validate) object and writing it out in an external format) is handled by [`export_contract()`](../../reference/export_contract.md#pointblank.export_contract):
 
 ``` python
 # Create a contract

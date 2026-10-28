@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Restore a DataScan from a JSON string produced by to_json().">
+<meta name="description" content="Restore a DataScan from a JSON string.">
 
 <title>DataScan.from_json() | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "DataScan.from_json - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/DataScan.from_json.html"}]</script>
@@ -86,7 +86,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-0158e586ba661c38853d0fb84a3c8340.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-2cbc4fce51ec727eb1ce5774130eab4b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="DataScan.from_json() | Pointblank">
-<meta property="og:description" content="Restore a DataScan from a JSON string produced by to_json().">
+<meta property="og:description" content="Restore a DataScan from a JSON string.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="DataScan.from_json() | Pointblank">
-<meta name="twitter:description" content="Restore a DataScan from a JSON string produced by to_json().">
+<meta name="twitter:description" content="Restore a DataScan from a JSON string.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1670,14 +1670,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>Restore a <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> from a JSON string produced by <code>to_json()</code>.</p>
+<p>Restore a <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> from a JSON string.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L664-L679" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L668-L685" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">DataScan</span><span class="op">.</span><span class="fu">from_json</span>(<span class="va">json_string</span>)</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>The JSON string is the one produced by <a href="../reference/DataScan.to_json.html#pointblank.DataScan.to_json" class="gdls-link"><code>to_json()</code></a>.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1685,7 +1688,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">json_string</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-A JSON string as produced by <code>to_json()</code>.
+A JSON string as produced by <a href="../reference/DataScan.to_json.html#pointblank.DataScan.to_json" class="gdls-link"><code>to_json()</code></a>.
 </dd>
 </dl>
 </div>

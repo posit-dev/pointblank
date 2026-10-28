@@ -62,7 +62,7 @@ small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
 scan = pb.DataScan(data=small_table, tbl_name="small_table")
 ```
 
-The [DataScan](../../reference/DataScan.md#pointblank.DataScan) object computes the same column-level statistics shown in the summary table. You can access the profile as a dictionary with `to_dict()`, export it as JSON with `to_json()`, or render the same tabular report with `get_tabular_report()`.
+The [DataScan](../../reference/DataScan.md#pointblank.DataScan) object computes the same column-level statistics shown in the summary table. You can access the profile as a dictionary with [`to_dict()`](../../reference/DataScan.to_dict.md#pointblank.DataScan.to_dict), export it as JSON with [`to_json()`](../../reference/DataScan.to_json.md#pointblank.DataScan.to_json), or render the same tabular report with [`get_tabular_report()`](../../reference/DataScan.get_tabular_report.md#pointblank.DataScan.get_tabular_report).
 
 ## Saving and Loading Profiles
 
@@ -76,11 +76,11 @@ scan.save_to_json("small_table_profile.json")
 loaded = pb.DataScan.load_from_json("small_table_profile.json")
 ```
 
-The [from_json()](../../reference/DataScan.from_json.md#pointblank.DataScan.from_json) classmethod works with JSON strings directly, and `from_dict()` accepts the dictionary format produced by `to_dict()`. All three approaches produce a fully restored [DataScan](../../reference/DataScan.md#pointblank.DataScan) that retains the column names, types, statistics, and sample data from the original scan.
+The [from_json()](../../reference/DataScan.from_json.md#pointblank.DataScan.from_json) classmethod works with JSON strings directly, and [`from_dict()`](../../reference/DataScan.from_dict.md#pointblank.DataScan.from_dict) accepts the dictionary format produced by `to_dict()`. All three approaches produce a fully restored [DataScan](../../reference/DataScan.md#pointblank.DataScan) that retains the column names, types, statistics, and sample data from the original scan.
 
 ## Comparing Profiles for Drift
 
-When your data changes over time, you can compare two [DataScan](../../reference/DataScan.md#pointblank.DataScan) profiles to detect drift. The `compare()` method identifies schema changes (columns added, removed, or with changed types) and statistical shifts in common columns.
+When your data changes over time, you can compare two [DataScan](../../reference/DataScan.md#pointblank.DataScan) profiles to detect drift. The [`compare()`](../../reference/DataScan.compare.md#pointblank.DataScan.compare) method identifies schema changes (columns added, removed, or with changed types) and statistical shifts in common columns.
 
 ``` python
 import polars as pl
@@ -117,7 +117,7 @@ print("Row count (baseline vs current):", diff.row_count_diff)
     Columns added: ['region']
     Row count (baseline vs current): (5, 8)
 
-You can also get the full comparison as a dictionary with `to_dict()`, or view it as a styled report:
+You can also get the full comparison as a dictionary with [`to_dict()`](../../reference/DataScanDiff.md#pointblank.DataScanDiff.to_dict), or view it as a styled report:
 
 ``` python
 diff.get_tabular_report()
@@ -160,7 +160,7 @@ diff.get_tabular_report()
 
 [TABLE]
 
-The drift scores are also available programmatically through `to_dict()`:
+The drift scores are also available programmatically through [`to_dict()`](../../reference/DataScanDiff.md#pointblank.DataScanDiff.to_dict):
 
 ``` python
 drift = diff.to_dict().get("drift_scores", {})

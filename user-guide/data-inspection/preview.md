@@ -70,7 +70,7 @@ pb.preview(small_table, n_head=3, n_tail=1)
 
 | PandasRows13Columns8 |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
-|  | date_time *datetime64\[ns\]* | date *datetime64\[ns\]* | a *int64* | b *object* | c *float64* | d *float64* | e *bool* | f *object* |
+|  | date_time *datetime64\[us\]* | date *datetime64\[us\]* | a *int64* | b *str* | c *float64* | d *float64* | e *bool* | f *str* |
 | 1 | 2016-01-04 11:00:00 | 2016-01-04 00:00:00 | 2 | 1-bcd-345 | 3.0 | 3423.29 | True | high |
 | 2 | 2016-01-04 00:32:00 | 2016-01-04 00:00:00 | 3 | 5-egh-163 | 8.0 | 9999.99 | True | low |
 | 3 | 2016-01-05 13:32:00 | 2016-01-05 00:00:00 | 6 | 8-kdg-938 | 3.0 | 2343.23 | True | high |
@@ -86,7 +86,7 @@ pb.preview(small_table, n_head=10, n_tail=10)
 
 | PandasRows13Columns8 |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
-|  | date_time *datetime64\[ns\]* | date *datetime64\[ns\]* | a *int64* | b *object* | c *float64* | d *float64* | e *bool* | f *object* |
+|  | date_time *datetime64\[us\]* | date *datetime64\[us\]* | a *int64* | b *str* | c *float64* | d *float64* | e *bool* | f *str* |
 | 1 | 2016-01-04 11:00:00 | 2016-01-04 00:00:00 | 2 | 1-bcd-345 | 3.0 | 3423.29 | True | high |
 | 2 | 2016-01-04 00:32:00 | 2016-01-04 00:00:00 | 3 | 5-egh-163 | 8.0 | 9999.99 | True | low |
 | 3 | 2016-01-05 13:32:00 | 2016-01-05 00:00:00 | 6 | 8-kdg-938 | 3.0 | 2343.23 | True | high |
@@ -132,7 +132,7 @@ What we see are the six columns we specified from the `nycflights` dataset.
 
 Note that the columns are displayed in the order provided in the `columns_subset=` list. This can be useful for making quick, side-by-side comparisons. In the example above, we placed `hour` and `minute` next to the `sched_dep_time` column. In the original dataset, `sched_dep_time` is far apart from the other two columns, but, it's useful to have them next to each other in the preview since `hour` and `minute` are derived from `sched_dep_time` (and this lets us spot check any issues).
 
-We can also use column selectors within `columns_subset=`. Suppose we want to only see those columns that have `"dep_"` or `"arr_"` in the name. To do that, we use the `matches()` column selector function:
+We can also use column selectors within `columns_subset=`. Suppose we want to only see those columns that have `"dep_"` or `"arr_"` in the name. To do that, we use the [`matches()`](../../reference/matches.md#pointblank.matches) column selector function:
 
 ``` python
 pb.preview(nycflights, columns_subset=pb.matches("dep_|arr_"))

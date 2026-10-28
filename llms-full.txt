@@ -14879,8 +14879,9 @@ str
     The validation plan as a YAML string. The `tbl` field is set from `tbl_name` when
     available, otherwise to the placeholder `your_data`; set it to a loadable data
     source before passing the YAML to `yaml_interrogate()`. The `reference` field is
-    written the same way as in `to_code()`: a file path or connection string as-is, and
-    the placeholder `your_reference_data` (with a warning) for an in-memory table.
+    written the same way as in [`to_code()`](`pointblank.Validate.to_code`): a file path
+    or connection string as-is, and the placeholder `your_reference_data` (with a
+    warning) for an in-memory table.
 
 Notes on Fidelity
 -----------------
@@ -15340,9 +15341,9 @@ assert_passing(self) -> 'None'
 Raise an `AssertionError` if all tests are not passing.
 
 The `assert_passing()` method will raise an `AssertionError` if a test does not pass. This
-method simply wraps `all_passed` for more ready use in test suites. The step number and
-assertion made is printed in the `AssertionError` message if a failure occurs, ensuring
-some details are preserved.
+method simply wraps [`all_passed()`](`pointblank.Validate.all_passed`) for more ready use
+in test suites. The step number and assertion made is printed in the `AssertionError`
+message if a failure occurs, ensuring some details are preserved.
 
 If the validation has not yet been interrogated, this method will automatically call
 [`interrogate()`](`pointblank.Validate.interrogate`) with default parameters before checking
@@ -16536,8 +16537,9 @@ following information:
     - a sample of the data (the first 5 values)
     - statistics (if the column contains numbers, strings, or datetimes)
 
-To obtain a dictionary representation of the summary, you can use the `to_dict()` method. To
-get a JSON representation of the summary, you can use the `to_json()` method. To save the JSON
+To obtain a dictionary representation of the summary, you can use the
+[`to_dict()`](`pointblank.DataScan.to_dict`) method. To get a JSON representation of the
+summary, you can use the [`to_json()`](`pointblank.DataScan.to_json`) method. To save the JSON
 text to a file, the `save_to_json()` method could be used.
 
 :::{.callout-warning}
@@ -16629,7 +16631,8 @@ DataScanDiff(current: 'DataScan', baseline: 'DataScan') -> 'None'
 The result of comparing two `DataScan` profiles.
 
 Created by calling `DataScan.compare()`. Provides programmatic access to schema changes and
-per-column statistical drift, plus a tabular report via `get_tabular_report()`.
+per-column statistical drift, plus a tabular report via
+[`get_tabular_report()`](`pointblank.DataScanDiff.get_tabular_report`).
 
 Attributes
 ----------
@@ -16796,7 +16799,7 @@ pb.preview(game_revenue_pandas, columns_subset=["player_id", "item_name", "item_
 ```
 
 Alternatively, we can use column selector functions like
-[`starts_with()`](`pointblank.starts_with`) and [`matches()`](`pointblank.matches`)` to select
+[`starts_with()`](`pointblank.starts_with`) and [`matches()`](`pointblank.matches`) to select
 columns based on text or patterns:
 
 ```{python}
@@ -17402,8 +17405,9 @@ Export the profile as a structured dictionary.
 
 The returned dictionary contains metadata (table name, row count, column list) plus
 per-column profile entries with their data type, statistics, and sample data. This format is
-designed for round-trip persistence: save it with `to_json()` / `save_to_json()` and restore
-with `from_dict()` / `from_json()` / `load_from_json()`.
+designed for round-trip persistence: save it with
+[`to_json()`](`pointblank.DataScan.to_json`) / `save_to_json()` and restore with
+[`from_dict()`](`pointblank.DataScan.from_dict`) / `from_json()` / `load_from_json()`.
 
 Returns
 -------
@@ -17433,14 +17437,16 @@ output_file
 
 from_dict(d: 'dict[str, Any]') -> 'DataScan'
 
-Restore a `DataScan` from a dictionary produced by `to_dict()`.
+Restore a `DataScan` from a dictionary.
 
-This reconstructs the profile without needing the original data.
+The dictionary is the one produced by [`to_dict()`](`pointblank.DataScan.to_dict`). This
+reconstructs the profile without needing the original data.
 
 Parameters
 ----------
 d
-    A dictionary with `"metadata"` and `"columns"` keys, as produced by `to_dict()`.
+    A dictionary with `"metadata"` and `"columns"` keys, as produced by
+    [`to_dict()`](`pointblank.DataScan.to_dict`).
 
 Returns
 -------
@@ -17449,12 +17455,14 @@ DataScan
 
 from_json(json_string: 'str') -> 'DataScan'
 
-Restore a `DataScan` from a JSON string produced by `to_json()`.
+Restore a `DataScan` from a JSON string.
+
+The JSON string is the one produced by [`to_json()`](`pointblank.DataScan.to_json`).
 
 Parameters
 ----------
 json_string
-    A JSON string as produced by `to_json()`.
+    A JSON string as produced by [`to_json()`](`pointblank.DataScan.to_json`).
 
 Returns
 -------
@@ -17481,7 +17489,8 @@ Compare this scan against a baseline and return the differences.
 
 The comparison covers schema changes (columns added, removed, or with changed types) and
 statistical drift for columns present in both scans. The returned `DataScanDiff` object
-provides programmatic access to the results and a tabular report via `get_tabular_report()`.
+provides programmatic access to the results and a tabular report via
+[`get_tabular_report()`](`pointblank.DataScanDiff.get_tabular_report`).
 
 Parameters
 ----------
@@ -17782,7 +17791,9 @@ limit
 
 to_json(self, samples: 'bool' = True, limit: 'int' = 10, indent: 'int | None' = 2) -> 'str'
 
-Get the comparison results as a JSON string (see `to_dict()`).
+Get the comparison results as a JSON string.
+
+The structure is the same as that of [`to_dict()`](`pointblank.Comparison.to_dict`).
 
 get_tabular_report(self, limit: 'int' = 10, title: 'str | None' = None, lang: 'str | None' = None, locale: 'str | None' = None) -> 'GT'
 
@@ -21551,8 +21562,9 @@ sdtm_to_metadata(domain: 'str', study_id: 'str | None' = None) -> 'MetadataImpor
 
 Convert an SDTM domain template to a `MetadataImport` object.
 
-This allows using the standard metadata pipeline (`to_schema`, `to_validate`) with SDTM domain
-specifications.
+This allows using the standard metadata pipeline
+([`to_schema()`](`pointblank.MetadataImport.to_schema`),
+[`to_validate()`](`pointblank.MetadataImport.to_validate`)) with SDTM domain specifications.
 
 Parameters
 ----------
@@ -24890,7 +24902,7 @@ The complete list of column selectors includes:
 - `starts_with()`
 - `ends_with()`
 - `contains()`
-- `matches()`
+- [`matches()`](`pointblank.matches`)
 - `everything()`
 - `first_n()`
 - `last_n()`
@@ -24927,7 +24939,7 @@ This selects every column except the first four, resulting in seven validation s
 Pointblank also supports column selectors from the
 [Narwhals](https://narwhals-dev.github.io/narwhals/) library, which include:
 
-- `matches()`
+- [`matches()`](`pointblank.matches`)
 - `by_dtype()`
 - `boolean()`
 - `categorical()`
@@ -28404,8 +28416,8 @@ Three methods do this:
 The first two are ordinary, deterministic utilities that round-trip through Pointblank itself.
 `to_json_schema()` produces a standard that tools in many ecosystems can consume. All three are
 useful for sharing plans, reviewing changes in a diff, and persisting a plan alongside its results.
-`to_code()` and `to_yaml()` are also the foundation for the
-[AI Validation Editor](ai-validation-editor.qmd), which sends the current plan to a model as
+[`to_code()`](`Validate.to_code`) and [`to_yaml()`](`Validate.to_yaml`) are also the foundation for
+the [AI Validation Editor](ai-validation-editor.qmd), which sends the current plan to a model as
 editable code.
 
 ## Rendering a Plan as Python Code
@@ -28597,13 +28609,13 @@ that consumes JSON Schema files.
 
 ### Relationship to `export_contract()`
 
-Under the hood, `to_json_schema()` delegates to the [`export_contract()`](`export_contract`)
-function with `format="json_schema"`. The convenience method adds type enrichment from the data and
-handles file output. If you need the raw adapter behavior (for example, to export without type
-enrichment, or to work with a `Contract` object rather than a `Validate` object), use
-`export_contract()` directly. See the
-[Importing and Exporting Contracts](../10-contracts-and-pipelines/04-importing-contracts.qmd) guide
-for the full story on contract adapters.
+Under the hood, `to_json_schema()` delegates to the
+[`export_contract()`](`pointblank.export_contract`) function with `format="json_schema"`. The
+convenience method adds type enrichment from the data and handles file output. If you need the raw
+adapter behavior (for example, to export without type enrichment, or to work with a `Contract`
+object rather than a `Validate` object), use `export_contract()` directly. See the [Importing and
+Exporting Contracts](../10-contracts-and-pipelines/04-importing-contracts.qmd) guide for the full
+story on contract adapters.
 
 ## Conclusion
 
@@ -31960,8 +31972,8 @@ attention and prioritize your data quality efforts accordingly.
 ## Customizing the Report Title
 
 You can customize the validation report's title using the `title=` parameter in
-`get_tabular_report()`. This is particularly useful when generating multiple reports or when you
-want to provide more context:
+[`get_tabular_report()`](`Validate.get_tabular_report`). This is particularly useful when generating
+multiple reports or when you want to provide more context:
 
 ```{python}
 # Default title
@@ -33804,8 +33816,8 @@ since `hour` and `minute` are derived from `sched_dep_time` (and this lets us sp
 issues).
 
 We can also use column selectors within `columns_subset=`. Suppose we want to only see those columns
-that have `"dep_"` or `"arr_"` in the name. To do that, we use the `matches()` column selector
-function:
+that have `"dep_"` or `"arr_"` in the name. To do that, we use the
+[`matches()`](`pointblank.matches`) column selector function:
 
 ```{python}
 pb.preview(nycflights, columns_subset=pb.matches("dep_|arr_"))
@@ -33944,8 +33956,9 @@ scan = pb.DataScan(data=small_table, tbl_name="small_table")
 ```
 
 The `DataScan` object computes the same column-level statistics shown in the summary table. You can
-access the profile as a dictionary with `to_dict()`, export it as JSON with `to_json()`, or render
-the same tabular report with `get_tabular_report()`.
+access the profile as a dictionary with [`to_dict()`](`DataScan.to_dict`), export it as JSON with
+[`to_json()`](`DataScan.to_json`), or render the same tabular report with
+[`get_tabular_report()`](`DataScan.get_tabular_report`).
 
 ## Saving and Loading Profiles
 
@@ -33966,15 +33979,16 @@ loaded = pb.DataScan.load_from_json("small_table_profile.json")
 os.remove("small_table_profile.json")
 ```
 
-The `from_json()` classmethod works with JSON strings directly, and `from_dict()` accepts the
-dictionary format produced by `to_dict()`. All three approaches produce a fully restored `DataScan`
-that retains the column names, types, statistics, and sample data from the original scan.
+The `from_json()` classmethod works with JSON strings directly, and
+[`from_dict()`](`DataScan.from_dict`) accepts the dictionary format produced by `to_dict()`. All
+three approaches produce a fully restored `DataScan` that retains the column names, types,
+statistics, and sample data from the original scan.
 
 ## Comparing Profiles for Drift
 
 When your data changes over time, you can compare two `DataScan` profiles to detect drift. The
-`compare()` method identifies schema changes (columns added, removed, or with changed types) and
-statistical shifts in common columns.
+[`compare()`](`DataScan.compare`) method identifies schema changes (columns added, removed, or with
+changed types) and statistical shifts in common columns.
 
 ```{python}
 import polars as pl
@@ -34008,8 +34022,8 @@ print("Columns added:", diff.columns_added)
 print("Row count (baseline vs current):", diff.row_count_diff)
 ```
 
-You can also get the full comparison as a dictionary with `to_dict()`, or view it as a styled
-report:
+You can also get the full comparison as a dictionary with [`to_dict()`](`DataScanDiff.to_dict`), or
+view it as a styled report:
 
 ```{python}
 diff.get_tabular_report()
@@ -34059,7 +34073,7 @@ diff = current.compare(baseline)
 diff.get_tabular_report()
 ```
 
-The drift scores are also available programmatically through `to_dict()`:
+The drift scores are also available programmatically through [`to_dict()`](`DataScanDiff.to_dict`):
 
 ```{python}
 drift = diff.to_dict().get("drift_scores", {})
@@ -37062,8 +37076,8 @@ class, covered in the next guide page):
 
 ## Using `to_validate()` for Custom Workflows
 
-If you need more control, `to_validate()` gives you back an un-interrogated `Validate` object that
-you can extend with additional checks:
+If you need more control, [`to_validate()`](`Contract.to_validate`) gives you back an
+un-interrogated `Validate` object that you can extend with additional checks:
 
 ```{python}
 # Start from the contract, then add ad-hoc checks
@@ -38090,9 +38104,10 @@ target:
 
 ### Loading and Running a Pipeline from YAML
 
-Loading a pipeline from YAML works the same way as loading a contract: call the `from_yaml()` class
-method with the file path. The returned `Pipeline` object is fully functional and ready to validate
-data or run a complete boundary enforcement workflow.
+Loading a pipeline from YAML works the same way as loading a contract: call the
+[`from_yaml()`](`Pipeline.from_yaml`) class method with the file path. The returned `Pipeline`
+object is fully functional and ready to validate data or run a complete boundary enforcement
+workflow.
 
 ```{python}
 # Load the pipeline from YAML
@@ -38348,10 +38363,11 @@ Frictionless Table Schemas for open data, dbt `schema.yml` files for analytics p
 data contracts for cross-team governance. Rather than manually rewriting these specifications as
 Pointblank validation steps, you can **import** them directly.
 
-The `import_contract()` function reads an external schema definition and produces a `ContractImport`
-object containing everything Pointblank needs to validate data: column types, constraints, and
-mapped validation steps. From there you can create a `Validate` workflow, a `Contract` object,
-generate equivalent Python code, or produce a YAML definition, all with a single function call.
+The [`import_contract()`](`pointblank.import_contract`) function reads an external schema definition
+and produces a `ContractImport` object containing everything Pointblank needs to validate data:
+column types, constraints, and mapped validation steps. From there you can create a `Validate`
+workflow, a `Contract` object, generate equivalent Python code, or produce a YAML definition, all
+with a single function call.
 
 ## Quick Start
 
@@ -38905,7 +38921,7 @@ files rather than Python code.
 ## Exporting Contracts
 
 The reverse operation (taking a Pointblank `Contract` or `Validate` object and writing it out in
-an external format) is handled by `export_contract()`:
+an external format) is handled by [`export_contract()`](`pointblank.export_contract`):
 
 ```{python}
 # Create a contract
@@ -39196,17 +39212,19 @@ a proprietary schema format, an internal data catalog, or any other schema defin
 isn't covered by the built-in adapters, you can write a **custom adapter** and register it with
 the framework.
 
-Once registered, your custom adapter works seamlessly with `import_contract()` and
-`export_contract()`, the same API surface your team already uses for JSON Schema, Frictionless, dbt,
-and ODCS.
+Once registered, your custom adapter works seamlessly with
+[`import_contract()`](`pointblank.import_contract`) and
+[`export_contract()`](`pointblank.export_contract`), the same API surface your team already uses for
+JSON Schema, Frictionless, dbt, and ODCS.
 
 ## The Adapter Architecture
 
 Every adapter follows the same pattern:
 
 1. **Subclass** `ContractAdapter` and set a few class attributes
-2. **Implement** `detect()` (for auto-detection), `import_contract()`, and optionally
-   `export_contract()`
+2. **Implement** `detect()` (for auto-detection),
+   [`import_contract()`](`ContractAdapter.import_contract`), and optionally
+   [`export_contract()`](`ContractAdapter.export_contract`)
 3. **Register** the adapter with the `@register_adapter` decorator
 
 Here's a minimal example to illustrate the structure:
@@ -39606,8 +39624,9 @@ between domain-specific formats and Pointblank's validation engine.
 
 ## Quick Start
 
-The fastest path from a metadata file to a running validation uses three steps: import the
-metadata, provide your data, and call `to_validate()`. Here is the basic pattern:
+The fastest path from a metadata file to a running validation uses three steps: import the metadata,
+provide your data, and call [`to_validate()`](`MetadataImport.to_validate`). Here is the basic
+pattern:
 
 ```python
 import pointblank as pb
@@ -39694,9 +39713,9 @@ renamed, retyped, or dropped since the metadata was last updated.
 
 ## Converting to a Validation Workflow
 
-The `to_validate()` method is where all the power lives. It reads all constraints from the
-metadata and generates a complete `Validate` object with the appropriate validation steps. Each
-constraint type maps to a specific Pointblank method:
+The [`to_validate()`](`MetadataImport.to_validate`) method is where all the power lives. It reads
+all constraints from the metadata and generates a complete `Validate` object with the appropriate
+validation steps. Each constraint type maps to a specific Pointblank method:
 
 | Metadata Constraint | Generated Validation Step |
 |---------------------|--------------------------|
@@ -40045,10 +40064,10 @@ for var in meta.variables:
 
 ### Length Constraints
 
-Character variables in SAS Transport files have defined maximum lengths. Pointblank captures
-these as `max_length` constraints on the `VariableMetadata` object. When you call `to_validate()`,
-variables with length constraints get a `col_vals_expr()` step that checks string length does not
-exceed the specified maximum.
+Character variables in SAS Transport files have defined maximum lengths. Pointblank captures these
+as `max_length` constraints on the `VariableMetadata` object. When you call
+[`to_validate()`](`MetadataImport.to_validate`), variables with length constraints get a
+`col_vals_expr()` step that checks string length does not exceed the specified maximum.
 
 This is particularly important for CDISC submissions where variable lengths are strictly defined
 in the submission specification. A variable defined as `$200.` (200 characters) must not contain
@@ -40116,8 +40135,8 @@ values, and the generated schema reflects that expectation.
 ## Generating Validation from Statistical Metadata
 
 Once you have imported metadata from any statistical package file, the workflow for generating
-validation is the same. The `to_validate()` method examines every variable's constraints and
-creates the appropriate validation steps.
+validation is the same. The [`to_validate()`](`MetadataImport.to_validate`) method examines every
+variable's constraints and creates the appropriate validation steps.
 
 For a typical SPSS file with value labels and types defined, the generated validation includes:
 
@@ -40297,8 +40316,9 @@ Define-XML documents contain rich structural metadata. Pointblank extracts the f
 ### Controlled Terminology from Define-XML
 
 Define-XML documents embed the codelists that constrain variable values. When Pointblank parses a
-Define-XML, all codelists are extracted and linked to their respective variables. The `to_validate()`
-method then generates `col_vals_in_set()` checks for each variable that references a codelist:
+Define-XML, all codelists are extracted and linked to their respective variables. The
+[`to_validate()`](`MetadataImport.to_validate`) method then generates `col_vals_in_set()` checks for
+each variable that references a codelist:
 
 ```{python}
 # Inspect codelists referenced by the Demographics domain
@@ -40666,7 +40686,7 @@ print(f"Population flags present: {result.get('population_flags_present', [])}")
 ### Converting ADaM Templates to MetadataImport
 
 The `adam_to_metadata()` function converts an ADaM template into the standard `MetadataImport`
-format, giving you access to `to_schema()` and `to_validate()`:
+format, giving you access to `to_schema()` and [`to_validate()`](`MetadataImport.to_validate`):
 
 ```{python}
 from pointblank.metadata import adam_to_metadata
@@ -41268,16 +41288,18 @@ report = ConformanceReport.from_core_report(raw, agency="FDA")
 print(report)
 ```
 
-**Overall result.** `all_passed()` returns `True` when no rules reported issues; `is_core`
-confirms the report originated from the CORE engine rather than the built-in engine:
+**Overall result.** [`all_passed()`](`ConformanceReport.all_passed`) returns `True` when no rules
+reported issues; `is_core` confirms the report originated from the CORE engine rather than the
+built-in engine:
 
 ```{python}
 print("All passed:", report.all_passed())
 print("Is CORE report:", report.is_core)
 ```
 
-**Summary dictionary.** `summary()` returns run provenance and rule counts as a plain dictionary,
-useful for logging, assertions in CI scripts, or building a custom status page:
+**Summary dictionary.** [`summary()`](`ConformanceReport.summary`) returns run provenance and rule
+counts as a plain dictionary, useful for logging, assertions in CI scripts, or building a custom
+status page:
 
 ```{python}
 s = report.summary()
@@ -41373,8 +41395,8 @@ output, and Excel for spreadsheet-based review workflows.
 
 ### JSON
 
-`to_json()` saves the report as a JSON file. For CORE reports the structure mirrors CORE's native
-output and is parseable by `parse_core_report()`:
+[`to_json()`](`ConformanceReport.to_json`) saves the report as a JSON file. For CORE reports the
+structure mirrors CORE's native output and is parseable by `parse_core_report()`:
 
 ```{python}
 import tempfile
@@ -41481,8 +41503,9 @@ data you expect) and a *target* table (the data you want to check), and you want
 - which records have values that differ, and in which columns
 - whether the columns themselves (names, types, order) changed
 
-Pointblank answers all of these with the `compare()` function, and the same comparison is available
-as a validation step through `Validate.tbl_match()` and on the command line through `pb compare`.
+Pointblank answers all of these with the [`compare()`](`pointblank.compare`) function, and the same
+comparison is available as a validation step through `Validate.tbl_match()` and on the command line
+through `pb compare`.
 
 ## A First Comparison
 
@@ -41751,9 +41774,10 @@ of their own, which is matched with the other table's null-key group.
 
 ## Exporting the Results
 
-The results can be serialized with `to_dict()` or `to_json()`, which include the counts, the schema
-differences, and (by default) samples of the differing rows. If the data could contain sensitive
-values, leave the samples out:
+The results can be serialized with [`to_dict()`](`Comparison.to_dict`) or
+[`to_json()`](`Comparison.to_json`), which include the counts, the schema differences, and (by
+default) samples of the differing rows. If the data could contain sensitive values, leave the
+samples out:
 
 ```{python}
 print(comparison.to_json(samples=False))
@@ -41827,7 +41851,7 @@ that each key's rows from both files land in the same chunk. That's a lot of cod
 
 ## How Pointblank Approaches It
 
-Three things make `compare()` suitable for large files:
+Three things make [`compare()`](`pointblank.compare`) suitable for large files:
 
 1. **Files are scanned, not loaded.** CSV and Parquet paths are read lazily (with Polars, or
    DuckDB), so the comparison is a query plan rather than two DataFrames in memory.
@@ -42107,9 +42131,9 @@ Column comparison
 Column selection
 : How you tell a **validation step** which columns to check. You can give a single column name, a
   list of names, or a helper that picks columns for you: `starts_with()`, `ends_with()`,
-  `contains()`, `matches()`, `everything()`, `first_n()`, or `last_n()`. Helpers can be combined
-  inside `col()` using `&` (and), `|` (or), and `-` (but not). Each column that's picked gets its
-  own step. [Learn more](../validation-plan/column-selection-patterns.qmd).
+  `contains()`, [`matches()`](`pointblank.matches`), `everything()`, `first_n()`, or `last_n()`.
+  Helpers can be combined inside `col()` using `&` (and), `|` (or), and `-` (but not). Each column
+  that's picked gets its own step. [Learn more](../validation-plan/column-selection-patterns.qmd).
 
 Column summary table
 : A table that describes each column of your data: its type, how many values are missing, how many
@@ -42152,24 +42176,25 @@ Contract
   expected columns and their types), a list of rules, and details like the owner and version. You
   create one with the `Contract` class and check a table against it with `.validate(data)`.
   Contracts can be saved as YAML, imported from other formats (such as JSON Schema, Frictionless,
-  dbt, and ODCS) with `import_contract()`, and exported with `export_contract()`. See also
-  **pipeline**, **contract import**, and **violation handling**. [Learn
-  more](../contracts-and-pipelines/contracts.qmd).
+  dbt, and ODCS) with [`import_contract()`](`pointblank.import_contract`), and exported with
+  [`export_contract()`](`pointblank.export_contract`). See also **pipeline**, **contract import**,
+  and **violation handling**. [Learn more](../contracts-and-pipelines/contracts.qmd).
 
 Contract adapter
 : The part of Pointblank that translates between a **contract** and one outside format. There are
   built-in adapters for JSON Schema, Frictionless, dbt, and ODCS, and `list_adapters()` shows which
   ones are available. For another format, you can write your own adapter by making a subclass of
-  `ContractAdapter` and registering it with `@register_adapter`. `import_contract()` and
-  `export_contract()` can then use it like any other. [Learn
+  `ContractAdapter` and registering it with `@register_adapter`.
+  [`import_contract()`](`pointblank.import_contract`) and
+  [`export_contract()`](`pointblank.export_contract`) can then use it like any other. [Learn
   more](../contracts-and-pipelines/custom-adapters.qmd).
 
 Contract import
-: What you get back from `import_contract()`: a `ContractImport` object holding the checks that
-  were translated from an outside format. Nothing is checked yet. Its `coverage` is the share of
-  the outside rules that could be translated, and `warnings` lists any that couldn't. From there,
-  `to_validate(data)` gives a **validation plan**, `to_contract()` gives a **contract**, and
-  `to_python()` or `to_yaml()` give code. [Learn
+: What you get back from [`import_contract()`](`pointblank.import_contract`): a `ContractImport`
+  object holding the checks that were translated from an outside format. Nothing is checked yet. Its
+  `coverage` is the share of the outside rules that could be translated, and `warnings` lists any
+  that couldn't. From there, `to_validate(data)` gives a **validation plan**, `to_contract()` gives
+  a **contract**, and `to_python()` or [`to_yaml()`](`ContractImport.to_yaml`) give code. [Learn
   more](../contracts-and-pipelines/importing-contracts.qmd).
 
 Controlled terminology (CT)
@@ -42363,11 +42388,12 @@ OpenTelemetry integration
   more](../integrations/otel-integration.qmd).
 
 Partitions
-: A way to compare tables that are too large to fit in memory. With `partitions=N`, `compare()`
-  (and `tbl_match()` and `tbl_reconcile()`) works through the tables in N passes, each covering a
-  share of the keys from both tables. The results are the same as in a single pass, but less memory
-  is needed at once. More partitions use less memory but take longer. See also **table
-  comparison**. [Learn more](../table-comparison/comparing-large-files.qmd).
+: A way to compare tables that are too large to fit in memory. With `partitions=N`,
+  [`compare()`](`pointblank.compare`) (and `tbl_match()` and `tbl_reconcile()`) works through the
+  tables in N passes, each covering a share of the keys from both tables. The results are the same
+  as in a single pass, but less memory is needed at once. More partitions use less memory but take
+  longer. See also **table comparison**. [Learn
+  more](../table-comparison/comparing-large-files.qmd).
 
 Pipeline
 : A data-processing step with **contracts** on both sides. A `Pipeline` checks the incoming data
@@ -42446,11 +42472,11 @@ Report language
   [Learn more](../validation-plan/briefs.qmd).
 
 Round trip
-: Turning something into another form and back again, ending up with the same thing. For example,
-  a **validation plan** saved with `to_yaml()` and loaded again with `yaml_interrogate()`, or a
-  **contract** imported from JSON Schema and exported back. Anything that both forms can express
-  survives the round trip. Things that only one form can express, such as a `pre=` function, are
-  replaced with a placeholder or left out. [Learn
+: Turning something into another form and back again, ending up with the same thing. For example, a
+  **validation plan** saved with [`to_yaml()`](`Validate.to_yaml`) and loaded again with
+  `yaml_interrogate()`, or a **contract** imported from JSON Schema and exported back. Anything that
+  both forms can express survives the round trip. Things that only one form can express, such as a
+  `pre=` function, are replaced with a placeholder or left out. [Learn
   more](../advanced-validation/plan-serialization.qmd).
 
 Row-based check
@@ -42524,9 +42550,9 @@ Specification check
 
 Status check
 : A method that tells you how a validation went, as `True` or `False`, without stopping your code.
-  `all_passed()` tells you whether every **test unit** passed, and `above_threshold()`,
-  `warning()`, `error()`, and `critical()` tell you whether **threshold** levels were reached. See
-  also **assertion**. [Learn more](../advanced-validation/assertions.qmd).
+  [`all_passed()`](`Validate.all_passed`) tells you whether every **test unit** passed, and
+  `above_threshold()`, `warning()`, `error()`, and `critical()` tell you whether **threshold**
+  levels were reached. See also **assertion**. [Learn more](../advanced-validation/assertions.qmd).
 
 Step
 : Usually short for **validation step**. In a **contract**, the `Step` class describes one
@@ -42549,16 +42575,17 @@ Sundering
   more](../post-interrogation/sundering.qmd).
 
 Table comparison
-: Finding the differences between two tables. `compare()` matches up the rows of a source table
-  and a target table, gives each row a **row status** (such as `changed` or `missing`), and reports
-  any differences in their columns. It returns a `Comparison` object, which counts as `True` only
-  if the tables match. Rows can be matched by key columns (`keys="id"`), by position (the default),
-  or regardless of order (`keys="*"`), and small differences can be allowed with `tolerance=` or
-  ignored with `normalize=` (for example, letter case). As a **validation step**, `tbl_match()`
-  runs the same comparison with each row as a **test unit**, and `tbl_reconcile()` compares totals
-  instead (see **reconciliation**). From the **CLI**, use `pb compare`. To check only the number of
-  rows or columns, use `row_count_match()` or `col_count_match()`. See also **source and target**
-  and **partitions**. [Learn more](../table-comparison/comparing-tables.qmd).
+: Finding the differences between two tables. [`compare()`](`pointblank.compare`) matches up the
+  rows of a source table and a target table, gives each row a **row status** (such as `changed` or
+  `missing`), and reports any differences in their columns. It returns a `Comparison` object, which
+  counts as `True` only if the tables match. Rows can be matched by key columns (`keys="id"`), by
+  position (the default), or regardless of order (`keys="*"`), and small differences can be allowed
+  with `tolerance=` or ignored with `normalize=` (for example, letter case). As a **validation
+  step**, `tbl_match()` runs the same comparison with each row as a **test unit**, and
+  `tbl_reconcile()` compares totals instead (see **reconciliation**). From the **CLI**, use
+  `pb compare`. To check only the number of rows or columns, use `row_count_match()` or
+  `col_count_match()`. See also **source and target** and **partitions**. [Learn
+  more](../table-comparison/comparing-tables.qmd).
 
 Test data generation
 : Making realistic fake tables for testing and demos. You describe each column in a `Schema` with

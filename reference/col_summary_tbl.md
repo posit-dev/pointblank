@@ -4,7 +4,7 @@ Generate a column-level summary table of a dataset.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1230-L1330)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1238-L1338)
 
 ``` python
 col_summary_tbl(
@@ -87,7 +87,7 @@ nycflights = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
 pb.col_summary_tbl(data=nycflights, tbl_name="nycflights")
 ```
 
-    /Users/riannone/py_projects/pointblank/.venv/lib/python3.11/site-packages/great_tables/_tbl_data.py:902: UserWarning: PyArrow Table support is currently experimental.
+    /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/great_tables/_tbl_data.py:902: UserWarning: PyArrow Table support is currently experimental.
       warnings.warn("PyArrow Table support is currently experimental.")
 
 [TABLE]

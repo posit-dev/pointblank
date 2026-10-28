@@ -408,10 +408,10 @@ Export the profile as a JSON string.
 Save the profile to a JSON file.
 
 [DataScan.from_dict()](DataScan.from_dict.md#pointblank.DataScan.from_dict)  
-Restore a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a dictionary produced by `to_dict()`.
+Restore a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a dictionary.
 
 [DataScan.from_json()](DataScan.from_json.md#pointblank.DataScan.from_json)  
-Restore a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a JSON string produced by `to_json()`.
+Restore a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a JSON string.
 
 [DataScan.load_from_json()](DataScan.load_from_json.md#pointblank.DataScan.load_from_json)  
 Load a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a JSON file produced by [save_to_json()](../reference/DataScan.save_to_json.md#pointblank.DataScan.save_to_json).
@@ -468,7 +468,7 @@ Get a per-column summary of value mismatches.
 Get the comparison results as a JSON-serializable dict.
 
 [Comparison.to_json()](Comparison.to_json.md#pointblank.Comparison.to_json)  
-Get the comparison results as a JSON string (see `to_dict()`).
+Get the comparison results as a JSON string.
 
 [Comparison.get_tabular_report()](Comparison.get_tabular_report.md#pointblank.Comparison.get_tabular_report)  
 Get a tabular report of the comparison.

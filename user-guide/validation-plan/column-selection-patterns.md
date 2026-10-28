@@ -96,7 +96,7 @@ The complete list of column selectors includes:
 - [starts_with()](../../reference/starts_with.md#pointblank.starts_with)
 - [ends_with()](../../reference/ends_with.md#pointblank.ends_with)
 - [contains()](../../reference/contains.md#pointblank.contains)
-- `matches()`
+- [`matches()`](../../reference/matches.md#pointblank.matches)
 - [everything()](../../reference/everything.md#pointblank.everything)
 - [first_n()](../../reference/first_n.md#pointblank.first_n)
 - [last_n()](../../reference/last_n.md#pointblank.last_n)
@@ -133,7 +133,7 @@ This selects every column except the first four, resulting in seven validation s
 
 Pointblank also supports column selectors from the [Narwhals](https://narwhals-dev.github.io/narwhals/) library, which include:
 
-- `matches()`
+- [`matches()`](../../reference/matches.md#pointblank.matches)
 - `by_dtype()`
 - `boolean()`
 - `categorical()`

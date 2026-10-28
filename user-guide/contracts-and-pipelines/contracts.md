@@ -186,7 +186,7 @@ The `on_violation` parameter controls what happens when validation fails (used b
 
 ## Using `to_validate()` for Custom Workflows
 
-If you need more control, `to_validate()` gives you back an un-interrogated [Validate](../../reference/Validate.md#pointblank.Validate) object that you can extend with additional checks:
+If you need more control, [`to_validate()`](../../reference/Contract.md#pointblank.Contract.to_validate) gives you back an un-interrogated [Validate](../../reference/Validate.md#pointblank.Validate) object that you can extend with additional checks:
 
 ``` python
 # Start from the contract, then add ad-hoc checks

@@ -8,7 +8,7 @@ Three methods do this:
 - [`Validate.to_yaml()`](../../reference/Validate.to_yaml.md#pointblank.Validate.to_yaml) produces a [`yaml_interrogate()`](../../reference/yaml_interrogate.md#pointblank.yaml_interrogate)-compatible YAML document
 - [`Validate.to_json_schema()`](../../reference/Validate.to_json_schema.md#pointblank.Validate.to_json_schema) produces a [JSON Schema](https://json-schema.org/) document
 
-The first two are ordinary, deterministic utilities that round-trip through Pointblank itself. [to_json_schema()](../../reference/Validate.to_json_schema.md#pointblank.Validate.to_json_schema) produces a standard that tools in many ecosystems can consume. All three are useful for sharing plans, reviewing changes in a diff, and persisting a plan alongside its results. `to_code()` and `to_yaml()` are also the foundation for the [AI Validation Editor](ai-validation-editor.md), which sends the current plan to a model as editable code.
+The first two are ordinary, deterministic utilities that round-trip through Pointblank itself. [to_json_schema()](../../reference/Validate.to_json_schema.md#pointblank.Validate.to_json_schema) produces a standard that tools in many ecosystems can consume. All three are useful for sharing plans, reviewing changes in a diff, and persisting a plan alongside its results. [`to_code()`](../../reference/Validate.to_code.md#pointblank.Validate.to_code) and [`to_yaml()`](../../reference/Validate.to_yaml.md#pointblank.Validate.to_yaml) are also the foundation for the [AI Validation Editor](ai-validation-editor.md), which sends the current plan to a model as editable code.
 
 ## Rendering a Plan as Python Code
 
@@ -241,7 +241,7 @@ This is useful for checking schemas into version control or feeding them into do
 
 ### Relationship to `export_contract()`
 
-Under the hood, [to_json_schema()](../../reference/Validate.to_json_schema.md#pointblank.Validate.to_json_schema) delegates to the `export_contract()` function with `format="json_schema"`. The convenience method adds type enrichment from the data and handles file output. If you need the raw adapter behavior (for example, to export without type enrichment, or to work with a [Contract](../../reference/Contract.md#pointblank.Contract) object rather than a [Validate](../../reference/Validate.md#pointblank.Validate) object), use `export_contract()` directly. See the [Importing and Exporting Contracts](../contracts-and-pipelines/importing-contracts.md) guide for the full story on contract adapters.
+Under the hood, [to_json_schema()](../../reference/Validate.to_json_schema.md#pointblank.Validate.to_json_schema) delegates to the [`export_contract()`](../../reference/export_contract.md#pointblank.export_contract) function with `format="json_schema"`. The convenience method adds type enrichment from the data and handles file output. If you need the raw adapter behavior (for example, to export without type enrichment, or to work with a [Contract](../../reference/Contract.md#pointblank.Contract) object rather than a [Validate](../../reference/Validate.md#pointblank.Validate) object), use `export_contract()` directly. See the [Importing and Exporting Contracts](../contracts-and-pipelines/importing-contracts.md) guide for the full story on contract adapters.
 
 ## Conclusion
 

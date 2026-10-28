@@ -2,14 +2,14 @@
 
 Pointblank's contract import/export system is designed to be extensible. If your organization uses a proprietary schema format, an internal data catalog, or any other schema definition tool that isn't covered by the built-in adapters, you can write a **custom adapter** and register it with the framework.
 
-Once registered, your custom adapter works seamlessly with `import_contract()` and `export_contract()`, the same API surface your team already uses for JSON Schema, Frictionless, dbt, and ODCS.
+Once registered, your custom adapter works seamlessly with [`import_contract()`](../../reference/import_contract.md#pointblank.import_contract) and [`export_contract()`](../../reference/export_contract.md#pointblank.export_contract), the same API surface your team already uses for JSON Schema, Frictionless, dbt, and ODCS.
 
 ## The Adapter Architecture
 
 Every adapter follows the same pattern:
 
 1.  **Subclass** [ContractAdapter](../../reference/ContractAdapter.md#pointblank.ContractAdapter) and set a few class attributes
-2.  **Implement** [detect()](../../reference/ContractAdapter.md#pointblank.ContractAdapter.detect) (for auto-detection), `import_contract()`, and optionally `export_contract()`
+2.  **Implement** [detect()](../../reference/ContractAdapter.md#pointblank.ContractAdapter.detect) (for auto-detection), [`import_contract()`](../../reference/ContractAdapter.md#pointblank.ContractAdapter.import_contract), and optionally [`export_contract()`](../../reference/ContractAdapter.md#pointblank.ContractAdapter.export_contract)
 3.  **Register** the adapter with the `@register_adapter` decorator
 
 Here's a minimal example to illustrate the structure:

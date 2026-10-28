@@ -4,13 +4,13 @@ Compare this scan against a baseline and return the differences.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L699-L717)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L705-L724)
 
 ``` python
 DataScan.compare(baseline)
 ```
 
-The comparison covers schema changes (columns added, removed, or with changed types) and statistical drift for columns present in both scans. The returned [DataScanDiff](../reference/DataScanDiff.md#pointblank.DataScanDiff) object provides programmatic access to the results and a tabular report via `get_tabular_report()`.
+The comparison covers schema changes (columns added, removed, or with changed types) and statistical drift for columns present in both scans. The returned [DataScanDiff](../reference/DataScanDiff.md#pointblank.DataScanDiff) object provides programmatic access to the results and a tabular report via [`get_tabular_report()`](../reference/DataScanDiff.md#pointblank.DataScanDiff.get_tabular_report).
 
 ## Parameters
 

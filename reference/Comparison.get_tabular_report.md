@@ -4,7 +4,7 @@ Get a tabular report of the comparison.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L1473-L1511)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L1477-L1515)
 
 ``` python
 Comparison.get_tabular_report(

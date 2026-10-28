@@ -4,7 +4,7 @@ The result of a CDISC conformance validation run.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L919-L1921)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L919-L1923)
 
 ``` python
 ConformanceReport(
@@ -117,7 +117,7 @@ Return all row-level findings as a Polars DataFrame.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1387-L1462)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1387-L1463)
 
 ``` python
 findings_df()
@@ -125,7 +125,7 @@ findings_df()
 
 Each row represents one failing record captured during the conformance run. Use this method for programmatic analysis (filtering by rule, grouping by subject, exporting to CSV, or joining back to the source datasets to investigate root causes).
 
-Only `RECORD_CHECK` and `DATASET_CONTENTS_CHECK` rules produce row-level findings; rules that check metadata or domain presence (e.g., `VARIABLE_METADATA_CHECK`, `DOMAIN_PRESENCE_CHECK`) report a finding count in `get_tabular_report()` but do not appear here. To see the visual findings table call [get_findings_table()](../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table) instead.
+Only `RECORD_CHECK` and `DATASET_CONTENTS_CHECK` rules produce row-level findings; rules that check metadata or domain presence (e.g., `VARIABLE_METADATA_CHECK`, `DOMAIN_PRESENCE_CHECK`) report a finding count in [`get_tabular_report()`](../reference/ConformanceReport.md#pointblank.ConformanceReport.get_tabular_report) but do not appear here. To see the visual findings table call [get_findings_table()](../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table) instead.
 
 Findings are capped at **100 rows per rule** to bound memory use on large datasets. The `n_issues` value shown in `get_tabular_report()` always reflects the true total count for a rule, even when more than 100 records failed.
 
@@ -189,13 +189,13 @@ Build a record-level findings table as a styled Great Tables object.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1464-L1623)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1465-L1625)
 
 ``` python
 get_findings_table()
 ```
 
-Returns one row per failing record captured by Pointblank's built-in rules engine. This is the drill-down companion to `get_tabular_report()`: where the tabular report shows one row per rule with an aggregate issue count, the findings table shows the individual offending records so reviewers can trace violations back to specific subjects and variables.
+Returns one row per failing record captured by Pointblank's built-in rules engine. This is the drill-down companion to [`get_tabular_report()`](../reference/ConformanceReport.md#pointblank.ConformanceReport.get_tabular_report): where the tabular report shows one row per rule with an aggregate issue count, the findings table shows the individual offending records so reviewers can trace violations back to specific subjects and variables.
 
 #### Table Layout
 
@@ -237,7 +237,7 @@ Build a rule-level conformance summary table as a styled Great Tables object.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1625-L1839)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1627-L1841)
 
 ``` python
 get_tabular_report()

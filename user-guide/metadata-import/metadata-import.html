@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-0158e586ba661c38853d0fb84a3c8340.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-2cbc4fce51ec727eb1ce5774130eab4b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -694,7 +694,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Pointblank’s metadata import system reads these external descriptions and converts them into validation workflows automatically. Rather than manually translating a Define-XML specification or an SPSS codebook into validation code, you can call <a href="../../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link gdls-code">import_metadata()</a> and let Pointblank generate the appropriate checks for you. The result is a <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> object that bridges between domain-specific formats and Pointblank’s validation engine.</p>
 <section id="quick-start" class="level1">
 <h1>Quick Start</h1>
-<p>The fastest path from a metadata file to a running validation uses three steps: import the metadata, provide your data, and call <code>to_validate()</code>. Here is the basic pattern:</p>
+<p>The fastest path from a metadata file to a running validation uses three steps: import the metadata, provide your data, and call <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a>. Here is the basic pattern:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Import metadata from any supported format</span></span>
@@ -840,7 +840,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="converting-to-a-validation-workflow" class="level1">
 <h1>Converting to a Validation Workflow</h1>
-<p>The <code>to_validate()</code> method is where all the power lives. It reads all constraints from the metadata and generates a complete <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with the appropriate validation steps. Each constraint type maps to a specific Pointblank method:</p>
+<p>The <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a> method is where all the power lives. It reads all constraints from the metadata and generates a complete <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with the appropriate validation steps. Each constraint type maps to a specific Pointblank method:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">

@@ -4,7 +4,7 @@ Generate a comprehensive SDTM validation workflow for a dataset.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_validate.py#L91-L197)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_validate.py#L92-L198)
 
 ``` python
 validate_sdtm(

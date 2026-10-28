@@ -467,7 +467,7 @@ report_with_issues = pb.validate_sdtmig({"DM": dm_with_issues})
 report_with_issues.get_findings_table()
 ```
 
-    /Users/riannone/py_projects/pointblank/.venv/lib/python3.11/site-packages/great_tables/_render_checks.py:37: RenderWarning: Rendering table with .cols_width() in Quarto may result in unexpected behavior. This is because Quarto performs custom table processing. Either use all percentage widths, or set .tab_options(quarto_disable_processing=True) to disable Quarto table processing.
+    /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/great_tables/_render_checks.py:37: RenderWarning: Rendering table with .cols_width() in Quarto may result in unexpected behavior. This is because Quarto performs custom table processing. Either use all percentage widths, or set .tab_options(quarto_disable_processing=True) to disable Quarto table processing.
       warnings.warn(
 
 | Findings Report for CDISC Conformance |  |  |  |  |  |  |  |
@@ -540,9 +540,9 @@ shape: (3, 2)
 | rule_id    | n_violations |
 |------------|--------------|
 | str        | u32          |
+| "SDTM-195" | 1            |
 | "SDTM-010" | 1            |
 | "SDTM-007" | 1            |
-| "SDTM-195" | 1            |
 
 The DataFrame is empty (with the same schema) when all rules pass, so it is safe to call unconditionally in a script. Use it to triage failures before running the more time-intensive CDISC CORE engine, or to generate a custom summary report tailored to your team's workflow.
 
@@ -755,7 +755,7 @@ print(report)
       430 rules (EXECUTION ERROR=2, ISSUE REPORTED=6, SKIPPED=344, SUCCESS=78)
       8 issues -- FAIL
 
-**Overall result.** `all_passed()` returns `True` when no rules reported issues; [is_core](../../reference/ConformanceReport.md#pointblank.ConformanceReport.is_core) confirms the report originated from the CORE engine rather than the built-in engine:
+**Overall result.** [`all_passed()`](../../reference/ConformanceReport.md#pointblank.ConformanceReport.all_passed) returns `True` when no rules reported issues; [is_core](../../reference/ConformanceReport.md#pointblank.ConformanceReport.is_core) confirms the report originated from the CORE engine rather than the built-in engine:
 
 ``` python
 print("All passed:", report.all_passed())
@@ -765,7 +765,7 @@ print("Is CORE report:", report.is_core)
     All passed: False
     Is CORE report: True
 
-**Summary dictionary.** `summary()` returns run provenance and rule counts as a plain dictionary, useful for logging, assertions in CI scripts, or building a custom status page:
+**Summary dictionary.** [`summary()`](../../reference/ConformanceReport.md#pointblank.ConformanceReport.summary) returns run provenance and rule counts as a plain dictionary, useful for logging, assertions in CI scripts, or building a custom status page:
 
 ``` python
 s = report.summary()
@@ -904,7 +904,7 @@ Both built-in and CORE reports can be exported for archiving, sharing with a bio
 
 ### JSON
 
-`to_json()` saves the report as a JSON file. For CORE reports the structure mirrors CORE's native output and is parseable by `parse_core_report()`:
+[`to_json()`](../../reference/ConformanceReport.md#pointblank.ConformanceReport.to_json) saves the report as a JSON file. For CORE reports the structure mirrors CORE's native output and is parseable by `parse_core_report()`:
 
 ``` python
 import tempfile

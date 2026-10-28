@@ -4,7 +4,7 @@ The result of comparing two [DataScan](../reference/DataScan.md#pointblank.DataS
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L920-L1219)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L927-L1227)
 
 ``` python
 DataScanDiff(
@@ -13,7 +13,7 @@ DataScanDiff(
 )
 ```
 
-Created by calling [DataScan.compare()](../reference/DataScan.compare.md#pointblank.DataScan.compare). Provides programmatic access to schema changes and per-column statistical drift, plus a tabular report via `get_tabular_report()`.
+Created by calling [DataScan.compare()](../reference/DataScan.compare.md#pointblank.DataScan.compare). Provides programmatic access to schema changes and per-column statistical drift, plus a tabular report via [`get_tabular_report()`](../reference/DataScanDiff.md#pointblank.DataScanDiff.get_tabular_report).
 
 ## Attributes
 
@@ -61,7 +61,7 @@ Generate a GT table summarizing the differences between the two scans.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1091-L1209)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1099-L1217)
 
 ``` python
 get_tabular_report()
@@ -78,7 +78,7 @@ Export the comparison results as a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1053-L1089)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1061-L1097)
 
 ``` python
 to_dict()

@@ -7,7 +7,7 @@ A very common data question is *how do these two tables differ?* Maybe you refac
 - which records have values that differ, and in which columns
 - whether the columns themselves (names, types, order) changed
 
-Pointblank answers all of these with the `compare()` function, and the same comparison is available as a validation step through [Validate.tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) and on the command line through `pb compare`.
+Pointblank answers all of these with the [`compare()`](../../reference/compare.md#pointblank.compare) function, and the same comparison is available as a validation step through [Validate.tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) and on the command line through `pb compare`.
 
 ## A First Comparison
 
@@ -290,7 +290,7 @@ validation.get_step_report(i=1)
 
 ## Exporting the Results
 
-The results can be serialized with `to_dict()` or `to_json()`, which include the counts, the schema differences, and (by default) samples of the differing rows. If the data could contain sensitive values, leave the samples out:
+The results can be serialized with [`to_dict()`](../../reference/Comparison.to_dict.md#pointblank.Comparison.to_dict) or [`to_json()`](../../reference/Comparison.to_json.md#pointblank.Comparison.to_json), which include the counts, the schema differences, and (by default) samples of the differing rows. If the data could contain sensitive values, leave the samples out:
 
 ``` python
 print(comparison.to_json(samples=False))

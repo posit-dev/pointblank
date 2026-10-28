@@ -102,7 +102,7 @@ Define-XML documents contain rich structural metadata. Pointblank extracts the f
 
 ### Controlled Terminology from Define-XML
 
-Define-XML documents embed the codelists that constrain variable values. When Pointblank parses a Define-XML, all codelists are extracted and linked to their respective variables. The `to_validate()` method then generates [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) checks for each variable that references a codelist:
+Define-XML documents embed the codelists that constrain variable values. When Pointblank parses a Define-XML, all codelists are extracted and linked to their respective variables. The [`to_validate()`](../../reference/MetadataImport.md#pointblank.MetadataImport.to_validate) method then generates [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) checks for each variable that references a codelist:
 
 ``` python
 # Inspect codelists referenced by the Demographics domain
@@ -498,7 +498,7 @@ print(f"Population flags present: {result.get('population_flags_present', [])}")
 
 ### Converting ADaM Templates to MetadataImport
 
-The [adam_to_metadata()](../../reference/adam_to_metadata.md#pointblank.adam_to_metadata) function converts an ADaM template into the standard [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) format, giving you access to [to_schema()](../../reference/MetadataImport.md#pointblank.MetadataImport.to_schema) and `to_validate()`:
+The [adam_to_metadata()](../../reference/adam_to_metadata.md#pointblank.adam_to_metadata) function converts an ADaM template into the standard [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) format, giving you access to [to_schema()](../../reference/MetadataImport.md#pointblank.MetadataImport.to_schema) and [`to_validate()`](../../reference/MetadataImport.md#pointblank.MetadataImport.to_validate):
 
 ``` python
 from pointblank.metadata import adam_to_metadata
