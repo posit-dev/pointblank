@@ -145,6 +145,10 @@ skill:
 
 # API Reference Structure
 # Organized to match the current quartodoc sections
+#
+# A `members:` list sets the reading order of a class's members (attributes always render before
+# methods). Only the listed members are documented, so add new public methods and properties to
+# the list.
 reference:
   title: "Reference"
   sections:
@@ -166,9 +170,27 @@ reference:
         - name: DraftValidation
           members: false
         - name: EditValidation
-          members: true
+          members:
+            - review
+            - accept
+            - diff
+            - changed_steps
+            - to_code
+            - validate_syntax
+            - from_plans
         - name: MissingSpec
-          members: true
+          members:
+            - from_cdisc_null_flavors
+            - from_cdisc
+            - from_sas
+            - from_spss
+            - from_variable_metadata
+            - is_missing
+            - reason_for
+            - sentinel_values
+            - reasons_list
+            - values_for_reason
+            - values_for_category
 
     - title: Contracts and Pipelines
       desc: >
@@ -179,13 +201,28 @@ reference:
         `PipelineResult` with full introspection into what passed and what failed.
       contents:
         - name: Contract
-          members: true
+          members:
+            - validate
+            - to_validate
+            - to_yaml
+            - from_yaml
+            - to_dict
+            - from_dict
         - name: Step
-          members: true
+          members:
+            - to_dict
+            - from_dict
         - name: Steps
           members: true
         - name: Pipeline
-          members: true
+          members:
+            - run
+            - validate_source
+            - validate_target
+            - to_yaml
+            - from_yaml
+            - to_dict
+            - from_dict
         - name: PipelineResult
           members: true
 
@@ -201,9 +238,17 @@ reference:
         - list_adapters
         - register_adapter
         - name: ContractImport
-          members: true
+          members:
+            - to_validate
+            - to_contract
+            - to_python
+            - to_yaml
+            - summary
         - name: ContractAdapter
-          members: true
+          members:
+            - detect
+            - import_contract
+            - export_contract
 
     - title: Validation Steps
       desc: >
@@ -332,7 +377,8 @@ reference:
         `preview()` for first/last rows, `col_summary_tbl()` for column summaries, and
         `missing_vals_tbl()` for missing value analysis.
       contents:
-        - DataScan
+        - name: DataScan
+          members: false
         - DataScanDiff
         - preview
         - col_summary_tbl
@@ -341,6 +387,19 @@ reference:
         - get_data_path
         - connect_to_table
         - print_database_tables
+
+    - title: DataScan Methods
+      desc: Methods for the DataScan class
+      contents:
+        - DataScan.get_tabular_report
+        - DataScan.summary_data
+        - DataScan.compare
+        - DataScan.save_to_json
+        - DataScan.load_from_json
+        - DataScan.to_json
+        - DataScan.from_json
+        - DataScan.to_dict
+        - DataScan.from_dict
 
     - title: Table Comparison
       desc: >
@@ -352,8 +411,24 @@ reference:
         per group) instead of rows.
       contents:
         - compare
-        - Comparison
+        - name: Comparison
+          members: false
         - SchemaDiff
+
+    - title: Comparison Methods
+      desc: Methods for the Comparison class
+      contents:
+        - Comparison.identical
+        - Comparison.schema_ok
+        - Comparison.status_counts
+        - Comparison.n
+        - Comparison.n_passed
+        - Comparison.n_failed
+        - Comparison.rows
+        - Comparison.column_summary
+        - Comparison.get_tabular_report
+        - Comparison.to_dict
+        - Comparison.to_json
 
     - title: Table Pre-checks
       desc: >
@@ -419,13 +494,27 @@ reference:
         - import_metadata
         - export_metadata
         - name: MetadataImport
-          members: true
+          members:
+            - variable_names
+            - to_validate
+            - to_schema
+            - get_variable
+            - get_codelist
+            - missing_specs
+            - summary
         - name: MetadataPackage
-          members: true
+          members:
+            - get_domain
+            - keys
+            - values
+            - summary
         - name: VariableMetadata
           members: true
         - name: Codelist
-          members: true
+          members:
+            - to_set
+            - to_dict
+            - extended_values
         - name: CodelistEntry
           members: true
         - name: MissingValueCode
@@ -444,7 +533,11 @@ reference:
         - get_sdtm_domain
         - list_sdtm_domains
         - name: SDTMDomainTemplate
-          members: true
+          members:
+            - required_variables
+            - expected_variables
+            - identifier_variables
+            - get_variable
         - name: SDTMVariableSpec
           members: true
 
@@ -460,7 +553,11 @@ reference:
         - get_adam_dataset
         - list_adam_datasets
         - name: ADaMDatasetTemplate
-          members: true
+          members:
+            - required_variables
+            - conditional_variables
+            - population_flags
+            - get_variable
         - name: ADaMVariableSpec
           members: true
 
@@ -476,9 +573,32 @@ reference:
         - validate_sdtmig
         - validate_cdisc_submission
         - name: SubmissionPackage
-          members: true
+          members:
+            - domains
+            - metadata
+            - from_folder
+            - validate_conformance
+            - get_dataset
+            - subject_ids
+            - orphan_ids
+            - summary
         - name: ConformanceReport
-          members: true
+          members:
+            - n_datasets
+            - is_core
+            - is_rules
+            - all_passed
+            - summary
+            - get_tabular_report
+            - get_findings_table
+            - rules
+            - issues
+            - findings
+            - findings_df
+            - get_validation
+            - to_json
+            - to_excel
+            - from_core_report
 
     - title: Integrations
       desc: >
