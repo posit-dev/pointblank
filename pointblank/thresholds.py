@@ -456,8 +456,8 @@ class Actions:
 
     See Also
     --------
-    The [`get_action_metadata()`](`pointblank.get_action_metadata`) function, which can be used to
-    retrieve metadata about the step where the action is executed.
+    get_action_metadata : Get metadata about the step where an action is executed.
+    FinalActions : Define actions that run after all validation steps are done.
     """
 
     warning: str | Callable | list[str | Callable] | None = None
@@ -599,8 +599,8 @@ class FinalActions:
 
     See Also
     --------
-    The [`get_validation_summary()`](`pointblank.get_validation_summary`) function, which can be
-    used to retrieve the summary of the validation results.
+    get_validation_summary : Get a summary of the validation results inside a final action.
+    Actions : Define actions that run when a step exceeds a threshold.
     """
 
     actions: list | str | Callable
