@@ -374,6 +374,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">ContractAdapter</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1683,7 +1689,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L17-L256" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L17-L261" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">PipelineResult</span>(</span>
@@ -1724,7 +1730,7 @@ The table returned by the transformation function, or <code>None</code> if the r
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s run a small pipeline that turns raw temperature readings in Fahrenheit into Celsius. The source contract requires a station for every reading, and the target contract requires temperatures in a plausible range.</p>
-<div id="ac29e391" class="cell" data-execution_count="2">
+<div id="1bd75fb3" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1756,7 +1762,7 @@ The table returned by the transformation function, or <code>None</code> if the r
 </div>
 </div>
 <p>Printing the result shows which boundaries were validated and whether the run passed. In a scheduled job, <a href="../reference/PipelineResult.html#pointblank.PipelineResult.passed" class="gdls-link gdls-code">passed</a> is the natural thing to branch on:</p>
-<div id="1b0d0e2f" class="cell" data-execution_count="3">
+<div id="ee4f0156" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> result.passed:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(result.transform_output)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1775,7 +1781,7 @@ The table returned by the transformation function, or <code>None</code> if the r
 </div>
 </div>
 <p>For a plain-text summary of both boundaries, suitable for a log or a notification, use <a href="../reference/PipelineResult.html#pointblank.PipelineResult.get_report" class="gdls-link"><code>get_report()</code></a>:</p>
-<div id="e08e2833" class="cell" data-execution_count="4">
+<div id="71879c42" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result.get_report())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Pipeline Boundary Validation Results
@@ -1797,7 +1803,7 @@ Overall: PASSED</code></pre>
 </div>
 </div>
 <p>The full validation report for either boundary is in <code>source_validation</code> or <code>target_validation</code>:</p>
-<div id="539e11c2" class="cell" data-execution_count="5">
+<div id="3730af71" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>result.target_validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1957,6 +1963,7 @@ Overall: PASSED</code></pre>
 </div>
 </div>
 </div>
+<p>All three converted readings pass the target’s single step, which is why <a href="../reference/PipelineResult.html#pointblank.PipelineResult.passed" class="gdls-link gdls-code">passed</a> is <code>True</code>. When a run fails, these reports show which steps failed and on which rows, and <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a> pulls out the failing rows themselves.</p>
 </section>
 <section id="see-also" class="level2 doc-see-also">
 <h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
@@ -2055,7 +2062,7 @@ Overall: PASSED</code></pre>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L182-L248" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L187-L253" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb9"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_report</span>()</span></code></pre></div>
@@ -2077,7 +2084,7 @@ A multi-line summary. Use <code>print()</code> to display it.
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
 <p>Let’s run a pipeline whose target contract catches a mistake in the transformation: it should keep only active accounts, but the filter was left out.</p>
-<div id="3eefa3b4" class="cell" data-execution_count="6">
+<div id="7ae1f9d4" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>

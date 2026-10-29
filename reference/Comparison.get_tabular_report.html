@@ -11,7 +11,7 @@
 <meta name="description" content="Get a tabular report of the comparison.">
 
 <title>Comparison.get_tabular_report() | Pointblank</title>
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Comparison.get_tabular_report - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Comparison.get_tabular_report.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Comparison.get_tabular_report - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Comparison.get_tabular_report.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -114,6 +114,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../gd-lightbox.css">
 <script defer="" src="../gd-lightbox.js"></script>
@@ -369,6 +372,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/ContractAdapter.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ContractAdapter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
   </div>
 </li>
       </ul>
@@ -1638,6 +1647,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
     </div>
@@ -1668,7 +1678,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L1478-L1516" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L2439-L2540" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Comparison</span><span class="op">.</span><span class="fu">get_tabular_report</span>(</span>
@@ -1679,7 +1689,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The report has a header with the verdict, the row status counts, and the comparison settings, followed by sections (as row groups) for schema differences, per-column mismatches, and samples of changed, missing, extra, and duplicate-key rows. Sections with nothing to show are omitted.</p>
+<p>The report brings everything about a comparison together in one table, for reading rather than for further processing. It’s what’s shown when a comparison is displayed in a notebook, and calling <code>get_tabular_report()</code> directly lets the report be customized and saved, for example to attach to a pull request or to share with whoever owns the data.</p>
+<p>The report has a header with the verdict, the row status counts, and the comparison settings, followed by sections (as row groups) for schema differences, per-column mismatches, and samples of changed, missing, extra, and duplicate-key rows. Changed rows show only the columns that differ, with the source and target values (and the difference, for numbers). Sections with nothing to show are omitted.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1714,6 +1725,279 @@ A Great Tables object.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s compare two months of a payroll table. Naming the tables with <code>source_name=</code> and <code>target_name=</code> makes the report easier to read.</p>
+<div id="23328169" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>payroll_jan <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"emp_id"</span>: [<span class="dv">101</span>, <span class="dv">102</span>, <span class="dv">103</span>, <span class="dv">104</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dept"</span>: [<span class="st">"Sales"</span>, <span class="st">"Sales"</span>, <span class="st">"Ops"</span>, <span class="st">"Ops"</span>],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"salary"</span>: [<span class="dv">52000</span>, <span class="dv">61000</span>, <span class="dv">58000</span>, <span class="dv">47000</span>],</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>payroll_feb <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"emp_id"</span>: [<span class="dv">101</span>, <span class="dv">102</span>, <span class="dv">103</span>, <span class="dv">105</span>],</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dept"</span>: [<span class="st">"Sales"</span>, <span class="st">"Sales"</span>, <span class="st">"Ops"</span>, <span class="st">"Ops"</span>],</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"salary"</span>: [<span class="dv">52000</span>, <span class="dv">63500</span>, <span class="dv">58000</span>, <span class="dv">49000</span>],</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    payroll_jan,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    payroll_feb,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    keys<span class="op">=</span><span class="st">"emp_id"</span>,</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    source_name<span class="op">=</span><span class="st">"payroll_jan"</span>,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    target_name<span class="op">=</span><span class="st">"payroll_feb"</span>,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>comparison.get_tabular_report()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_comparison_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_comparison_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_comparison_tbl p { margin: 0; padding: 0; }
+ #pb_comparison_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_comparison_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_comparison_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_comparison_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_comparison_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_comparison_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_comparison_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_comparison_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_comparison_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_comparison_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_comparison_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_comparison_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_comparison_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_comparison_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_comparison_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_comparison_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_comparison_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_comparison_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_comparison_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_comparison_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_left { text-align: left; }
+ #pb_comparison_tbl .gt_center { text-align: center; }
+ #pb_comparison_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_comparison_tbl .gt_font_normal { font-weight: normal; }
+ #pb_comparison_tbl .gt_font_bold { font-weight: bold; }
+ #pb_comparison_tbl .gt_font_italic { font-style: italic; }
+ #pb_comparison_tbl .gt_super { font-size: 65%; }
+ #pb_comparison_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:30%;">
+  <col style="width:70%;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_title gt_font_normal" id="pb_comparison_tbl-title">Table Comparison</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_comparison_tbl-subtitle"><div style="font-size:13px; line-height:1.9;"><strong>payroll_jan</strong> (4 rows) → <strong>payroll_feb</strong> (4 rows), aligned by key <code>emp_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 5 rows fail (60.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 2" style="width:40.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:20.000%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:20.000%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:20.000%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>2</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span></div></td>
+  </tr>
+
+</thead>
+<tbody class="gt_table_body">
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-2-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 2 columns)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left">salary</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:33.33%; height:100%; background:#E8A33D;"></div></div>1 of 3 matched rows differ (33.3%)</td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left">102</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">salary:</span> <span style="text-decoration:line-through; color:#999;">61000</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">63500</span> <span style="color:#888; font-size:11px;">(+2500)</span></span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left">104</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">dept:</span> Ops</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">salary:</span> 47000</span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left">105</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">dept:</span> Ops</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">salary:</span> 49000</span></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>The verdict and counts are at the top, and below them are the sections that have something to show: the mismatches in <code>salary</code>, the changed row for employee 102, and the employees who left and joined.</p>
+<p>The title can be replaced, and the labels can be shown in any of Pointblank’s reporting languages. Here’s the same report in French:</p>
+<div id="a84c6e9d" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison.get_tabular_report(title<span class="op">=</span><span class="st">"Paie : janvier et février"</span>, lang<span class="op">=</span><span class="st">"fr"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_comparison_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_comparison_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_comparison_tbl p { margin: 0; padding: 0; }
+ #pb_comparison_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_comparison_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_comparison_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_comparison_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_comparison_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_comparison_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_comparison_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_comparison_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_comparison_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_comparison_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_comparison_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_comparison_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_comparison_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_comparison_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_comparison_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_comparison_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_comparison_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_comparison_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_comparison_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_comparison_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_left { text-align: left; }
+ #pb_comparison_tbl .gt_center { text-align: center; }
+ #pb_comparison_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_comparison_tbl .gt_font_normal { font-weight: normal; }
+ #pb_comparison_tbl .gt_font_bold { font-weight: bold; }
+ #pb_comparison_tbl .gt_font_italic { font-style: italic; }
+ #pb_comparison_tbl .gt_super { font-size: 65%; }
+ #pb_comparison_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:30%;">
+  <col style="width:70%;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_title gt_font_normal" id="pb_comparison_tbl-title">Paie : janvier et février</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_comparison_tbl-subtitle"><div style="font-size:13px; line-height:1.9;"><strong>payroll_jan</strong> (4 lignes) → <strong>payroll_feb</strong> (4 lignes), alignées par la clé <code>emp_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFÉRENTES</span> 3 lignes sur 5 en échec (60,0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="identique: 2" style="width:40.000%; background:#4CA64C; height:100%;"></div><div title="modifiée: 1" style="width:20.000%; background:#E8A33D; height:100%;"></div><div title="manquante: 1" style="width:20.000%; background:#CF142B; height:100%;"></div><div title="supplémentaire: 1" style="width:20.000%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>identique <strong>2</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>modifiée <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>manquante <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>supplémentaire <strong>1</strong></span></div></td>
+  </tr>
+
+</thead>
+<tbody class="gt_table_body">
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Écarts-par-colonne-1-colonnes-sur-2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Écarts par colonne (1 colonnes sur 2)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Écarts-par-colonne-1-colonnes-sur-2" class="gt_row gt_left">salary</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Écarts-par-colonne-1-colonnes-sur-2" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:33.33%; height:100%; background:#E8A33D;"></div></div>1 lignes appariées sur 3 diffèrent (33,3%)</td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Lignes-modifiées-1-ligne" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Lignes modifiées (1 ligne)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Lignes-modifiées-1-ligne" class="gt_row gt_left">102</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Lignes-modifiées-1-ligne" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">salary:</span> <span style="text-decoration:line-through; color:#999;">61000</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">63500</span> <span style="color:#888; font-size:11px;">(+2500)</span></span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Absentes-de-la-cible-1-ligne" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Absentes de la cible (1 ligne)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Absentes-de-la-cible-1-ligne" class="gt_row gt_left">104</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Absentes-de-la-cible-1-ligne" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">dept:</span> Ops</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">salary:</span> 47000</span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Supplémentaires-dans-la-cible-1-ligne" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Supplémentaires dans la cible (1 ligne)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Supplémentaires-dans-la-cible-1-ligne" class="gt_row gt_left">105</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Supplémentaires-dans-la-cible-1-ligne" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">dept:</span> Ops</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">salary:</span> 49000</span></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>Numbers are formatted for the French locale too, with a decimal comma (as in <code>60,0%</code>). Use <code>locale=</code> to format them differently from the labels. To save a report as a standalone HTML file, use the <code>write_raw_html()</code> method of the returned Great Tables object.</p>
 
 
 </section>

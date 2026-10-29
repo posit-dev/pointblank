@@ -4,7 +4,7 @@ A declarative boundary contract for pipeline data.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L360-L1346)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L373-L1368)
 
 ``` python
 Contract(
@@ -248,11 +248,11 @@ The column names and types used in a contract's `schema=`.
 [Pipeline](../reference/Pipeline.md#pointblank.Pipeline)  
 Enforce source and target contracts around a transformation.
 
-`export_contract`  
+[export_contract()](../reference/export_contract.md#pointblank.export_contract)  
 Convert a contract to JSON Schema, Frictionless, dbt, or ODCS.
 
-`import_contract`  
-Read an external contract format, then call [to_contract()](../reference/ContractImport.md#pointblank.ContractImport.to_contract) on the result.
+[import_contract()](../reference/import_contract.md#pointblank.import_contract)  
+Read an external format, then call [to_contract()](../reference/ContractImport.md#pointblank.ContractImport.to_contract) on it.
 
 ## Methods
 
@@ -271,7 +271,7 @@ Check a table against the contract.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L811-L903)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L824-L916)
 
 ``` python
 validate(data)
@@ -345,7 +345,7 @@ Compile the contract into a validation plan for a table, without running it.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L692-L809)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L705-L822)
 
 ``` python
 to_validate(data)
@@ -416,7 +416,7 @@ Write the contract as YAML.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1248-L1336)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1264-L1358)
 
 ``` python
 to_yaml(path=None)
@@ -504,13 +504,15 @@ pb.Contract.from_yaml(contract_path) == sessions_contract
 
     True
 
+The file holds everything needed to rebuild the contract. A natural place for it is version control, next to the code that produces the data, so that changes to the rules are reviewed like any other change. Wherever the contract is enforced, it can be loaded with [`from_yaml()`](../reference/Contract.md#pointblank.Contract.from_yaml) (or as part of a pipeline with [`Pipeline.from_yaml()`](../reference/Pipeline.md#pointblank.Pipeline.from_yaml)).
+
 ### from_yaml()
 
 Read a contract from a YAML file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1121-L1246)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1137-L1262)
 
 ``` python
 from_yaml(path)
@@ -612,7 +614,7 @@ Convert the contract to a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L905-L989)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L918-L1005)
 
 ``` python
 to_dict()
@@ -693,13 +695,15 @@ print(json.dumps(accounts_contract.to_dict(), indent=2))
       }
     }
 
+The JSON text can be stored in a database column or sent to an API. After it's parsed with `json.loads()`, [`from_dict()`](../reference/Contract.md#pointblank.Contract.from_dict) rebuilds the contract.
+
 ### from_dict()
 
 Create a contract from a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L991-L1119)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1007-L1135)
 
 ``` python
 from_dict(data)

@@ -4,7 +4,7 @@ The outcome of running a data pipeline.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L17-L256)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L17-L261)
 
 ``` python
 PipelineResult(
@@ -121,6 +121,8 @@ result.target_validation
 
 [TABLE]
 
+All three converted readings pass the target's single step, which is why [passed](../reference/PipelineResult.md#pointblank.PipelineResult.passed) is `True`. When a run fails, these reports show which steps failed and on which rows, and [`get_data_extracts()`](../reference/Validate.get_data_extracts.md#pointblank.Validate.get_data_extracts) pulls out the failing rows themselves.
+
 ## See Also
 
 [Pipeline](../reference/Pipeline.md#pointblank.Pipeline)  
@@ -173,7 +175,7 @@ Summarize both boundary validations as plain text.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L182-L248)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L187-L253)
 
 ``` python
 get_report()

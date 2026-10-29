@@ -4,7 +4,7 @@ Perform multiple row-wise validations for joint validity.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15876-L16145)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15872-L16140)
 
 ``` python
 Validate.conjointly(
@@ -189,6 +189,5 @@ Using [`expr_col()`](../reference/expr_col.md#pointblank.expr_col) allows your v
 
 ## See Also
 
-`Look` at the documentation of the [`expr_col()`](../reference/expr_col.md#pointblank.expr_col) function for more  
-
-`information` on how to use it with different table backends.  
+[expr_col()](../reference/expr_col.md#pointblank.expr_col)  
+Build column expressions that work across table backends.

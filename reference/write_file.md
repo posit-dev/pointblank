@@ -4,7 +4,7 @@ Write a Validate object to disk as a serialized file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1138-L1490)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1135-L1486)
 
 ``` python
 write_file(
@@ -240,6 +240,5 @@ When you load this validation in a new session, simply import the preprocessing 
 
 ## See Also
 
-`Use` the [`read_file()`](../reference/read_file.md#pointblank.read_file) function to load a validation object that was  
-
-`previously` saved with [write_file()](../reference/write_file.md#pointblank.write_file).  
+[read_file()](../reference/read_file.md#pointblank.read_file)  
+Load a validation object saved with [write_file()](../reference/write_file.md#pointblank.write_file).

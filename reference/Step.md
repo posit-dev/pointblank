@@ -4,7 +4,7 @@ A single validation step, stored as data.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L18-L325)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L18-L338)
 
 ``` python
 Step(
@@ -116,6 +116,8 @@ id_length_step = pb.Step("col_vals_str_len", columns="patient_id", min_val=6, ma
 
 [TABLE]
 
+The first four steps give the same results as in the contract. The new length check, in step 5, also catches `"PT-03"`, which has five characters instead of six. Defining the steps once as a list lets a contract and an ordinary validation share them.
+
 ## See Also
 
 [Contract](../reference/Contract.md#pointblank.Contract)  
@@ -140,7 +142,7 @@ Convert the step to a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L191-L245)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L195-L253)
 
 ``` python
 to_dict()
@@ -188,13 +190,15 @@ pb.Step(
     {'col_vals_not_null': {'columns': 'email',
       'thresholds': {'warning': 1, 'error': 0.05}}}
 
+The [critical](../reference/Validate.critical.md#pointblank.Validate.critical) level isn't set, so it's left out. Each of these dictionaries is ready to be written as YAML or JSON. Reading one back with [`from_dict()`](../reference/Step.md#pointblank.Step.from_dict) gives a step that runs the same check.
+
 ### from_dict()
 
 Create a step from a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L247-L325)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L255-L338)
 
 ``` python
 from_dict(data)
@@ -257,3 +261,5 @@ pb.Step.from_dict(step.to_dict()) == step
 ```
 
     True
+
+The round trip gives back an equal step, so steps can be stored as YAML, as JSON, or in a database and rebuilt later. The parsed steps above could go straight into a [`Contract`](../reference/Contract.md#pointblank.Contract) or, wrapped in [`Steps`](../reference/Steps.md#pointblank.Steps), into an ordinary validation.

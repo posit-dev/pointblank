@@ -4,7 +4,7 @@ Set or replace the table associated with the Validate object.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6156-L6289)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6152-L6285)
 
 ``` python
 Validate.set_tbl(

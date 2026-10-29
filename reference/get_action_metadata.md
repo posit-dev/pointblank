@@ -4,7 +4,7 @@ Access step-level metadata when authoring custom actions.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L201-L274)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L201-L273)
 
 ``` python
 get_action_metadata()
@@ -73,6 +73,5 @@ Key pieces to note in the above example:
 
 ## See Also
 
-`Have` a look at [`Actions`](../reference/Actions.md#pointblank.Actions) for more information on how to create custom  
-
-`actions` for validation steps that exceed a set threshold value.  
+[Actions](../reference/Actions.md#pointblank.Actions)  
+Create custom actions for steps that exceed a threshold.

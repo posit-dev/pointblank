@@ -371,6 +371,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">ContractAdapter</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1631,8 +1637,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -1661,7 +1675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L1470-L1476" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L2379-L2437" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Comparison</span><span class="op">.</span><span class="fu">to_json</span>(</span>
@@ -1671,10 +1685,114 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The structure is the same as that of <a href="../reference/Comparison.to_dict.html#pointblank.Comparison.to_dict" class="gdls-link"><code>to_dict()</code></a>.</p>
+<p>JSON is the format to use when a comparison result leaves Python: written to a file alongside a pipeline run, returned from an API, or read by another tool. The structure is the same as that of <a href="../reference/Comparison.to_dict.html#pointblank.Comparison.to_dict" class="gdls-link"><code>to_dict()</code></a>. The <code>pb compare</code> command line tool produces the same JSON with <code>--format json</code> (to the terminal) or <code>--output-json</code> (to a file), and its <code>--no-samples</code> option corresponds to <code>samples=False</code>.</p>
 </div>
+<section id="parameters" class="level2 doc-parameters">
+<h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code><span class="doc-parameter-name">samples</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
+<dd>
+<p>Should samples of differing rows be included? Set to <code>False</code> when the data might contain sensitive values (e.g., PII) and only counts and schema details may be stored.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">limit</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="dv">10</span></span></code></dt>
+<dd>
+<p>The maximum number of sample rows per status.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">indent</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="dv">2</span></span></code></dt>
+<dd>
+The number of spaces to indent nested levels by. Use <code>None</code> for the most compact output, on a single line (as for JSON Lines files, with one comparison per line).
+</dd>
+</dl>
+</div>
+</section>
+<section id="returns" class="level2 doc-returns">
+<h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">str</span></code></dt>
+<dd>
+The comparison results as a JSON string.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Here, a new version of a price list has one changed price.</p>
+<div id="814f4570" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>prices_v1 <span class="op">=</span> pl.DataFrame({<span class="st">"sku"</span>: [<span class="st">"A-1"</span>, <span class="st">"A-2"</span>, <span class="st">"A-3"</span>], <span class="st">"price"</span>: [<span class="fl">9.99</span>, <span class="fl">24.50</span>, <span class="fl">5.00</span>]})</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>prices_v2 <span class="op">=</span> pl.DataFrame({<span class="st">"sku"</span>: [<span class="st">"A-1"</span>, <span class="st">"A-2"</span>, <span class="st">"A-3"</span>], <span class="st">"price"</span>: [<span class="fl">9.99</span>, <span class="fl">26.00</span>, <span class="fl">5.00</span>]})</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(prices_v1, prices_v2, keys<span class="op">=</span><span class="st">"sku"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(comparison.to_json(limit<span class="op">=</span><span class="dv">5</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{
+  "source_name": "source",
+  "target_name": "target",
+  "mode": "keyed",
+  "keys": [
+    "sku"
+  ],
+  "compared_columns": [
+    "price"
+  ],
+  "column_map": {},
+  "schema_mode": "strict",
+  "null_equal": true,
+  "partitions": 1,
+  "n_source_rows": 3,
+  "n_target_rows": 3,
+  "n": 3,
+  "n_passed": 2,
+  "n_failed": 1,
+  "identical": false,
+  "status_counts": {
+    "match": 2,
+    "changed": 1,
+    "missing": 0,
+    "extra": 0,
+    "dup_key": 0
+  },
+  "column_mismatches": {
+    "price": 1
+  },
+  "schema_diff": {
+    "matches": true,
+    "only_in_source": [],
+    "only_in_target": [],
+    "dtype_changed": [],
+    "renamed": [],
+    "case_only": [],
+    "reordered": false
+  },
+  "samples": {
+    "changed": [
+      {
+        "sku": "A-2",
+        "price_source": 24.5,
+        "price_target": 26.0
+      }
+    ]
+  }
+}</code></pre>
+</div>
+</div>
+<p>For a compact record without row samples, set <code>samples=False</code> and <code>indent=None</code>:</p>
+<div id="7c922089" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(comparison.to_json(samples<span class="op">=</span><span class="va">False</span>, indent<span class="op">=</span><span class="va">None</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{"source_name": "source", "target_name": "target", "mode": "keyed", "keys": ["sku"], "compared_columns": ["price"], "column_map": {}, "schema_mode": "strict", "null_equal": true, "partitions": 1, "n_source_rows": 3, "n_target_rows": 3, "n": 3, "n_passed": 2, "n_failed": 1, "identical": false, "status_counts": {"match": 2, "changed": 1, "missing": 0, "extra": 0, "dup_key": 0}, "column_mismatches": {"price": 1}, "schema_diff": {"matches": true, "only_in_source": [], "only_in_target": [], "dtype_changed": [], "renamed": [], "case_only": [], "reordered": false}}</code></pre>
+</div>
+</div>
+<p>Each such record is one line, so a series of comparisons can be appended to a single file and read back later, one comparison per line.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

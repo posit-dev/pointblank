@@ -4,7 +4,7 @@ Select columns that contain specified text.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L951-L1111)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L950-L1110)
 
 ``` python
 contains(

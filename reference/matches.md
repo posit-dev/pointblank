@@ -4,7 +4,7 @@ Select columns that match a specified regular expression pattern.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L1114-L1274)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L1113-L1273)
 
 ``` python
 matches(

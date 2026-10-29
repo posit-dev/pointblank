@@ -34,12 +34,13 @@
 > Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use `import_contract()` as the entry point, `export_contract()` for the reverse, and `register_adapter()` to add support for custom formats.
 
 
-- [import_contract](https://posit-dev.github.io/pointblank/reference/import_contract.html): Import a contract/schema from an external format
-- [export_contract](https://posit-dev.github.io/pointblank/reference/export_contract.html): Export a Pointblank validation or contract to an external format
-- [list_adapters](https://posit-dev.github.io/pointblank/reference/list_adapters.html): List all registered adapters with their capabilities
-- [register_adapter](https://posit-dev.github.io/pointblank/reference/register_adapter.html): Register a contract adapter class
-- [ContractImport](https://posit-dev.github.io/pointblank/reference/ContractImport.html): Result of importing an external contract/schema
-- [ContractAdapter](https://posit-dev.github.io/pointblank/reference/ContractAdapter.html): Base class for contract import/export adapters
+- [import_contract](https://posit-dev.github.io/pointblank/reference/import_contract.html): Import a contract or schema written in another format
+- [export_contract](https://posit-dev.github.io/pointblank/reference/export_contract.html): Export a Pointblank validation or contract to another format
+- [list_adapters](https://posit-dev.github.io/pointblank/reference/list_adapters.html): List the formats available for contract import and export
+- [register_adapter](https://posit-dev.github.io/pointblank/reference/register_adapter.html): Register a contract adapter so that it can be used for import and export
+- [ContractImport](https://posit-dev.github.io/pointblank/reference/ContractImport.html): The result of importing a contract or schema from another format
+- [ContractAdapter](https://posit-dev.github.io/pointblank/reference/ContractAdapter.html): The base class for adapters that translate contracts to and from other formats
+- [adapters.MappedConstraint](https://posit-dev.github.io/pointblank/reference/adapters.MappedConstraint.html)
 
 #### Validation Steps
 > Validation steps are sequential validations on the target data. Call `Validate`'s validation methods to build up a validation plan: a collection of steps that provides good validation coverage.

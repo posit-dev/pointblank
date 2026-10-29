@@ -303,9 +303,9 @@ result.to_validate(data=events).interrogate()
 
 The validation report shows each imported constraint as a separate step, just as if you had written the validation by hand. From the user's perspective, there is no difference between validation steps that came from a custom adapter and those written directly in Python.
 
-## The `MappedConstraint` Class
+## The [MappedConstraint](../../reference/adapters.MappedConstraint.md#pointblank.adapters.MappedConstraint) Class
 
-Each constraint from the external format gets mapped to a `MappedConstraint`, which is a simple data container holding:
+Each constraint from the external format gets mapped to a [MappedConstraint](../../reference/adapters.MappedConstraint.md#pointblank.adapters.MappedConstraint), which is a simple data container holding:
 
 - `method`: the Pointblank [Validate](../../reference/Validate.md#pointblank.Validate) method name (e.g., `"col_vals_gt"`)
 - `kwargs`: the keyword arguments to pass to that method

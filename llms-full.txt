@@ -832,8 +832,8 @@ two threshold levels, they would also be executed.
 
 See Also
 --------
-The [`get_action_metadata()`](`pointblank.get_action_metadata`) function, which can be used to
-retrieve metadata about the step where the action is executed.
+get_action_metadata : Get metadata about the step where an action is executed.
+FinalActions : Define actions that run after all validation steps are done.
 
 FinalActions(*actions) -> 'None'
 
@@ -932,8 +932,8 @@ validation = (
 
 See Also
 --------
-The [`get_validation_summary()`](`pointblank.get_validation_summary`) function, which can be
-used to retrieve the summary of the validation results.
+get_validation_summary : Get a summary of the validation results inside a final action.
+Actions : Define actions that run when a step exceeds a threshold.
 
 Schema(columns: 'str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None' = None, tbl: 'Any | None' = None, **kwargs) -> 'None'
 
@@ -1189,8 +1189,7 @@ these dtypes is found in the column, the portion of the schema check will succee
 
 See Also
 --------
-The [`col_schema_match()`](`pointblank.Validate.col_schema_match`) validation method, where a
-`Schema` object is used in a validation workflow.
+Validate.col_schema_match : The validation step that checks a table against a `Schema`.
 
 DraftValidation(data: 'Any', model: 'str', api_key: 'str | None' = None, verify_ssl: 'bool' = True, max_reprompts: 'int' = 1) -> None
 
@@ -1859,8 +1858,8 @@ See Also
 Step : A single declarative validation step, used in a contract's `steps=`.
 Schema : The column names and types used in a contract's `schema=`.
 Pipeline : Enforce source and target contracts around a transformation.
-export_contract : Convert a contract to JSON Schema, Frictionless, dbt, or ODCS.
-import_contract : Read an external contract format, then call `to_contract()` on the result.
+pointblank.export_contract : Convert a contract to JSON Schema, Frictionless, dbt, or ODCS.
+pointblank.import_contract : Read an external format, then call `to_contract()` on it.
 
 Step(method: 'str', **kwargs: 'Any') -> 'None'
 
@@ -2009,6 +2008,10 @@ id_length_step = pb.Step("col_vals_str_len", columns="patient_id", min_val=6, ma
     .interrogate()
 )
 ```
+
+The first four steps give the same results as in the contract. The new length check, in
+step 5, also catches `"PT-03"`, which has five characters instead of six. Defining the steps
+once as a list lets a contract and an ordinary validation share them.
 
 See Also
 --------
@@ -2558,6 +2561,9 @@ validation shows why the input was rejected, with one failing test unit in each 
 result.source_validation
 ```
 
+The batch was caught at the source boundary, so nothing reached the target table. Once the
+upstream data is fixed, the same pipeline can be run again on it without any changes.
+
 See Also
 --------
 PipelineResult : The result of `run()`, holding both boundary validations.
@@ -2672,6 +2678,11 @@ The full validation report for either boundary is in `source_validation` or
 result.target_validation
 ```
 
+All three converted readings pass the target's single step, which is why `passed` is `True`.
+When a run fails, these reports show which steps failed and on which rows, and
+[`get_data_extracts()`](`pointblank.Validate.get_data_extracts`) pulls out the failing rows
+themselves.
+
 See Also
 --------
 Pipeline : Define the boundaries and run the transformation.
@@ -2686,167 +2697,1032 @@ Import external schema definitions (JSON Schema, Frictionless Table Schema, and 
 
 import_contract(source: 'Any', *, format: 'str | None' = None, **kwargs: 'Any') -> 'ContractImport'
 
-Import a contract/schema from an external format.
+Import a contract or schema written in another format.
 
-Reads an external schema definition and produces a `ContractImport` with validation steps
-mapped to Pointblank methods. Use `pb.list_adapters()` to see all registered formats.
+Data is often already described somewhere outside of Pointblank: a JSON Schema for an API
+payload, a Frictionless Table Schema inside a Data Package, the `schema.yml` file of a dbt
+project, or an Open Data Contract Standard (ODCS) document. `import_contract()` reads such a
+definition and translates its rules into Pointblank validation steps. That way the existing
+definition can be checked against real data without rewriting it by hand, and the rules stay
+in the place where they're already maintained.
+
+The result is a [`ContractImport`](`pointblank.ContractImport`) object. It holds the column
+names and types, the mapped constraints, any metadata from the source (such as a title and a
+description), and a warning for every rule that has no Pointblank equivalent. From there you
+can:
+
+- get a [`Validate`](`pointblank.Validate`) object, ready to interrogate, with
+[`to_validate()`](`pointblank.ContractImport.to_validate`)
+- get a reusable [`Contract`](`pointblank.Contract`) (for a
+[`Pipeline`](`pointblank.Pipeline`), or to save as YAML) with
+[`to_contract()`](`pointblank.ContractImport.to_contract`)
+- generate equivalent Python code with
+[`to_python()`](`pointblank.ContractImport.to_python`)
+- review what was and wasn't translated with
+[`summary()`](`pointblank.ContractImport.summary`)
+
+The reverse direction is handled by [`export_contract()`](`pointblank.export_contract`).
+Support for further formats can be added with
+[`register_adapter()`](`pointblank.register_adapter`).
 
 Parameters
 ----------
 source
-    The source to import from. Can be: (1) a file path (str) to a schema/contract file, or
-    (2) a Python dict with schema content already loaded.
+    The definition to import. This can be a path to a file, given as a string, or a dictionary
+    holding content that has already been loaded (e.g., with `json.load()` or
+    `yaml.safe_load()`). `pathlib.Path` objects aren't accepted, so pass `str(path)` instead.
 format
-    The format identifier (e.g., `"json_schema"`, `"frictionless"`, `"dbt"`, `"odcs"`). If
-    `None`, the format is auto-detected from file extension or content.
+    The name of the adapter to use: `"json_schema"`, `"frictionless"`, `"dbt"`, or `"odcs"`
+    for the built-in formats, or the name of a custom adapter. If `None` (the default), the
+    format is detected from the file name or the content (see the *Format Detection* section).
 **kwargs
-    Format-specific options passed to the adapter.
+    Options for the adapter. The Frictionless adapter takes `resource=` (the name or position
+    of the resource to use in a Data Package), the dbt adapter takes `model=` (the name of a
+    model or source table), and the ODCS adapter takes `table=` (the name of a dataset table).
+    Each defaults to the first entry in the document. The JSON Schema adapter takes no
+    options. Options that an adapter doesn't recognize are ignored.
 
 Returns
 -------
 ContractImport
-    An object containing the imported columns, constraints, and methods to generate `Validate`
-    objects, `Contract` objects, Python code, or YAML.
+    The imported columns, constraints, metadata, and warnings, along with methods for turning
+    them into a `Validate` object, a `Contract`, Python code, or a text summary.
 
 Raises
 ------
 ValueError
-    If the format cannot be detected or no adapter is registered for it.
+    If the format can't be detected, if no adapter is registered under `format=`, or if the
+    adapter doesn't support importing. Adapters also raise `ValueError` when the document lacks
+    the content they need (e.g., a dbt file with no models) or when a `resource=`, `model=`, or
+    `table=` value doesn't match anything in it.
+FileNotFoundError
+    If `source` is a path to a file that doesn't exist.
+
+Supported Formats
+-----------------
+Each built-in adapter reads the column names and types and the following rules:
+
+- **JSON Schema** (`"json_schema"`): the `properties` of an object schema become the columns.
+`required` maps to `col_vals_not_null()`, `minimum`/`maximum` to `col_vals_ge()`/
+`col_vals_le()`, `exclusiveMinimum`/`exclusiveMaximum` to `col_vals_gt()`/`col_vals_lt()`,
+`enum` to `col_vals_in_set()`, `pattern` to `col_vals_regex()`, and `const` to
+`col_vals_eq()`. The `format` values `email`, `uri`, `uri-reference`, `ipv4`, and `ipv6` map
+to `col_vals_within_spec()`; other formats (such as `date`) produce a warning. The `title` and
+`description` keywords are kept as metadata and `$schema` is recorded as the source version.
+- **Frictionless Table Schema** (`"frictionless"`): a standalone Table Schema (with `fields`)
+or a Data Package (with `resources`). The field constraints `required`, `unique`, `minimum`,
+`maximum`, `enum`, and `pattern` are mapped, and a `primaryKey` becomes `col_vals_not_null()`
+on each key column plus `rows_distinct()` over all of them. Foreign keys produce a warning.
+- **dbt** (`"dbt"`): the models and source tables of a `schema.yml` file. The column tests
+`not_null`, `unique`, and `accepted_values` are mapped (from either `data_tests:` or the older
+`tests:` key), as is a model-level `unique` test with `combination_of_columns`.
+`relationships` and any other tests produce a warning. The model name becomes the title.
+- **Open Data Contract Standard** (`"odcs"`): documents with a `dataset:` list of tables and
+their columns. `isNullable: false`, `isUnique`, `isPrimaryKey`, `enum` (or `values`),
+`pattern`, and `minimum`/`maximum` are mapped. Length limits and `checks`/`quality` entries
+produce a warning.
+
+Format Detection
+----------------
+When `format=` isn't given, a file path is first matched against the file extensions of the
+registered adapters: `.schema.json` (JSON Schema), `.resource.json` and `.datapackage.json`
+(Frictionless), `.yml` and `.yaml` (dbt), and `.odcs.yml`, `.odcs.yaml`, and `.odcs.json`
+(ODCS). If no extension matches, each adapter in turn inspects the content of the file or
+dictionary (e.g., a `fields` list identifies a Table Schema and a `models` list a dbt file).
+Since the dbt adapter claims every `.yml` and `.yaml` file, pass `format="odcs"` when importing
+an ODCS document stored as YAML. Use [`list_adapters()`](`pointblank.list_adapters`) to see the
+registered formats and their extensions.
+
+Coverage and Warnings
+---------------------
+Not every rule in an external format can be expressed as a Pointblank validation step. When the
+adapter recognizes a rule but can't translate it, it adds a message to `warnings` and leaves the
+rule out. The `coverage` value is the share of recognized rules that were translated, so
+`1.0` means nothing recognized was dropped. Keywords that an adapter doesn't look at all (such
+as `minLength` in a JSON Schema) are skipped without a warning and don't count toward coverage,
+so it's worth checking [`summary()`](`pointblank.ContractImport.summary`) against the source
+when importing a definition for the first time.
 
 Examples
 --------
-```python
+```{python}
+#| echo: false
+#| output: false
+import os
+import tempfile
 import pointblank as pb
-
-# Import from JSON Schema
-result = pb.import_contract("user_profile.schema.json", format="json_schema")
-validation = result.to_validate(data=my_df)
-validation.interrogate()
-
-# Auto-detect format
-result = pb.import_contract("datapackage.json")
-
-# Import from a dict
-schema_dict = {"type": "object", "properties": {"age": {"type": "integer", "minimum": 0}}}
-result = pb.import_contract(schema_dict, format="json_schema")
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+os.chdir(tempfile.mkdtemp())
 ```
+
+Suppose an API team publishes a JSON Schema for user profiles and we want to check a table of
+profiles against it. The schema can be passed as a dictionary (here it's written inline, but it
+would usually come from `json.load()`). Because it has a `$schema` key, the format is detected
+without needing `format=`.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+user_schema = {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "user_profile",
+    "description": "A registered user of the app.",
+    "type": "object",
+    "properties": {
+        "user_id": {"type": "integer", "minimum": 1},
+        "email": {"type": "string", "format": "email"},
+        "country": {"type": "string", "pattern": "^[A-Z]{2}$"},
+        "plan": {"type": "string", "enum": ["free", "pro", "team"]},
+    },
+    "required": ["user_id", "email"],
+}
+
+imported = pb.import_contract(user_schema)
+
+imported
+```
+
+The printed form gives the counts at a glance: four columns, six constraints, and nothing left
+untranslated. The [`summary()`](`pointblank.ContractImport.summary`) method gives a little more
+detail, including the version of the source specification.
+
+```{python}
+print(imported.summary())
+```
+
+Now let's validate some data. The [`to_validate()`](`pointblank.ContractImport.to_validate`)
+method builds a `Validate` object with a schema check followed by one step per constraint, and
+it accepts the usual `Validate` arguments such as `tbl_name=` and `label=`.
+
+```{python}
+users = pl.DataFrame(
+    {
+        "user_id": [1, 2, 3, 0],
+        "email": ["ana@example.com", "ben@example", "cy@example.org", None],
+        "country": ["US", "CA", "gb", "DE"],
+        "plan": ["free", "pro", "enterprise", "team"],
+    }
+)
+
+imported.to_validate(users, tbl_name="users", label="Checks from user_profile").interrogate()
+```
+
+The table has the right columns and types, so the schema check passes. The remaining failures
+come straight from the JSON Schema rules: a `user_id` of `0` (below the minimum of `1`), a
+missing email (which fails both the `required` check and the `email` format check), an email
+without a valid domain, a lowercase country code, and a plan that isn't in the `enum`.
+
+Files work the same way. In this next example a dbt `schema.yml` file with two models is
+written to the working directory. The `.yml` extension identifies it as a dbt file, and
+`model=` picks the model to import (without it, the first model would be used).
+
+```{python}
+from pathlib import Path
+
+dbt_yml = '''
+version: 2
+models:
+  - name: customers
+    columns:
+      - name: customer_id
+        data_tests: [not_null, unique]
+  - name: orders
+    description: One row per order.
+    columns:
+      - name: order_id
+        data_type: integer
+        data_tests: [not_null, unique]
+      - name: customer_id
+        data_type: integer
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('customers')
+              field: customer_id
+      - name: status
+        data_type: varchar(20)
+        data_tests:
+          - accepted_values:
+              values: [placed, shipped, returned]
+'''
+
+Path("schema.yml").write_text(dbt_yml)
+
+orders_import = pb.import_contract("schema.yml", model="orders")
+
+print(orders_import.summary())
+```
+
+Four of the five tests were translated. The `relationships` test checks values against another
+model, which a single-table validation can't do, so it was reported as a warning and the
+coverage is 80%. Note also that the dbt type `varchar(20)` was read as Pointblank's `String`
+type.
+
+The import can also be turned into a `Contract` with
+[`to_contract()`](`pointblank.ContractImport.to_contract`), which accepts any `Contract`
+argument. Printing the contract as YAML shows that the schema, the steps, and the model's
+description were all carried over.
+
+```{python}
+orders_contract = orders_import.to_contract(name="orders", owner="analytics")
+
+print(orders_contract.to_yaml())
+```
+
+The contract now has a name and an owner, and the dbt model's four translated tests are its
+steps. From here it works like any other contract: it can be saved as YAML next to the dbt
+project, enforced with [`Contract.validate()`](`pointblank.Contract.validate`), or used as a
+boundary in a [`Pipeline`](`pointblank.Pipeline`).
+
+See Also
+--------
+pointblank.export_contract : Export a `Validate` object or `Contract` to an external format.
+ContractImport : The object returned by this function.
+list_adapters : List the formats available for import and export.
+register_adapter : Add support for another format.
+Contract : Pointblank's own declarative contract.
 
 export_contract(validation_or_contract: 'Any', destination: 'str | None' = None, *, format: 'str', **kwargs: 'Any') -> 'str | dict[str, Any]'
 
-Export a Pointblank validation or contract to an external format.
+Export a Pointblank validation or contract to another format.
+
+Data quality rules written in Pointblank are often useful to tools that don't run Pointblank.
+An API team may want a JSON Schema, an analytics engineering team may want the tests in a dbt
+`schema.yml` file, and a data catalog may accept Open Data Contract Standard (ODCS) documents.
+`export_contract()` translates a [`Contract`](`pointblank.Contract`) or a
+[`Validate`](`pointblank.Validate`) object into one of these formats, so a single set of rules
+can be published wherever it's needed.
+
+Contracts export most completely because they carry a name, a description, and a
+[`Schema`](`pointblank.Schema`) with column types. A `Validate` object is exported from the
+steps in its plan; it doesn't need to be interrogated first. The translation is lossy by
+nature: only checks that have an equivalent in the target format are written, and the rest are
+left out without a warning (see the *What Gets Exported* section). To bring a definition back
+into Pointblank, use [`import_contract()`](`pointblank.import_contract`).
 
 Parameters
 ----------
 validation_or_contract
-    A `Validate` or `Contract` object to export.
+    The `Contract` or `Validate` object to export.
 destination
-    Optional file path to write the output. If None, the result is returned without writing to
-    disk.
+    A file path to write the exported document to. Parent directories are created as needed.
+    If `None` (the default), nothing is written and the document is only returned.
 format
-    The target format identifier (e.g., `"json_schema"`, `"frictionless"`, `"dbt"`, `"odcs"`).
+    The name of the adapter to use: `"json_schema"`, `"frictionless"`, `"dbt"`, or `"odcs"`
+    for the built-in formats, or the name of a custom adapter. This argument is required and
+    must be given by keyword.
 **kwargs
-    Format-specific options passed to the adapter.
+    Options for the adapter. None of the built-in adapters currently take any options.
 
 Returns
 -------
 str | dict
-    The exported content.
+    The exported document. The built-in adapters return it as a dictionary (whether or not it's
+    also written to `destination=`), which can be serialized with `json.dumps()` or
+    `yaml.dump()`.
 
 Raises
 ------
 ValueError
-    If no adapter is registered for the format, or the adapter doesn't support export.
+    If no adapter is registered under `format=` (the message lists the available ones), or if
+    the adapter doesn't support exporting.
+TypeError
+    If `validation_or_contract` is neither a `Contract` nor a `Validate` object.
+
+What Gets Exported
+------------------
+The column types come from the contract's schema, and each built-in adapter translates these
+checks:
+
+- **JSON Schema** (`"json_schema"`): a draft 2020-12 object schema whose `title` and
+`description` come from the contract. `col_vals_not_null()` adds the column to `required`;
+`col_vals_ge()`/`col_vals_le()` become `minimum`/`maximum`, `col_vals_gt()`/`col_vals_lt()`
+become `exclusiveMinimum`/`exclusiveMaximum`, and `col_vals_between()` sets both `minimum` and
+`maximum`. `col_vals_in_set()` becomes `enum`, `col_vals_regex()` becomes `pattern`,
+`col_vals_eq()` becomes `const`, and `col_vals_within_spec()` becomes a `format` for the
+`email`, `url`, `ipv4`, and `ipv6` specs.
+- **Frictionless Table Schema** (`"frictionless"`): a `fields` list with field constraints.
+`col_vals_not_null()` becomes `required`, `rows_distinct()` becomes `unique`,
+`col_vals_ge()`/`col_vals_le()` become `minimum`/`maximum`, `col_vals_in_set()` becomes `enum`,
+and `col_vals_regex()` becomes `pattern`.
+- **dbt** (`"dbt"`): a `version: 2` document with one model named after the contract.
+`col_vals_not_null()`, `rows_distinct()`, and `col_vals_in_set()` become the generic tests
+`not_null`, `unique`, and `accepted_values`.
+- **Open Data Contract Standard** (`"odcs"`): a `DataContract` document with an `info` block
+and one dataset table. `col_vals_not_null()` sets `isNullable: false`, `rows_distinct()` sets
+`isUnique`, `col_vals_in_set()` becomes `enum`, `col_vals_regex()` becomes `pattern`, and
+`col_vals_ge()`/`col_vals_le()` become `minimum`/`maximum`.
+
+Any other step, along with thresholds, actions, and owner information, isn't exported.
+
+When `destination=` is given, the JSON Schema and Frictionless documents are written as JSON
+and the dbt document as YAML. ODCS documents are written as JSON if the path ends in `.json`
+and as YAML otherwise.
 
 Examples
 --------
-```python
+```{python}
+#| echo: false
+#| output: false
+import os
+import tempfile
 import pointblank as pb
-
-validation = pb.Validate(data=df).col_vals_gt(columns="age", value=0).interrogate()
-pb.export_contract(validation, "output.schema.json", format="json_schema")
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+os.chdir(tempfile.mkdtemp())
 ```
+
+Let's start with a `Contract` for a table of orders. It has a schema with column types, a
+description, and a mix of checks.
+
+```{python}
+import pointblank as pb
+import json
+
+orders_contract = pb.Contract(
+    name="orders",
+    description="One row per customer order.",
+    schema=pb.Schema(order_id="Int64", status="String", amount="Float64"),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["order_id", "status"]),
+        pb.Step("rows_distinct", columns_subset="order_id"),
+        pb.Step("col_vals_in_set", columns="status", set=["placed", "shipped", "returned"]),
+        pb.Step("col_vals_between", columns="amount", left=0, right=10000),
+    ],
+)
+```
+
+Exporting it as a JSON Schema gives us a dictionary, which we can print with `json.dumps()`.
+
+```{python}
+orders_json_schema = pb.export_contract(orders_contract, format="json_schema")
+
+print(json.dumps(orders_json_schema, indent=2))
+```
+
+The Pointblank types became JSON types, the not-null check filled the `required` list, the set
+of statuses became an `enum`, and the range check became `minimum` and `maximum` values. The
+`rows_distinct()` step was left out because JSON Schema has no way to say that a value must be
+unique across records.
+
+The same contract can be written out as a dbt `schema.yml` file. Here we write it to a
+`models` directory (which is created if it doesn't exist) and print the file's contents.
+
+```{python}
+from pathlib import Path
+
+pb.export_contract(orders_contract, "models/schema.yml", format="dbt")
+
+print(Path("models/schema.yml").read_text())
+```
+
+This time the uniqueness check is kept (as dbt's `unique` test) but the range check is not,
+since dbt has no generic test for it. The `amount` column is still listed, with its type and an
+empty list of tests.
+
+An exported document can be imported again with `import_contract()`. Doing so is a quick way to
+see which rules survive the round trip.
+
+```{python}
+print(pb.import_contract(orders_json_schema).summary())
+```
+
+All five constraints in the JSON Schema were mapped back, so the coverage is 100%. The range
+check returns as two steps (one each for `minimum` and `maximum`), and the uniqueness check is
+gone because it was dropped on export. Coverage measures how much of the *document* was
+understood, not how much of the original contract survived. To find what an export loses,
+compare the steps before and after.
+
+See Also
+--------
+pointblank.import_contract : Import an external definition into Pointblank.
+list_adapters : List the formats available for import and export.
+register_adapter : Add support for another format.
+Contract : The declarative contract that exports most completely.
 
 list_adapters() -> 'dict[str, dict[str, Any]]'
 
-List all registered adapters with their capabilities.
+List the formats available for contract import and export.
+
+Every format that [`import_contract()`](`pointblank.import_contract`) and
+[`export_contract()`](`pointblank.export_contract`) can work with is provided by a registered
+adapter. `list_adapters()` reports what's registered in the current session: the four built-in
+formats plus any custom adapters added with
+[`register_adapter()`](`pointblank.register_adapter`). It's useful for finding the right value
+for `format=`, for checking whether a format supports import, export, or both before calling
+either function, and for seeing which file extensions are used to detect a format.
 
 Returns
 -------
-dict
-    A dictionary mapping format names to adapter info dicts with keys:
+dict[str, dict]
+    A dictionary, sorted by format name, that maps each format name to a dictionary with these
+    keys:
 
-    - "class": the adapter class name
-    - "file_extensions": associated file extensions
-    - "supports_import": whether import is supported
-    - "supports_export": whether export is supported
+    - `"class"`: the name of the adapter class
+    - `"file_extensions"`: the list of file extensions used to detect the format
+    - `"supports_import"`: whether the format can be imported with `import_contract()`
+    - `"supports_export"`: whether the format can be exported with `export_contract()`
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+With no custom adapters registered, the result lists the four built-in formats.
+
+```{python}
+import pointblank as pb
+
+adapters = pb.list_adapters()
+
+list(adapters)
+```
+
+Each entry describes one adapter. Here's the entry for the dbt adapter, which claims the `.yml`
+and `.yaml` file extensions and supports both directions.
+
+```{python}
+adapters["dbt"]
+```
+
+Since the result is an ordinary dictionary, it's easy to filter. This finds the formats that
+a contract can be exported to.
+
+```{python}
+[name for name, info in adapters.items() if info["supports_export"]]
+```
+
+All four built-in formats support export, so the list is the same as before. An adapter added
+with [`register_adapter()`](`pointblank.register_adapter`) may be import-only, though, so a
+check like this is useful before calling [`export_contract()`](`pointblank.export_contract`)
+with a format chosen at run time.
+
+See Also
+--------
+register_adapter : Add a custom format to this list.
+pointblank.import_contract : Import a definition in one of the listed formats.
+pointblank.export_contract : Export a contract to one of the listed formats.
 
 register_adapter(format_name: 'str | None' = None)
 
-Register a contract adapter class.
+Register a contract adapter so that it can be used for import and export.
 
-Can be used as a decorator (with or without arguments) or called directly.
+Pointblank ships with adapters for JSON Schema, Frictionless Table Schema, dbt, and the Open
+Data Contract Standard, but many organizations describe their data in other ways: an in-house
+data dictionary, a spreadsheet export, or a schema format from another tool. Writing a
+[`ContractAdapter`](`pointblank.ContractAdapter`) subclass for such a format and registering it
+with `register_adapter()` makes the format a first-class citizen.
+[`import_contract()`](`pointblank.import_contract`) and
+[`export_contract()`](`pointblank.export_contract`) can then use it by name with `format=`,
+and [`list_adapters()`](`pointblank.list_adapters`) includes it.
+
+Registration creates one instance of the class (by calling it with no arguments) and stores it
+under the format name for the rest of the session. Registering a second adapter under a name
+that's already taken replaces the first one, and that includes the built-in adapters. When a
+format has to be detected, adapters are tried in the order they were registered, so the
+built-in adapters are always tried before custom ones.
 
 Parameters
 ----------
 format_name
-    The format name to register under. If `None`, uses the class's `format_name` attribute.
+    The name to register the adapter under, which becomes the value to pass to `format=`. If
+    `None` (the default), the class's own `format_name` attribute is used.
 
 Returns
 -------
-type
-    The adapter class (unmodified), enabling use as a decorator.
+Callable or type
+    When called with a name (or with no arguments), a decorator that registers the class it's
+    applied to and returns that class unchanged. When applied directly to a class (as a bare
+    `@register_adapter`), the class itself, unchanged.
+
+Raises
+------
+ValueError
+    If no name is given and the class has an empty `format_name` attribute.
+
+Ways to Register
+----------------
+There are three equivalent ways to register an adapter class:
+
+- `@register_adapter("name")` above the class definition registers it under `"name"`
+- a bare `@register_adapter` above the class definition uses the class's `format_name`
+- `register_adapter("name")(AdapterClass)` registers a class that's already been defined (the
+name can be left out here too, as in `register_adapter()(AdapterClass)`)
 
 Examples
 --------
-```python
-@pb.register_adapter("my_format")
-class MyAdapter(pb.ContractAdapter):
-    format_name = "my_format"
-    ...
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
 ```
+
+Suppose a team keeps a simple list of required columns in a dictionary with a `required_columns`
+key. A minimal adapter for this format only needs to say how to recognize it and how to turn it
+into a [`ContractImport`](`pointblank.ContractImport`). Since this adapter can't export, it sets
+`supports_export = False`.
+
+```{python}
+import pointblank as pb
+from pointblank.adapters import MappedConstraint
+
+
+@pb.register_adapter("required_columns")
+class RequiredColumnsAdapter(pb.ContractAdapter):
+    format_name = "required_columns"
+    supports_export = False
+
+    @staticmethod
+    def detect(source):
+        return isinstance(source, dict) and "required_columns" in source
+
+    def import_contract(self, source, **kwargs):
+        columns = source["required_columns"]
+        return pb.ContractImport(
+            source_format="required_columns",
+            columns=[(col, None) for col in columns],
+            constraints=[
+                MappedConstraint("col_vals_not_null", {"columns": col}, f"{col} is required")
+                for col in columns
+            ],
+        )
+```
+
+The new format now appears next to the built-in ones in `list_adapters()`.
+
+```{python}
+for name, info in pb.list_adapters().items():
+    print(f"{name:<18} import={info['supports_import']}  export={info['supports_export']}")
+```
+
+And it can be used with `import_contract()`, either by name or (since it implements
+`detect()`) by letting the format be detected from the content.
+
+```{python}
+imported = pb.import_contract({"required_columns": ["id", "email"]})
+
+imported.constraints
+```
+
+Exporting to this format isn't possible, so `export_contract()` raises an error that says so.
+
+```{python}
+contract = pb.Contract(name="users", steps=[pb.Step("col_vals_not_null", columns="id")])
+
+try:
+    pb.export_contract(contract, format="required_columns")
+except ValueError as e:
+    print(e)
+```
+
+The error is about the adapter, not the contract. To make the format work in both directions,
+the adapter class would also implement
+[`export_contract()`](`pointblank.ContractAdapter.export_contract`) and drop the
+`supports_export = False` line.
+
+See Also
+--------
+ContractAdapter : The base class to subclass when writing an adapter.
+ContractImport : What an adapter's `import_contract()` method returns.
+list_adapters : List the registered adapters.
+pointblank.import_contract : Import a definition using a registered adapter.
+pointblank.export_contract : Export a contract using a registered adapter.
 
 ContractImport(source_format: 'str', source_path: 'str | None' = None, source_version: 'str | None' = None, columns: 'list[tuple[str, str | None]]' = <factory>, constraints: 'list[MappedConstraint]' = <factory>, metadata: 'dict[str, Any]' = <factory>, warnings: 'list[str]' = <factory>, coverage: 'float' = 1.0) -> None
 
-Result of importing an external contract/schema.
+The result of importing a contract or schema from another format.
 
-Contains the parsed schema information, mapped validation steps, and any warnings about
-constraints that couldn't be fully translated.
+[`import_contract()`](`pointblank.import_contract`) returns a `ContractImport`. It's the
+halfway point between an external definition (a JSON Schema, a Frictionless Table Schema, a dbt
+`schema.yml` file, and so on) and a Pointblank validation. The definition has been read and
+translated, but nothing has been run yet, so this is the place to review the translation and
+decide how to use it.
+
+The object holds what the adapter found: the columns and their types, the rules translated into
+[`MappedConstraint`](`pointblank.adapters.MappedConstraint`) objects, the source's metadata, and
+a warning for each rule that couldn't be translated. Its methods turn this into something
+usable:
+
+- [`to_validate()`](`pointblank.ContractImport.to_validate`) builds a
+[`Validate`](`pointblank.Validate`) object for a table, ready to interrogate or to extend with
+more steps
+- [`to_contract()`](`pointblank.ContractImport.to_contract`) builds a
+[`Contract`](`pointblank.Contract`), which can be used in a [`Pipeline`](`pointblank.Pipeline`)
+or saved as YAML
+- [`to_python()`](`pointblank.ContractImport.to_python`) writes equivalent Python code, for
+when the imported rules should become a starting point that's edited by hand
+- [`to_yaml()`](`pointblank.ContractImport.to_yaml`) lists the steps as YAML
+- [`summary()`](`pointblank.ContractImport.summary`) describes what was imported and what
+wasn't
+
+`ContractImport` is a dataclass, so its fields can be read and changed directly. For instance,
+an unwanted constraint can be removed from `constraints` before calling `to_validate()`.
+Custom adapters (see [`ContractAdapter`](`pointblank.ContractAdapter`)) create these objects
+by calling the constructor with the parameters below.
 
 Parameters
 ----------
 source_format
-    The adapter format name (e.g., `"json_schema"`, `"frictionless"`, etc.).
+    The name of the adapter that produced the import, such as `"json_schema"` or `"dbt"`.
 source_path
-    File path if loaded from a file, else None.
+    The path of the imported file, or `None` if the definition was given as a dictionary.
 source_version
-    Version of the source format specification, if detectable.
+    The version of the source format, when the document states one (e.g., the `$schema` URL
+    of a JSON Schema). Otherwise `None` or an empty string.
 columns
-    List of (column_name, dtype_string_or_None) tuples detected from the source.
+    The columns found in the source, as a list of `(name, dtype)` tuples. The `dtype` is a
+    Pointblank type name such as `"Int64"` or `"String"`, or `None` when the source doesn't give
+    a type that maps to one.
 constraints
-    List of MappedConstraint objects ready for translation to Validate steps.
+    The translated rules, as a list of `MappedConstraint` objects, in the order in which they
+    become validation steps.
 metadata
-    Any additional metadata from the source (title, description, etc.).
+    Other information from the source, such as a `"title"` and a `"description"`.
 warnings
-    Messages about constraints that couldn't be mapped.
+    A message for each rule that was recognized but couldn't be translated.
 coverage
-    Fraction of source constraints successfully mapped (`0.0` to `1.0`).
+    The share of recognized rules that were translated, from `0.0` to `1.0`.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's import a Frictionless Data Package that describes two tables. The `resource=` option
+selects the `readings` table, which has a primary key and a foreign key to the `stations`
+table.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+package = {
+    "name": "weather",
+    "resources": [
+        {
+            "name": "stations",
+            "schema": {"fields": [{"name": "station_id", "type": "string"}]},
+        },
+        {
+            "name": "readings",
+            "schema": {
+                "fields": [
+                    {"name": "station_id", "type": "string"},
+                    {"name": "reading_no", "type": "integer"},
+                    {
+                        "name": "temp_c",
+                        "type": "number",
+                        "constraints": {"minimum": -90, "maximum": 60},
+                    },
+                ],
+                "primaryKey": ["station_id", "reading_no"],
+                "foreignKeys": [
+                    {
+                        "fields": "station_id",
+                        "reference": {"resource": "stations", "fields": "station_id"},
+                    }
+                ],
+            },
+        },
+    ],
+}
+
+readings = pb.import_contract(package, resource="readings")
+
+readings
+```
+
+The fields hold the details. The columns come with their Frictionless types translated to
+Pointblank types:
+
+```{python}
+readings.columns
+```
+
+The constraints show how the temperature range became a pair of bounds, and how the primary
+key was expressed as not-null checks plus a `rows_distinct()` check over both key columns.
+
+```{python}
+for c in readings.constraints:
+    print(c)
+```
+
+The foreign key couldn't be translated, since checking it would need the `stations` table. It
+shows up in `warnings`, and it's why the coverage is below 100%.
+
+```{python}
+readings.warnings
+```
+
+Because the fields can be changed, the import can be adjusted before it's used. Here the
+temperature range is dropped (perhaps the sensors are known to report out-of-range values
+that are dealt with later) and the remaining checks are run against a table.
+
+```{python}
+readings.constraints = [c for c in readings.constraints if c.kwargs.get("columns") != "temp_c"]
+
+readings_tbl = pl.DataFrame(
+    {
+        "station_id": ["S1", "S1", "S2", "S2"],
+        "reading_no": [1, 2, 1, 1],
+        "temp_c": [12.5, 13.1, 75.0, 8.4],
+    }
+)
+
+readings.to_validate(readings_tbl, tbl_name="readings").interrogate()
+```
+
+The duplicated `("S2", 1)` key is caught by the `rows_distinct()` step, while the `75.0` reading
+no longer fails any step because the range check was removed.
+
+See Also
+--------
+pointblank.import_contract : Create a `ContractImport` from an external definition.
+adapters.MappedConstraint : The objects in the `constraints` list.
+ContractAdapter : The base class for adapters, which create these objects.
+Contract : The Pointblank contract that `to_contract()` produces.
 
 ContractAdapter()
 
-Base class for contract import/export adapters.
+The base class for adapters that translate contracts to and from other formats.
 
-Subclass this to add support for a new external format.
+An adapter is what connects an external format to
+[`import_contract()`](`pointblank.import_contract`) and
+[`export_contract()`](`pointblank.export_contract`). Pointblank's built-in support for JSON
+Schema, Frictionless Table Schema, dbt, and the Open Data Contract Standard is made of four
+`ContractAdapter` subclasses. Writing another subclass adds a new format, such as an
+organization's own data dictionary or a schema format from another tool. Once it's registered
+with [`register_adapter()`](`pointblank.register_adapter`), the new format works everywhere the
+built-in ones do.
+
+A subclass sets a few class attributes and implements up to three methods:
+
+- [`detect()`](`pointblank.ContractAdapter.detect`) decides whether a source is in this format,
+which lets `import_contract()` find the adapter without being told `format=` (optional)
+- [`import_contract()`](`pointblank.ContractAdapter.import_contract`) reads a source and
+returns a [`ContractImport`](`pointblank.ContractImport`) whose rules are expressed as
+[`MappedConstraint`](`pointblank.adapters.MappedConstraint`) objects (needed for import)
+- [`export_contract()`](`pointblank.ContractAdapter.export_contract`) translates a
+[`Contract`](`pointblank.Contract`) or [`Validate`](`pointblank.Validate`) object into the
+format (needed for export)
+
+The base class versions of these methods raise `NotImplementedError`. An adapter that only
+goes in one direction should set `supports_import` or `supports_export` to `False`, so that the
+unsupported direction fails with a clear error message.
 
 Attributes
 ----------
 format_name
-    Short identifier for this format (e.g., `"json_schema"`).
+    The name of the format, used as the value of `format=`. It's also the registration name
+    when `register_adapter()` is used without one.
 file_extensions
-    File extensions associated with this format (e.g., `[".json"]`).
+    File name endings that identify the format, such as `[".schema.json"]`. They're matched
+    against file paths during format detection, before any `detect()` method is tried.
 supports_import
-    Whether this adapter supports importing from the format.
+    Whether the adapter can import. The default is `True`.
 supports_export
-    Whether this adapter supports exporting to the format.
+    Whether the adapter can export. The default is `True`.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Suppose a team documents its tables in a "data dictionary" format of its own: a dictionary
+with the table name under `data_dictionary` and a list of `columns`. Each column has a name and
+a type and can say whether it's nullable, whether it's unique, and which values are allowed. It
+can also have a `pii` flag, which matters for governance but isn't a data quality rule.
+
+The adapter below supports both directions. Importing maps the column properties to
+`MappedConstraint` objects and records a warning for the `pii` flag, which has no equivalent.
+Exporting goes the other way, starting from a contract's schema and steps.
+
+```{python}
+import json
+import pointblank as pb
+from pointblank.adapters import MappedConstraint
+
+TYPES = {"integer": "Int64", "decimal": "Float64", "text": "String"}
+
+
+@pb.register_adapter
+class DataDictionaryAdapter(pb.ContractAdapter):
+    format_name = "data_dictionary"
+    file_extensions = [".dd.json"]
+
+    @staticmethod
+    def detect(source):
+        return isinstance(source, dict) and "data_dictionary" in source
+
+    def import_contract(self, source, **kwargs):
+        path = None
+        if isinstance(source, str):
+            path = source
+            with open(source) as f:
+                source = json.load(f)
+
+        columns, constraints, warnings = [], [], []
+        for fld in source["columns"]:
+            name = fld["name"]
+            columns.append((name, TYPES.get(fld.get("type"))))
+            if fld.get("nullable") is False:
+                constraints.append(
+                    MappedConstraint("col_vals_not_null", {"columns": name}, "nullable: false")
+                )
+            if fld.get("unique"):
+                constraints.append(
+                    MappedConstraint("rows_distinct", {"columns_subset": [name]}, "unique")
+                )
+            if "allowed" in fld:
+                constraints.append(
+                    MappedConstraint(
+                        "col_vals_in_set", {"columns": name, "set": fld["allowed"]}, "allowed"
+                    )
+                )
+            if fld.get("pii"):
+                warnings.append(f"Column '{name}': the pii flag has no Pointblank equivalent.")
+
+        n_rules = len(constraints) + len(warnings)
+        return pb.ContractImport(
+            source_format=self.format_name,
+            source_path=path,
+            columns=columns,
+            constraints=constraints,
+            metadata={"title": source["data_dictionary"]},
+            warnings=warnings,
+            coverage=len(constraints) / n_rules if n_rules else 1.0,
+        )
+
+    def export_contract(self, validation_or_contract, destination=None, **kwargs):
+        if not isinstance(validation_or_contract, pb.Contract):
+            raise TypeError("This adapter can only export a Contract.")
+        contract = validation_or_contract
+
+        to_dd_type = {pb_type: dd_type for dd_type, pb_type in TYPES.items()}
+        entries = {name: {"name": name} for name, _ in contract.schema.columns}
+        for name, dtype in contract.schema.columns:
+            entries[name]["type"] = to_dd_type.get(dtype, "text")
+        for step in contract.steps:
+            columns = step.kwargs.get("columns")
+            columns = [columns] if isinstance(columns, str) else columns or []
+            for col in columns:
+                if step.method == "col_vals_not_null":
+                    entries[col]["nullable"] = False
+                elif step.method == "col_vals_in_set":
+                    entries[col]["allowed"] = list(step.kwargs["set"])
+
+        doc = {"data_dictionary": contract.name, "columns": list(entries.values())}
+        if destination is not None:
+            with open(destination, "w") as f:
+                json.dump(doc, f, indent=2)
+        return doc
+```
+
+The bare `@pb.register_adapter` decorator registered the class under its `format_name`. Now
+a data dictionary can be imported with `import_contract()`, and its `detect()` method means
+there's no need for `format=`.
+
+```{python}
+customers_dd = {
+    "data_dictionary": "customers",
+    "columns": [
+        {"name": "customer_id", "type": "integer", "nullable": False, "unique": True},
+        {"name": "tier", "type": "text", "allowed": ["bronze", "silver", "gold"]},
+        {"name": "email", "type": "text", "nullable": False, "pii": True},
+    ],
+}
+
+imported = pb.import_contract(customers_dd)
+
+print(imported.summary())
+```
+
+Four of the five column properties became constraints and the `pii` flag became a warning,
+which the coverage figure reflects. From here the import behaves like any other: it can be
+validated against a table, turned into a contract, or written out as code.
+
+Exporting runs in the other direction. A contract written in Pointblank can be shared as a
+data dictionary with `export_contract()`.
+
+```{python}
+orders_contract = pb.Contract(
+    name="orders",
+    schema=pb.Schema(order_id="Int64", status="String", total="Float64"),
+    steps=[
+        pb.Step("col_vals_not_null", columns=["order_id", "status"]),
+        pb.Step("col_vals_in_set", columns="status", set=["open", "closed"]),
+        pb.Step("col_vals_ge", columns="total", value=0),
+    ],
+)
+
+print(json.dumps(pb.export_contract(orders_contract, format="data_dictionary"), indent=2))
+```
+
+The schema supplied the columns and their types, and the not-null and set-membership steps
+became `nullable` and `allowed` properties. The data dictionary format has nothing that
+corresponds to `col_vals_ge()`, so that step was left out.
+
+See Also
+--------
+register_adapter : Register an adapter so that it can be used by name.
+ContractImport : The object an adapter's `import_contract()` method returns.
+adapters.MappedConstraint : The objects that hold translated rules.
+list_adapters : List the registered adapters.
+
+MappedConstraint(method: 'str', kwargs: 'dict[str, Any]' = <factory>, source_description: 'str' = '') -> None
+
+A rule from an external format, translated into a Pointblank validation step.
+
+When an adapter imports a definition, each rule it can translate becomes a `MappedConstraint`:
+the name of a [`Validate`](`pointblank.Validate`) method and the arguments to call it with.
+Together they make up the `constraints` list of a
+[`ContractImport`](`pointblank.ContractImport`), which turns them into real validation steps
+in [`to_validate()`](`pointblank.ContractImport.to_validate`), into
+[`Step`](`pointblank.Step`) objects in
+[`to_contract()`](`pointblank.ContractImport.to_contract`), and into method calls in
+[`to_python()`](`pointblank.ContractImport.to_python`).
+
+Most users only read these objects, to see what an import produced. Anyone writing a
+[`ContractAdapter`](`pointblank.ContractAdapter`) creates them, and that's the reason for the
+`source_description=` field: it records the original rule in the source's own terms (such as
+`"minimum: 0"`), which helps when tracing a validation step back to where it came from.
+
+`MappedConstraint` is available from the `pointblank.adapters` module.
+
+Parameters
+----------
+method
+    The name of a `Validate` validation method, such as `"col_vals_gt"` or `"rows_distinct"`.
+kwargs
+    The keyword arguments for that method, such as `{"columns": "age", "value": 0}`.
+source_description
+    A human-readable description of the rule as written in the source format.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Here's a constraint that requires values in the `age` column to be at least `0`, written the
+way an adapter would create it from a JSON Schema `minimum` keyword.
+
+```{python}
+from pointblank.adapters import MappedConstraint
+
+constraint = MappedConstraint(
+    method="col_vals_ge",
+    kwargs={"columns": "age", "value": 0},
+    source_description="minimum: 0 on age",
+)
+
+constraint
+```
+
+The printed form shows the method call that the constraint stands for. Constraints are what an
+imported definition is made of, as we can see by importing a small JSON Schema and looking at
+its `constraints` list.
+
+```{python}
+import pointblank as pb
+
+imported = pb.import_contract(
+    {
+        "type": "object",
+        "properties": {"age": {"type": "integer", "minimum": 0}},
+        "required": ["age"],
+    }
+)
+
+for c in imported.constraints:
+    print(f"{c.method:<18} {c.kwargs}  (from {c.source_description!r})")
+```
+
+Each JSON Schema keyword became one constraint: the `required` entry gave a not-null check
+and `minimum` gave a lower bound. The `source_description` records where each constraint
+came from, which helps when tracing a failing step back to the definition that produced it.
+
+See Also
+--------
+ContractImport : The import result that holds a list of constraints.
+ContractAdapter : The base class for adapters, which create constraints.
+Step : The equivalent declarative object used in a `Contract`.
 
 
 ## Validation Steps
@@ -9871,8 +10747,7 @@ pipelines more portable.
 
 See Also
 --------
-Look at the documentation of the [`expr_col()`](`pointblank.expr_col`) function for more
-information on how to use it with different table backends.
+expr_col : Build column expressions that work across table backends.
 
 specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
@@ -13711,8 +14586,7 @@ text `"2023"` or `"2024"`.
 
 See Also
 --------
-Create a column expression for use in `conjointly()` validation with the
-[`expr_col()`](`pointblank.expr_col`) function.
+expr_col : Create a column expression for use in `conjointly()`.
 
 starts_with(text: 'str', case_sensitive: 'bool' = False) -> 'StartsWith'
 
@@ -14864,8 +15738,7 @@ satisfied for each row in the table.
 
 See Also
 --------
-The [`conjointly()`](`pointblank.Validate.conjointly`) validation method, which is where this
-function should be used.
+Validate.conjointly : The validation step where these expressions are used.
 
 
 ## Segment Groups
@@ -15615,10 +16488,8 @@ print(f"Number of failing validation steps: {len(failing_steps)}")
 
 See Also
 --------
-- [`get_tabular_report()`](`pointblank.Validate.get_tabular_report`): Get a formatted HTML
-report as a GT table
-- [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`): Get rows that
-failed validation
+Validate.get_tabular_report : Get a formatted HTML report as a GT table.
+Validate.get_data_extracts : Get the rows that failed validation.
 
 get_dataframe_report(self, tbl_type: "Literal['polars', 'pandas', 'duckdb']" = 'polars') -> 'Any'
 
@@ -16392,13 +17263,10 @@ except AssertionError as e:
 
 See Also
 --------
-- [`warning()`](`pointblank.Validate.warning`): get the 'warning' status for each validation
-step
-- [`error()`](`pointblank.Validate.error`): get the 'error' status for each validation step
-- [`critical()`](`pointblank.Validate.critical`): get the 'critical' status for each
-validation step
-- [`assert_passing()`](`pointblank.Validate.assert_passing`): assert all validations pass
-completely
+Validate.warning : Get the 'warning' status for each validation step.
+Validate.error : Get the 'error' status for each validation step.
+Validate.critical : Get the 'critical' status for each validation step.
+Validate.assert_passing : Assert that all validations pass completely.
 
 assert_dimension_scores(self, thresholds: 'dict[str, float] | None' = None, message: 'str | None' = None) -> 'None'
 
@@ -16445,9 +17313,8 @@ validation.assert_dimension_scores(thresholds={"completeness": 95})
 
 See Also
 --------
-Use [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`) to retrieve the
-scores without raising, and [`config()`](`pointblank.config`) to set default per-dimension
-thresholds globally.
+Validate.get_dimension_scores : Get the scores without raising.
+config : Set default per-dimension thresholds globally.
 
 above_threshold(self, level: 'str' = 'warning', i: 'int | None' = None) -> 'bool'
 
@@ -16558,13 +17425,10 @@ pipelines and notification systems.
 
 See Also
 --------
-- [`assert_below_threshold()`](`pointblank.Validate.assert_below_threshold`): a similar
-method that raises an exception if thresholds are exceeded
-- [`warning()`](`pointblank.Validate.warning`): get the 'warning' status for each validation
-step
-- [`error()`](`pointblank.Validate.error`): get the 'error' status for each validation step
-- [`critical()`](`pointblank.Validate.critical`): get the 'critical' status for each
-validation step
+Validate.assert_below_threshold : Raise an exception instead if thresholds are exceeded.
+Validate.warning : Get the 'warning' status for each validation step.
+Validate.error : Get the 'error' status for each validation step.
+Validate.critical : Get the 'critical' status for each validation step.
 
 get_dimension_scores(self) -> 'dict[str, float]'
 
@@ -16604,8 +17468,7 @@ validation.get_dimension_scores()
 
 See Also
 --------
-Use [`get_health_score()`](`pointblank.Validate.get_health_score`) for a single overall
-score across all dimensions.
+Validate.get_health_score : Get a single overall score across all dimensions.
 
 get_health_score(self) -> 'float'
 
@@ -16646,8 +17509,7 @@ validation.get_health_score()
 
 See Also
 --------
-Use [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`) for a per-dimension
-breakdown of the score.
+Validate.get_dimension_scores : Get a per-dimension breakdown of the score.
 
 get_scorecard(self, title: 'str | None' = ':default:') -> 'GT'
 
@@ -16692,10 +17554,9 @@ validation.get_scorecard()
 
 See Also
 --------
-Use [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`) and
-[`get_health_score()`](`pointblank.Validate.get_health_score`) for the underlying numbers,
-and [`get_tabular_report()`](`pointblank.Validate.get_tabular_report`) for the full per-step
-validation report.
+Validate.get_dimension_scores : Get the per-dimension scores behind the scorecard.
+Validate.get_health_score : Get the overall score behind the scorecard.
+Validate.get_tabular_report : Get the full per-step validation report.
 
 n(self, i: 'int | list[int] | None' = None, scalar: 'bool' = False) -> 'dict[int, int] | int'
 
@@ -18175,7 +19036,7 @@ validation = (
 
 See Also
 --------
-[`load_dataset()`](`pointblank.load_dataset`) for loading datasets directly as table objects.
+load_dataset : Load a dataset directly as a table object.
 
 connect_to_table(connection_string: 'str') -> 'Any'
 
@@ -18410,25 +19271,40 @@ compare(source: 'Any', target: 'Any', keys: 'str | list[str] | None' = None, col
 
 Compare two tables row by row and report how they differ.
 
-The `compare()` function aligns the rows of a *source* table (the reference, or expected data)
-with those of a *target* table (the data being checked) and classifies every aligned row:
-rows that match, rows whose values changed, rows missing from the target, and extra rows in the
-target. It also reports schema differences (columns added, removed, retyped, or reordered). The
-returned `Comparison` object gives you the counts, samples of the differing rows, and a
-tabular report.
+A common data question is *how do these two tables differ?* You may have refactored a
+pipeline and want to know whether its output changed, migrated a table from one database to
+another, or received a new extract of a data feed. Spot checks and row counts can tell you
+*that* something changed. The `compare()` function tells you *which* rows changed, how, and in
+which columns.
 
-Rows are aligned in one of two ways:
+It aligns the rows of a *source* table (the reference, or expected data) with those of a
+*target* table (the data being checked) and classifies every aligned row: rows that match,
+rows whose values changed, rows missing from the target, and extra rows in the target. It also
+reports schema differences (columns added, removed, retyped, or reordered). The result is a
+[`Comparison`](`pointblank.Comparison`) object. It holds the counts, gives samples of the
+differing rows on request, and displays as a tabular report in a notebook.
 
-- **by key** (`keys=` given): rows are matched on the values of one or more key columns, so
-  row order doesn't matter. This is the most useful mode for comparing extracts of the same
-  data (e.g., the source and target of a pipeline run).
+Rows are aligned in one of three ways:
+
+- **by key** (`keys=` gives one or more columns): rows are matched on the key values, so row
+  order doesn't matter. This is the most informative mode, and the one to use whenever the
+  data has an identifier.
 - **by position** (`keys=None`, the default): the first row of the source is compared with the
-  first row of the target, and so on.
+  first row of the target, and so on. This suits outputs that are supposed to be identical row
+  for row.
+- **as multisets** (`keys="*"`): whole rows are compared regardless of their order, with
+  duplicates counted. This is for tables that have no key at all.
 
 The comparison is backend-agnostic and runs inside the table's own engine: tables can be
 Polars or Pandas DataFrames, Polars LazyFrames, Ibis tables (e.g., DuckDB, PostgreSQL), or
 paths to CSV/Parquet files. File paths are scanned lazily, and only counts and small samples of
 differing rows are ever collected, so tables that don't fit in memory can still be compared.
+
+The same comparison is available as a validation step with
+[`Validate.tbl_match()`](`pointblank.Validate.tbl_match`), where every aligned row is a test
+unit that thresholds and actions can respond to. On the command line, it's available as
+`pb compare`. To compare totals per group rather than individual rows, use
+[`Validate.tbl_reconcile()`](`pointblank.Validate.tbl_reconcile`).
 
 Parameters
 ----------
@@ -18442,6 +19318,8 @@ keys
     Key names refer to the source table (use `column_map=` if the target names them
     differently). If `None`, rows are aligned by position, which requires the tables to have
     a defined row order (eager DataFrames, Polars LazyFrames, or any table with `order_by=`).
+    Use `"*"` to compare the tables as multisets of whole rows (see the *Test Units and Row
+    Statuses* section). `tolerance=` can't be used in that mode.
 columns
     The source columns whose values should be compared. By default, all columns present in
     both tables (other than the keys) are compared. Giving `columns=` also limits the schema
@@ -18506,6 +19384,10 @@ Every aligned row is one *test unit* and gets exactly one status:
 Rows with a null in a key column can't be matched: they count as `"missing"` (source) or
 `"extra"` (target).
 
+In multiset mode (`keys="*"`), a row is either present in the other table or not, so there are
+no `"changed"` or `"dup_key"` rows. Each distinct row matches as many times as it occurs in
+both tables, and any surplus copies count as `"missing"` or `"extra"`.
+
 Large Tables
 ------------
 The comparison runs inside the tables' own engine and only counts and small samples of rows
@@ -18521,44 +19403,130 @@ peaked at about 2 GB.
 Examples
 --------
 ```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's compare two versions of a product catalog. In the newer version, one product was
+discontinued, one was added, one had its price lowered, and one went out of stock.
+
+```{python}
 import pointblank as pb
 import polars as pl
 
-source = pl.DataFrame(
-    {"id": [1, 2, 3, 4], "amount": [10.0, 20.0, 30.0, 40.0], "region": ["N", "S", "E", "W"]}
+catalog_v1 = pl.DataFrame(
+    {
+        "sku": ["A-101", "A-102", "A-103", "A-104", "A-105"],
+        "name": ["Desk lamp", "Office chair", "Monitor arm", "Keyboard", "Mouse pad"],
+        "price": [24.99, 149.00, 59.50, 45.00, 9.99],
+        "in_stock": [True, True, False, True, True],
+    }
 )
-target = pl.DataFrame(
-    {"id": [1, 2, 4, 5], "amount": [10.0, 20.5, 40.0, 50.0], "region": ["N", "S", "W", "N"]}
+
+catalog_v2 = pl.DataFrame(
+    {
+        "sku": ["A-101", "A-102", "A-104", "A-105", "A-106"],
+        "name": ["Desk lamp", "Office chair", "Keyboard", "Mouse pad", "USB hub"],
+        "price": [24.99, 139.00, 45.00, 9.99, 19.99],
+        "in_stock": [True, True, True, False, True],
+    }
+)
+```
+
+Every product has a unique `sku`, so we'll use it as the key that lines up the rows. Naming
+the two tables makes the report easier to read.
+
+```{python}
+comparison = pb.compare(
+    catalog_v1, catalog_v2, keys="sku", source_name="catalog_v1", target_name="catalog_v2"
 )
 
-cmp = pb.compare(source, target, keys="id")
-cmp
+comparison
 ```
 
-The counts are available as attributes, and the differing rows can be retrieved by status:
+The report's header gives the verdict and a breakdown of the six aligned rows. Below it are
+the columns with mismatched values, then samples of the changed, missing, and extra rows. For
+changed rows, only the differing values are shown.
+
+The same information is available programmatically. The status counts add up to the number
+of test units (aligned rows):
 
 ```{python}
-cmp.n_changed, cmp.n_missing, cmp.n_extra
+comparison.status_counts
 ```
+
+To work with the differing rows, get them by status with
+[`rows()`](`pointblank.Comparison.rows`). Changed rows have a `<column>_source` and a
+`<column>_target` column for each compared column.
 
 ```{python}
-cmp.rows("changed")
+comparison.rows("changed")
 ```
 
-A tolerance can absorb small numeric differences:
+`A-102` changed price and `A-105` changed its stock status. If only prices matter, list the
+columns to compare with `columns=`. The stock change is then ignored and `A-105` matches:
 
 ```{python}
-pb.compare(source, target, keys="id", tolerance={"amount": 1}).n_changed
+pb.compare(catalog_v1, catalog_v2, keys="sku", columns="price").status_counts
 ```
+
+Without `keys=`, rows are compared by position. Since a product was removed from the middle
+of the catalog, most rows no longer line up, and four of the five rows count as changed. This
+is why a key gives a much more useful answer when the data has one.
+
+```{python}
+pb.compare(catalog_v1, catalog_v2).status_counts
+```
+
+Schema changes are found too. Suppose the next version renames `price` to `unit_price`. With
+the default `schema="strict"`, the comparison fails every row until the schemas agree.
+`column_map=` pairs up the renamed column, after which the values are compared as before:
+
+```{python}
+catalog_v3 = catalog_v2.rename({"price": "unit_price"})
+
+pb.compare(catalog_v1, catalog_v3, keys="sku", column_map={"price": "unit_price"})
+```
+
+The rename is listed as a schema difference, but it no longer causes a failure, and the
+result is the same as the comparison of `catalog_v1` with `catalog_v2`. To make a comparison
+like this part of a validation, with thresholds, actions, and a step in the validation report,
+use [`Validate.tbl_match()`](`pointblank.Validate.tbl_match`) with the same arguments.
+
+See Also
+--------
+Comparison : The object returned by this function.
+SchemaDiff : The schema differences found by a comparison.
+Validate.tbl_match : Use a table comparison as a validation step.
+Validate.tbl_reconcile : Compare aggregates per group instead of rows.
 
 Comparison() -> 'None'
 
 The result of comparing a source table with a target table.
 
-`Comparison` objects are created by [`compare()`](`pointblank.compare`). They hold the row
-status counts, per-column mismatch counts, and the schema differences, and can retrieve samples
-of differing rows on demand. A `Comparison` is truthy only when the tables match (see
-[`identical`](`pointblank.Comparison.identical`)), so `if pb.compare(a, b):` reads naturally.
+`Comparison` objects are created by [`compare()`](`pointblank.compare`); they can't be created
+directly. A comparison does its counting when it's created, inside the tables' own engine, and
+only fetches rows when you ask for them. This keeps it cheap to create and to pass around,
+even for very large tables.
+
+What you do with a `Comparison` depends on the question being asked:
+
+- **Do the tables match?** A `Comparison` is truthy only when the tables match (see
+  [`identical`](`pointblank.Comparison.identical`)), so `if pb.compare(a, b):` and
+  `assert pb.compare(a, b)` read naturally. [`n_failed`](`pointblank.Comparison.n_failed`)
+  says by how many rows they don't.
+- **How do they differ?** [`status_counts`](`pointblank.Comparison.status_counts`) breaks the
+  rows down by status, [`schema_diff`](`pointblank.SchemaDiff`) lists the column differences,
+  and [`column_summary()`](`pointblank.Comparison.column_summary`) shows which columns have
+  mismatched values.
+- **Which rows differ?** [`rows()`](`pointblank.Comparison.rows`) returns a sample of the rows
+  with a given status, as a table of the same type as the inputs.
+- **How can I show or store the result?** In a notebook, a `Comparison` displays as its
+  [tabular report](`pointblank.Comparison.get_tabular_report`). For logs, files, and other
+  programs, there's [`to_dict()`](`pointblank.Comparison.to_dict`) and
+  [`to_json()`](`pointblank.Comparison.to_json`).
 
 Attributes
 ----------
@@ -18568,22 +19536,110 @@ keys
     The key columns used to align rows (empty for positional alignment).
 mode
     `"keyed"`, `"positional"`, or `"multiset"` (for `keys="*"`).
+compared_columns
+    The source columns whose values were compared.
+column_map
+    The mapping of source to target column names given in `column_map=`.
+schema_mode
+    How schema differences affect the result: `"strict"` or `"common"`.
 schema_diff
     A [`SchemaDiff`](`pointblank.SchemaDiff`) describing schema differences.
 n_source_rows, n_target_rows
     Row counts of the two tables.
 n_match, n_changed, n_missing, n_extra, n_dup_key
     Number of test units (aligned rows) with each status.
+n_dup_key_values
+    Number of distinct key values that are duplicated in either table.
 column_mismatches
     A dict mapping each compared source column to the number of matched rows where its values
     differ.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's compare the output of a reporting job with the output of a new version of the job. The
+new version should produce exactly the same daily totals.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+old_totals = pl.DataFrame(
+    {
+        "day": ["2025-06-01", "2025-06-02", "2025-06-03", "2025-06-04"],
+        "orders": [118, 131, 97, 142],
+        "revenue": [5902.10, 6611.45, 4875.00, 7120.80],
+    }
+)
+
+new_totals = pl.DataFrame(
+    {
+        "day": ["2025-06-01", "2025-06-02", "2025-06-03", "2025-06-04"],
+        "orders": [118, 131, 97, 142],
+        "revenue": [5902.10, 6611.45, 4857.00, 7120.80],
+    }
+)
+
+comparison = pb.compare(old_totals, new_totals, keys="day")
+
+print(repr(comparison))
+```
+
+The printed form is a one-line summary: one day changed and the schemas agree, so the tables
+aren't identical. In a test or a deployment script, the comparison can be used as a condition
+directly. Here, when the tables differ, we look at the rows that changed:
+
+```{python}
+if comparison:
+    print("The new job reproduces the old totals.")
+else:
+    print(f"{comparison.n_failed} of {comparison.n} days differ:")
+    print(comparison.rows("changed"))
+```
+
+The revenue for June 3 has two digits swapped. To see where the mismatches are concentrated,
+which matters more when there are many columns, use `column_summary()`:
+
+```{python}
+comparison.column_summary()
+```
+
+Only `revenue` has a mismatch, in one of the four matched rows. From here, the full report is
+available with [`get_tabular_report()`](`pointblank.Comparison.get_tabular_report`), and the
+result can be saved with `to_json()` to keep a record of the check.
+
+See Also
+--------
+pointblank.compare : Create a `Comparison` from two tables.
+SchemaDiff : The schema differences held in `schema_diff`.
+Validate.tbl_match : Run the same comparison as a validation step.
 
 SchemaDiff(only_in_source: 'list[str]' = <factory>, only_in_target: 'list[str]' = <factory>, dtype_changed: 'list[tuple[str, str, str]]' = <factory>, renamed: 'list[tuple[str, str]]' = <factory>, case_only: 'list[tuple[str, str]]' = <factory>, reordered: 'bool' = False) -> None
 
 Differences between the schemas of the source and target tables.
 
+Changes to a table's columns are often more disruptive than changes to its values. A dropped
+column breaks the queries that select it, a retyped column changes how values sort and
+aggregate, and a renamed column looks like one column removed and another added. Every
+[`Comparison`](`pointblank.Comparison`) checks the two schemas before comparing values and
+records what it found in its `schema_diff` attribute, which is a `SchemaDiff`.
+
+Whether these differences fail the comparison depends on `schema=` in
+[`compare()`](`pointblank.compare`). With the default `"strict"`, any difference other than an
+explicit rename means that every row counts as failing. With `"common"`, the differences are
+only reported, and the shared columns are compared as usual. Either way, the `SchemaDiff`
+lists the differences, and they appear in the *Schema differences* section of the comparison
+report.
+
 Column names refer to the source table except in `only_in_target` (and the second element of
-`renamed` and `case_only` pairs), which refer to the target table.
+`renamed` and `case_only` pairs), which refer to the target table. A `SchemaDiff` is
+immutable.
 
 Attributes
 ----------
@@ -18602,6 +19658,91 @@ case_only
 reordered
     `True` if the shared columns appear in a different order in the two tables.
 
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's compare a table of customers with a version written by a migrated job. The new version
+stores the signup date as a string, capitalizes one column name, and adds a column.
+
+```{python}
+import pointblank as pb
+import polars as pl
+from datetime import date
+
+customers = pl.DataFrame(
+    {
+        "customer_id": [1, 2, 3],
+        "email": ["ana@example.com", "ben@example.com", "cho@example.com"],
+        "signup": [date(2024, 1, 5), date(2024, 2, 11), date(2024, 3, 2)],
+    }
+)
+
+customers_migrated = pl.DataFrame(
+    {
+        "customer_id": [1, 2, 3],
+        "Email": ["ana@example.com", "ben@example.com", "cho@example.com"],
+        "signup": ["2024-01-05", "2024-02-11", "2024-03-02"],
+        "loaded_at": ["2025-06-01"] * 3,
+    }
+)
+
+comparison = pb.compare(customers, customers_migrated, keys="customer_id")
+
+comparison.schema_diff
+```
+
+Each kind of difference has its own field. `email` and `Email` appear in `only_in_source` and
+`only_in_target`, since column names are case-sensitive, and `case_only` points out that the
+two names differ only in case. `signup` is in `dtype_changed` with both data types, and
+`loaded_at` is new in the target.
+
+Because the schemas differ and `schema="strict"` is the default, no row passes:
+
+```{python}
+comparison.schema_diff.matches, comparison.n_passed
+```
+
+Pairing up the renamed column with `column_map=` resolves the case change, and
+`schema="common"` reports the other two differences without failing any rows:
+
+```{python}
+relaxed = pb.compare(
+    customers,
+    customers_migrated,
+    keys="customer_id",
+    column_map={"email": "Email"},
+    schema="common",
+)
+
+relaxed.schema_diff
+```
+
+The rename now appears in `renamed`, and `case_only` is empty. The retyped `signup` column is
+still listed, but it no longer fails the comparison. When a column's two data types can't be
+compared directly (here, a date and a string), both sides are compared as strings, so the
+three dates still match:
+
+```{python}
+relaxed.status_counts
+```
+
+So `schema="common"` answers whether the values survived the migration, while the
+`SchemaDiff` records how the columns changed along the way. For a schema check that doesn't
+compare any values, see
+[`Validate.col_schema_match()`](`pointblank.Validate.col_schema_match`).
+
+See Also
+--------
+pointblank.compare : Compare two tables, including their schemas.
+Comparison : The comparison result that holds a `SchemaDiff`.
+Validate.col_schema_match : Check a table against an expected schema.
+
 
 ## Comparison Methods
 
@@ -18610,33 +19751,355 @@ Methods for the Comparison class
 
 Comparison.identical
 
-`True` if the tables match under the comparison settings.
+Whether the tables match under the comparison settings.
+
+A comparison is identical if the schema check passed (see
+[`schema_ok`](`pointblank.Comparison.schema_ok`)) and no test unit failed. This is the
+single answer to "are these tables the same?", and it's also the truth value of the
+comparison, so `if comparison:` is the same as `if comparison.identical:`.
+
+"Identical" is relative to the settings given to [`compare()`](`pointblank.compare`).
+Columns left out with `columns=` aren't checked, values within `tolerance=` count as equal,
+values are compared after any `normalize=` operations, and with `schema="common"`, the
+tables can have different columns.
+
+Returns
+-------
+bool
+    `True` if the tables match.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Here, a reporting table stores the readings rounded to one decimal place.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+raw = pl.DataFrame({"station": ["S1", "S2", "S3"], "temp": [12.14, 14.02, 9.81]})
+rounded = pl.DataFrame({"station": ["S1", "S2", "S3"], "temp": [12.1, 14.0, 9.8]})
+
+pb.compare(raw, rounded, keys="station").identical
+```
+
+An exact comparison finds every row changed. Allowing for the rounding with `tolerance=`
+makes the tables match:
+
+```{python}
+comparison = pb.compare(raw, rounded, keys="station", tolerance={"temp": 0.05})
+
+comparison.identical
+```
+
+Since a comparison has the same truth value, it can be used directly in a condition:
+
+```{python}
+if comparison:
+    print("The rounded table matches the raw readings.")
+```
+
+A result of `True` here means "the same within 0.05 degrees", not "exactly the same". The
+settings belong with the result, and the comparison report lists them in its header.
 
 Comparison.schema_ok
 
-`True` if the schemas match, or if schema differences are tolerated (`"common"`).
+Whether the schema check passed.
+
+A comparison checks the two tables' schemas before it compares their values. How a schema
+difference is treated depends on `schema=` in [`compare()`](`pointblank.compare`). With
+`schema="strict"` (the default), `schema_ok` is the same as
+[`SchemaDiff.matches`](`pointblank.SchemaDiff.matches`), and a `False` value means that
+every test unit fails, so [`n_passed`](`pointblank.Comparison.n_passed`) is `0`. With
+`schema="common"`, schema differences are only reported, so `schema_ok` is always `True`.
+
+This makes `schema_ok` the property to check when a comparison fails and it's not clear
+whether the values or the columns are to blame. The details of the difference are in
+`schema_diff`.
+
+Returns
+-------
+bool
+    `True` if the schemas match, or if `schema="common"` was used.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Here, the target table has the same rows as the source, plus a new `humidity` column.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+readings = pl.DataFrame({"station": ["S1", "S2", "S3"], "temp": [12.1, 14.0, 9.8]})
+readings_new = readings.with_columns(humidity=pl.Series([0.61, 0.58, 0.72]))
+
+comparison = pb.compare(readings, readings_new, keys="station")
+
+comparison.schema_ok, comparison.status_counts, comparison.n_passed
+```
+
+Every row has a status of `"match"`, but none of them pass, because the schema check
+failed. The cause is in the schema differences:
+
+```{python}
+comparison.schema_diff.only_in_target
+```
+
+If the new column is expected, `schema="common"` compares the shared columns and lets the
+rows pass:
+
+```{python}
+relaxed = pb.compare(readings, readings_new, keys="station", schema="common")
+
+relaxed.schema_ok, relaxed.n_passed
+```
+
+The new column is still listed in `relaxed.schema_diff`, so the change remains visible in
+the report even though it no longer fails the comparison.
 
 Comparison.status_counts
 
 The number of test units with each row status.
 
+Where [`n_passed`](`pointblank.Comparison.n_passed`) and
+[`n_failed`](`pointblank.Comparison.n_failed`) say how many rows differ,
+`status_counts` says how they differ. The statuses are described in the
+*Test Units and Row Statuses* section of [`compare()`](`pointblank.compare`). The counts
+are computed when the comparison is made, so reading them doesn't touch the tables again.
+
+The counts are the row statuses alone and aren't affected by the schema check. If the
+schema check fails, there can be `"match"` rows even though no test units pass.
+
+Returns
+-------
+dict[str, int]
+    A dictionary with the keys `"match"`, `"changed"`, `"missing"`, `"extra"`, and
+    `"dup_key"` (in that order). The values add up to [`n`](`pointblank.Comparison.n`).
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+In this example, station `S3` appears twice in the source table.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+readings_v1 = pl.DataFrame(
+    {"station": ["S1", "S2", "S3", "S3", "S4"], "temp": [12.1, 14.0, 9.8, 9.9, 11.2]}
+)
+readings_v2 = pl.DataFrame(
+    {"station": ["S1", "S2", "S3", "S5"], "temp": [12.1, 14.3, 9.8, 8.0]}
+)
+
+comparison = pb.compare(readings_v1, readings_v2, keys="station")
+
+comparison.status_counts
+```
+
+Each status has a different cause. `S2` changed, `S4` is missing from the target, and `S5`
+is extra. The duplicated `S3` key counts as two `"dup_key"` units, since it occurs twice in
+the source. Those rows can't be paired up, so they're not compared. To see the rows behind
+any of these counts, pass the status to [`rows()`](`pointblank.Comparison.rows`), as in
+`comparison.rows("dup_key")`.
+
 Comparison.n
 
 The number of test units (aligned rows).
 
+A comparison aligns the rows of the two tables and gives each aligned row one status (see
+the *Test Units and Row Statuses* section of [`compare()`](`pointblank.compare`)). `n` is
+the total, so it's always the sum of the values in
+[`status_counts`](`pointblank.Comparison.status_counts`) and of
+[`n_passed`](`pointblank.Comparison.n_passed`) and
+[`n_failed`](`pointblank.Comparison.n_failed`). It's the denominator to use for any
+fraction of rows that pass or fail.
+
+`n` isn't the row count of either table. A row that's in both tables counts once, rows in
+only one table count once each, and a duplicated key counts as many units as the larger of
+its two occurrence counts. The row counts of the two tables are available as
+`n_source_rows` and `n_target_rows`.
+
+Returns
+-------
+int
+    The number of test units.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+These two tables of weather station readings have four rows each, but only three stations
+in common.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+readings_v1 = pl.DataFrame(
+    {"station": ["S1", "S2", "S3", "S4"], "temp": [12.1, 14.0, 9.8, 11.2]}
+)
+readings_v2 = pl.DataFrame(
+    {"station": ["S1", "S2", "S3", "S5"], "temp": [12.1, 14.3, 9.8, 8.0]}
+)
+
+comparison = pb.compare(readings_v1, readings_v2, keys="station")
+
+comparison.n, comparison.n_source_rows, comparison.n_target_rows
+```
+
+There are five test units: the three shared stations, `S4` (only in the source), and `S5`
+(only in the target). Dividing by `n` gives the fraction of rows that failed:
+
+```{python}
+comparison.n_failed / comparison.n
+```
+
+Three of the five units failed: `S2` changed, `S4` is missing, and `S5` is extra.
+
 Comparison.n_passed
 
-Test units that pass: matching rows (none, if the schema check fails).
+The number of test units that passed.
+
+A test unit passes if its status is `"match"`, which means the row is in both tables with
+the same values in every compared column (within any tolerance set in
+[`compare()`](`pointblank.compare`)). If the schema check failed (see
+[`schema_ok`](`pointblank.Comparison.schema_ok`)), no test unit passes and `n_passed` is
+`0`, whatever the row statuses are.
+
+`n_passed` and [`n_failed`](`pointblank.Comparison.n_failed`) are the counts that
+[`Validate.tbl_match()`](`pointblank.Validate.tbl_match`) uses for its test units, so they
+work with the same thresholds and fractions as any other validation step.
+
+Returns
+-------
+int
+    The number of passing test units.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Two of these four stations have the same reading in both tables.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+readings_v1 = pl.DataFrame(
+    {"station": ["S1", "S2", "S3", "S4"], "temp": [12.1, 14.0, 9.8, 11.2]}
+)
+readings_v2 = pl.DataFrame(
+    {"station": ["S1", "S2", "S3", "S4"], "temp": [12.1, 14.3, 9.8, 11.5]}
+)
+
+comparison = pb.compare(readings_v1, readings_v2, keys="station")
+
+comparison.n_passed, comparison.n_passed / comparison.n
+```
+
+Half of the test units passed. The two changed rows are available with
+[`rows("changed")`](`pointblank.Comparison.rows`).
 
 Comparison.n_failed
 
-Test units that fail: all non-matching rows (all rows, if the schema check fails).
+The number of test units that failed.
+
+A test unit fails if its status is `"changed"`, `"missing"`, `"extra"`, or `"dup_key"`. If
+the schema check failed (see [`schema_ok`](`pointblank.Comparison.schema_ok`)), every test
+unit fails, so `n_failed` equals [`n`](`pointblank.Comparison.n`). It's always
+`n - n_passed`.
+
+A count of zero failures, along with a passing schema check, is what makes a comparison
+[`identical`](`pointblank.Comparison.identical`). To see how the failures break down by
+status, use [`status_counts`](`pointblank.Comparison.status_counts`).
+
+Returns
+-------
+int
+    The number of failing test units.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+One station's reading changed, one station was dropped, and one was added.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+readings_v1 = pl.DataFrame(
+    {"station": ["S1", "S2", "S3", "S4"], "temp": [12.1, 14.0, 9.8, 11.2]}
+)
+readings_v2 = pl.DataFrame(
+    {"station": ["S1", "S2", "S3", "S5"], "temp": [12.1, 14.3, 9.8, 8.0]}
+)
+
+comparison = pb.compare(readings_v1, readings_v2, keys="station")
+
+comparison.n_failed
+```
+
+A count is useful for a quick check, for instance to stop a script when too many rows
+differ:
+
+```{python}
+if comparison.n_failed > 0.25 * comparison.n:
+    print(f"{comparison.n_failed} of {comparison.n} rows differ")
+```
+
+To act on failures with thresholds and actions instead, compare the tables in a validation
+with [`Validate.tbl_match()`](`pointblank.Validate.tbl_match`).
 
 rows(self, status: "Literal['changed', 'missing', 'extra', 'dup_key', 'match']", limit: 'int' = 100) -> 'Any'
 
 Get a sample of rows with a given status.
 
-Only up to `limit=` rows are collected, so this is safe to use on very large tables.
+The counts in [`status_counts`](`pointblank.Comparison.status_counts`) say how many rows
+differ, and `rows()` shows which ones. It's the step that turns "12 rows changed" into
+something that can be investigated: the keys to look up, the values on each side, and the
+rows that were dropped or added.
+
+A comparison collects counts when it's made, but it doesn't collect rows until they're
+asked for. `rows()` then fetches up to `limit=` rows with the requested status from the
+tables' own engine, so it's safe to use with very large tables and with database tables.
+The result is cached, so asking for the same status and limit again returns the same table
+without querying the tables a second time.
 
 Parameters
 ----------
@@ -18644,11 +20107,11 @@ status
     The row status to retrieve:
 
     - `"changed"`: the keys, then a `<column>_source` and a `<column>_target` column for
-      each compared column
+      each compared column (including columns whose values are equal in that row)
     - `"missing"`: source rows not in the target (source column names)
     - `"extra"`: target rows not in the source (target column names)
     - `"dup_key"`: duplicated key values with their occurrence counts in each table
-      (`n_source`, `n_target`)
+      (`n_source`, `n_target`), one row per key
     - `"match"`: the keys of matching rows
 limit
     The maximum number of rows to return.
@@ -18657,11 +20120,95 @@ Returns
 -------
 Any
     A table of the same type as the (collected) input tables. In positional mode, rows
-    are identified by a 1-based `_row_num_` column.
+    are identified by a 1-based `_row_num_` column, and a `"changed"` sample has the
+    `_source` and `_target` columns for every column. In multiset mode (`keys="*"`),
+    `"missing"` and `"extra"` return distinct rows, with the compared values as strings,
+    plus `n_source` and `n_target` columns giving how often each row occurs in each table.
+
+Raises
+------
+ValueError
+    If `status=` isn't one of the five row statuses.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's compare two versions of an employee table, where one salary changed, one employee
+left, and one joined.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+staff_jan = pl.DataFrame(
+    {
+        "emp_id": [101, 102, 103, 104],
+        "dept": ["Sales", "Sales", "Ops", "Ops"],
+        "salary": [52000, 61000, 58000, 47000],
+    }
+)
+staff_feb = pl.DataFrame(
+    {
+        "emp_id": [101, 102, 103, 105],
+        "dept": ["Sales", "Sales", "Ops", "Ops"],
+        "salary": [52000, 63500, 58000, 49000],
+    }
+)
+
+comparison = pb.compare(staff_jan, staff_feb, keys="emp_id")
+
+comparison.rows("changed")
+```
+
+Each changed row has both versions of every compared column side by side. Here, `dept`
+is the same on both sides and `salary` is the column that changed. The departed employee
+is a `"missing"` row, and it's shown as it was in the source table:
+
+```{python}
+comparison.rows("missing")
+```
+
+The new employee is an `"extra"` row, shown as it is in the target table:
+
+```{python}
+comparison.rows("extra")
+```
+
+In multiset mode, rows have no identity apart from their values. So `"missing"` and
+`"extra"` rows are listed once each, with the number of times they occur in each table.
+Here, the target table has one fewer copy of a row than the source:
+
+```{python}
+scans_source = pl.DataFrame({"badge": [7, 7, 9], "door": ["A", "A", "B"]})
+scans_target = pl.DataFrame({"badge": [7, 9], "door": ["A", "B"]})
+
+pb.compare(scans_source, scans_target, keys="*").rows("missing")
+```
+
+The row with badge 7 at door A occurs twice in the source and once in the target, so one
+copy is missing. For a summary of all the samples in one place, see
+[`get_tabular_report()`](`pointblank.Comparison.get_tabular_report`), which shows up to 10
+rows for each status by default.
 
 column_summary(self) -> 'Any'
 
 Get a per-column summary of value mismatches.
+
+A row counts as `"changed"` if any compared column differs, so the row statuses don't say
+which columns are responsible. `column_summary()` does. It's often the quickest way to find
+the cause of a difference. A single column with mismatches in every row suggests a change
+in how that column is computed or formatted, while mismatches spread thinly across many
+columns suggest changed rows.
+
+The summary also lists each column's data type on both sides and the target column it was
+compared against, which shows the effect of `column_map=`. The counts are computed when
+the comparison is made, so this doesn't query the tables again.
 
 Returns
 -------
@@ -18669,16 +20216,64 @@ Any
     A table (Polars if available, else Pandas) with one row per compared column: the
     source and target column names and data types, the number of matched rows whose
     values differ (`n_mismatch`), and that number as a fraction of matched rows
-    (`f_mismatch`).
+    (`f_mismatch`). Matched rows are those with a status of `"match"` or `"changed"`. In
+    multiset mode, there are no matched pairs, so the last two columns are null.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Here, a rewritten job produces an orders table where the totals are rounded to whole
+units, and one order has a different status.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+orders_old = pl.DataFrame(
+    {
+        "order_id": [1, 2, 3, 4],
+        "status": ["shipped", "shipped", "pending", "shipped"],
+        "total": [19.99, 45.50, 12.00, 80.25],
+    }
+)
+orders_new = pl.DataFrame(
+    {
+        "order_id": [1, 2, 3, 4],
+        "status": ["shipped", "shipped", "cancelled", "shipped"],
+        "total": [20.0, 46.0, 12.0, 80.0],
+    }
+)
+
+comparison = pb.compare(orders_old, orders_new, keys="order_id")
+
+comparison.column_summary()
+```
+
+`total` differs in three of the four orders, which points to a systematic change (the
+rounding), while `status` differs in a single order. All four rows are `"changed"`, but
+the summary separates the two causes. Once the rounding is accepted (for instance, with
+`tolerance={"total": 0.5}`), only the status change is left.
 
 get_tabular_report(self, limit: 'int' = 10, title: 'str | None' = None, lang: 'str | None' = None, locale: 'str | None' = None) -> 'GT'
 
 Get a tabular report of the comparison.
 
+The report brings everything about a comparison together in one table, for reading
+rather than for further processing. It's what's shown when a comparison is displayed in a
+notebook, and calling `get_tabular_report()` directly lets the report be customized and
+saved, for example to attach to a pull request or to share with whoever owns the data.
+
 The report has a header with the verdict, the row status counts, and the comparison
 settings, followed by sections (as row groups) for schema differences, per-column
-mismatches, and samples of changed, missing, extra, and duplicate-key rows. Sections with
-nothing to show are omitted.
+mismatches, and samples of changed, missing, extra, and duplicate-key rows. Changed rows
+show only the columns that differ, with the source and target values (and the difference,
+for numbers). Sections with nothing to show are omitted.
 
 Parameters
 ----------
@@ -18699,9 +20294,73 @@ Returns
 GT
     A Great Tables object.
 
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's compare two months of a payroll table. Naming the tables with `source_name=` and
+`target_name=` makes the report easier to read.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+payroll_jan = pl.DataFrame(
+    {
+        "emp_id": [101, 102, 103, 104],
+        "dept": ["Sales", "Sales", "Ops", "Ops"],
+        "salary": [52000, 61000, 58000, 47000],
+    }
+)
+payroll_feb = pl.DataFrame(
+    {
+        "emp_id": [101, 102, 103, 105],
+        "dept": ["Sales", "Sales", "Ops", "Ops"],
+        "salary": [52000, 63500, 58000, 49000],
+    }
+)
+
+comparison = pb.compare(
+    payroll_jan,
+    payroll_feb,
+    keys="emp_id",
+    source_name="payroll_jan",
+    target_name="payroll_feb",
+)
+
+comparison.get_tabular_report()
+```
+
+The verdict and counts are at the top, and below them are the sections that have
+something to show: the mismatches in `salary`, the changed row for employee 102, and the
+employees who left and joined.
+
+The title can be replaced, and the labels can be shown in any of Pointblank's reporting
+languages. Here's the same report in French:
+
+```{python}
+comparison.get_tabular_report(title="Paie : janvier et février", lang="fr")
+```
+
+Numbers are formatted for the French locale too, with a decimal comma (as in `60,0%`). Use
+`locale=` to format them differently from the labels. To save a report as a standalone
+HTML file, use the `write_raw_html()` method of the returned Great Tables object.
+
 to_dict(self, samples: 'bool' = True, limit: 'int' = 10) -> 'dict[str, Any]'
 
 Get the comparison results as a JSON-serializable dict.
+
+A comparison is a live object that refers to the tables it compared. `to_dict()` turns
+its results into plain data that can be stored or sent elsewhere: written to a log or a
+database table, attached to a CI run, checked in a test, or passed to a dashboard.
+Everything in the dictionary is a string, number, boolean, list, dict, or `None` (dates and
+other values in the samples are converted to strings), so it can be serialized as it is.
+For a JSON string, use [`to_json()`](`pointblank.Comparison.to_json`).
 
 Parameters
 ----------
@@ -18711,11 +20370,125 @@ samples
 limit
     The maximum number of sample rows per status.
 
+Returns
+-------
+dict[str, Any]
+    A dictionary with the comparison settings (`"source_name"`, `"target_name"`, `"mode"`,
+    `"keys"`, `"compared_columns"`, `"column_map"`, `"schema_mode"`, `"null_equal"`, and
+    `"partitions"`), the row counts of both tables, the results (`"n"`, `"n_passed"`,
+    `"n_failed"`, `"identical"`, `"status_counts"`, and `"column_mismatches"`), and the
+    schema differences (`"schema_diff"`, from
+    [`SchemaDiff.to_dict()`](`pointblank.SchemaDiff.to_dict`)). If `samples=True`, there's
+    also a `"samples"` entry, which maps each failing status that has rows to a list of
+    row dictionaries, structured as in [`rows()`](`pointblank.Comparison.rows`).
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's compare two months of an employee table and turn the result into a dictionary.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+staff_jan = pl.DataFrame(
+    {"emp_id": [101, 102, 103, 104], "salary": [52000, 61000, 58000, 47000]}
+)
+staff_feb = pl.DataFrame(
+    {"emp_id": [101, 102, 103, 105], "salary": [52000, 63500, 58000, 49000]}
+)
+
+comparison = pb.compare(
+    staff_jan, staff_feb, keys="emp_id", source_name="staff_jan", target_name="staff_feb"
+)
+
+result = comparison.to_dict()
+
+result["status_counts"]
+```
+
+The samples hold the actual rows, keyed by status:
+
+```{python}
+result["samples"]
+```
+
+Salaries are sensitive, so a record that's kept in a shared log might leave the samples
+out. With `samples=False`, only counts, settings, and schema details remain:
+
+```{python}
+record = comparison.to_dict(samples=False)
+
+{k: record[k] for k in ["source_name", "target_name", "n_failed", "identical"]}
+```
+
+Leaving out the samples also means the tables aren't queried again, because the counts
+were collected when the comparison was made. To limit the samples instead of dropping them,
+set `limit=` to the number of rows to keep for each status.
+
 to_json(self, samples: 'bool' = True, limit: 'int' = 10, indent: 'int | None' = 2) -> 'str'
 
 Get the comparison results as a JSON string.
 
-The structure is the same as that of [`to_dict()`](`pointblank.Comparison.to_dict`).
+JSON is the format to use when a comparison result leaves Python: written to a file
+alongside a pipeline run, returned from an API, or read by another tool. The structure is
+the same as that of [`to_dict()`](`pointblank.Comparison.to_dict`). The `pb compare`
+command line tool produces the same JSON with `--format json` (to the terminal) or
+`--output-json` (to a file), and its `--no-samples` option corresponds to `samples=False`.
+
+Parameters
+----------
+samples
+    Should samples of differing rows be included? Set to `False` when the data might
+    contain sensitive values (e.g., PII) and only counts and schema details may be stored.
+limit
+    The maximum number of sample rows per status.
+indent
+    The number of spaces to indent nested levels by. Use `None` for the most compact
+    output, on a single line (as for JSON Lines files, with one comparison per line).
+
+Returns
+-------
+str
+    The comparison results as a JSON string.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Here, a new version of a price list has one changed price.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+prices_v1 = pl.DataFrame({"sku": ["A-1", "A-2", "A-3"], "price": [9.99, 24.50, 5.00]})
+prices_v2 = pl.DataFrame({"sku": ["A-1", "A-2", "A-3"], "price": [9.99, 26.00, 5.00]})
+
+comparison = pb.compare(prices_v1, prices_v2, keys="sku")
+
+print(comparison.to_json(limit=5))
+```
+
+For a compact record without row samples, set `samples=False` and `indent=None`:
+
+```{python}
+print(comparison.to_json(samples=False, indent=None))
+```
+
+Each such record is one line, so a series of comparisons can be appended to a single file
+and read back later, one comparison per line.
 
 
 ## Table Pre-checks
@@ -19947,8 +21720,7 @@ Key pieces to note in the above example:
 
 See Also
 --------
-Have a look at [`Actions`](`pointblank.Actions`) for more information on how to create custom
-actions for validation steps that exceed a set threshold value.
+Actions : Create custom actions for steps that exceed a threshold.
 
 get_validation_summary() -> 'dict | None'
 
@@ -20060,8 +21832,7 @@ you to integrate validation results into your broader data quality workflows.
 
 See Also
 --------
-Have a look at [`FinalActions`](`pointblank.FinalActions`) for more information on how to create
-custom actions that are executed after all validation steps have been completed.
+FinalActions : Create custom actions that run after all validation steps are done.
 
 write_file(validation: 'Validate', filename: 'str', path: 'str | None' = None, keep_tbl: 'bool' = False, keep_extracts: 'bool' = False, quiet: 'bool' = False) -> 'None'
 
@@ -20295,8 +22066,7 @@ again and they will be automatically restored.
 
 See Also
 --------
-Use the [`read_file()`](`pointblank.read_file`) function to load a validation object that was
-previously saved with `write_file()`.
+read_file : Load a validation object saved with `write_file()`.
 
 read_file(filepath: 'str | Path') -> 'Validate'
 
@@ -20356,8 +22126,7 @@ if validation.data is not None:
 
 See Also
 --------
-Use the [`write_file()`](`pointblank.Validate.write_file`) method to save a validation object
-to disk for later retrieval with this function.
+write_file : Save a validation object to disk for later retrieval with `read_file()`.
 
 ref(column_name: 'str') -> 'ReferenceColumn'
 
@@ -20431,7 +22200,7 @@ validation
 
 See Also
 --------
-The [`col()`](`pointblank.col`) function for referencing columns within the same table.
+col : Reference columns within the same table.
 
 
 ## Test Data Generation

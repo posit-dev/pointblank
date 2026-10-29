@@ -55,22 +55,25 @@ The outcome of running a data pipeline.
 Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use `import_contract()` as the entry point, `export_contract()` for the reverse, and [register_adapter()](../reference/register_adapter.md#pointblank.register_adapter) to add support for custom formats.
 
 [import_contract()](import_contract.md#pointblank.import_contract)  
-Import a contract/schema from an external format.
+Import a contract or schema written in another format.
 
 [export_contract()](export_contract.md#pointblank.export_contract)  
-Export a Pointblank validation or contract to an external format.
+Export a Pointblank validation or contract to another format.
 
 [list_adapters()](list_adapters.md#pointblank.list_adapters)  
-List all registered adapters with their capabilities.
+List the formats available for contract import and export.
 
 [register_adapter()](register_adapter.md#pointblank.register_adapter)  
-Register a contract adapter class.
+Register a contract adapter so that it can be used for import and export.
 
 [ContractImport](ContractImport.md#pointblank.ContractImport)  
-Result of importing an external contract/schema.
+The result of importing a contract or schema from another format.
 
 [ContractAdapter](ContractAdapter.md#pointblank.ContractAdapter)  
-Base class for contract import/export adapters.
+The base class for adapters that translate contracts to and from other formats.
+
+[adapters.MappedConstraint](adapters.MappedConstraint.md#pointblank.adapters.MappedConstraint)  
+A rule from an external format, translated into a Pointblank validation step.
 
 ## Validation Steps
 
@@ -440,10 +443,10 @@ Differences between the schemas of the source and target tables.
 Methods for the Comparison class
 
 [Comparison.identical](Comparison.identical.md#pointblank.Comparison.identical)  
-`True` if the tables match under the comparison settings.
+Whether the tables match under the comparison settings.
 
 [Comparison.schema_ok](Comparison.schema_ok.md#pointblank.Comparison.schema_ok)  
-`True` if the schemas match, or if schema differences are tolerated (`"common"`).
+Whether the schema check passed.
 
 [Comparison.status_counts](Comparison.status_counts.md#pointblank.Comparison.status_counts)  
 The number of test units with each row status.
@@ -452,10 +455,10 @@ The number of test units with each row status.
 The number of test units (aligned rows).
 
 [Comparison.n_passed](Comparison.n_passed.md#pointblank.Comparison.n_passed)  
-Test units that pass: matching rows (none, if the schema check fails).
+The number of test units that passed.
 
 [Comparison.n_failed](Comparison.n_failed.md#pointblank.Comparison.n_failed)  
-Test units that fail: all non-matching rows (all rows, if the schema check fails).
+The number of test units that failed.
 
 [Comparison.rows()](Comparison.rows.md#pointblank.Comparison.rows)  
 Get a sample of rows with a given status.

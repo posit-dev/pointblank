@@ -11,7 +11,7 @@
 <meta name="description" content="The result of comparing a source table with a target table.">
 
 <title>Comparison | Pointblank</title>
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Comparison - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Comparison.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Comparison - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Comparison.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -114,6 +114,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../gd-lightbox.css">
 <script defer="" src="../gd-lightbox.js"></script>
@@ -369,6 +372,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/ContractAdapter.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ContractAdapter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
   </div>
 </li>
       </ul>
@@ -1637,6 +1646,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#attributes" id="toc-attributes" class="nav-link active" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1667,13 +1678,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L490-L1516" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L785-L2540" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Comparison</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p><a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> objects are created by <a href="../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a>. They hold the row status counts, per-column mismatch counts, and the schema differences, and can retrieve samples of differing rows on demand. A <a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> is truthy only when the tables match (see <a href="../reference/Comparison.identical.html#pointblank.Comparison.identical" class="gdls-link"><code>identical</code></a>), so <code>if pb.compare(a, b):</code> reads naturally.</p>
+<p><a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> objects are created by <a href="../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a>; they can’t be created directly. A comparison does its counting when it’s created, inside the tables’ own engine, and only fetches rows when you ask for them. This keeps it cheap to create and to pass around, even for very large tables.</p>
+<p>What you do with a <a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> depends on the question being asked:</p>
+<ul>
+<li><strong>Do the tables match?</strong> A <a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> is truthy only when the tables match (see <a href="../reference/Comparison.identical.html#pointblank.Comparison.identical" class="gdls-link"><code>identical</code></a>), so <code>if pb.compare(a, b):</code> and <code>assert pb.compare(a, b)</code> read naturally. <a href="../reference/Comparison.n_failed.html#pointblank.Comparison.n_failed" class="gdls-link"><code>n_failed</code></a> says by how many rows they don’t.</li>
+<li><strong>How do they differ?</strong> <a href="../reference/Comparison.status_counts.html#pointblank.Comparison.status_counts" class="gdls-link"><code>status_counts</code></a> breaks the rows down by status, <a href="../reference/SchemaDiff.html#pointblank.SchemaDiff" class="gdls-link"><code>schema_diff</code></a> lists the column differences, and <a href="../reference/Comparison.column_summary.html#pointblank.Comparison.column_summary" class="gdls-link"><code>column_summary()</code></a> shows which columns have mismatched values.</li>
+<li><strong>Which rows differ?</strong> <a href="../reference/Comparison.rows.html#pointblank.Comparison.rows" class="gdls-link"><code>rows()</code></a> returns a sample of the rows with a given status, as a table of the same type as the inputs.</li>
+<li><strong>How can I show or store the result?</strong> In a notebook, a <a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> displays as its <a href="../reference/Comparison.get_tabular_report.html#pointblank.Comparison.get_tabular_report" class="gdls-link">tabular report</a>. For logs, files, and other programs, there’s <a href="../reference/Comparison.to_dict.html#pointblank.Comparison.to_dict" class="gdls-link"><code>to_dict()</code></a> and <a href="../reference/Comparison.to_json.html#pointblank.Comparison.to_json" class="gdls-link"><code>to_json()</code></a>.</li>
+</ul>
 </div>
 <section id="attributes" class="level2 doc-attributes">
 <h2 class="doc-attributes anchored" data-anchor-id="attributes">Attributes</h2>
@@ -1691,6 +1709,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dd>
 <p><code>"keyed"</code>, <code>"positional"</code>, or <code>"multiset"</code> (for <code>keys="*"</code>).</p>
 </dd>
+<dt><code><span class="doc-parameter-name">compared_columns</span></code></dt>
+<dd>
+<p>The source columns whose values were compared.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">column_map</span></code></dt>
+<dd>
+<p>The mapping of source to target column names given in <code>column_map=</code>.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">schema_mode</span></code></dt>
+<dd>
+<p>How schema differences affect the result: <code>"strict"</code> or <code>"common"</code>.</p>
+</dd>
 <dt><code><span class="doc-parameter-name">schema_diff</span></code></dt>
 <dd>
 <p>A <a href="../reference/SchemaDiff.html#pointblank.SchemaDiff" class="gdls-link"><code>SchemaDiff</code></a> describing schema differences.</p>
@@ -1703,12 +1733,98 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dd>
 <p>Number of test units (aligned rows) with each status.</p>
 </dd>
+<dt><code><span class="doc-parameter-name">n_dup_key_values</span></code></dt>
+<dd>
+<p>Number of distinct key values that are duplicated in either table.</p>
+</dd>
 <dt><code><span class="doc-parameter-name">column_mismatches</span></code></dt>
 <dd>
 A dict mapping each compared source column to the number of matched rows where its values differ.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s compare the output of a reporting job with the output of a new version of the job. The new version should produce exactly the same daily totals.</p>
+<div id="19bbd852" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>old_totals <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"day"</span>: [<span class="st">"2025-06-01"</span>, <span class="st">"2025-06-02"</span>, <span class="st">"2025-06-03"</span>, <span class="st">"2025-06-04"</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"orders"</span>: [<span class="dv">118</span>, <span class="dv">131</span>, <span class="dv">97</span>, <span class="dv">142</span>],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"revenue"</span>: [<span class="fl">5902.10</span>, <span class="fl">6611.45</span>, <span class="fl">4875.00</span>, <span class="fl">7120.80</span>],</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>new_totals <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"day"</span>: [<span class="st">"2025-06-01"</span>, <span class="st">"2025-06-02"</span>, <span class="st">"2025-06-03"</span>, <span class="st">"2025-06-04"</span>],</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"orders"</span>: [<span class="dv">118</span>, <span class="dv">131</span>, <span class="dv">97</span>, <span class="dv">142</span>],</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"revenue"</span>: [<span class="fl">5902.10</span>, <span class="fl">6611.45</span>, <span class="fl">4857.00</span>, <span class="fl">7120.80</span>],</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(old_totals, new_totals, keys<span class="op">=</span><span class="st">"day"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">repr</span>(comparison))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Comparison('source' vs 'target': match=3, changed=1, missing=0, extra=0, dup_key=0; schema ok; identical=False)</code></pre>
+</div>
+</div>
+<p>The printed form is a one-line summary: one day changed and the schemas agree, so the tables aren’t identical. In a test or a deployment script, the comparison can be used as a condition directly. Here, when the tables differ, we look at the rows that changed:</p>
+<div id="b3a21824" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> comparison:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"The new job reproduces the old totals."</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>comparison<span class="sc">.</span>n_failed<span class="sc">}</span><span class="ss"> of </span><span class="sc">{</span>comparison<span class="sc">.</span>n<span class="sc">}</span><span class="ss"> days differ:"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(comparison.rows(<span class="st">"changed"</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>1 of 4 days differ:
+shape: (1, 5)
+┌────────────┬───────────────┬───────────────┬────────────────┬────────────────┐
+│ day        ┆ orders_source ┆ orders_target ┆ revenue_source ┆ revenue_target │
+│ ---        ┆ ---           ┆ ---           ┆ ---            ┆ ---            │
+│ str        ┆ i64           ┆ i64           ┆ f64            ┆ f64            │
+╞════════════╪═══════════════╪═══════════════╪════════════════╪════════════════╡
+│ 2025-06-03 ┆ 97            ┆ 97            ┆ 4875.0         ┆ 4857.0         │
+└────────────┴───────────────┴───────────────┴────────────────┴────────────────┘</code></pre>
+</div>
+</div>
+<p>The revenue for June 3 has two digits swapped. To see where the mismatches are concentrated, which matters more when there are many columns, use <a href="../reference/Comparison.column_summary.html#pointblank.Comparison.column_summary" class="gdls-link gdls-code">column_summary()</a>:</p>
+<div id="3a894a3e" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>comparison.column_summary()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (2, 6)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>column</th><th>target_column</th><th>dtype_source</th><th>dtype_target</th><th>n_mismatch</th><th>f_mismatch</th></tr><tr><td>str</td><td>str</td><td>str</td><td>str</td><td>i64</td><td>f64</td></tr></thead><tbody><tr><td>"orders"</td><td>"orders"</td><td>"Int64"</td><td>"Int64"</td><td>0</td><td>0.0</td></tr><tr><td>"revenue"</td><td>"revenue"</td><td>"Float64"</td><td>"Float64"</td><td>1</td><td>0.25</td></tr></tbody></table></div>
+</div>
+</div>
+<p>Only <code>revenue</code> has a mismatch, in one of the four matched rows. From here, the full report is available with <a href="../reference/Comparison.get_tabular_report.html#pointblank.Comparison.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>, and the result can be saved with <code>to_json()</code> to keep a record of the check.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/compare.html#pointblank.compare" class="gdls-link gdls-code">compare()</a></dt>
+<dd>
+<p>Create a <a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> from two tables.</p>
+</dd>
+<dt><a href="../reference/SchemaDiff.html#pointblank.SchemaDiff" class="gdls-link gdls-code">SchemaDiff</a></dt>
+<dd>
+<p>The schema differences held in <code>schema_diff</code>.</p>
+</dd>
+<dt><a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a></dt>
+<dd>
+<p>Run the same comparison as a validation step.</p>
+</dd>
+</dl>
 
 
 </section>

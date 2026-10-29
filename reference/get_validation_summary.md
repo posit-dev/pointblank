@@ -4,7 +4,7 @@ Access validation summary information when authoring final actions.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L293-L408)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L292-L406)
 
 ``` python
 get_validation_summary()
@@ -99,6 +99,5 @@ Final actions work well with both simple logging and more complex notification s
 
 ## See Also
 
-`Have` a look at [`FinalActions`](../reference/FinalActions.md#pointblank.FinalActions) for more information on how to create  
-
-`custom` actions that are executed after all validation steps have been completed.  
+[FinalActions](../reference/FinalActions.md#pointblank.FinalActions)  
+Create custom actions that run after all validation steps are done.

@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Base class for contract import/export adapters.">
+<meta name="description" content="The base class for adapters that translate contracts to and from other formats.">
 
 <title>ContractAdapter | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "ContractAdapter - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/ContractAdapter.html"}]</script>
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="ContractAdapter | Pointblank">
-<meta property="og:description" content="Base class for contract import/export adapters.">
+<meta property="og:description" content="The base class for adapters that translate contracts to and from other formats.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="ContractAdapter | Pointblank">
-<meta name="twitter:description" content="Base class for contract import/export adapters.">
+<meta name="twitter:description" content="The base class for adapters that translate contracts to and from other formats.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -369,6 +369,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/ContractAdapter.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">ContractAdapter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
   </div>
 </li>
       </ul>
@@ -1637,6 +1643,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#attributes" id="toc-attributes" class="nav-link active" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#detect" id="toc-detect" class="nav-link" data-scroll-target="#detect"><span class="doc-object-name doc-function doc-label doc-label-method">detect()</span></a></li>
@@ -1669,17 +1677,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>Base class for contract import/export adapters.</p>
+<p>The base class for adapters that translate contracts to and from other formats.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L232-L309" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L726-L1167" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ContractAdapter</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Subclass this to add support for a new external format.</p>
+<p>An adapter is what connects an external format to <a href="../reference/import_contract.html#pointblank.import_contract" class="gdls-link"><code>import_contract()</code></a> and <a href="../reference/export_contract.html#pointblank.export_contract" class="gdls-link"><code>export_contract()</code></a>. Pointblank’s built-in support for JSON Schema, Frictionless Table Schema, dbt, and the Open Data Contract Standard is made of four <a href="../reference/ContractAdapter.html#pointblank.ContractAdapter" class="gdls-link gdls-code">ContractAdapter</a> subclasses. Writing another subclass adds a new format, such as an organization’s own data dictionary or a schema format from another tool. Once it’s registered with <a href="../reference/register_adapter.html#pointblank.register_adapter" class="gdls-link"><code>register_adapter()</code></a>, the new format works everywhere the built-in ones do.</p>
+<p>A subclass sets a few class attributes and implements up to three methods:</p>
+<ul>
+<li><a href="../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link"><code>detect()</code></a> decides whether a source is in this format, which lets <code>import_contract()</code> find the adapter without being told <code>format=</code> (optional)</li>
+<li><a href="../reference/ContractAdapter.html#pointblank.ContractAdapter.import_contract" class="gdls-link"><code>import_contract()</code></a> reads a source and returns a <a href="../reference/ContractImport.html#pointblank.ContractImport" class="gdls-link"><code>ContractImport</code></a> whose rules are expressed as <a href="../reference/adapters.MappedConstraint.html#pointblank.adapters.MappedConstraint" class="gdls-link"><code>MappedConstraint</code></a> objects (needed for import)</li>
+<li><a href="../reference/ContractAdapter.html#pointblank.ContractAdapter.export_contract" class="gdls-link"><code>export_contract()</code></a> translates a <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link"><code>Contract</code></a> or <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object into the format (needed for export)</li>
+</ul>
+<p>The base class versions of these methods raise <code>NotImplementedError</code>. An adapter that only goes in one direction should set <code>supports_import</code> or <code>supports_export</code> to <code>False</code>, so that the unsupported direction fails with a clear error message.</p>
 </div>
 <section id="attributes" class="level2 doc-attributes">
 <h2 class="doc-attributes anchored" data-anchor-id="attributes">Attributes</h2>
@@ -1687,22 +1702,193 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">format_name</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>Short identifier for this format (e.g., <code>"json_schema"</code>).</p>
+<p>The name of the format, used as the value of <code>format=</code>. It’s also the registration name when <a href="../reference/register_adapter.html#pointblank.register_adapter" class="gdls-link gdls-code">register_adapter()</a> is used without one.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">file_extensions</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str]</span></code></dt>
 <dd>
-<p>File extensions associated with this format (e.g., <code>[".json"]</code>).</p>
+<p>File name endings that identify the format, such as <code>[".schema.json"]</code>. They’re matched against file paths during format detection, before any <a href="../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> method is tried.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">supports_import</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span></code></dt>
 <dd>
-<p>Whether this adapter supports importing from the format.</p>
+<p>Whether the adapter can import. The default is <code>True</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">supports_export</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span></code></dt>
 <dd>
-Whether this adapter supports exporting to the format.
+Whether the adapter can export. The default is <code>True</code>.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Suppose a team documents its tables in a “data dictionary” format of its own: a dictionary with the table name under <code>data_dictionary</code> and a list of <code>columns</code>. Each column has a name and a type and can say whether it’s nullable, whether it’s unique, and which values are allowed. It can also have a <code>pii</code> flag, which matters for governance but isn’t a data quality rule.</p>
+<p>The adapter below supports both directions. Importing maps the column properties to <a href="../reference/adapters.MappedConstraint.html#pointblank.adapters.MappedConstraint" class="gdls-link gdls-code">MappedConstraint</a> objects and records a warning for the <code>pii</code> flag, which has no equivalent. Exporting goes the other way, starting from a contract’s schema and steps.</p>
+<div id="e1512a13" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.adapters <span class="im">import</span> MappedConstraint</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>TYPES <span class="op">=</span> {<span class="st">"integer"</span>: <span class="st">"Int64"</span>, <span class="st">"decimal"</span>: <span class="st">"Float64"</span>, <span class="st">"text"</span>: <span class="st">"String"</span>}</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="at">@pb.register_adapter</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DataDictionaryAdapter(pb.ContractAdapter):</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    format_name <span class="op">=</span> <span class="st">"data_dictionary"</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    file_extensions <span class="op">=</span> [<span class="st">".dd.json"</span>]</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">@staticmethod</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> detect(source):</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">isinstance</span>(source, <span class="bu">dict</span>) <span class="kw">and</span> <span class="st">"data_dictionary"</span> <span class="kw">in</span> source</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> import_contract(<span class="va">self</span>, source, <span class="op">**</span>kwargs):</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        path <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(source, <span class="bu">str</span>):</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>            path <span class="op">=</span> source</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> <span class="bu">open</span>(source) <span class="im">as</span> f:</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>                source <span class="op">=</span> json.load(f)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        columns, constraints, warnings <span class="op">=</span> [], [], []</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> fld <span class="kw">in</span> source[<span class="st">"columns"</span>]:</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>            name <span class="op">=</span> fld[<span class="st">"name"</span>]</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>            columns.append((name, TYPES.get(fld.get(<span class="st">"type"</span>))))</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> fld.get(<span class="st">"nullable"</span>) <span class="kw">is</span> <span class="va">False</span>:</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>                constraints.append(</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>                    MappedConstraint(<span class="st">"col_vals_not_null"</span>, {<span class="st">"columns"</span>: name}, <span class="st">"nullable: false"</span>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> fld.get(<span class="st">"unique"</span>):</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>                constraints.append(</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                    MappedConstraint(<span class="st">"rows_distinct"</span>, {<span class="st">"columns_subset"</span>: [name]}, <span class="st">"unique"</span>)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">"allowed"</span> <span class="kw">in</span> fld:</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>                constraints.append(</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>                    MappedConstraint(</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"col_vals_in_set"</span>, {<span class="st">"columns"</span>: name, <span class="st">"set"</span>: fld[<span class="st">"allowed"</span>]}, <span class="st">"allowed"</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>                    )</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> fld.get(<span class="st">"pii"</span>):</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>                warnings.append(<span class="ss">f"Column '</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">': the pii flag has no Pointblank equivalent."</span>)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        n_rules <span class="op">=</span> <span class="bu">len</span>(constraints) <span class="op">+</span> <span class="bu">len</span>(warnings)</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pb.ContractImport(</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>            source_format<span class="op">=</span><span class="va">self</span>.format_name,</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>            source_path<span class="op">=</span>path,</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>            columns<span class="op">=</span>columns,</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>            constraints<span class="op">=</span>constraints,</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>            metadata<span class="op">=</span>{<span class="st">"title"</span>: source[<span class="st">"data_dictionary"</span>]},</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>            warnings<span class="op">=</span>warnings,</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>            coverage<span class="op">=</span><span class="bu">len</span>(constraints) <span class="op">/</span> n_rules <span class="cf">if</span> n_rules <span class="cf">else</span> <span class="fl">1.0</span>,</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> export_contract(<span class="va">self</span>, validation_or_contract, destination<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs):</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="bu">isinstance</span>(validation_or_contract, pb.Contract):</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">TypeError</span>(<span class="st">"This adapter can only export a Contract."</span>)</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>        contract <span class="op">=</span> validation_or_contract</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>        to_dd_type <span class="op">=</span> {pb_type: dd_type <span class="cf">for</span> dd_type, pb_type <span class="kw">in</span> TYPES.items()}</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>        entries <span class="op">=</span> {name: {<span class="st">"name"</span>: name} <span class="cf">for</span> name, _ <span class="kw">in</span> contract.schema.columns}</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> name, dtype <span class="kw">in</span> contract.schema.columns:</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>            entries[name][<span class="st">"type"</span>] <span class="op">=</span> to_dd_type.get(dtype, <span class="st">"text"</span>)</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> step <span class="kw">in</span> contract.steps:</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>            columns <span class="op">=</span> step.kwargs.get(<span class="st">"columns"</span>)</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>            columns <span class="op">=</span> [columns] <span class="cf">if</span> <span class="bu">isinstance</span>(columns, <span class="bu">str</span>) <span class="cf">else</span> columns <span class="kw">or</span> []</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> col <span class="kw">in</span> columns:</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> step.method <span class="op">==</span> <span class="st">"col_vals_not_null"</span>:</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>                    entries[col][<span class="st">"nullable"</span>] <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>                <span class="cf">elif</span> step.method <span class="op">==</span> <span class="st">"col_vals_in_set"</span>:</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>                    entries[col][<span class="st">"allowed"</span>] <span class="op">=</span> <span class="bu">list</span>(step.kwargs[<span class="st">"set"</span>])</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>        doc <span class="op">=</span> {<span class="st">"data_dictionary"</span>: contract.name, <span class="st">"columns"</span>: <span class="bu">list</span>(entries.values())}</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> destination <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> <span class="bu">open</span>(destination, <span class="st">"w"</span>) <span class="im">as</span> f:</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>                json.dump(doc, f, indent<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> doc</span></code></pre></div>
+</div>
+<p>The bare <code>@pb.register_adapter</code> decorator registered the class under its <code>format_name</code>. Now a data dictionary can be imported with <code>import_contract()</code>, and its <a href="../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> method means there’s no need for <code>format=</code>.</p>
+<div id="bd2f4735" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>customers_dd <span class="op">=</span> {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"data_dictionary"</span>: <span class="st">"customers"</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"columns"</span>: [</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"name"</span>: <span class="st">"customer_id"</span>, <span class="st">"type"</span>: <span class="st">"integer"</span>, <span class="st">"nullable"</span>: <span class="va">False</span>, <span class="st">"unique"</span>: <span class="va">True</span>},</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"name"</span>: <span class="st">"tier"</span>, <span class="st">"type"</span>: <span class="st">"text"</span>, <span class="st">"allowed"</span>: [<span class="st">"bronze"</span>, <span class="st">"silver"</span>, <span class="st">"gold"</span>]},</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"name"</span>: <span class="st">"email"</span>, <span class="st">"type"</span>: <span class="st">"text"</span>, <span class="st">"nullable"</span>: <span class="va">False</span>, <span class="st">"pii"</span>: <span class="va">True</span>},</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>imported <span class="op">=</span> pb.import_contract(customers_dd)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(imported.summary())</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Contract Import Summary
+  Format: data_dictionary
+  Columns detected: 3
+  Constraints mapped: 4
+  Coverage: 80%
+  Warnings (1):
+    - Column 'email': the pii flag has no Pointblank equivalent.</code></pre>
+</div>
+</div>
+<p>Four of the five column properties became constraints and the <code>pii</code> flag became a warning, which the coverage figure reflects. From here the import behaves like any other: it can be validated against a table, turned into a contract, or written out as code.</p>
+<p>Exporting runs in the other direction. A contract written in Pointblank can be shared as a data dictionary with <code>export_contract()</code>.</p>
+<div id="31d4dc0d" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>orders_contract <span class="op">=</span> pb.Contract(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"orders"</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    schema<span class="op">=</span>pb.Schema(order_id<span class="op">=</span><span class="st">"Int64"</span>, status<span class="op">=</span><span class="st">"String"</span>, total<span class="op">=</span><span class="st">"Float64"</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    steps<span class="op">=</span>[</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        pb.Step(<span class="st">"col_vals_not_null"</span>, columns<span class="op">=</span>[<span class="st">"order_id"</span>, <span class="st">"status"</span>]),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        pb.Step(<span class="st">"col_vals_in_set"</span>, columns<span class="op">=</span><span class="st">"status"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"open"</span>, <span class="st">"closed"</span>]),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        pb.Step(<span class="st">"col_vals_ge"</span>, columns<span class="op">=</span><span class="st">"total"</span>, value<span class="op">=</span><span class="dv">0</span>),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json.dumps(pb.export_contract(orders_contract, <span class="bu">format</span><span class="op">=</span><span class="st">"data_dictionary"</span>), indent<span class="op">=</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{
+  "data_dictionary": "orders",
+  "columns": [
+    {
+      "name": "order_id",
+      "type": "integer",
+      "nullable": false
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "nullable": false,
+      "allowed": [
+        "open",
+        "closed"
+      ]
+    },
+    {
+      "name": "total",
+      "type": "decimal"
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<p>The schema supplied the columns and their types, and the not-null and set-membership steps became <code>nullable</code> and <code>allowed</code> properties. The data dictionary format has nothing that corresponds to <code>col_vals_ge()</code>, so that step was left out.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/register_adapter.html#pointblank.register_adapter" class="gdls-link gdls-code">register_adapter()</a></dt>
+<dd>
+<p>Register an adapter so that it can be used by name.</p>
+</dd>
+<dt><a href="../reference/ContractImport.html#pointblank.ContractImport" class="gdls-link gdls-code">ContractImport</a></dt>
+<dd>
+<p>The object an adapter’s <code>import_contract()</code> method returns.</p>
+</dd>
+<dt><a href="../reference/adapters.MappedConstraint.html#pointblank.adapters.MappedConstraint" class="gdls-link gdls-code">MappedConstraint</a></dt>
+<dd>
+<p>The objects that hold translated rules.</p>
+</dd>
+<dt><a href="../reference/list_adapters.html#pointblank.list_adapters" class="gdls-link gdls-code">list_adapters()</a></dt>
+<dd>
+<p>List the registered adapters.</p>
+</dd>
+</dl>
 </section>
 <section id="methods" class="level2 doc-methods">
 <h2 class="doc-methods anchored" data-anchor-id="methods">Methods</h2>
@@ -1716,29 +1902,34 @@ Whether this adapter supports exporting to the format.
 <tbody>
 <tr class="odd">
 <td><a href="#detect" class="doc-function doc-label doc-label-method">detect()</a></td>
-<td>Return True if this adapter can handle the given source.</td>
+<td>Decide whether a source is in this adapter’s format.</td>
 </tr>
 <tr class="even">
 <td><a href="#import_contract" class="doc-function doc-label doc-label-method">import_contract()</a></td>
-<td>Import from the external format.</td>
+<td>Read a source in this format and translate it into Pointblank terms.</td>
 </tr>
 <tr class="odd">
 <td><a href="#export_contract" class="doc-function doc-label doc-label-method">export_contract()</a></td>
-<td>Export to the external format.</td>
+<td>Translate a Pointblank contract or validation into this format.</td>
 </tr>
 </tbody>
 </table>
 <section id="detect" class="level3">
 <h3 class="anchored" data-anchor-id="detect"><span class="doc-object-name doc-function doc-label doc-label-method">detect()</span></h3>
 <div class="doc-subject">
-<p>Return True if this adapter can handle the given source.</p>
+<p>Decide whether a source is in this adapter’s format.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L254-L268" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L922-L984" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb2"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">detect</span>(<span class="va">source</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">detect</span>(<span class="va">source</span>)</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>When <a href="../reference/import_contract.html#pointblank.import_contract" class="gdls-link"><code>import_contract()</code></a> is called without <code>format=</code> and the source isn’t a file path ending in one of the registered <code>file_extensions</code>, it calls <a href="../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> on each registered adapter in turn (in the order they were registered) and uses the first one that returns <code>True</code>. Implementing <a href="../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> lets users import a definition without having to name its format.</p>
+<p>A good <a href="../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> method looks for a feature that sets the format apart, such as a particular top-level key, and returns <code>False</code> for anything else. It’s called on sources meant for other adapters too, so it should be quick and shouldn’t assume anything about the source’s type. When the source is a file path, check that the file exists before reading it. An exception raised in <a href="../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a> is treated the same as returning <code>False</code>.</p>
+<p>Implementing this method is optional. The base class version raises <code>NotImplementedError</code>, which also counts as <code>False</code>, so an adapter without it can still be used by passing <code>format=</code>. The method must be a static method.</p>
 </div>
 <section id="parameters" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h4>
@@ -1746,7 +1937,7 @@ Whether this adapter supports exporting to the format.
 <dl>
 <dt><code><span class="doc-parameter-name">source</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-A file path string, dict, or Python object to inspect.
+The <code>source=</code> value given to <code>import_contract()</code>: usually a file path string or a dictionary, but it could be any object.
 </dd>
 </dl>
 </div>
@@ -1757,26 +1948,62 @@ A file path string, dict, or Python object to inspect.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">bool</span></code></dt>
 <dd>
-True if this adapter can handle the source.
+<code>True</code> if this adapter should import the source, <code>False</code> otherwise.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples-1" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<p>This adapter recognizes its format by a <code>column_rules</code> key that holds a list. The checks are ordered so that a source that isn’t a dictionary is rejected first.</p>
+<div id="b4549375" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ColumnRulesAdapter(pb.ContractAdapter):</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    format_name <span class="op">=</span> <span class="st">"column_rules"</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">@staticmethod</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> detect(source):</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">isinstance</span>(source, <span class="bu">dict</span>) <span class="kw">and</span> <span class="bu">isinstance</span>(source.get(<span class="st">"column_rules"</span>), <span class="bu">list</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> source <span class="kw">in</span> [{<span class="st">"column_rules"</span>: []}, {<span class="st">"column_rules"</span>: <span class="st">"id"</span>}, {<span class="st">"fields"</span>: []}, <span class="st">"rules.txt"</span>]:</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>source<span class="sc">!r:&lt;24}</span><span class="ss"> </span><span class="sc">{</span>ColumnRulesAdapter<span class="sc">.</span>detect(source)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'column_rules': []}     True
+{'column_rules': 'id'}   False
+{'fields': []}           False
+'rules.txt'              False</code></pre>
+</div>
+</div>
+<p>Only the first source has a <code>column_rules</code> list, so it’s the only one that this adapter would claim.</p>
 </section>
 </section>
 <section id="import_contract" class="level3">
 <h3 class="anchored" data-anchor-id="import_contract"><span class="doc-object-name doc-function doc-label doc-label-method">import_contract()</span></h3>
 <div class="doc-subject">
-<p>Import from the external format.</p>
+<p>Read a source in this format and translate it into Pointblank terms.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L270-L285" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L986-L1073" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb3"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">import_contract</span>(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">source</span>,</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span><span class="va">kwargs</span>,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">import_contract</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">source</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span><span class="va">kwargs</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>This is the method that <a href="../reference/import_contract.html#pointblank.import_contract" class="gdls-link"><code>import_contract()</code></a> calls once it has picked the adapter. It receives the source and any options the user passed, and it must return a <a href="../reference/ContractImport.html#pointblank.ContractImport" class="gdls-link"><code>ContractImport</code></a>. An implementation usually does four things:</p>
+<ol type="1">
+<li>loads the content if <code>source</code> is a file path (and records the path as <code>source_path</code>)</li>
+<li>collects the columns as <code>(name, dtype)</code> tuples, using Pointblank type names such as <code>"Int64"</code> and <code>"String"</code>, or <code>None</code> for a type that has no equivalent</li>
+<li>translates each rule it understands into a <a href="../reference/adapters.MappedConstraint.html#pointblank.adapters.MappedConstraint" class="gdls-link"><code>MappedConstraint</code></a> that names a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> method and its arguments</li>
+<li>adds a message to <code>warnings</code> for each rule it recognizes but can’t translate, and sets <code>coverage</code> to the share of recognized rules that were translated</li>
+</ol>
+<p>Format-specific options, such as which table of a multi-table document to use, arrive in <code>**kwargs</code>. Follow the built-in adapters and raise <code>FileNotFoundError</code> for a missing file and <code>ValueError</code> for content that can’t be imported. The base class version raises <code>NotImplementedError</code>, so an adapter that doesn’t implement this method should set <code>supports_import = False</code>.</p>
 </div>
 <section id="parameters-1" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
@@ -1784,11 +2011,11 @@ True if this adapter can handle the source.
 <dl>
 <dt><code><span class="doc-parameter-name">source</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>The source to import from (file path, dict, or Python object).</p>
+<p>The <code>source=</code> value given to <code>import_contract()</code>, typically a file path string or a dictionary.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">**kwargs</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-Format-specific options.
+Any other keyword arguments given to <code>import_contract()</code>.
 </dd>
 </dl>
 </div>
@@ -1799,27 +2026,73 @@ Format-specific options.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ContractImport</span></code></dt>
 <dd>
-The import result with columns, constraints, and metadata.
+The columns, constraints, metadata, warnings, and coverage of the import.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples-2" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
+<p>This adapter reads a list of column rules, where each rule has a column name and an optional lower bound. A <code>table=</code> option sets the title.</p>
+<div id="f1b5a6fe" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.adapters <span class="im">import</span> MappedConstraint</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ColumnRulesAdapter(pb.ContractAdapter):</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    format_name <span class="op">=</span> <span class="st">"column_rules"</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    supports_export <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> import_contract(<span class="va">self</span>, source, <span class="op">**</span>kwargs):</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        constraints <span class="op">=</span> [</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>            MappedConstraint(</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                <span class="st">"col_vals_ge"</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"columns"</span>: rule[<span class="st">"column"</span>], <span class="st">"value"</span>: rule[<span class="st">"min"</span>]},</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f"</span><span class="sc">{</span>rule[<span class="st">'column'</span>]<span class="sc">}</span><span class="ss"> &gt;= </span><span class="sc">{</span>rule[<span class="st">'min'</span>]<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> rule <span class="kw">in</span> source[<span class="st">"column_rules"</span>]</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">"min"</span> <span class="kw">in</span> rule</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pb.ContractImport(</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>            source_format<span class="op">=</span><span class="va">self</span>.format_name,</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>            columns<span class="op">=</span>[(rule[<span class="st">"column"</span>], <span class="va">None</span>) <span class="cf">for</span> rule <span class="kw">in</span> source[<span class="st">"column_rules"</span>]],</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>            constraints<span class="op">=</span>constraints,</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>            metadata<span class="op">=</span>{<span class="st">"title"</span>: kwargs.get(<span class="st">"table"</span>, <span class="st">""</span>)},</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>rules <span class="op">=</span> {<span class="st">"column_rules"</span>: [{<span class="st">"column"</span>: <span class="st">"age"</span>, <span class="st">"min"</span>: <span class="dv">0</span>}, {<span class="st">"column"</span>: <span class="st">"name"</span>}]}</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>imported <span class="op">=</span> ColumnRulesAdapter().import_contract(rules, table<span class="op">=</span><span class="st">"people"</span>)</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>imported.constraints</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>[MappedConstraint('col_vals_ge', columns='age', value=0)]</code></pre>
+</div>
+</div>
+<p>Calling the method on an instance, as done here, is a handy way to test an adapter. Once the class is registered with <a href="../reference/register_adapter.html#pointblank.register_adapter" class="gdls-link"><code>register_adapter()</code></a>, the same import is available as <code>pb.import_contract(rules, format="column_rules", table="people")</code>.</p>
 </section>
 </section>
 <section id="export_contract" class="level3">
 <h3 class="anchored" data-anchor-id="export_contract"><span class="doc-object-name doc-function doc-label doc-label-method">export_contract()</span></h3>
 <div class="doc-subject">
-<p>Export to the external format.</p>
+<p>Translate a Pointblank contract or validation into this format.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L287-L309" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L1075-L1167" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb4"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">export_contract</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">validation_or_contract</span>,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">destination</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span><span class="va">kwargs</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">export_contract</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">validation_or_contract</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">destination</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span><span class="va">kwargs</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>This is the method that <a href="../reference/export_contract.html#pointblank.export_contract" class="gdls-link"><code>export_contract()</code></a> calls once it has picked the adapter. It receives the object to export, the optional destination, and any options the user passed. It should build the document, write it to <code>destination</code> when one is given, and return it in either case.</p>
+<p>The object can be a <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link"><code>Contract</code></a> or a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object. A contract is the easier of the two to work from: its <code>name</code>, <code>description</code>, <code>schema</code> (a <a href="../reference/Schema.html#pointblank.Schema" class="gdls-link"><code>Schema</code></a> whose <code>columns</code> attribute is a list of <code>(name, dtype)</code> tuples), and <code>steps</code> (a list of <a href="../reference/Step.html#pointblank.Step" class="gdls-link"><code>Step</code></a> objects, each with a <code>method</code> and <code>kwargs</code>) map naturally onto most schema formats. Steps that have no equivalent in the format are usually left out. An adapter that only handles some kinds of object should raise <code>TypeError</code> for the others.</p>
+<p>The built-in adapters return a dictionary, which suits JSON and YAML formats, but a string is fine for text-based formats. The base class version raises <code>NotImplementedError</code>, so an adapter that doesn’t implement this method should set <code>supports_export = False</code>.</p>
 </div>
 <section id="parameters-2" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
@@ -1827,15 +2100,15 @@ The import result with columns, constraints, and metadata.
 <dl>
 <dt><code><span class="doc-parameter-name">validation_or_contract</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>A <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> or <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> object to export.</p>
+<p>The <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> or <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object given to <code>export_contract()</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">destination</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional file path to write the output. If <code>None</code>, returns the result.</p>
+<p>The file path to write to, or <code>None</code> to only return the document.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">**kwargs</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-Format-specific options.
+Any other keyword arguments given to <code>export_contract()</code>.
 </dd>
 </dl>
 </div>
@@ -1846,10 +2119,53 @@ Format-specific options.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">str | dict</span></code></dt>
 <dd>
-The exported content (string or dict), also written to file if destination given.
+The exported document.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples-3" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
+<p>This adapter exports a contract as a list of column rules, writing a lower bound for each <code>col_vals_ge()</code> step and leaving out every other kind of step.</p>
+<div id="6c4577cc" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ColumnRulesAdapter(pb.ContractAdapter):</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    format_name <span class="op">=</span> <span class="st">"column_rules"</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    supports_import <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> export_contract(<span class="va">self</span>, validation_or_contract, destination<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs):</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="bu">isinstance</span>(validation_or_contract, pb.Contract):</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">TypeError</span>(<span class="st">"Only a Contract can be exported as column rules."</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>        rules <span class="op">=</span> [</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"column"</span>: step.kwargs[<span class="st">"columns"</span>], <span class="st">"min"</span>: step.kwargs[<span class="st">"value"</span>]}</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> step <span class="kw">in</span> validation_or_contract.steps</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> step.method <span class="op">==</span> <span class="st">"col_vals_ge"</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        doc <span class="op">=</span> {<span class="st">"column_rules"</span>: rules}</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> destination <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> <span class="bu">open</span>(destination, <span class="st">"w"</span>) <span class="im">as</span> f:</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>                f.write(<span class="bu">repr</span>(doc))</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> doc</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>contract <span class="op">=</span> pb.Contract(</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"people"</span>,</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>    steps<span class="op">=</span>[</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>        pb.Step(<span class="st">"col_vals_ge"</span>, columns<span class="op">=</span><span class="st">"age"</span>, value<span class="op">=</span><span class="dv">0</span>),</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>        pb.Step(<span class="st">"col_vals_not_null"</span>, columns<span class="op">=</span><span class="st">"name"</span>),</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>ColumnRulesAdapter().export_contract(contract)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>{'column_rules': [{'column': 'age', 'min': 0}]}</code></pre>
+</div>
+</div>
+<p>Only the <code>col_vals_ge()</code> step was written, since the format has no way to express a not-null rule. After registering the class with <a href="../reference/register_adapter.html#pointblank.register_adapter" class="gdls-link"><code>register_adapter()</code></a>, the same export is available as <code>pb.export_contract(contract, format="column_rules")</code>.</p>
 
 
 </section>

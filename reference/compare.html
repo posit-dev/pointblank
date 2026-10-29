@@ -374,6 +374,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">ContractAdapter</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1644,6 +1650,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#test-units-and-row-statuses" id="toc-test-units-and-row-statuses" class="nav-link" data-scroll-target="#test-units-and-row-statuses">Test Units And Row Statuses</a></li>
   <li><a href="#large-tables" id="toc-large-tables" class="nav-link" data-scroll-target="#large-tables">Large Tables</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1674,7 +1681,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L116-L291" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L321-L586" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compare</span>(</span>
@@ -1695,13 +1702,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <code>compare()</code> function aligns the rows of a <em>source</em> table (the reference, or expected data) with those of a <em>target</em> table (the data being checked) and classifies every aligned row: rows that match, rows whose values changed, rows missing from the target, and extra rows in the target. It also reports schema differences (columns added, removed, retyped, or reordered). The returned <a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> object gives you the counts, samples of the differing rows, and a tabular report.</p>
-<p>Rows are aligned in one of two ways:</p>
+<p>A common data question is <em>how do these two tables differ?</em> You may have refactored a pipeline and want to know whether its output changed, migrated a table from one database to another, or received a new extract of a data feed. Spot checks and row counts can tell you <em>that</em> something changed. The <code>compare()</code> function tells you <em>which</em> rows changed, how, and in which columns.</p>
+<p>It aligns the rows of a <em>source</em> table (the reference, or expected data) with those of a <em>target</em> table (the data being checked) and classifies every aligned row: rows that match, rows whose values changed, rows missing from the target, and extra rows in the target. It also reports schema differences (columns added, removed, retyped, or reordered). The result is a <a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link"><code>Comparison</code></a> object. It holds the counts, gives samples of the differing rows on request, and displays as a tabular report in a notebook.</p>
+<p>Rows are aligned in one of three ways:</p>
 <ul>
-<li><strong>by key</strong> (<code>keys=</code> given): rows are matched on the values of one or more key columns, so row order doesn’t matter. This is the most useful mode for comparing extracts of the same data (e.g., the source and target of a pipeline run).</li>
-<li><strong>by position</strong> (<code>keys=None</code>, the default): the first row of the source is compared with the first row of the target, and so on.</li>
+<li><strong>by key</strong> (<code>keys=</code> gives one or more columns): rows are matched on the key values, so row order doesn’t matter. This is the most informative mode, and the one to use whenever the data has an identifier.</li>
+<li><strong>by position</strong> (<code>keys=None</code>, the default): the first row of the source is compared with the first row of the target, and so on. This suits outputs that are supposed to be identical row for row.</li>
+<li><strong>as multisets</strong> (<code>keys="*"</code>): whole rows are compared regardless of their order, with duplicates counted. This is for tables that have no key at all.</li>
 </ul>
 <p>The comparison is backend-agnostic and runs inside the table’s own engine: tables can be Polars or Pandas DataFrames, Polars LazyFrames, Ibis tables (e.g., DuckDB, PostgreSQL), or paths to CSV/Parquet files. File paths are scanned lazily, and only counts and small samples of differing rows are ever collected, so tables that don’t fit in memory can still be compared.</p>
+<p>The same comparison is available as a validation step with <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link"><code>Validate.tbl_match()</code></a>, where every aligned row is a test unit that thresholds and actions can respond to. On the command line, it’s available as <code>pb compare</code>. To compare totals per group rather than individual rows, use <a href="../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link"><code>Validate.tbl_reconcile()</code></a>.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1717,7 +1727,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">keys</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | list[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>One or more columns that uniquely identify a row, used to align rows between the tables. Key names refer to the source table (use <code>column_map=</code> if the target names them differently). If <code>None</code>, rows are aligned by position, which requires the tables to have a defined row order (eager DataFrames, Polars LazyFrames, or any table with <code>order_by=</code>).</p>
+<p>One or more columns that uniquely identify a row, used to align rows between the tables. Key names refer to the source table (use <code>column_map=</code> if the target names them differently). If <code>None</code>, rows are aligned by position, which requires the tables to have a defined row order (eager DataFrames, Polars LazyFrames, or any table with <code>order_by=</code>). Use <code>"*"</code> to compare the tables as multisets of whole rows (see the <em>Test Units and Row Statuses</em> section). <code>tolerance=</code> can’t be used in that mode.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">columns</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | list[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1788,6 +1798,7 @@ The result of the comparison.
 <li><code>"dup_key"</code>: the row’s key appears more than once in either table. A duplicated key counts as many units as the larger of its two occurrence counts.</li>
 </ul>
 <p>Rows with a null in a key column can’t be matched: they count as <code>"missing"</code> (source) or <code>"extra"</code> (target).</p>
+<p>In multiset mode (<code>keys="*"</code>), a row is either present in the other table or not, so there are no <code>"changed"</code> or <code>"dup_key"</code> rows. Each distinct row matches as many times as it occurs in both tables, and any surplus copies count as <code>"missing"</code> or <code>"extra"</code>.</p>
 </section>
 <section id="large-tables" class="level2 doc-large-tables">
 <h2 class="doc-large-tables anchored" data-anchor-id="large-tables">Large Tables</h2>
@@ -1795,20 +1806,37 @@ The result of the comparison.
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="a2a2ca33" class="cell" data-execution_count="1">
+<p>Let’s compare two versions of a product catalog. In the newer version, one product was discontinued, one was added, one had its price lowered, and one went out of stock.</p>
+<div id="1f7c72b9" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>source <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>], <span class="st">"amount"</span>: [<span class="fl">10.0</span>, <span class="fl">20.0</span>, <span class="fl">30.0</span>, <span class="fl">40.0</span>], <span class="st">"region"</span>: [<span class="st">"N"</span>, <span class="st">"S"</span>, <span class="st">"E"</span>, <span class="st">"W"</span>]}</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">5</span>], <span class="st">"amount"</span>: [<span class="fl">10.0</span>, <span class="fl">20.5</span>, <span class="fl">40.0</span>, <span class="fl">50.0</span>], <span class="st">"region"</span>: [<span class="st">"N"</span>, <span class="st">"S"</span>, <span class="st">"W"</span>, <span class="st">"N"</span>]}</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">cmp</span> <span class="op">=</span> pb.compare(source, target, keys<span class="op">=</span><span class="st">"id"</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="bu">cmp</span></span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>catalog_v1 <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"sku"</span>: [<span class="st">"A-101"</span>, <span class="st">"A-102"</span>, <span class="st">"A-103"</span>, <span class="st">"A-104"</span>, <span class="st">"A-105"</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Desk lamp"</span>, <span class="st">"Office chair"</span>, <span class="st">"Monitor arm"</span>, <span class="st">"Keyboard"</span>, <span class="st">"Mouse pad"</span>],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"price"</span>: [<span class="fl">24.99</span>, <span class="fl">149.00</span>, <span class="fl">59.50</span>, <span class="fl">45.00</span>, <span class="fl">9.99</span>],</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"in_stock"</span>: [<span class="va">True</span>, <span class="va">True</span>, <span class="va">False</span>, <span class="va">True</span>, <span class="va">True</span>],</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>catalog_v2 <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"sku"</span>: [<span class="st">"A-101"</span>, <span class="st">"A-102"</span>, <span class="st">"A-104"</span>, <span class="st">"A-105"</span>, <span class="st">"A-106"</span>],</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Desk lamp"</span>, <span class="st">"Office chair"</span>, <span class="st">"Keyboard"</span>, <span class="st">"Mouse pad"</span>, <span class="st">"USB hub"</span>],</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"price"</span>: [<span class="fl">24.99</span>, <span class="fl">139.00</span>, <span class="fl">45.00</span>, <span class="fl">9.99</span>, <span class="fl">19.99</span>],</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"in_stock"</span>: [<span class="va">True</span>, <span class="va">True</span>, <span class="va">True</span>, <span class="va">False</span>, <span class="va">True</span>],</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<p>Every product has a unique <code>sku</code>, so we’ll use it as the key that lines up the rows. Naming the two tables makes the report easier to read.</p>
+<div id="9ef95af9" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    catalog_v1, catalog_v2, keys<span class="op">=</span><span class="st">"sku"</span>, source_name<span class="op">=</span><span class="st">"catalog_v1"</span>, target_name<span class="op">=</span><span class="st">"catalog_v2"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>comparison</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
@@ -1886,38 +1914,46 @@ The result of the comparison.
     <td colspan="2" class="gt_heading gt_title gt_font_normal" id="pb_comparison_tbl-title">Table Comparison</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_comparison_tbl-subtitle"><div style="font-size:13px; line-height:1.9;"><strong>source</strong> (4 rows) → <strong>target</strong> (4 rows), aligned by key <code>id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 3 of 5 rows fail (60.0%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 2" style="width:40.000%; background:#4CA64C; height:100%;"></div><div title="changed: 1" style="width:20.000%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:20.000%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:20.000%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>2</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span></div></td>
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_comparison_tbl-subtitle"><div style="font-size:13px; line-height:1.9;"><strong>catalog_v1</strong> (5 rows) → <strong>catalog_v2</strong> (5 rows), aligned by key <code>sku</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 4 of 6 rows fail (66.7%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 2" style="width:33.333%; background:#4CA64C; height:100%;"></div><div title="changed: 2" style="width:33.333%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>2</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>2</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span></div></td>
   </tr>
 
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-2-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 2 columns)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-2-of-3-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (2 of 3 columns)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left">amount</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:33.33%; height:100%; background:#E8A33D;"></div></div>1 of 3 matched rows differ (33.3%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-2-of-3-columns" class="gt_row gt_left">price</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-2-of-3-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-2-of-3-columns" class="gt_row gt_left">in_stock</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-2-of-3-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-2-rows" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (2 rows)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left">2</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="text-decoration:line-through; color:#999;">20</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">20.5</span> <span style="color:#888; font-size:11px;">(+0.5)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-2-rows" class="gt_row gt_left">A-102</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-2-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">price:</span> <span style="text-decoration:line-through; color:#999;">149</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">139</span> <span style="color:#888; font-size:11px;">(-10)</span></span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-2-rows" class="gt_row gt_left">A-105</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-2-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">in_stock:</span> <span style="text-decoration:line-through; color:#999;">True</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">False</span></span></td>
   </tr>
   <tr class="gt_group_heading_row">
     <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left">3</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 30</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> E</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left">A-103</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">name:</span> Monitor arm</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">price:</span> 59.5</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">in_stock:</span> False</span></td>
   </tr>
   <tr class="gt_group_heading_row">
     <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left">5</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 50</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> N</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left">A-106</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">name:</span> USB hub</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">price:</span> 19.99</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">in_stock:</span> True</span></td>
   </tr>
 </tbody>
 
@@ -1926,16 +1962,18 @@ The result of the comparison.
 </div>
 </div>
 </div>
-<p>The counts are available as attributes, and the differing rows can be retrieved by status:</p>
-<div id="5cb1a88d" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cmp</span>.n_changed, <span class="bu">cmp</span>.n_missing, <span class="bu">cmp</span>.n_extra</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-<pre><code>(1, 1, 1)</code></pre>
+<p>The report’s header gives the verdict and a breakdown of the six aligned rows. Below it are the columns with mismatched values, then samples of the changed, missing, and extra rows. For changed rows, only the differing values are shown.</p>
+<p>The same information is available programmatically. The status counts add up to the number of test units (aligned rows):</p>
+<div id="b1d9e51f" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>comparison.status_counts</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>{'match': 2, 'changed': 2, 'missing': 1, 'extra': 1, 'dup_key': 0}</code></pre>
 </div>
 </div>
-<div id="a47a2617" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cmp</span>.rows(<span class="st">"changed"</span>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
+<p>To work with the differing rows, get them by status with <a href="../reference/Comparison.rows.html#pointblank.Comparison.rows" class="gdls-link"><code>rows()</code></a>. Changed rows have a <code>&lt;column&gt;_source</code> and a <code>&lt;column&gt;_target</code> column for each compared column.</p>
+<div id="c3142748" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"changed"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
 <div><style>
 .dataframe > thead > tr,
 .dataframe > tbody > tr {
@@ -1943,16 +1981,183 @@ The result of the comparison.
   white-space: pre-wrap;
 }
 </style>
-<small>shape: (1, 5)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>id</th><th>amount_source</th><th>amount_target</th><th>region_source</th><th>region_target</th></tr><tr><td>i64</td><td>f64</td><td>f64</td><td>str</td><td>str</td></tr></thead><tbody><tr><td>2</td><td>20.0</td><td>20.5</td><td>"S"</td><td>"S"</td></tr></tbody></table></div>
+<small>shape: (2, 7)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>sku</th><th>name_source</th><th>name_target</th><th>price_source</th><th>price_target</th><th>in_stock_source</th><th>in_stock_target</th></tr><tr><td>str</td><td>str</td><td>str</td><td>f64</td><td>f64</td><td>bool</td><td>bool</td></tr></thead><tbody><tr><td>"A-102"</td><td>"Office chair"</td><td>"Office chair"</td><td>149.0</td><td>139.0</td><td>true</td><td>true</td></tr><tr><td>"A-105"</td><td>"Mouse pad"</td><td>"Mouse pad"</td><td>9.99</td><td>9.99</td><td>true</td><td>false</td></tr></tbody></table></div>
 </div>
 </div>
-<p>A tolerance can absorb small numeric differences:</p>
-<div id="17d8bb7a" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pb.compare(source, target, keys<span class="op">=</span><span class="st">"id"</span>, tolerance<span class="op">=</span>{<span class="st">"amount"</span>: <span class="dv">1</span>}).n_changed</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
-<pre><code>0</code></pre>
+<p><code>A-102</code> changed price and <code>A-105</code> changed its stock status. If only prices matter, list the columns to compare with <code>columns=</code>. The stock change is then ignored and <code>A-105</code> matches:</p>
+<div id="4558f990" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pb.compare(catalog_v1, catalog_v2, keys<span class="op">=</span><span class="st">"sku"</span>, columns<span class="op">=</span><span class="st">"price"</span>).status_counts</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>{'match': 3, 'changed': 1, 'missing': 1, 'extra': 1, 'dup_key': 0}</code></pre>
 </div>
 </div>
+<p>Without <code>keys=</code>, rows are compared by position. Since a product was removed from the middle of the catalog, most rows no longer line up, and four of the five rows count as changed. This is why a key gives a much more useful answer when the data has one.</p>
+<div id="6c63968d" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pb.compare(catalog_v1, catalog_v2).status_counts</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>{'match': 1, 'changed': 4, 'missing': 0, 'extra': 0, 'dup_key': 0}</code></pre>
+</div>
+</div>
+<p>Schema changes are found too. Suppose the next version renames <code>price</code> to <code>unit_price</code>. With the default <code>schema="strict"</code>, the comparison fails every row until the schemas agree. <code>column_map=</code> pairs up the renamed column, after which the values are compared as before:</p>
+<div id="49eef14b" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>catalog_v3 <span class="op">=</span> catalog_v2.rename({<span class="st">"price"</span>: <span class="st">"unit_price"</span>})</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>pb.compare(catalog_v1, catalog_v3, keys<span class="op">=</span><span class="st">"sku"</span>, column_map<span class="op">=</span>{<span class="st">"price"</span>: <span class="st">"unit_price"</span>})</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_comparison_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_comparison_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_comparison_tbl p { margin: 0; padding: 0; }
+ #pb_comparison_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_comparison_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_comparison_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_comparison_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_comparison_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_comparison_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_comparison_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_comparison_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_comparison_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_comparison_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_comparison_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_comparison_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_comparison_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_comparison_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_comparison_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_comparison_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_comparison_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_comparison_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_comparison_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_comparison_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_comparison_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_comparison_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_left { text-align: left; }
+ #pb_comparison_tbl .gt_center { text-align: center; }
+ #pb_comparison_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_comparison_tbl .gt_font_normal { font-weight: normal; }
+ #pb_comparison_tbl .gt_font_bold { font-weight: bold; }
+ #pb_comparison_tbl .gt_font_italic { font-style: italic; }
+ #pb_comparison_tbl .gt_super { font-size: 65%; }
+ #pb_comparison_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_comparison_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_comparison_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_comparison_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:30%;">
+  <col style="width:70%;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_title gt_font_normal" id="pb_comparison_tbl-title">Table Comparison</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_comparison_tbl-subtitle"><div style="font-size:13px; line-height:1.9;"><strong>source</strong> (5 rows) → <strong>target</strong> (5 rows), aligned by key <code>sku</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 4 of 6 rows fail (66.7%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 2" style="width:33.333%; background:#4CA64C; height:100%;"></div><div title="changed: 2" style="width:33.333%; background:#E8A33D; height:100%;"></div><div title="missing: 1" style="width:16.667%; background:#CF142B; height:100%;"></div><div title="extra: 1" style="width:16.667%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>2</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>2</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>1</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>1</strong></span></div></td>
+  </tr>
+
+</thead>
+<tbody class="gt_table_body">
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Schema-differences" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Schema differences</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left">price</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left">renamed → <code>unit_price</code> (via <code>column_map=</code>)</td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-2-of-3-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (2 of 3 columns)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-2-of-3-columns" class="gt_row gt_left">price → unit_price</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-2-of-3-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-2-of-3-columns" class="gt_row gt_left">in_stock</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-2-of-3-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-2-rows" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (2 rows)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-2-rows" class="gt_row gt_left">A-102</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-2-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">price:</span> <span style="text-decoration:line-through; color:#999;">149</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">139</span> <span style="color:#888; font-size:11px;">(-10)</span></span></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-2-rows" class="gt_row gt_left">A-105</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-2-rows" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">in_stock:</span> <span style="text-decoration:line-through; color:#999;">True</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">False</span></span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left">A-103</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">name:</span> Monitor arm</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">price:</span> 59.5</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">in_stock:</span> False</span></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left">A-106</td>
+    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">name:</span> USB hub</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">unit_price:</span> 19.99</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">in_stock:</span> True</span></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>The rename is listed as a schema difference, but it no longer causes a failure, and the result is the same as the comparison of <code>catalog_v1</code> with <code>catalog_v2</code>. To make a comparison like this part of a validation, with thresholds, actions, and a step in the validation report, use <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link"><code>Validate.tbl_match()</code></a> with the same arguments.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a></dt>
+<dd>
+<p>The object returned by this function.</p>
+</dd>
+<dt><a href="../reference/SchemaDiff.html#pointblank.SchemaDiff" class="gdls-link gdls-code">SchemaDiff</a></dt>
+<dd>
+<p>The schema differences found by a comparison.</p>
+</dd>
+<dt><a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a></dt>
+<dd>
+<p>Use a table comparison as a validation step.</p>
+</dd>
+<dt><a href="../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a></dt>
+<dd>
+<p>Compare aggregates per group instead of rows.</p>
+</dd>
+</dl>
 
 
 </section>

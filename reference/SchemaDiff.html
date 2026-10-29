@@ -371,6 +371,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">ContractAdapter</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1637,9 +1643,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#attributes" id="toc-attributes" class="nav-link active" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#attributes-1" id="toc-attributes-1" class="nav-link" data-scroll-target="#attributes-1">Attributes</a>
   <ul class="collapse">
   <li><a href="#matches" id="toc-matches" class="nav-link" data-scroll-target="#matches"><span class="doc-object-name doc-attribute doc-label doc-label-property">matches</span></a></li>
+  </ul></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#to_dict" id="toc-to_dict" class="nav-link" data-scroll-target="#to_dict"><span class="doc-object-name doc-function doc-label doc-label-method">to_dict()</span></a></li>
   </ul></li>
   </ul>
 </nav>
@@ -1671,7 +1683,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L51-L100" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L51-L305" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">SchemaDiff</span>(</span>
@@ -1684,7 +1696,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Column names refer to the source table except in <code>only_in_target</code> (and the second element of <code>renamed</code> and <code>case_only</code> pairs), which refer to the target table.</p>
+<p>Changes to a table’s columns are often more disruptive than changes to its values. A dropped column breaks the queries that select it, a retyped column changes how values sort and aggregate, and a renamed column looks like one column removed and another added. Every <a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link"><code>Comparison</code></a> checks the two schemas before comparing values and records what it found in its <code>schema_diff</code> attribute, which is a <a href="../reference/SchemaDiff.html#pointblank.SchemaDiff" class="gdls-link gdls-code">SchemaDiff</a>.</p>
+<p>Whether these differences fail the comparison depends on <code>schema=</code> in <a href="../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a>. With the default <code>"strict"</code>, any difference other than an explicit rename means that every row counts as failing. With <code>"common"</code>, the differences are only reported, and the shared columns are compared as usual. Either way, the <a href="../reference/SchemaDiff.html#pointblank.SchemaDiff" class="gdls-link gdls-code">SchemaDiff</a> lists the differences, and they appear in the <em>Schema differences</em> section of the comparison report.</p>
+<p>Column names refer to the source table except in <code>only_in_target</code> (and the second element of <code>renamed</code> and <code>case_only</code> pairs), which refer to the target table. A <a href="../reference/SchemaDiff.html#pointblank.SchemaDiff" class="gdls-link gdls-code">SchemaDiff</a> is immutable.</p>
 </div>
 <section id="attributes" class="level2 doc-attributes">
 <h2 class="doc-attributes anchored" data-anchor-id="attributes">Attributes</h2>
@@ -1717,6 +1731,87 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dl>
 </div>
 </section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s compare a table of customers with a version written by a migrated job. The new version stores the signup date as a string, capitalizes one column name, and adds a column.</p>
+<div id="b879b5f5" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>customers <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"customer_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"email"</span>: [<span class="st">"ana@example.com"</span>, <span class="st">"ben@example.com"</span>, <span class="st">"cho@example.com"</span>],</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"signup"</span>: [date(<span class="dv">2024</span>, <span class="dv">1</span>, <span class="dv">5</span>), date(<span class="dv">2024</span>, <span class="dv">2</span>, <span class="dv">11</span>), date(<span class="dv">2024</span>, <span class="dv">3</span>, <span class="dv">2</span>)],</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>customers_migrated <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"customer_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Email"</span>: [<span class="st">"ana@example.com"</span>, <span class="st">"ben@example.com"</span>, <span class="st">"cho@example.com"</span>],</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"signup"</span>: [<span class="st">"2024-01-05"</span>, <span class="st">"2024-02-11"</span>, <span class="st">"2024-03-02"</span>],</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"loaded_at"</span>: [<span class="st">"2025-06-01"</span>] <span class="op">*</span> <span class="dv">3</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(customers, customers_migrated, keys<span class="op">=</span><span class="st">"customer_id"</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>comparison.schema_diff</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>SchemaDiff(only_in_source=['email'], only_in_target=['Email', 'loaded_at'], dtype_changed=[('signup', 'Date', 'String')], renamed=[], case_only=[('email', 'Email')], reordered=False)</code></pre>
+</div>
+</div>
+<p>Each kind of difference has its own field. <code>email</code> and <code>Email</code> appear in <code>only_in_source</code> and <code>only_in_target</code>, since column names are case-sensitive, and <code>case_only</code> points out that the two names differ only in case. <code>signup</code> is in <code>dtype_changed</code> with both data types, and <code>loaded_at</code> is new in the target.</p>
+<p>Because the schemas differ and <code>schema="strict"</code> is the default, no row passes:</p>
+<div id="fee8f358" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>comparison.schema_diff.matches, comparison.n_passed</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>(False, 0)</code></pre>
+</div>
+</div>
+<p>Pairing up the renamed column with <code>column_map=</code> resolves the case change, and <code>schema="common"</code> reports the other two differences without failing any rows:</p>
+<div id="03ed743d" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>relaxed <span class="op">=</span> pb.compare(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    customers,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    customers_migrated,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    keys<span class="op">=</span><span class="st">"customer_id"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    column_map<span class="op">=</span>{<span class="st">"email"</span>: <span class="st">"Email"</span>},</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    schema<span class="op">=</span><span class="st">"common"</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>relaxed.schema_diff</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>SchemaDiff(only_in_source=[], only_in_target=['loaded_at'], dtype_changed=[('signup', 'Date', 'String')], renamed=[('email', 'Email')], case_only=[], reordered=False)</code></pre>
+</div>
+</div>
+<p>The rename now appears in <code>renamed</code>, and <code>case_only</code> is empty. The retyped <code>signup</code> column is still listed, but it no longer fails the comparison. When a column’s two data types can’t be compared directly (here, a date and a string), both sides are compared as strings, so the three dates still match:</p>
+<div id="edb6aaa0" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>relaxed.status_counts</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>{'match': 3, 'changed': 0, 'missing': 0, 'extra': 0, 'dup_key': 0}</code></pre>
+</div>
+</div>
+<p>So <code>schema="common"</code> answers whether the values survived the migration, while the <a href="../reference/SchemaDiff.html#pointblank.SchemaDiff" class="gdls-link gdls-code">SchemaDiff</a> records how the columns changed along the way. For a schema check that doesn’t compare any values, see <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>Validate.col_schema_match()</code></a>.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/compare.html#pointblank.compare" class="gdls-link gdls-code">compare()</a></dt>
+<dd>
+<p>Compare two tables, including their schemas.</p>
+</dd>
+<dt><a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a></dt>
+<dd>
+<p>The comparison result that holds a <a href="../reference/SchemaDiff.html#pointblank.SchemaDiff" class="gdls-link gdls-code">SchemaDiff</a>.</p>
+</dd>
+<dt><a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a></dt>
+<dd>
+<p>Check a table against an expected schema.</p>
+</dd>
+</dl>
+</section>
 <section id="attributes-1" class="level2 doc-attributes">
 <h2 class="doc-attributes anchored" data-anchor-id="attributes-1">Attributes</h2>
 <table class="gd-summary-table caption-top table">
@@ -1729,20 +1824,130 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td><a href="#matches" class="doc-attribute doc-label doc-label-property">matches</a></td>
-<td><code>True</code> if the schemas match (explicit renames through <code>column_map=</code> are allowed).</td>
+<td>Whether the two schemas match.</td>
 </tr>
 </tbody>
 </table>
 <section id="matches" class="level3">
 <h3 class="anchored" data-anchor-id="matches"><span class="doc-object-name doc-attribute doc-label doc-label-property">matches</span></h3>
 <div class="doc-subject">
-<p><code>True</code> if the schemas match (explicit renames through <code>column_map=</code> are allowed).</p>
+<p>Whether the two schemas match.</p>
 </div>
 <div class="doc-signature doc-attribute">
 <p><code><span class="doc-parameter-name">matches</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span></code></p>
 </div>
+<div class="doc-text">
+<p>This is the yes-or-no answer behind the schema check in <a href="../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a>. It’s <code>False</code> if any of <code>only_in_source</code>, <code>only_in_target</code>, or <code>dtype_changed</code> is non-empty, or if <code>reordered</code> is <code>True</code>. Renames listed in <code>renamed</code> don’t count against it, because they were declared with <code>column_map=</code>. Names that differ only in case do count, since they also appear in <code>only_in_source</code> and <code>only_in_target</code>. Note that column order matters here: the same columns in a different order don’t match.</p>
+<p>With <code>schema="strict"</code> (the default in <code>compare()</code>), a <code>False</code> value here means the comparison fails as a whole, with no rows passing. With <code>schema="common"</code>, it’s reported but doesn’t affect the result. <a href="../reference/Comparison.schema_ok.html#pointblank.Comparison.schema_ok" class="gdls-link"><code>Comparison.schema_ok</code></a> combines the two: it’s this value under <code>"strict"</code> and always <code>True</code> under <code>"common"</code>.</p>
+</div>
+<section id="examples-1" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<p>Two tables with the same columns in a different order have different schemas, even though every value matches:</p>
+<div id="53804c6b" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>stock <span class="op">=</span> pl.DataFrame({<span class="st">"sku"</span>: [<span class="st">"A-1"</span>, <span class="st">"A-2"</span>], <span class="st">"qty"</span>: [<span class="dv">12</span>, <span class="dv">30</span>], <span class="st">"bin"</span>: [<span class="st">"B4"</span>, <span class="st">"C1"</span>]})</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>stock_reordered <span class="op">=</span> stock.select(<span class="st">"sku"</span>, <span class="st">"bin"</span>, <span class="st">"qty"</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(stock, stock_reordered, keys<span class="op">=</span><span class="st">"sku"</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>comparison.schema_diff.matches, comparison.schema_diff.reordered</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>(False, True)</code></pre>
+</div>
+</div>
+<p>Since the default is <code>schema="strict"</code>, the comparison as a whole fails:</p>
+<div id="7a04fc3f" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>comparison.schema_ok, comparison.n_passed</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>(False, 0)</code></pre>
+</div>
+</div>
+<p>If column order doesn’t matter for the use at hand, use <code>schema="common"</code> to compare the values regardless. The <a href="../reference/SchemaDiff.html#pointblank.SchemaDiff" class="gdls-link gdls-code">SchemaDiff</a> still records the reordering, so it isn’t lost from the report.</p>
+</section>
+</section>
+</section>
+<section id="methods" class="level2 doc-methods">
+<h2 class="doc-methods anchored" data-anchor-id="methods">Methods</h2>
+<table class="gd-summary-table caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#to_dict" class="doc-function doc-label doc-label-method">to_dict()</a></td>
+<td>Convert the schema differences to a dictionary.</td>
+</tr>
+</tbody>
+</table>
+<section id="to_dict" class="level3">
+<h3 class="anchored" data-anchor-id="to_dict"><span class="doc-object-name doc-function doc-label doc-label-method">to_dict()</span></h3>
+<div class="doc-subject">
+<p>Convert the schema differences to a dictionary.</p>
+</div>
+<div class="doc-usage-source">
+<p>Usage</p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L243-L305" target="_blank" rel="noopener">Source</a></p>
+</div>
+<div class="doc-signature doc-function">
+<div class="sourceCode" id="cb14"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_dict</span>()</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>The dictionary contains only lists, strings, and booleans, so it can be written to JSON or YAML as it is. That makes it useful for logging schema drift over time or for passing it to another tool. It’s also the <code>"schema_diff"</code> entry in the output of <a href="../reference/Comparison.to_dict.html#pointblank.Comparison.to_dict" class="gdls-link"><code>Comparison.to_dict()</code></a> and <a href="../reference/Comparison.to_json.html#pointblank.Comparison.to_json" class="gdls-link"><code>Comparison.to_json()</code></a>.</p>
+</div>
+<section id="returns" class="level4 doc-returns">
+<h4 class="doc-returns anchored" data-anchor-id="returns">Returns</h4>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">dict[str, Any]</span></code></dt>
+<dd>
+A dictionary with the key <code>"matches"</code> (the value of <a href="../reference/SchemaDiff.html#pointblank.SchemaDiff.matches" class="gdls-link"><code>matches</code></a>) followed by one key for each field: <code>"only_in_source"</code>, <code>"only_in_target"</code>, <code>"dtype_changed"</code>, <code>"renamed"</code>, <code>"case_only"</code>, and <code>"reordered"</code>. The pairs and triples in the tuple-valued fields become lists.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples-2" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
+<p>Here, a new version of a table has changed the type of <code>amount</code> and added a column.</p>
+<div id="a9534590" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>payments <span class="op">=</span> pl.DataFrame({<span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"amount"</span>: [<span class="fl">10.5</span>, <span class="fl">20.0</span>]})</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>payments_new <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"amount"</span>: [<span class="fl">10.5</span>, <span class="fl">20.0</span>], <span class="st">"currency"</span>: [<span class="st">"EUR"</span>, <span class="st">"EUR"</span>]}</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>).with_columns(pl.col(<span class="st">"amount"</span>).cast(pl.Float32))</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> pb.compare(payments, payments_new, keys<span class="op">=</span><span class="st">"id"</span>).schema_diff</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>diff.to_dict()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>{'matches': False,
+ 'only_in_source': [],
+ 'only_in_target': ['currency'],
+ 'dtype_changed': [['amount', 'Float64', 'Float32']],
+ 'renamed': [],
+ 'case_only': [],
+ 'reordered': False}</code></pre>
+</div>
+</div>
+<p>Each data type change is a <code>[column, source dtype, target dtype]</code> list, and the result converts directly to JSON:</p>
+<div id="346ab228" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json.dumps(diff.to_dict()))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{"matches": false, "only_in_source": [], "only_in_target": ["currency"], "dtype_changed": [["amount", "Float64", "Float32"]], "renamed": [], "case_only": [], "reordered": false}</code></pre>
+</div>
+</div>
+<p>A record like this can be stored each time a pipeline runs, so that the history of schema changes can be read back later.</p>
 
 
+</section>
 </section>
 </section>
 

@@ -4,7 +4,7 @@ Create a column expression for use in `conjointly()` validation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L2017-L2085)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L2016-L2083)
 
 ``` python
 expr_col(column_name)
@@ -64,6 +64,5 @@ The above code creates a validation object that checks the specified conditions 
 
 ## See Also
 
-`The` [`conjointly()`](../reference/Validate.conjointly.md#pointblank.Validate.conjointly) validation method, which is where this  
-
-`function` should be used.  
+[conjointly()](../reference/Validate.conjointly.md#pointblank.Validate.conjointly)  
+The validation step where these expressions are used.

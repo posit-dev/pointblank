@@ -336,6 +336,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">ContractAdapter</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1728,27 +1734,31 @@ ul.task-list li input[type="checkbox"] {
 <dl>
 <dt><a href="../reference/import_contract.html#pointblank.import_contract" class="doc-function doc-label doc-label-function">import_contract()</a></dt>
 <dd>
-<p>Import a contract/schema from an external format.</p>
+<p>Import a contract or schema written in another format.</p>
 </dd>
 <dt><a href="../reference/export_contract.html#pointblank.export_contract" class="doc-function doc-label doc-label-function">export_contract()</a></dt>
 <dd>
-<p>Export a Pointblank validation or contract to an external format.</p>
+<p>Export a Pointblank validation or contract to another format.</p>
 </dd>
 <dt><a href="../reference/list_adapters.html#pointblank.list_adapters" class="doc-function doc-label doc-label-function">list_adapters()</a></dt>
 <dd>
-<p>List all registered adapters with their capabilities.</p>
+<p>List the formats available for contract import and export.</p>
 </dd>
 <dt><a href="../reference/register_adapter.html#pointblank.register_adapter" class="doc-function doc-label doc-label-function">register_adapter()</a></dt>
 <dd>
-<p>Register a contract adapter class.</p>
+<p>Register a contract adapter so that it can be used for import and export.</p>
 </dd>
 <dt><a href="../reference/ContractImport.html#pointblank.ContractImport" class="doc-class doc-label doc-label-dataclass">ContractImport</a></dt>
 <dd>
-<p>Result of importing an external contract/schema.</p>
+<p>The result of importing a contract or schema from another format.</p>
 </dd>
 <dt><a href="../reference/ContractAdapter.html#pointblank.ContractAdapter" class="doc-class doc-label doc-label-class">ContractAdapter</a></dt>
 <dd>
-<p>Base class for contract import/export adapters.</p>
+<p>The base class for adapters that translate contracts to and from other formats.</p>
+</dd>
+<dt><a href="../reference/adapters.MappedConstraint.html#pointblank.adapters.MappedConstraint" class="doc-class doc-label doc-label-dataclass">adapters.MappedConstraint</a></dt>
+<dd>
+<p>A rule from an external format, translated into a Pointblank validation step.</p>
 </dd>
 </dl>
 </section>
@@ -2268,11 +2278,11 @@ ul.task-list li input[type="checkbox"] {
 <dl>
 <dt><a href="../reference/Comparison.identical.html#pointblank.Comparison.identical" class="doc-attribute doc-label doc-label-property">Comparison.identical</a></dt>
 <dd>
-<p><code>True</code> if the tables match under the comparison settings.</p>
+<p>Whether the tables match under the comparison settings.</p>
 </dd>
 <dt><a href="../reference/Comparison.schema_ok.html#pointblank.Comparison.schema_ok" class="doc-attribute doc-label doc-label-property">Comparison.schema_ok</a></dt>
 <dd>
-<p><code>True</code> if the schemas match, or if schema differences are tolerated (<code>"common"</code>).</p>
+<p>Whether the schema check passed.</p>
 </dd>
 <dt><a href="../reference/Comparison.status_counts.html#pointblank.Comparison.status_counts" class="doc-attribute doc-label doc-label-property">Comparison.status_counts</a></dt>
 <dd>
@@ -2284,11 +2294,11 @@ ul.task-list li input[type="checkbox"] {
 </dd>
 <dt><a href="../reference/Comparison.n_passed.html#pointblank.Comparison.n_passed" class="doc-attribute doc-label doc-label-property">Comparison.n_passed</a></dt>
 <dd>
-<p>Test units that pass: matching rows (none, if the schema check fails).</p>
+<p>The number of test units that passed.</p>
 </dd>
 <dt><a href="../reference/Comparison.n_failed.html#pointblank.Comparison.n_failed" class="doc-attribute doc-label doc-label-property">Comparison.n_failed</a></dt>
 <dd>
-<p>Test units that fail: all non-matching rows (all rows, if the schema check fails).</p>
+<p>The number of test units that failed.</p>
 </dd>
 <dt><a href="../reference/Comparison.rows.html#pointblank.Comparison.rows" class="doc-function doc-label doc-label-method">Comparison.rows()</a></dt>
 <dd>

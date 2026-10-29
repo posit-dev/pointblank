@@ -4,7 +4,7 @@ Reference a column from the reference data for aggregate comparisons.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L549-L623)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L548-L622)
 
 ``` python
 ref(column_name)
@@ -69,4 +69,5 @@ validation
 
 ## See Also
 
-`The` [`col()`](../reference/col.md#pointblank.col) function for referencing columns within the same table.  
+[col()](../reference/col.md#pointblank.col)  
+Reference columns within the same table.

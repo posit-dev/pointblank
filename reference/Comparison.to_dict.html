@@ -371,6 +371,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">ContractAdapter</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1637,6 +1643,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
     </div>
@@ -1667,13 +1675,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L1425-L1468" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L2265-L2377" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Comparison</span><span class="op">.</span><span class="fu">to_dict</span>(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">samples</span><span class="op">=</span><span class="bn">True</span>,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">limit</span><span class="op">=</span><span class="dv">10</span>,</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>A comparison is a live object that refers to the tables it compared. <code>to_dict()</code> turns its results into plain data that can be stored or sent elsewhere: written to a log or a database table, attached to a CI run, checked in a test, or passed to a dashboard. Everything in the dictionary is a string, number, boolean, list, dict, or <code>None</code> (dates and other values in the samples are converted to strings), so it can be serialized as it is. For a JSON string, use <a href="../reference/Comparison.to_json.html#pointblank.Comparison.to_json" class="gdls-link"><code>to_json()</code></a>.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1689,6 +1700,65 @@ The maximum number of sample rows per status.
 </dd>
 </dl>
 </div>
+</section>
+<section id="returns" class="level2 doc-returns">
+<h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">dict[str, Any]</span></code></dt>
+<dd>
+A dictionary with the comparison settings (<code>"source_name"</code>, <code>"target_name"</code>, <code>"mode"</code>, <code>"keys"</code>, <code>"compared_columns"</code>, <code>"column_map"</code>, <code>"schema_mode"</code>, <code>"null_equal"</code>, and <code>"partitions"</code>), the row counts of both tables, the results (<code>"n"</code>, <code>"n_passed"</code>, <code>"n_failed"</code>, <code>"identical"</code>, <code>"status_counts"</code>, and <code>"column_mismatches"</code>), and the schema differences (<code>"schema_diff"</code>, from <a href="../reference/SchemaDiff.html#pointblank.SchemaDiff.to_dict" class="gdls-link"><code>SchemaDiff.to_dict()</code></a>). If <code>samples=True</code>, there’s also a <code>"samples"</code> entry, which maps each failing status that has rows to a list of row dictionaries, structured as in <a href="../reference/Comparison.rows.html#pointblank.Comparison.rows" class="gdls-link"><code>rows()</code></a>.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s compare two months of an employee table and turn the result into a dictionary.</p>
+<div id="32fb92da" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>staff_jan <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"emp_id"</span>: [<span class="dv">101</span>, <span class="dv">102</span>, <span class="dv">103</span>, <span class="dv">104</span>], <span class="st">"salary"</span>: [<span class="dv">52000</span>, <span class="dv">61000</span>, <span class="dv">58000</span>, <span class="dv">47000</span>]}</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>staff_feb <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"emp_id"</span>: [<span class="dv">101</span>, <span class="dv">102</span>, <span class="dv">103</span>, <span class="dv">105</span>], <span class="st">"salary"</span>: [<span class="dv">52000</span>, <span class="dv">63500</span>, <span class="dv">58000</span>, <span class="dv">49000</span>]}</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    staff_jan, staff_feb, keys<span class="op">=</span><span class="st">"emp_id"</span>, source_name<span class="op">=</span><span class="st">"staff_jan"</span>, target_name<span class="op">=</span><span class="st">"staff_feb"</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> comparison.to_dict()</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>result[<span class="st">"status_counts"</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>{'match': 2, 'changed': 1, 'missing': 1, 'extra': 1, 'dup_key': 0}</code></pre>
+</div>
+</div>
+<p>The samples hold the actual rows, keyed by status:</p>
+<div id="d13d6bd8" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>result[<span class="st">"samples"</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>{'changed': [{'emp_id': 102, 'salary_source': 61000, 'salary_target': 63500}],
+ 'missing': [{'emp_id': 104, 'salary': 47000}],
+ 'extra': [{'emp_id': 105, 'salary': 49000}]}</code></pre>
+</div>
+</div>
+<p>Salaries are sensitive, so a record that’s kept in a shared log might leave the samples out. With <code>samples=False</code>, only counts, settings, and schema details remain:</p>
+<div id="8c7e386e" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>record <span class="op">=</span> comparison.to_dict(samples<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>{k: record[k] <span class="cf">for</span> k <span class="kw">in</span> [<span class="st">"source_name"</span>, <span class="st">"target_name"</span>, <span class="st">"n_failed"</span>, <span class="st">"identical"</span>]}</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>{'source_name': 'staff_jan',
+ 'target_name': 'staff_feb',
+ 'n_failed': 3,
+ 'identical': False}</code></pre>
+</div>
+</div>
+<p>Leaving out the samples also means the tables aren’t queried again, because the counts were collected when the comparison was made. To limit the samples instead of dropping them, set <code>limit=</code> to the number of rows to keep for each status.</p>
 
 
 </section>

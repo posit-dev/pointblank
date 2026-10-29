@@ -4,7 +4,7 @@ Definition of a schema object.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L20-L731)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L20-L730)
 
 ``` python
 Schema(
@@ -216,6 +216,5 @@ For the `age` column, the schema will check for both `Float64` and `Int64` dtype
 
 ## See Also
 
-`The` [`col_schema_match()`](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) validation method, where a  
-
-[Schema](../reference/Schema.md#pointblank.Schema) object is used in a validation workflow.  
+[col_schema_match()](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match)  
+The validation step that checks a table against a [Schema](../reference/Schema.md#pointblank.Schema).

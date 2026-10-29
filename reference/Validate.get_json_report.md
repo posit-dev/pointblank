@@ -4,7 +4,7 @@ Get a report of the validation results as a JSON-formatted string.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20339-L20511)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20324-L20494)
 
 ``` python
 Validate.get_json_report(
@@ -108,8 +108,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-28T18:33:04.668+00:00",
-            "proc_duration_s": 0.002658
+            "time_processed": "2026-10-28T22:12:43.569+00:00",
+            "proc_duration_s": 0.004014
         },
         {
             "i": 2,
@@ -135,8 +135,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-28T18:33:04.670+00:00",
-            "proc_duration_s": 0.001528
+            "time_processed": "2026-10-28T22:12:43.570+00:00",
+            "proc_duration_s": 0.001871
         }
     ]
 
@@ -231,13 +231,8 @@ print(f"Number of failing validation steps: {len(failing_steps)}")
 
 ## See Also
 
-- [`get_tabular_report()`](../reference/Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report)
+[get_tabular_report()](../reference/Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report)  
+Get a formatted HTML report as a GT table.
 
-: Get a formatted HTML
-
-`report` as a GT table  
-
-\- [`get_data_extracts()`](../reference/Validate.get_data_extracts.md#pointblank.Validate.get_data_extracts)  
-Get rows that
-
-`failed` validation  
+[get_data_extracts()](../reference/Validate.get_data_extracts.md#pointblank.Validate.get_data_extracts)  
+Get the rows that failed validation.

@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="True if the schemas match, or if schema differences are tolerated (“common”).">
+<meta name="description" content="Whether the schema check passed.">
 
 <title>Comparison.schema_ok | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Comparison.schema_ok - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Comparison.schema_ok.html"}]</script>
@@ -30,6 +30,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -105,10 +140,10 @@ ul.task-list li input[type="checkbox"] {
 
 
 <meta property="og:title" content="Comparison.schema_ok | Pointblank">
-<meta property="og:description" content="True if the schemas match, or if schema differences are tolerated (“common”).">
+<meta property="og:description" content="Whether the schema check passed.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="Comparison.schema_ok | Pointblank">
-<meta name="twitter:description" content="True if the schemas match, or if schema differences are tolerated (“common”).">
+<meta name="twitter:description" content="Whether the schema check passed.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -334,6 +369,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../reference/ContractAdapter.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ContractAdapter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
   </div>
 </li>
       </ul>
@@ -1596,8 +1637,14 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#examples" id="toc-examples" class="nav-link active" data-scroll-target="#examples">Examples</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -1622,13 +1669,52 @@ ul.task-list li input[type="checkbox"] {
 
 
 <div class="doc-subject">
-<p><code>True</code> if the schemas match, or if schema differences are tolerated (<code>"common"</code>).</p>
+<p>Whether the schema check passed.</p>
 </div>
 <div class="doc-signature doc-attribute">
 <p><code><span class="doc-parameter-name">Comparison.schema_ok</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span></code></p>
 </div>
+<div class="doc-text">
+<p>A comparison checks the two tables’ schemas before it compares their values. How a schema difference is treated depends on <code>schema=</code> in <a href="../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a>. With <code>schema="strict"</code> (the default), <a href="../reference/Comparison.schema_ok.html#pointblank.Comparison.schema_ok" class="gdls-link gdls-code">schema_ok</a> is the same as <a href="../reference/SchemaDiff.html#pointblank.SchemaDiff.matches" class="gdls-link"><code>SchemaDiff.matches</code></a>, and a <code>False</code> value means that every test unit fails, so <a href="../reference/Comparison.n_passed.html#pointblank.Comparison.n_passed" class="gdls-link"><code>n_passed</code></a> is <code>0</code>. With <code>schema="common"</code>, schema differences are only reported, so <a href="../reference/Comparison.schema_ok.html#pointblank.Comparison.schema_ok" class="gdls-link gdls-code">schema_ok</a> is always <code>True</code>.</p>
+<p>This makes <a href="../reference/Comparison.schema_ok.html#pointblank.Comparison.schema_ok" class="gdls-link gdls-code">schema_ok</a> the property to check when a comparison fails and it’s not clear whether the values or the columns are to blame. The details of the difference are in <code>schema_diff</code>.</p>
+</div>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Here, the target table has the same rows as the source, plus a new <code>humidity</code> column.</p>
+<div id="95abb808" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>readings <span class="op">=</span> pl.DataFrame({<span class="st">"station"</span>: [<span class="st">"S1"</span>, <span class="st">"S2"</span>, <span class="st">"S3"</span>], <span class="st">"temp"</span>: [<span class="fl">12.1</span>, <span class="fl">14.0</span>, <span class="fl">9.8</span>]})</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>readings_new <span class="op">=</span> readings.with_columns(humidity<span class="op">=</span>pl.Series([<span class="fl">0.61</span>, <span class="fl">0.58</span>, <span class="fl">0.72</span>]))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(readings, readings_new, keys<span class="op">=</span><span class="st">"station"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>comparison.schema_ok, comparison.status_counts, comparison.n_passed</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>(False, {'match': 3, 'changed': 0, 'missing': 0, 'extra': 0, 'dup_key': 0}, 0)</code></pre>
+</div>
+</div>
+<p>Every row has a status of <code>"match"</code>, but none of them pass, because the schema check failed. The cause is in the schema differences:</p>
+<div id="d3eb1669" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison.schema_diff.only_in_target</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>['humidity']</code></pre>
+</div>
+</div>
+<p>If the new column is expected, <code>schema="common"</code> compares the shared columns and lets the rows pass:</p>
+<div id="8c369203" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>relaxed <span class="op">=</span> pb.compare(readings, readings_new, keys<span class="op">=</span><span class="st">"station"</span>, schema<span class="op">=</span><span class="st">"common"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>relaxed.schema_ok, relaxed.n_passed</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>(True, 3)</code></pre>
+</div>
+</div>
+<p>The new column is still listed in <code>relaxed.schema_diff</code>, so the change remains visible in the report even though it no longer fails the comparison.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

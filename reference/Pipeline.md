@@ -4,7 +4,7 @@ Enforce data contracts at both ends of a data transformation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L275-L1421)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L280-L1441)
 
 ``` python
 Pipeline(
@@ -209,6 +209,8 @@ result.source_validation
 
 [TABLE]
 
+The batch was caught at the source boundary, so nothing reached the target table. Once the upstream data is fixed, the same pipeline can be run again on it without any changes.
+
 ## See Also
 
 [PipelineResult](../reference/PipelineResult.md#pointblank.PipelineResult)  
@@ -238,7 +240,7 @@ Validate the input, transform it, and validate the output.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L740-L920)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L756-L936)
 
 ``` python
 run(
@@ -373,7 +375,7 @@ Check incoming data against the source contract.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L543-L637)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L551-L649)
 
 ``` python
 validate_source(data)
@@ -444,13 +446,15 @@ except RuntimeError as e:
 
     Rejected: Contract 'sensor_readings' (source) violated: validation has failing steps.
 
+The message names the contract and its direction. If the contract used `on_violation="warn"` or `"log"` instead, the call would return the failing validation rather than raising, leaving it to the caller to decide what to do.
+
 ### validate_target()
 
 Check transformed data against the target contract.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L639-L738)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L651-L754)
 
 ``` python
 validate_target(data)
@@ -526,13 +530,15 @@ validation.all_passed()
 
     False
 
+Here the job would hold the summary back until the duplicate day is resolved. To make a failure stop the job instead, set `on_violation="raise"` on the contract, which turns a failing validation into a `RuntimeError`.
+
 ### to_yaml()
 
 Write the pipeline as YAML.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1332-L1409)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1352-L1429)
 
 ``` python
 to_yaml(path=None)
@@ -614,7 +620,7 @@ Read a pipeline from a YAML file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1206-L1330)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1222-L1350)
 
 ``` python
 from_yaml(path)
@@ -718,13 +724,15 @@ result.passed
 
     True
 
+Both boundaries pass, since the heavier shipment (410 lb, or about 186 kg) is well within the target's range of 0 to 1000 kg. The transformation stays in Python while the contracts live in the file, so the rules can be changed without touching the job's code.
+
 ### to_dict()
 
 Convert the pipeline to a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1012-L1082)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1028-L1098)
 
 ``` python
 to_dict()
@@ -780,7 +788,7 @@ Create a pipeline from a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1084-L1204)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1100-L1220)
 
 ``` python
 from_dict(data)

@@ -4,7 +4,7 @@ Select the last `n` columns in the column list.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L1573-L1729)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L1572-L1728)
 
 ``` python
 last_n(

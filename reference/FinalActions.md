@@ -80,6 +80,8 @@ validation = (
 
 ## See Also
 
-`The` [`get_validation_summary()`](../reference/get_validation_summary.md#pointblank.get_validation_summary) function, which can be  
+[get_validation_summary()](../reference/get_validation_summary.md#pointblank.get_validation_summary)  
+Get a summary of the validation results inside a final action.
 
-`used` to retrieve the summary of the validation results.  
+[Actions](../reference/Actions.md#pointblank.Actions)  
+Define actions that run when a step exceeds a threshold.

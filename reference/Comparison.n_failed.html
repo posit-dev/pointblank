@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Test units that fail: all non-matching rows (all rows, if the schema check fails).">
+<meta name="description" content="The number of test units that failed.">
 
 <title>Comparison.n_failed | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Comparison.n_failed - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Comparison.n_failed.html"}]</script>
@@ -30,6 +30,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -105,10 +140,10 @@ ul.task-list li input[type="checkbox"] {
 
 
 <meta property="og:title" content="Comparison.n_failed | Pointblank">
-<meta property="og:description" content="Test units that fail: all non-matching rows (all rows, if the schema check fails).">
+<meta property="og:description" content="The number of test units that failed.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="Comparison.n_failed | Pointblank">
-<meta name="twitter:description" content="Test units that fail: all non-matching rows (all rows, if the schema check fails).">
+<meta name="twitter:description" content="The number of test units that failed.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -334,6 +369,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../reference/ContractAdapter.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ContractAdapter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
   </div>
 </li>
       </ul>
@@ -1596,8 +1637,14 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#examples" id="toc-examples" class="nav-link active" data-scroll-target="#examples">Examples</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -1622,13 +1669,48 @@ ul.task-list li input[type="checkbox"] {
 
 
 <div class="doc-subject">
-<p>Test units that fail: all non-matching rows (all rows, if the schema check fails).</p>
+<p>The number of test units that failed.</p>
 </div>
 <div class="doc-signature doc-attribute">
 <p><code><span class="doc-parameter-name">Comparison.n_failed</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span></code></p>
 </div>
+<div class="doc-text">
+<p>A test unit fails if its status is <code>"changed"</code>, <code>"missing"</code>, <code>"extra"</code>, or <code>"dup_key"</code>. If the schema check failed (see <a href="../reference/Comparison.schema_ok.html#pointblank.Comparison.schema_ok" class="gdls-link"><code>schema_ok</code></a>), every test unit fails, so <code>n_failed</code> equals <a href="../reference/Comparison.n.html#pointblank.Comparison.n" class="gdls-link"><code>n</code></a>. It’s always <code>n - n_passed</code>.</p>
+<p>A count of zero failures, along with a passing schema check, is what makes a comparison <a href="../reference/Comparison.identical.html#pointblank.Comparison.identical" class="gdls-link"><code>identical</code></a>. To see how the failures break down by status, use <a href="../reference/Comparison.status_counts.html#pointblank.Comparison.status_counts" class="gdls-link"><code>status_counts</code></a>.</p>
+</div>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>One station’s reading changed, one station was dropped, and one was added.</p>
+<div id="434ad40c" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>readings_v1 <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"station"</span>: [<span class="st">"S1"</span>, <span class="st">"S2"</span>, <span class="st">"S3"</span>, <span class="st">"S4"</span>], <span class="st">"temp"</span>: [<span class="fl">12.1</span>, <span class="fl">14.0</span>, <span class="fl">9.8</span>, <span class="fl">11.2</span>]}</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>readings_v2 <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"station"</span>: [<span class="st">"S1"</span>, <span class="st">"S2"</span>, <span class="st">"S3"</span>, <span class="st">"S5"</span>], <span class="st">"temp"</span>: [<span class="fl">12.1</span>, <span class="fl">14.3</span>, <span class="fl">9.8</span>, <span class="fl">8.0</span>]}</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(readings_v1, readings_v2, keys<span class="op">=</span><span class="st">"station"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>comparison.n_failed</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>3</code></pre>
+</div>
+</div>
+<p>A count is useful for a quick check, for instance to stop a script when too many rows differ:</p>
+<div id="a60d3236" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> comparison.n_failed <span class="op">&gt;</span> <span class="fl">0.25</span> <span class="op">*</span> comparison.n:</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>comparison<span class="sc">.</span>n_failed<span class="sc">}</span><span class="ss"> of </span><span class="sc">{</span>comparison<span class="sc">.</span>n<span class="sc">}</span><span class="ss"> rows differ"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>3 of 5 rows differ</code></pre>
+</div>
+</div>
+<p>To act on failures with thresholds and actions instead, compare the tables in a validation with <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link"><code>Validate.tbl_match()</code></a>.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

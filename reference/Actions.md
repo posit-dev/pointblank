@@ -125,7 +125,7 @@ validation = (
 validation
 ```
 
-    Data quality issue found (2026-10-28 11:01:41.643643).
+    Data quality issue found (2026-10-28 18:09:47.359351).
 
 [TABLE]
 
@@ -133,6 +133,8 @@ In this case, the 'warning' action is set to call the `dq_issue()` function. Thi
 
 ## See Also
 
-`The` [`get_action_metadata()`](../reference/get_action_metadata.md#pointblank.get_action_metadata) function, which can be used to  
+[get_action_metadata()](../reference/get_action_metadata.md#pointblank.get_action_metadata)  
+Get metadata about the step where an action is executed.
 
-`retrieve` metadata about the step where the action is executed.  
+[FinalActions](../reference/FinalActions.md#pointblank.FinalActions)  
+Define actions that run after all validation steps are done.

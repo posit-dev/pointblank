@@ -4,7 +4,7 @@ Raise an `AssertionError` if any dimension's health score falls below a minimum.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20072-L20153)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20059-L20139)
 
 ``` python
 Validate.assert_dimension_scores(
@@ -49,8 +49,8 @@ validation.assert_dimension_scores(thresholds={"completeness": 95})
 
 ## See Also
 
-`Use` [`get_dimension_scores()`](../reference/Validate.get_dimension_scores.md#pointblank.Validate.get_dimension_scores) to retrieve the  
+[get_dimension_scores()](../reference/Validate.get_dimension_scores.md#pointblank.Validate.get_dimension_scores)  
+Get the scores without raising.
 
-`scores` without raising, and `config()` to set default per-dimension  
-
-`thresholds` globally.  
+`config`  
+Set default per-dimension thresholds globally.

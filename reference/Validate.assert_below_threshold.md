@@ -4,7 +4,7 @@ Raise an `AssertionError` if validation steps exceed a specified threshold level
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18219-L18380)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18214-L18372)
 
 ``` python
 Validate.assert_below_threshold(
@@ -108,21 +108,14 @@ except AssertionError as e:
 
 ## See Also
 
-- [`warning()`](../reference/Validate.warning.md#pointblank.Validate.warning)
+[warning()](../reference/Validate.warning.md#pointblank.Validate.warning)  
+Get the 'warning' status for each validation step.
 
-: get the 'warning' status for each validation
+[error()](../reference/Validate.error.md#pointblank.Validate.error)  
+Get the 'error' status for each validation step.
 
-`step`  
+[critical()](../reference/Validate.critical.md#pointblank.Validate.critical)  
+Get the 'critical' status for each validation step.
 
-\- [`error()`](../reference/Validate.error.md#pointblank.Validate.error)  
-get the 'error' status for each validation step
-
-\- [`critical()`](../reference/Validate.critical.md#pointblank.Validate.critical)  
-get the 'critical' status for each
-
-`validation` step  
-
-\- [`assert_passing()`](../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing)  
-assert all validations pass
-
-`completely`  
+[assert_passing()](../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing)  
+Assert that all validations pass completely.

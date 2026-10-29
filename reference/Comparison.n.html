@@ -31,6 +31,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -334,6 +369,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../reference/ContractAdapter.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ContractAdapter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
   </div>
 </li>
       </ul>
@@ -1596,8 +1637,14 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#examples" id="toc-examples" class="nav-link active" data-scroll-target="#examples">Examples</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -1627,8 +1674,42 @@ ul.task-list li input[type="checkbox"] {
 <div class="doc-signature doc-attribute">
 <p><code><span class="doc-parameter-name">Comparison.n</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span></code></p>
 </div>
+<div class="doc-text">
+<p>A comparison aligns the rows of the two tables and gives each aligned row one status (see the <em>Test Units and Row Statuses</em> section of <a href="../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a>). <code>n</code> is the total, so it’s always the sum of the values in <a href="../reference/Comparison.status_counts.html#pointblank.Comparison.status_counts" class="gdls-link"><code>status_counts</code></a> and of <a href="../reference/Comparison.n_passed.html#pointblank.Comparison.n_passed" class="gdls-link"><code>n_passed</code></a> and <a href="../reference/Comparison.n_failed.html#pointblank.Comparison.n_failed" class="gdls-link"><code>n_failed</code></a>. It’s the denominator to use for any fraction of rows that pass or fail.</p>
+<p><code>n</code> isn’t the row count of either table. A row that’s in both tables counts once, rows in only one table count once each, and a duplicated key counts as many units as the larger of its two occurrence counts. The row counts of the two tables are available as <code>n_source_rows</code> and <code>n_target_rows</code>.</p>
+</div>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>These two tables of weather station readings have four rows each, but only three stations in common.</p>
+<div id="ac318043" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>readings_v1 <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"station"</span>: [<span class="st">"S1"</span>, <span class="st">"S2"</span>, <span class="st">"S3"</span>, <span class="st">"S4"</span>], <span class="st">"temp"</span>: [<span class="fl">12.1</span>, <span class="fl">14.0</span>, <span class="fl">9.8</span>, <span class="fl">11.2</span>]}</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>readings_v2 <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"station"</span>: [<span class="st">"S1"</span>, <span class="st">"S2"</span>, <span class="st">"S3"</span>, <span class="st">"S5"</span>], <span class="st">"temp"</span>: [<span class="fl">12.1</span>, <span class="fl">14.3</span>, <span class="fl">9.8</span>, <span class="fl">8.0</span>]}</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(readings_v1, readings_v2, keys<span class="op">=</span><span class="st">"station"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>comparison.n, comparison.n_source_rows, comparison.n_target_rows</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>(5, 4, 4)</code></pre>
+</div>
+</div>
+<p>There are five test units: the three shared stations, <code>S4</code> (only in the source), and <code>S5</code> (only in the target). Dividing by <code>n</code> gives the fraction of rows that failed:</p>
+<div id="4cadbadf" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison.n_failed <span class="op">/</span> comparison.n</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>0.6</code></pre>
+</div>
+</div>
+<p>Three of the five units failed: <code>S2</code> changed, <code>S4</code> is missing, and <code>S5</code> is extra.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

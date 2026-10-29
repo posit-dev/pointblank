@@ -4,7 +4,7 @@ Check if any validation steps exceed a specified threshold level.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18382-L18521)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18374-L18510)
 
 ``` python
 Validate.above_threshold(
@@ -100,21 +100,14 @@ Note that this is just a suggestion for how to implement conditional workflow pr
 
 ## See Also
 
-- [`assert_below_threshold()`](../reference/Validate.assert_below_threshold.md#pointblank.Validate.assert_below_threshold)
+[assert_below_threshold()](../reference/Validate.assert_below_threshold.md#pointblank.Validate.assert_below_threshold)  
+Raise an exception instead if thresholds are exceeded.
 
-: a similar
+[warning()](../reference/Validate.warning.md#pointblank.Validate.warning)  
+Get the 'warning' status for each validation step.
 
-`method` that raises an exception if thresholds are exceeded  
+[error()](../reference/Validate.error.md#pointblank.Validate.error)  
+Get the 'error' status for each validation step.
 
-\- [`warning()`](../reference/Validate.warning.md#pointblank.Validate.warning)  
-get the 'warning' status for each validation
-
-`step`  
-
-\- [`error()`](../reference/Validate.error.md#pointblank.Validate.error)  
-get the 'error' status for each validation step
-
-\- [`critical()`](../reference/Validate.critical.md#pointblank.Validate.critical)  
-get the 'critical' status for each
-
-`validation` step  
+[critical()](../reference/Validate.critical.md#pointblank.Validate.critical)  
+Get the 'critical' status for each validation step.

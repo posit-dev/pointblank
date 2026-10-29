@@ -4,7 +4,7 @@ Select columns that end with specified text.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L789-L948)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L788-L947)
 
 ``` python
 ends_with(

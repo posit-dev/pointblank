@@ -4,7 +4,7 @@ Helper function for referencing a column in the input table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L250-L546)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L250-L545)
 
 ``` python
 col(exprs)
@@ -245,6 +245,5 @@ In the above example the [col()](../reference/col.md#pointblank.col) function co
 
 ## See Also
 
-`Create` a column expression for use in `conjointly()` validation with the  
-
-[`expr_col()`](../reference/expr_col.md#pointblank.expr_col) function.  
+[expr_col()](../reference/expr_col.md#pointblank.expr_col)  
+Create a column expression for use in `conjointly()`.

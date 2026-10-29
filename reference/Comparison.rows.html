@@ -11,7 +11,7 @@
 <meta name="description" content="Get a sample of rows with a given status.">
 
 <title>Comparison.rows() | Pointblank</title>
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Comparison.rows - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Comparison.rows.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Comparison.rows - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Comparison.rows.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -114,6 +114,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../gd-lightbox.css">
 <script defer="" src="../gd-lightbox.js"></script>
@@ -369,6 +372,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/ContractAdapter.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ContractAdapter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
   </div>
 </li>
       </ul>
@@ -1638,6 +1647,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
     </div>
@@ -1668,7 +1679,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L862-L896" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L1567-L1684" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Comparison</span><span class="op">.</span><span class="fu">rows</span>(</span>
@@ -1677,7 +1688,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Only up to <code>limit=</code> rows are collected, so this is safe to use on very large tables.</p>
+<p>The counts in <a href="../reference/Comparison.status_counts.html#pointblank.Comparison.status_counts" class="gdls-link"><code>status_counts</code></a> say how many rows differ, and <a href="../reference/Comparison.rows.html#pointblank.Comparison.rows" class="gdls-link gdls-code">rows()</a> shows which ones. It’s the step that turns “12 rows changed” into something that can be investigated: the keys to look up, the values on each side, and the rows that were dropped or added.</p>
+<p>A comparison collects counts when it’s made, but it doesn’t collect rows until they’re asked for. <a href="../reference/Comparison.rows.html#pointblank.Comparison.rows" class="gdls-link gdls-code">rows()</a> then fetches up to <code>limit=</code> rows with the requested status from the tables’ own engine, so it’s safe to use with very large tables and with database tables. The result is cached, so asking for the same status and limit again returns the same table without querying the tables a second time.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1687,10 +1699,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dd>
 <p>The row status to retrieve:</p>
 <ul>
-<li><code>"changed"</code>: the keys, then a <code>&lt;column&gt;_source</code> and a <code>&lt;column&gt;_target</code> column for each compared column</li>
+<li><code>"changed"</code>: the keys, then a <code>&lt;column&gt;_source</code> and a <code>&lt;column&gt;_target</code> column for each compared column (including columns whose values are equal in that row)</li>
 <li><code>"missing"</code>: source rows not in the target (source column names)</li>
 <li><code>"extra"</code>: target rows not in the source (target column names)</li>
-<li><code>"dup_key"</code>: duplicated key values with their occurrence counts in each table (<code>n_source</code>, <code>n_target</code>)</li>
+<li><code>"dup_key"</code>: duplicated key values with their occurrence counts in each table (<code>n_source</code>, <code>n_target</code>), one row per key</li>
 <li><code>"match"</code>: the keys of matching rows</li>
 </ul>
 </dd>
@@ -1707,10 +1719,104 @@ The maximum number of rows to return.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-A table of the same type as the (collected) input tables. In positional mode, rows are identified by a 1-based <code>_row_num_</code> column.
+A table of the same type as the (collected) input tables. In positional mode, rows are identified by a 1-based <code>_row_num_</code> column, and a <code>"changed"</code> sample has the <code>_source</code> and <code>_target</code> columns for every column. In multiset mode (<code>keys="*"</code>), <code>"missing"</code> and <code>"extra"</code> return distinct rows, with the compared values as strings, plus <code>n_source</code> and <code>n_target</code> columns giving how often each row occurs in each table.
 </dd>
 </dl>
 </div>
+</section>
+<section id="raises" class="level2 doc-raises">
+<h2 class="doc-raises anchored" data-anchor-id="raises">Raises</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
+<dd>
+If <code>status=</code> isn’t one of the five row statuses.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s compare two versions of an employee table, where one salary changed, one employee left, and one joined.</p>
+<div id="50c58314" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>staff_jan <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"emp_id"</span>: [<span class="dv">101</span>, <span class="dv">102</span>, <span class="dv">103</span>, <span class="dv">104</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dept"</span>: [<span class="st">"Sales"</span>, <span class="st">"Sales"</span>, <span class="st">"Ops"</span>, <span class="st">"Ops"</span>],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"salary"</span>: [<span class="dv">52000</span>, <span class="dv">61000</span>, <span class="dv">58000</span>, <span class="dv">47000</span>],</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>staff_feb <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"emp_id"</span>: [<span class="dv">101</span>, <span class="dv">102</span>, <span class="dv">103</span>, <span class="dv">105</span>],</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dept"</span>: [<span class="st">"Sales"</span>, <span class="st">"Sales"</span>, <span class="st">"Ops"</span>, <span class="st">"Ops"</span>],</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"salary"</span>: [<span class="dv">52000</span>, <span class="dv">63500</span>, <span class="dv">58000</span>, <span class="dv">49000</span>],</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(staff_jan, staff_feb, keys<span class="op">=</span><span class="st">"emp_id"</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"changed"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 5)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>emp_id</th><th>dept_source</th><th>dept_target</th><th>salary_source</th><th>salary_target</th></tr><tr><td>i64</td><td>str</td><td>str</td><td>i64</td><td>i64</td></tr></thead><tbody><tr><td>102</td><td>"Sales"</td><td>"Sales"</td><td>61000</td><td>63500</td></tr></tbody></table></div>
+</div>
+</div>
+<p>Each changed row has both versions of every compared column side by side. Here, <code>dept</code> is the same on both sides and <code>salary</code> is the column that changed. The departed employee is a <code>"missing"</code> row, and it’s shown as it was in the source table:</p>
+<div id="42b5fc4c" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"missing"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 3)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>emp_id</th><th>dept</th><th>salary</th></tr><tr><td>i64</td><td>str</td><td>i64</td></tr></thead><tbody><tr><td>104</td><td>"Ops"</td><td>47000</td></tr></tbody></table></div>
+</div>
+</div>
+<p>The new employee is an <code>"extra"</code> row, shown as it is in the target table:</p>
+<div id="f2424dee" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"extra"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 3)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>emp_id</th><th>dept</th><th>salary</th></tr><tr><td>i64</td><td>str</td><td>i64</td></tr></thead><tbody><tr><td>105</td><td>"Ops"</td><td>49000</td></tr></tbody></table></div>
+</div>
+</div>
+<p>In multiset mode, rows have no identity apart from their values. So <code>"missing"</code> and <code>"extra"</code> rows are listed once each, with the number of times they occur in each table. Here, the target table has one fewer copy of a row than the source:</p>
+<div id="1de8cf32" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>scans_source <span class="op">=</span> pl.DataFrame({<span class="st">"badge"</span>: [<span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">9</span>], <span class="st">"door"</span>: [<span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"B"</span>]})</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>scans_target <span class="op">=</span> pl.DataFrame({<span class="st">"badge"</span>: [<span class="dv">7</span>, <span class="dv">9</span>], <span class="st">"door"</span>: [<span class="st">"A"</span>, <span class="st">"B"</span>]})</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>pb.compare(scans_source, scans_target, keys<span class="op">=</span><span class="st">"*"</span>).rows(<span class="st">"missing"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 4)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>badge</th><th>door</th><th>n_source</th><th>n_target</th></tr><tr><td>str</td><td>str</td><td>i64</td><td>i64</td></tr></thead><tbody><tr><td>"7"</td><td>"A"</td><td>2</td><td>1</td></tr></tbody></table></div>
+</div>
+</div>
+<p>The row with badge 7 at door A occurs twice in the source and once in the target, so one copy is missing. For a summary of all the samples in one place, see <a href="../reference/Comparison.get_tabular_report.html#pointblank.Comparison.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>, which shows up to 10 rows for each status by default.</p>
 
 
 </section>

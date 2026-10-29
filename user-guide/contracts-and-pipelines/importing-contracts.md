@@ -77,7 +77,7 @@ After calling `import_contract()`, you get back a [ContractImport](../../referen
 | Attribute / Method | Description |
 |----|----|
 | `.columns` | List of `(column_name, dtype)` tuples detected from the source |
-| `.constraints` | List of `MappedConstraint` objects (method + kwargs) |
+| `.constraints` | List of [MappedConstraint](../../reference/adapters.MappedConstraint.md#pointblank.adapters.MappedConstraint) objects (method + kwargs) |
 | `.warnings` | Messages about constraints that couldn't be translated |
 | `.coverage` | Fraction of source constraints successfully mapped (0.0-1.0) |
 | `.metadata` | Extra metadata (title, description) from the source |

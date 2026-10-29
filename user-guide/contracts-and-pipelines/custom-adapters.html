@@ -661,7 +661,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#the-adapter-architecture" id="toc-the-adapter-architecture" class="nav-link active" data-scroll-target="#the-adapter-architecture">The Adapter Architecture</a></li>
   <li><a href="#the-contractadapter-base-class" id="toc-the-contractadapter-base-class" class="nav-link" data-scroll-target="#the-contractadapter-base-class">The ContractAdapter Base Class</a></li>
   <li><a href="#building-an-import-adapter" id="toc-building-an-import-adapter" class="nav-link" data-scroll-target="#building-an-import-adapter">Building an Import Adapter</a></li>
-  <li><a href="#the-mappedconstraint-class" id="toc-the-mappedconstraint-class" class="nav-link" data-scroll-target="#the-mappedconstraint-class">The <code>MappedConstraint</code> Class</a></li>
+  <li><a href="#the-mappedconstraint-class" id="toc-the-mappedconstraint-class" class="nav-link" data-scroll-target="#the-mappedconstraint-class">The MappedConstraint Class</a></li>
   <li><a href="#handling-unmappable-constraints" id="toc-handling-unmappable-constraints" class="nav-link" data-scroll-target="#handling-unmappable-constraints">Handling Unmappable Constraints</a></li>
   <li><a href="#auto-detection-tips" id="toc-auto-detection-tips" class="nav-link" data-scroll-target="#auto-detection-tips">Auto-Detection Tips</a></li>
   <li><a href="#best-practices" id="toc-best-practices" class="nav-link" data-scroll-target="#best-practices">Best Practices</a></li>
@@ -1547,8 +1547,8 @@ tr { background-color: transparent; }
 <p>The validation report shows each imported constraint as a separate step, just as if you had written the validation by hand. From the user’s perspective, there is no difference between validation steps that came from a custom adapter and those written directly in Python.</p>
 </section>
 <section id="the-mappedconstraint-class" class="level1">
-<h1>The <code>MappedConstraint</code> Class</h1>
-<p>Each constraint from the external format gets mapped to a <code>MappedConstraint</code>, which is a simple data container holding:</p>
+<h1>The <a href="../../reference/adapters.MappedConstraint.html#pointblank.adapters.MappedConstraint" class="gdls-link gdls-code">MappedConstraint</a> Class</h1>
+<p>Each constraint from the external format gets mapped to a <a href="../../reference/adapters.MappedConstraint.html#pointblank.adapters.MappedConstraint" class="gdls-link gdls-code">MappedConstraint</a>, which is a simple data container holding:</p>
 <ul>
 <li><code>method</code>: the Pointblank <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> method name (e.g., <code>"col_vals_gt"</code>)</li>
 <li><code>kwargs</code>: the keyword arguments to pass to that method</li>

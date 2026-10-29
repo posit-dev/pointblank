@@ -4,7 +4,7 @@ Read a Validate object from disk that was previously saved with [write_file()](.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L740-L889)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L738-L886)
 
 ``` python
 read_file(filepath)
@@ -60,6 +60,5 @@ if validation.data is not None:
 
 ## See Also
 
-`Use` the `write_file()` method to save a validation object  
-
-`to` disk for later retrieval with this function.  
+[write_file()](../reference/write_file.md#pointblank.write_file)  
+Save a validation object to disk for later retrieval with [read_file()](../reference/read_file.md#pointblank.read_file).

@@ -4,7 +4,7 @@ Get a data quality scorecard as a GT table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20155-L20337)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20141-L20322)
 
 ``` python
 Validate.get_scorecard(title=":default:")
@@ -42,10 +42,11 @@ validation.get_scorecard()
 
 ## See Also
 
-`Use` [`get_dimension_scores()`](../reference/Validate.get_dimension_scores.md#pointblank.Validate.get_dimension_scores) and  
+[get_dimension_scores()](../reference/Validate.get_dimension_scores.md#pointblank.Validate.get_dimension_scores)  
+Get the per-dimension scores behind the scorecard.
 
-[`get_health_score()`](../reference/Validate.get_health_score.md#pointblank.Validate.get_health_score) for the underlying numbers,  
+[get_health_score()](../reference/Validate.get_health_score.md#pointblank.Validate.get_health_score)  
+Get the overall score behind the scorecard.
 
-`and` [`get_tabular_report()`](../reference/Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report) for the full per-step  
-
-`validation` report.  
+[get_tabular_report()](../reference/Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report)  
+Get the full per-step validation report.

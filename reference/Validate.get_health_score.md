@@ -4,7 +4,7 @@ Get the overall data quality health score from the validation results.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20027-L20070)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20015-L20057)
 
 ``` python
 Validate.get_health_score()
@@ -36,6 +36,5 @@ validation.get_health_score()
 
 ## See Also
 
-`Use` [`get_dimension_scores()`](../reference/Validate.get_dimension_scores.md#pointblank.Validate.get_dimension_scores) for a per-dimension  
-
-`breakdown` of the score.  
+[get_dimension_scores()](../reference/Validate.get_dimension_scores.md#pointblank.Validate.get_dimension_scores)  
+Get a per-dimension breakdown of the score.

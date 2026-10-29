@@ -374,6 +374,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">ContractAdapter</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1686,7 +1692,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L360-L1346" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L373-L1368" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Contract</span>(</span>
@@ -1803,7 +1809,7 @@ A <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s write a contract for a daily orders extract. The schema fixes the four columns and their types, and the steps say that IDs must be present, each order must appear once, amounts must be positive, and the status must be one of three known values. Ownership and versioning go in the metadata, and the thresholds flag any failing test unit as a warning and a failure rate of 10% or more as an error.</p>
-<div id="075bf96f" class="cell" data-execution_count="2">
+<div id="82fd8349" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1835,7 +1841,7 @@ A <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls
 </div>
 <p>The contract itself is just a definition. Printing it shows a short summary: the name, direction, version, whether a schema is set, and the number of steps.</p>
 <p>Now let’s apply the contract to a day’s extract that meets every expectation. The <a href="../reference/Contract.html#pointblank.Contract.validate" class="gdls-link"><code>validate()</code></a> method compiles the contract against the table and interrogates it, returning a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object that displays as a validation report.</p>
-<div id="72e10c81" class="cell" data-execution_count="3">
+<div id="35c5ee1b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>orders_day_1 <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="st">"A1"</span>, <span class="st">"A2"</span>, <span class="st">"A3"</span>, <span class="st">"A4"</span>],</span>
@@ -2374,7 +2380,7 @@ tr { background-color: transparent; }
 </div>
 <p>The report header shows the label built from the contract (<code>Contract: orders v1.2.0</code>) along with the owner, consumers, and version. The first step is the schema check, followed by one step per contract rule. The <code>col_vals_not_null</code> step names two columns, so it becomes two validation steps. All six steps pass.</p>
 <p>The next day’s extract has problems: a missing customer ID, a repeated order ID, a negative amount, and a status the contract doesn’t allow. The same contract catches all of them.</p>
-<div id="d7559988" class="cell" data-execution_count="4">
+<div id="b9320b19" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>orders_day_2 <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="st">"A5"</span>, <span class="st">"A6"</span>, <span class="st">"A6"</span>, <span class="st">"A8"</span>],</span>
@@ -2914,14 +2920,14 @@ tr { background-color: transparent; }
 </div>
 </div>
 <p>The schema still matches, but four of the rule steps have failing test units. With only four rows, one failure is already 25% of the table, so those steps exceed both the warning and the error thresholds. The <code>rows_distinct</code> step counts two failures because both rows with order <code>"A6"</code> are duplicates. Since the result is an ordinary <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, you can check it in code, for example to stop a scheduled job:</p>
-<div id="ee5f3d65" class="cell" data-execution_count="5">
+<div id="89a88acb" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation.all_passed()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>False</code></pre>
 </div>
 </div>
 <p>To share the contract with another team or keep it under version control, write it out as YAML. Called without a path, <a href="../reference/Contract.html#pointblank.Contract.to_yaml" class="gdls-link"><code>to_yaml()</code></a> returns the YAML text.</p>
-<div id="5541766d" class="cell" data-execution_count="6">
+<div id="ed3dc61e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(orders_contract.to_yaml())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>contract:
@@ -2962,7 +2968,7 @@ tr { background-color: transparent; }
 </div>
 <p>The YAML lists the metadata, schema, steps, and thresholds in a form that’s easy to read and review. <a href="../reference/Contract.html#pointblank.Contract.from_yaml" class="gdls-link"><code>from_yaml()</code></a> reads it back into an equivalent <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a>.</p>
 <p>Finally, a contract can be the starting point for a stricter, local validation. Here, <a href="../reference/Contract.html#pointblank.Contract.to_validate" class="gdls-link"><code>to_validate()</code></a> compiles the contract without interrogating, and we add one more check (orders of 100 or less) before calling <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a>.</p>
-<div id="46c2912c" class="cell" data-execution_count="7">
+<div id="cb2be6f7" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    orders_contract.to_validate(orders_day_1)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_le(columns<span class="op">=</span><span class="st">"amount"</span>, value<span class="op">=</span><span class="dv">100</span>)</span>
@@ -3552,13 +3558,13 @@ tr { background-color: transparent; }
 <dd>
 <p>Enforce source and target contracts around a transformation.</p>
 </dd>
-<dt><code>export_contract</code></dt>
+<dt><a href="../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a></dt>
 <dd>
 <p>Convert a contract to JSON Schema, Frictionless, dbt, or ODCS.</p>
 </dd>
-<dt><code>import_contract</code></dt>
+<dt><a href="../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a></dt>
 <dd>
-<p>Read an external contract format, then call <a href="../reference/ContractImport.html#pointblank.ContractImport.to_contract" class="gdls-link gdls-code">to_contract()</a> on the result.</p>
+<p>Read an external format, then call <a href="../reference/ContractImport.html#pointblank.ContractImport.to_contract" class="gdls-link gdls-code">to_contract()</a> on it.</p>
 </dd>
 </dl>
 </section>
@@ -3605,7 +3611,7 @@ tr { background-color: transparent; }
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L811-L903" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L824-L916" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb11"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validate</span>(<span class="va">data</span>)</span></code></pre></div>
@@ -3650,7 +3656,7 @@ If a step’s arguments don’t fit its validation method (for example, a misspe
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
 <p>Here’s a contract for a sensor readings feed. Each reading needs a sensor ID, the temperature must be within a plausible range, and the feed must have five rows. Any failing test unit counts as an error.</p>
-<div id="1eb3640d" class="cell" data-execution_count="9">
+<div id="bbef62af" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -3923,7 +3929,7 @@ If a step’s arguments don’t fit its validation method (for example, a misspe
 </div>
 </div>
 <p>The row count is right, but the report shows two problems: one reading has no sensor ID, and one temperature (85.0) is out of range. Both steps reach the error threshold. Because <a href="../reference/Contract.html#pointblank.Contract.validate" class="gdls-link gdls-code">validate()</a> doesn’t raise, a script or scheduled job decides what happens next. For example, it could test whether any step reached the error level:</p>
-<div id="c2a1e1cc" class="cell" data-execution_count="10">
+<div id="ecca9a9f" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>validation.above_threshold(level<span class="op">=</span><span class="st">"error"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <pre><code>True</code></pre>
@@ -3939,7 +3945,7 @@ If a step’s arguments don’t fit its validation method (for example, a misspe
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L692-L809" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L705-L822" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb15"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_validate</span>(<span class="va">data</span>)</span></code></pre></div>
@@ -3984,7 +3990,7 @@ If a step’s arguments don’t fit its validation method (for example, a misspe
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
 <p>Let’s define a small contract for a table of products: a two-column schema, plus rules that product IDs are present and prices are positive.</p>
-<div id="2727d11e" class="cell" data-execution_count="12">
+<div id="089c9e9f" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -4006,7 +4012,7 @@ If a step’s arguments don’t fit its validation method (for example, a misspe
 <span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Our team also wants product IDs to start with <code>"P-"</code>. That rule isn’t part of the shared contract, so we compile the contract with <code>to_validate()</code>, add a <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link"><code>col_vals_regex()</code></a> step, and then interrogate.</p>
-<div id="86a5c36f" class="cell" data-execution_count="13">
+<div id="fe00d084" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    products_contract.to_validate(products)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"product_id"</span>, pattern<span class="op">=</span><span class="vs">r"</span><span class="dv">^</span><span class="vs">P-"</span>)</span>
@@ -4443,7 +4449,7 @@ tr { background-color: transparent; }
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1248-L1336" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1264-L1358" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb18"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_yaml</span>(<span class="va">path</span><span class="op">=</span><span class="cn">None</span>)</span></code></pre></div>
@@ -4488,7 +4494,7 @@ If a step argument can’t be represented in YAML (for example, a column selecto
 <section id="examples-3" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
 <p>Let’s define a contract for a table of web sessions and get its YAML representation.</p>
-<div id="001975e4" class="cell" data-execution_count="14">
+<div id="2ca5eaeb" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>sessions_contract <span class="op">=</span> pb.Contract(</span>
@@ -4533,7 +4539,7 @@ If a step argument can’t be represented in YAML (for example, a column selecto
 </div>
 <p>The output lists the metadata first, including <code>on_violation</code> because it isn’t the default, then the schema and the steps. Each step is written as its method name with the arguments nested below it.</p>
 <p>To save the contract, pass a file path. The parent directory is created if needed, and the YAML text is still returned. Reading the file back gives a contract equal to the original:</p>
-<div id="2ee61e4a" class="cell" data-execution_count="15">
+<div id="b822fd45" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -4546,6 +4552,7 @@ If a step argument can’t be represented in YAML (for example, a column selecto
 <pre><code>True</code></pre>
 </div>
 </div>
+<p>The file holds everything needed to rebuild the contract. A natural place for it is version control, next to the code that produces the data, so that changes to the rules are reviewed like any other change. Wherever the contract is enforced, it can be loaded with <a href="../reference/Contract.html#pointblank.Contract.from_yaml" class="gdls-link"><code>from_yaml()</code></a> (or as part of a pipeline with <a href="../reference/Pipeline.html#pointblank.Pipeline.from_yaml" class="gdls-link"><code>Pipeline.from_yaml()</code></a>).</p>
 </section>
 </section>
 <section id="from_yaml" class="level3">
@@ -4555,7 +4562,7 @@ If a step argument can’t be represented in YAML (for example, a column selecto
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1121-L1246" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1137-L1262" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb23"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_yaml</span>(<span class="va">path</span>)</span></code></pre></div>
@@ -4619,7 +4626,7 @@ If the file is empty, if it has no contract <code>name</code>, or if a field has
 <section id="examples-4" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
 <p>Let’s write the contract file shown above to a temporary directory, then load it.</p>
-<div id="8fee3847" class="cell" data-execution_count="17">
+<div id="629d0579" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -4654,7 +4661,7 @@ If the file is empty, if it has no contract <code>name</code>, or if a field has
 </div>
 </div>
 <p>The loaded contract works like one defined in Python. Here it is applied to a small payments table:</p>
-<div id="8ac7381e" class="cell" data-execution_count="18">
+<div id="4ed7889b" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>payments <span class="op">=</span> pl.DataFrame({<span class="st">"payment_id"</span>: [<span class="st">"T1"</span>, <span class="st">"T2"</span>, <span class="st">"T3"</span>], <span class="st">"amount"</span>: [<span class="fl">50.0</span>, <span class="fl">0.0</span>, <span class="fl">12.5</span>]})</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>payments_contract.validate(payments)</span></code></pre></div>
@@ -5045,7 +5052,7 @@ tr { background-color: transparent; }
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L905-L989" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L918-L1005" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb28"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_dict</span>()</span></code></pre></div>
@@ -5068,7 +5075,7 @@ A dictionary representation of the contract.
 <section id="examples-5" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-5">Examples</h4>
 <p>Let’s create a contract for a target table and convert it to a dictionary.</p>
-<div id="934dcede" class="cell" data-execution_count="19">
+<div id="af0051ed" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>accounts_contract <span class="op">=</span> pb.Contract(</span>
@@ -5096,7 +5103,7 @@ A dictionary representation of the contract.
 </div>
 <p><code>direction</code> is included because <code>"target"</code> isn’t the default, while <code>on_violation</code>, <code>owner</code>, and the other unset fields are left out. Only the warning level of the thresholds is set, so it’s the only one listed.</p>
 <p>A dictionary like this converts directly to JSON with the standard library:</p>
-<div id="798c4310" class="cell" data-execution_count="20">
+<div id="90136d4a" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json.dumps(accounts_contract.to_dict(), indent<span class="op">=</span><span class="dv">2</span>))</span></code></pre></div>
@@ -5128,6 +5135,7 @@ A dictionary representation of the contract.
 }</code></pre>
 </div>
 </div>
+<p>The JSON text can be stored in a database column or sent to an API. After it’s parsed with <code>json.loads()</code>, <a href="../reference/Contract.html#pointblank.Contract.from_dict" class="gdls-link"><code>from_dict()</code></a> rebuilds the contract.</p>
 </section>
 </section>
 <section id="from_dict" class="level3">
@@ -5137,7 +5145,7 @@ A dictionary representation of the contract.
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L991-L1119" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1007-L1135" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb33"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_dict</span>(<span class="va">data</span>)</span></code></pre></div>
@@ -5186,7 +5194,7 @@ If <code>"steps"</code> isn’t a list, or if a step’s arguments aren’t a di
 <section id="examples-6" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-6">Examples</h4>
 <p>Suppose a contract definition arrives as JSON from a configuration service. After parsing, it’s a dictionary that <code>from_dict()</code> can turn into a <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a>.</p>
-<div id="48ed0e08" class="cell" data-execution_count="22">
+<div id="21f7fd90" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -5212,7 +5220,7 @@ If <code>"steps"</code> isn’t a list, or if a step’s arguments aren’t a di
 </div>
 </div>
 <p>The result is a regular <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a>, ready to use on data:</p>
-<div id="fb931e24" class="cell" data-execution_count="23">
+<div id="97cab239" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>shipments <span class="op">=</span> pl.DataFrame(</span>

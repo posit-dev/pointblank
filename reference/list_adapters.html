@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="List all registered adapters with their capabilities.">
+<meta name="description" content="List the formats available for contract import and export.">
 
 <title>list_adapters() | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "list_adapters - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/list_adapters.html"}]</script>
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="list_adapters() | Pointblank">
-<meta property="og:description" content="List all registered adapters with their capabilities.">
+<meta property="og:description" content="List the formats available for contract import and export.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="list_adapters() | Pointblank">
-<meta name="twitter:description" content="List all registered adapters with their capabilities.">
+<meta name="twitter:description" content="List the formats available for contract import and export.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -369,6 +369,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/ContractAdapter.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ContractAdapter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/adapters.MappedConstraint.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">adapters.MappedConstraint</span></a>
   </div>
 </li>
       </ul>
@@ -1637,6 +1643,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#returns" id="toc-returns" class="nav-link active" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1663,31 +1671,83 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>List all registered adapters with their capabilities.</p>
+<p>List the formats available for contract import and export.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_registry.py#L81-L102" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_registry.py#L182-L256" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list_adapters</span>()</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>Every format that <a href="../reference/import_contract.html#pointblank.import_contract" class="gdls-link"><code>import_contract()</code></a> and <a href="../reference/export_contract.html#pointblank.export_contract" class="gdls-link"><code>export_contract()</code></a> can work with is provided by a registered adapter. <a href="../reference/list_adapters.html#pointblank.list_adapters" class="gdls-link gdls-code">list_adapters()</a> reports what’s registered in the current session: the four built-in formats plus any custom adapters added with <a href="../reference/register_adapter.html#pointblank.register_adapter" class="gdls-link"><code>register_adapter()</code></a>. It’s useful for finding the right value for <code>format=</code>, for checking whether a format supports import, export, or both before calling either function, and for seeing which file extensions are used to detect a format.</p>
 </div>
 <section id="returns" class="level2 doc-returns">
 <h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
 <div class="doc-definition-items">
 <dl>
-<dt><code> <span class="doc-parameter-annotation">dict</span></code></dt>
+<dt><code> <span class="doc-parameter-annotation">dict[str, dict]</span></code></dt>
 <dd>
-<p>A dictionary mapping format names to adapter info dicts with keys:</p>
+<p>A dictionary, sorted by format name, that maps each format name to a dictionary with these keys:</p>
 <ul>
-<li>“class”: the adapter class name</li>
-<li>“file_extensions”: associated file extensions</li>
-<li>“supports_import”: whether import is supported</li>
-<li>“supports_export”: whether export is supported</li>
+<li><code>"class"</code>: the name of the adapter class</li>
+<li><code>"file_extensions"</code>: the list of file extensions used to detect the format</li>
+<li><code>"supports_import"</code>: whether the format can be imported with <code>import_contract()</code></li>
+<li><code>"supports_export"</code>: whether the format can be exported with <code>export_contract()</code></li>
 </ul>
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>With no custom adapters registered, the result lists the four built-in formats.</p>
+<div id="12c69bbe" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>adapters <span class="op">=</span> pb.list_adapters()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">list</span>(adapters)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>['dbt', 'frictionless', 'json_schema', 'odcs']</code></pre>
+</div>
+</div>
+<p>Each entry describes one adapter. Here’s the entry for the dbt adapter, which claims the <code>.yml</code> and <code>.yaml</code> file extensions and supports both directions.</p>
+<div id="2622e776" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>adapters[<span class="st">"dbt"</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>{'class': 'DbtAdapter',
+ 'file_extensions': ['.yml', '.yaml'],
+ 'supports_import': True,
+ 'supports_export': True}</code></pre>
+</div>
+</div>
+<p>Since the result is an ordinary dictionary, it’s easy to filter. This finds the formats that a contract can be exported to.</p>
+<div id="680d71c0" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>[name <span class="cf">for</span> name, info <span class="kw">in</span> adapters.items() <span class="cf">if</span> info[<span class="st">"supports_export"</span>]]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>['dbt', 'frictionless', 'json_schema', 'odcs']</code></pre>
+</div>
+</div>
+<p>All four built-in formats support export, so the list is the same as before. An adapter added with <a href="../reference/register_adapter.html#pointblank.register_adapter" class="gdls-link"><code>register_adapter()</code></a> may be import-only, though, so a check like this is useful before calling <a href="../reference/export_contract.html#pointblank.export_contract" class="gdls-link"><code>export_contract()</code></a> with a format chosen at run time.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/register_adapter.html#pointblank.register_adapter" class="gdls-link gdls-code">register_adapter()</a></dt>
+<dd>
+<p>Add a custom format to this list.</p>
+</dd>
+<dt><a href="../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a></dt>
+<dd>
+<p>Import a definition in one of the listed formats.</p>
+</dd>
+<dt><a href="../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a></dt>
+<dd>
+<p>Export a contract to one of the listed formats.</p>
+</dd>
+</dl>
 
 
 </section>
