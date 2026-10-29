@@ -95,6 +95,10 @@ def has_columns(*columns: str | list[str]) -> Callable[[Any], bool]:
 
     validation
     ```
+
+    Passing a list is the same as passing the column names as separate arguments, so this step is
+    active and passes. Lists are handy when the required column names are already stored in a
+    variable.
     """
 
     # Flatten: accept a mix of individual strings and lists of strings
