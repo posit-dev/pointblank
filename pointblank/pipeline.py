@@ -122,6 +122,11 @@ class PipelineResult:
     result.target_validation
     ```
 
+    All three converted readings pass the target's single step, which is why `passed` is `True`.
+    When a run fails, these reports show which steps failed and on which rows, and
+    [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`) pulls out the failing rows
+    themselves.
+
     See Also
     --------
     Pipeline : Define the boundaries and run the transformation.
@@ -511,6 +516,9 @@ class Pipeline:
     result.source_validation
     ```
 
+    The batch was caught at the source boundary, so nothing reached the target table. Once the
+    upstream data is fixed, the same pipeline can be run again on it without any changes.
+
     See Also
     --------
     PipelineResult : The result of `run()`, holding both boundary validations.
@@ -625,6 +633,10 @@ class Pipeline:
         except RuntimeError as e:
             print(f"Rejected: {e}")
         ```
+
+        The message names the contract and its direction. If the contract used
+        `on_violation="warn"` or `"log"` instead, the call would return the failing validation
+        rather than raising, leaving it to the caller to decide what to do.
         """
         if self.source is None:
             raise ValueError("No source contract defined for this pipeline.")
@@ -726,6 +738,10 @@ class Pipeline:
         ```{python}
         validation.all_passed()
         ```
+
+        Here the job would hold the summary back until the duplicate day is resolved. To make a
+        failure stop the job instead, set `on_violation="raise"` on the contract, which turns a
+        failing validation into a `RuntimeError`.
         """
         if self.target is None:
             raise ValueError("No target contract defined for this pipeline.")
@@ -1312,6 +1328,10 @@ class Pipeline:
 
         result.passed
         ```
+
+        Both boundaries pass, since the heavier shipment (410 lb, or about 186 kg) is well within
+        the target's range of 0 to 1000 kg. The transformation stays in Python while the contracts
+        live in the file, so the rules can be changed without touching the job's code.
         """
         from pathlib import Path
 
