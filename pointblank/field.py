@@ -313,8 +313,8 @@ def int_field(
     generating synthetic data with `generate_dataset()`. You can control the range of values
     with `min_val=` and `max_val=`, restrict values to a specific set with `allowed=`, enforce
     uniqueness with `unique=True`, and introduce null values with `nullable=True` and
-    `null_probability=`. The `dtype=` parameter lets you choose the specific integer type (e.g.,
-    `"Int8"`, `"UInt16"`, `"Int64"`), which also determines the valid range of values.
+    `null_probability=`. The `dtype=` parameter sets the integer type in the schema (e.g.,
+    `"Int8"`, `"UInt16"`, `"Int64"`), which also limits the range of values.
 
     When no constraints are specified, values are drawn uniformly from the full range of the
     chosen integer dtype. If both `min_val=` and `max_val=` are provided, values are drawn
@@ -339,12 +339,16 @@ def int_field(
         Whether all values must be unique. Default is `False`. When `True`, the generator will
         retry until it produces `n` distinct values (subject to retry limits).
     generator
-        Custom callable that generates values. When provided, this overrides all other
-        constraints (`min_val=`, `max_val=`, `allowed=`, etc.). The callable should take no
-        arguments and return a single integer value.
+        Custom callable that generates values. When provided, it's used instead of `min_val=`,
+        `max_val=` and `allowed=`, while `unique=` and `nullable=` still apply. The callable should
+        take no arguments and return a single integer value. It isn't controlled by the `seed=` of
+        `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+        data.
     dtype
         Integer dtype. Default is `"Int64"`. Options: `"Int8"`, `"Int16"`, `"Int32"`,
-        `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`.
+        `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`. The dtype limits the range of
+        values (e.g., `0` to `255` for `"UInt8"`), but the column that `generate_dataset()` creates
+        is currently always `Int64`.
 
     Returns
     -------
@@ -376,7 +380,7 @@ def int_field(
     ```
 
     It's possible to introduce missing values with `nullable=True` and `null_probability=`,
-    and to select a smaller dtype with `dtype=`:
+    and to limit the range of values with a smaller `dtype=`:
 
     ```{python}
     schema = pb.Schema(
@@ -415,6 +419,10 @@ def int_field(
 
     pb.preview(pb.generate_dataset(schema, n=20, seed=5))
     ```
+
+    The generator is called once for each row, so every value is an even number below 100. The
+    `seed=` of `generate_dataset()` doesn't reach the generator, which is why it uses its own
+    `random.Random(0)`: that makes the data the same on every run.
     """
     return IntField(
         min_val=min_val,
@@ -545,8 +553,8 @@ def float_field(
     when generating synthetic data with `generate_dataset()`. You can control the range of values
     with `min_val=` and `max_val=`, restrict values to a specific set with `allowed=`, enforce
     uniqueness with `unique=True`, and introduce null values with `nullable=True` and
-    `null_probability=`. The `dtype=` parameter lets you choose between `"Float32"` and
-    `"Float64"` precision.
+    `null_probability=`. The `dtype=` parameter sets the float type in the schema (`"Float32"` or
+    `"Float64"`).
 
     When both `min_val=` and `max_val=` are provided, values are drawn from a uniform
     distribution across that range. If neither is specified, values are drawn uniformly from a
@@ -573,10 +581,14 @@ def float_field(
         Whether all values must be unique. Default is `False`. When `True`, the generator will
         retry until it produces `n` distinct values.
     generator
-        Custom callable that generates values. When provided, this overrides all other
-        constraints. The callable should take no arguments and return a single float value.
+        Custom callable that generates values. When provided, it's used instead of `min_val=`,
+        `max_val=`, `allowed=` and `precision=`, while `unique=` and `nullable=` still apply. The
+        callable should take no arguments and return a single float value. It isn't controlled by
+        the `seed=` of `generate_dataset()`, so it needs its own seeded random number generator
+        for reproducible data.
     dtype
-        Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`.
+        Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`. The column that
+        `generate_dataset()` creates is currently always `Float64`.
 
     Returns
     -------
@@ -645,8 +657,8 @@ def float_field(
     pb.preview(pb.generate_dataset(schema, n=20, seed=23))
     ```
 
-    Setting `dtype="Float32"` gives reduced precision, and a custom `generator=` provides
-    full control over value generation:
+    A custom `generator=` provides full control over value generation, such as values from a
+    distribution other than the uniform one:
 
     ```{python}
     import random, math
@@ -654,12 +666,17 @@ def float_field(
     rng = random.Random(0)
 
     schema = pb.Schema(
-        sensor_value=pb.float_field(min_val=-10.0, max_val=10.0, dtype="Float32"),
+        sensor_value=pb.float_field(min_val=-10.0, max_val=10.0),
         log_value=pb.float_field(generator=lambda: math.log(rng.uniform(1, 1000))),
     )
 
     pb.preview(pb.generate_dataset(schema, n=20, seed=23))
     ```
+
+    The `log_value` column holds the logarithm of a uniform value between 1 and 1000, so its
+    values lie between 0 and about 6.9 and are bunched toward the top of that range. The
+    generator has its own seeded `random.Random(0)`, since the `seed=` of `generate_dataset()`
+    doesn't reach it.
     """
     return FloatField(
         min_val=min_val,
@@ -859,8 +876,11 @@ def string_field(
         Whether all values must be unique. Default is `False`. When `True`, the generator will
         retry until it produces `n` distinct values.
     generator
-        Custom callable that generates values. When provided, this overrides all other
-        constraints. The callable should take no arguments and return a single string value.
+        Custom callable that generates values. When provided, it's used instead of the other
+        constraints, while `unique=` and `nullable=` still apply. The callable should take no
+        arguments and return a single string value. It isn't controlled by the `seed=` of
+        `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+        data.
 
     Returns
     -------
@@ -985,6 +1005,10 @@ def string_field(
 
     pb.preview(pb.generate_dataset(schema, n=20, seed=55))
     ```
+
+    Unlike the person and address presets, `"domain_name"` isn't coherent with `"company"`, so
+    each domain is unrelated to the company in its row. The `industry_tag` values come from the
+    `allowed=` list, also independently of the company.
     """
     return StringField(
         min_length=min_length,
@@ -1100,8 +1124,11 @@ def bool_field(
         only have 2 unique non-null values, so `n` must be `<= 2` when `unique=True` (or
         `<= 3` with `nullable=True`).
     generator
-        Custom callable that generates values. When provided, this overrides all other
-        constraints. The callable should take no arguments and return a single boolean value.
+        Custom callable that generates values. When provided, it's used instead of the other
+        constraints, while `unique=` and `nullable=` still apply. The callable should take no
+        arguments and return a single boolean value. It isn't controlled by the `seed=` of
+        `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+        data.
 
     Returns
     -------
@@ -1150,7 +1177,7 @@ def bool_field(
 
     ```{python}
     schema = pb.Schema(
-        user_id=pb.int_field(min_val=1, unique=True),
+        user_id=pb.int_field(min_val=1, max_val=9999, unique=True),
         name=pb.string_field(preset="name"),
         email_verified=pb.bool_field(p_true=0.9),
         is_admin=pb.bool_field(p_true=0.05),
@@ -1158,6 +1185,10 @@ def bool_field(
 
     pb.preview(pb.generate_dataset(schema, n=30, seed=10))
     ```
+
+    Here, `email_verified` is `True` in 26 of the 30 rows and `is_admin` in 3 of them. These
+    counts are close to, but not exactly, the `p_true=` values of `0.9` and `0.05`, since each
+    value is drawn independently.
     """
     return BoolField(
         p_true=p_true,
@@ -1301,9 +1332,11 @@ def date_field(
         retry until it produces `n` distinct dates. Ensure the date range is large enough to
         accommodate the requested number of unique dates.
     generator
-        Custom callable that generates values. When provided, this overrides all other
-        constraints. The callable should take no arguments and return a single `datetime.date`
-        value.
+        Custom callable that generates values. When provided, it's used instead of the other
+        constraints, while `unique=` and `nullable=` still apply. The callable should take no
+        arguments and return a single `datetime.date` value. It isn't controlled by the `seed=` of
+        `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+        data.
 
     Returns
     -------
@@ -1366,6 +1399,11 @@ def date_field(
 
     pb.preview(pb.generate_dataset(schema, n=30, seed=7))
     ```
+
+    All 30 `order_date` values are distinct, which is possible because the first quarter of 2024
+    has 91 days to choose from. About half of the `cancel_date` values are missing (20 of 30 here).
+    Each column is generated independently, so a few cancellation dates fall before the order
+    date in the same row.
     """
     return DateField(
         min_date=min_date,
@@ -1513,9 +1551,11 @@ def datetime_field(
         Whether all values must be unique. Default is `False`. With second-level resolution
         over a wide range, collisions are unlikely for moderate dataset sizes.
     generator
-        Custom callable that generates values. When provided, this overrides all other
-        constraints. The callable should take no arguments and return a single
-        `datetime.datetime` value.
+        Custom callable that generates values. When provided, it's used instead of the other
+        constraints, while `unique=` and `nullable=` still apply. The callable should take no
+        arguments and return a single `datetime.datetime` value. It isn't controlled by the `seed=`
+        of `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+        data.
 
     Returns
     -------
@@ -1582,6 +1622,10 @@ def datetime_field(
 
     pb.preview(pb.generate_dataset(schema, n=30, seed=7))
     ```
+
+    About 30% of the `shipped_at` values are missing (13 of 30 here). Since each column is
+    generated independently, some `shipped_at` values come before `placed_at` in the same row, so
+    these columns aren't suited for checks of date ordering without some extra processing.
     """
     return DatetimeField(
         min_date=min_date,
@@ -1705,6 +1749,8 @@ def time_field(
     Time values are generated uniformly (at second-level resolution) within the specified range.
     If no range is provided, the default range is 00:00:00 to 23:59:59. Both `min_time=` and
     `max_time=` accept `datetime.time` objects or ISO format time strings (e.g., `"09:30:00"`).
+    The column that `generate_dataset()` creates currently holds the times as `"HH:MM:SS"` strings
+    rather than as a time dtype.
 
     Parameters
     ----------
@@ -1723,8 +1769,11 @@ def time_field(
         Whether all values must be unique. Default is `False`. With second-level resolution
         within a time range, uniqueness is feasible for moderate dataset sizes.
     generator
-        Custom callable that generates values. When provided, this overrides all other
-        constraints. The callable should take no arguments and return a single value.
+        Custom callable that generates values. When provided, it's used instead of the other
+        constraints, while `unique=` and `nullable=` still apply. The callable should take no
+        arguments and return a single value. It isn't controlled by the `seed=` of
+        `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+        data.
 
     Returns
     -------
@@ -1785,6 +1834,10 @@ def time_field(
 
     pb.preview(pb.generate_dataset(schema, n=30, seed=7))
     ```
+
+    Every `check_in` time falls in the morning window and every non-missing `check_out` time in the
+    late afternoon or evening one, with 6 of the 30 `check_out` values missing. The `employee_id`
+    values are distinct three-digit numbers.
     """
     return TimeField(
         min_time=min_time,
@@ -1939,9 +1992,11 @@ def duration_field(
         Whether all values must be unique. Default is `False`. With second-level resolution
         within a duration range, uniqueness is feasible for moderate dataset sizes.
     generator
-        Custom callable that generates values. When provided, this overrides all other
-        constraints. The callable should take no arguments and return a single
-        `datetime.timedelta` value.
+        Custom callable that generates values. When provided, it's used instead of the other
+        constraints, while `unique=` and `nullable=` still apply. The callable should take no
+        arguments and return a single `datetime.timedelta` value. It isn't controlled by the `seed=`
+        of `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+        data.
 
     Returns
     -------
@@ -2007,6 +2062,10 @@ def duration_field(
 
     pb.preview(pb.generate_dataset(schema, n=30, seed=7))
     ```
+
+    The `time_spent` values range from one minute to eight hours, while the `overtime` column is
+    missing in most rows (20 of 30 here, in line with the `null_probability=` of `0.6`). Both
+    columns have a duration dtype, so they can take part in arithmetic with dates and datetimes.
     """
     return DurationField(
         min_duration=min_duration,
@@ -2117,7 +2176,9 @@ def profile_fields(
         ignored.
     prefix
         Optional string to prepend to every column name. For example, `prefix="customer_"`
-        produces keys like `"customer_first_name"`, `"customer_email"`, etc.
+        produces keys like `"customer_first_name"`, `"customer_email"`, etc. The prefix doesn't
+        create a separate identity: all person-related columns in a schema currently share the
+        same person in each row.
 
     Returns
     -------
@@ -2174,18 +2235,22 @@ def profile_fields(
     pb.preview(pb.generate_dataset(schema, n=50, seed=23, country="DE"))
     ```
 
-    The `prefix=` parameter prepends a string to every column name, which is especially useful when
-    a schema needs two independent profiles (e.g., a sender and a recipient). Each prefixed group
-    maintains its own coherence:
+    The `prefix=` parameter prepends a string to every column name, which helps when the profile
+    columns sit alongside other columns in a schema:
 
     ```{python}
     schema = pb.Schema(
-        **pb.profile_fields(set="minimal", prefix="sender_"),
-        **pb.profile_fields(set="minimal", prefix="recipient_"),
+        **pb.profile_fields(set="minimal", prefix="customer_"),
+        order_total=pb.float_field(min_val=5.0, max_val=500.0, precision=2),
     )
 
     pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
+
+    The prefix changes only the column names, so the emails are still derived from the names in
+    each row. All person-related columns in a schema share one identity per row, so two prefixed
+    profiles (e.g., `"sender_"` and `"recipient_"`) currently get the same names rather than two
+    independent people.
     """
 
     # --- Validate set parameter ---
