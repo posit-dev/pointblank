@@ -1209,6 +1209,28 @@ class TestCSVWReader:
         assert humidity_var.min_val == 0
         assert humidity_var.max_val == 100
 
+    def test_zero_bounds_from_datatype(self, tmp_path):
+        """A bound of `0` given with `minimum`/`maximum` must not be dropped."""
+        import json
+
+        doc = {
+            "@context": "http://www.w3.org/ns/csvw",
+            "url": "readings.csv",
+            "tableSchema": {
+                "columns": [
+                    {"name": "low", "datatype": {"base": "decimal", "minimum": 0, "maximum": 1}},
+                    {"name": "high", "datatype": {"base": "decimal", "minimum": -1, "maximum": 0}},
+                ]
+            },
+        }
+        path = tmp_path / "readings-csv-metadata.json"
+        path.write_text(json.dumps(doc))
+
+        meta = import_metadata(path)
+
+        assert meta.get_variable("low").min_val == 0.0
+        assert meta.get_variable("high").max_val == 0.0
+
     def test_max_length(self, csvw_metadata):
         meta = import_metadata(csvw_metadata)
 
