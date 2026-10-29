@@ -100,6 +100,8 @@ docs = [
     "duckdb>=1.2.0,<2",                          # 2.0 breaks ibis's `list_tables()` and Narwhals' joins
     "lxml>=4.9.0",                               # CDISC Define-XML / Controlled Terminology examples
     "pyreadstat>=1.2.0",                         # SAS Transport (XPT) metadata example
+    "opentelemetry-api>=1.22.0",                 # OTelExporter and emit_otel() examples
+    "opentelemetry-sdk>=1.22.0",
 ]
 
 [dependency-groups]
