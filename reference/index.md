@@ -401,8 +401,10 @@ List all tables in a database from a connection string.
 Methods for the DataScan class
 
 [DataScan.get_tabular_report()](DataScan.get_tabular_report.md#pointblank.DataScan.get_tabular_report)  
+Get a tabular report of the scan.
 
 [DataScan.summary_data](DataScan.summary_data.md#pointblank.DataScan.summary_data)  
+The column statistics as a DataFrame.
 
 [DataScan.compare()](DataScan.compare.md#pointblank.DataScan.compare)  
 Compare this scan against a baseline and return the differences.

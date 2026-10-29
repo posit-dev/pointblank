@@ -1643,6 +1643,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#returns" id="toc-returns" class="nav-link active" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
     </div>
@@ -1673,13 +1674,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L586-L598" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L792-L837" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">DataScan</span><span class="op">.</span><span class="fu">to_json</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The JSON is structured for round-trip persistence. Use <a href="../reference/DataScan.from_json.html#pointblank.DataScan.from_json" class="gdls-link gdls-code">from_json()</a> or <a href="../reference/DataScan.load_from_json.html#pointblank.DataScan.load_from_json" class="gdls-link gdls-code">load_from_json()</a> to restore a <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> from the output.</p>
+<p>JSON is the format to use when a profile is stored outside of Python or sent to another system: in a database column, an object store, or an API response. The structure is the same as that of <a href="../reference/DataScan.to_dict.html#pointblank.DataScan.to_dict" class="gdls-link"><code>to_dict()</code></a>, and <a href="../reference/DataScan.from_json.html#pointblank.DataScan.from_json" class="gdls-link"><code>from_json()</code></a> restores a <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> from it. Values that JSON can’t represent directly, such as dates, are written as strings. To write the JSON to a file, use <a href="../reference/DataScan.save_to_json.html#pointblank.DataScan.save_to_json" class="gdls-link"><code>save_to_json()</code></a>.</p>
 </div>
 <section id="returns" class="level2 doc-returns">
 <h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
@@ -1687,10 +1688,57 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-A JSON string representing the profile.
+A JSON string representing the profile, indented by four spaces.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Here, a table of shipments with a date column is scanned and converted to JSON.</p>
+<div id="69354476" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>shipments <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"shipped"</span>: [date(<span class="dv">2025</span>, <span class="dv">3</span>, <span class="dv">1</span>), date(<span class="dv">2025</span>, <span class="dv">3</span>, <span class="dv">4</span>), date(<span class="dv">2025</span>, <span class="dv">3</span>, <span class="dv">9</span>)]}</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>profile_json <span class="op">=</span> pb.DataScan(shipments, tbl_name<span class="op">=</span><span class="st">"shipments"</span>).to_json()</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(profile_json)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{
+    "metadata": {
+        "table_name": "shipments",
+        "row_count": 3,
+        "columns": [
+            "shipped"
+        ],
+        "skipped_columns": {}
+    },
+    "columns": [
+        {
+            "colname": "shipped",
+            "coltype": "Date",
+            "sample_data": [
+                "2025-03-01",
+                "2025-03-04",
+                "2025-03-09"
+            ],
+            "statistics": {
+                "n_missing": 0,
+                "n_unique": 3,
+                "min": "2025-03-01",
+                "max": "2025-03-09"
+            }
+        }
+    ]
+}</code></pre>
+</div>
+</div>
+<p>The earliest and latest dates are stored as strings. Because the result is text, it can be stored wherever text can, and <a href="../reference/DataScan.from_json.html#pointblank.DataScan.from_json" class="gdls-link"><code>from_json()</code></a> turns it back into a <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a>.</p>
 
 
 </section>

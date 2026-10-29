@@ -11,7 +11,7 @@
 <meta name="description" content="Compare this scan against a baseline and return the differences.">
 
 <title>DataScan.compare() | Pointblank</title>
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "DataScan.compare - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/DataScan.compare.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "DataScan.compare - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/DataScan.compare.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -114,6 +114,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../gd-lightbox.css">
 <script defer="" src="../gd-lightbox.js"></script>
@@ -1642,8 +1645,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#what-is-compared" id="toc-what-is-compared" class="nav-link active" data-scroll-target="#what-is-compared">What Is Compared</a></li>
+  <li><a href="#drift-scores" id="toc-drift-scores" class="nav-link" data-scroll-target="#drift-scores">Drift Scores</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1674,14 +1681,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L705-L724" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1123-L1245" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">DataScan</span><span class="op">.</span><span class="fu">compare</span>(<span class="va">baseline</span>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The comparison covers schema changes (columns added, removed, or with changed types) and statistical drift for columns present in both scans. The returned <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff" class="gdls-link gdls-code">DataScanDiff</a> object provides programmatic access to the results and a tabular report via <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>.</p>
+<p>Tables that are refreshed regularly (a monthly extract, a nightly load, a model’s input data) can change in ways that no single row reveals: a column is dropped, a type changes, or the values shift to a different range. Comparing a scan of the current table with a scan of an earlier version that’s known to be good finds those changes. The baseline is often a profile saved earlier with <a href="../reference/DataScan.save_to_json.html#pointblank.DataScan.save_to_json" class="gdls-link"><code>save_to_json()</code></a> and brought back with <a href="../reference/DataScan.load_from_json.html#pointblank.DataScan.load_from_json" class="gdls-link"><code>load_from_json()</code></a>.</p>
+<p>The scan this method is called on is the <em>current</em> one, and <code>baseline</code> is the one it’s compared against. The result is a <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff" class="gdls-link"><code>DataScanDiff</code></a>, which has the differences as attributes, as a dictionary through <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff.to_dict" class="gdls-link"><code>to_dict()</code></a>, and as a report through <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>.</p>
+<p>This compares profiles, not rows. To find out which rows of two tables differ, use <a href="../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a> instead.</p>
 </div>
+<section id="what-is-compared" class="level2 doc-what-is-compared">
+<h2 class="doc-what-is-compared anchored" data-anchor-id="what-is-compared">What Is Compared</h2>
+<p>Columns are matched by name. A column that’s only in the current scan is <em>added</em>, one that’s only in the baseline is <em>removed</em>, and one whose data type differs is <em>type-changed</em>. For every column in both scans, each statistic is compared for exact equality, so any difference at all (even in the last decimal place of a mean) is reported along with both values. When the type has changed, the statistics might no longer measure the same thing (a numeric column’s mean is of its values, but a string column’s mean is of its lengths).</p>
+</section>
+<section id="drift-scores" class="level2 doc-drift-scores">
+<h2 class="doc-drift-scores anchored" data-anchor-id="drift-scores">Drift Scores</h2>
+<p>Statistics show that something changed but not how much the distribution of values moved. For that, drift scores are computed for columns whose type hasn’t changed:</p>
+<ul>
+<li>numeric columns get the population stability index (<code>psi</code>), with the values divided into ten bins at the baseline’s deciles (at least ten values are needed on each side), and the Kolmogorov–Smirnov statistic (<code>ks_statistic</code>, the largest gap between the two cumulative distributions) with its p-value (<code>ks_p_value</code>). The p-value comes from SciPy if it’s installed and from an approximation otherwise</li>
+<li>all other columns get a <code>psi</code> computed from how often each distinct value appears</li>
+</ul>
+<p>A common rule of thumb reads a PSI below 0.1 as little or no shift, from 0.1 to 0.25 as a moderate shift, and above 0.25 as a large one. A score of zero is left out.</p>
+<p>Drift scores need the values themselves, so they’re only computed when both scans were made from data. A scan restored with <a href="../reference/DataScan.from_dict.html#pointblank.DataScan.from_dict" class="gdls-link"><code>from_dict()</code></a>, <a href="../reference/DataScan.from_json.html#pointblank.DataScan.from_json" class="gdls-link"><code>from_json()</code></a>, or <a href="../reference/DataScan.load_from_json.html#pointblank.DataScan.load_from_json" class="gdls-link"><code>load_from_json()</code></a> only has statistics, and then only Boolean columns (whose value counts are part of the profile) get a drift score.</p>
+</section>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
@@ -1703,6 +1726,191 @@ An object describing the differences between the two scans.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s compare two monthly extracts of an orders table. Between January and February, the <code>gift</code> column was dropped, a <code>coupon</code> column was added, a new <code>"app"</code> channel appeared, and order amounts went up.</p>
+<div id="293e717a" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>jan <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">21</span>)),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"amount"</span>: [<span class="fl">20.0</span> <span class="op">+</span> i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">20</span>)],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"channel"</span>: [<span class="st">"web"</span>] <span class="op">*</span> <span class="dv">14</span> <span class="op">+</span> [<span class="st">"store"</span>] <span class="op">*</span> <span class="dv">6</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"gift"</span>: [i <span class="op">%</span> <span class="dv">4</span> <span class="op">==</span> <span class="dv">0</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">20</span>)],</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>feb <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">21</span>, <span class="dv">45</span>)),</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"amount"</span>: [<span class="fl">35.0</span> <span class="op">+</span> <span class="fl">1.5</span> <span class="op">*</span> i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">24</span>)],</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"channel"</span>: [<span class="st">"web"</span>] <span class="op">*</span> <span class="dv">10</span> <span class="op">+</span> [<span class="st">"store"</span>] <span class="op">*</span> <span class="dv">8</span> <span class="op">+</span> [<span class="st">"app"</span>] <span class="op">*</span> <span class="dv">6</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"coupon"</span>: [<span class="st">"SPRING"</span>] <span class="op">*</span> <span class="dv">5</span> <span class="op">+</span> [<span class="va">None</span>] <span class="op">*</span> <span class="dv">19</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>scan_jan <span class="op">=</span> pb.DataScan(jan, tbl_name<span class="op">=</span><span class="st">"orders_jan"</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>scan_feb <span class="op">=</span> pb.DataScan(feb, tbl_name<span class="op">=</span><span class="st">"orders_feb"</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> scan_feb.compare(scan_jan)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>diff</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>DataScanDiff(added=1, removed=1, type_changed=0, stat_changed=3)</code></pre>
+</div>
+</div>
+<p>The printed summary counts one added column, one removed column, and three columns whose statistics changed. The report shows the details:</p>
+<div id="fed26c09" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>diff.get_tabular_report()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div id="twzyhpmrjr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#twzyhpmrjr table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#twzyhpmrjr thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#twzyhpmrjr p { margin: 0; padding: 0; }
+ #twzyhpmrjr .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #twzyhpmrjr .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #twzyhpmrjr .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #twzyhpmrjr .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #twzyhpmrjr .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #twzyhpmrjr .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #twzyhpmrjr .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #twzyhpmrjr .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #twzyhpmrjr .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #twzyhpmrjr .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #twzyhpmrjr .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #twzyhpmrjr .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #twzyhpmrjr .gt_spanner_row { border-bottom-style: hidden; }
+ #twzyhpmrjr .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #twzyhpmrjr .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #twzyhpmrjr .gt_from_md> :first-child { margin-top: 0; }
+ #twzyhpmrjr .gt_from_md> :last-child { margin-bottom: 0; }
+ #twzyhpmrjr .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #twzyhpmrjr .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #twzyhpmrjr .gt_indent_1 { text-indent: 5px; }
+ #twzyhpmrjr .gt_indent_2 { text-indent: calc(5px * 2); }
+ #twzyhpmrjr .gt_indent_3 { text-indent: calc(5px * 3); }
+ #twzyhpmrjr .gt_indent_4 { text-indent: calc(5px * 4); }
+ #twzyhpmrjr .gt_indent_5 { text-indent: calc(5px * 5); }
+ #twzyhpmrjr .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #twzyhpmrjr .gt_row_group_first td { border-top-width: 2px; }
+ #twzyhpmrjr .gt_row_group_first th { border-top-width: 2px; }
+ #twzyhpmrjr .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #twzyhpmrjr .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #twzyhpmrjr .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #twzyhpmrjr .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #twzyhpmrjr .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #twzyhpmrjr .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #twzyhpmrjr .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #twzyhpmrjr .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #twzyhpmrjr .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #twzyhpmrjr .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #twzyhpmrjr .gt_left { text-align: left; }
+ #twzyhpmrjr .gt_center { text-align: center; }
+ #twzyhpmrjr .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #twzyhpmrjr .gt_font_normal { font-weight: normal; }
+ #twzyhpmrjr .gt_font_bold { font-weight: bold; }
+ #twzyhpmrjr .gt_font_italic { font-style: italic; }
+ #twzyhpmrjr .gt_super { font-size: 65%; }
+ #twzyhpmrjr .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #twzyhpmrjr .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #twzyhpmrjr .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #twzyhpmrjr .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #twzyhpmrjr .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #twzyhpmrjr .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table class="gt_table" aria-labelledby="title" aria-describedby="subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="6" class="gt_heading gt_title gt_font_normal" id="title">Profile Comparison: orders_jan vs orders_feb</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="subtitle">Row count: 20 (baseline) vs 24 (current)</td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="column">Column</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="status">Status</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="type_baseline">Type (Baseline)</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="type_current">Type (Current)</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="stat_changes">Changed Statistics</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="drift">Drift Scores</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="column" class="gt_row gt_left">order_id</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="status" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_baseline" class="gt_row gt_left">Int64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_current" class="gt_row gt_left">Int64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="stat_changes" class="gt_row gt_left">n_unique: 20 -&gt; 24<br>mean: 10.5 -&gt; 32.5<br>median: 10.5 -&gt; 32.5<br>std: 5.916 -&gt; 7.071<br>min: 1 -&gt; 21<br>max: 20 -&gt; 44<br>p05: 1.095 -&gt; 21.11<br>q_1: 5.75 -&gt; 26.75<br>q_3: 15.25 -&gt; 38.25<br>p95: 19.05 -&gt; 42.85<br>iqr: 9.5 -&gt; 11.5</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="drift" class="gt_row gt_left">PSI: 8.2831<br>KS: 1.0000 (p=0.0000)</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="column" class="gt_row gt_left">amount</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="status" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_baseline" class="gt_row gt_left">Float64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_current" class="gt_row gt_left">Float64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="stat_changes" class="gt_row gt_left">n_unique: 20 -&gt; 24<br>mean: 29.5 -&gt; 52.25<br>median: 29.5 -&gt; 52.25<br>std: 5.916 -&gt; 10.61<br>min: 20 -&gt; 35<br>max: 39 -&gt; 69.5<br>p05: 20.09 -&gt; 35.17<br>q_1: 24.75 -&gt; 43.62<br>q_3: 34.25 -&gt; 60.88<br>p95: 38.05 -&gt; 67.77<br>iqr: 9.5 -&gt; 17.25</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="drift" class="gt_row gt_left">PSI: 6.7421<br>KS: 0.8750 (p=0.0000)</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="column" class="gt_row gt_left">channel</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="status" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_baseline" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_current" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="stat_changes" class="gt_row gt_left">n_unique: 2 -&gt; 3<br>mean: 3.6 -&gt; 3.667<br>std: 0.9403 -&gt; 0.9631</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="drift" class="gt_row gt_left">PSI: 2.1057</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="column" class="gt_row gt_left">gift</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="status" class="gt_row gt_left">Removed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_baseline" class="gt_row gt_left">Boolean</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_current" class="gt_row gt_left"></td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="stat_changes" class="gt_row gt_left"></td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="drift" class="gt_row gt_left"></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="column" class="gt_row gt_left">coupon</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="status" class="gt_row gt_left">Added</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_baseline" class="gt_row gt_left"></td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_current" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="stat_changes" class="gt_row gt_left"></td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="drift" class="gt_row gt_left"></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>The PSI of <code>amount</code> (about 6.7) and its KS statistic (0.875) are far beyond the rule of thumb, so the amounts really did move. The <code>channel</code> column has a PSI of about 2.1 because of the new <code>"app"</code> value. The shift in <code>order_id</code> is expected, since each month has its own IDs, which shows that drift scores still need to be read with the meaning of each column in mind.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/DataScanDiff.html#pointblank.DataScanDiff" class="gdls-link gdls-code">DataScanDiff</a></dt>
+<dd>
+<p>The result of comparing two scans.</p>
+</dd>
+<dt><a href="../reference/compare.html#pointblank.compare" class="gdls-link gdls-code">compare()</a></dt>
+<dd>
+<p>Compare two tables row by row.</p>
+</dd>
+</dl>
 
 
 </section>

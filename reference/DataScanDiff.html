@@ -11,7 +11,7 @@
 <meta name="description" content="The result of comparing two DataScan profiles.">
 
 <title>DataScanDiff | Pointblank</title>
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "DataScanDiff - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/DataScanDiff.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "DataScanDiff - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/DataScanDiff.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -114,6 +114,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../gd-lightbox.css">
 <script defer="" src="../gd-lightbox.js"></script>
@@ -1642,7 +1645,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#attributes" id="toc-attributes" class="nav-link active" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#attributes-1" id="toc-attributes-1" class="nav-link" data-scroll-target="#attributes-1">Attributes</a>
   <ul class="collapse">
   <li><a href="#has_changes" id="toc-has_changes" class="nav-link" data-scroll-target="#has_changes"><span class="doc-object-name doc-attribute doc-label doc-label-property">has_changes</span></a></li>
@@ -1683,7 +1689,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L927-L1227" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1448-L1995" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataScanDiff</span>(</span>
@@ -1692,19 +1698,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Created by calling <a href="../reference/DataScan.compare.html#pointblank.DataScan.compare" class="gdls-link gdls-code">DataScan.compare()</a>. Provides programmatic access to schema changes and per-column statistical drift, plus a tabular report via <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>.</p>
+<p>A <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff" class="gdls-link gdls-code">DataScanDiff</a> is what <a href="../reference/DataScan.compare.html#pointblank.DataScan.compare" class="gdls-link"><code>DataScan.compare()</code></a> returns, and it isn’t meant to be created directly. It records how a table’s profile changed between a baseline scan and a current one: which columns were added, removed, or changed type, which statistics changed and by how much, and how far each column’s distribution drifted (see <a href="../reference/DataScan.compare.html#pointblank.DataScan.compare" class="gdls-link"><code>DataScan.compare()</code></a> for how the drift scores are computed).</p>
+<p>The results can be used in three ways. The attributes and the <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff.has_changes" class="gdls-link"><code>has_changes</code></a> property suit checks in code, such as stopping a pipeline when a column disappears. <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff.to_dict" class="gdls-link"><code>to_dict()</code></a> gives every difference as plain data, for logging or alerting. And <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a> shows the differences as a table, for a person to review.</p>
 </div>
+<section id="parameters" class="level2 doc-parameters">
+<h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code><span class="doc-parameter-name">current</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">DataScan</span></code></dt>
+<dd>
+<p>The newer <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> (the one whose <code>compare()</code> method was called).</p>
+</dd>
+<dt><code><span class="doc-parameter-name">baseline</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">DataScan</span></code></dt>
+<dd>
+The older <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> that <code>current</code> is compared against.
+</dd>
+</dl>
+</div>
+</section>
 <section id="attributes" class="level2 doc-attributes">
 <h2 class="doc-attributes anchored" data-anchor-id="attributes">Attributes</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">columns_added</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str]</span></code></dt>
 <dd>
-<p>Column names present in the current scan but not the baseline.</p>
+<p>Column names present in the current scan but not the baseline, sorted alphabetically.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">columns_removed</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str]</span></code></dt>
 <dd>
-<p>Column names present in the baseline but not the current scan.</p>
+<p>Column names present in the baseline but not the current scan, sorted alphabetically.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">columns_type_changed</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str]</span></code></dt>
 <dd>
@@ -1712,10 +1734,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">column_diffs</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[_ColumnDiff]</span></code></dt>
 <dd>
-Per-column diff details for all columns that appear in either scan.
+Per-column diff details for all columns that appear in either scan, with the baseline’s columns first. Each entry has the attributes <code>colname</code>, <code>coltype_baseline</code> and <code>coltype_current</code> (<code>None</code> for a column missing from that scan), <code>status</code> (one of <code>"added"</code>, <code>"removed"</code>, <code>"type_changed"</code>, <code>"changed"</code>, or <code>"unchanged"</code>), <code>stat_diffs</code> (a dictionary mapping each changed statistic to a <code>(baseline, current)</code> tuple), and <code>drift_scores</code> (a dictionary of drift scores, which might be empty).
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>In this example, a table gains a row and a <code>note</code> column, and its <code>score</code> column changes from integers to strings.</p>
+<div id="0cb02c55" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>old <span class="op">=</span> pl.DataFrame({<span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>], <span class="st">"score"</span>: [<span class="dv">7</span>, <span class="dv">9</span>, <span class="dv">8</span>]})</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>new <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>], <span class="st">"score"</span>: [<span class="st">"7"</span>, <span class="st">"9"</span>, <span class="st">"8"</span>, <span class="st">"6"</span>], <span class="st">"note"</span>: [<span class="st">"a"</span>, <span class="va">None</span>, <span class="st">"b"</span>, <span class="va">None</span>]}</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> pb.DataScan(new).compare(pb.DataScan(old))</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>diff.columns_added, diff.columns_removed, diff.columns_type_changed</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>(['note'], [], ['score'])</code></pre>
+</div>
+</div>
+<p>The schema changes are available directly as lists. For a look at each column, go through <code>column_diffs</code>:</p>
+<div id="bd777f45" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> diff.column_diffs:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(col.colname, col.status, col.coltype_baseline, <span class="st">"-&gt;"</span>, col.coltype_current)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>id changed Int64 -&gt; Int64
+score type_changed Int64 -&gt; String
+note added None -&gt; String</code></pre>
+</div>
+</div>
+<p>The <code>id</code> column kept its type, but its statistics changed because of the new row. A pipeline could stop whenever <code>columns_removed</code> or <code>columns_type_changed</code> isn’t empty, since those changes tend to break code that reads the table.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a></dt>
+<dd>
+<p>Profile a table, column by column.</p>
+</dd>
+<dt><a href="../reference/compare.html#pointblank.compare" class="gdls-link gdls-code">compare()</a></dt>
+<dd>
+<p>Compare two tables row by row.</p>
+</dd>
+</dl>
 </section>
 <section id="attributes-1" class="level2 doc-attributes">
 <h2 class="doc-attributes anchored" data-anchor-id="attributes-1">Attributes</h2>
@@ -1745,6 +1812,28 @@ Per-column diff details for all columns that appear in either scan.
 <div class="doc-signature doc-attribute">
 <p><code><span class="doc-parameter-name">has_changes</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span></code></p>
 </div>
+<div class="doc-text">
+<p>This is the quickest check of whether a table changed. It’s <code>True</code> if a column was added, removed, or changed type, or if any statistic or drift score differs between the two scans. A change in the row count alone doesn’t count, since tables often grow without changing in character. Check <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff.row_count_diff" class="gdls-link"><code>row_count_diff</code></a> for that.</p>
+</div>
+<section id="examples-1" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<p>Here, a log of job runs grows from three rows to five, but every status is still <code>"ok"</code>.</p>
+<div id="be0ea84d" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>runs_before <span class="op">=</span> pl.DataFrame({<span class="st">"status"</span>: [<span class="st">"ok"</span>] <span class="op">*</span> <span class="dv">3</span>})</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>runs_after <span class="op">=</span> pl.DataFrame({<span class="st">"status"</span>: [<span class="st">"ok"</span>] <span class="op">*</span> <span class="dv">5</span>})</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> pb.DataScan(runs_after).compare(pb.DataScan(runs_before))</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>diff.has_changes</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>False</code></pre>
+</div>
+</div>
+<p>The table has more rows, but nothing about its columns changed (they have the same values in the same proportions), so <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff.has_changes" class="gdls-link gdls-code">has_changes</a> is <code>False</code>. A single <code>"failed"</code> status in the new rows would have changed the number of distinct values and made it <code>True</code>.</p>
+</section>
 </section>
 <section id="row_count_diff" class="level3">
 <h3 class="anchored" data-anchor-id="row_count_diff"><span class="doc-object-name doc-attribute doc-label doc-label-property">row_count_diff</span></h3>
@@ -1754,6 +1843,30 @@ Per-column diff details for all columns that appear in either scan.
 <div class="doc-signature doc-attribute">
 <p><code><span class="doc-parameter-name">row_count_diff</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">tuple[int, int]</span></code></p>
 </div>
+<div class="doc-text">
+<p>The row counts are kept apart from the other differences, since a change in size is often expected (a table that collects events grows every day). Having both counts lets you decide what change is acceptable, such as a minimum growth rate or a maximum drop.</p>
+</div>
+<section id="examples-2" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
+<p>Let’s compare two versions of a log of job runs, where the newer one has two more rows.</p>
+<div id="c1a0a344" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>runs_before <span class="op">=</span> pl.DataFrame({<span class="st">"status"</span>: [<span class="st">"ok"</span>] <span class="op">*</span> <span class="dv">3</span>})</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>runs_after <span class="op">=</span> pl.DataFrame({<span class="st">"status"</span>: [<span class="st">"ok"</span>] <span class="op">*</span> <span class="dv">5</span>})</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> pb.DataScan(runs_after).compare(pb.DataScan(runs_before))</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>baseline_rows, current_rows <span class="op">=</span> diff.row_count_diff</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>baseline_rows, current_rows</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>(3, 5)</code></pre>
+</div>
+</div>
+<p>The baseline has three rows and the current scan five. The <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff.has_changes" class="gdls-link"><code>has_changes</code></a> property is <code>False</code> here, so code that should also react to a table shrinking (for instance, when a load was incomplete) needs to check these counts.</p>
+</section>
 </section>
 </section>
 <section id="methods" class="level2 doc-methods">
@@ -1783,10 +1896,21 @@ Per-column diff details for all columns that appear in either scan.
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1099-L1217" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1814-L1985" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb2"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_tabular_report</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_tabular_report</span>()</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>The report is for a person reviewing the changes: it has one row per column of either scan, in the order of the baseline’s columns followed by the added ones. The title names the two tables (baseline first) and the subtitle gives both row counts. The <code>Status</code> column says what happened to each column:</p>
+<ul>
+<li><code>Added</code> or <code>Removed</code>: the column is in only one of the scans</li>
+<li><code>Type Changed</code> or <code>Type + Stats Changed</code>: the data type changed (and maybe the statistics too)</li>
+<li><code>Stats Changed</code>: the type is the same, but statistics or drift scores differ</li>
+<li><code>OK</code>: nothing changed</li>
+</ul>
+<p>The types in the baseline and the current scan come next, then every changed statistic with its baseline and current values. If any column has drift scores, a final column shows them (PSI, and for numeric columns the KS statistic with its p-value).</p>
+<p>This method needs Polars, whatever the type of the scanned tables.</p>
 </div>
 <section id="returns" class="level4 doc-returns">
 <h4 class="doc-returns anchored" data-anchor-id="returns">Returns</h4>
@@ -1799,6 +1923,180 @@ A styled Great Tables report showing schema and statistical drift.
 </dl>
 </div>
 </section>
+<section id="examples-3" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
+<p>Let’s compare a scan of the <code>small_table</code> dataset with a scan of an older version, where the <code>f</code> column only had <code>"low"</code> and <code>"high"</code> values and there was no <code>e</code> column.</p>
+<div id="3260ec70" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>older <span class="op">=</span> small_table.<span class="bu">filter</span>(pl.col(<span class="st">"f"</span>) <span class="op">!=</span> <span class="st">"mid"</span>).drop(<span class="st">"e"</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> pb.DataScan(small_table, tbl_name<span class="op">=</span><span class="st">"current"</span>).compare(</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    pb.DataScan(older, tbl_name<span class="op">=</span><span class="st">"older"</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>diff.get_tabular_report()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div id="glkfvfdrsp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#glkfvfdrsp table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#glkfvfdrsp thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#glkfvfdrsp p { margin: 0; padding: 0; }
+ #glkfvfdrsp .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #glkfvfdrsp .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #glkfvfdrsp .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #glkfvfdrsp .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #glkfvfdrsp .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #glkfvfdrsp .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #glkfvfdrsp .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #glkfvfdrsp .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #glkfvfdrsp .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #glkfvfdrsp .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #glkfvfdrsp .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #glkfvfdrsp .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #glkfvfdrsp .gt_spanner_row { border-bottom-style: hidden; }
+ #glkfvfdrsp .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #glkfvfdrsp .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #glkfvfdrsp .gt_from_md> :first-child { margin-top: 0; }
+ #glkfvfdrsp .gt_from_md> :last-child { margin-bottom: 0; }
+ #glkfvfdrsp .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #glkfvfdrsp .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #glkfvfdrsp .gt_indent_1 { text-indent: 5px; }
+ #glkfvfdrsp .gt_indent_2 { text-indent: calc(5px * 2); }
+ #glkfvfdrsp .gt_indent_3 { text-indent: calc(5px * 3); }
+ #glkfvfdrsp .gt_indent_4 { text-indent: calc(5px * 4); }
+ #glkfvfdrsp .gt_indent_5 { text-indent: calc(5px * 5); }
+ #glkfvfdrsp .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #glkfvfdrsp .gt_row_group_first td { border-top-width: 2px; }
+ #glkfvfdrsp .gt_row_group_first th { border-top-width: 2px; }
+ #glkfvfdrsp .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #glkfvfdrsp .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #glkfvfdrsp .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #glkfvfdrsp .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #glkfvfdrsp .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #glkfvfdrsp .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #glkfvfdrsp .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #glkfvfdrsp .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #glkfvfdrsp .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #glkfvfdrsp .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #glkfvfdrsp .gt_left { text-align: left; }
+ #glkfvfdrsp .gt_center { text-align: center; }
+ #glkfvfdrsp .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #glkfvfdrsp .gt_font_normal { font-weight: normal; }
+ #glkfvfdrsp .gt_font_bold { font-weight: bold; }
+ #glkfvfdrsp .gt_font_italic { font-style: italic; }
+ #glkfvfdrsp .gt_super { font-size: 65%; }
+ #glkfvfdrsp .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #glkfvfdrsp .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #glkfvfdrsp .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #glkfvfdrsp .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #glkfvfdrsp .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #glkfvfdrsp .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table class="gt_table" aria-labelledby="title" aria-describedby="subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="6" class="gt_heading gt_title gt_font_normal" id="title">Profile Comparison: older vs current</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="subtitle">Row count: 11 (baseline) vs 13 (current)</td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="column">Column</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="status">Status</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="type_baseline">Type (Baseline)</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="type_current">Type (Current)</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="stat_changes">Changed Statistics</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="drift">Drift Scores</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="column" class="gt_row gt_left">date_time</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="status" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_baseline" class="gt_row gt_left">Datetime(time_unit='us', time_zone=None)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_current" class="gt_row gt_left">Datetime(time_unit='us', time_zone=None)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="stat_changes" class="gt_row gt_left">n_unique: 10 -&gt; 12</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="drift" class="gt_row gt_left">PSI: 1.0467</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="column" class="gt_row gt_left">date</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="status" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_baseline" class="gt_row gt_left">Date</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_current" class="gt_row gt_left">Date</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="stat_changes" class="gt_row gt_left">n_unique: 9 -&gt; 11</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="drift" class="gt_row gt_left">PSI: 1.0467</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="column" class="gt_row gt_left">a</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="status" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_baseline" class="gt_row gt_left">Int64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_current" class="gt_row gt_left">Int64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="stat_changes" class="gt_row gt_left">mean: 3.909 -&gt; 3.769<br>std: 2.212 -&gt; 2.088<br>p05: 1.05 -&gt; 1.06<br>q_1: 2.5 -&gt; 2<br>q_3: 5 -&gt; 4<br>p95: 7.5 -&gt; 7.4<br>iqr: 2.5 -&gt; 2</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="drift" class="gt_row gt_left">PSI: 0.0397<br>KS: 0.0420 (p=1.0000)</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="column" class="gt_row gt_left">b</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="status" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_baseline" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_current" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="stat_changes" class="gt_row gt_left">n_unique: 10 -&gt; 12</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="drift" class="gt_row gt_left">PSI: 1.0467</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="column" class="gt_row gt_left">c</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="status" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_baseline" class="gt_row gt_left">Int64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_current" class="gt_row gt_left">Int64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="stat_changes" class="gt_row gt_left">n_missing: 1 -&gt; 2<br>n_unique: 6 -&gt; 7<br>mean: 5.9 -&gt; 5.727<br>std: 2.807 -&gt; 2.724<br>p05: 2.045 -&gt; 2.05</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="drift" class="gt_row gt_left">PSI: 0.0183<br>KS: 0.0545 (p=1.0000)</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="column" class="gt_row gt_left">d</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="status" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_baseline" class="gt_row gt_left">Float64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_current" class="gt_row gt_left">Float64</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="stat_changes" class="gt_row gt_left">n_unique: 10 -&gt; 12<br>mean: 2071 -&gt; 2305<br>median: 843.3 -&gt; 1036<br>std: 2811 -&gt; 2631<br>p05: 117.1 -&gt; 118.9<br>q_1: 836 -&gt; 837.9<br>q_3: 2287 -&gt; 3291<br>p95: 6712 -&gt; 6335<br>iqr: 1451 -&gt; 2453</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="drift" class="gt_row gt_left">PSI: 0.0635<br>KS: 0.1259 (p=1.0000)</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="column" class="gt_row gt_left">f</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="status" class="gt_row gt_left">Stats Changed</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_baseline" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_current" class="gt_row gt_left">String</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="stat_changes" class="gt_row gt_left">n_unique: 2 -&gt; 3<br>mean: 3.545 -&gt; 3.462<br>median: 4 -&gt; 3<br>std: 0.5222 -&gt; 0.5189</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="drift" class="gt_row gt_left">PSI: 1.1540</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="column" class="gt_row gt_left">e</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="status" class="gt_row gt_left">Added</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_baseline" class="gt_row gt_left"></td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="type_current" class="gt_row gt_left">Boolean</td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="stat_changes" class="gt_row gt_left"></td>
+    <td style="font-family: IBM Plex Mono;font-size: 11px;" headers="drift" class="gt_row gt_left"></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>The <code>e</code> column shows as added, and the other columns have changed statistics, since the older version had two fewer rows. The PSI of <code>f</code> (about 1.15) comes from the <code>"mid"</code> values that are only in the current version. The <code>date_time</code>, <code>date</code>, and <code>b</code> columns get a similar PSI, but for a different reason: nearly all of their values are distinct, so removing any rows changes their value frequencies a lot. The PSI of a non-numeric column means most for columns with a few distinct values, like <code>f</code>. Like other GT tables, the report can be saved as HTML with <code>write_raw_html()</code>, to share with others who want to review the changes.</p>
+</section>
 </section>
 <section id="to_dict" class="level3">
 <h3 class="anchored" data-anchor-id="to_dict"><span class="doc-object-name doc-function doc-label doc-label-method">to_dict()</span></h3>
@@ -1807,10 +2105,13 @@ A styled Great Tables report showing schema and statistical drift.
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1061-L1097" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1728-L1812" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb3"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_dict</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_dict</span>()</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>The dictionary has every difference the comparison found, in plain Python data. That suits logging, alerting (by sending only the parts that matter), or storing the results next to the scans that produced them. Columns without changes are left out, so the dictionary only grows with the number of differences.</p>
 </div>
 <section id="returns-1" class="level4 doc-returns">
 <h4 class="doc-returns anchored" data-anchor-id="returns-1">Returns</h4>
@@ -1818,10 +2119,39 @@ A styled Great Tables report showing schema and statistical drift.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">dict[str, Any]</span></code></dt>
 <dd>
-A dictionary with schema changes, row count diff, and per-column stat diffs.
+A dictionary with these keys: <code>"row_count"</code> (a dictionary with the <code>"baseline"</code> and <code>"current"</code> row counts), <code>"columns_added"</code> and <code>"columns_removed"</code> (lists of column names), <code>"columns_type_changed"</code> (a list of dictionaries with <code>"column"</code>, <code>"baseline_type"</code>, and <code>"current_type"</code>), <code>"stat_diffs"</code> (a dictionary that maps each column with changed statistics to a dictionary that maps each statistic to its <code>"baseline"</code> and <code>"current"</code> values), and <code>"drift_scores"</code> (a dictionary mapping each column that has drift scores to those scores).
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples-4" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
+<p>Let’s compare two versions of a table of orders. The newer version has one more order, a refund for -15.5.</p>
+<div id="5bcf99ac" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>orders <span class="op">=</span> pl.DataFrame({<span class="st">"order_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>], <span class="st">"amount"</span>: [<span class="fl">25.0</span>, <span class="fl">40.0</span>, <span class="fl">15.5</span>, <span class="fl">60.0</span>]})</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>orders_now <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"order_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>], <span class="st">"amount"</span>: [<span class="fl">25.0</span>, <span class="fl">40.0</span>, <span class="fl">15.5</span>, <span class="fl">60.0</span>, <span class="op">-</span><span class="fl">15.5</span>]}</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>diff_dict <span class="op">=</span> pb.DataScan(orders_now).compare(pb.DataScan(orders)).to_dict()</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>diff_dict[<span class="st">"row_count"</span>], diff_dict[<span class="st">"columns_added"</span>], diff_dict[<span class="st">"columns_removed"</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>({'baseline': 4, 'current': 5}, [], [])</code></pre>
+</div>
+</div>
+<p>There are no schema changes. The changed statistics of <code>amount</code> include its minimum:</p>
+<div id="c1a58544" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>diff_dict[<span class="st">"stat_diffs"</span>][<span class="st">"amount"</span>][<span class="st">"min"</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>{'baseline': 15.5, 'current': -15.5}</code></pre>
+</div>
+</div>
+<p>Picking out an entry like this one makes it easy to raise an alert on specific changes (here, a negative amount) and ignore others, such as a mean that moves a little as new orders come in.</p>
 
 
 </section>

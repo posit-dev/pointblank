@@ -18281,24 +18281,28 @@ DataScan(data: 'Any', tbl_name: 'str | None' = None) -> 'None'
 
 Get a summary of a dataset.
 
-The `DataScan` class provides a way to get a summary of a dataset. The summary includes the
-following information:
+Before writing validation rules for a table, it helps to know what's in it: which columns
+have missing values, how many distinct values each column has, and what ranges the numbers
+and dates fall in. A `DataScan` collects these facts for every column in one pass. You can
+look at the result as a report, work with it as a table, or save it to compare against later.
 
-- the name of the table (if provided)
-- the type of the table (e.g., `"polars"`, `"pandas"`, etc.)
-- the number of rows and columns in the table
-- column-level information, including:
-    - the column name
-    - the column type
-    - measures of missingness and distinctness
-    - measures of negative, zero, and positive values (for numerical columns)
-    - a sample of the data (the first 5 values)
-    - statistics (if the column contains numbers, strings, or datetimes)
+Once a scan is made, it can be used in several ways:
 
-To obtain a dictionary representation of the summary, you can use the
-[`to_dict()`](`pointblank.DataScan.to_dict`) method. To get a JSON representation of the
-summary, you can use the [`to_json()`](`pointblank.DataScan.to_json`) method. To save the JSON
-text to a file, the `save_to_json()` method could be used.
+- [`get_tabular_report()`](`pointblank.DataScan.get_tabular_report`) shows the summary as a
+table with one row per column (this is also what
+[`col_summary_tbl()`](`pointblank.col_summary_tbl`) returns)
+- [`summary_data`](`pointblank.DataScan.summary_data`) gives the statistics as a DataFrame, for
+filtering, sorting, or building checks on them
+- [`to_dict()`](`pointblank.DataScan.to_dict`), [`to_json()`](`pointblank.DataScan.to_json`),
+and [`save_to_json()`](`pointblank.DataScan.save_to_json`) store the profile, which
+[`from_dict()`](`pointblank.DataScan.from_dict`),
+[`from_json()`](`pointblank.DataScan.from_json`), and
+[`load_from_json()`](`pointblank.DataScan.load_from_json`) restore without the original data
+- [`compare()`](`pointblank.DataScan.compare`) compares two scans and reports schema changes
+and drift in each column's statistics, as a [`DataScanDiff`](`pointblank.DataScanDiff`)
+
+The scan stores the profile, not the data. To compare the rows of two tables rather than
+their profiles, use [`compare()`](`pointblank.compare`).
 
 :::{.callout-warning}
 The `DataScan()` class is still experimental. Please report any issues you encounter in the
@@ -18312,63 +18316,48 @@ data
     a CSV file path, a Parquet file path, a GitHub URL pointing to a CSV or Parquet file,
     or a database connection string.
 tbl_name
-    Optionally, the name of the table could be provided as `tbl_name`.
+    Optionally, the name of the table could be provided as `tbl_name`. It's shown in the
+    header of the report, stored with the profile, and used to label the two scans in a
+    [`DataScanDiff`](`pointblank.DataScanDiff`) report.
 
 Measures of Missingness and Distinctness
 ----------------------------------------
 For each column, the following measures are provided:
 
-- `n_missing_values`: the number of missing values in the column
-- `f_missing_values`: the fraction of missing values in the column
-- `n_unique_values`: the number of unique values in the column
-- `f_unique_values`: the fraction of unique values in the column
+- `n_missing`: the number of missing values in the column
+- `n_unique`: the number of distinct values in the column (if there are missing values, they
+count as one more distinct value)
 
-The fractions are calculated as the ratio of the measure to the total number of rows in the
-dataset.
+The report also shows each count as a fraction of the number of rows in the table.
 
-Counts and Fractions of Negative, Zero, and Positive Values
------------------------------------------------------------
-For numerical columns, the following measures are provided:
+Statistics for Numeric and String Columns
+-----------------------------------------
+For numeric and string columns, the following statistics are provided. For string columns,
+they describe the lengths of the strings (in characters), not the strings themselves, which
+makes it easy to spot truncated values or codes of an unexpected length.
 
-- `n_negative_values`: the number of negative values in the column
-- `f_negative_values`: the fraction of negative values in the column
-- `n_zero_values`: the number of zero values in the column
-- `f_zero_values`: the fraction of zero values in the column
-- `n_positive_values`: the number of positive values in the column
-- `f_positive_values`: the fraction of positive values in the column
+- `mean`: the mean
+- `std`: the standard deviation
+- `min`: the minimum
+- `p05`: the 5th percentile
+- `q_1`: the first quartile
+- `median`: the median
+- `q_3`: the third quartile
+- `p95`: the 95th percentile
+- `max`: the maximum
+- `iqr`: the interquartile range (`q_3 - q_1`)
 
-The fractions are calculated as the ratio of the measure to the total number of rows in the
-dataset.
+Statistics for Date, Datetime, and Time Columns
+-----------------------------------------------
+For date, datetime, and time columns, the following statistics are provided:
 
-Statistics for Numerical and String Columns
--------------------------------------------
-For numerical and string columns, several statistical measures are provided. Please note that
-for string columms, the statistics are based on the lengths of the strings in the column.
+- `min`: the earliest value in the column
+- `max`: the latest value in the column
 
-The following descriptive statistics are provided:
-
-- `mean`: the mean of the column
-- `std_dev`: the standard deviation of the column
-
-Additionally, the following quantiles are provided:
-
-- `min`: the minimum value in the column
-- `p05`: the 5th percentile of the column
-- `q_1`: the first quartile of the column
-- `med`: the median of the column
-- `q_3`: the third quartile of the column
-- `p95`: the 95th percentile of the column
-- `max`: the maximum value in the column
-- `iqr`: the interquartile range of the column
-
-Statistics for Date and Datetime Columns
-----------------------------------------
-For date/datetime columns, the following statistics are provided:
-
-- `min`: the minimum date/datetime in the column
-- `max`: the maximum date/datetime in the column
-
-Time columns get the same statistics.
+Statistics for Boolean Columns
+------------------------------
+For Boolean columns, `freqs` gives the number of `True` and `False` values (as a dictionary,
+e.g., `{"True": 9, "False": 4}`). The report shows these as percentages.
 
 Supported Column Types
 ----------------------
@@ -18384,24 +18373,140 @@ Returns
 DataScan
     A DataScan object.
 
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's scan the `small_table` dataset, which has 13 rows and 8 columns of several types.
+
+```{python}
+import pointblank as pb
+
+small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
+scan = pb.DataScan(small_table, tbl_name="small_table")
+
+scan.get_tabular_report()
+```
+
+The report has one row per column. Column `c` has 2 missing values, `d` spans a wide range
+(from about 108 to 9,999.99), and the string column `b` always has 9 characters, which suggests
+a fixed-format code. Column `e` is Boolean, so it shows the share of `True` and `False` values
+instead of statistics.
+
+The same statistics are available as a DataFrame through `summary_data`, so they can be
+filtered like any other table. Here are the columns with missing values:
+
+```{python}
+import polars as pl
+
+(
+    scan.summary_data
+    .filter(pl.col("n_missing") > 0)
+    .select("colname", "coltype", "n_missing", "n_unique")
+)
+```
+
+A scan can also be kept as a baseline. If its profile is saved now with
+[`save_to_json()`](`pointblank.DataScan.save_to_json`), a later scan of a new version of the
+table can be compared against it with [`compare()`](`pointblank.DataScan.compare`), which
+reports added and removed columns, type changes, and changes in each statistic.
+
+See Also
+--------
+col_summary_tbl : Get the same report directly from a table.
+missing_vals_tbl : See where in a table the missing values are.
+preview : Show the first and last rows of a table.
+DataScanDiff : The result of comparing two scans.
+
 DataScanDiff(current: 'DataScan', baseline: 'DataScan') -> 'None'
 
 The result of comparing two `DataScan` profiles.
 
-Created by calling `DataScan.compare()`. Provides programmatic access to schema changes and
-per-column statistical drift, plus a tabular report via
-[`get_tabular_report()`](`pointblank.DataScanDiff.get_tabular_report`).
+A `DataScanDiff` is what [`DataScan.compare()`](`pointblank.DataScan.compare`) returns, and
+it isn't meant to be created directly. It records how a table's profile changed between a
+baseline scan and a current one: which columns were added, removed, or changed type, which
+statistics changed and by how much, and how far each column's distribution drifted (see
+[`DataScan.compare()`](`pointblank.DataScan.compare`) for how the drift scores are computed).
+
+The results can be used in three ways. The attributes and the
+[`has_changes`](`pointblank.DataScanDiff.has_changes`) property suit checks in code, such as
+stopping a pipeline when a column disappears.
+[`to_dict()`](`pointblank.DataScanDiff.to_dict`) gives every difference as plain data, for
+logging or alerting. And [`get_tabular_report()`](`pointblank.DataScanDiff.get_tabular_report`)
+shows the differences as a table, for a person to review.
+
+Parameters
+----------
+current
+    The newer `DataScan` (the one whose `compare()` method was called).
+baseline
+    The older `DataScan` that `current` is compared against.
 
 Attributes
 ----------
 columns_added
-    Column names present in the current scan but not the baseline.
+    Column names present in the current scan but not the baseline, sorted alphabetically.
 columns_removed
-    Column names present in the baseline but not the current scan.
+    Column names present in the baseline but not the current scan, sorted alphabetically.
 columns_type_changed
     Column names whose data type changed between baseline and current.
 column_diffs
-    Per-column diff details for all columns that appear in either scan.
+    Per-column diff details for all columns that appear in either scan, with the baseline's
+    columns first. Each entry has the attributes `colname`, `coltype_baseline` and
+    `coltype_current` (`None` for a column missing from that scan), `status` (one of
+    `"added"`, `"removed"`, `"type_changed"`, `"changed"`, or `"unchanged"`), `stat_diffs` (a
+    dictionary mapping each changed statistic to a `(baseline, current)` tuple), and
+    `drift_scores` (a dictionary of drift scores, which might be empty).
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+In this example, a table gains a row and a `note` column, and its `score` column changes from
+integers to strings.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+old = pl.DataFrame({"id": [1, 2, 3], "score": [7, 9, 8]})
+
+new = pl.DataFrame(
+    {"id": [1, 2, 3, 4], "score": ["7", "9", "8", "6"], "note": ["a", None, "b", None]}
+)
+
+diff = pb.DataScan(new).compare(pb.DataScan(old))
+
+diff.columns_added, diff.columns_removed, diff.columns_type_changed
+```
+
+The schema changes are available directly as lists. For a look at each column, go through
+`column_diffs`:
+
+```{python}
+for col in diff.column_diffs:
+    print(col.colname, col.status, col.coltype_baseline, "->", col.coltype_current)
+```
+
+The `id` column kept its type, but its statistics changed because of the new row. A
+pipeline could stop whenever `columns_removed` or `columns_type_changed` isn't empty, since
+those changes tend to break code that reads the table.
+
+See Also
+--------
+DataScan : Profile a table, column by column.
+pointblank.compare : Compare two tables row by row.
 
 preview(data: 'Any', columns_subset: 'str | list[str] | Column | None' = None, n_head: 'int' = 5, n_tail: 'int' = 5, limit: 'int' = 50, show_row_numbers: 'bool' = True, max_col_width: 'int' = 250, min_tbl_width: 'int' = 500, incl_header: 'bool | None' = None) -> 'GT'
 
@@ -18729,6 +18834,13 @@ nycflights = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
 
 pb.col_summary_tbl(data=nycflights, tbl_name="nycflights")
 ```
+
+The `tbl_name=` value appears in the report's title, which helps tell reports apart when
+several tables are summarized. An Ibis table is read into memory before its statistics are
+computed, so a very large table might be better summarized from a sample. To keep the
+summary rather than just display it (to query it, save it, or compare it with a later version
+of the table), create a [`DataScan`](`pointblank.DataScan`) instead, which produces this same
+report through its [`get_tabular_report()`](`pointblank.DataScan.get_tabular_report`) method.
 
 missing_vals_tbl(data: 'Any', missing: 'dict[str, MissingSpec] | None' = None, as_heatmap: 'bool' = False) -> 'GT'
 
@@ -19155,16 +19267,181 @@ Methods for the DataScan class
 
 get_tabular_report(self, *, show_sample_data: 'bool' = False) -> 'GT'
 
+Get a tabular report of the scan.
+
+The report presents the profile of each column as one row of a table: the column's name
+and type, the number and fraction of missing and distinct values, and its statistics. It's
+the quickest way to get an overview of a table you haven't seen before, and it's what
+[`col_summary_tbl()`](`pointblank.col_summary_tbl`) returns.
+
+Each row starts with an icon for the column's type. Statistics that don't apply to any
+column are left out, and those that don't apply to a particular column are shown as `-`.
+Statistics for string columns describe the lengths of the strings (as the note below the
+table says). Boolean columns show the percentages of `True` and `False` values in place of
+the number of distinct values. Columns of unsupported types are listed with an
+*unsupported type* badge and no statistics.
+
+Parameters
+----------
+show_sample_data
+    Should a column with the first five non-missing values of each column be added? This
+    is off by default, since the values can be long, and the table may hold sensitive data.
+
+Returns
+-------
+GT
+    A Great Tables object.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's scan the `game_revenue` dataset and look at the report.
+
+```{python}
+import pointblank as pb
+
+game_revenue = pb.load_dataset(dataset="game_revenue", tbl_type="polars")
+
+scan = pb.DataScan(game_revenue, tbl_name="game_revenue")
+
+scan.get_tabular_report()
+```
+
+The header shows the table type and its dimensions. In the rows, `item_revenue` has a
+long right tail (its 95th percentile is far below its maximum), and the string columns
+`player_id` and `session_id` have fixed lengths. To see what the values look like, add
+the sample data:
+
+```{python}
+scan.get_tabular_report(show_sample_data=True)
+```
+
+The samples make it clear that `player_id` and `session_id` are codes, and they show the
+format of each column's values. The report is a Great Tables object, so it can be saved
+to a standalone HTML file with its `write_raw_html()` method.
+
 DataScan.summary_data
+
+The column statistics as a DataFrame.
+
+The report from [`get_tabular_report()`](`pointblank.DataScan.get_tabular_report`) is for
+reading, while `summary_data` holds the same statistics as data. That's useful for finding
+columns that need attention (the ones with missing values, or with a single distinct
+value), for building validation steps from what was found, or for passing the profile to
+another tool.
+
+The statistics are described in the [`DataScan`](`pointblank.DataScan`) documentation. A
+statistic that doesn't apply to a column's type is null (for example, `mean` for a date
+column). The order of the statistic columns isn't fixed, so select columns by name.
+
+Returns
+-------
+Any
+    A DataFrame of the same type as the scanned table (Polars for a scan restored with
+    [`from_dict()`](`pointblank.DataScan.from_dict`) or a related method), with one row per
+    summarized column. The `colname` and `coltype` columns give each column's name and
+    data type, `sample_data` holds the first five non-missing values (as one string), and
+    `icon` is the type icon used in the report. The other columns are the statistics.
+    When a statistic holds values of different types across columns (e.g., `min` for a
+    number and a date), its values are converted to strings. Columns of unsupported types
+    aren't included.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Here's the summary for the numeric columns of the `small_table` dataset.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
+summary = pb.DataScan(small_table).summary_data
+
+(
+    summary
+    .filter(pl.col("coltype").is_in(["Int64", "Float64"]))
+    .select("colname", "n_missing", "n_unique", "mean", "min", "max")
+)
+```
+
+Column `c` is the only one with missing values. The `min` and `max` columns are strings,
+because they also hold the dates from the date columns.
+
+Since this is an ordinary DataFrame, the profile can lead to further checks. This finds
+the columns with one distinct value fewer than the table has rows:
+
+```{python}
+summary.filter(pl.col("n_unique") == small_table.height - 1).get_column("colname").to_list()
+```
+
+Three columns that look like they should identify each row (a timestamp, a code, and an
+amount) each have exactly one repeated value. That's a sign of a duplicated row, which
+[`Validate.rows_distinct()`](`pointblank.Validate.rows_distinct`) would confirm.
 
 compare(self, baseline: 'DataScan') -> 'DataScanDiff'
 
 Compare this scan against a baseline and return the differences.
 
-The comparison covers schema changes (columns added, removed, or with changed types) and
-statistical drift for columns present in both scans. The returned `DataScanDiff` object
-provides programmatic access to the results and a tabular report via
+Tables that are refreshed regularly (a monthly extract, a nightly load, a model's input
+data) can change in ways that no single row reveals: a column is dropped, a type changes,
+or the values shift to a different range. Comparing a scan of the current table with a
+scan of an earlier version that's known to be good finds those changes. The baseline is
+often a profile saved earlier with [`save_to_json()`](`pointblank.DataScan.save_to_json`)
+and brought back with [`load_from_json()`](`pointblank.DataScan.load_from_json`).
+
+The scan this method is called on is the *current* one, and `baseline` is the one it's
+compared against. The result is a [`DataScanDiff`](`pointblank.DataScanDiff`), which has
+the differences as attributes, as a dictionary through
+[`to_dict()`](`pointblank.DataScanDiff.to_dict`), and as a report through
 [`get_tabular_report()`](`pointblank.DataScanDiff.get_tabular_report`).
+
+This compares profiles, not rows. To find out which rows of two tables differ, use
+[`compare()`](`pointblank.compare`) instead.
+
+What Is Compared
+----------------
+Columns are matched by name. A column that's only in the current scan is *added*, one
+that's only in the baseline is *removed*, and one whose data type differs is
+*type-changed*. For every column in both scans, each statistic is compared for exact
+equality, so any difference at all (even in the last decimal place of a mean) is
+reported along with both values. When the type has changed, the statistics might no
+longer measure the same thing (a numeric column's mean is of its values, but a string
+column's mean is of its lengths).
+
+Drift Scores
+------------
+Statistics show that something changed but not how much the distribution of values moved.
+For that, drift scores are computed for columns whose type hasn't changed:
+
+- numeric columns get the population stability index (`psi`), with the values divided into
+ten bins at the baseline's deciles (at least ten values are needed on each side), and the
+Kolmogorov–Smirnov statistic (`ks_statistic`, the largest gap between the two cumulative
+distributions) with its p-value (`ks_p_value`). The p-value comes from SciPy if it's
+installed and from an approximation otherwise
+- all other columns get a `psi` computed from how often each distinct value appears
+
+A common rule of thumb reads a PSI below 0.1 as little or no shift, from 0.1 to 0.25 as a
+moderate shift, and above 0.25 as a large one. A score of zero is left out.
+
+Drift scores need the values themselves, so they're only computed when both scans were
+made from data. A scan restored with [`from_dict()`](`pointblank.DataScan.from_dict`),
+[`from_json()`](`pointblank.DataScan.from_json`), or
+[`load_from_json()`](`pointblank.DataScan.load_from_json`) only has statistics, and then
+only Boolean columns (whose value counts are part of the profile) get a drift score.
 
 Parameters
 ----------
@@ -19176,18 +19453,129 @@ Returns
 DataScanDiff
     An object describing the differences between the two scans.
 
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's compare two monthly extracts of an orders table. Between January and February, the
+`gift` column was dropped, a `coupon` column was added, a new `"app"` channel appeared, and
+order amounts went up.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+jan = pl.DataFrame(
+    {
+        "order_id": list(range(1, 21)),
+        "amount": [20.0 + i for i in range(20)],
+        "channel": ["web"] * 14 + ["store"] * 6,
+        "gift": [i % 4 == 0 for i in range(20)],
+    }
+)
+
+feb = pl.DataFrame(
+    {
+        "order_id": list(range(21, 45)),
+        "amount": [35.0 + 1.5 * i for i in range(24)],
+        "channel": ["web"] * 10 + ["store"] * 8 + ["app"] * 6,
+        "coupon": ["SPRING"] * 5 + [None] * 19,
+    }
+)
+
+scan_jan = pb.DataScan(jan, tbl_name="orders_jan")
+scan_feb = pb.DataScan(feb, tbl_name="orders_feb")
+
+diff = scan_feb.compare(scan_jan)
+
+diff
+```
+
+The printed summary counts one added column, one removed column, and three columns whose
+statistics changed. The report shows the details:
+
+```{python}
+diff.get_tabular_report()
+```
+
+The PSI of `amount` (about 6.7) and its KS statistic (0.875) are far beyond the rule of
+thumb, so the amounts really did move. The `channel` column has a PSI of about 2.1 because
+of the new `"app"` value. The shift in `order_id` is expected, since each month has its
+own IDs, which shows that drift scores still need to be read with the meaning of each
+column in mind.
+
+See Also
+--------
+DataScanDiff : The result of comparing two scans.
+pointblank.compare : Compare two tables row by row.
+
 save_to_json(self, output_file: 'str') -> 'None'
 
 Save the profile to a JSON file.
 
+Saving a scan to a file is the simplest way to keep a baseline: scan a table once, save
+the profile, and load it later with
+[`load_from_json()`](`pointblank.DataScan.load_from_json`) to compare a new scan against
+it with [`compare()`](`pointblank.DataScan.compare`). The file holds the output of
+[`to_json()`](`pointblank.DataScan.to_json`), so it's small (it stores the statistics, not
+the data) and can be kept in version control next to the code that produces the table.
+
 Parameters
 ----------
 output_file
-    The path to the output JSON file.
+    The path to the output JSON file. An existing file is overwritten.
+
+Returns
+-------
+None
+    Nothing is returned. The profile is written to `output_file`.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's save a profile of the `small_table` dataset to a file in a temporary directory.
+
+```{python}
+import pointblank as pb
+import tempfile
+from pathlib import Path
+
+small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
+profile_path = Path(tempfile.mkdtemp()) / "small_table_profile.json"
+
+pb.DataScan(small_table, tbl_name="small_table").save_to_json(profile_path)
+
+print(profile_path.read_text()[:180])
+```
+
+The file starts with the table's metadata, and the column profiles follow. Loading it with
+[`load_from_json()`](`pointblank.DataScan.load_from_json`) gives back the same profile,
+without needing the table itself.
 
 load_from_json(input_file: 'str') -> 'DataScan'
 
 Load a `DataScan` from a JSON file produced by `save_to_json()`.
+
+This is how a saved baseline is brought back: load the profile from the file, then pass it
+to the [`compare()`](`pointblank.DataScan.compare`) method of a new scan to find out what
+has changed since. The file is the one written by
+[`save_to_json()`](`pointblank.DataScan.save_to_json`) (or any file containing the output
+of [`to_json()`](`pointblank.DataScan.to_json`)).
+
+As with [`from_dict()`](`pointblank.DataScan.from_dict`), the loaded scan has the
+statistics but not the data, so drift scores are only computed for its Boolean columns.
 
 Parameters
 ----------
@@ -19199,23 +19587,108 @@ Returns
 DataScan
     A restored `DataScan` instance.
 
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's save a profile of a table of orders as a baseline.
+
+```{python}
+import pointblank as pb
+import polars as pl
+import tempfile
+from pathlib import Path
+
+orders = pl.DataFrame(
+    {"order_id": [1, 2, 3, 4], "amount": [25.0, 40.0, 15.5, 60.0]}
+)
+
+baseline_path = Path(tempfile.mkdtemp()) / "orders_profile.json"
+
+pb.DataScan(orders, tbl_name="orders").save_to_json(baseline_path)
+```
+
+Later, the table has grown and a refund (a negative amount) has appeared. The baseline is
+loaded from the file and compared with a scan of the current table:
+
+```{python}
+orders_now = pl.DataFrame(
+    {"order_id": [1, 2, 3, 4, 5], "amount": [25.0, 40.0, 15.5, 60.0, -15.5]}
+)
+
+baseline = pb.DataScan.load_from_json(baseline_path)
+
+diff = pb.DataScan(orders_now, tbl_name="orders").compare(baseline)
+
+diff.to_dict()["stat_diffs"]["amount"]["min"]
+```
+
+The minimum `amount` went from 15.5 to -15.5. A change like this is easy to miss in the
+data but stands out in a comparison of profiles, and a check such as
+[`Validate.col_vals_ge()`](`pointblank.Validate.col_vals_ge`) can then guard against it.
+
 to_json(self) -> 'str'
 
 Export the profile as a JSON string.
 
-The JSON is structured for round-trip persistence. Use `from_json()` or `load_from_json()`
-to restore a `DataScan` from the output.
+JSON is the format to use when a profile is stored outside of Python or sent to another
+system: in a database column, an object store, or an API response. The structure is the
+same as that of [`to_dict()`](`pointblank.DataScan.to_dict`), and
+[`from_json()`](`pointblank.DataScan.from_json`) restores a `DataScan` from it. Values that
+JSON can't represent directly, such as dates, are written as strings. To write the JSON
+to a file, use [`save_to_json()`](`pointblank.DataScan.save_to_json`).
 
 Returns
 -------
 str
-    A JSON string representing the profile.
+    A JSON string representing the profile, indented by four spaces.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Here, a table of shipments with a date column is scanned and converted to JSON.
+
+```{python}
+import pointblank as pb
+import polars as pl
+from datetime import date
+
+shipments = pl.DataFrame(
+    {"shipped": [date(2025, 3, 1), date(2025, 3, 4), date(2025, 3, 9)]}
+)
+
+profile_json = pb.DataScan(shipments, tbl_name="shipments").to_json()
+
+print(profile_json)
+```
+
+The earliest and latest dates are stored as strings. Because the result is text, it can
+be stored wherever text can, and [`from_json()`](`pointblank.DataScan.from_json`) turns it
+back into a `DataScan`.
 
 from_json(json_string: 'str') -> 'DataScan'
 
 Restore a `DataScan` from a JSON string.
 
-The JSON string is the one produced by [`to_json()`](`pointblank.DataScan.to_json`).
+The JSON string is the one produced by [`to_json()`](`pointblank.DataScan.to_json`). It's
+the counterpart to that method for profiles stored as text, such as in a database column
+or an API response. To read a JSON file, use
+[`load_from_json()`](`pointblank.DataScan.load_from_json`).
+
+As with [`from_dict()`](`pointblank.DataScan.from_dict`), the restored scan has the
+statistics but not the data. Values that were written as strings in the JSON (such as
+dates) stay strings.
 
 Parameters
 ----------
@@ -19227,27 +19700,110 @@ Returns
 DataScan
     A restored `DataScan` instance.
 
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Suppose the profile of the `small_table` dataset was stored as JSON text some time ago.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
+stored_json = pb.DataScan(small_table, tbl_name="small_table").to_json()
+```
+
+Restoring it gives a `DataScan` that can be queried like the original one:
+
+```{python}
+restored = pb.DataScan.from_json(stored_json)
+
+restored.summary_data.select("colname", "n_missing", "n_unique")
+```
+
+The table name, row count, and every column's statistics come from the JSON, so the
+original table isn't needed to answer questions about it later.
+
 to_dict(self) -> 'dict[str, Any]'
 
 Export the profile as a structured dictionary.
 
-The returned dictionary contains metadata (table name, row count, column list) plus
-per-column profile entries with their data type, statistics, and sample data. This format is
-designed for round-trip persistence: save it with
-[`to_json()`](`pointblank.DataScan.to_json`) / `save_to_json()` and restore with
-[`from_dict()`](`pointblank.DataScan.from_dict`) / `from_json()` / `load_from_json()`.
+A profile is worth keeping when it serves as a baseline: a record of what a table looked
+like at one point, to compare later scans against, or to store alongside the table in a
+catalog. `to_dict()` returns the whole profile as plain Python data, which
+[`from_dict()`](`pointblank.DataScan.from_dict`) turns back into a `DataScan`. For a JSON
+string or file, use [`to_json()`](`pointblank.DataScan.to_json`) or
+[`save_to_json()`](`pointblank.DataScan.save_to_json`).
+
+The profile includes the first five non-missing values of each column (`sample_data`). If
+the table holds sensitive values, keep that in mind before storing or sharing the result.
 
 Returns
 -------
 dict[str, Any]
-    A dictionary with keys `"metadata"` and `"columns"`.
+    A dictionary with two keys. `"metadata"` holds the table name, the row count, the
+    list of column names, and `"skipped_columns"` (a dictionary mapping each column of an
+    unsupported type to its type). `"columns"` holds a list with one entry per summarized
+    column, each a dictionary with `"colname"`, `"coltype"`, `"sample_data"`, and
+    `"statistics"` (a dictionary mapping each statistic's name to its value).
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's scan a small table of sensor readings, where one reading is missing.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+readings = pl.DataFrame(
+    {"sensor": ["T1", "T2", "T3", "T4"], "temp_c": [21.4, 22.1, None, 20.8]}
+)
+
+profile = pb.DataScan(readings, tbl_name="readings").to_dict()
+
+profile["metadata"]
+```
+
+Each column has its own entry, with the statistics in a nested dictionary:
+
+```{python}
+profile["columns"][1]["statistics"]
+```
+
+The missing reading is counted in `n_missing` and left out of the other statistics. The
+statistics keep their Python types (the minimum and maximum of a date column, for example,
+are `datetime.date` values), and passing the dictionary to
+[`from_dict()`](`pointblank.DataScan.from_dict`) gives back the same profile.
 
 from_dict(d: 'dict[str, Any]') -> 'DataScan'
 
 Restore a `DataScan` from a dictionary.
 
 The dictionary is the one produced by [`to_dict()`](`pointblank.DataScan.to_dict`). This
-reconstructs the profile without needing the original data.
+reconstructs the profile without needing the original data, so a profile that was stored
+earlier can be viewed again with
+[`get_tabular_report()`](`pointblank.DataScan.get_tabular_report`), queried through
+[`summary_data`](`pointblank.DataScan.summary_data`), or used as the baseline in
+[`compare()`](`pointblank.DataScan.compare`).
+
+A restored scan has the statistics but not the data. Its `summary_data` is a Polars
+DataFrame, whatever the type of the original table. And when it's compared with another
+scan, the statistics are compared as usual, but drift scores (which need the values
+themselves) are only computed for Boolean columns.
 
 Parameters
 ----------
@@ -19259,6 +19815,43 @@ Returns
 -------
 DataScan
     A restored `DataScan` instance.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's take a profile of a table of sensor readings as a dictionary, then restore it.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+readings = pl.DataFrame(
+    {"sensor": ["T1", "T2", "T3", "T4"], "temp_c": [21.4, 22.1, None, 20.8]}
+)
+
+profile = pb.DataScan(readings, tbl_name="readings").to_dict()
+
+restored = pb.DataScan.from_dict(profile)
+
+restored.get_tabular_report()
+```
+
+The report is the same as the one for the original scan, even though `restored` was made
+from the dictionary alone. Converting the restored scan back to a dictionary gives the
+same dictionary:
+
+```{python}
+restored.to_dict() == profile
+```
+
+So a profile can go through any number of save-and-restore cycles without losing
+information.
 
 
 ## Table Comparison

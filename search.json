@@ -8705,7 +8705,19 @@
     "href": "reference/DataScan.to_json.html#returns",
     "title": "DataScan.to_json()",
     "section": "Returns",
-    "text": "Returns\n\n\n str\n\nA JSON string representing the profile.",
+    "text": "Returns\n\n\n str\n\nA JSON string representing the profile, indented by four spaces.",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.to_json"
+    ]
+  },
+  {
+    "objectID": "reference/DataScan.to_json.html#examples",
+    "href": "reference/DataScan.to_json.html#examples",
+    "title": "DataScan.to_json()",
+    "section": "Examples",
+    "text": "Examples\nHere, a table of shipments with a date column is scanned and converted to JSON.\n\nimport pointblank as pb\nimport polars as pl\nfrom datetime import date\n\nshipments = pl.DataFrame(\n    {\"shipped\": [date(2025, 3, 1), date(2025, 3, 4), date(2025, 3, 9)]}\n)\n\nprofile_json = pb.DataScan(shipments, tbl_name=\"shipments\").to_json()\n\nprint(profile_json)\n\n{\n    \"metadata\": {\n        \"table_name\": \"shipments\",\n        \"row_count\": 3,\n        \"columns\": [\n            \"shipped\"\n        ],\n        \"skipped_columns\": {}\n    },\n    \"columns\": [\n        {\n            \"colname\": \"shipped\",\n            \"coltype\": \"Date\",\n            \"sample_data\": [\n                \"2025-03-01\",\n                \"2025-03-04\",\n                \"2025-03-09\"\n            ],\n            \"statistics\": {\n                \"n_missing\": 0,\n                \"n_unique\": 3,\n                \"min\": \"2025-03-01\",\n                \"max\": \"2025-03-09\"\n            }\n        }\n    ]\n}\n\n\nThe earliest and latest dates are stored as strings. Because the result is text, it can be stored wherever text can, and from_json() turns it back into a DataScan.",
     "crumbs": [
       "Reference",
       "DataScan Methods",
@@ -8717,7 +8729,19 @@
     "href": "reference/DataScan.summary_data.html",
     "title": "DataScan.summary_data",
     "section": "",
-    "text": "DataScan.summary_data: Any",
+    "text": "The column statistics as a DataFrame.",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.summary_data"
+    ]
+  },
+  {
+    "objectID": "reference/DataScan.summary_data.html#examples",
+    "href": "reference/DataScan.summary_data.html#examples",
+    "title": "DataScan.summary_data",
+    "section": "Examples",
+    "text": "Examples\nHere’s the summary for the numeric columns of the small_table dataset.\n\nimport pointblank as pb\nimport polars as pl\n\nsmall_table = pb.load_dataset(dataset=\"small_table\", tbl_type=\"polars\")\n\nsummary = pb.DataScan(small_table).summary_data\n\n(\n    summary\n    .filter(pl.col(\"coltype\").is_in([\"Int64\", \"Float64\"]))\n    .select(\"colname\", \"n_missing\", \"n_unique\", \"mean\", \"min\", \"max\")\n)\n\n\nshape: (3, 6)colnamen_missingn_uniquemeanminmaxstri64i64f64strstr\"a\"073.769231\"1\"\"8\"\"c\"275.727273\"2\"\"9\"\"d\"0122304.702308\"108.34\"\"9999.99\"\n\n\nColumn c is the only one with missing values. The min and max columns are strings, because they also hold the dates from the date columns.\nSince this is an ordinary DataFrame, the profile can lead to further checks. This finds the columns with one distinct value fewer than the table has rows:\n\nsummary.filter(pl.col(\"n_unique\") == small_table.height - 1).get_column(\"colname\").to_list()\n\n['date_time', 'b', 'd']\n\n\nThree columns that look like they should identify each row (a timestamp, a code, and an amount) each have exactly one repeated value. That’s a sign of a duplicated row, which Validate.rows_distinct() would confirm.",
     "crumbs": [
       "Reference",
       "DataScan Methods",
@@ -8741,7 +8765,7 @@
     "href": "reference/DataScan.html#parameters",
     "title": "DataScan",
     "section": "Parameters",
-    "text": "Parameters\n\n\ndata: Any\n\nThe data to scan and summarize. This could be a DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, a GitHub URL pointing to a CSV or Parquet file, or a database connection string.\n\ntbl_name: str | None = None\n\nOptionally, the name of the table could be provided as tbl_name.",
+    "text": "Parameters\n\n\ndata: Any\n\nThe data to scan and summarize. This could be a DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, a GitHub URL pointing to a CSV or Parquet file, or a database connection string.\n\ntbl_name: str | None = None\n\nOptionally, the name of the table could be provided as tbl_name. It’s shown in the header of the report, stored with the profile, and used to label the two scans in a DataScanDiff report.",
     "crumbs": [
       "Reference",
       "Inspection and Assistance",
@@ -8753,7 +8777,7 @@
     "href": "reference/DataScan.html#measures-of-missingness-and-distinctness",
     "title": "DataScan",
     "section": "Measures Of Missingness And Distinctness",
-    "text": "Measures Of Missingness And Distinctness\nFor each column, the following measures are provided:\n\nn_missing_values: the number of missing values in the column\nf_missing_values: the fraction of missing values in the column\nn_unique_values: the number of unique values in the column\nf_unique_values: the fraction of unique values in the column\n\nThe fractions are calculated as the ratio of the measure to the total number of rows in the dataset.",
+    "text": "Measures Of Missingness And Distinctness\nFor each column, the following measures are provided:\n\nn_missing: the number of missing values in the column\nn_unique: the number of distinct values in the column (if there are missing values, they count as one more distinct value)\n\nThe report also shows each count as a fraction of the number of rows in the table.",
     "crumbs": [
       "Reference",
       "Inspection and Assistance",
@@ -8761,11 +8785,11 @@
     ]
   },
   {
-    "objectID": "reference/DataScan.html#counts-and-fractions-of-negative-zero-and-positive-values",
-    "href": "reference/DataScan.html#counts-and-fractions-of-negative-zero-and-positive-values",
+    "objectID": "reference/DataScan.html#statistics-for-numeric-and-string-columns",
+    "href": "reference/DataScan.html#statistics-for-numeric-and-string-columns",
     "title": "DataScan",
-    "section": "Counts And Fractions Of Negative, Zero, And Positive Values",
-    "text": "Counts And Fractions Of Negative, Zero, And Positive Values\nFor numerical columns, the following measures are provided:\n\nn_negative_values: the number of negative values in the column\nf_negative_values: the fraction of negative values in the column\nn_zero_values: the number of zero values in the column\nf_zero_values: the fraction of zero values in the column\nn_positive_values: the number of positive values in the column\nf_positive_values: the fraction of positive values in the column\n\nThe fractions are calculated as the ratio of the measure to the total number of rows in the dataset.",
+    "section": "Statistics For Numeric And String Columns",
+    "text": "Statistics For Numeric And String Columns\nFor numeric and string columns, the following statistics are provided. For string columns, they describe the lengths of the strings (in characters), not the strings themselves, which makes it easy to spot truncated values or codes of an unexpected length.\n\nmean: the mean\nstd: the standard deviation\nmin: the minimum\np05: the 5th percentile\nq_1: the first quartile\nmedian: the median\nq_3: the third quartile\np95: the 95th percentile\nmax: the maximum\niqr: the interquartile range (q_3 - q_1)",
     "crumbs": [
       "Reference",
       "Inspection and Assistance",
@@ -8773,11 +8797,11 @@
     ]
   },
   {
-    "objectID": "reference/DataScan.html#statistics-for-numerical-and-string-columns",
-    "href": "reference/DataScan.html#statistics-for-numerical-and-string-columns",
+    "objectID": "reference/DataScan.html#statistics-for-date-datetime-and-time-columns",
+    "href": "reference/DataScan.html#statistics-for-date-datetime-and-time-columns",
     "title": "DataScan",
-    "section": "Statistics For Numerical And String Columns",
-    "text": "Statistics For Numerical And String Columns\nFor numerical and string columns, several statistical measures are provided. Please note that for string columms, the statistics are based on the lengths of the strings in the column.\nThe following descriptive statistics are provided:\n\nmean: the mean of the column\nstd_dev: the standard deviation of the column\n\nAdditionally, the following quantiles are provided:\n\nmin: the minimum value in the column\np05: the 5th percentile of the column\nq_1: the first quartile of the column\nmed: the median of the column\nq_3: the third quartile of the column\np95: the 95th percentile of the column\nmax: the maximum value in the column\niqr: the interquartile range of the column",
+    "section": "Statistics For Date, Datetime, And Time Columns",
+    "text": "Statistics For Date, Datetime, And Time Columns\nFor date, datetime, and time columns, the following statistics are provided:\n\nmin: the earliest value in the column\nmax: the latest value in the column",
     "crumbs": [
       "Reference",
       "Inspection and Assistance",
@@ -8785,11 +8809,11 @@
     ]
   },
   {
-    "objectID": "reference/DataScan.html#statistics-for-date-and-datetime-columns",
-    "href": "reference/DataScan.html#statistics-for-date-and-datetime-columns",
+    "objectID": "reference/DataScan.html#statistics-for-boolean-columns",
+    "href": "reference/DataScan.html#statistics-for-boolean-columns",
     "title": "DataScan",
-    "section": "Statistics For Date And Datetime Columns",
-    "text": "Statistics For Date And Datetime Columns\nFor date/datetime columns, the following statistics are provided:\n\nmin: the minimum date/datetime in the column\nmax: the maximum date/datetime in the column\n\nTime columns get the same statistics.",
+    "section": "Statistics For Boolean Columns",
+    "text": "Statistics For Boolean Columns\nFor Boolean columns, freqs gives the number of True and False values (as a dictionary, e.g., {\"True\": 9, \"False\": 4}). The report shows these as percentages.",
     "crumbs": [
       "Reference",
       "Inspection and Assistance",
@@ -8821,11 +8845,71 @@
     ]
   },
   {
+    "objectID": "reference/DataScan.html#examples",
+    "href": "reference/DataScan.html#examples",
+    "title": "DataScan",
+    "section": "Examples",
+    "text": "Examples\nLet’s scan the small_table dataset, which has 13 rows and 8 columns of several types.\n\nimport pointblank as pb\n\nsmall_table = pb.load_dataset(dataset=\"small_table\", tbl_type=\"polars\")\n\nscan = pb.DataScan(small_table, tbl_name=\"small_table\")\n\nscan.get_tabular_report()\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Polarssmall_tableRows13Columns8\n  \n\n  \n  Column\n  NA\n  UQ\n  Mean\n  SD\n  Min\n  P5\n  Q1\n  Med\n  Q3\n  P95\n  Max\n  IQR\n\n\n\n  \n    \n    date\n    \n        \n            \n            \n                \n            \n        \n    \n\n    date_timeDatetime(time_unit='us', time_zone=None)\n    00\n    120.92\n    -\n    -\n    20160104 00:32:00\n    -\n    -\n    -\n    -\n    -\n    20160130 11:23:00\n    -\n  \n  \n    \n    date\n    \n        \n            \n            \n                \n            \n        \n    \n\n    dateDate\n    00\n    110.85\n    -\n    -\n    20160104\n    -\n    -\n    -\n    -\n    -\n    20160130\n    -\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    aInt64\n    00\n    70.54\n    3.77\n    2.09\n    1\n    1.06\n    2\n    3\n    4\n    7.4\n    8\n    2\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    bString\n    00\n    120.92\n    9\n    0\n    9\n    9\n    9\n    9\n    9\n    9\n    9\n    0\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    cInt64\n    20.15\n    70.54\n    5.73\n    2.72\n    2\n    2.05\n    3\n    7\n    8\n    9\n    9\n    5\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    dFloat64\n    00\n    120.92\n    2,304.7\n    2,631.36\n    108.34\n    118.88\n    837.93\n    1,035.64\n    3,291.03\n    6,335.44\n    9999.99\n    2,453.1\n  \n  \n    \n    boolean\n    \n        \n            \n            \n                \n            \n            \n                \n            \n            \n        \n    \n\n    eBoolean\n    00\n    T0.62F0.38\n    -\n    -\n    -\n    -\n    -\n    -\n    -\n    -\n    -\n    -\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    fString\n    00\n    30.23\n    3.46\n    0.52\n    3\n    3\n    3\n    3\n    4\n    4\n    4\n    1\n  \n\nString columns statistics regard the string's length.\n\n\n\n\n\nThe report has one row per column. Column c has 2 missing values, d spans a wide range (from about 108 to 9,999.99), and the string column b always has 9 characters, which suggests a fixed-format code. Column e is Boolean, so it shows the share of True and False values instead of statistics.\nThe same statistics are available as a DataFrame through summary_data, so they can be filtered like any other table. Here are the columns with missing values:\n\nimport polars as pl\n\n(\n    scan.summary_data\n    .filter(pl.col(\"n_missing\") &gt; 0)\n    .select(\"colname\", \"coltype\", \"n_missing\", \"n_unique\")\n)\n\n\nshape: (1, 4)colnamecoltypen_missingn_uniquestrstri64i64\"c\"\"Int64\"27\n\n\nA scan can also be kept as a baseline. If its profile is saved now with save_to_json(), a later scan of a new version of the table can be compared against it with compare(), which reports added and removed columns, type changes, and changes in each statistic.",
+    "crumbs": [
+      "Reference",
+      "Inspection and Assistance",
+      "DataScan"
+    ]
+  },
+  {
+    "objectID": "reference/DataScan.html#see-also",
+    "href": "reference/DataScan.html#see-also",
+    "title": "DataScan",
+    "section": "See Also",
+    "text": "See Also\n\ncol_summary_tbl()\n\nGet the same report directly from a table.\n\nmissing_vals_tbl()\n\nSee where in a table the missing values are.\n\npreview()\n\nShow the first and last rows of a table.\n\nDataScanDiff\n\nThe result of comparing two scans.",
+    "crumbs": [
+      "Reference",
+      "Inspection and Assistance",
+      "DataScan"
+    ]
+  },
+  {
     "objectID": "reference/DataScan.get_tabular_report.html",
     "href": "reference/DataScan.get_tabular_report.html",
     "title": "DataScan.get_tabular_report()",
     "section": "",
-    "text": "Usage\nSource\n\n\nDataScan.get_tabular_report(\n    *,\n    show_sample_data=False,\n)",
+    "text": "Get a tabular report of the scan.",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.get_tabular_report"
+    ]
+  },
+  {
+    "objectID": "reference/DataScan.get_tabular_report.html#parameters",
+    "href": "reference/DataScan.get_tabular_report.html#parameters",
+    "title": "DataScan.get_tabular_report()",
+    "section": "Parameters",
+    "text": "Parameters\n\n\nshow_sample_data: bool = False\n\nShould a column with the first five non-missing values of each column be added? This is off by default, since the values can be long, and the table may hold sensitive data.",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.get_tabular_report"
+    ]
+  },
+  {
+    "objectID": "reference/DataScan.get_tabular_report.html#returns",
+    "href": "reference/DataScan.get_tabular_report.html#returns",
+    "title": "DataScan.get_tabular_report()",
+    "section": "Returns",
+    "text": "Returns\n\n\n GT\n\nA Great Tables object.",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.get_tabular_report"
+    ]
+  },
+  {
+    "objectID": "reference/DataScan.get_tabular_report.html#examples",
+    "href": "reference/DataScan.get_tabular_report.html#examples",
+    "title": "DataScan.get_tabular_report()",
+    "section": "Examples",
+    "text": "Examples\nLet’s scan the game_revenue dataset and look at the report.\n\nimport pointblank as pb\n\ngame_revenue = pb.load_dataset(dataset=\"game_revenue\", tbl_type=\"polars\")\n\nscan = pb.DataScan(game_revenue, tbl_name=\"game_revenue\")\n\nscan.get_tabular_report()\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Polarsgame_revenueRows2,000Columns11\n  \n\n  \n  Column\n  NA\n  UQ\n  Mean\n  SD\n  Min\n  P5\n  Q1\n  Med\n  Q3\n  P95\n  Max\n  IQR\n\n\n\n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    player_idString\n    00\n    760.04\n    15\n    0\n    15\n    15\n    15\n    15\n    15\n    15\n    15\n    0\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    session_idString\n    00\n    6180.31\n    24\n    0\n    24\n    24\n    24\n    24\n    24\n    24\n    24\n    0\n  \n  \n    \n    date\n    \n        \n            \n            \n                \n            \n        \n    \n\n    session_startDatetime(time_unit='us', time_zone='UTC')\n    00\n    6180.31\n    -\n    -\n    20150101 01:31:03+00:00\n    -\n    -\n    -\n    -\n    -\n    20150121 03:59:23+00:00\n    -\n  \n  \n    \n    date\n    \n        \n            \n            \n                \n            \n        \n    \n\n    timeDatetime(time_unit='us', time_zone='UTC')\n    00\n    19890.99\n    -\n    -\n    20150101 01:31:27+00:00\n    -\n    -\n    -\n    -\n    -\n    20150121 04:06:29+00:00\n    -\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    item_typeString\n    00\n    2&lt;.01\n    2.22\n    0.42\n    2\n    2\n    2\n    2\n    2\n    3\n    3\n    0\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    item_nameString\n    00\n    240.01\n    7.35\n    1.27\n    5\n    5\n    7\n    8\n    8\n    9\n    11\n    1\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    item_revenueFloat64\n    00\n    5080.25\n    4.34\n    13.21\n    0.004\n    0.01\n    0.09\n    0.38\n    1.25\n    21.99\n    142.99\n    1.16\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    session_durationFloat64\n    00\n    3100.15\n    25.63\n    9.55\n    3.2\n    4.2\n    18.5\n    26.5\n    33.82\n    39.5\n    41.0\n    15.32\n  \n  \n    \n    date\n    \n        \n            \n            \n                \n            \n        \n    \n\n    start_dayDate\n    00\n    200.01\n    -\n    -\n    20150101\n    -\n    -\n    -\n    -\n    -\n    20150121\n    -\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    acquisitionString\n    00\n    6&lt;.01\n    7.97\n    2.54\n    5\n    5\n    7\n    7\n    8\n    14\n    14\n    1\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    countryString\n    00\n    230.01\n    8.53\n    3.13\n    5\n    5\n    6\n    7\n    12\n    13\n    14\n    6\n  \n\nString columns statistics regard the string's length.\n\n\n\n\n\nThe header shows the table type and its dimensions. In the rows, item_revenue has a long right tail (its 95th percentile is far below its maximum), and the string columns player_id and session_id have fixed lengths. To see what the values look like, add the sample data:\n\nscan.get_tabular_report(show_sample_data=True)\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Polarsgame_revenueRows2,000Columns11\n  \n\n  \n  Column\n  NA\n  UQ\n  Mean\n  SD\n  Min\n  P5\n  Q1\n  Med\n  Q3\n  P95\n  Max\n  IQR\n  sample_data\n\n\n\n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    player_idString\n    00\n    760.04\n    15\n    0\n    15\n    15\n    15\n    15\n    15\n    15\n    15\n    0\n    ['ECPANOIXLZHF896', 'ECPANOIXLZHF896', 'ECPANOIXLZHF896', 'ECPANOIXLZHF896', 'ECPANOIXLZHF896']\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    session_idString\n    00\n    6180.31\n    24\n    0\n    24\n    24\n    24\n    24\n    24\n    24\n    24\n    0\n    ['ECPANOIXLZHF896-eol2j8bs', 'ECPANOIXLZHF896-eol2j8bs', 'ECPANOIXLZHF896-eol2j8bs', 'ECPANOIXLZHF896-eol2j8bs', 'ECPANOIXLZHF896-hdu9jkls']\n  \n  \n    \n    date\n    \n        \n            \n            \n                \n            \n        \n    \n\n    session_startDatetime(time_unit='us', time_zone='UTC')\n    00\n    6180.31\n    -\n    -\n    20150101 01:31:03+00:00\n    -\n    -\n    -\n    -\n    -\n    20150121 03:59:23+00:00\n    -\n    ['2015-01-01 01:31:03+00:00', '2015-01-01 01:31:03+00:00', '2015-01-01 01:31:03+00:00', '2015-01-01 01:31:03+00:00', '2015-01-01 11:50:02+00:00']\n  \n  \n    \n    date\n    \n        \n            \n            \n                \n            \n        \n    \n\n    timeDatetime(time_unit='us', time_zone='UTC')\n    00\n    19890.99\n    -\n    -\n    20150101 01:31:27+00:00\n    -\n    -\n    -\n    -\n    -\n    20150121 04:06:29+00:00\n    -\n    ['2015-01-01 01:31:27+00:00', '2015-01-01 01:36:57+00:00', '2015-01-01 01:37:45+00:00', '2015-01-01 01:42:33+00:00', '2015-01-01 11:55:20+00:00']\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    item_typeString\n    00\n    2&lt;.01\n    2.22\n    0.42\n    2\n    2\n    2\n    2\n    2\n    3\n    3\n    0\n    ['iap', 'iap', 'iap', 'ad', 'ad']\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    item_nameString\n    00\n    240.01\n    7.35\n    1.27\n    5\n    5\n    7\n    8\n    8\n    9\n    11\n    1\n    ['offer2', 'gems3', 'gold7', 'ad_20sec', 'ad_5sec']\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    item_revenueFloat64\n    00\n    5080.25\n    4.34\n    13.21\n    0.004\n    0.01\n    0.09\n    0.38\n    1.25\n    21.99\n    142.99\n    1.16\n    ['8.99', '22.49', '107.99', '0.76', '0.03']\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    session_durationFloat64\n    00\n    3100.15\n    25.63\n    9.55\n    3.2\n    4.2\n    18.5\n    26.5\n    33.82\n    39.5\n    41.0\n    15.32\n    ['16.3', '16.3', '16.3', '16.3', '35.2']\n  \n  \n    \n    date\n    \n        \n            \n            \n                \n            \n        \n    \n\n    start_dayDate\n    00\n    200.01\n    -\n    -\n    20150101\n    -\n    -\n    -\n    -\n    -\n    20150121\n    -\n    ['2015-01-01', '2015-01-01', '2015-01-01', '2015-01-01', '2015-01-01']\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    acquisitionString\n    00\n    6&lt;.01\n    7.97\n    2.54\n    5\n    5\n    7\n    7\n    8\n    14\n    14\n    1\n    ['google', 'google', 'google', 'google', 'google']\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    countryString\n    00\n    230.01\n    8.53\n    3.13\n    5\n    5\n    6\n    7\n    12\n    13\n    14\n    6\n    ['Germany', 'Germany', 'Germany', 'Germany', 'Germany']\n  \n\nString columns statistics regard the string's length.\n\n\n\n\n\nThe samples make it clear that player_id and session_id are codes, and they show the format of each column’s values. The report is a Great Tables object, so it can be saved to a standalone HTML file with its write_raw_html() method.",
     "crumbs": [
       "Reference",
       "DataScan Methods",
@@ -8862,6 +8946,18 @@
     "title": "DataScan.from_dict()",
     "section": "Returns",
     "text": "Returns\n\n\n DataScan\n\nA restored DataScan instance.",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.from_dict"
+    ]
+  },
+  {
+    "objectID": "reference/DataScan.from_dict.html#examples",
+    "href": "reference/DataScan.from_dict.html#examples",
+    "title": "DataScan.from_dict()",
+    "section": "Examples",
+    "text": "Examples\nLet’s take a profile of a table of sensor readings as a dictionary, then restore it.\n\nimport pointblank as pb\nimport polars as pl\n\nreadings = pl.DataFrame(\n    {\"sensor\": [\"T1\", \"T2\", \"T3\", \"T4\"], \"temp_c\": [21.4, 22.1, None, 20.8]}\n)\n\nprofile = pb.DataScan(readings, tbl_name=\"readings\").to_dict()\n\nrestored = pb.DataScan.from_dict(profile)\n\nrestored.get_tabular_report()\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    PolarsreadingsRows4Columns2\n  \n\n  \n  Column\n  NA\n  UQ\n  Mean\n  SD\n  Min\n  P5\n  Q1\n  Med\n  Q3\n  P95\n  Max\n  IQR\n\n\n\n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    sensorString\n    00\n    41\n    2\n    0\n    2\n    2\n    2\n    2\n    2\n    2\n    2\n    0\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    temp_cFloat64\n    10.25\n    41\n    21.43\n    0.65\n    20.8\n    20.81\n    21.1\n    21.4\n    21.75\n    22.03\n    22.1\n    0.65\n  \n\nString columns statistics regard the string's length.\n\n\n\n\n\nThe report is the same as the one for the original scan, even though restored was made from the dictionary alone. Converting the restored scan back to a dictionary gives the same dictionary:\n\nrestored.to_dict() == profile\n\nTrue\n\n\nSo a profile can go through any number of save-and-restore cycles without losing information.",
     "crumbs": [
       "Reference",
       "DataScan Methods",
@@ -11222,6 +11318,30 @@
     ]
   },
   {
+    "objectID": "reference/DataScan.compare.html#what-is-compared",
+    "href": "reference/DataScan.compare.html#what-is-compared",
+    "title": "DataScan.compare()",
+    "section": "What Is Compared",
+    "text": "What Is Compared\nColumns are matched by name. A column that’s only in the current scan is added, one that’s only in the baseline is removed, and one whose data type differs is type-changed. For every column in both scans, each statistic is compared for exact equality, so any difference at all (even in the last decimal place of a mean) is reported along with both values. When the type has changed, the statistics might no longer measure the same thing (a numeric column’s mean is of its values, but a string column’s mean is of its lengths).",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.compare"
+    ]
+  },
+  {
+    "objectID": "reference/DataScan.compare.html#drift-scores",
+    "href": "reference/DataScan.compare.html#drift-scores",
+    "title": "DataScan.compare()",
+    "section": "Drift Scores",
+    "text": "Drift Scores\nStatistics show that something changed but not how much the distribution of values moved. For that, drift scores are computed for columns whose type hasn’t changed:\n\nnumeric columns get the population stability index (psi), with the values divided into ten bins at the baseline’s deciles (at least ten values are needed on each side), and the Kolmogorov–Smirnov statistic (ks_statistic, the largest gap between the two cumulative distributions) with its p-value (ks_p_value). The p-value comes from SciPy if it’s installed and from an approximation otherwise\nall other columns get a psi computed from how often each distinct value appears\n\nA common rule of thumb reads a PSI below 0.1 as little or no shift, from 0.1 to 0.25 as a moderate shift, and above 0.25 as a large one. A score of zero is left out.\nDrift scores need the values themselves, so they’re only computed when both scans were made from data. A scan restored with from_dict(), from_json(), or load_from_json() only has statistics, and then only Boolean columns (whose value counts are part of the profile) get a drift score.",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.compare"
+    ]
+  },
+  {
     "objectID": "reference/DataScan.compare.html#parameters",
     "href": "reference/DataScan.compare.html#parameters",
     "title": "DataScan.compare()",
@@ -11239,6 +11359,30 @@
     "title": "DataScan.compare()",
     "section": "Returns",
     "text": "Returns\n\n\n DataScanDiff\n\nAn object describing the differences between the two scans.",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.compare"
+    ]
+  },
+  {
+    "objectID": "reference/DataScan.compare.html#examples",
+    "href": "reference/DataScan.compare.html#examples",
+    "title": "DataScan.compare()",
+    "section": "Examples",
+    "text": "Examples\nLet’s compare two monthly extracts of an orders table. Between January and February, the gift column was dropped, a coupon column was added, a new \"app\" channel appeared, and order amounts went up.\n\nimport pointblank as pb\nimport polars as pl\n\njan = pl.DataFrame(\n    {\n        \"order_id\": list(range(1, 21)),\n        \"amount\": [20.0 + i for i in range(20)],\n        \"channel\": [\"web\"] * 14 + [\"store\"] * 6,\n        \"gift\": [i % 4 == 0 for i in range(20)],\n    }\n)\n\nfeb = pl.DataFrame(\n    {\n        \"order_id\": list(range(21, 45)),\n        \"amount\": [35.0 + 1.5 * i for i in range(24)],\n        \"channel\": [\"web\"] * 10 + [\"store\"] * 8 + [\"app\"] * 6,\n        \"coupon\": [\"SPRING\"] * 5 + [None] * 19,\n    }\n)\n\nscan_jan = pb.DataScan(jan, tbl_name=\"orders_jan\")\nscan_feb = pb.DataScan(feb, tbl_name=\"orders_feb\")\n\ndiff = scan_feb.compare(scan_jan)\n\ndiff\n\nDataScanDiff(added=1, removed=1, type_changed=0, stat_changed=3)\n\n\nThe printed summary counts one added column, one removed column, and three columns whose statistics changed. The report shows the details:\n\ndiff.get_tabular_report()\n\n\n\n\n\n\n  \n    Profile Comparison: orders_jan vs orders_feb\n  \n  \n    Row count: 20 (baseline) vs 24 (current)\n  \n\n  Column\n  Status\n  Type (Baseline)\n  Type (Current)\n  Changed Statistics\n  Drift Scores\n\n\n\n  \n    order_id\n    Stats Changed\n    Int64\n    Int64\n    n_unique: 20 -&gt; 24mean: 10.5 -&gt; 32.5median: 10.5 -&gt; 32.5std: 5.916 -&gt; 7.071min: 1 -&gt; 21max: 20 -&gt; 44p05: 1.095 -&gt; 21.11q_1: 5.75 -&gt; 26.75q_3: 15.25 -&gt; 38.25p95: 19.05 -&gt; 42.85iqr: 9.5 -&gt; 11.5\n    PSI: 8.2831KS: 1.0000 (p=0.0000)\n  \n  \n    amount\n    Stats Changed\n    Float64\n    Float64\n    n_unique: 20 -&gt; 24mean: 29.5 -&gt; 52.25median: 29.5 -&gt; 52.25std: 5.916 -&gt; 10.61min: 20 -&gt; 35max: 39 -&gt; 69.5p05: 20.09 -&gt; 35.17q_1: 24.75 -&gt; 43.62q_3: 34.25 -&gt; 60.88p95: 38.05 -&gt; 67.77iqr: 9.5 -&gt; 17.25\n    PSI: 6.7421KS: 0.8750 (p=0.0000)\n  \n  \n    channel\n    Stats Changed\n    String\n    String\n    n_unique: 2 -&gt; 3mean: 3.6 -&gt; 3.667std: 0.9403 -&gt; 0.9631\n    PSI: 2.1057\n  \n  \n    gift\n    Removed\n    Boolean\n    \n    \n    \n  \n  \n    coupon\n    Added\n    \n    String\n    \n    \n  \n\n\n\n\n\n\n\nThe PSI of amount (about 6.7) and its KS statistic (0.875) are far beyond the rule of thumb, so the amounts really did move. The channel column has a PSI of about 2.1 because of the new \"app\" value. The shift in order_id is expected, since each month has its own IDs, which shows that drift scores still need to be read with the meaning of each column in mind.",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.compare"
+    ]
+  },
+  {
+    "objectID": "reference/DataScan.compare.html#see-also",
+    "href": "reference/DataScan.compare.html#see-also",
+    "title": "DataScan.compare()",
+    "section": "See Also",
+    "text": "See Also\n\nDataScanDiff\n\nThe result of comparing two scans.\n\ncompare()\n\nCompare two tables row by row.",
     "crumbs": [
       "Reference",
       "DataScan Methods",
@@ -11282,6 +11426,18 @@
     ]
   },
   {
+    "objectID": "reference/DataScan.from_json.html#examples",
+    "href": "reference/DataScan.from_json.html#examples",
+    "title": "DataScan.from_json()",
+    "section": "Examples",
+    "text": "Examples\nSuppose the profile of the small_table dataset was stored as JSON text some time ago.\n\nimport pointblank as pb\nimport polars as pl\n\nsmall_table = pb.load_dataset(dataset=\"small_table\", tbl_type=\"polars\")\n\nstored_json = pb.DataScan(small_table, tbl_name=\"small_table\").to_json()\n\nRestoring it gives a DataScan that can be queried like the original one:\n\nrestored = pb.DataScan.from_json(stored_json)\n\nrestored.summary_data.select(\"colname\", \"n_missing\", \"n_unique\")\n\n\nshape: (8, 3)colnamen_missingn_uniquestri64i64\"date_time\"012\"date\"011\"a\"07\"b\"012\"c\"27\"d\"012\"e\"02\"f\"03\n\n\nThe table name, row count, and every column’s statistics come from the JSON, so the original table isn’t needed to answer questions about it later.",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.from_json"
+    ]
+  },
+  {
     "objectID": "reference/DataScan.load_from_json.html",
     "href": "reference/DataScan.load_from_json.html",
     "title": "DataScan.load_from_json()",
@@ -11318,6 +11474,18 @@
     ]
   },
   {
+    "objectID": "reference/DataScan.load_from_json.html#examples",
+    "href": "reference/DataScan.load_from_json.html#examples",
+    "title": "DataScan.load_from_json()",
+    "section": "Examples",
+    "text": "Examples\nLet’s save a profile of a table of orders as a baseline.\n\nimport pointblank as pb\nimport polars as pl\nimport tempfile\nfrom pathlib import Path\n\norders = pl.DataFrame(\n    {\"order_id\": [1, 2, 3, 4], \"amount\": [25.0, 40.0, 15.5, 60.0]}\n)\n\nbaseline_path = Path(tempfile.mkdtemp()) / \"orders_profile.json\"\n\npb.DataScan(orders, tbl_name=\"orders\").save_to_json(baseline_path)\n\nLater, the table has grown and a refund (a negative amount) has appeared. The baseline is loaded from the file and compared with a scan of the current table:\n\norders_now = pl.DataFrame(\n    {\"order_id\": [1, 2, 3, 4, 5], \"amount\": [25.0, 40.0, 15.5, 60.0, -15.5]}\n)\n\nbaseline = pb.DataScan.load_from_json(baseline_path)\n\ndiff = pb.DataScan(orders_now, tbl_name=\"orders\").compare(baseline)\n\ndiff.to_dict()[\"stat_diffs\"][\"amount\"][\"min\"]\n\n{'baseline': 15.5, 'current': -15.5}\n\n\nThe minimum amount went from 15.5 to -15.5. A change like this is easy to miss in the data but stands out in a comparison of profiles, and a check such as Validate.col_vals_ge() can then guard against it.",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.load_from_json"
+    ]
+  },
+  {
     "objectID": "reference/DataScan.save_to_json.html",
     "href": "reference/DataScan.save_to_json.html",
     "title": "DataScan.save_to_json()",
@@ -11334,7 +11502,31 @@
     "href": "reference/DataScan.save_to_json.html#parameters",
     "title": "DataScan.save_to_json()",
     "section": "Parameters",
-    "text": "Parameters\n\n\noutput_file: str\n\nThe path to the output JSON file.",
+    "text": "Parameters\n\n\noutput_file: str\n\nThe path to the output JSON file. An existing file is overwritten.",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.save_to_json"
+    ]
+  },
+  {
+    "objectID": "reference/DataScan.save_to_json.html#returns",
+    "href": "reference/DataScan.save_to_json.html#returns",
+    "title": "DataScan.save_to_json()",
+    "section": "Returns",
+    "text": "Returns\n\n\n None\n\nNothing is returned. The profile is written to output_file.",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.save_to_json"
+    ]
+  },
+  {
+    "objectID": "reference/DataScan.save_to_json.html#examples",
+    "href": "reference/DataScan.save_to_json.html#examples",
+    "title": "DataScan.save_to_json()",
+    "section": "Examples",
+    "text": "Examples\nLet’s save a profile of the small_table dataset to a file in a temporary directory.\n\nimport pointblank as pb\nimport tempfile\nfrom pathlib import Path\n\nsmall_table = pb.load_dataset(dataset=\"small_table\", tbl_type=\"polars\")\n\nprofile_path = Path(tempfile.mkdtemp()) / \"small_table_profile.json\"\n\npb.DataScan(small_table, tbl_name=\"small_table\").save_to_json(profile_path)\n\nprint(profile_path.read_text()[:180])\n\n{\n    \"metadata\": {\n        \"table_name\": \"small_table\",\n        \"row_count\": 13,\n        \"columns\": [\n            \"date_time\",\n            \"date\",\n            \"a\",\n            \"b\"\n\n\nThe file starts with the table’s metadata, and the column profiles follow. Loading it with load_from_json() gives back the same profile, without needing the table itself.",
     "crumbs": [
       "Reference",
       "DataScan Methods",
@@ -11358,7 +11550,19 @@
     "href": "reference/DataScan.to_dict.html#returns",
     "title": "DataScan.to_dict()",
     "section": "Returns",
-    "text": "Returns\n\n\n dict[str, Any]\n\nA dictionary with keys \"metadata\" and \"columns\".",
+    "text": "Returns\n\n\n dict[str, Any]\n\nA dictionary with two keys. \"metadata\" holds the table name, the row count, the list of column names, and \"skipped_columns\" (a dictionary mapping each column of an unsupported type to its type). \"columns\" holds a list with one entry per summarized column, each a dictionary with \"colname\", \"coltype\", \"sample_data\", and \"statistics\" (a dictionary mapping each statistic’s name to its value).",
+    "crumbs": [
+      "Reference",
+      "DataScan Methods",
+      "DataScan.to_dict"
+    ]
+  },
+  {
+    "objectID": "reference/DataScan.to_dict.html#examples",
+    "href": "reference/DataScan.to_dict.html#examples",
+    "title": "DataScan.to_dict()",
+    "section": "Examples",
+    "text": "Examples\nLet’s scan a small table of sensor readings, where one reading is missing.\n\nimport pointblank as pb\nimport polars as pl\n\nreadings = pl.DataFrame(\n    {\"sensor\": [\"T1\", \"T2\", \"T3\", \"T4\"], \"temp_c\": [21.4, 22.1, None, 20.8]}\n)\n\nprofile = pb.DataScan(readings, tbl_name=\"readings\").to_dict()\n\nprofile[\"metadata\"]\n\n{'table_name': 'readings',\n 'row_count': 4,\n 'columns': ['sensor', 'temp_c'],\n 'skipped_columns': {}}\n\n\nEach column has its own entry, with the statistics in a nested dictionary:\n\nprofile[\"columns\"][1][\"statistics\"]\n\n{'n_missing': 1,\n 'n_unique': 4,\n 'mean': 21.433333333333334,\n 'median': 21.4,\n 'std': 0.6506407098647716,\n 'min': 20.8,\n 'max': 22.1,\n 'p05': 20.806,\n 'q_1': 21.1,\n 'q_3': 21.75,\n 'p95': 22.03,\n 'iqr': 0.6499999999999986}\n\n\nThe missing reading is counted in n_missing and left out of the other statistics. The statistics keep their Python types (the minimum and maximum of a date column, for example, are datetime.date values), and passing the dictionary to from_dict() gives back the same profile.",
     "crumbs": [
       "Reference",
       "DataScan Methods",
@@ -11378,11 +11582,47 @@
     ]
   },
   {
+    "objectID": "reference/DataScanDiff.html#parameters",
+    "href": "reference/DataScanDiff.html#parameters",
+    "title": "DataScanDiff",
+    "section": "Parameters",
+    "text": "Parameters\n\n\ncurrent: DataScan\n\nThe newer DataScan (the one whose compare() method was called).\n\nbaseline: DataScan\n\nThe older DataScan that current is compared against.",
+    "crumbs": [
+      "Reference",
+      "Inspection and Assistance",
+      "DataScanDiff"
+    ]
+  },
+  {
     "objectID": "reference/DataScanDiff.html#attributes",
     "href": "reference/DataScanDiff.html#attributes",
     "title": "DataScanDiff",
     "section": "Attributes",
-    "text": "Attributes\n\n\ncolumns_added: list[str]\n\nColumn names present in the current scan but not the baseline.\n\ncolumns_removed: list[str]\n\nColumn names present in the baseline but not the current scan.\n\ncolumns_type_changed: list[str]\n\nColumn names whose data type changed between baseline and current.\n\ncolumn_diffs: list[_ColumnDiff]\n\nPer-column diff details for all columns that appear in either scan.",
+    "text": "Attributes\n\n\ncolumns_added: list[str]\n\nColumn names present in the current scan but not the baseline, sorted alphabetically.\n\ncolumns_removed: list[str]\n\nColumn names present in the baseline but not the current scan, sorted alphabetically.\n\ncolumns_type_changed: list[str]\n\nColumn names whose data type changed between baseline and current.\n\ncolumn_diffs: list[_ColumnDiff]\n\nPer-column diff details for all columns that appear in either scan, with the baseline’s columns first. Each entry has the attributes colname, coltype_baseline and coltype_current (None for a column missing from that scan), status (one of \"added\", \"removed\", \"type_changed\", \"changed\", or \"unchanged\"), stat_diffs (a dictionary mapping each changed statistic to a (baseline, current) tuple), and drift_scores (a dictionary of drift scores, which might be empty).",
+    "crumbs": [
+      "Reference",
+      "Inspection and Assistance",
+      "DataScanDiff"
+    ]
+  },
+  {
+    "objectID": "reference/DataScanDiff.html#examples",
+    "href": "reference/DataScanDiff.html#examples",
+    "title": "DataScanDiff",
+    "section": "Examples",
+    "text": "Examples\nIn this example, a table gains a row and a note column, and its score column changes from integers to strings.\n\nimport pointblank as pb\nimport polars as pl\n\nold = pl.DataFrame({\"id\": [1, 2, 3], \"score\": [7, 9, 8]})\n\nnew = pl.DataFrame(\n    {\"id\": [1, 2, 3, 4], \"score\": [\"7\", \"9\", \"8\", \"6\"], \"note\": [\"a\", None, \"b\", None]}\n)\n\ndiff = pb.DataScan(new).compare(pb.DataScan(old))\n\ndiff.columns_added, diff.columns_removed, diff.columns_type_changed\n\n(['note'], [], ['score'])\n\n\nThe schema changes are available directly as lists. For a look at each column, go through column_diffs:\n\nfor col in diff.column_diffs:\n    print(col.colname, col.status, col.coltype_baseline, \"-&gt;\", col.coltype_current)\n\nid changed Int64 -&gt; Int64\nscore type_changed Int64 -&gt; String\nnote added None -&gt; String\n\n\nThe id column kept its type, but its statistics changed because of the new row. A pipeline could stop whenever columns_removed or columns_type_changed isn’t empty, since those changes tend to break code that reads the table.",
+    "crumbs": [
+      "Reference",
+      "Inspection and Assistance",
+      "DataScanDiff"
+    ]
+  },
+  {
+    "objectID": "reference/DataScanDiff.html#see-also",
+    "href": "reference/DataScanDiff.html#see-also",
+    "title": "DataScanDiff",
+    "section": "See Also",
+    "text": "See Also\n\nDataScan\n\nProfile a table, column by column.\n\ncompare()\n\nCompare two tables row by row.",
     "crumbs": [
       "Reference",
       "Inspection and Assistance",
@@ -11394,7 +11634,7 @@
     "href": "reference/DataScanDiff.html#attributes-1",
     "title": "DataScanDiff",
     "section": "Attributes",
-    "text": "Attributes\n\n\n\nName\nDescription\n\n\n\n\nhas_changes\nReturn True if any schema or statistical changes were detected.\n\n\nrow_count_diff\nReturn (baseline_row_count, current_row_count).\n\n\n\n\nhas_changes\n\nReturn True if any schema or statistical changes were detected.\n\n\nhas_changes: bool\n\n\n\nrow_count_diff\n\nReturn (baseline_row_count, current_row_count).\n\n\nrow_count_diff: tuple[int, int]",
+    "text": "Attributes\n\n\n\nName\nDescription\n\n\n\n\nhas_changes\nReturn True if any schema or statistical changes were detected.\n\n\nrow_count_diff\nReturn (baseline_row_count, current_row_count).\n\n\n\n\nhas_changes\n\nReturn True if any schema or statistical changes were detected.\n\n\nhas_changes: bool\n\n\nThis is the quickest check of whether a table changed. It’s True if a column was added, removed, or changed type, or if any statistic or drift score differs between the two scans. A change in the row count alone doesn’t count, since tables often grow without changing in character. Check row_count_diff for that.\n\n\nExamples\nHere, a log of job runs grows from three rows to five, but every status is still \"ok\".\n\nimport pointblank as pb\nimport polars as pl\n\nruns_before = pl.DataFrame({\"status\": [\"ok\"] * 3})\nruns_after = pl.DataFrame({\"status\": [\"ok\"] * 5})\n\ndiff = pb.DataScan(runs_after).compare(pb.DataScan(runs_before))\n\ndiff.has_changes\n\nFalse\n\n\nThe table has more rows, but nothing about its columns changed (they have the same values in the same proportions), so has_changes is False. A single \"failed\" status in the new rows would have changed the number of distinct values and made it True.\n\n\n\nrow_count_diff\n\nReturn (baseline_row_count, current_row_count).\n\n\nrow_count_diff: tuple[int, int]\n\n\nThe row counts are kept apart from the other differences, since a change in size is often expected (a table that collects events grows every day). Having both counts lets you decide what change is acceptable, such as a minimum growth rate or a maximum drop.\n\n\nExamples\nLet’s compare two versions of a log of job runs, where the newer one has two more rows.\n\nimport pointblank as pb\nimport polars as pl\n\nruns_before = pl.DataFrame({\"status\": [\"ok\"] * 3})\nruns_after = pl.DataFrame({\"status\": [\"ok\"] * 5})\n\ndiff = pb.DataScan(runs_after).compare(pb.DataScan(runs_before))\n\nbaseline_rows, current_rows = diff.row_count_diff\n\nbaseline_rows, current_rows\n\n(3, 5)\n\n\nThe baseline has three rows and the current scan five. The has_changes property is False here, so code that should also react to a table shrinking (for instance, when a load was incomplete) needs to check these counts.",
     "crumbs": [
       "Reference",
       "Inspection and Assistance",
@@ -11406,7 +11646,7 @@
     "href": "reference/DataScanDiff.html#methods",
     "title": "DataScanDiff",
     "section": "Methods",
-    "text": "Methods\n\n\n\nName\nDescription\n\n\n\n\nget_tabular_report()\nGenerate a GT table summarizing the differences between the two scans.\n\n\nto_dict()\nExport the comparison results as a dictionary.\n\n\n\n\nget_tabular_report()\n\nGenerate a GT table summarizing the differences between the two scans.\n\n\nUsage\nSource\n\n\nget_tabular_report()\n\n\nReturns\n\n\n GT\n\nA styled Great Tables report showing schema and statistical drift.\n\n\n\n\n\n\nto_dict()\n\nExport the comparison results as a dictionary.\n\n\nUsage\nSource\n\n\nto_dict()\n\n\nReturns\n\n\n dict[str, Any]\n\nA dictionary with schema changes, row count diff, and per-column stat diffs.",
+    "text": "Methods\n\n\n\nName\nDescription\n\n\n\n\nget_tabular_report()\nGenerate a GT table summarizing the differences between the two scans.\n\n\nto_dict()\nExport the comparison results as a dictionary.\n\n\n\n\nget_tabular_report()\n\nGenerate a GT table summarizing the differences between the two scans.\n\n\nUsage\nSource\n\n\nget_tabular_report()\n\n\nThe report is for a person reviewing the changes: it has one row per column of either scan, in the order of the baseline’s columns followed by the added ones. The title names the two tables (baseline first) and the subtitle gives both row counts. The Status column says what happened to each column:\n\nAdded or Removed: the column is in only one of the scans\nType Changed or Type + Stats Changed: the data type changed (and maybe the statistics too)\nStats Changed: the type is the same, but statistics or drift scores differ\nOK: nothing changed\n\nThe types in the baseline and the current scan come next, then every changed statistic with its baseline and current values. If any column has drift scores, a final column shows them (PSI, and for numeric columns the KS statistic with its p-value).\nThis method needs Polars, whatever the type of the scanned tables.\n\n\nReturns\n\n\n GT\n\nA styled Great Tables report showing schema and statistical drift.\n\n\n\n\n\nExamples\nLet’s compare a scan of the small_table dataset with a scan of an older version, where the f column only had \"low\" and \"high\" values and there was no e column.\n\nimport pointblank as pb\nimport polars as pl\n\nsmall_table = pb.load_dataset(dataset=\"small_table\", tbl_type=\"polars\")\n\nolder = small_table.filter(pl.col(\"f\") != \"mid\").drop(\"e\")\n\ndiff = pb.DataScan(small_table, tbl_name=\"current\").compare(\n    pb.DataScan(older, tbl_name=\"older\")\n)\n\ndiff.get_tabular_report()\n\n\n\n\n\n\n  \n    Profile Comparison: older vs current\n  \n  \n    Row count: 11 (baseline) vs 13 (current)\n  \n\n  Column\n  Status\n  Type (Baseline)\n  Type (Current)\n  Changed Statistics\n  Drift Scores\n\n\n\n  \n    date_time\n    Stats Changed\n    Datetime(time_unit='us', time_zone=None)\n    Datetime(time_unit='us', time_zone=None)\n    n_unique: 10 -&gt; 12\n    PSI: 1.0467\n  \n  \n    date\n    Stats Changed\n    Date\n    Date\n    n_unique: 9 -&gt; 11\n    PSI: 1.0467\n  \n  \n    a\n    Stats Changed\n    Int64\n    Int64\n    mean: 3.909 -&gt; 3.769std: 2.212 -&gt; 2.088p05: 1.05 -&gt; 1.06q_1: 2.5 -&gt; 2q_3: 5 -&gt; 4p95: 7.5 -&gt; 7.4iqr: 2.5 -&gt; 2\n    PSI: 0.0397KS: 0.0420 (p=1.0000)\n  \n  \n    b\n    Stats Changed\n    String\n    String\n    n_unique: 10 -&gt; 12\n    PSI: 1.0467\n  \n  \n    c\n    Stats Changed\n    Int64\n    Int64\n    n_missing: 1 -&gt; 2n_unique: 6 -&gt; 7mean: 5.9 -&gt; 5.727std: 2.807 -&gt; 2.724p05: 2.045 -&gt; 2.05\n    PSI: 0.0183KS: 0.0545 (p=1.0000)\n  \n  \n    d\n    Stats Changed\n    Float64\n    Float64\n    n_unique: 10 -&gt; 12mean: 2071 -&gt; 2305median: 843.3 -&gt; 1036std: 2811 -&gt; 2631p05: 117.1 -&gt; 118.9q_1: 836 -&gt; 837.9q_3: 2287 -&gt; 3291p95: 6712 -&gt; 6335iqr: 1451 -&gt; 2453\n    PSI: 0.0635KS: 0.1259 (p=1.0000)\n  \n  \n    f\n    Stats Changed\n    String\n    String\n    n_unique: 2 -&gt; 3mean: 3.545 -&gt; 3.462median: 4 -&gt; 3std: 0.5222 -&gt; 0.5189\n    PSI: 1.1540\n  \n  \n    e\n    Added\n    \n    Boolean\n    \n    \n  \n\n\n\n\n\n\n\nThe e column shows as added, and the other columns have changed statistics, since the older version had two fewer rows. The PSI of f (about 1.15) comes from the \"mid\" values that are only in the current version. The date_time, date, and b columns get a similar PSI, but for a different reason: nearly all of their values are distinct, so removing any rows changes their value frequencies a lot. The PSI of a non-numeric column means most for columns with a few distinct values, like f. Like other GT tables, the report can be saved as HTML with write_raw_html(), to share with others who want to review the changes.\n\n\n\nto_dict()\n\nExport the comparison results as a dictionary.\n\n\nUsage\nSource\n\n\nto_dict()\n\n\nThe dictionary has every difference the comparison found, in plain Python data. That suits logging, alerting (by sending only the parts that matter), or storing the results next to the scans that produced them. Columns without changes are left out, so the dictionary only grows with the number of differences.\n\n\nReturns\n\n\n dict[str, Any]\n\nA dictionary with these keys: \"row_count\" (a dictionary with the \"baseline\" and \"current\" row counts), \"columns_added\" and \"columns_removed\" (lists of column names), \"columns_type_changed\" (a list of dictionaries with \"column\", \"baseline_type\", and \"current_type\"), \"stat_diffs\" (a dictionary that maps each column with changed statistics to a dictionary that maps each statistic to its \"baseline\" and \"current\" values), and \"drift_scores\" (a dictionary mapping each column that has drift scores to those scores).\n\n\n\n\n\nExamples\nLet’s compare two versions of a table of orders. The newer version has one more order, a refund for -15.5.\n\nimport pointblank as pb\nimport polars as pl\n\norders = pl.DataFrame({\"order_id\": [1, 2, 3, 4], \"amount\": [25.0, 40.0, 15.5, 60.0]})\n\norders_now = pl.DataFrame(\n    {\"order_id\": [1, 2, 3, 4, 5], \"amount\": [25.0, 40.0, 15.5, 60.0, -15.5]}\n)\n\ndiff_dict = pb.DataScan(orders_now).compare(pb.DataScan(orders)).to_dict()\n\ndiff_dict[\"row_count\"], diff_dict[\"columns_added\"], diff_dict[\"columns_removed\"]\n\n({'baseline': 4, 'current': 5}, [], [])\n\n\nThere are no schema changes. The changed statistics of amount include its minimum:\n\ndiff_dict[\"stat_diffs\"][\"amount\"][\"min\"]\n\n{'baseline': 15.5, 'current': -15.5}\n\n\nPicking out an entry like this one makes it easy to raise an alert on specific changes (here, a negative amount) and ignore others, such as a mean that moves a little as new orders come in.",
     "crumbs": [
       "Reference",
       "Inspection and Assistance",
@@ -15471,7 +15711,7 @@
     "href": "reference/col_summary_tbl.html#examples",
     "title": "col_summary_tbl()",
     "section": "Examples",
-    "text": "Examples\nIt’s easy to get a column-level summary of a table using the col_summary_tbl() function. Here’s an example using the small_table dataset (itself loaded using the load_dataset() function):\n\nimport pointblank as pb\n\nsmall_table = pb.load_dataset(dataset=\"small_table\", tbl_type=\"polars\")\n\npb.col_summary_tbl(data=small_table)\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    PolarsRows13Columns8\n  \n\n  \n  Column\n  NA\n  UQ\n  Mean\n  SD\n  Min\n  P5\n  Q1\n  Med\n  Q3\n  P95\n  Max\n  IQR\n\n\n\n  \n    \n    date\n    \n        \n            \n            \n                \n            \n        \n    \n\n    date_timeDatetime(time_unit='us', time_zone=None)\n    00\n    120.92\n    -\n    -\n    20160104 00:32:00\n    -\n    -\n    -\n    -\n    -\n    20160130 11:23:00\n    -\n  \n  \n    \n    date\n    \n        \n            \n            \n                \n            \n        \n    \n\n    dateDate\n    00\n    110.85\n    -\n    -\n    20160104\n    -\n    -\n    -\n    -\n    -\n    20160130\n    -\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    aInt64\n    00\n    70.54\n    3.77\n    2.09\n    1\n    1.06\n    2\n    3\n    4\n    7.4\n    8\n    2\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    bString\n    00\n    120.92\n    9\n    0\n    9\n    9\n    9\n    9\n    9\n    9\n    9\n    0\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    cInt64\n    20.15\n    70.54\n    5.73\n    2.72\n    2\n    2.05\n    3\n    7\n    8\n    9\n    9\n    5\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    dFloat64\n    00\n    120.92\n    2,304.7\n    2,631.36\n    108.34\n    118.88\n    837.93\n    1,035.64\n    3,291.03\n    6,335.44\n    9999.99\n    2,453.1\n  \n  \n    \n    boolean\n    \n        \n            \n            \n                \n            \n            \n                \n            \n            \n        \n    \n\n    eBoolean\n    00\n    T0.62F0.38\n    -\n    -\n    -\n    -\n    -\n    -\n    -\n    -\n    -\n    -\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    fString\n    00\n    30.23\n    3.46\n    0.52\n    3\n    3\n    3\n    3\n    4\n    4\n    4\n    1\n  \n\nString columns statistics regard the string's length.\n\n\n\n\n\nThis table used above was a Polars DataFrame, but the col_summary_tbl() function works with any table supported by pointblank, including Pandas DataFrames and Ibis backend tables. Here’s an example using a DuckDB table handled by Ibis:\n\nnycflights = pb.load_dataset(dataset=\"nycflights\", tbl_type=\"duckdb\")\n\npb.col_summary_tbl(data=nycflights, tbl_name=\"nycflights\")\n\n/Users/riannone/py_projects/pointblank/.venv/lib/python3.11/site-packages/great_tables/_tbl_data.py:902: UserWarning: PyArrow Table support is currently experimental.\n  warnings.warn(\"PyArrow Table support is currently experimental.\")\n\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Rows336,776Columns18\n  \n\n  \n  Column\n  NA\n  UQ\n  Mean\n  SD\n  Min\n  P5\n  Q1\n  Med\n  Q3\n  P95\n  Max\n  IQR\n\n\n\n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    yearInt64\n    00\n    1&lt;.01\n    2,013\n    0\n    2,013\n    2,013\n    2,013\n    2,013\n    2,013\n    2,013\n    2,013\n    0\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    monthInt64\n    00\n    12&lt;.01\n    6.55\n    3.41\n    1\n    1\n    4\n    7\n    10\n    12\n    12\n    6\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    dayInt64\n    00\n    31&lt;.01\n    15.71\n    8.77\n    1\n    1\n    8\n    16\n    23\n    29\n    31\n    15\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    dep_timeInt64\n    82550.02\n    1319&lt;.01\n    1,349.11\n    488.28\n    1\n    514\n    907\n    1,401\n    1,744\n    2,112\n    2,400\n    837\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    sched_dep_timeInt64\n    00\n    1021&lt;.01\n    1,344.25\n    467.34\n    106\n    545\n    906\n    1,359\n    1,729\n    2,050\n    2,359\n    823\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    dep_delayInt64\n    82550.02\n    528&lt;.01\n    12.64\n    40.21\n    −43\n    −13\n    −5\n    −2\n    11\n    88\n    1,301\n    16\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    arr_timeInt64\n    87130.03\n    1412&lt;.01\n    1,502.05\n    533.26\n    1\n    10\n    1,104\n    1,535\n    1,940\n    2,248\n    2,400\n    836\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    sched_arr_timeInt64\n    00\n    1163&lt;.01\n    1,536.38\n    497.46\n    1\n    15\n    1,124\n    1,556\n    1,945\n    2,246\n    2,359\n    821\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    arr_delayInt64\n    94300.03\n    578&lt;.01\n    6.9\n    44.63\n    −86\n    −48\n    −17\n    −5\n    14\n    91\n    1,272\n    31\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    carrierString\n    00\n    16&lt;.01\n    2\n    0\n    2\n    2\n    2\n    2\n    2\n    2\n    2\n    0\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    flightInt64\n    00\n    38440.01\n    1,971.92\n    1,632.47\n    1\n    4\n    553\n    1,496\n    3,465\n    4,695\n    8,500\n    2,912\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    tailnumString\n    2512&lt;.01\n    40440.01\n    6\n    0.07\n    5\n    6\n    6\n    6\n    6\n    6\n    6\n    0\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    originString\n    00\n    3&lt;.01\n    3\n    0\n    3\n    3\n    3\n    3\n    3\n    3\n    3\n    0\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    destString\n    00\n    105&lt;.01\n    3\n    0\n    3\n    3\n    3\n    3\n    3\n    3\n    3\n    0\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    air_timeInt64\n    94300.03\n    510&lt;.01\n    150.69\n    93.69\n    20\n    31\n    82\n    129\n    192\n    339\n    695\n    110\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    distanceInt64\n    00\n    214&lt;.01\n    1,039.91\n    733.23\n    17\n    116\n    502\n    872\n    1,389\n    2,475\n    4,983\n    887\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    hourInt64\n    00\n    20&lt;.01\n    13.18\n    4.66\n    1\n    5\n    9\n    13\n    17\n    20\n    23\n    8\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    minuteInt64\n    00\n    60&lt;.01\n    26.23\n    19.3\n    0\n    0\n    8\n    29\n    44\n    58\n    59\n    36\n  \n\nString columns statistics regard the string's length.",
+    "text": "Examples\nIt’s easy to get a column-level summary of a table using the col_summary_tbl() function. Here’s an example using the small_table dataset (itself loaded using the load_dataset() function):\n\nimport pointblank as pb\n\nsmall_table = pb.load_dataset(dataset=\"small_table\", tbl_type=\"polars\")\n\npb.col_summary_tbl(data=small_table)\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    PolarsRows13Columns8\n  \n\n  \n  Column\n  NA\n  UQ\n  Mean\n  SD\n  Min\n  P5\n  Q1\n  Med\n  Q3\n  P95\n  Max\n  IQR\n\n\n\n  \n    \n    date\n    \n        \n            \n            \n                \n            \n        \n    \n\n    date_timeDatetime(time_unit='us', time_zone=None)\n    00\n    120.92\n    -\n    -\n    20160104 00:32:00\n    -\n    -\n    -\n    -\n    -\n    20160130 11:23:00\n    -\n  \n  \n    \n    date\n    \n        \n            \n            \n                \n            \n        \n    \n\n    dateDate\n    00\n    110.85\n    -\n    -\n    20160104\n    -\n    -\n    -\n    -\n    -\n    20160130\n    -\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    aInt64\n    00\n    70.54\n    3.77\n    2.09\n    1\n    1.06\n    2\n    3\n    4\n    7.4\n    8\n    2\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    bString\n    00\n    120.92\n    9\n    0\n    9\n    9\n    9\n    9\n    9\n    9\n    9\n    0\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    cInt64\n    20.15\n    70.54\n    5.73\n    2.72\n    2\n    2.05\n    3\n    7\n    8\n    9\n    9\n    5\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    dFloat64\n    00\n    120.92\n    2,304.7\n    2,631.36\n    108.34\n    118.88\n    837.93\n    1,035.64\n    3,291.03\n    6,335.44\n    9999.99\n    2,453.1\n  \n  \n    \n    boolean\n    \n        \n            \n            \n                \n            \n            \n                \n            \n            \n        \n    \n\n    eBoolean\n    00\n    T0.62F0.38\n    -\n    -\n    -\n    -\n    -\n    -\n    -\n    -\n    -\n    -\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    fString\n    00\n    30.23\n    3.46\n    0.52\n    3\n    3\n    3\n    3\n    4\n    4\n    4\n    1\n  \n\nString columns statistics regard the string's length.\n\n\n\n\n\nThis table used above was a Polars DataFrame, but the col_summary_tbl() function works with any table supported by pointblank, including Pandas DataFrames and Ibis backend tables. Here’s an example using a DuckDB table handled by Ibis:\n\nnycflights = pb.load_dataset(dataset=\"nycflights\", tbl_type=\"duckdb\")\n\npb.col_summary_tbl(data=nycflights, tbl_name=\"nycflights\")\n\n/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/great_tables/_tbl_data.py:902: UserWarning: PyArrow Table support is currently experimental.\n  warnings.warn(\"PyArrow Table support is currently experimental.\")\n\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Rows336,776Columns18\n  \n\n  \n  Column\n  NA\n  UQ\n  Mean\n  SD\n  Min\n  P5\n  Q1\n  Med\n  Q3\n  P95\n  Max\n  IQR\n\n\n\n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    yearInt64\n    00\n    1&lt;.01\n    2,013\n    0\n    2,013\n    2,013\n    2,013\n    2,013\n    2,013\n    2,013\n    2,013\n    0\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    monthInt64\n    00\n    12&lt;.01\n    6.55\n    3.41\n    1\n    1\n    4\n    7\n    10\n    12\n    12\n    6\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    dayInt64\n    00\n    31&lt;.01\n    15.71\n    8.77\n    1\n    1\n    8\n    16\n    23\n    29\n    31\n    15\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    dep_timeInt64\n    82550.02\n    1319&lt;.01\n    1,349.11\n    488.28\n    1\n    514\n    907\n    1,401\n    1,744\n    2,112\n    2,400\n    837\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    sched_dep_timeInt64\n    00\n    1021&lt;.01\n    1,344.25\n    467.34\n    106\n    545\n    906\n    1,359\n    1,729\n    2,050\n    2,359\n    823\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    dep_delayInt64\n    82550.02\n    528&lt;.01\n    12.64\n    40.21\n    −43\n    −13\n    −5\n    −2\n    11\n    88\n    1,301\n    16\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    arr_timeInt64\n    87130.03\n    1412&lt;.01\n    1,502.05\n    533.26\n    1\n    10\n    1,104\n    1,535\n    1,940\n    2,248\n    2,400\n    836\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    sched_arr_timeInt64\n    00\n    1163&lt;.01\n    1,536.38\n    497.46\n    1\n    15\n    1,124\n    1,556\n    1,945\n    2,246\n    2,359\n    821\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    arr_delayInt64\n    94300.03\n    578&lt;.01\n    6.9\n    44.63\n    −86\n    −48\n    −17\n    −5\n    14\n    91\n    1,272\n    31\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    carrierString\n    00\n    16&lt;.01\n    2\n    0\n    2\n    2\n    2\n    2\n    2\n    2\n    2\n    0\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    flightInt64\n    00\n    38440.01\n    1,971.92\n    1,632.47\n    1\n    4\n    553\n    1,496\n    3,465\n    4,695\n    8,500\n    2,912\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    tailnumString\n    2512&lt;.01\n    40440.01\n    6\n    0.07\n    5\n    6\n    6\n    6\n    6\n    6\n    6\n    0\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    originString\n    00\n    3&lt;.01\n    3\n    0\n    3\n    3\n    3\n    3\n    3\n    3\n    3\n    0\n  \n  \n    \n    string\n    \n        \n            \n            \n                \n            \n        \n    \n\n    destString\n    00\n    105&lt;.01\n    3\n    0\n    3\n    3\n    3\n    3\n    3\n    3\n    3\n    0\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    air_timeInt64\n    94300.03\n    510&lt;.01\n    150.69\n    93.69\n    20\n    31\n    82\n    129\n    192\n    339\n    695\n    110\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    distanceInt64\n    00\n    214&lt;.01\n    1,039.91\n    733.23\n    17\n    116\n    502\n    872\n    1,389\n    2,475\n    4,983\n    887\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    hourInt64\n    00\n    20&lt;.01\n    13.18\n    4.66\n    1\n    5\n    9\n    13\n    17\n    20\n    23\n    8\n  \n  \n    \n    numeric\n    \n        \n            \n            \n                \n            \n        \n    \n\n    minuteInt64\n    00\n    60&lt;.01\n    26.23\n    19.3\n    0\n    0\n    8\n    29\n    44\n    58\n    59\n    36\n  \n\nString columns statistics regard the string's length.\n\n\n\n\n\nThe tbl_name= value appears in the report’s title, which helps tell reports apart when several tables are summarized. An Ibis table is read into memory before its statistics are computed, so a very large table might be better summarized from a sample. To keep the summary rather than just display it (to query it, save it, or compare it with a later version of the table), create a DataScan instead, which produces this same report through its get_tabular_report() method.",
     "crumbs": [
       "Reference",
       "Inspection and Assistance",
@@ -16541,7 +16781,7 @@
     "href": "reference/index.html#datascan-methods",
     "title": "Reference",
     "section": "DataScan Methods",
-    "text": "DataScan Methods\n\nMethods for the DataScan class\n\n\nDataScan.get_tabular_report()\n\n\n\nDataScan.summary_data\n\n\n\nDataScan.compare()\n\nCompare this scan against a baseline and return the differences.\n\nDataScan.save_to_json()\n\nSave the profile to a JSON file.\n\nDataScan.load_from_json()\n\nLoad a DataScan from a JSON file produced by save_to_json().\n\nDataScan.to_json()\n\nExport the profile as a JSON string.\n\nDataScan.from_json()\n\nRestore a DataScan from a JSON string.\n\nDataScan.to_dict()\n\nExport the profile as a structured dictionary.\n\nDataScan.from_dict()\n\nRestore a DataScan from a dictionary.",
+    "text": "DataScan Methods\n\nMethods for the DataScan class\n\n\nDataScan.get_tabular_report()\n\nGet a tabular report of the scan.\n\nDataScan.summary_data\n\nThe column statistics as a DataFrame.\n\nDataScan.compare()\n\nCompare this scan against a baseline and return the differences.\n\nDataScan.save_to_json()\n\nSave the profile to a JSON file.\n\nDataScan.load_from_json()\n\nLoad a DataScan from a JSON file produced by save_to_json().\n\nDataScan.to_json()\n\nExport the profile as a JSON string.\n\nDataScan.from_json()\n\nRestore a DataScan from a JSON string.\n\nDataScan.to_dict()\n\nExport the profile as a structured dictionary.\n\nDataScan.from_dict()\n\nRestore a DataScan from a dictionary.",
     "crumbs": [
       "Reference",
       "API Index"

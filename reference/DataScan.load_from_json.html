@@ -1644,6 +1644,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
     </div>
@@ -1674,10 +1675,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L687-L703" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1051-L1121" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">DataScan</span><span class="op">.</span><span class="fu">load_from_json</span>(<span class="va">input_file</span>)</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>This is how a saved baseline is brought back: load the profile from the file, then pass it to the <a href="../reference/DataScan.compare.html#pointblank.DataScan.compare" class="gdls-link"><code>compare()</code></a> method of a new scan to find out what has changed since. The file is the one written by <a href="../reference/DataScan.save_to_json.html#pointblank.DataScan.save_to_json" class="gdls-link"><code>save_to_json()</code></a> (or any file containing the output of <a href="../reference/DataScan.to_json.html#pointblank.DataScan.to_json" class="gdls-link"><code>to_json()</code></a>).</p>
+<p>As with <a href="../reference/DataScan.from_dict.html#pointblank.DataScan.from_dict" class="gdls-link"><code>from_dict()</code></a>, the loaded scan has the statistics but not the data, so drift scores are only computed for its Boolean columns.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1700,6 +1705,40 @@ A restored <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s save a profile of a table of orders as a baseline.</p>
+<div id="eb23eee2" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>orders <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"order_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>], <span class="st">"amount"</span>: [<span class="fl">25.0</span>, <span class="fl">40.0</span>, <span class="fl">15.5</span>, <span class="fl">60.0</span>]}</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>baseline_path <span class="op">=</span> Path(tempfile.mkdtemp()) <span class="op">/</span> <span class="st">"orders_profile.json"</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>pb.DataScan(orders, tbl_name<span class="op">=</span><span class="st">"orders"</span>).save_to_json(baseline_path)</span></code></pre></div>
+</div>
+<p>Later, the table has grown and a refund (a negative amount) has appeared. The baseline is loaded from the file and compared with a scan of the current table:</p>
+<div id="d56e7ed4" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>orders_now <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"order_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>], <span class="st">"amount"</span>: [<span class="fl">25.0</span>, <span class="fl">40.0</span>, <span class="fl">15.5</span>, <span class="fl">60.0</span>, <span class="op">-</span><span class="fl">15.5</span>]}</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> pb.DataScan.load_from_json(baseline_path)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> pb.DataScan(orders_now, tbl_name<span class="op">=</span><span class="st">"orders"</span>).compare(baseline)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>diff.to_dict()[<span class="st">"stat_diffs"</span>][<span class="st">"amount"</span>][<span class="st">"min"</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>{'baseline': 15.5, 'current': -15.5}</code></pre>
+</div>
+</div>
+<p>The minimum <code>amount</code> went from 15.5 to -15.5. A change like this is easy to miss in the data but stands out in a comparison of profiles, and a check such as <a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link"><code>Validate.col_vals_ge()</code></a> can then guard against it.</p>
 
 
 </section>

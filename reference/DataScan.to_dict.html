@@ -1643,6 +1643,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#returns" id="toc-returns" class="nav-link active" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
     </div>
@@ -1673,13 +1674,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L545-L584" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L708-L790" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">DataScan</span><span class="op">.</span><span class="fu">to_dict</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The returned dictionary contains metadata (table name, row count, column list) plus per-column profile entries with their data type, statistics, and sample data. This format is designed for round-trip persistence: save it with <a href="../reference/DataScan.to_json.html#pointblank.DataScan.to_json" class="gdls-link"><code>to_json()</code></a> / <a href="../reference/DataScan.save_to_json.html#pointblank.DataScan.save_to_json" class="gdls-link gdls-code">save_to_json()</a> and restore with <a href="../reference/DataScan.from_dict.html#pointblank.DataScan.from_dict" class="gdls-link"><code>from_dict()</code></a> / <a href="../reference/DataScan.from_json.html#pointblank.DataScan.from_json" class="gdls-link gdls-code">from_json()</a> / <a href="../reference/DataScan.load_from_json.html#pointblank.DataScan.load_from_json" class="gdls-link gdls-code">load_from_json()</a>.</p>
+<p>A profile is worth keeping when it serves as a baseline: a record of what a table looked like at one point, to compare later scans against, or to store alongside the table in a catalog. <code>to_dict()</code> returns the whole profile as plain Python data, which <a href="../reference/DataScan.from_dict.html#pointblank.DataScan.from_dict" class="gdls-link"><code>from_dict()</code></a> turns back into a <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a>. For a JSON string or file, use <a href="../reference/DataScan.to_json.html#pointblank.DataScan.to_json" class="gdls-link"><code>to_json()</code></a> or <a href="../reference/DataScan.save_to_json.html#pointblank.DataScan.save_to_json" class="gdls-link"><code>save_to_json()</code></a>.</p>
+<p>The profile includes the first five non-missing values of each column (<code>sample_data</code>). If the table holds sensitive values, keep that in mind before storing or sharing the result.</p>
 </div>
 <section id="returns" class="level2 doc-returns">
 <h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
@@ -1687,10 +1689,51 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code> <span class="doc-parameter-annotation">dict[str, Any]</span></code></dt>
 <dd>
-A dictionary with keys <code>"metadata"</code> and <code>"columns"</code>.
+A dictionary with two keys. <code>"metadata"</code> holds the table name, the row count, the list of column names, and <code>"skipped_columns"</code> (a dictionary mapping each column of an unsupported type to its type). <code>"columns"</code> holds a list with one entry per summarized column, each a dictionary with <code>"colname"</code>, <code>"coltype"</code>, <code>"sample_data"</code>, and <code>"statistics"</code> (a dictionary mapping each statistic’s name to its value).
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s scan a small table of sensor readings, where one reading is missing.</p>
+<div id="28e424d3" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>readings <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"sensor"</span>: [<span class="st">"T1"</span>, <span class="st">"T2"</span>, <span class="st">"T3"</span>, <span class="st">"T4"</span>], <span class="st">"temp_c"</span>: [<span class="fl">21.4</span>, <span class="fl">22.1</span>, <span class="va">None</span>, <span class="fl">20.8</span>]}</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>profile <span class="op">=</span> pb.DataScan(readings, tbl_name<span class="op">=</span><span class="st">"readings"</span>).to_dict()</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>profile[<span class="st">"metadata"</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>{'table_name': 'readings',
+ 'row_count': 4,
+ 'columns': ['sensor', 'temp_c'],
+ 'skipped_columns': {}}</code></pre>
+</div>
+</div>
+<p>Each column has its own entry, with the statistics in a nested dictionary:</p>
+<div id="8cd1193a" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>profile[<span class="st">"columns"</span>][<span class="dv">1</span>][<span class="st">"statistics"</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>{'n_missing': 1,
+ 'n_unique': 4,
+ 'mean': 21.433333333333334,
+ 'median': 21.4,
+ 'std': 0.6506407098647716,
+ 'min': 20.8,
+ 'max': 22.1,
+ 'p05': 20.806,
+ 'q_1': 21.1,
+ 'q_3': 21.75,
+ 'p95': 22.03,
+ 'iqr': 0.6499999999999986}</code></pre>
+</div>
+</div>
+<p>The missing reading is counted in <code>n_missing</code> and left out of the other statistics. The statistics keep their Python types (the minimum and maximum of a date column, for example, are <code>datetime.date</code> values), and passing the dictionary to <a href="../reference/DataScan.from_dict.html#pointblank.DataScan.from_dict" class="gdls-link"><code>from_dict()</code></a> gives back the same profile.</p>
 
 
 </section>

@@ -1643,6 +1643,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
     </div>
@@ -1673,10 +1675,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L600-L610" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L839-L890" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">DataScan</span><span class="op">.</span><span class="fu">save_to_json</span>(<span class="va">output_file</span>)</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>Saving a scan to a file is the simplest way to keep a baseline: scan a table once, save the profile, and load it later with <a href="../reference/DataScan.load_from_json.html#pointblank.DataScan.load_from_json" class="gdls-link"><code>load_from_json()</code></a> to compare a new scan against it with <a href="../reference/DataScan.compare.html#pointblank.DataScan.compare" class="gdls-link"><code>compare()</code></a>. The file holds the output of <a href="../reference/DataScan.to_json.html#pointblank.DataScan.to_json" class="gdls-link"><code>to_json()</code></a>, so it’s small (it stores the statistics, not the data) and can be kept in version control next to the code that produces the table.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1684,10 +1689,50 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">output_file</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-The path to the output JSON file.
+The path to the output JSON file. An existing file is overwritten.
 </dd>
 </dl>
 </div>
+</section>
+<section id="returns" class="level2 doc-returns">
+<h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">None</span></code></dt>
+<dd>
+Nothing is returned. The profile is written to <code>output_file</code>.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s save a profile of the <code>small_table</code> dataset to a file in a temporary directory.</p>
+<div id="d051ae9f" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>profile_path <span class="op">=</span> Path(tempfile.mkdtemp()) <span class="op">/</span> <span class="st">"small_table_profile.json"</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>pb.DataScan(small_table, tbl_name<span class="op">=</span><span class="st">"small_table"</span>).save_to_json(profile_path)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(profile_path.read_text()[:<span class="dv">180</span>])</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{
+    "metadata": {
+        "table_name": "small_table",
+        "row_count": 13,
+        "columns": [
+            "date_time",
+            "date",
+            "a",
+            "b"</code></pre>
+</div>
+</div>
+<p>The file starts with the table’s metadata, and the column profiles follow. Loading it with <a href="../reference/DataScan.load_from_json.html#pointblank.DataScan.load_from_json" class="gdls-link"><code>load_from_json()</code></a> gives back the same profile, without needing the table itself.</p>
 
 
 </section>
