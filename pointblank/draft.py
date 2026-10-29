@@ -55,6 +55,14 @@ class DraftValidation:
         to disable SSL verification (e.g., when behind a corporate firewall with self-signed
         certificates). Defaults to `True`. Use with caution as disabling SSL verification can pose
         security risks.
+    max_reprompts
+        The maximum number of times to ask the model for a corrected plan when the one it returned
+        doesn't pass a basic check: the code must parse as Python, and every method that looks like
+        a validation method (a name starting with `col_`, `row_`, or `rows_`) must exist, since
+        models sometimes invent method names. The retry tells the model what the problem was. Each
+        retry is another request to the provider, so a higher value can cost more. Set to `0` to
+        accept the first reply as is, and check it yourself with the object's `validate_syntax()`
+        method. Defaults to `1`.
 
     Returns
     -------
