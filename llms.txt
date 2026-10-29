@@ -254,8 +254,8 @@
 > Prebuilt action functions for common notification patterns.
 
 
-- [send_slack_notification](https://posit-dev.github.io/pointblank/reference/send_slack_notification.html): Create a Slack notification function using a webhook URL
-- [emit_otel](https://posit-dev.github.io/pointblank/reference/emit_otel.html): Create an OTel export action for use in `FinalActions`
+- [send_slack_notification](https://posit-dev.github.io/pointblank/reference/send_slack_notification.html): Create an action that sends a Slack notification about a validation
+- [emit_otel](https://posit-dev.github.io/pointblank/reference/emit_otel.html): Create a final action that sends a validation's metrics to OpenTelemetry
 
 #### Metadata Import/Export
 > Import variable-level metadata from external data standards files (CDISC Define-XML, Controlled Terminology, SPSS `.sav`, SAS XPORT, Stata `.dta`, and more) and export metadata to various formats. Use `import_metadata()` as the entry point and `export_metadata()` for the reverse.

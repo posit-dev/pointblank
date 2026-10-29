@@ -1649,6 +1649,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#export" id="toc-export" class="nav-link" data-scroll-target="#export"><span class="doc-object-name doc-function doc-label doc-label-method">export()</span></a></li>
@@ -1683,7 +1686,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/integrations/otel.py#L30-L455" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/integrations/otel.py#L30-L695" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">integrations</span><span class="op">.</span><span class="va">otel</span><span class="op">.</span><span class="va">OTelExporter</span>(</span>
@@ -1701,56 +1704,180 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">extra_attributes</span><span class="op">=</span><span class="cn">None</span>,</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
+<div class="doc-text">
+<p>OpenTelemetry (OTel) is a vendor-neutral standard for application telemetry, which backends such as Grafana, Datadog, New Relic and Prometheus can receive. An <a href="../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a> sends the results of an interrogated <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object to OTel, so that data quality shows up in the same dashboards and alerts as the rest of a pipeline’s telemetry. Call <a href="../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter.export" class="gdls-link"><code>export()</code></a> after <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> to send the results. For an export that happens at the end of every interrogation, use <a href="../reference/emit_otel.html#pointblank.emit_otel" class="gdls-link"><code>emit_otel()</code></a> in <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> instead (it sends metrics only).</p>
+<p>An export can produce three kinds of signal:</p>
+<ul>
+<li><strong>Metrics</strong> (on by default). There are counters of the steps (<code>{prefix}.steps.total</code>, <code>{prefix}.steps.passed</code> and <code>{prefix}.steps.failed</code>), of the test units (<code>{prefix}.test_units.total</code>, <code>{prefix}.test_units.passed</code> and <code>{prefix}.test_units.failed</code>) and of the steps that exceeded each threshold level (<code>{prefix}.threshold.warning</code>, <code>{prefix}.threshold.error</code> and <code>{prefix}.threshold.critical</code>). There are gauges of the overall pass rate (<code>{prefix}.pass_rate</code>) and of the interrogation time in seconds (<code>{prefix}.duration</code>), and a histogram of the step processing times (<code>{prefix}.step.duration</code>). Here <code>{prefix}</code> is the <code>metric_prefix=</code> value. Counters add up over exports, while a gauge keeps the latest value.</li>
+<li><strong>Traces</strong> (<code>enable_tracing=True</code>). A <code>pb.validate</code> span covers the interrogation, with a <code>pb.validate.step</code> child span for each step. A step’s span has its test unit counts and fractions and the threshold levels it exceeded. The <code>pb.validate</code> span also has a <code>threshold_breach</code> event for each threshold level that each step exceeded.</li>
+<li><strong>Logs</strong> (<code>enable_logging=True</code>). There is one log record for each step that exceeded a threshold, at the highest level it exceeded (<code>WARNING</code>, <code>ERROR</code> or <code>CRITICAL</code>). The <code>log_level=</code> value sets the lowest level that is logged.</li>
+</ul>
+<p>Every signal has the attributes <code>pb.tbl_name</code>, <code>pb.label</code>, <code>pb.owner</code> and <code>pb.version</code> (for the ones that are set in the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object), plus those in <code>extra_attributes=</code>. The signals for individual steps also have <code>pb.step.i</code>, <code>pb.step.assertion_type</code> and <code>pb.step.column</code>.</p>
+<p>The signals go to the providers given as <code>meter_provider=</code>, <code>tracer_provider=</code> and <code>logger_provider=</code>. Without them, metrics and traces go to OTel’s global providers, which discard everything until the application sets up the OTel SDK (for example, with an OTLP exporter that sends to a collector). Log records have no global provider to fall back on, so logging needs <code>logger_provider=</code>.</p>
+<p>The OTel packages are an optional dependency, installed with <code>pip install pointblank[otel]</code>.</p>
+</div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">meter_name</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"pointblank"</span></span></code></dt>
 <dd>
-<p>Name for the OTel Meter. Defaults to <code>"pointblank"</code>.</p>
+<p>The name that identifies Pointblank as the source of the signals (the OTel instrumentation scope), used for the meter, the tracer and the logger. The default is <code>"pointblank"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">meter_version</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Version string for the Meter. Defaults to <code>"pointblank.__version__"</code>.</p>
+<p>The version of the instrumentation scope. The default is <code>None</code>, which uses the installed version of Pointblank.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">enable_metrics</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-<p>Emit OTel metrics (counters, gauges, histograms). Default is <code>"True"</code>.</p>
+<p>Whether to send the metrics. The default is <code>True</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">enable_tracing</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
-<p>Emit OTel trace spans. Default is <code>"False"</code>.</p>
+<p>Whether to send the trace spans. The default is <code>False</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">enable_logging</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
-<p>Emit OTel log records for threshold breaches. Default is <code>"False"</code>.</p>
+<p>Whether to send log records for the steps that exceeded a threshold. This needs <code>logger_provider=</code>. The default is <code>False</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">meter_provider</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">MeterProvider | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Custom MeterProvider. If <code>"None"</code>, uses the global default.</p>
+<p>An OTel <code>MeterProvider</code> for the metrics. The default is <code>None</code>, which uses the global meter provider.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">tracer_provider</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">TracerProvider | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Custom TracerProvider. If <code>"None"</code>, uses the global default.</p>
+<p>An OTel <code>TracerProvider</code> for the trace spans. The default is <code>None</code>, which uses the global tracer provider.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">logger_provider</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Custom LoggerProvider. Required when <code>"enable_logging=True"</code>.</p>
+<p>An OTel <code>LoggerProvider</code> for the log records, needed when <code>enable_logging=True</code>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">metric_prefix</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"pb.validation"</span></span></code></dt>
 <dd>
-<p>Prefix for all metric instrument names. Default is <code>"pb.validation"</code>.</p>
+<p>The prefix for the names of the metrics. The default is <code>"pb.validation"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">log_level</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"warning"</span></span></code></dt>
 <dd>
-<p>Minimum severity level for log emission. One of <code>"warning"</code>, <code>"error"</code>, <code>"critical"</code>. Default is <code>"warning"</code>.</p>
+<p>The lowest threshold level that produces a log record: <code>"warning"</code> (every step that exceeded a threshold), <code>"error"</code> or <code>"critical"</code>. The default is <code>"warning"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">extra_attributes</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[str, str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-Additional key-value pairs attached to all emitted signals.
+A dictionary of attributes to add to every signal, such as the environment or the name of the pipeline. The default is <code>None</code>.
 </dd>
 </dl>
 </div>
+</section>
+<section id="raises" class="level2 doc-raises">
+<h2 class="doc-raises anchored" data-anchor-id="raises">Raises</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">ImportError</span></code></dt>
+<dd>
+If the OTel packages aren’t installed.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s validate a small table of orders, which has a missing customer name and two amounts that aren’t positive:</p>
+<div id="577564de" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>orders <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="dv">101</span>, <span class="dv">102</span>, <span class="dv">103</span>, <span class="dv">104</span>, <span class="dv">105</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"amount"</span>: [<span class="fl">29.99</span>, <span class="fl">150.00</span>, <span class="op">-</span><span class="fl">5.00</span>, <span class="fl">75.50</span>, <span class="fl">0.00</span>],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"customer"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="va">None</span>, <span class="st">"Dana"</span>, <span class="st">"Eve"</span>],</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>orders, tbl_name<span class="op">=</span><span class="st">"orders"</span>, thresholds<span class="op">=</span>(<span class="fl">0.05</span>, <span class="fl">0.20</span>, <span class="fl">0.40</span>))</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"customer"</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"amount"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<p>In production, the exporter would use providers that send to a collector. Here, the OTel SDK’s <code>InMemoryMetricReader</code> keeps the metrics in memory so we can look at them:</p>
+<div id="e85aa377" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics <span class="im">import</span> MeterProvider</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics.export <span class="im">import</span> InMemoryMetricReader</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.integrations.otel <span class="im">import</span> OTelExporter</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>reader <span class="op">=</span> InMemoryMetricReader()</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>meter_provider <span class="op">=</span> MeterProvider(metric_readers<span class="op">=</span>[reader])</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>exporter <span class="op">=</span> OTelExporter(meter_provider<span class="op">=</span>meter_provider, extra_attributes<span class="op">=</span>{<span class="st">"env"</span>: <span class="st">"dev"</span>})</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>exporter.export(validation)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> reader.get_metrics_data().resource_metrics[<span class="dv">0</span>].scope_metrics[<span class="dv">0</span>].metrics</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> metric <span class="kw">in</span> metrics:</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> point <span class="kw">in</span> metric.data.data_points:</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        value <span class="op">=</span> point.count <span class="cf">if</span> <span class="bu">hasattr</span>(point, <span class="st">"count"</span>) <span class="cf">else</span> point.value</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(metric.name, value)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>pb.validation.steps.total 2
+pb.validation.steps.passed 0
+pb.validation.steps.failed 2
+pb.validation.test_units.total 10
+pb.validation.test_units.passed 7
+pb.validation.test_units.failed 3
+pb.validation.pass_rate 0.7
+pb.validation.duration 0.004554
+pb.validation.threshold.warning 2
+pb.validation.threshold.error 2
+pb.validation.threshold.critical 1
+pb.validation.step.duration 1
+pb.validation.step.duration 1</code></pre>
+</div>
+</div>
+<p>Both steps failed, and 7 of the 10 test units passed, for a pass rate of <code>0.7</code>. The first step (20% failing) exceeded the warning and error thresholds, and the second (40% failing) exceeded all three. The step duration histogram has a data point for each step, and the value printed for it is its count of one observation. Every data point has the <code>pb.tbl_name</code> and <code>env</code> attributes (and the histogram’s also have the <code>pb.step.*</code> ones):</p>
+<div id="74416756" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">dict</span>(metrics[<span class="dv">0</span>].data.data_points[<span class="dv">0</span>].attributes)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>{'pb.tbl_name': 'orders', 'env': 'dev'}</code></pre>
+</div>
+</div>
+<p>For traces, we give the exporter a <code>TracerProvider</code> with an in-memory span exporter. This exporter sends traces only:</p>
+<div id="92335070" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace <span class="im">import</span> TracerProvider</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace.export <span class="im">import</span> SimpleSpanProcessor</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace.export.in_memory_span_exporter <span class="im">import</span> InMemorySpanExporter</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>span_exporter <span class="op">=</span> InMemorySpanExporter()</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>tracer_provider <span class="op">=</span> TracerProvider()</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>tracer_provider.add_span_processor(SimpleSpanProcessor(span_exporter))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>OTelExporter(</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    enable_metrics<span class="op">=</span><span class="va">False</span>, enable_tracing<span class="op">=</span><span class="va">True</span>, tracer_provider<span class="op">=</span>tracer_provider</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>).export(validation)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> span <span class="kw">in</span> span_exporter.get_finished_spans():</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    attrs <span class="op">=</span> span.attributes</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(span.name, attrs.get(<span class="st">"pb.step.assertion_type"</span>), attrs.get(<span class="st">"pb.step.n_failed"</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>pb.validate.step col_vals_not_null 1
+pb.validate.step col_vals_gt 2
+pb.validate None None</code></pre>
+</div>
+</div>
+<p>The two <code>pb.validate.step</code> spans (one per step, with its number of failing test units) end before the <code>pb.validate</code> span that contains them, so they’re listed first. The <code>pb.validate</code> span has five <code>threshold_breach</code> events: two for the first step and three for the second. The <a href="../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter.export" class="gdls-link"><code>export()</code></a> method has an example of sending log records.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/emit_otel.html#pointblank.emit_otel" class="gdls-link gdls-code">emit_otel()</a></dt>
+<dd>
+<p>Send the metrics automatically at the end of an interrogation.</p>
+</dd>
+<dt><a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a></dt>
+<dd>
+<p>Run actions after an interrogation.</p>
+</dd>
+</dl>
 </section>
 <section id="methods" class="level2 doc-methods">
 <h2 class="doc-methods anchored" data-anchor-id="methods">Methods</h2>
@@ -1764,21 +1891,24 @@ Additional key-value pairs attached to all emitted signals.
 <tbody>
 <tr class="odd">
 <td><a href="#export" class="doc-function doc-label doc-label-method">export()</a></td>
-<td>Export validation results as OTel signals.</td>
+<td>Send the results of an interrogated validation as OTel signals.</td>
 </tr>
 </tbody>
 </table>
 <section id="export" class="level3">
 <h3 class="anchored" data-anchor-id="export"><span class="doc-object-name doc-function doc-label doc-label-method">export()</span></h3>
 <div class="doc-subject">
-<p>Export validation results as OTel signals.</p>
+<p>Send the results of an interrogated validation as OTel signals.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/integrations/otel.py#L101-L124" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/integrations/otel.py#L241-L364" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb2"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">export</span>(<span class="va">validation</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">export</span>(<span class="va">validation</span>)</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>The <a href="../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter.export" class="gdls-link gdls-code">export()</a> method sends the signals that the exporter has enabled (metrics, traces and log records, as described in <a href="../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link"><code>OTelExporter</code></a>) for one interrogated <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object. The same exporter can export any number of validations, such as one for each table in a pipeline. The counters then add up over the validations, and the <code>pb.tbl_name</code> attribute keeps the tables apart. Exporting the same validation twice counts it twice.</p>
 </div>
 <section id="parameters-1" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
@@ -1786,10 +1916,113 @@ Additional key-value pairs attached to all emitted signals.
 <dl>
 <dt><code><span class="doc-parameter-name">validation</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Validate</span></code></dt>
 <dd>
-A <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object that has been interrogated. If not yet interrogated, raises <code>ValueError</code>.
+An interrogated <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object.
 </dd>
 </dl>
 </div>
+</section>
+<section id="returns" class="level4 doc-returns">
+<h4 class="doc-returns anchored" data-anchor-id="returns">Returns</h4>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">None</span></code></dt>
+<dd>
+The signals are sent to the providers.
+</dd>
+</dl>
+</div>
+</section>
+<section id="raises-1" class="level4 doc-raises">
+<h4 class="doc-raises anchored" data-anchor-id="raises-1">Raises</h4>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
+<dd>
+<p>If <code>validation</code> hasn’t been interrogated, or if logging is enabled and there is no <code>logger_provider=</code>. In the second case, the metrics and traces have already been sent when the error is raised.</p>
+</dd>
+<dt><code> <span class="doc-parameter-annotation">ImportError</span></code></dt>
+<dd>
+If the OTel packages aren’t installed.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples-1" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<p>Let’s send log records for the steps of a validation that exceeded a threshold. The OTel SDK’s <code>InMemoryLogRecordExporter</code> keeps the records in memory so we can look at them:</p>
+<div id="10282ed7" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk._logs <span class="im">import</span> LoggerProvider</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk._logs.export <span class="im">import</span> (</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    InMemoryLogRecordExporter,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    SimpleLogRecordProcessor,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.integrations.otel <span class="im">import</span> OTelExporter</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>log_exporter <span class="op">=</span> InMemoryLogRecordExporter()</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>logger_provider <span class="op">=</span> LoggerProvider()</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>logger_provider.add_log_record_processor(SimpleLogRecordProcessor(log_exporter))</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>orders <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"amount"</span>: [<span class="fl">29.99</span>, <span class="fl">150.00</span>, <span class="op">-</span><span class="fl">5.00</span>, <span class="fl">75.50</span>, <span class="fl">0.00</span>],</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"customer"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="va">None</span>, <span class="st">"Dana"</span>, <span class="st">"Eve"</span>],</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>orders, tbl_name<span class="op">=</span><span class="st">"orders"</span>, thresholds<span class="op">=</span>(<span class="fl">0.05</span>, <span class="fl">0.20</span>, <span class="fl">0.40</span>))</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"customer"</span>)</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"amount"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>exporter <span class="op">=</span> OTelExporter(</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    enable_metrics<span class="op">=</span><span class="va">False</span>, enable_logging<span class="op">=</span><span class="va">True</span>, logger_provider<span class="op">=</span>logger_provider</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>exporter.export(validation)</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> log <span class="kw">in</span> log_exporter.get_finished_logs():</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(log.log_record.severity_text, log.log_record.body)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ERROR Validation step 1 (col_vals_not_null on 'customer') exceeded error threshold: 20.00% failed
+CRITICAL Validation step 2 (col_vals_gt on 'amount') exceeded critical threshold: 40.00% failed</code></pre>
+</div>
+</div>
+<p>Each step has one record, at the highest threshold level it exceeded. With <code>log_level="critical"</code>, only the second step’s record would be sent.</p>
+<p>A pipeline that checks several tables can use one exporter for all of them. Here, we export a second validation, of a table of customers, with a metrics-only exporter that also gets the first validation:</p>
+<div id="866b53df" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics <span class="im">import</span> MeterProvider</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics.export <span class="im">import</span> InMemoryMetricReader</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>customers <span class="op">=</span> pl.DataFrame({<span class="st">"customer_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]})</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>validation_2 <span class="op">=</span> (</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>customers, tbl_name<span class="op">=</span><span class="st">"customers"</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"customer_id"</span>)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"customer_id"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"customer_id"</span>, value<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>reader <span class="op">=</span> InMemoryMetricReader()</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>exporter <span class="op">=</span> OTelExporter(meter_provider<span class="op">=</span>MeterProvider(metric_readers<span class="op">=</span>[reader]))</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>exporter.export(validation)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>exporter.export(validation_2)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> reader.get_metrics_data().resource_metrics[<span class="dv">0</span>].scope_metrics[<span class="dv">0</span>].metrics</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>steps_total <span class="op">=</span> <span class="bu">next</span>(m <span class="cf">for</span> m <span class="kw">in</span> metrics <span class="cf">if</span> m.name <span class="op">==</span> <span class="st">"pb.validation.steps.total"</span>)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> point <span class="kw">in</span> steps_total.data.data_points:</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(point.attributes[<span class="st">"pb.tbl_name"</span>], point.value)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>orders 2
+customers 3</code></pre>
+</div>
+</div>
+<p>The <code>pb.validation.steps.total</code> counter has a data point for each table: 2 steps for <code>orders</code> and 3 for <code>customers</code>. A dashboard can show them separately, or add them up for a total over the pipeline.</p>
 
 
 </section>
@@ -2157,6 +2390,7 @@ A <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls
 <script src="../dark-mode-toggle.js"></script>
 <script src="../back-to-top.js"></script>
 <script src="../on-this-page.js"></script>
+<script src="../wide-layout.js"></script>
 <script src="../keyboard-nav.js"></script>
 <script src="../copy-code.js"></script>
 <script src="../details.js"></script>
@@ -2167,7 +2401,6 @@ A <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls
 <script src="../responsive-tables.js"></script>
 <script src="../video-embed.js"></script>
 <script src="../navbar-widgets.js"></script>
-<script src="../wide-layout.js"></script>
 
 
 

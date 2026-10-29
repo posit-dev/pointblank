@@ -1,10 +1,10 @@
 # send_slack_notification()
 
-Create a Slack notification function using a webhook URL.
+Create an action that sends a Slack notification about a validation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/actions.py#L13-L453)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/actions.py#L13-L343)
 
 ``` python
 send_slack_notification(
@@ -15,65 +15,58 @@ send_slack_notification(
 )
 ```
 
-This function can be used in two ways:
+Slack is a common place for a team to hear about problems with its data. The [send_slack_notification()](../reference/send_slack_notification.md#pointblank.send_slack_notification) function creates an action that posts a message to a Slack channel through an [incoming webhook](https://api.slack.com/messaging/webhooks). The same action works in two places:
 
-1.  With [`Actions`](../reference/Actions.md#pointblank.Actions) to notify about individual validation step failures
-2.  With [`FinalActions`](../reference/FinalActions.md#pointblank.FinalActions) to provide a summary notification after all validation steps have undergone interrogation
+1.  In [`Actions`](../reference/Actions.md#pointblank.Actions), it sends a message about a step that exceeded a threshold level.
+2.  In [`FinalActions`](../reference/FinalActions.md#pointblank.FinalActions), it sends a summary of the whole validation after the interrogation.
 
-The function creates a callable that sends notifications through a Slack webhook. Message formatting can be customized using templates for both individual steps and summary reports.
+The action works out from where it runs which kind of message to send. The messages are made from templates (`step_msg=` and `summary_msg=`), which can use Slack's Markdown formatting.
+
+A notification that can't be sent (because of a wrong webhook URL, a network error or a template with an unknown variable) doesn't stop the validation. The error is printed as `Failed to send Slack notification: ...` instead of being raised.
+
+Without a webhook URL, nothing is sent to Slack, which is useful for trying out templates:
+
+- With `webhook_url=None`, the action prints the message that it would send.
+- With `webhook_url=None` and `debug=True`, the function prints previews of both templates filled in with sample values. It then returns `None` instead of an action.
 
 ## Parameters
 
 `webhook_url: str | None = None`  
-The Slack webhook URL. If `None` (and `debug=True`), a dry run is performed (see the *Offline Testing* section below for information on this).
+The URL of a Slack incoming webhook (`https://hooks.slack.com/services/...`). Since anyone with the URL can post to the channel, it's best read from an environment variable rather than written in the code. The default is `None`, which prints the messages instead of sending them.
 
 `step_msg: str | None = None`  
-Template string for step notifications. Some of the available variables include: `"{step}"`, `"{column}"`, `"{value}"`, `"{type}"`, `"{time}"`, `"{level}"`, etc. See the *Available Template Variables for Step Notifications* section below for more details. If not provided, a default step message template will be used.
+The template for messages about a step, using the variables in *Template Variables for Step Messages* below. The default is `None`, which uses a template with the assertion type, the threshold level, the step number, the column and the time.
 
 `summary_msg: str | None = None`  
-Template string for summary notifications. Some of the available variables are: `"{n_steps}"`, `"{n_passing_steps}"`, `"{n_failing_steps}"`, `"{all_passed}"`, `"{highest_severity}"`, etc. See the *Available Template Variables for Summary Notifications* section below for more details. If not provided, a default summary message template will be used.
+The template for summary messages, using the variables in *Template Variables for Summary Messages* below. The default is `None`, which uses a template with the highest threshold level reached, the number of steps, the number of failing steps and the time.
 
 `debug: bool = False`  
-Print debug information if `True`. This includes the message content and the response from Slack. This is useful for testing and debugging the notification function. If `webhook_url` is `None`, the function will print the message to the console instead of sending it to Slack. This is useful for debugging and ensuring that your templates are formatted correctly.
+Whether to print each message, and Slack's response, when it's sent. With `webhook_url=None`, the function prints previews of the templates instead (see above). The default is `False`.
 
 ## Returns
 
-`Callable`  
-A function that sends notifications to Slack.
+`Callable or None`  
+The action, to use in [Actions](../reference/Actions.md#pointblank.Actions) or [FinalActions](../reference/FinalActions.md#pointblank.FinalActions). With `webhook_url=None` and `debug=True`, the function returns `None` after printing the previews.
 
-## Available Template Variables For Step Notifications
+## Template Variables For Step Messages
 
-When creating a custom template for validation step alerts (`step_msg=`), the following templating strings can be used:
+A `step_msg=` template can use these variables:
 
 - `"{step}"`: The step number.
 - `"{column}"`: The column name.
 - `"{value}"`: The value being compared (only available in certain validation steps).
 - `"{type}"`: The assertion type (e.g., `"col_vals_gt"`, etc.).
-- `"{level}"`: The severity level (`"warning"`, `"error"`, or `"critical"`).
-- `"{level_num}"`: The severity level as a numeric value (`30`, `40`, or `50`).
+- `"{level}"`: The threshold level (`"warning"`, `"error"`, or `"critical"`).
+- `"{level_num}"`: The threshold level as a number (`30`, `40`, or `50`).
 - `"{autobrief}"`: A localized and brief statement of the expectation for the step.
 - `"{failure_text}"`: Localized text that explains how the validation step failed.
 - `"{time}"`: The time of the notification.
 
-Here's an example of how to construct a `step_msg=` template:
+These are the keys of [`get_action_metadata()`](../reference/get_action_metadata.md#pointblank.get_action_metadata)'s dictionary, plus `"{time}"`.
 
-``` python
-step_msg = '''🚨 *Validation Step Alert*
-• Step Number: {step}
-• Column: {column}
-• Test Type: {type}
-• Value Tested: {value}
-• Severity: {level} (level {level_num})
-• Brief: {autobrief}
-• Details: {failure_text}
-• Time: {time}'''
-```
+## Template Variables For Summary Messages
 
-This template will be filled with the relevant information when a validation step fails. The placeholders will be replaced with actual values when the Slack notification is sent.
-
-## Available Template Variables For Summary Notifications
-
-When creating a custom template for a validation summary (`summary_msg=`), the following templating strings can be used:
+A `summary_msg=` template can use these variables:
 
 - `"{n_steps}"`: The total number of validation steps.
 - `"{n_passing_steps}"`: The number of validation steps where all test units passed.
@@ -82,195 +75,148 @@ When creating a custom template for a validation summary (`summary_msg=`), the f
 - `"{n_error_steps}"`: The number of steps that exceeded an 'error' threshold.
 - `"{n_critical_steps}"`: The number of steps that exceeded a 'critical' threshold.
 - `"{all_passed}"`: Whether or not every validation step had no failing test units.
-- `"{highest_severity}"`: The highest severity level encountered during validation. This can be one of the following: `"warning"`, `"error"`, or `"critical"`, `"some failing"`, or `"all passed"`.
+- `"{highest_severity}"`: The highest threshold level reached in the validation: `"warning"`, `"error"` or `"critical"`. If no threshold was exceeded, it is `"some failing"` when some test units failed and `"all passed"` otherwise.
 - `"{tbl_row_count}"`: The number of rows in the target table.
 - `"{tbl_column_count}"`: The number of columns in the target table.
-- `"{tbl_name}"`: The name of the target table.
+- `"{tbl_name}"`: The name of the target table (`"Unknown"` without a `tbl_name=`).
 - `"{validation_duration}"`: The duration of the validation in seconds.
 - `"{time}"`: The time of the notification.
 
-Here's an example of how to put together a `summary_msg=` template:
-
-``` python
-summary_msg = '''📊 *Validation Summary Report*
-*Overview*
-• Status: {highest_severity}
-• All Passed: {all_passed}
-• Total Steps: {n_steps}
-
-*Step Results*
-• Passing Steps: {n_passing_steps}
-• Failing Steps: {n_failing_steps}
-• Warning Level: {n_warning_steps}
-• Error Level: {n_error_steps}
-• Critical Level: {n_critical_steps}
-
-*Table Info*
-• Table Name: {tbl_name}
-• Row Count: {tbl_row_count}
-• Column Count: {tbl_column_count}
-
-*Timing*
-• Duration: {validation_duration}s
-• Completed: {time}'''
-```
-
-This template will be filled with the relevant information when the validation summary is generated. The placeholders will be replaced with actual values when the Slack notification is sent.
-
-## Offline Testing
-
-If you want to test the function without sending actual notifications, you can leave the `webhook_url=` as `None` and set `debug=True`. This will print the message to the console instead of sending it to Slack. This is useful for debugging and ensuring that your templates are formatted correctly. Furthermore, the function could be run globally (i.e., outside of the context of a validation plan) to show the message templates with all possible variables. Here's an example of how to do this:
-
-``` python
-import pointblank as pb
-
-# Create a Slack notification function
-notify_slack = pb.send_slack_notification(
-    webhook_url=None,  # Leave as None for dry run
-    debug=True,  # Enable debug mode to print message previews
-)
-# Call the function to see the message previews
-notify_slack()
-```
-
-This will print the step and summary message previews to the console, allowing you to see how the templates will look when filled with actual data. You can then adjust your templates as needed before using them in a real validation plan.
-
-When `step_msg=` and `summary_msg=` are not provided, the function will use default templates. However, you can customize the templates to include additional information or change the format to better suit your needs. Iterating on the templates can help you create more informative and visually appealing messages. Here's an example of that:
-
-``` python
-import pointblank as pb
-
-# Create a Slack notification function with custom templates
-notify_slack = pb.send_slack_notification(
-    webhook_url=None, # Leave as None for dry run
-    step_msg='''*Data Validation Alert*
-    • Type: {type}
-    • Level: {level}
-    • Step: {step}
-    • Column: {column}
-    • Time: {time}''',
-    summary_msg='''*Data Validation Summary*
-    • Highest Severity: {highest_severity}
-    • Total Steps: {n_steps}
-    • Failed Steps: {n_failing_steps}
-    • Time: {time}''',
-    debug=True,  # Enable debug mode to print message previews
-)
-```
-
-These templates will be used with sample data when the function is called. The combination of `webhook_url=None` and `debug=True` allows you to test your custom templates without having to send actual notifications to Slack.
+These are keys of [`get_validation_summary()`](../reference/get_validation_summary.md#pointblank.get_validation_summary)'s dictionary, plus `"{time}"`. Its other keys, such as `"{overall_health_score}"` and `"{list_failing_steps}"`, can be used too. Since the templates are filled in with Python's `str.format()`, a literal brace has to be doubled (`"{{"` or `"}}"`).
 
 ## Examples
 
-When using an action with one or more validation steps, you typically provide callables that fire when a matched threshold of failed test units is exceeded. The callable can be a function or a lambda. The [send_slack_notification()](../reference/send_slack_notification.md#pointblank.send_slack_notification) function creates a callable that sends a Slack notification when the validation step fails. Here is how it can be set up to work for multiple validation steps by using of [Actions](../reference/Actions.md#pointblank.Actions):
+Let's validate a small table of orders, which has a missing customer name and two amounts that aren't positive. The action has no webhook URL, so it prints the message instead of sending it. In `Actions(critical=)`, it runs for the steps that exceed the critical threshold:
 
 ``` python
 import pointblank as pb
+import polars as pl
 
-# Create a Slack notification function
-notify_slack = pb.send_slack_notification(
-    webhook_url="https://hooks.slack.com/services/your/webhook/url"
+orders = pl.DataFrame(
+    {
+        "amount": [29.99, 150.00, -5.00, 75.50, 0.00],
+        "customer": ["Alice", "Bob", None, "Dana", "Eve"],
+    }
 )
-# Create a validation plan
+
+notify_slack = pb.send_slack_notification()
+
 validation = (
     pb.Validate(
-        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
-        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+        data=orders,
+        tbl_name="orders",
+        thresholds=(0.05, 0.20, 0.40),
         actions=pb.Actions(critical=notify_slack),
     )
-    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}[0-9]{3}")
-    .col_vals_gt(columns="item_revenue", value=0.05)
-    .col_vals_gt(columns="session_duration", value=15)
+    .col_vals_not_null(columns="customer")
+    .col_vals_gt(columns="amount", value=0)
     .interrogate()
 )
-
-validation
 ```
 
-By placing the `notify_slack()` function in the `Validate(actions=Actions(critical=))` argument, you can ensure that the notification is sent whenever the 'critical' threshold is reached (as set here, when 15% or more of the test units fail). The notification will include information about the validation step that triggered the alert.
+    === Dry Run ===
+    Would send to Slack:
+    *Data Validation Alert*
+    • Type: col_vals_gt
+    • Level: critical
+    • Step: 2
+    • Column: amount
+    • Time: 2026-10-29 12:56:57.021509
+    ==============
 
-When using a [`FinalActions`](../reference/FinalActions.md#pointblank.FinalActions) object, the notification will be sent after all validation steps have been completed. This is useful for providing a summary of the validation process. Here is an example of how to set up a summary notification:
+Only the second step, with 40% of its test units failing, reached the critical threshold, so there is one message. The first step (20% failing) exceeded the error threshold, which has no action here.
+
+In [FinalActions](../reference/FinalActions.md#pointblank.FinalActions), the same action sends a summary of the validation instead:
 
 ``` python
-import pointblank as pb
-
-# Create a Slack notification function
-notify_slack = pb.send_slack_notification(
-    webhook_url="https://hooks.slack.com/services/your/webhook/url"
-)
-# Create a validation plan
 validation = (
     pb.Validate(
-        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
-        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+        data=orders,
+        tbl_name="orders",
+        thresholds=(0.05, 0.20, 0.40),
         final_actions=pb.FinalActions(notify_slack),
     )
-    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}[0-9]{3}")
-    .col_vals_gt(columns="item_revenue", value=0.05)
-    .col_vals_gt(columns="session_duration", value=15)
+    .col_vals_not_null(columns="customer")
+    .col_vals_gt(columns="amount", value=0)
     .interrogate()
 )
 ```
 
-In this case, the same `notify_slack()` function is used, but it is placed in `Validate(final_actions=FinalActions())`. This results in the summary notification being sent after all validation steps are completed, regardless of whether any steps failed or not.
+    === Dry Run ===
+    Would send to Slack:
+    *Data Validation Summary*
+    • Highest Severity: critical
+    • Total Steps: 2
+    • Failed Steps: 2
+    • Time: 2026-10-29 12:56:57.029036
+    ==============
 
-This simplicity is possible because the [send_slack_notification()](../reference/send_slack_notification.md#pointblank.send_slack_notification) function creates a callable that can be used in both contexts. The function will automatically determine whether to send a step notification or a summary notification based on the context in which it is called.
+The summary is sent once per interrogation, whether or not any step failed. Both steps failed here, and the highest threshold level reached was critical.
 
-We can customize the message templates for both step and summary notifications. In that way, it's possible to create a more informative and visually appealing message. For example, we can use Markdown formatting to make the message more readable and visually appealing. Here is an example of how to customize the templates:
+Custom templates can add more detail. With `webhook_url=None` and `debug=True`, the function shows previews of the templates with sample values, without a validation:
 
 ``` python
-import pointblank as pb
-# Create a Slack notification function
-
-notify_slack = pb.send_slack_notification(
-    webhook_url="https://hooks.slack.com/services/your/webhook/url",
-    step_msg='''
-    🚨 *Validation Step Alert*
-    • Step Number: {step}
-    • Column: {column}
-    • Test Type: {type}
-    • Value Tested: {value}
-    • Severity: {level} (level {level_num})
-    • Brief: {autobrief}
-    • Details: {failure_text}
-    • Time: {time}''',
-    summary_msg='''
-    📊 *Validation Summary Report*
-    *Overview*
-    • Status: {highest_severity}
-    • All Passed: {all_passed}
-    • Total Steps: {n_steps}
-
-    *Step Results*
-    • Passing Steps: {n_passing_steps}
-    • Failing Steps: {n_failing_steps}
-    • Warning Level: {n_warning_steps}
-    • Error Level: {n_error_steps}
-    • Critical Level: {n_critical_steps}
-
-    *Table Info*
-    • Table Name: {tbl_name}
-    • Row Count: {tbl_row_count}
-    • Column Count: {tbl_column_count}
-
-    *Timing*
-    • Duration: {validation_duration}s
-    • Completed: {time}''',
+pb.send_slack_notification(
+    step_msg=(
+        "🚨 *Step {step} ({type})* exceeded the {level} threshold\n"
+        "• Column: {column}\n"
+        "• Details: {failure_text}"
+    ),
+    summary_msg=(
+        "📊 *Validation of {tbl_name}*: {highest_severity}\n"
+        "• Failing steps: {n_failing_steps} of {n_steps}\n"
+        "• Rows: {tbl_row_count}"
+    ),
+    debug=True,
 )
+```
 
-# Create a validation plan
+    === Step Notification Preview ===
+    🚨 *Step 1 (col_vals_gt)* exceeded the critical threshold
+    • Column: column_name
+    • Details: 25% of values failed this test
+
+    === Summary Notification Preview ===
+    📊 *Validation of example_table*: critical
+    • Failing steps: 2 of 5
+    • Rows: 1000
+
+The sample values show where each variable goes. For a real channel, we pass the webhook URL and use the action for both kinds of message. With `Actions(default=)`, a step message is sent for every step that exceeds a threshold, at its highest level:
+
+``` python
+import os
+
+notify_slack = pb.send_slack_notification(webhook_url=os.environ["SLACK_WEBHOOK_URL"])
+
 validation = (
     pb.Validate(
-        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
-        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+        data=orders,
+        tbl_name="orders",
+        thresholds=(0.05, 0.20, 0.40),
         actions=pb.Actions(default=notify_slack),
         final_actions=pb.FinalActions(notify_slack),
     )
-    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}[0-9]{3}")
-    .col_vals_gt(columns="item_revenue", value=0.05)
-    .col_vals_gt(columns="session_duration", value=15)
+    .col_vals_not_null(columns="customer")
+    .col_vals_gt(columns="amount", value=0)
     .interrogate()
 )
 ```
 
-In this example, we have customized the templates for both step and summary notifications. The step notification includes details about the validation step, including the step number, column name, test type, value tested, severity level, brief description, and time of the notification. The summary notification includes an overview of the validation process, including the status, number of steps, passing and failing steps, table information, and timing details.
+This interrogation posts three messages to the channel: one for each failing step (at the error and critical levels), then the summary. Reading the URL from the `SLACK_WEBHOOK_URL` environment variable keeps it out of the code.
+
+## See Also
+
+[Actions](../reference/Actions.md#pointblank.Actions)  
+Run actions when a step exceeds a threshold level.
+
+[FinalActions](../reference/FinalActions.md#pointblank.FinalActions)  
+Run actions after an interrogation.
+
+[get_action_metadata()](../reference/get_action_metadata.md#pointblank.get_action_metadata)  
+Get the information that step messages are made from.
+
+[get_validation_summary()](../reference/get_validation_summary.md#pointblank.get_validation_summary)  
+Get the information that summary messages are made from.
+
+[emit_otel()](../reference/emit_otel.md#pointblank.emit_otel)  
+Send validation metrics to OpenTelemetry from a final action.

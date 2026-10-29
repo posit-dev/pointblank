@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Create a Slack notification function using a webhook URL.">
+<meta name="description" content="Create an action that sends a Slack notification about a validation.">
 
 <title>send_slack_notification() | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "send_slack_notification - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/send_slack_notification.html"}]</script>
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="send_slack_notification() | Pointblank">
-<meta property="og:description" content="Create a Slack notification function using a webhook URL.">
+<meta property="og:description" content="Create an action that sends a Slack notification about a validation.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="send_slack_notification() | Pointblank">
-<meta name="twitter:description" content="Create a Slack notification function using a webhook URL.">
+<meta name="twitter:description" content="Create an action that sends a Slack notification about a validation.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1650,10 +1650,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#available-template-variables-for-step-notifications" id="toc-available-template-variables-for-step-notifications" class="nav-link" data-scroll-target="#available-template-variables-for-step-notifications">Available Template Variables For Step Notifications</a></li>
-  <li><a href="#available-template-variables-for-summary-notifications" id="toc-available-template-variables-for-summary-notifications" class="nav-link" data-scroll-target="#available-template-variables-for-summary-notifications">Available Template Variables For Summary Notifications</a></li>
-  <li><a href="#offline-testing" id="toc-offline-testing" class="nav-link" data-scroll-target="#offline-testing">Offline Testing</a></li>
+  <li><a href="#template-variables-for-step-messages" id="toc-template-variables-for-step-messages" class="nav-link" data-scroll-target="#template-variables-for-step-messages">Template Variables For Step Messages</a></li>
+  <li><a href="#template-variables-for-summary-messages" id="toc-template-variables-for-summary-messages" class="nav-link" data-scroll-target="#template-variables-for-summary-messages">Template Variables For Summary Messages</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1680,11 +1680,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>Create a Slack notification function using a webhook URL.</p>
+<p>Create an action that sends a Slack notification about a validation.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/actions.py#L13-L453" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/actions.py#L13-L343" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">send_slack_notification</span>(</span>
@@ -1695,12 +1695,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>This function can be used in two ways:</p>
+<p>Slack is a common place for a team to hear about problems with its data. The <a href="../reference/send_slack_notification.html#pointblank.send_slack_notification" class="gdls-link gdls-code">send_slack_notification()</a> function creates an action that posts a message to a Slack channel through an <a href="https://api.slack.com/messaging/webhooks">incoming webhook</a>. The same action works in two places:</p>
 <ol type="1">
-<li>With <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a> to notify about individual validation step failures</li>
-<li>With <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> to provide a summary notification after all validation steps have undergone interrogation</li>
+<li>In <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link"><code>Actions</code></a>, it sends a message about a step that exceeded a threshold level.</li>
+<li>In <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a>, it sends a summary of the whole validation after the interrogation.</li>
 </ol>
-<p>The function creates a callable that sends notifications through a Slack webhook. Message formatting can be customized using templates for both individual steps and summary reports.</p>
+<p>The action works out from where it runs which kind of message to send. The messages are made from templates (<code>step_msg=</code> and <code>summary_msg=</code>), which can use Slack’s Markdown formatting.</p>
+<p>A notification that can’t be sent (because of a wrong webhook URL, a network error or a template with an unknown variable) doesn’t stop the validation. The error is printed as <code>Failed to send Slack notification: ...</code> instead of being raised.</p>
+<p>Without a webhook URL, nothing is sent to Slack, which is useful for trying out templates:</p>
+<ul>
+<li>With <code>webhook_url=None</code>, the action prints the message that it would send.</li>
+<li>With <code>webhook_url=None</code> and <code>debug=True</code>, the function prints previews of both templates filled in with sample values. It then returns <code>None</code> instead of an action.</li>
+</ul>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1708,19 +1714,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">webhook_url</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>The Slack webhook URL. If <code>None</code> (and <code>debug=True</code>), a dry run is performed (see the <em>Offline Testing</em> section below for information on this).</p>
+<p>The URL of a Slack incoming webhook (<code>https://hooks.slack.com/services/...</code>). Since anyone with the URL can post to the channel, it’s best read from an environment variable rather than written in the code. The default is <code>None</code>, which prints the messages instead of sending them.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">step_msg</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Template string for step notifications. Some of the available variables include: <code>"{step}"</code>, <code>"{column}"</code>, <code>"{value}"</code>, <code>"{type}"</code>, <code>"{time}"</code>, <code>"{level}"</code>, etc. See the <em>Available Template Variables for Step Notifications</em> section below for more details. If not provided, a default step message template will be used.</p>
+<p>The template for messages about a step, using the variables in <em>Template Variables for Step Messages</em> below. The default is <code>None</code>, which uses a template with the assertion type, the threshold level, the step number, the column and the time.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">summary_msg</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Template string for summary notifications. Some of the available variables are: <code>"{n_steps}"</code>, <code>"{n_passing_steps}"</code>, <code>"{n_failing_steps}"</code>, <code>"{all_passed}"</code>, <code>"{highest_severity}"</code>, etc. See the <em>Available Template Variables for Summary Notifications</em> section below for more details. If not provided, a default summary message template will be used.</p>
+<p>The template for summary messages, using the variables in <em>Template Variables for Summary Messages</em> below. The default is <code>None</code>, which uses a template with the highest threshold level reached, the number of steps, the number of failing steps and the time.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">debug</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
-Print debug information if <code>True</code>. This includes the message content and the response from Slack. This is useful for testing and debugging the notification function. If <code>webhook_url</code> is <code>None</code>, the function will print the message to the console instead of sending it to Slack. This is useful for debugging and ensuring that your templates are formatted correctly.
+Whether to print each message, and Slack’s response, when it’s sent. With <code>webhook_url=None</code>, the function prints previews of the templates instead (see above). The default is <code>False</code>.
 </dd>
 </dl>
 </div>
@@ -1729,42 +1735,32 @@ Print debug information if <code>True</code>. This includes the message content 
 <h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
 <div class="doc-definition-items">
 <dl>
-<dt><code> <span class="doc-parameter-annotation">Callable</span></code></dt>
+<dt><code> <span class="doc-parameter-annotation">Callable or None</span></code></dt>
 <dd>
-A function that sends notifications to Slack.
+The action, to use in <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link gdls-code">Actions</a> or <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a>. With <code>webhook_url=None</code> and <code>debug=True</code>, the function returns <code>None</code> after printing the previews.
 </dd>
 </dl>
 </div>
 </section>
-<section id="available-template-variables-for-step-notifications" class="level2 doc-available-template-variables-for-step-notifications">
-<h2 class="doc-available-template-variables-for-step-notifications anchored" data-anchor-id="available-template-variables-for-step-notifications">Available Template Variables For Step Notifications</h2>
-<p>When creating a custom template for validation step alerts (<code>step_msg=</code>), the following templating strings can be used:</p>
+<section id="template-variables-for-step-messages" class="level2 doc-template-variables-for-step-messages">
+<h2 class="doc-template-variables-for-step-messages anchored" data-anchor-id="template-variables-for-step-messages">Template Variables For Step Messages</h2>
+<p>A <code>step_msg=</code> template can use these variables:</p>
 <ul>
 <li><code>"{step}"</code>: The step number.</li>
 <li><code>"{column}"</code>: The column name.</li>
 <li><code>"{value}"</code>: The value being compared (only available in certain validation steps).</li>
 <li><code>"{type}"</code>: The assertion type (e.g., <code>"col_vals_gt"</code>, etc.).</li>
-<li><code>"{level}"</code>: The severity level (<code>"warning"</code>, <code>"error"</code>, or <code>"critical"</code>).</li>
-<li><code>"{level_num}"</code>: The severity level as a numeric value (<code>30</code>, <code>40</code>, or <code>50</code>).</li>
+<li><code>"{level}"</code>: The threshold level (<code>"warning"</code>, <code>"error"</code>, or <code>"critical"</code>).</li>
+<li><code>"{level_num}"</code>: The threshold level as a number (<code>30</code>, <code>40</code>, or <code>50</code>).</li>
 <li><code>"{autobrief}"</code>: A localized and brief statement of the expectation for the step.</li>
 <li><code>"{failure_text}"</code>: Localized text that explains how the validation step failed.</li>
 <li><code>"{time}"</code>: The time of the notification.</li>
 </ul>
-<p>Here’s an example of how to construct a <code>step_msg=</code> template:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>step_msg <span class="op">=</span> <span class="st">'''🚨 *Validation Step Alert*</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="st">• Step Number: </span><span class="sc">{step}</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="st">• Column: </span><span class="sc">{column}</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="st">• Test Type: </span><span class="sc">{type}</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="st">• Value Tested: </span><span class="sc">{value}</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="st">• Severity: </span><span class="sc">{level}</span><span class="st"> (level </span><span class="sc">{level_num}</span><span class="st">)</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="st">• Brief: </span><span class="sc">{autobrief}</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="st">• Details: </span><span class="sc">{failure_text}</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="st">• Time: </span><span class="sc">{time}</span><span class="st">'''</span></span></code></pre></div>
-<p>This template will be filled with the relevant information when a validation step fails. The placeholders will be replaced with actual values when the Slack notification is sent.</p>
+<p>These are the keys of <a href="../reference/get_action_metadata.html#pointblank.get_action_metadata" class="gdls-link"><code>get_action_metadata()</code></a>’s dictionary, plus <code>"{time}"</code>.</p>
 </section>
-<section id="available-template-variables-for-summary-notifications" class="level2 doc-available-template-variables-for-summary-notifications">
-<h2 class="doc-available-template-variables-for-summary-notifications anchored" data-anchor-id="available-template-variables-for-summary-notifications">Available Template Variables For Summary Notifications</h2>
-<p>When creating a custom template for a validation summary (<code>summary_msg=</code>), the following templating strings can be used:</p>
+<section id="template-variables-for-summary-messages" class="level2 doc-template-variables-for-summary-messages">
+<h2 class="doc-template-variables-for-summary-messages anchored" data-anchor-id="template-variables-for-summary-messages">Template Variables For Summary Messages</h2>
+<p>A <code>summary_msg=</code> template can use these variables:</p>
 <ul>
 <li><code>"{n_steps}"</code>: The total number of validation steps.</li>
 <li><code>"{n_passing_steps}"</code>: The number of validation steps where all test units passed.</li>
@@ -1773,170 +1769,155 @@ A function that sends notifications to Slack.
 <li><code>"{n_error_steps}"</code>: The number of steps that exceeded an ‘error’ threshold.</li>
 <li><code>"{n_critical_steps}"</code>: The number of steps that exceeded a ‘critical’ threshold.</li>
 <li><code>"{all_passed}"</code>: Whether or not every validation step had no failing test units.</li>
-<li><code>"{highest_severity}"</code>: The highest severity level encountered during validation. This can be one of the following: <code>"warning"</code>, <code>"error"</code>, or <code>"critical"</code>, <code>"some failing"</code>, or <code>"all passed"</code>.</li>
+<li><code>"{highest_severity}"</code>: The highest threshold level reached in the validation: <code>"warning"</code>, <code>"error"</code> or <code>"critical"</code>. If no threshold was exceeded, it is <code>"some failing"</code> when some test units failed and <code>"all passed"</code> otherwise.</li>
 <li><code>"{tbl_row_count}"</code>: The number of rows in the target table.</li>
 <li><code>"{tbl_column_count}"</code>: The number of columns in the target table.</li>
-<li><code>"{tbl_name}"</code>: The name of the target table.</li>
+<li><code>"{tbl_name}"</code>: The name of the target table (<code>"Unknown"</code> without a <code>tbl_name=</code>).</li>
 <li><code>"{validation_duration}"</code>: The duration of the validation in seconds.</li>
 <li><code>"{time}"</code>: The time of the notification.</li>
 </ul>
-<p>Here’s an example of how to put together a <code>summary_msg=</code> template:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>summary_msg <span class="op">=</span> <span class="st">'''📊 *Validation Summary Report*</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="st">*Overview*</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="st">• Status: </span><span class="sc">{highest_severity}</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="st">• All Passed: </span><span class="sc">{all_passed}</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="st">• Total Steps: </span><span class="sc">{n_steps}</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="st">*Step Results*</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="st">• Passing Steps: </span><span class="sc">{n_passing_steps}</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="st">• Failing Steps: </span><span class="sc">{n_failing_steps}</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="st">• Warning Level: </span><span class="sc">{n_warning_steps}</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="st">• Error Level: </span><span class="sc">{n_error_steps}</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="st">• Critical Level: </span><span class="sc">{n_critical_steps}</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="st">*Table Info*</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="st">• Table Name: </span><span class="sc">{tbl_name}</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="st">• Row Count: </span><span class="sc">{tbl_row_count}</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="st">• Column Count: </span><span class="sc">{tbl_column_count}</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="st">*Timing*</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="st">• Duration: </span><span class="sc">{validation_duration}</span><span class="st">s</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="st">• Completed: </span><span class="sc">{time}</span><span class="st">'''</span></span></code></pre></div>
-<p>This template will be filled with the relevant information when the validation summary is generated. The placeholders will be replaced with actual values when the Slack notification is sent.</p>
-</section>
-<section id="offline-testing" class="level2 doc-offline-testing">
-<h2 class="doc-offline-testing anchored" data-anchor-id="offline-testing">Offline Testing</h2>
-<p>If you want to test the function without sending actual notifications, you can leave the <code>webhook_url=</code> as <code>None</code> and set <code>debug=True</code>. This will print the message to the console instead of sending it to Slack. This is useful for debugging and ensuring that your templates are formatted correctly. Furthermore, the function could be run globally (i.e., outside of the context of a validation plan) to show the message templates with all possible variables. Here’s an example of how to do this:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Slack notification function</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>notify_slack <span class="op">=</span> pb.send_slack_notification(</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    webhook_url<span class="op">=</span><span class="va">None</span>,  <span class="co"># Leave as None for dry run</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    debug<span class="op">=</span><span class="va">True</span>,  <span class="co"># Enable debug mode to print message previews</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Call the function to see the message previews</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>notify_slack()</span></code></pre></div>
-<p>This will print the step and summary message previews to the console, allowing you to see how the templates will look when filled with actual data. You can then adjust your templates as needed before using them in a real validation plan.</p>
-<p>When <code>step_msg=</code> and <code>summary_msg=</code> are not provided, the function will use default templates. However, you can customize the templates to include additional information or change the format to better suit your needs. Iterating on the templates can help you create more informative and visually appealing messages. Here’s an example of that:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Slack notification function with custom templates</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>notify_slack <span class="op">=</span> pb.send_slack_notification(</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    webhook_url<span class="op">=</span><span class="va">None</span>, <span class="co"># Leave as None for dry run</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    step_msg<span class="op">=</span><span class="st">'''*Data Validation Alert*</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="st">    • Type: </span><span class="sc">{type}</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="st">    • Level: </span><span class="sc">{level}</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="st">    • Step: </span><span class="sc">{step}</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="st">    • Column: </span><span class="sc">{column}</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="st">    • Time: </span><span class="sc">{time}</span><span class="st">'''</span>,</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    summary_msg<span class="op">=</span><span class="st">'''*Data Validation Summary*</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="st">    • Highest Severity: </span><span class="sc">{highest_severity}</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="st">    • Total Steps: </span><span class="sc">{n_steps}</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="st">    • Failed Steps: </span><span class="sc">{n_failing_steps}</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="st">    • Time: </span><span class="sc">{time}</span><span class="st">'''</span>,</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    debug<span class="op">=</span><span class="va">True</span>,  <span class="co"># Enable debug mode to print message previews</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>These templates will be used with sample data when the function is called. The combination of <code>webhook_url=None</code> and <code>debug=True</code> allows you to test your custom templates without having to send actual notifications to Slack.</p>
+<p>These are keys of <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a>’s dictionary, plus <code>"{time}"</code>. Its other keys, such as <code>"{overall_health_score}"</code> and <code>"{list_failing_steps}"</code>, can be used too. Since the templates are filled in with Python’s <code>str.format()</code>, a literal brace has to be doubled (<code>"{{"</code> or <code>"}}"</code>).</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>When using an action with one or more validation steps, you typically provide callables that fire when a matched threshold of failed test units is exceeded. The callable can be a function or a lambda. The <a href="../reference/send_slack_notification.html#pointblank.send_slack_notification" class="gdls-link gdls-code">send_slack_notification()</a> function creates a callable that sends a Slack notification when the validation step fails. Here is how it can be set up to work for multiple validation steps by using of <a href="../reference/Actions.html#pointblank.Actions" class="gdls-link">Actions</a>:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Slack notification function</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>notify_slack <span class="op">=</span> pb.send_slack_notification(</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    webhook_url<span class="op">=</span><span class="st">"https://hooks.slack.com/services/your/webhook/url"</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a validation plan</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>),</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>pb.Thresholds(warning<span class="op">=</span><span class="fl">0.05</span>, error<span class="op">=</span><span class="fl">0.10</span>, critical<span class="op">=</span><span class="fl">0.15</span>),</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        actions<span class="op">=</span>pb.Actions(critical<span class="op">=</span>notify_slack),</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"player_id"</span>, pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[A-Z]</span><span class="op">{12}</span><span class="pp">[0-9]</span><span class="op">{3}</span><span class="vs">"</span>)</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"item_revenue"</span>, value<span class="op">=</span><span class="fl">0.05</span>)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"session_duration"</span>, value<span class="op">=</span><span class="dv">15</span>)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
-<p>By placing the <code>notify_slack()</code> function in the <code>Validate(actions=Actions(critical=))</code> argument, you can ensure that the notification is sent whenever the ‘critical’ threshold is reached (as set here, when 15% or more of the test units fail). The notification will include information about the validation step that triggered the alert.</p>
-<p>When using a <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> object, the notification will be sent after all validation steps have been completed. This is useful for providing a summary of the validation process. Here is an example of how to set up a summary notification:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Slack notification function</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>notify_slack <span class="op">=</span> pb.send_slack_notification(</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    webhook_url<span class="op">=</span><span class="st">"https://hooks.slack.com/services/your/webhook/url"</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a validation plan</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>),</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>pb.Thresholds(warning<span class="op">=</span><span class="fl">0.05</span>, error<span class="op">=</span><span class="fl">0.10</span>, critical<span class="op">=</span><span class="fl">0.15</span>),</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        final_actions<span class="op">=</span>pb.FinalActions(notify_slack),</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"player_id"</span>, pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[A-Z]</span><span class="op">{12}</span><span class="pp">[0-9]</span><span class="op">{3}</span><span class="vs">"</span>)</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"item_revenue"</span>, value<span class="op">=</span><span class="fl">0.05</span>)</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"session_duration"</span>, value<span class="op">=</span><span class="dv">15</span>)</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>In this case, the same <code>notify_slack()</code> function is used, but it is placed in <code>Validate(final_actions=FinalActions())</code>. This results in the summary notification being sent after all validation steps are completed, regardless of whether any steps failed or not.</p>
-<p>This simplicity is possible because the <a href="../reference/send_slack_notification.html#pointblank.send_slack_notification" class="gdls-link gdls-code">send_slack_notification()</a> function creates a callable that can be used in both contexts. The function will automatically determine whether to send a step notification or a summary notification based on the context in which it is called.</p>
-<p>We can customize the message templates for both step and summary notifications. In that way, it’s possible to create a more informative and visually appealing message. For example, we can use Markdown formatting to make the message more readable and visually appealing. Here is an example of how to customize the templates:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Slack notification function</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>notify_slack <span class="op">=</span> pb.send_slack_notification(</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    webhook_url<span class="op">=</span><span class="st">"https://hooks.slack.com/services/your/webhook/url"</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    step_msg<span class="op">=</span><span class="st">'''</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="st">    🚨 *Validation Step Alert*</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="st">    • Step Number: </span><span class="sc">{step}</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="st">    • Column: </span><span class="sc">{column}</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="st">    • Test Type: </span><span class="sc">{type}</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="st">    • Value Tested: </span><span class="sc">{value}</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="st">    • Severity: </span><span class="sc">{level}</span><span class="st"> (level </span><span class="sc">{level_num}</span><span class="st">)</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="st">    • Brief: </span><span class="sc">{autobrief}</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="st">    • Details: </span><span class="sc">{failure_text}</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="st">    • Time: </span><span class="sc">{time}</span><span class="st">'''</span>,</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    summary_msg<span class="op">=</span><span class="st">'''</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="st">    📊 *Validation Summary Report*</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="st">    *Overview*</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="st">    • Status: </span><span class="sc">{highest_severity}</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="st">    • All Passed: </span><span class="sc">{all_passed}</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="st">    • Total Steps: </span><span class="sc">{n_steps}</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="st">    *Step Results*</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="st">    • Passing Steps: </span><span class="sc">{n_passing_steps}</span></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="st">    • Failing Steps: </span><span class="sc">{n_failing_steps}</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="st">    • Warning Level: </span><span class="sc">{n_warning_steps}</span></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="st">    • Error Level: </span><span class="sc">{n_error_steps}</span></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="st">    • Critical Level: </span><span class="sc">{n_critical_steps}</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="st">    *Table Info*</span></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="st">    • Table Name: </span><span class="sc">{tbl_name}</span></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="st">    • Row Count: </span><span class="sc">{tbl_row_count}</span></span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="st">    • Column Count: </span><span class="sc">{tbl_column_count}</span></span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="st">    *Timing*</span></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="st">    • Duration: </span><span class="sc">{validation_duration}</span><span class="st">s</span></span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="st">    • Completed: </span><span class="sc">{time}</span><span class="st">'''</span>,</span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a validation plan</span></span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>),</span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>pb.Thresholds(warning<span class="op">=</span><span class="fl">0.05</span>, error<span class="op">=</span><span class="fl">0.10</span>, critical<span class="op">=</span><span class="fl">0.15</span>),</span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>        actions<span class="op">=</span>pb.Actions(default<span class="op">=</span>notify_slack),</span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>        final_actions<span class="op">=</span>pb.FinalActions(notify_slack),</span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"player_id"</span>, pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[A-Z]</span><span class="op">{12}</span><span class="pp">[0-9]</span><span class="op">{3}</span><span class="vs">"</span>)</span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"item_revenue"</span>, value<span class="op">=</span><span class="fl">0.05</span>)</span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"session_duration"</span>, value<span class="op">=</span><span class="dv">15</span>)</span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>In this example, we have customized the templates for both step and summary notifications. The step notification includes details about the validation step, including the step number, column name, test type, value tested, severity level, brief description, and time of the notification. The summary notification includes an overview of the validation process, including the status, number of steps, passing and failing steps, table information, and timing details.</p>
+<p>Let’s validate a small table of orders, which has a missing customer name and two amounts that aren’t positive. The action has no webhook URL, so it prints the message instead of sending it. In <code>Actions(critical=)</code>, it runs for the steps that exceed the critical threshold:</p>
+<div id="0002a669" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>orders <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"amount"</span>: [<span class="fl">29.99</span>, <span class="fl">150.00</span>, <span class="op">-</span><span class="fl">5.00</span>, <span class="fl">75.50</span>, <span class="fl">0.00</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"customer"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="va">None</span>, <span class="st">"Dana"</span>, <span class="st">"Eve"</span>],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>notify_slack <span class="op">=</span> pb.send_slack_notification()</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>orders,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"orders"</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>(<span class="fl">0.05</span>, <span class="fl">0.20</span>, <span class="fl">0.40</span>),</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        actions<span class="op">=</span>pb.Actions(critical<span class="op">=</span>notify_slack),</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"customer"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"amount"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+=== Dry Run ===
+Would send to Slack:
+*Data Validation Alert*
+• Type: col_vals_gt
+• Level: critical
+• Step: 2
+• Column: amount
+• Time: 2026-10-29 12:56:57.021509
+==============
+</code></pre>
+</div>
+</div>
+<p>Only the second step, with 40% of its test units failing, reached the critical threshold, so there is one message. The first step (20% failing) exceeded the error threshold, which has no action here.</p>
+<p>In <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a>, the same action sends a summary of the validation instead:</p>
+<div id="db699781" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>orders,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"orders"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>(<span class="fl">0.05</span>, <span class="fl">0.20</span>, <span class="fl">0.40</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        final_actions<span class="op">=</span>pb.FinalActions(notify_slack),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"customer"</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"amount"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+=== Dry Run ===
+Would send to Slack:
+*Data Validation Summary*
+• Highest Severity: critical
+• Total Steps: 2
+• Failed Steps: 2
+• Time: 2026-10-29 12:56:57.029036
+==============
+</code></pre>
+</div>
+</div>
+<p>The summary is sent once per interrogation, whether or not any step failed. Both steps failed here, and the highest threshold level reached was critical.</p>
+<p>Custom templates can add more detail. With <code>webhook_url=None</code> and <code>debug=True</code>, the function shows previews of the templates with sample values, without a validation:</p>
+<div id="a7f8d46e" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pb.send_slack_notification(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    step_msg<span class="op">=</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"🚨 *Step </span><span class="sc">{step}</span><span class="st"> (</span><span class="sc">{type}</span><span class="st">)* exceeded the </span><span class="sc">{level}</span><span class="st"> threshold</span><span class="ch">\n</span><span class="st">"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"• Column: </span><span class="sc">{column}</span><span class="ch">\n</span><span class="st">"</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"• Details: </span><span class="sc">{failure_text}</span><span class="st">"</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    summary_msg<span class="op">=</span>(</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"📊 *Validation of </span><span class="sc">{tbl_name}</span><span class="st">*: </span><span class="sc">{highest_severity}</span><span class="ch">\n</span><span class="st">"</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"• Failing steps: </span><span class="sc">{n_failing_steps}</span><span class="st"> of </span><span class="sc">{n_steps}</span><span class="ch">\n</span><span class="st">"</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"• Rows: </span><span class="sc">{tbl_row_count}</span><span class="st">"</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    debug<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+=== Step Notification Preview ===
+🚨 *Step 1 (col_vals_gt)* exceeded the critical threshold
+• Column: column_name
+• Details: 25% of values failed this test
+
+=== Summary Notification Preview ===
+📊 *Validation of example_table*: critical
+• Failing steps: 2 of 5
+• Rows: 1000</code></pre>
+</div>
+</div>
+<p>The sample values show where each variable goes. For a real channel, we pass the webhook URL and use the action for both kinds of message. With <code>Actions(default=)</code>, a step message is sent for every step that exceeds a threshold, at its highest level:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>notify_slack <span class="op">=</span> pb.send_slack_notification(webhook_url<span class="op">=</span>os.environ[<span class="st">"SLACK_WEBHOOK_URL"</span>])</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>orders,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"orders"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>(<span class="fl">0.05</span>, <span class="fl">0.20</span>, <span class="fl">0.40</span>),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        actions<span class="op">=</span>pb.Actions(default<span class="op">=</span>notify_slack),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        final_actions<span class="op">=</span>pb.FinalActions(notify_slack),</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"customer"</span>)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"amount"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>This interrogation posts three messages to the channel: one for each failing step (at the error and critical levels), then the summary. Reading the URL from the <code>SLACK_WEBHOOK_URL</code> environment variable keeps it out of the code.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/Actions.html#pointblank.Actions" class="gdls-link gdls-code">Actions</a></dt>
+<dd>
+<p>Run actions when a step exceeds a threshold level.</p>
+</dd>
+<dt><a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a></dt>
+<dd>
+<p>Run actions after an interrogation.</p>
+</dd>
+<dt><a href="../reference/get_action_metadata.html#pointblank.get_action_metadata" class="gdls-link gdls-code">get_action_metadata()</a></dt>
+<dd>
+<p>Get the information that step messages are made from.</p>
+</dd>
+<dt><a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link gdls-code">get_validation_summary()</a></dt>
+<dd>
+<p>Get the information that summary messages are made from.</p>
+</dd>
+<dt><a href="../reference/emit_otel.html#pointblank.emit_otel" class="gdls-link gdls-code">emit_otel()</a></dt>
+<dd>
+<p>Send validation metrics to OpenTelemetry from a final action.</p>
+</dd>
+</dl>
 
 
 </section>
@@ -2302,6 +2283,7 @@ A function that sends notifications to Slack.
 <script src="../dark-mode-toggle.js"></script>
 <script src="../back-to-top.js"></script>
 <script src="../on-this-page.js"></script>
+<script src="../wide-layout.js"></script>
 <script src="../keyboard-nav.js"></script>
 <script src="../copy-code.js"></script>
 <script src="../details.js"></script>
@@ -2312,7 +2294,6 @@ A function that sends notifications to Slack.
 <script src="../responsive-tables.js"></script>
 <script src="../video-embed.js"></script>
 <script src="../navbar-widgets.js"></script>
-<script src="../wide-layout.js"></script>
 
 
 

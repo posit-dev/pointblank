@@ -121,7 +121,7 @@ validation = (
 )
 ```
 
-Both patterns produce identical OTel output. Choose explicit export when you want manual control, and [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions) when you want every validation run to emit signals automatically.
+The two patterns differ in what they send. [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) sends metrics only (its `enable_tracing=` and `enable_logging=` arguments currently have no effect), leaves out the per-step duration histogram, and attaches only the `pb.tbl_name` attribute plus any `extra_attributes`. Choose explicit export when you want traces, log records, or the full set of attributes, and [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions) when you want every validation run to emit metrics automatically.
 
 ## Working Example with Console Output
 
@@ -261,7 +261,7 @@ That completes the end-to-end walkthrough. The same three signal types (metrics,
 
 ## Configuration Reference
 
-Both [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) and the [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) factory accept the same set of parameters. This section documents every option and how the log-level filter works.
+This section documents every [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) option and how the log-level filter works.
 
 ### [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) Parameters
 
@@ -281,7 +281,7 @@ The table below lists all constructor parameters for [OTelExporter](../../refere
 | `log_level` | `"warning"` | Minimum threshold severity for log emission |
 | `extra_attributes` | `None` | Additional key-value pairs on all signals |
 
-The [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) factory function accepts the same parameters and returns a callable suitable for use in [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions).
+The [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) factory function accepts the same parameters except `meter_version`, and returns a callable suitable for use in [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions). Since it sends metrics only, its tracing and logging parameters currently have no effect.
 
 ### Log Level Filtering
 

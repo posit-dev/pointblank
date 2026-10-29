@@ -25335,81 +25335,77 @@ Prebuilt action functions for common notification patterns.
 
 send_slack_notification(webhook_url: 'str | None' = None, step_msg: 'str | None' = None, summary_msg: 'str | None' = None, debug: 'bool' = False) -> 'Callable | None'
 
-Create a Slack notification function using a webhook URL.
+Create an action that sends a Slack notification about a validation.
 
-This function can be used in two ways:
+Slack is a common place for a team to hear about problems with its data. The
+`send_slack_notification()` function creates an action that posts a message to a Slack channel
+through an [incoming webhook](https://api.slack.com/messaging/webhooks). The same action works
+in two places:
 
-1. With [`Actions`](`pointblank.Actions`) to notify about individual validation step failures
-2. With [`FinalActions`](`pointblank.FinalActions`) to provide a summary notification after all
-validation steps have undergone interrogation
+1. In [`Actions`](`pointblank.Actions`), it sends a message about a step that exceeded a
+threshold level.
+2. In [`FinalActions`](`pointblank.FinalActions`), it sends a summary of the whole validation
+after the interrogation.
 
-The function creates a callable that sends notifications through a Slack webhook. Message
-formatting can be customized using templates for both individual steps and summary reports.
+The action works out from where it runs which kind of message to send. The messages are made
+from templates (`step_msg=` and `summary_msg=`), which can use Slack's Markdown formatting.
+
+A notification that can't be sent (because of a wrong webhook URL, a network error or a
+template with an unknown variable) doesn't stop the validation. The error is printed as
+`Failed to send Slack notification: ...` instead of being raised.
+
+Without a webhook URL, nothing is sent to Slack, which is useful for trying out templates:
+
+- With `webhook_url=None`, the action prints the message that it would send.
+- With `webhook_url=None` and `debug=True`, the function prints previews of both templates
+filled in with sample values. It then returns `None` instead of an action.
 
 Parameters
 ----------
 webhook_url
-    The Slack webhook URL. If `None` (and `debug=True`), a dry run is performed (see the
-    *Offline Testing* section below for information on this).
+    The URL of a Slack incoming webhook (`https://hooks.slack.com/services/...`). Since anyone
+    with the URL can post to the channel, it's best read from an environment variable rather
+    than written in the code. The default is `None`, which prints the messages instead of
+    sending them.
 step_msg
-    Template string for step notifications. Some of the available variables include: `"{step}"`,
-    `"{column}"`, `"{value}"`, `"{type}"`, `"{time}"`, `"{level}"`, etc. See the *Available
-    Template Variables for Step Notifications* section below for more details. If not provided,
-    a default step message template will be used.
+    The template for messages about a step, using the variables in *Template Variables for
+    Step Messages* below. The default is `None`, which uses a template with the assertion
+    type, the threshold level, the step number, the column and the time.
 summary_msg
-    Template string for summary notifications. Some of the available variables are:
-    `"{n_steps}"`, `"{n_passing_steps}"`, `"{n_failing_steps}"`, `"{all_passed}"`,
-    `"{highest_severity}"`, etc. See the *Available Template Variables for Summary
-    Notifications* section below for more details. If not provided, a default summary message
-    template will be used.
+    The template for summary messages, using the variables in *Template Variables for Summary
+    Messages* below. The default is `None`, which uses a template with the highest threshold
+    level reached, the number of steps, the number of failing steps and the time.
 debug
-    Print debug information if `True`. This includes the message content and the response from
-    Slack. This is useful for testing and debugging the notification function. If `webhook_url`
-    is `None`, the function will print the message to the console instead of sending it to
-    Slack. This is useful for debugging and ensuring that your templates are formatted
-    correctly.
+    Whether to print each message, and Slack's response, when it's sent. With
+    `webhook_url=None`, the function prints previews of the templates instead (see above). The
+    default is `False`.
 
 Returns
 -------
-Callable
-    A function that sends notifications to Slack.
+Callable or None
+    The action, to use in `Actions` or `FinalActions`. With `webhook_url=None` and
+    `debug=True`, the function returns `None` after printing the previews.
 
-Available Template Variables for Step Notifications
----------------------------------------------------
-When creating a custom template for validation step alerts (`step_msg=`), the following
-templating strings can be used:
+Template Variables for Step Messages
+------------------------------------
+A `step_msg=` template can use these variables:
 
 - `"{step}"`: The step number.
 - `"{column}"`: The column name.
 - `"{value}"`: The value being compared (only available in certain validation steps).
 - `"{type}"`: The assertion type (e.g., `"col_vals_gt"`, etc.).
-- `"{level}"`: The severity level (`"warning"`, `"error"`, or `"critical"`).
-- `"{level_num}"`: The severity level as a numeric value (`30`, `40`, or `50`).
+- `"{level}"`: The threshold level (`"warning"`, `"error"`, or `"critical"`).
+- `"{level_num}"`: The threshold level as a number (`30`, `40`, or `50`).
 - `"{autobrief}"`: A localized and brief statement of the expectation for the step.
 - `"{failure_text}"`: Localized text that explains how the validation step failed.
 - `"{time}"`: The time of the notification.
 
-Here's an example of how to construct a `step_msg=` template:
+These are the keys of [`get_action_metadata()`](`pointblank.get_action_metadata`)'s
+dictionary, plus `"{time}"`.
 
-```python
-step_msg = '''🚨 *Validation Step Alert*
-• Step Number: {step}
-• Column: {column}
-• Test Type: {type}
-• Value Tested: {value}
-• Severity: {level} (level {level_num})
-• Brief: {autobrief}
-• Details: {failure_text}
-• Time: {time}'''
-```
-
-This template will be filled with the relevant information when a validation step fails. The
-placeholders will be replaced with actual values when the Slack notification is sent.
-
-Available Template Variables for Summary Notifications
-------------------------------------------------------
-When creating a custom template for a validation summary (`summary_msg=`), the following
-templating strings can be used:
+Template Variables for Summary Messages
+---------------------------------------
+A `summary_msg=` template can use these variables:
 
 - `"{n_steps}"`: The total number of validation steps.
 - `"{n_passing_steps}"`: The number of validation steps where all test units passed.
@@ -25418,286 +25414,272 @@ templating strings can be used:
 - `"{n_error_steps}"`: The number of steps that exceeded an 'error' threshold.
 - `"{n_critical_steps}"`: The number of steps that exceeded a 'critical' threshold.
 - `"{all_passed}"`: Whether or not every validation step had no failing test units.
-- `"{highest_severity}"`: The highest severity level encountered during validation. This can be
-one of the following: `"warning"`, `"error"`, or `"critical"`, `"some failing"`, or
-`"all passed"`.
+- `"{highest_severity}"`: The highest threshold level reached in the validation: `"warning"`,
+`"error"` or `"critical"`. If no threshold was exceeded, it is `"some failing"` when some
+test units failed and `"all passed"` otherwise.
 - `"{tbl_row_count}"`: The number of rows in the target table.
 - `"{tbl_column_count}"`: The number of columns in the target table.
-- `"{tbl_name}"`: The name of the target table.
+- `"{tbl_name}"`: The name of the target table (`"Unknown"` without a `tbl_name=`).
 - `"{validation_duration}"`: The duration of the validation in seconds.
 - `"{time}"`: The time of the notification.
 
-Here's an example of how to put together a `summary_msg=` template:
-
-```python
-summary_msg = '''📊 *Validation Summary Report*
-*Overview*
-• Status: {highest_severity}
-• All Passed: {all_passed}
-• Total Steps: {n_steps}
-
-*Step Results*
-• Passing Steps: {n_passing_steps}
-• Failing Steps: {n_failing_steps}
-• Warning Level: {n_warning_steps}
-• Error Level: {n_error_steps}
-• Critical Level: {n_critical_steps}
-
-*Table Info*
-• Table Name: {tbl_name}
-• Row Count: {tbl_row_count}
-• Column Count: {tbl_column_count}
-
-*Timing*
-• Duration: {validation_duration}s
-• Completed: {time}'''
-```
-
-This template will be filled with the relevant information when the validation summary is
-generated. The placeholders will be replaced with actual values when the Slack notification is
-sent.
-
-Offline Testing
----------------
-If you want to test the function without sending actual notifications, you can leave the
-`webhook_url=` as `None` and set `debug=True`. This will print the message to the console
-instead of sending it to Slack. This is useful for debugging and ensuring that your templates
-are formatted correctly. Furthermore, the function could be run globally (i.e., outside of the
-context of a validation plan) to show the message templates with all possible variables. Here's
-an example of how to do this:
-
-```python
-import pointblank as pb
-
-# Create a Slack notification function
-notify_slack = pb.send_slack_notification(
-    webhook_url=None,  # Leave as None for dry run
-    debug=True,  # Enable debug mode to print message previews
-)
-# Call the function to see the message previews
-notify_slack()
-```
-
-This will print the step and summary message previews to the console, allowing you to see how
-the templates will look when filled with actual data. You can then adjust your templates as
-needed before using them in a real validation plan.
-
-When `step_msg=` and `summary_msg=` are not provided, the function will use default templates.
-However, you can customize the templates to include additional information or change the format
-to better suit your needs. Iterating on the templates can help you create more informative and
-visually appealing messages. Here's an example of that:
-
-```python
-import pointblank as pb
-
-# Create a Slack notification function with custom templates
-notify_slack = pb.send_slack_notification(
-    webhook_url=None, # Leave as None for dry run
-    step_msg='''*Data Validation Alert*
-    • Type: {type}
-    • Level: {level}
-    • Step: {step}
-    • Column: {column}
-    • Time: {time}''',
-    summary_msg='''*Data Validation Summary*
-    • Highest Severity: {highest_severity}
-    • Total Steps: {n_steps}
-    • Failed Steps: {n_failing_steps}
-    • Time: {time}''',
-    debug=True,  # Enable debug mode to print message previews
-)
-```
-
-These templates will be used with sample data when the function is called. The combination of
-`webhook_url=None` and `debug=True` allows you to test your custom templates without having to
-send actual notifications to Slack.
+These are keys of [`get_validation_summary()`](`pointblank.get_validation_summary`)'s
+dictionary, plus `"{time}"`. Its other keys, such as `"{overall_health_score}"` and
+`"{list_failing_steps}"`, can be used too. Since the templates are filled in with Python's
+`str.format()`, a literal brace has to be doubled (`"{{"` or `"}}"`).
 
 Examples
 --------
-When using an action with one or more validation steps, you typically provide callables that
-fire when a matched threshold of failed test units is exceeded. The callable can be
-a function or a lambda. The `send_slack_notification()` function creates a callable that sends
-a Slack notification when the validation step fails. Here is how it can be set up to work for
-multiple validation steps by using of [Actions](`pointblank.Actions`):
+Let's validate a small table of orders, which has a missing customer name and two amounts
+that aren't positive. The action has no webhook URL, so it prints the message instead of
+sending it. In `Actions(critical=)`, it runs for the steps that exceed the critical
+threshold:
 
-```python
+```{python}
 import pointblank as pb
+import polars as pl
 
-# Create a Slack notification function
-notify_slack = pb.send_slack_notification(
-    webhook_url="https://hooks.slack.com/services/your/webhook/url"
+orders = pl.DataFrame(
+    {
+        "amount": [29.99, 150.00, -5.00, 75.50, 0.00],
+        "customer": ["Alice", "Bob", None, "Dana", "Eve"],
+    }
 )
-# Create a validation plan
+
+notify_slack = pb.send_slack_notification()
+
 validation = (
     pb.Validate(
-        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
-        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+        data=orders,
+        tbl_name="orders",
+        thresholds=(0.05, 0.20, 0.40),
         actions=pb.Actions(critical=notify_slack),
     )
-    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}[0-9]{3}")
-    .col_vals_gt(columns="item_revenue", value=0.05)
-    .col_vals_gt(columns="session_duration", value=15)
+    .col_vals_not_null(columns="customer")
+    .col_vals_gt(columns="amount", value=0)
     .interrogate()
 )
-
-validation
 ```
 
-By placing the `notify_slack()` function in the `Validate(actions=Actions(critical=))` argument,
-you can ensure that the notification is sent whenever the 'critical' threshold is reached (as
-set here, when 15% or more of the test units fail). The notification will include information
-about the validation step that triggered the alert.
+Only the second step, with 40% of its test units failing, reached the critical threshold, so
+there is one message. The first step (20% failing) exceeded the error threshold, which has no
+action here.
 
-When using a [`FinalActions`](`pointblank.FinalActions`) object, the notification will be sent
-after all validation steps have been completed. This is useful for providing a summary of the
-validation process. Here is an example of how to set up a summary notification:
+In `FinalActions`, the same action sends a summary of the validation instead:
 
-```python
-import pointblank as pb
-
-# Create a Slack notification function
-notify_slack = pb.send_slack_notification(
-    webhook_url="https://hooks.slack.com/services/your/webhook/url"
-)
-# Create a validation plan
+```{python}
 validation = (
     pb.Validate(
-        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
-        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+        data=orders,
+        tbl_name="orders",
+        thresholds=(0.05, 0.20, 0.40),
         final_actions=pb.FinalActions(notify_slack),
     )
-    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}[0-9]{3}")
-    .col_vals_gt(columns="item_revenue", value=0.05)
-    .col_vals_gt(columns="session_duration", value=15)
+    .col_vals_not_null(columns="customer")
+    .col_vals_gt(columns="amount", value=0)
     .interrogate()
 )
 ```
 
-In this case, the same `notify_slack()` function is used, but it is placed in
-`Validate(final_actions=FinalActions())`. This results in the summary notification being sent
-after all validation steps are completed, regardless of whether any steps failed or not.
+The summary is sent once per interrogation, whether or not any step failed. Both steps failed
+here, and the highest threshold level reached was critical.
 
-This simplicity is possible because the `send_slack_notification()` function creates a callable
-that can be used in both contexts. The function will automatically determine whether to send a
-step notification or a summary notification based on the context in which it is called.
+Custom templates can add more detail. With `webhook_url=None` and `debug=True`, the function
+shows previews of the templates with sample values, without a validation:
 
-We can customize the message templates for both step and summary notifications. In that way,
-it's possible to create a more informative and visually appealing message. For example, we can
-use Markdown formatting to make the message more readable and visually appealing. Here is an
-example of how to customize the templates:
+```{python}
+pb.send_slack_notification(
+    step_msg=(
+        "🚨 *Step {step} ({type})* exceeded the {level} threshold\n"
+        "• Column: {column}\n"
+        "• Details: {failure_text}"
+    ),
+    summary_msg=(
+        "📊 *Validation of {tbl_name}*: {highest_severity}\n"
+        "• Failing steps: {n_failing_steps} of {n_steps}\n"
+        "• Rows: {tbl_row_count}"
+    ),
+    debug=True,
+)
+```
+
+The sample values show where each variable goes. For a real channel, we pass the webhook URL
+and use the action for both kinds of message. With `Actions(default=)`, a step message is sent
+for every step that exceeds a threshold, at its highest level:
 
 ```python
-import pointblank as pb
-# Create a Slack notification function
+import os
 
-notify_slack = pb.send_slack_notification(
-    webhook_url="https://hooks.slack.com/services/your/webhook/url",
-    step_msg='''
-    🚨 *Validation Step Alert*
-    • Step Number: {step}
-    • Column: {column}
-    • Test Type: {type}
-    • Value Tested: {value}
-    • Severity: {level} (level {level_num})
-    • Brief: {autobrief}
-    • Details: {failure_text}
-    • Time: {time}''',
-    summary_msg='''
-    📊 *Validation Summary Report*
-    *Overview*
-    • Status: {highest_severity}
-    • All Passed: {all_passed}
-    • Total Steps: {n_steps}
+notify_slack = pb.send_slack_notification(webhook_url=os.environ["SLACK_WEBHOOK_URL"])
 
-    *Step Results*
-    • Passing Steps: {n_passing_steps}
-    • Failing Steps: {n_failing_steps}
-    • Warning Level: {n_warning_steps}
-    • Error Level: {n_error_steps}
-    • Critical Level: {n_critical_steps}
-
-    *Table Info*
-    • Table Name: {tbl_name}
-    • Row Count: {tbl_row_count}
-    • Column Count: {tbl_column_count}
-
-    *Timing*
-    • Duration: {validation_duration}s
-    • Completed: {time}''',
-)
-
-# Create a validation plan
 validation = (
     pb.Validate(
-        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
-        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+        data=orders,
+        tbl_name="orders",
+        thresholds=(0.05, 0.20, 0.40),
         actions=pb.Actions(default=notify_slack),
         final_actions=pb.FinalActions(notify_slack),
     )
-    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}[0-9]{3}")
-    .col_vals_gt(columns="item_revenue", value=0.05)
-    .col_vals_gt(columns="session_duration", value=15)
+    .col_vals_not_null(columns="customer")
+    .col_vals_gt(columns="amount", value=0)
     .interrogate()
 )
 ```
 
-In this example, we have customized the templates for both step and summary notifications. The
-step notification includes details about the validation step, including the step number, column
-name, test type, value tested, severity level, brief description, and time of the notification.
-The summary notification includes an overview of the validation process, including the status,
-number of steps, passing and failing steps, table information, and timing details.
+This interrogation posts three messages to the channel: one for each failing step (at the
+error and critical levels), then the summary. Reading the URL from the `SLACK_WEBHOOK_URL`
+environment variable keeps it out of the code.
+
+See Also
+--------
+Actions : Run actions when a step exceeds a threshold level.
+FinalActions : Run actions after an interrogation.
+get_action_metadata : Get the information that step messages are made from.
+get_validation_summary : Get the information that summary messages are made from.
+emit_otel : Send validation metrics to OpenTelemetry from a final action.
 
 emit_otel(*, meter_name: 'str' = 'pointblank', enable_metrics: 'bool' = True, enable_tracing: 'bool' = False, enable_logging: 'bool' = False, meter_provider: 'Any | None' = None, tracer_provider: 'Any | None' = None, logger_provider: 'Any | None' = None, metric_prefix: 'str' = 'pb.validation', log_level: 'str' = 'warning', extra_attributes: 'dict[str, str] | None' = None) -> 'Callable'
 
-Create an OTel export action for use in `FinalActions`.
+Create a final action that sends a validation's metrics to OpenTelemetry.
 
-Returns a callable that, when invoked as a FinalAction after interrogation, exports validation
-results as OpenTelemetry metrics.
+The `emit_otel()` function returns an action for [`FinalActions`](`pointblank.FinalActions`)
+that sends validation metrics to OpenTelemetry (OTel) at the end of every
+[`interrogate()`](`pointblank.Validate.interrogate`) call. With the action in the validation
+plan, every run reports to the monitoring backend without any code after the validation. That
+suits validations that run on a schedule, such as checks in a data pipeline.
+
+The action sends the metrics of
+[`OTelExporter`](`pointblank.integrations.otel.OTelExporter`), with these differences:
+
+- It sends metrics only. The `enable_tracing=`, `enable_logging=`, `tracer_provider=`,
+`logger_provider=` and `log_level=` arguments currently have no effect. Use
+[`OTelExporter.export()`](`pointblank.integrations.otel.OTelExporter.export`) after the
+interrogation for traces and log records.
+- It doesn't send the step duration histogram (`{prefix}.step.duration`), so there are 11
+metrics instead of 12.
+- The only attributes are `pb.tbl_name` (when the validation has a `tbl_name=`) and those in
+`extra_attributes=`.
+
+Without `meter_provider=`, the metrics go to OTel's global meter provider, which discards them
+until the application sets up the OTel SDK. The OTel packages are an optional dependency,
+installed with `pip install pointblank[otel]`.
 
 Parameters
 ----------
 meter_name
-    Name for the OTel Meter. Defaults to `"pointblank"`.
+    The name that identifies Pointblank as the source of the metrics (the OTel instrumentation
+    scope). The default is `"pointblank"`.
 enable_metrics
-    Emit OTel metrics (counters, gauges, histograms). Default is `"True"`.
+    Whether to send the metrics. The default is `True`.
 enable_tracing
-    Emit OTel trace spans. Default is `"False"`.
+    Currently has no effect. The default is `False`.
 enable_logging
-    Emit OTel log records for threshold breaches. Default is `"False"`.
+    Currently has no effect. The default is `False`.
 meter_provider
-    Custom MeterProvider. If `"None"`, uses the global default.
+    An OTel `MeterProvider` for the metrics. The default is `None`, which uses the global meter
+    provider.
 tracer_provider
-    Custom TracerProvider. If `"None"`, uses the global default.
+    Currently has no effect. The default is `None`.
 logger_provider
-    Custom LoggerProvider. Required when `"enable_logging=True"`.
+    Currently has no effect. The default is `None`.
 metric_prefix
-    Prefix for all metric instrument names. Default is `"pb.validation"`.
+    The prefix for the names of the metrics. The default is `"pb.validation"`.
 log_level
-    Minimum severity level for log emission. One of `"warning"`, `"error"`, `"critical"`.
-    The default is `"warning"`.
+    Currently has no effect. The default is `"warning"`.
 extra_attributes
-    Additional key-value pairs attached to all emitted signals.
+    A dictionary of attributes to add to every metric, such as the environment or the name of
+    the pipeline. The default is `None`.
 
 Returns
 -------
 Callable
-    A callable suitable for use in `FinalActions`.
+    A function to use in `FinalActions`.
+
+Raises
+------
+ImportError
+    If the OTel packages aren't installed.
 
 Examples
 --------
-```python
+Let's add the action to a validation of a small table of orders. The OTel SDK's
+`InMemoryMetricReader` keeps the metrics in memory so we can look at them (in production,
+the meter provider would send them to a collector instead):
+
+```{python}
+import pointblank as pb
+import polars as pl
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.sdk.metrics.export import InMemoryMetricReader
+
+reader = InMemoryMetricReader()
+meter_provider = MeterProvider(metric_readers=[reader])
+
+orders = pl.DataFrame(
+    {
+        "amount": [29.99, 150.00, -5.00, 75.50, 0.00],
+        "customer": ["Alice", "Bob", None, "Dana", "Eve"],
+    }
+)
+
 validation = (
     pb.Validate(
-        data=df,
-        tbl_name="sales",
+        data=orders,
+        tbl_name="orders",
+        thresholds=(0.05, 0.20, 0.40),
         final_actions=pb.FinalActions(
-            pb.emit_otel(enable_metrics=True, enable_tracing=True),
+            pb.emit_otel(meter_provider=meter_provider, extra_attributes={"env": "dev"})
         ),
     )
-    .col_vals_not_null(columns="customer_id")
+    .col_vals_not_null(columns="customer")
+    .col_vals_gt(columns="amount", value=0)
+    .interrogate()
+)
+
+metrics = reader.get_metrics_data().resource_metrics[0].scope_metrics[0].metrics
+
+for metric in metrics:
+    print(metric.name, metric.data.data_points[0].value)
+```
+
+The metrics were sent during `interrogate()`. Both steps failed, 7 of the 10 test units passed,
+and the second step exceeded all three thresholds. Each metric has the `pb.tbl_name` and `env`
+attributes:
+
+```{python}
+dict(metrics[0].data.data_points[0].attributes)
+```
+
+Since `FinalActions` takes any number of actions, the metrics can be sent along with other
+notifications. Here, a [`send_slack_notification()`](`pointblank.send_slack_notification`)
+action without a webhook URL prints the message it would send:
+
+```{python}
+validation = (
+    pb.Validate(
+        data=orders,
+        tbl_name="orders",
+        thresholds=(0.05, 0.20, 0.40),
+        final_actions=pb.FinalActions(
+            pb.emit_otel(meter_provider=meter_provider),
+            pb.send_slack_notification(),
+        ),
+    )
+    .col_vals_not_null(columns="customer")
+    .col_vals_gt(columns="amount", value=0)
     .interrogate()
 )
 ```
+
+The actions run in the order they're given, so the metrics are sent before the Slack message.
+The message summarizes the same results as the metrics: both steps failed, and the highest
+threshold level reached was critical.
+
+See Also
+--------
+integrations.otel.OTelExporter : Send metrics, traces and log records after an interrogation.
+FinalActions : Run actions after an interrogation.
+send_slack_notification : Send a Slack notification from a final action.
 
 
 ## Metadata Import/Export
@@ -28200,31 +28182,171 @@ OTelExporter(*, meter_name: 'str' = 'pointblank', meter_version: 'str | None' = 
 
 Export Pointblank validation results as OpenTelemetry signals.
 
+OpenTelemetry (OTel) is a vendor-neutral standard for application telemetry, which backends
+such as Grafana, Datadog, New Relic and Prometheus can receive. An `OTelExporter` sends the
+results of an interrogated [`Validate`](`pointblank.Validate`) object to OTel, so that data
+quality shows up in the same dashboards and alerts as the rest of a pipeline's telemetry. Call
+[`export()`](`pointblank.integrations.otel.OTelExporter.export`) after
+[`interrogate()`](`pointblank.Validate.interrogate`) to send the results. For an export that
+happens at the end of every interrogation, use [`emit_otel()`](`pointblank.emit_otel`) in
+[`FinalActions`](`pointblank.FinalActions`) instead (it sends metrics only).
+
+An export can produce three kinds of signal:
+
+- **Metrics** (on by default). There are counters of the steps (`{prefix}.steps.total`,
+`{prefix}.steps.passed` and `{prefix}.steps.failed`), of the test units
+(`{prefix}.test_units.total`, `{prefix}.test_units.passed` and `{prefix}.test_units.failed`)
+and of the steps that exceeded each threshold level (`{prefix}.threshold.warning`,
+`{prefix}.threshold.error` and `{prefix}.threshold.critical`). There are gauges of the overall
+pass rate (`{prefix}.pass_rate`) and of the interrogation time in seconds (`{prefix}.duration`),
+and a histogram of the step processing times (`{prefix}.step.duration`). Here `{prefix}` is the
+`metric_prefix=` value. Counters add up over exports, while a gauge keeps the latest value.
+- **Traces** (`enable_tracing=True`). A `pb.validate` span covers the interrogation, with a
+`pb.validate.step` child span for each step. A step's span has its test unit counts and
+fractions and the threshold levels it exceeded. The `pb.validate` span also has a
+`threshold_breach` event for each threshold level that each step exceeded.
+- **Logs** (`enable_logging=True`). There is one log record for each step that exceeded a
+threshold, at the highest level it exceeded (`WARNING`, `ERROR` or `CRITICAL`). The
+`log_level=` value sets the lowest level that is logged.
+
+Every signal has the attributes `pb.tbl_name`, `pb.label`, `pb.owner` and `pb.version` (for the
+ones that are set in the `Validate` object), plus those in `extra_attributes=`. The signals for
+individual steps also have `pb.step.i`, `pb.step.assertion_type` and `pb.step.column`.
+
+The signals go to the providers given as `meter_provider=`, `tracer_provider=` and
+`logger_provider=`. Without them, metrics and traces go to OTel's global providers, which
+discard everything until the application sets up the OTel SDK (for example, with an OTLP
+exporter that sends to a collector). Log records have no global provider to fall back on, so
+logging needs `logger_provider=`.
+
+The OTel packages are an optional dependency, installed with `pip install pointblank[otel]`.
+
 Parameters
 ----------
 meter_name
-    Name for the OTel Meter. Defaults to `"pointblank"`.
+    The name that identifies Pointblank as the source of the signals (the OTel instrumentation
+    scope), used for the meter, the tracer and the logger. The default is `"pointblank"`.
 meter_version
-    Version string for the Meter. Defaults to `"pointblank.__version__"`.
+    The version of the instrumentation scope. The default is `None`, which uses the installed
+    version of Pointblank.
 enable_metrics
-    Emit OTel metrics (counters, gauges, histograms). Default is `"True"`.
+    Whether to send the metrics. The default is `True`.
 enable_tracing
-    Emit OTel trace spans. Default is `"False"`.
+    Whether to send the trace spans. The default is `False`.
 enable_logging
-    Emit OTel log records for threshold breaches. Default is `"False"`.
+    Whether to send log records for the steps that exceeded a threshold. This needs
+    `logger_provider=`. The default is `False`.
 meter_provider
-    Custom MeterProvider. If `"None"`, uses the global default.
+    An OTel `MeterProvider` for the metrics. The default is `None`, which uses the global meter
+    provider.
 tracer_provider
-    Custom TracerProvider. If `"None"`, uses the global default.
+    An OTel `TracerProvider` for the trace spans. The default is `None`, which uses the global
+    tracer provider.
 logger_provider
-    Custom LoggerProvider. Required when `"enable_logging=True"`.
+    An OTel `LoggerProvider` for the log records, needed when `enable_logging=True`. The
+    default is `None`.
 metric_prefix
-    Prefix for all metric instrument names. Default is `"pb.validation"`.
+    The prefix for the names of the metrics. The default is `"pb.validation"`.
 log_level
-    Minimum severity level for log emission. One of `"warning"`, `"error"`, `"critical"`.
-    Default is `"warning"`.
+    The lowest threshold level that produces a log record: `"warning"` (every step that
+    exceeded a threshold), `"error"` or `"critical"`. The default is `"warning"`.
 extra_attributes
-    Additional key-value pairs attached to all emitted signals.
+    A dictionary of attributes to add to every signal, such as the environment or the name of
+    the pipeline. The default is `None`.
+
+Raises
+------
+ImportError
+    If the OTel packages aren't installed.
+
+Examples
+--------
+Let's validate a small table of orders, which has a missing customer name and two amounts
+that aren't positive:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+orders = pl.DataFrame(
+    {
+        "order_id": [101, 102, 103, 104, 105],
+        "amount": [29.99, 150.00, -5.00, 75.50, 0.00],
+        "customer": ["Alice", "Bob", None, "Dana", "Eve"],
+    }
+)
+
+validation = (
+    pb.Validate(data=orders, tbl_name="orders", thresholds=(0.05, 0.20, 0.40))
+    .col_vals_not_null(columns="customer")
+    .col_vals_gt(columns="amount", value=0)
+    .interrogate()
+)
+```
+
+In production, the exporter would use providers that send to a collector. Here, the OTel SDK's
+`InMemoryMetricReader` keeps the metrics in memory so we can look at them:
+
+```{python}
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.sdk.metrics.export import InMemoryMetricReader
+from pointblank.integrations.otel import OTelExporter
+
+reader = InMemoryMetricReader()
+meter_provider = MeterProvider(metric_readers=[reader])
+
+exporter = OTelExporter(meter_provider=meter_provider, extra_attributes={"env": "dev"})
+exporter.export(validation)
+
+metrics = reader.get_metrics_data().resource_metrics[0].scope_metrics[0].metrics
+
+for metric in metrics:
+    for point in metric.data.data_points:
+        value = point.count if hasattr(point, "count") else point.value
+        print(metric.name, value)
+```
+
+Both steps failed, and 7 of the 10 test units passed, for a pass rate of `0.7`. The first step
+(20% failing) exceeded the warning and error thresholds, and the second (40% failing) exceeded
+all three. The step duration histogram has a data point for each step, and the value printed
+for it is its count of one observation. Every data point has the `pb.tbl_name` and `env`
+attributes (and the histogram's also have the `pb.step.*` ones):
+
+```{python}
+dict(metrics[0].data.data_points[0].attributes)
+```
+
+For traces, we give the exporter a `TracerProvider` with an in-memory span exporter. This
+exporter sends traces only:
+
+```{python}
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+
+span_exporter = InMemorySpanExporter()
+tracer_provider = TracerProvider()
+tracer_provider.add_span_processor(SimpleSpanProcessor(span_exporter))
+
+OTelExporter(
+    enable_metrics=False, enable_tracing=True, tracer_provider=tracer_provider
+).export(validation)
+
+for span in span_exporter.get_finished_spans():
+    attrs = span.attributes
+    print(span.name, attrs.get("pb.step.assertion_type"), attrs.get("pb.step.n_failed"))
+```
+
+The two `pb.validate.step` spans (one per step, with its number of failing test units) end
+before the `pb.validate` span that contains them, so they're listed first. The `pb.validate`
+span has five `threshold_breach` events: two for the first step and three for the second. The
+[`export()`](`pointblank.integrations.otel.OTelExporter.export`) method has an example of
+sending log records.
+
+See Also
+--------
+emit_otel : Send the metrics automatically at the end of an interrogation.
+FinalActions : Run actions after an interrogation.
 
 
 ----------------------------------------------------------------------
@@ -42700,8 +42822,11 @@ validation = (
 )
 ```
 
-Both patterns produce identical OTel output. Choose explicit export when you want manual control,
-and `FinalActions` when you want every validation run to emit signals automatically.
+The two patterns differ in what they send. `emit_otel()` sends metrics only (its `enable_tracing=`
+and `enable_logging=` arguments currently have no effect), leaves out the per-step duration
+histogram, and attaches only the `pb.tbl_name` attribute plus any `extra_attributes`. Choose
+explicit export when you want traces, log records, or the full set of attributes, and
+`FinalActions` when you want every validation run to emit metrics automatically.
 
 ## Working Example with Console Output
 
@@ -42872,8 +42997,7 @@ identically whether you use in-memory providers for development or OTLP exporter
 
 ## Configuration Reference
 
-Both `OTelExporter` and the `emit_otel()` factory accept the same set of parameters. This section
-documents every option and how the log-level filter works.
+This section documents every `OTelExporter` option and how the log-level filter works.
 
 ### `OTelExporter` Parameters
 
@@ -42893,8 +43017,9 @@ The table below lists all constructor parameters for `OTelExporter`.
 | `log_level` | `"warning"` | Minimum threshold severity for log emission |
 | `extra_attributes` | `None` | Additional key-value pairs on all signals |
 
-The `emit_otel()` factory function accepts the same parameters and returns a callable suitable for
-use in `FinalActions`.
+The `emit_otel()` factory function accepts the same parameters except `meter_version`, and returns
+a callable suitable for use in `FinalActions`. Since it sends metrics only, its tracing and logging
+parameters currently have no effect.
 
 ### Log Level Filtering
 

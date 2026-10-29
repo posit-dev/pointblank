@@ -567,10 +567,10 @@ Create a dict of string field specifications representing a person profile.
 Prebuilt action functions for common notification patterns.
 
 [send_slack_notification()](send_slack_notification.md#pointblank.send_slack_notification)  
-Create a Slack notification function using a webhook URL.
+Create an action that sends a Slack notification about a validation.
 
 [emit_otel()](emit_otel.md#pointblank.emit_otel)  
-Create an OTel export action for use in [FinalActions](../reference/FinalActions.md#pointblank.FinalActions).
+Create a final action that sends a validation's metrics to OpenTelemetry.
 
 ## Metadata Import/Export
 
