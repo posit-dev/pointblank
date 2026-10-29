@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="A single entry in a codelist (controlled terminology).">
+<meta name="description" content="A single permitted value in a codelist.">
 
 <title>CodelistEntry | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "CodelistEntry - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/CodelistEntry.html"}]</script>
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="CodelistEntry | Pointblank">
-<meta property="og:description" content="A single entry in a codelist (controlled terminology).">
+<meta property="og:description" content="A single permitted value in a codelist.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="CodelistEntry | Pointblank">
-<meta name="twitter:description" content="A single entry in a codelist (controlled terminology).">
+<meta name="twitter:description" content="A single permitted value in a codelist.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1438,6 +1438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/load_metadata_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_metadata_example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MetadataImport</span></a>
   </div>
@@ -1643,6 +1649,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1669,11 +1677,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>A single entry in a codelist (controlled terminology).</p>
+<p>A single permitted value in a codelist.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L21-L47" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L21-L90" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CodelistEntry</span>(</span>
@@ -1685,36 +1693,77 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">is_extended</span><span class="op">=</span><span class="bn">False</span>,</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
+<div class="doc-text">
+<p>A <a href="../reference/Codelist.html#pointblank.Codelist" class="gdls-link"><code>Codelist</code></a> is a list of <a href="../reference/CodelistEntry.html#pointblank.CodelistEntry" class="gdls-link gdls-code">CodelistEntry</a> objects, each pairing a coded value (the value that appears in the data, such as <code>"F"</code>) with a label that says what it means (such as <code>"Female"</code>). Codelist entries are created when <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a> reads a codelist, and can also be created directly to build a codelist by hand.</p>
+</div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">value</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>The coded value.</p>
+<p>The coded value, as it appears in the data.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">label</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>Human-readable label for the value.</p>
+<p>A human-readable label for the value.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">description</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Extended description of this entry.</p>
+<p>A longer description of the entry. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">synonyms</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Alternative terms for this entry.</p>
+<p>Other terms with the same meaning, such as the synonyms listed in CDISC Controlled Terminology. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">is_deprecated</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
-<p>Whether this entry is deprecated.</p>
+<p>Whether the entry has been retired. A deprecated entry stays in the codelist (and in <a href="../reference/Codelist.html#pointblank.Codelist.to_dict" class="gdls-link"><code>to_dict()</code></a>) but is left out of the permitted values given by <a href="../reference/Codelist.html#pointblank.Codelist.to_set" class="gdls-link"><code>to_set()</code></a>. The readers don’t currently set this flag, but you can for codelists you build yourself. The default is <code>False</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">is_extended</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
-Whether this entry is a sponsor extension of an extensible codelist (declared in Define-XML with <code>def:ExtendedValue="Yes"</code>).
+Whether the entry is a sponsor extension to an extensible codelist: a value that isn’t in the published terminology but was added for a study. Define-XML marks these with <code>def:ExtendedValue="Yes"</code>. The default is <code>False</code>.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Each codelist imported from a file holds its entries in <code>codes</code>. Here are the entries of the <code>Sex</code> codelist in the bundled CDISC Controlled Terminology file:</p>
+<div id="cf5e551a" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ct <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"sdtm_ct.xml"</span>), codelist<span class="op">=</span><span class="st">"Sex"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>sex <span class="op">=</span> ct.get_codelist(<span class="st">"Sex"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> entry <span class="kw">in</span> sex.codes:</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(entry.value, <span class="st">"-&gt;"</span>, entry.label)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>F -&gt; Female
+M -&gt; Male
+U -&gt; Unknown
+UNDIFFERENTIATED -&gt; Undifferentiated</code></pre>
+</div>
+</div>
+<p>The values are the codes used in the data, and the labels say what they mean. An entry can also be created directly, for example to build a codelist that isn’t in any file:</p>
+<div id="017196da" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>entry <span class="op">=</span> pb.CodelistEntry(value<span class="op">=</span><span class="st">"NASOGASTRIC TUBE"</span>, label<span class="op">=</span><span class="st">"Nasogastric tube"</span>, is_extended<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>entry</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>CodelistEntry(value='NASOGASTRIC TUBE', label='Nasogastric tube', description=None, synonyms=None, is_deprecated=False, is_extended=True)</code></pre>
+</div>
+</div>
+<p>Setting <code>is_extended=True</code> records that this value was added to an extensible codelist rather than taken from the published terminology, so <a href="../reference/Codelist.html#pointblank.Codelist.extended_values" class="gdls-link"><code>extended_values()</code></a> will list it.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/Codelist.html#pointblank.Codelist" class="gdls-link gdls-code">Codelist</a></dt>
+<dd>
+<p>The list of entries that a codelist is made of.</p>
+</dd>
+</dl>
 
 
 </section>

@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Export metadata to an external standard format.">
+<meta name="description" content="Export metadata as a Frictionless Table Schema.">
 
 <title>export_metadata() | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "export_metadata - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/export_metadata.html"}]</script>
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="export_metadata() | Pointblank">
-<meta property="og:description" content="Export metadata to an external standard format.">
+<meta property="og:description" content="Export metadata as a Frictionless Table Schema.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="export_metadata() | Pointblank">
-<meta name="twitter:description" content="Export metadata to an external standard format.">
+<meta name="twitter:description" content="Export metadata as a Frictionless Table Schema.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1438,6 +1438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/load_metadata_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_metadata_example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MetadataImport</span></a>
   </div>
@@ -1645,6 +1651,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1671,11 +1679,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>Export metadata to an external standard format.</p>
+<p>Export metadata as a Frictionless Table Schema.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_export.py#L32-L80" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_export.py#L32-L155" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">export_metadata</span>(</span>
@@ -1686,7 +1694,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Converts a MetadataImport object to a standards-compliant representation (e.g., Frictionless Table Schema) and optionally writes it to a file.</p>
+<p>The <a href="../reference/export_metadata.html#pointblank.export_metadata" class="gdls-link gdls-code">export_metadata()</a> function is the reverse of <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a>: it writes a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport</code></a> out in a standard format. The only format currently supported is the <a href="https://specs.frictionlessdata.io/table-schema/">Frictionless Table Schema</a>, a JSON description of a table’s fields that many data tools can read. Because the metadata can come from any of the formats that <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link gdls-code">import_metadata()</a> reads, this is also a way to convert between them, for example to get a Table Schema from a CSVW file or from the variable definitions in a Define-XML document.</p>
+<p>Each variable becomes a field, with its dtype mapped to a Frictionless type (<code>"integer"</code>, <code>"number"</code>, <code>"string"</code>, <code>"date"</code> and so on) and its label and description used as the field’s <code>title</code> and <code>description</code>. The constraints <code>required</code>, <code>unique</code>, <code>minimum</code>, <code>maximum</code>, <code>minLength</code>, <code>maxLength</code>, <code>pattern</code> and <code>enum</code> are written for the variables that have them, and declared missing values become the field’s <code>missingValues</code>. Variables that are both required and unique make up the schema’s <code>primaryKey</code>, and the dataset label and description become the schema’s <code>title</code> and <code>description</code>.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1694,19 +1703,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">source</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">MetadataImport</span></code></dt>
 <dd>
-<p>The MetadataImport object to export.</p>
+<p>The metadata to export. To export one dataset from a <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>, select it first (as in <code>package["DM"]</code>).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">destination</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional file path to write the output. If <code>None</code>, returns the result as a dict (for JSON formats) or string.</p>
+<p>A file path to write the schema to, as indented JSON. Any missing parent directories are created. If <code>None</code> (the default), nothing is written. The schema is returned in both cases.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">format</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"frictionless"</span></span></code></dt>
 <dd>
-<p>Target format. Currently supported: <code>"frictionless"</code>.</p>
+<p>The output format. Only <code>"frictionless"</code> is supported (<code>"table_schema"</code> is accepted as another name for it).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">**kwargs</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-Additional format-specific options.
+Options for the exporter. <code>include_constraints=False</code> leaves out the <code>constraints</code> of every field, giving a schema with only the field names, types, titles and missing values.
 </dd>
 </dl>
 </div>
@@ -1715,9 +1724,9 @@ Additional format-specific options.
 <h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
 <div class="doc-definition-items">
 <dl>
-<dt><code> <span class="doc-parameter-annotation">dict | str</span></code></dt>
+<dt><code> <span class="doc-parameter-annotation">dict</span></code></dt>
 <dd>
-The exported metadata as a dict (JSON formats) or string.
+The Table Schema as a dictionary.
 </dd>
 </dl>
 </div>
@@ -1728,10 +1737,99 @@ The exported metadata as a dict (JSON formats) or string.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
 <dd>
-If the format is not supported.
+If the format isn’t supported.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s import the bundled CSVW metadata for a table of weather observations and export it as a Frictionless Table Schema:</p>
+<div id="d6d30391" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"weather_csvw.json"</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.export_metadata(meta)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json.dumps(schema[<span class="st">"fields"</span>][:<span class="dv">3</span>], indent<span class="op">=</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[
+  {
+    "name": "station_id",
+    "type": "string",
+    "title": "Station ID",
+    "constraints": {
+      "required": true,
+      "unique": true
+    }
+  },
+  {
+    "name": "timestamp",
+    "type": "datetime",
+    "title": "Observation Time",
+    "constraints": {
+      "required": true,
+      "unique": true
+    }
+  },
+  {
+    "name": "temperature_c",
+    "type": "number",
+    "title": "Temperature (Celsius)",
+    "constraints": {
+      "required": true,
+      "minimum": -50.0,
+      "maximum": 60.0
+    }
+  }
+]</code></pre>
+</div>
+</div>
+<p>The first three fields show how the CSVW column definitions were carried over: the titles, the types (a CSVW <code>decimal</code> is a Frictionless <code>number</code>), and the constraints. The remaining keys of the schema describe the table as a whole:</p>
+<div id="caa61558" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(schema[<span class="st">"primaryKey"</span>])</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(schema[<span class="st">"title"</span>])</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['station_id', 'timestamp']
+Weather Station Observations</code></pre>
+</div>
+</div>
+<p>The two required and unique columns form the primary key, and the title comes from the dataset label in the CSVW file.</p>
+<p>Give a <code>destination=</code> to write the schema to a file. Here it’s written to a temporary directory and then imported again:</p>
+<div id="be893e76" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.TemporaryDirectory() <span class="im">as</span> tmp:</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    path <span class="op">=</span> Path(tmp) <span class="op">/</span> <span class="st">"weather_schema.json"</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    pb.export_metadata(meta, destination<span class="op">=</span>path, include_constraints<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    reimported <span class="op">=</span> pb.import_metadata(path)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(reimported.variable_names)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(reimported.get_variable(<span class="st">"temperature_c"</span>).min_val)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['station_id', 'timestamp', 'temperature_c', 'humidity_pct', 'wind_speed_kmh', 'precipitation_mm', 'condition']
+None</code></pre>
+</div>
+</div>
+<p>The file is a standalone Table Schema, so <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link gdls-code">import_metadata()</a> reads it back with the same variables. With <code>include_constraints=False</code> the range of <code>temperature_c</code> wasn’t written, so its <code>min_val</code> is now <code>None</code>. That’s useful when you want to share the structure of a table without the rules for its values.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link gdls-code">import_metadata()</a></dt>
+<dd>
+<p>Read metadata from a file.</p>
+</dd>
+<dt><a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a></dt>
+<dd>
+<p>The metadata that is exported.</p>
+</dd>
+</dl>
 
 
 </section>

@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="A structured missing value definition from an external standard.">
+<meta name="description" content="A declared missing-value code, as read from a metadata file.">
 
 <title>MissingValueCode | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "MissingValueCode - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/MissingValueCode.html"}]</script>
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="MissingValueCode | Pointblank">
-<meta property="og:description" content="A structured missing value definition from an external standard.">
+<meta property="og:description" content="A declared missing-value code, as read from a metadata file.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="MissingValueCode | Pointblank">
-<meta name="twitter:description" content="A structured missing value definition from an external standard.">
+<meta name="twitter:description" content="A declared missing-value code, as read from a metadata file.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1438,6 +1438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/load_metadata_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_metadata_example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MetadataImport</span></a>
   </div>
@@ -1643,6 +1649,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1669,11 +1677,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>A structured missing value definition from an external standard.</p>
+<p>A declared missing-value code, as read from a metadata file.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L115-L137" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L302-L365" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MissingValueCode</span>(</span>
@@ -1684,7 +1692,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>In SPSS, SAS, and clinical data, missing values carry meaning (<code>REFUSED</code>, <code>NOT_APPLICABLE</code>, <code>NOT_ASKED</code>, etc.).</p>
+<p>Many data formats let a dataset declare the values that stand for missing data: the user-defined missing values of an SPSS variable (such as <code>-99</code> for “Refused”), or the <code>missingValues</code> and <code>null</code> markers of a Frictionless or CSVW schema (such as <code>"NA"</code>). When <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a> reads these declarations, it records each one as a <a href="../reference/MissingValueCode.html#pointblank.MissingValueCode" class="gdls-link gdls-code">MissingValueCode</a> in <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport.missing_value_codes</code></a>, a dictionary from column name to that column’s list of codes.</p>
+<p>These objects describe the codes. To use the codes in validation, build <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects with <a href="../reference/MetadataImport.html#pointblank.MetadataImport.missing_specs" class="gdls-link"><code>MetadataImport.missing_specs()</code></a>, which works from each variable’s <a href="../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link"><code>missing_values</code></a> and their labels.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1692,22 +1701,59 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">value</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>The sentinel value (e.g., <code>-99</code>, <code>".A"</code>, <code>""</code>).</p>
+<p>The value that stands for missing data, such as <code>-99</code> or <code>"NA"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">label</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>What this missing code means.</p>
+<p>What the code means, such as <code>"Refused"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">category</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Category of missingness (e.g., <code>"system_missing"</code>, <code>"user_missing"</code>).</p>
+<p>The kind of missingness. The readers use <code>"user_missing"</code> for values declared in the file. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">reason</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-Why data is missing.
+Why the data is missing, if known. The default is <code>None</code>.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>The bundled Frictionless Data Package declares <code>"NA"</code> and <code>"N/A"</code> as missing-value markers for every field. Let’s look at the codes recorded for the <code>amount</code> column:</p>
+<div id="b574b1c3" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"datapackage.json"</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> code <span class="kw">in</span> meta.missing_value_codes[<span class="st">"amount"</span>]:</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(code.value, <span class="st">"|"</span>, code.label, <span class="st">"|"</span>, code.category)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>NA | Missing value marker: 'NA' | user_missing
+N/A | Missing value marker: 'N/A' | user_missing</code></pre>
+</div>
+</div>
+<p>Each marker is recorded with a generated label and the <code>"user_missing"</code> category, since it was declared in the file. A code can also be created directly:</p>
+<div id="d6ccd04b" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pb.MissingValueCode(value<span class="op">=-</span><span class="dv">99</span>, label<span class="op">=</span><span class="st">"Refused"</span>, category<span class="op">=</span><span class="st">"user_missing"</span>, reason<span class="op">=</span><span class="st">"refused"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>MissingValueCode(value=-99, label='Refused', category='user_missing', reason='refused')</code></pre>
+</div>
+</div>
+<p>Creating codes yourself is mainly useful when you build a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport</code></a> by hand to describe a dataset that doesn’t come with a metadata file.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/MetadataImport.html#pointblank.MetadataImport.missing_specs" class="gdls-link gdls-code">missing_specs()</a></dt>
+<dd>
+<p>Build missing-value specs from imported metadata.</p>
+</dd>
+<dt><a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a></dt>
+<dd>
+<p>Describe missing-value codes for use in validation.</p>
+</dd>
+</dl>
 
 
 </section>

@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Metadata for a single variable/column, as imported from an external standard.">
+<meta name="description" content="The metadata for a single variable (column).">
 
 <title>VariableMetadata | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "VariableMetadata - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/VariableMetadata.html"}]</script>
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="VariableMetadata | Pointblank">
-<meta property="og:description" content="Metadata for a single variable/column, as imported from an external standard.">
+<meta property="og:description" content="The metadata for a single variable (column).">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="VariableMetadata | Pointblank">
-<meta name="twitter:description" content="Metadata for a single variable/column, as imported from an external standard.">
+<meta name="twitter:description" content="The metadata for a single variable (column).">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1438,6 +1438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/load_metadata_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_metadata_example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MetadataImport</span></a>
   </div>
@@ -1643,6 +1649,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#to_missing_spec" id="toc-to_missing_spec" class="nav-link" data-scroll-target="#to_missing_spec"><span class="doc-object-name doc-function doc-label doc-label-method">to_missing_spec()</span></a></li>
@@ -1673,11 +1681,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>Metadata for a single variable/column, as imported from an external standard.</p>
+<p>The metadata for a single variable (column).</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L140-L254" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L368-L582" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">VariableMetadata</span>(</span>
@@ -1711,124 +1719,180 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="va">unit_system</span><span class="op">=</span><span class="cn">None</span>,</span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
+<div class="doc-text">
+<p>A <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport</code></a> holds one <a href="../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link gdls-code">VariableMetadata</a> for each variable described in the imported file. It gathers everything the file says about the variable in one place: its name, label and type, the constraints on its values, any value labels and missing-value codes, and (for clinical data) its CDISC attributes. Each format fills in the fields it has information for and leaves the rest as <code>None</code>.</p>
+<p>Some fields are used to generate validation steps in <a href="../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>MetadataImport.to_validate()</code></a>: <code>dtype</code> (in the schema check), <code>required</code>, <code>unique</code>, <code>min_val</code> and <code>max_val</code>, <code>allowed_values</code>, <code>pattern</code> and <code>missing_values</code>. All of the constraint fields, including <code>min_length</code> and <code>max_length</code>, are written out by <a href="../reference/export_metadata.html#pointblank.export_metadata" class="gdls-link"><code>export_metadata()</code></a>. The other fields are descriptive, and are kept so that you can use them in your own checks or reports.</p>
+</div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">name</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>Variable/column name.</p>
+<p>The name of the variable, which should match the column name in the data.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">label</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Human-readable label.</p>
+<p>A short human-readable label, such as <code>"Age in years"</code>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">description</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Longer description of the variable.</p>
+<p>A longer description of the variable. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">dtype</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Data type (mapped to Narwhals/Polars type names).</p>
+<p>The data type, as a Pointblank dtype name such as <code>"String"</code>, <code>"Int64"</code>, <code>"Float64"</code>, <code>"Boolean"</code>, <code>"Date"</code> or <code>"Datetime"</code>. The default is <code>None</code> (an unknown type, treated as <code>"String"</code> when a schema is made).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">role</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Variable role (e.g., <code>"identifier"</code>, <code>"measure"</code>, <code>"classifier"</code>).</p>
+<p>The role of the variable in the dataset, as given by the source. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">required</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
-<p>Whether the variable must be non-null.</p>
+<p>Whether the variable must have a value in every row. The default is <code>False</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">unique</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
-<p>Whether all values must be distinct.</p>
+<p>Whether every value must be different. The default is <code>False</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">min_val</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">float | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Minimum allowed value (inclusive).</p>
+<p>The smallest allowed value (inclusive). The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">max_val</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">float | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Maximum allowed value (inclusive).</p>
+<p>The largest allowed value (inclusive). The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">min_length</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Minimum string length.</p>
+<p>The shortest allowed string length. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">max_length</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Maximum string length.</p>
+<p>The longest allowed string length, such as the <code>Length</code> of a Define-XML variable. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">pattern</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Regex pattern that values must match.</p>
+<p>A regular expression that values must match. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">allowed_values</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[Any] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Explicit list of allowed values.</p>
+<p>The list of values the variable may take, usually the values of its codelist. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">codelist_ref</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Reference to a named codelist.</p>
+<p>The name of the variable’s <a href="../reference/Codelist.html#pointblank.Codelist" class="gdls-link"><code>Codelist</code></a> in <code>MetadataImport.codelists</code>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">display_format</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Display format from source system (e.g., <code>"F8.2"</code>, <code>"DATETIME20."</code>).</p>
+<p>The display format from the source system, such as the SPSS format <code>"F8.2"</code>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">value_labels</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[Any, str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Value-to-label mapping (e.g., <code>{1: "Male", 2: "Female"}</code>).</p>
+<p>A mapping of values to labels, such as <code>{1: "Male", 2: "Female"}</code> for an SPSS variable. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">missing_values</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[Any] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Sentinel values representing missingness (e.g., <code>-99</code>, <code>".A"</code>, <code>""</code>).</p>
+<p>The values that stand for missing data, such as <code>[-99, -98]</code> or <code>["NA"]</code>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">missing_value_labels</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[Any, str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Labels for missing value sentinels (e.g., <code>"Refused"</code>, <code>"Not Applicable"</code>).</p>
+<p>A mapping of missing values to labels, such as <code>{-99: "Refused"}</code>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">origin</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>How the variable was created (<code>"CRF"</code>, <code>"Derived"</code>, <code>"Assigned"</code>).</p>
+<p>How the variable’s values were obtained, such as <code>"CRF"</code>, <code>"Derived"</code> or <code>"Assigned"</code> in Define-XML. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">computational_method</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Derivation algorithm for computed variables.</p>
+<p>How a derived variable is computed. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">controlled_term</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>CDISC controlled terminology reference.</p>
+<p>The name of the CDISC Controlled Terminology codelist the variable uses. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">significant_digits</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Number of significant digits.</p>
+<p>The number of significant digits of a numeric variable. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">cdisc_domain</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>CDISC domain code (e.g., <code>"DM"</code>, <code>"AE"</code>, <code>"LB"</code>, <code>"VS"</code>).</p>
+<p>The CDISC domain or dataset that the variable belongs to, such as <code>"DM"</code> or <code>"AE"</code>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">cdisc_role</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>CDISC variable role (<code>"Identifier"</code>, <code>"Topic"</code>, <code>"Timing"</code>, <code>"Qualifier"</code>, <code>"Rule"</code>).</p>
+<p>The CDISC role of the variable, such as <code>"Identifier"</code>, <code>"Topic"</code> or <code>"Record Qualifier"</code>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">adam_derivation</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>ADaM derivation algorithm description.</p>
+<p>The source or derivation of an ADaM variable. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">traceability_ref</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>ADaM traceability reference back to SDTM source.</p>
+<p>A reference from an ADaM variable back to its SDTM source. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">unit</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Unit of measurement (e.g., <code>"kg"</code>, <code>"mmHg"</code>, <code>"years"</code>).</p>
+<p>The unit of measurement, such as <code>"kg"</code> or <code>"years"</code>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">unit_system</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-Unit system (e.g., <code>"SI"</code>, <code>"imperial"</code>, <code>"UDUNITS"</code>).
+The system of units, such as <code>"SI"</code>. The default is <code>None</code>.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s look up a variable in the bundled Frictionless Data Package with <a href="../reference/MetadataImport.html#pointblank.MetadataImport.get_variable" class="gdls-link"><code>get_variable()</code></a>:</p>
+<div id="0eda3e00" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"datapackage.json"</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>var <span class="op">=</span> meta.get_variable(<span class="st">"transaction_id"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(var.dtype, var.required, var.unique, var.min_length, var.max_length)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(var.missing_values)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>String True True 5 20
+['NA', 'N/A']</code></pre>
+</div>
+</div>
+<p>The <code>transaction_id</code> field is a required and unique string of 5 to 20 characters, and the package declares <code>"NA"</code> and <code>"N/A"</code> as its missing-value markers. The CDISC fields are filled in for variables read from a Define-XML document:</p>
+<div id="5e6a0cea" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>), dataset<span class="op">=</span><span class="st">"DM"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sex <span class="op">=</span> dm.get_variable(<span class="st">"SEX"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sex.label, sex.max_length, sex.codelist_ref)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sex.cdisc_domain, sex.cdisc_role)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sex.allowed_values)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sex 2 Sex
+DM Record Qualifier
+['M', 'F', 'U']</code></pre>
+</div>
+</div>
+<p>The <code>SEX</code> variable uses the <code>Sex</code> codelist, whose values were copied into <code>allowed_values</code>. <a href="../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link gdls-code">VariableMetadata</a> objects can also be created directly, which is how a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport</code></a> can be built for data that doesn’t come with a metadata file:</p>
+<div id="889af865" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pb.VariableMetadata(name<span class="op">=</span><span class="st">"age"</span>, label<span class="op">=</span><span class="st">"Age in years"</span>, dtype<span class="op">=</span><span class="st">"Int64"</span>, min_val<span class="op">=</span><span class="dv">18</span>, max_val<span class="op">=</span><span class="dv">99</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>VariableMetadata(name='age', label='Age in years', description=None, dtype='Int64', role=None, required=False, unique=False, min_val=18, max_val=99, min_length=None, max_length=None, pattern=None, allowed_values=None, codelist_ref=None, display_format=None, value_labels=None, missing_values=None, missing_value_labels=None, origin=None, computational_method=None, controlled_term=None, significant_digits=None, cdisc_domain=None, cdisc_role=None, adam_derivation=None, traceability_ref=None, unit=None, unit_system=None)</code></pre>
+</div>
+</div>
+<p>Only the fields that are given get a value, and the rest stay at their defaults.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a></dt>
+<dd>
+<p>The metadata for a dataset, with one of these per variable.</p>
+</dd>
+<dt><a href="../reference/MetadataImport.html#pointblank.MetadataImport.get_variable" class="gdls-link gdls-code">get_variable()</a></dt>
+<dd>
+<p>Get the metadata of a variable by name.</p>
+</dd>
+</dl>
 </section>
 <section id="methods" class="level2 doc-methods">
 <h2 class="doc-methods anchored" data-anchor-id="methods">Methods</h2>
@@ -1853,13 +1917,13 @@ Unit system (e.g., <code>"SI"</code>, <code>"imperial"</code>, <code>"UDUNITS"</
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L241-L254" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L538-L582" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb2"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_missing_spec</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_missing_spec</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Reads <code>missing_values</code> and derives reason labels from <code>missing_value_labels</code> or <code>value_labels</code> when available.</p>
+<p>Each value in <code>missing_values</code> becomes a sentinel value of the spec. Its reason is made from the value’s label in <code>missing_value_labels</code> or, failing that, in <code>value_labels</code>, turned into a lowercase name (<code>"Not asked"</code> becomes <code>"not_asked"</code>). A value with no label gets a placeholder reason, such as <code>"missing_99"</code> for <code>99</code>. The result is the same as <a href="../reference/MissingSpec.html#pointblank.MissingSpec.from_variable_metadata" class="gdls-link"><code>MissingSpec.from_variable_metadata()</code></a>.</p>
 </div>
 <section id="returns" class="level4 doc-returns">
 <h4 class="doc-returns anchored" data-anchor-id="returns">Returns</h4>
@@ -1867,10 +1931,36 @@ Unit system (e.g., <code>"SI"</code>, <code>"imperial"</code>, <code>"UDUNITS"</
 <dl>
 <dt><code> <span class="doc-parameter-annotation">MissingSpec | None</span></code></dt>
 <dd>
-A <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for the variable, or <code>None</code> if no missing values are declared.
+A <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for the variable, or <code>None</code> if the variable declares no missing values.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples-1" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<div id="c9679be3" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>income <span class="op">=</span> pb.VariableMetadata(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"income"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    dtype<span class="op">=</span><span class="st">"Int64"</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    missing_values<span class="op">=</span>[<span class="op">-</span><span class="dv">99</span>, <span class="op">-</span><span class="dv">98</span>],</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    missing_value_labels<span class="op">=</span>{<span class="op">-</span><span class="dv">99</span>: <span class="st">"Not asked"</span>, <span class="op">-</span><span class="dv">98</span>: <span class="st">"Refused"</span>},</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>income.to_missing_spec()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>MissingSpec(reasons={-99: 'not_asked', -98: 'refused'}, categories=None, null_is_missing=True, null_reason='unknown', description="Imported missing values for 'income'")</code></pre>
+</div>
+</div>
+<p>The two labels became the reasons <code>"not_asked"</code> and <code>"refused"</code>. The spec can be given to the <code>missing=</code> parameter of a validation method so that these codes are reported as missing data rather than as failing values. For a variable without missing values the method returns <code>None</code>:</p>
+<div id="3bb54ecf" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pb.VariableMetadata(name<span class="op">=</span><span class="st">"age"</span>, dtype<span class="op">=</span><span class="st">"Int64"</span>).to_missing_spec())</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>None</code></pre>
+</div>
+</div>
+<p>To get the specs of all the variables of a dataset at once, use <a href="../reference/MetadataImport.html#pointblank.MetadataImport.missing_specs" class="gdls-link"><code>MetadataImport.missing_specs()</code></a>.</p>
 
 
 </section>

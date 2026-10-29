@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Structural template for an SDTM domain.">
+<meta name="description" content="The structural template for an SDTM domain.">
 
 <title>SDTMDomainTemplate | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "SDTMDomainTemplate - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/SDTMDomainTemplate.html"}]</script>
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="SDTMDomainTemplate | Pointblank">
-<meta property="og:description" content="Structural template for an SDTM domain.">
+<meta property="og:description" content="The structural template for an SDTM domain.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="SDTMDomainTemplate | Pointblank">
-<meta name="twitter:description" content="Structural template for an SDTM domain.">
+<meta name="twitter:description" content="The structural template for an SDTM domain.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1438,6 +1438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/load_metadata_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_metadata_example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MetadataImport</span></a>
   </div>
@@ -1643,6 +1649,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a>
   <ul class="collapse">
   <li><a href="#required_variables" id="toc-required_variables" class="nav-link" data-scroll-target="#required_variables"><span class="doc-object-name doc-attribute doc-label doc-label-property">required_variables</span></a></li>
@@ -1679,11 +1687,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>Structural template for an SDTM domain.</p>
+<p>The structural template for an SDTM domain.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_templates.py#L51-L101" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_templates.py#L86-L257" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">SDTMDomainTemplate</span>(</span>
@@ -1696,40 +1704,94 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">natural_keys</span><span class="op">=</span><span class="bu">list</span>(),</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
+<div class="doc-text">
+<p>An <a href="../reference/SDTMDomainTemplate.html#pointblank.SDTMDomainTemplate" class="gdls-link gdls-code">SDTMDomainTemplate</a> describes the structure of one domain of the CDISC Study Data Tabulation Model (SDTM): its label and observation class, whether it has many records per subject, the variables that form its natural key, and the specifications of its variables (as <a href="../reference/SDTMVariableSpec.html#pointblank.SDTMVariableSpec" class="gdls-link"><code>SDTMVariableSpec</code></a> objects, in the SDTM order). Templates are obtained with <a href="../reference/get_sdtm_domain.html#pointblank.get_sdtm_domain" class="gdls-link"><code>get_sdtm_domain()</code></a>.</p>
+</div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">domain</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>Two-character domain code (e.g., <code>"DM"</code>, <code>"AE"</code>, <code>"LB"</code>).</p>
+<p>The two-letter domain code, such as <code>"DM"</code>, <code>"AE"</code> or <code>"LB"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">label</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>Domain label (e.g., <code>"Demographics"</code>, <code>"Adverse Events"</code>).</p>
+<p>The domain label, such as <code>"Demographics"</code> or <code>"Adverse Events"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">description</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>Brief description of the domain’s purpose.</p>
+<p>A short description of what the domain holds.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">domain_class</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>SDTM observation class: <code>"Special Purpose"</code>, <code>"Events"</code>, <code>"Interventions"</code>, or <code>"Findings"</code>.</p>
+<p>The SDTM observation class: <code>"Special Purpose"</code>, <code>"Events"</code>, <code>"Interventions"</code> or <code>"Findings"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">repeating</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span></code></dt>
 <dd>
-<p>Whether the domain is a repeating (multi-row per subject) domain.</p>
+<p>Whether the domain can have more than one record per subject. Only DM, which has one record per subject, isn’t repeating.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">variables</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[SDTMVariableSpec]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">list()</span></code></dt>
 <dd>
-<p>Ordered list of variable specifications.</p>
+<p>The specifications of the domain’s variables, in order. The default is an empty list.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">natural_keys</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">list()</span></code></dt>
 <dd>
-List of variable names that form the natural key.
+The names of the variables that together identify a record. The default is an empty list.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s look at the template for the Adverse Events (AE) domain:</p>
+<div id="d6bb03fb" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ae <span class="op">=</span> pb.get_sdtm_domain(<span class="st">"AE"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ae.label, <span class="st">"|"</span>, ae.domain_class, <span class="st">"| repeating:"</span>, ae.repeating)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ae.description)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(ae.variables), <span class="st">"variables"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Adverse Events | Events | repeating: True
+Adverse events reported during the study.
+28 variables</code></pre>
+</div>
+</div>
+<p>The variables are in the <code>variables</code> list. Here are the first eight, with their type, role and core designation:</p>
+<div id="361fe163" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> var <span class="kw">in</span> ae.variables[:<span class="dv">8</span>]:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>var<span class="sc">.</span>name<span class="sc">:9}{</span>var<span class="sc">.</span>dtype<span class="sc">:5}{</span>var<span class="sc">.</span>role<span class="sc">:12}{</span>var<span class="sc">.</span>core<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>STUDYID  Char Identifier  Req
+DOMAIN   Char Identifier  Req
+USUBJID  Char Identifier  Req
+AESEQ    Num  Identifier  Req
+AEGRPID  Char Identifier  Perm
+AEREFID  Char Identifier  Perm
+AESPID   Char Identifier  Perm
+AETERM   Char Topic       Req</code></pre>
+</div>
+</div>
+<p>The template’s properties collect the names of the variables with a given core designation or role, and <a href="../reference/SDTMDomainTemplate.html#pointblank.SDTMDomainTemplate.get_variable" class="gdls-link"><code>get_variable()</code></a> gets the specification of one variable.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/get_sdtm_domain.html#pointblank.get_sdtm_domain" class="gdls-link gdls-code">get_sdtm_domain()</a></dt>
+<dd>
+<p>Get the template for a domain.</p>
+</dd>
+<dt><a href="../reference/SDTMVariableSpec.html#pointblank.SDTMVariableSpec" class="gdls-link gdls-code">SDTMVariableSpec</a></dt>
+<dd>
+<p>The specification of a variable in the template.</p>
+</dd>
+<dt><a href="../reference/ADaMDatasetTemplate.html#pointblank.ADaMDatasetTemplate" class="gdls-link gdls-code">ADaMDatasetTemplate</a></dt>
+<dd>
+<p>The equivalent for ADaM datasets.</p>
+</dd>
+</dl>
 </section>
 <section id="attributes" class="level2 doc-attributes">
 <h2 class="doc-attributes anchored" data-anchor-id="attributes">Attributes</h2>
@@ -1743,44 +1805,105 @@ List of variable names that form the natural key.
 <tbody>
 <tr class="odd">
 <td><a href="#required_variables" class="doc-attribute doc-label doc-label-property">required_variables</a></td>
-<td>Get names of all required variables.</td>
+<td>The names of the required variables, in order.</td>
 </tr>
 <tr class="even">
 <td><a href="#expected_variables" class="doc-attribute doc-label doc-label-property">expected_variables</a></td>
-<td>Get names of all expected (Exp core) variables.</td>
+<td>The names of the expected variables, in order.</td>
 </tr>
 <tr class="odd">
 <td><a href="#identifier_variables" class="doc-attribute doc-label doc-label-property">identifier_variables</a></td>
-<td>Get names of all Identifier-role variables.</td>
+<td>The names of the variables with the Identifier role, in order.</td>
 </tr>
 </tbody>
 </table>
 <section id="required_variables" class="level3">
 <h3 class="anchored" data-anchor-id="required_variables"><span class="doc-object-name doc-attribute doc-label doc-label-property">required_variables</span></h3>
 <div class="doc-subject">
-<p>Get names of all required variables.</p>
+<p>The names of the required variables, in order.</p>
 </div>
 <div class="doc-signature doc-attribute">
 <p><code><span class="doc-parameter-name">required_variables</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str]</span></code></p>
 </div>
+<div class="doc-text">
+<p>Required variables (core designation <code>"Req"</code>) must be in every dataset of the domain and can’t be null. <a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link"><code>validate_sdtm()</code></a> adds a null check for each one, and <a href="../reference/validate_sdtm_structure.html#pointblank.validate_sdtm_structure" class="gdls-link"><code>validate_sdtm_structure()</code></a> reports the ones that are missing.</p>
+</div>
+<section id="examples-1" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<div id="25949c0d" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>pb.get_sdtm_domain(<span class="st">"DM"</span>).required_variables</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>['STUDYID',
+ 'DOMAIN',
+ 'USUBJID',
+ 'SUBJID',
+ 'SITEID',
+ 'SEX',
+ 'ARMCD',
+ 'ARM',
+ 'COUNTRY']</code></pre>
+</div>
+</div>
+<p>These are the variables that every Demographics (DM) dataset must have. This is a property, so it’s used without parentheses.</p>
+</section>
 </section>
 <section id="expected_variables" class="level3">
 <h3 class="anchored" data-anchor-id="expected_variables"><span class="doc-object-name doc-attribute doc-label doc-label-property">expected_variables</span></h3>
 <div class="doc-subject">
-<p>Get names of all expected (Exp core) variables.</p>
+<p>The names of the expected variables, in order.</p>
 </div>
 <div class="doc-signature doc-attribute">
 <p><code><span class="doc-parameter-name">expected_variables</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str]</span></code></p>
 </div>
+<div class="doc-text">
+<p>Expected variables (core designation <code>"Exp"</code>) should be in every dataset of the domain, but their values may be null when the data wasn’t collected or doesn’t apply. <a href="../reference/validate_sdtm_structure.html#pointblank.validate_sdtm_structure" class="gdls-link"><code>validate_sdtm_structure()</code></a> reports the ones that are missing when <code>strict=True</code>.</p>
+</div>
+<section id="examples-2" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
+<div id="d56faa5d" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>pb.get_sdtm_domain(<span class="st">"DM"</span>).expected_variables</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>['RFSTDTC',
+ 'RFENDTC',
+ 'RFXSTDTC',
+ 'RFXENDTC',
+ 'AGE',
+ 'AGEU',
+ 'RACE',
+ 'ACTARMCD',
+ 'ACTARM']</code></pre>
+</div>
+</div>
+<p>For Demographics (DM), these include the reference dates (such as <code>RFSTDTC</code>), age, race and the actual arm. This is a property, so it’s used without parentheses.</p>
+</section>
 </section>
 <section id="identifier_variables" class="level3">
 <h3 class="anchored" data-anchor-id="identifier_variables"><span class="doc-object-name doc-attribute doc-label doc-label-property">identifier_variables</span></h3>
 <div class="doc-subject">
-<p>Get names of all Identifier-role variables.</p>
+<p>The names of the variables with the Identifier role, in order.</p>
 </div>
 <div class="doc-signature doc-attribute">
 <p><code><span class="doc-parameter-name">identifier_variables</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str]</span></code></p>
 </div>
+<div class="doc-text">
+<p>Identifier variables identify the study, the subject, the domain and the record, as with <code>STUDYID</code>, <code>USUBJID</code>, <code>DOMAIN</code> and the sequence number.</p>
+</div>
+<section id="examples-3" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
+<div id="3d289d3e" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>pb.get_sdtm_domain(<span class="st">"AE"</span>).identifier_variables</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>['STUDYID', 'DOMAIN', 'USUBJID', 'AESEQ', 'AEGRPID', 'AEREFID', 'AESPID']</code></pre>
+</div>
+</div>
+<p>Besides the identifiers that all domains share, the Adverse Events (AE) template has the sequence number <code>AESEQ</code> and the optional group, reference and sponsor identifiers. This is a property, so it’s used without parentheses.</p>
+</section>
 </section>
 </section>
 <section id="methods" class="level2 doc-methods">
@@ -1795,24 +1918,67 @@ List of variable names that form the natural key.
 <tbody>
 <tr class="odd">
 <td><a href="#get_variable" class="doc-function doc-label doc-label-method">get_variable()</a></td>
-<td>Get a variable spec by name.</td>
+<td>Get the specification of a variable.</td>
 </tr>
 </tbody>
 </table>
 <section id="get_variable" class="level3">
 <h3 class="anchored" data-anchor-id="get_variable"><span class="doc-object-name doc-function doc-label doc-label-method">get_variable()</span></h3>
 <div class="doc-subject">
-<p>Get a variable spec by name.</p>
+<p>Get the specification of a variable.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_templates.py#L96-L101" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_templates.py#L221-L257" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb2"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_variable</span>(<span class="va">name</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_variable</span>(<span class="va">name</span>)</span></code></pre></div>
 </div>
+<section id="parameters-1" class="level4 doc-parameters">
+<h4 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
+<div class="doc-definition-items">
+<dl>
+<dt><code><span class="doc-parameter-name">name</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
+<dd>
+The variable name. This is case-sensitive, and SDTM variable names are in upper case.
+</dd>
+</dl>
+</div>
+</section>
+<section id="returns" class="level4 doc-returns">
+<h4 class="doc-returns anchored" data-anchor-id="returns">Returns</h4>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">SDTMVariableSpec | None</span></code></dt>
+<dd>
+The specification of the variable, or <code>None</code> if the template has no variable with that name.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples-4" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
+<div id="e70f7189" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pb.get_sdtm_domain(<span class="st">"DM"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>dm.get_variable(<span class="st">"AGE"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>SDTMVariableSpec(name='AGE', label='Age', dtype='Num', role='Qualifier', required=False, max_length=None, controlled_term=None, core='Exp')</code></pre>
+</div>
+</div>
+<p><code>AGE</code> is an expected numeric variable, so it has no maximum length. A name that isn’t in the template gives <code>None</code>:</p>
+<div id="67b94500" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dm.get_variable(<span class="st">"age"</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>None</code></pre>
+</div>
+</div>
+<p>The lookup is case-sensitive, so the lower-case name doesn’t match <code>AGE</code>.</p>
 
 
+</section>
 </section>
 </section>
 

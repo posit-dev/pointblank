@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Validate the structural conformance of a dataset against an SDTM domain template.">
+<meta name="description" content="Check a dataset’s variables against an SDTM domain template.">
 
 <title>validate_sdtm_structure() | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "validate_sdtm_structure - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/validate_sdtm_structure.html"}]</script>
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="validate_sdtm_structure() | Pointblank">
-<meta property="og:description" content="Validate the structural conformance of a dataset against an SDTM domain template.">
+<meta property="og:description" content="Check a dataset’s variables against an SDTM domain template.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="validate_sdtm_structure() | Pointblank">
-<meta name="twitter:description" content="Validate the structural conformance of a dataset against an SDTM domain template.">
+<meta name="twitter:description" content="Check a dataset’s variables against an SDTM domain template.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1438,6 +1438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/load_metadata_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_metadata_example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MetadataImport</span></a>
   </div>
@@ -1644,6 +1650,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1670,11 +1679,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>Validate the structural conformance of a dataset against an SDTM domain template.</p>
+<p>Check a dataset’s variables against an SDTM domain template.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_templates.py#L1361-L1445" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_templates.py#L1580-L1735" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_sdtm_structure</span>(</span>
@@ -1684,7 +1693,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Checks required variables, variable ordering, data types, and domainvalue consistency. Does not interrogate but rather returns a dict of findings.</p>
+<p>The <a href="../reference/validate_sdtm_structure.html#pointblank.validate_sdtm_structure" class="gdls-link gdls-code">validate_sdtm_structure()</a> function is a quick check of a dataset’s structure, run before (or instead of) a full validation with <a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link"><code>validate_sdtm()</code></a>. It checks that every required variable of the domain is a column of the dataset, and that the <code>DOMAIN</code> column holds only the domain code. It returns the findings as a dictionary straight away, without building a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> plan.</p>
+<p>With <code>strict=True</code>, two more things are reported: the expected variables (core designation <code>"Exp"</code>) that are missing, and the columns that aren’t variables in the template. These don’t affect <code>"valid"</code>. SDTM expects an expected variable to be in the dataset even if all of its values are null, but a missing one is treated here as something to review rather than an error. A column that isn’t in the template may still be a valid SDTM variable, since the templates only cover the common variables of each domain.</p>
+<p>The column order and the data types aren’t checked.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1692,15 +1703,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">data</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>A DataFrame (Pandas, Polars) to check.</p>
+<p>The dataset to check, as a Polars or Pandas DataFrame.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">domain</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>SDTM domain code (e.g., <code>"DM"</code>, <code>"AE"</code>). This is case-insensitive.</p>
+<p>The SDTM domain code, such as <code>"DM"</code> or <code>"AE"</code>. This is case-insensitive.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">strict</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
-If <code>True</code>, also report missing Expected variables and unknown variables.
+Whether to also report missing expected variables and columns that aren’t in the template. The default is <code>False</code>.
 </dd>
 </dl>
 </div>
@@ -1711,19 +1722,90 @@ If <code>True</code>, also report missing Expected variables and unknown variabl
 <dl>
 <dt><code> <span class="doc-parameter-annotation">dict</span></code></dt>
 <dd>
-<p>A dictionary with keys:</p>
+<p>A dictionary with these keys:</p>
 <ul>
-<li>“domain”: the domain code</li>
-<li>“valid”: <code>True</code> if no required violations found</li>
-<li>“missing_required”: list of missing required variable names</li>
-<li>“missing_expected”: list of missing expected variable names (strict only)</li>
-<li>“unknown_variables”: list of column names not in the template (strict only)</li>
-<li>“domain_mismatch”: <code>True</code> if <code>DOMAIN</code> column doesn’t match expected value</li>
-<li>“issues”: list of human-readable issue strings</li>
+<li><code>"domain"</code>: the domain code, in upper case.</li>
+<li><code>"valid"</code>: <code>True</code> if no required variable is missing and <code>DOMAIN</code> holds only the domain code.</li>
+<li><code>"missing_required"</code>: the names of the required variables that aren’t columns of the data.</li>
+<li><code>"missing_expected"</code>: the names of the expected variables that aren’t columns of the data (filled in only with <code>strict=True</code>).</li>
+<li><code>"unknown_variables"</code>: the columns that aren’t variables of the domain (filled in only with <code>strict=True</code>).</li>
+<li><code>"domain_mismatch"</code>: <code>True</code> if the <code>DOMAIN</code> column has any value (including a null) other than the domain code.</li>
+<li><code>"issues"</code>: a message for each of the problems above.</li>
 </ul>
 </dd>
 </dl>
 </div>
+</section>
+<section id="raises" class="level2 doc-raises">
+<h2 class="doc-raises anchored" data-anchor-id="raises">Raises</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">KeyError</span></code></dt>
+<dd>
+If there is no template for the domain.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s check a small Adverse Events (AE) dataset. It has all of the required AE variables except <code>AEDECOD</code>, and its <code>DOMAIN</code> column has one value from another domain:</p>
+<div id="7ed4b959" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>ae <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"STUDYID"</span>: [<span class="st">"STUDY01"</span>] <span class="op">*</span> <span class="dv">3</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"DOMAIN"</span>: [<span class="st">"AE"</span>, <span class="st">"AE"</span>, <span class="st">"CM"</span>],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"USUBJID"</span>: [<span class="st">"STUDY01-001"</span>, <span class="st">"STUDY01-001"</span>, <span class="st">"STUDY01-002"</span>],</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"AESEQ"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>],</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"AETERM"</span>: [<span class="st">"HEADACHE"</span>, <span class="st">"NAUSEA"</span>, <span class="st">"RASH"</span>],</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"AESEV"</span>: [<span class="st">"MILD"</span>, <span class="st">"MILD"</span>, <span class="st">"MODERATE"</span>],</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"AEFLAG"</span>: [<span class="st">"Y"</span>, <span class="st">"N"</span>, <span class="st">"Y"</span>],</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pb.validate_sdtm_structure(ae, domain<span class="op">=</span><span class="st">"AE"</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result[<span class="st">"valid"</span>])</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> issue <span class="kw">in</span> result[<span class="st">"issues"</span>]:</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(issue)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>False
+Required variable 'AEDECOD' is missing
+DOMAIN column contains unexpected values: ['AE', 'CM'] (expected ['AE'])</code></pre>
+</div>
+</div>
+<p>The dataset isn’t valid, and the issues say why. The extra column <code>AEFLAG</code> isn’t mentioned, since that’s only reported in strict mode:</p>
+<div id="0b92c8ba" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pb.validate_sdtm_structure(ae, domain<span class="op">=</span><span class="st">"AE"</span>, strict<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result[<span class="st">"missing_expected"</span>])</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result[<span class="st">"unknown_variables"</span>])</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['AEBODSYS', 'AESER', 'AEACN', 'AEREL', 'AEOUT', 'AESTDTC', 'AEENDTC']
+['AEFLAG']</code></pre>
+</div>
+</div>
+<p>Strict mode adds the expected AE variables that the dataset doesn’t have, such as <code>AESTDTC</code>, and the column that isn’t an AE variable. <code>AESEV</code> is a permissible variable of the domain, so it isn’t reported.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link gdls-code">validate_sdtm()</a></dt>
+<dd>
+<p>Build a validation plan from an SDTM domain template.</p>
+</dd>
+<dt><a href="../reference/get_sdtm_domain.html#pointblank.get_sdtm_domain" class="gdls-link gdls-code">get_sdtm_domain()</a></dt>
+<dd>
+<p>Get the template that the dataset is checked against.</p>
+</dd>
+<dt><a href="../reference/validate_adam_structure.html#pointblank.validate_adam_structure" class="gdls-link gdls-code">validate_adam_structure()</a></dt>
+<dd>
+<p>The equivalent for ADaM datasets.</p>
+</dd>
+</dl>
 
 
 </section>

@@ -25708,260 +25708,892 @@ Import variable-level metadata from external data standards files (CDISC Define-
 
 import_metadata(source: 'str | Path | Any', format: 'str | None' = None, **kwargs: 'Any') -> 'MetadataImport | MetadataPackage'
 
-Import metadata from an external standard or file.
+Import metadata from a statistical-package file or a metadata standard.
 
-Reads metadata definitions from statistical package files (SPSS, SAS, Stata), standards
-documents (CDISC Define-XML, Frictionless), or scientific formats (NetCDF/CF) and returns a
-structured representation that can be converted to Pointblank validation workflows.
+Many datasets come with a description of their variables: the variable labels, value labels
+and missing-value codes stored in an SPSS, Stata or SAS file, the field types and constraints in
+a Frictionless or CSVW schema, or the variable definitions and codelists in a CDISC Define-XML
+document. The `import_metadata()` function reads that description (not the data itself) into a
+[`MetadataImport`](`pointblank.MetadataImport`) object, with one
+[`VariableMetadata`](`pointblank.VariableMetadata`) per variable and any codelists as
+[`Codelist`](`pointblank.Codelist`) objects.
+
+The imported metadata is most useful as the starting point for validation. Its
+[`to_validate()`](`pointblank.MetadataImport.to_validate`) method turns the declared types and
+constraints into a [`Validate`](`pointblank.Validate`) plan,
+[`to_schema()`](`pointblank.MetadataImport.to_schema`) gives a
+[`Schema`](`pointblank.Schema`) of the column types, and
+[`missing_specs()`](`pointblank.MetadataImport.missing_specs`) turns declared missing-value
+codes into [`MissingSpec`](`pointblank.MissingSpec`) objects. Use
+[`export_metadata()`](`pointblank.export_metadata`) to go the other way and write metadata out
+as a Frictionless Table Schema.
+
+A source that describes several datasets (a Define-XML document for a whole study, a Data
+Package with several resources, or a Controlled Terminology file with several codelists) gives a
+[`MetadataPackage`](`pointblank.MetadataPackage`) instead, which holds one `MetadataImport` per
+dataset.
 
 Parameters
 ----------
 source
-    Path to a metadata file, or an object containing metadata (e.g., an xarray Dataset). For
-    file paths, the format will be auto-detected from the extension if not specified.
+    The path to the metadata file, as a string or a `pathlib.Path`. Other kinds of objects
+    raise a `TypeError`.
 format
-    Explicit format identifier. If None, auto-detected from the file extension. Supported
-    formats: `"spss"`, `"sav"`, `"xpt"`, `"sas"`, `"stata"`, `"dta"`, `"frictionless"`,
-    `"datapackage"`, `"table_schema"`, `"csvw"`, `"cdisc_define"`, `"define_xml"`, `"cdisc_ct"`.
+    The format of the file. If `None` (the default), the format is detected from the file: by
+    extension for `.sav`, `.zsav`, `.dta` and `.xpt` files, and by content for `.json` files
+    (Frictionless or CSVW) and `.xml` files (Define-XML or Controlled Terminology). Other
+    extensions need an explicit format. See the *Supported Formats* section for the values.
 **kwargs
-    Additional format-specific options passed to the reader.
+    Options for the reader of the chosen format. The Define-XML reader takes `dataset=` (such
+    as `"DM"`) to return only that dataset as a `MetadataImport`. The Controlled Terminology
+    reader takes `codelist=` to return only one codelist, and the Frictionless reader takes
+    `resource=` (a name or an index) to pick one resource from a Data Package. The
+    `"cdisc_sdtm"` and `"cdisc_adam"` formats need `domain=` and `dataset=`, respectively, and
+    also take `study_id=`.
 
 Returns
 -------
 MetadataImport | MetadataPackage
-    A MetadataImport for single-dataset sources, or a MetadataPackage for multi-dataset sources
-    (e.g., multi-domain CDISC studies).
+    A `MetadataImport` for a source that describes a single dataset, or a `MetadataPackage`
+    for a source that describes several.
 
 Raises
 ------
 ValueError
-    If the format cannot be determined or is not supported.
+    If the format can't be detected or isn't supported, or if a required option such as
+    `domain=` is missing.
+FileNotFoundError
+    If the file doesn't exist.
 ImportError
-    If the required optional dependency is not installed.
+    If the format needs an optional package that isn't installed.
+
+Supported Formats
+-----------------
+| `format=` | Reads | Needs |
+|-----------|-------|-------|
+| `"frictionless"` (or `"datapackage"`, `"table_schema"`) | Frictionless schema (`.json`) | |
+| `"csvw"` | W3C CSV on the Web metadata (`.json`) | |
+| `"cdisc_define"` (or `"define_xml"`) | CDISC Define-XML 2.0 or 2.1 (`.xml`) | `lxml` |
+| `"cdisc_ct"` | CDISC Controlled Terminology in ODM-XML (`.xml`) | `lxml` |
+| `"spss"` (or `"sav"`) | SPSS data file (`.sav`, `.zsav`) | `pyreadstat` |
+| `"stata"` (or `"dta"`) | Stata data file (`.dta`) | `pyreadstat` |
+| `"xpt"` (or `"sas"`) | SAS Transport file (`.xpt`) | `pyreadstat` |
+| `"cdisc_sdtm"` | A built-in SDTM domain template | |
+| `"cdisc_adam"` | A built-in ADaM dataset template | |
+
+For SPSS, Stata and SAS files only the metadata is read, not the data. The last two formats
+don't read a file at all: `source=` isn't used (any string will do), and the template named
+by `domain=` or `dataset=` is returned, as with
+[`sdtm_to_metadata()`](`pointblank.sdtm_to_metadata`) and
+[`adam_to_metadata()`](`pointblank.adam_to_metadata`).
 
 Examples
 --------
-Import SPSS metadata and generate validation:
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+Pointblank bundles a few metadata files to experiment with, which can be found with
+[`load_metadata_example()`](`pointblank.load_metadata_example`). Let's import a Frictionless
+Data Package that describes a table of sales transactions:
 
-```python
+```{python}
 import pointblank as pb
 
-meta = pb.import_metadata("survey_data.sav")
-meta.summary()
+meta = pb.import_metadata(pb.load_metadata_example("datapackage.json"))
 
-# Convert to a validation workflow
-validation = meta.to_validate(data=df).interrogate()
+meta
 ```
 
-Import SAS Transport metadata:
+The format was detected from the file's contents. The metadata describes eight variables and
+one codelist (the allowed values of `category`). Each variable's metadata can be looked up by
+name:
 
-```python
-meta = pb.import_metadata("clinical_data.xpt", format="xpt")
-schema = meta.to_schema()
+```{python}
+amount = meta.get_variable("amount")
+
+print(amount.dtype, amount.required, amount.min_val, amount.max_val)
 ```
+
+The `amount` variable must be a non-null float from `0.01` to `99999.99`. Constraints like these
+can be checked against a table with
+[`to_validate()`](`pointblank.MetadataImport.to_validate`), which builds a validation plan from
+the metadata:
+
+```{python}
+import datetime
+import polars as pl
+
+transactions = pl.DataFrame(
+    {
+        "transaction_id": ["TXN-00001", "TXN-00002", "TXN-00003", "TXN-00004"],
+        "customer_id": ["CUST-101", "CUST-102", "CUST-101", "CUST-103"],
+        "amount": [25.50, 1200.00, 0.00, 89.99],
+        "quantity": [1, 3, 2, 1],
+        "category": ["food", "electronics", "home", "toys"],
+        "sale_date": [datetime.date(2024, 5, d) for d in (1, 1, 2, 3)],
+        "discount_pct": [0.0, 10.0, 0.0, 5.0],
+        "email": ["a@example.com", "b@example.com", "c@example.com", "not-an-email"],
+    }
+)
+
+meta.to_validate(data=transactions).interrogate()
+```
+
+The table has the declared column types, so the schema check in step 1 passes. Three
+later steps find a failing row each: the `amount` of `0.00` is below the minimum, `"toys"`
+isn't one of the allowed categories, and `"not-an-email"` doesn't match the pattern given for
+`email`.
+
+A Define-XML document usually describes all the datasets in a study, so importing one gives a
+[`MetadataPackage`](`pointblank.MetadataPackage`):
+
+```{python}
+package = pb.import_metadata(pb.load_metadata_example("define.xml"))
+
+package
+```
+
+The package holds the Demographics (`DM`) and Adverse Events (`AE`) datasets, and
+`package["DM"]` gives the `MetadataImport` for one of them. If only one dataset is needed, the
+`dataset=` option of the Define-XML reader returns it directly:
+
+```{python}
+dm = pb.import_metadata(pb.load_metadata_example("define.xml"), dataset="DM")
+
+print(dm.dataset_label)
+print(dm.variable_names)
+```
+
+Options like `dataset=` are passed through to the reader for the file's format. The
+*Supported Formats* section lists the formats, and the `**kwargs` parameter describes the
+options that each reader accepts.
+
+See Also
+--------
+load_metadata_example : Get the path to a bundled metadata file.
+export_metadata : Export metadata as a Frictionless Table Schema.
+MetadataImport : The metadata for a single dataset.
+MetadataPackage : The metadata for several datasets.
 
 export_metadata(source: 'MetadataImport', destination: 'str | Path | None' = None, format: 'str' = 'frictionless', **kwargs: 'Any') -> 'dict[str, Any] | str'
 
-Export metadata to an external standard format.
+Export metadata as a Frictionless Table Schema.
 
-Converts a MetadataImport object to a standards-compliant representation (e.g., Frictionless
-Table Schema) and optionally writes it to a file.
+The `export_metadata()` function is the reverse of
+[`import_metadata()`](`pointblank.import_metadata`): it writes a
+[`MetadataImport`](`pointblank.MetadataImport`) out in a standard format. The only format
+currently supported is the
+[Frictionless Table Schema](https://specs.frictionlessdata.io/table-schema/), a JSON
+description of a table's fields that many data tools can read. Because the metadata can
+come from any of the formats that `import_metadata()` reads, this is also a way to convert
+between them, for example to get a Table Schema from a CSVW file or from the variable
+definitions in a Define-XML document.
+
+Each variable becomes a field, with its dtype mapped to a Frictionless type (`"integer"`,
+`"number"`, `"string"`, `"date"` and so on) and its label and description used as the field's
+`title` and `description`. The constraints `required`, `unique`, `minimum`, `maximum`,
+`minLength`, `maxLength`, `pattern` and `enum` are written for the variables that have them,
+and declared missing values become the field's `missingValues`. Variables that are both
+required and unique make up the schema's `primaryKey`, and the dataset label and description
+become the schema's `title` and `description`.
 
 Parameters
 ----------
 source
-    The MetadataImport object to export.
+    The metadata to export. To export one dataset from a
+    [`MetadataPackage`](`pointblank.MetadataPackage`), select it first (as in
+    `package["DM"]`).
 destination
-    Optional file path to write the output. If `None`, returns the result as a dict (for JSON
-    formats) or string.
+    A file path to write the schema to, as indented JSON. Any missing parent directories are
+    created. If `None` (the default), nothing is written. The schema is returned in both cases.
 format
-    Target format. Currently supported: `"frictionless"`.
+    The output format. Only `"frictionless"` is supported (`"table_schema"` is accepted as
+    another name for it).
 **kwargs
-    Additional format-specific options.
+    Options for the exporter. `include_constraints=False` leaves out the `constraints` of
+    every field, giving a schema with only the field names, types, titles and missing values.
 
 Returns
 -------
-dict | str
-    The exported metadata as a dict (JSON formats) or string.
+dict
+    The Table Schema as a dictionary.
 
 Raises
 ------
 ValueError
-    If the format is not supported.
+    If the format isn't supported.
+
+Examples
+--------
+Let's import the bundled CSVW metadata for a table of weather observations and export it as a
+Frictionless Table Schema:
+
+```{python}
+import json
+import pointblank as pb
+
+meta = pb.import_metadata(pb.load_metadata_example("weather_csvw.json"))
+
+schema = pb.export_metadata(meta)
+
+print(json.dumps(schema["fields"][:3], indent=2))
+```
+
+The first three fields show how the CSVW column definitions were carried over: the titles,
+the types (a CSVW `decimal` is a Frictionless `number`), and the constraints. The remaining
+keys of the schema describe the table as a whole:
+
+```{python}
+print(schema["primaryKey"])
+print(schema["title"])
+```
+
+The two required and unique columns form the primary key, and the title comes from the
+dataset label in the CSVW file.
+
+Give a `destination=` to write the schema to a file. Here it's written to a temporary
+directory and then imported again:
+
+```{python}
+import tempfile
+from pathlib import Path
+
+with tempfile.TemporaryDirectory() as tmp:
+    path = Path(tmp) / "weather_schema.json"
+
+    pb.export_metadata(meta, destination=path, include_constraints=False)
+
+    reimported = pb.import_metadata(path)
+
+print(reimported.variable_names)
+print(reimported.get_variable("temperature_c").min_val)
+```
+
+The file is a standalone Table Schema, so `import_metadata()` reads it back with the same
+variables. With `include_constraints=False` the range of `temperature_c` wasn't written, so
+its `min_val` is now `None`. That's useful when you want to share the structure of a table
+without the rules for its values.
+
+See Also
+--------
+import_metadata : Read metadata from a file.
+MetadataImport : The metadata that is exported.
+
+load_metadata_example(name: 'str') -> 'Path'
+
+Get the path to a bundled metadata example file.
+
+Pointblank ships a small collection of metadata files in the formats that
+[`import_metadata()`](`pointblank.import_metadata`) reads: CDISC Define-XML, CDISC Controlled
+Terminology, a Frictionless Data Package and Table Schema, CSVW, and SAS Transport (XPT). This
+function returns the path to one of them, so you can try out metadata import (and run the
+examples in this documentation) without supplying files of your own.
+
+Parameters
+----------
+name
+    The file name of the example, such as `"define.xml"`. See the *Available Examples* section
+    for the full list. An unknown name raises a `ValueError` that lists the valid names.
+
+Returns
+-------
+Path
+    The path to the bundled file, which can be passed directly to `import_metadata()`.
+
+Available Examples
+------------------
+| Name | Format | Description |
+|------|--------|-------------|
+| `"define.xml"` | `cdisc_define` | Define-XML 2.0 document with the DM and AE domains |
+| `"sdtm_ct.xml"` | `cdisc_ct` | SDTM Controlled Terminology with common codelists |
+| `"datapackage.json"` | `frictionless` | Frictionless Data Package for a transactions table |
+| `"table_schema.json"` | `table_schema` | Frictionless Table Schema for sensor readings |
+| `"weather_csvw.json"` | `csvw` | W3C CSVW metadata for weather observations |
+| `"dm.xpt"` | `xpt` | SAS Transport file with a small SDTM Demographics dataset |
+
+The XML formats need the `lxml` package and the XPT file needs `pyreadstat`. The JSON formats
+don't need any extra packages.
+
+Examples
+--------
+Get the path to the bundled Define-XML document:
+
+```{python}
+import pointblank as pb
+
+define_path = pb.load_metadata_example("define.xml")
+
+print(define_path.name)
+print(define_path.exists())
+```
+
+The result is a `pathlib.Path` to a file inside the installed package. Pass it to
+[`import_metadata()`](`pointblank.import_metadata`) to read the metadata:
+
+```{python}
+package = pb.import_metadata(define_path)
+
+for name in package.keys():
+    meta = package[name]
+    print(f"{name}: {meta.dataset_label} ({len(meta)} variables)")
+```
+
+The format was detected from the file's contents, and because the document describes two
+datasets the result is a [`MetadataPackage`](`pointblank.MetadataPackage`) with one entry per
+dataset.
+
+See Also
+--------
+import_metadata : Read metadata from a file, such as one of these examples.
 
 MetadataImport(source_format: 'str', source_path: 'str | None' = None, source_version: 'str | None' = None, dataset_name: 'str | None' = None, dataset_label: 'str | None' = None, dataset_description: 'str | None' = None, creation_date: 'str | None' = None, study_id: 'str | None' = None, domain: 'str | None' = None, variables: 'list[VariableMetadata]' = <factory>, codelists: 'dict[str, Codelist]' = <factory>, missing_value_codes: 'dict[str, list[MissingValueCode]]' = <factory>) -> None
 
-Parsed metadata from an external standard.
+The metadata for a single dataset.
 
-Contains variable definitions, value labels, missing value codes, controlled terminologies, and
-dataset-level metadata: all mapped to Pointblank concepts.
+A `MetadataImport` is what [`import_metadata()`](`pointblank.import_metadata`) returns for a
+file that describes one dataset. It holds the dataset-level information (name, label, study
+and domain), a [`VariableMetadata`](`pointblank.VariableMetadata`) for each variable, the
+codelists that the variables use, and any declared missing-value codes, all in the same form
+whatever the format of the file.
+
+The methods turn the metadata into things Pointblank can use:
+[`to_validate()`](`pointblank.MetadataImport.to_validate`) builds a validation plan from the
+declared types and constraints, [`to_schema()`](`pointblank.MetadataImport.to_schema`) gives a
+[`Schema`](`pointblank.Schema`) of the column types, and
+[`missing_specs()`](`pointblank.MetadataImport.missing_specs`) builds
+[`MissingSpec`](`pointblank.MissingSpec`) objects from the missing-value codes. Variables and
+codelists can be looked up with [`get_variable()`](`pointblank.MetadataImport.get_variable`)
+and [`get_codelist()`](`pointblank.MetadataImport.get_codelist`), and
+[`summary()`](`pointblank.MetadataImport.summary`) describes the whole dataset in text.
+
+A `MetadataImport` can also be created directly, which is a way to write down the rules for a
+dataset that doesn't come with a metadata file and still use the methods above. Calling
+`len()` on it gives the number of variables.
 
 Parameters
 ----------
 source_format
-    The format this metadata was imported from (e.g., `"spss"`, `"xpt"`, `"stata"`).
+    The format the metadata was read from, such as `"frictionless"`, `"cdisc_define"` or
+    `"spss"`. Any string can be used for metadata created directly.
 source_path
-    Path to the source file, if imported from a file.
+    The path of the file that was read. The default is `None`.
 source_version
-    Version of the source format/standard.
+    The version of the format or standard, such as `"Define-XML 2.0"`. The default is `None`.
 dataset_name
-    Name of the dataset.
+    The name of the dataset, such as `"DM"`. The default is `None`.
 dataset_label
-    Human-readable label for the dataset.
+    A human-readable label for the dataset, such as `"Demographics"`. The default is `None`.
 dataset_description
-    Description of the dataset.
+    A longer description of the dataset. The default is `None`.
 creation_date
-    When the dataset/metadata was created.
+    When the metadata was created, as given in the file. The default is `None`.
 study_id
-    Study identifier (for clinical data).
+    The study identifier, for clinical data. The default is `None`.
 domain
-    Domain identifier (e.g., `"DM"`, `"AE"` for CDISC).
+    The CDISC domain, such as `"DM"` or `"AE"`. The default is `None`.
 variables
-    List of variable metadata definitions.
+    The metadata of each variable, as a list of
+    [`VariableMetadata`](`pointblank.VariableMetadata`) objects. The default is an empty list.
 codelists
-    Named codelists (controlled terminologies).
+    The codelists used by the variables, as a dictionary from codelist name to
+    [`Codelist`](`pointblank.Codelist`). The default is an empty dictionary.
 missing_value_codes
-    Named missing value code definitions.
+    The declared missing-value codes, as a dictionary from column name to a list of
+    [`MissingValueCode`](`pointblank.MissingValueCode`) objects. The default is an empty
+    dictionary.
+
+Examples
+--------
+Let's import the bundled Frictionless Table Schema, which describes a table of sensor
+readings:
+
+```{python}
+import pointblank as pb
+
+meta = pb.import_metadata(pb.load_metadata_example("table_schema.json"))
+
+print(len(meta))
+print(meta.variable_names)
+print(list(meta.codelists))
+```
+
+The schema describes six variables, and the allowed values of `status` were read into a
+codelist named `"status_enum"`. Metadata can also be written down directly, here for a small
+survey table:
+
+```{python}
+survey = pb.MetadataImport(
+    source_format="custom",
+    dataset_name="survey",
+    dataset_label="Household survey",
+    variables=[
+        pb.VariableMetadata(name="respondent_id", dtype="String", required=True, unique=True),
+        pb.VariableMetadata(name="age", dtype="Int64", required=True, min_val=18, max_val=99),
+    ],
+)
+
+survey
+```
+
+Either way, the result can be turned into a validation plan with
+[`to_validate()`](`pointblank.MetadataImport.to_validate`), which has an example of checking a
+table against its metadata.
+
+See Also
+--------
+import_metadata : Read a `MetadataImport` from a file.
+MetadataPackage : The metadata for several datasets.
+VariableMetadata : The metadata of one variable.
 
 MetadataPackage(name: 'str | None' = None, items: 'dict[str, MetadataImport]' = <factory>, description: 'str | None' = None, version: 'str | None' = None) -> None
 
-A collection of `MetadataImport` objects from a multi-dataset source.
+The metadata for several datasets, read from one source.
 
-Used for multi-domain CDISC studies, Frictionless Data Packages, etc.
+When a file describes more than one dataset,
+[`import_metadata()`](`pointblank.import_metadata`) returns a `MetadataPackage` with a
+[`MetadataImport`](`pointblank.MetadataImport`) for each. This happens with a Define-XML
+document for a whole study (one entry per dataset, such as `"DM"` and `"AE"`), a Frictionless
+Data Package or CSVW table group with several tables, and a CDISC Controlled Terminology file
+(one entry per codelist).
+
+The package works much like a read-only dictionary: `package["DM"]` gets an entry, `"DM" in
+package` checks for one, `len()` counts them, iterating gives their names, and
+[`keys()`](`pointblank.MetadataPackage.keys`) and
+[`values()`](`pointblank.MetadataPackage.values`) give the names and entries.
+[`get_domain()`](`pointblank.MetadataPackage.get_domain`) also gets an entry, with an error
+message that lists the available names, and
+[`summary()`](`pointblank.MetadataPackage.summary`) describes the package in text.
 
 Parameters
 ----------
 name
-    Package name/identifier.
+    The name of the package, such as the study OID of a Define-XML document. The default is
+    `None`.
 items
-    Named `MetadataImport` objects.
+    The entries, as a dictionary from dataset name to `MetadataImport`. The default is an
+    empty dictionary.
 description
-    Description of the package.
+    A description of the package. The default is `None`.
 version
-    Package/study version.
+    The version of the package or of the standard it follows. The default is `None`.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+The bundled Define-XML document describes two datasets of a clinical study:
+
+```{python}
+import pointblank as pb
+
+package = pb.import_metadata(pb.load_metadata_example("define.xml"))
+
+print(len(package))
+print("DM" in package)
+
+for name in package:
+    print(name, "-", package[name].dataset_label)
+```
+
+Each entry is a `MetadataImport`, so it can be used like one. Here the Demographics metadata
+is used to check a small table:
+
+```{python}
+import polars as pl
+
+dm_data = pl.DataFrame(
+    {
+        "STUDYID": ["XYZ789"] * 3,
+        "DOMAIN": ["DM"] * 3,
+        "USUBJID": ["XYZ789-001", "XYZ789-002", "XYZ789-003"],
+        "SUBJID": ["001", "002", "003"],
+        "RFSTDTC": ["2024-01-15", "2024-01-20", "2024-02-01"],
+        "RFENDTC": ["2024-06-15", "2024-06-20", "2024-07-01"],
+        "SITEID": ["SITE01", "SITE01", "SITE02"],
+        "AGE": [45, 62, 38],
+        "AGEU": ["YEARS"] * 3,
+        "SEX": ["M", "F", "M"],
+        "RACE": ["WHITE", "ASIAN", "BLACK"],
+        "ARMCD": ["DRUG", "PLACEBO", "DRUG"],
+        "ARM": ["Active Drug 10mg", "Placebo", "Active Drug 10mg"],
+    }
+)
+
+package["DM"].to_validate(data=dm_data).interrogate()
+```
+
+The table has all the variables of the `DM` dataset with the declared types, and the required
+ones have values. The last step fails for one row, since `"BLACK"` isn't one of the values in
+the `Race` codelist (which uses `"BLACK OR AFRICAN AMERICAN"`).
+
+See Also
+--------
+import_metadata : Read metadata from a file.
+MetadataImport : The metadata for a single dataset.
 
 VariableMetadata(name: 'str', label: 'str | None' = None, description: 'str | None' = None, dtype: 'str | None' = None, role: 'str | None' = None, required: 'bool' = False, unique: 'bool' = False, min_val: 'float | None' = None, max_val: 'float | None' = None, min_length: 'int | None' = None, max_length: 'int | None' = None, pattern: 'str | None' = None, allowed_values: 'list[Any] | None' = None, codelist_ref: 'str | None' = None, display_format: 'str | None' = None, value_labels: 'dict[Any, str] | None' = None, missing_values: 'list[Any] | None' = None, missing_value_labels: 'dict[Any, str] | None' = None, origin: 'str | None' = None, computational_method: 'str | None' = None, controlled_term: 'str | None' = None, significant_digits: 'int | None' = None, cdisc_domain: 'str | None' = None, cdisc_role: 'str | None' = None, adam_derivation: 'str | None' = None, traceability_ref: 'str | None' = None, unit: 'str | None' = None, unit_system: 'str | None' = None) -> None
 
-Metadata for a single variable/column, as imported from an external standard.
+The metadata for a single variable (column).
+
+A [`MetadataImport`](`pointblank.MetadataImport`) holds one `VariableMetadata` for each
+variable described in the imported file. It gathers everything the file says about the
+variable in one place: its name, label and type, the constraints on its values, any value
+labels and missing-value codes, and (for clinical data) its CDISC attributes. Each format fills
+in the fields it has information for and leaves the rest as `None`.
+
+Some fields are used to generate validation steps in
+[`MetadataImport.to_validate()`](`pointblank.MetadataImport.to_validate`): `dtype` (in the
+schema check), `required`, `unique`, `min_val` and `max_val`, `allowed_values`, `pattern` and
+`missing_values`. All of the constraint fields, including `min_length` and `max_length`, are
+written out by [`export_metadata()`](`pointblank.export_metadata`). The other fields are
+descriptive, and are kept so that you can use them in your own checks or reports.
 
 Parameters
 ----------
 name
-    Variable/column name.
+    The name of the variable, which should match the column name in the data.
 label
-    Human-readable label.
+    A short human-readable label, such as `"Age in years"`. The default is `None`.
 description
-    Longer description of the variable.
+    A longer description of the variable. The default is `None`.
 dtype
-    Data type (mapped to Narwhals/Polars type names).
+    The data type, as a Pointblank dtype name such as `"String"`, `"Int64"`, `"Float64"`,
+    `"Boolean"`, `"Date"` or `"Datetime"`. The default is `None` (an unknown type, treated as
+    `"String"` when a schema is made).
 role
-    Variable role (e.g., `"identifier"`, `"measure"`, `"classifier"`).
+    The role of the variable in the dataset, as given by the source. The default is `None`.
 required
-    Whether the variable must be non-null.
+    Whether the variable must have a value in every row. The default is `False`.
 unique
-    Whether all values must be distinct.
+    Whether every value must be different. The default is `False`.
 min_val
-    Minimum allowed value (inclusive).
+    The smallest allowed value (inclusive). The default is `None`.
 max_val
-    Maximum allowed value (inclusive).
+    The largest allowed value (inclusive). The default is `None`.
 min_length
-    Minimum string length.
+    The shortest allowed string length. The default is `None`.
 max_length
-    Maximum string length.
+    The longest allowed string length, such as the `Length` of a Define-XML variable. The
+    default is `None`.
 pattern
-    Regex pattern that values must match.
+    A regular expression that values must match. The default is `None`.
 allowed_values
-    Explicit list of allowed values.
+    The list of values the variable may take, usually the values of its codelist. The default
+    is `None`.
 codelist_ref
-    Reference to a named codelist.
+    The name of the variable's [`Codelist`](`pointblank.Codelist`) in
+    `MetadataImport.codelists`. The default is `None`.
 display_format
-    Display format from source system (e.g., `"F8.2"`, `"DATETIME20."`).
+    The display format from the source system, such as the SPSS format `"F8.2"`. The default
+    is `None`.
 value_labels
-    Value-to-label mapping (e.g., `{1: "Male", 2: "Female"}`).
+    A mapping of values to labels, such as `{1: "Male", 2: "Female"}` for an SPSS variable. The
+    default is `None`.
 missing_values
-    Sentinel values representing missingness (e.g., `-99`, `".A"`, `""`).
+    The values that stand for missing data, such as `[-99, -98]` or `["NA"]`. The default is
+    `None`.
 missing_value_labels
-    Labels for missing value sentinels (e.g., `"Refused"`, `"Not Applicable"`).
+    A mapping of missing values to labels, such as `{-99: "Refused"}`. The default is `None`.
 origin
-    How the variable was created (`"CRF"`, `"Derived"`, `"Assigned"`).
+    How the variable's values were obtained, such as `"CRF"`, `"Derived"` or `"Assigned"` in
+    Define-XML. The default is `None`.
 computational_method
-    Derivation algorithm for computed variables.
+    How a derived variable is computed. The default is `None`.
 controlled_term
-    CDISC controlled terminology reference.
+    The name of the CDISC Controlled Terminology codelist the variable uses. The default is
+    `None`.
 significant_digits
-    Number of significant digits.
+    The number of significant digits of a numeric variable. The default is `None`.
 cdisc_domain
-    CDISC domain code (e.g., `"DM"`, `"AE"`, `"LB"`, `"VS"`).
+    The CDISC domain or dataset that the variable belongs to, such as `"DM"` or `"AE"`. The
+    default is `None`.
 cdisc_role
-    CDISC variable role (`"Identifier"`, `"Topic"`, `"Timing"`, `"Qualifier"`, `"Rule"`).
+    The CDISC role of the variable, such as `"Identifier"`, `"Topic"` or `"Record Qualifier"`.
+    The default is `None`.
 adam_derivation
-    ADaM derivation algorithm description.
+    The source or derivation of an ADaM variable. The default is `None`.
 traceability_ref
-    ADaM traceability reference back to SDTM source.
+    A reference from an ADaM variable back to its SDTM source. The default is `None`.
 unit
-    Unit of measurement (e.g., `"kg"`, `"mmHg"`, `"years"`).
+    The unit of measurement, such as `"kg"` or `"years"`. The default is `None`.
 unit_system
-    Unit system (e.g., `"SI"`, `"imperial"`, `"UDUNITS"`).
+    The system of units, such as `"SI"`. The default is `None`.
+
+Examples
+--------
+Let's look up a variable in the bundled Frictionless Data Package with
+[`get_variable()`](`pointblank.MetadataImport.get_variable`):
+
+```{python}
+import pointblank as pb
+
+meta = pb.import_metadata(pb.load_metadata_example("datapackage.json"))
+var = meta.get_variable("transaction_id")
+
+print(var.dtype, var.required, var.unique, var.min_length, var.max_length)
+print(var.missing_values)
+```
+
+The `transaction_id` field is a required and unique string of 5 to 20 characters, and the
+package declares `"NA"` and `"N/A"` as its missing-value markers. The CDISC fields are filled in
+for variables read from a Define-XML document:
+
+```{python}
+dm = pb.import_metadata(pb.load_metadata_example("define.xml"), dataset="DM")
+sex = dm.get_variable("SEX")
+
+print(sex.label, sex.max_length, sex.codelist_ref)
+print(sex.cdisc_domain, sex.cdisc_role)
+print(sex.allowed_values)
+```
+
+The `SEX` variable uses the `Sex` codelist, whose values were copied into `allowed_values`.
+`VariableMetadata` objects can also be created directly, which is how a
+[`MetadataImport`](`pointblank.MetadataImport`) can be built for data that doesn't come with a
+metadata file:
+
+```{python}
+pb.VariableMetadata(name="age", label="Age in years", dtype="Int64", min_val=18, max_val=99)
+```
+
+Only the fields that are given get a value, and the rest stay at their defaults.
+
+See Also
+--------
+MetadataImport : The metadata for a dataset, with one of these per variable.
+MetadataImport.get_variable : Get the metadata of a variable by name.
 
 Codelist(name: 'str', codes: 'list[CodelistEntry]' = <factory>, label: 'str | None' = None, version: 'str | None' = None, source: 'str | None' = None, extensible: 'bool' = False) -> None
 
-A controlled terminology / value set from an external standard.
+A set of permitted values, each with a label.
 
-Represents a set of permitted values from standards like CDISC controlled terminology, SPSS
-value labels, DDI code schemes, etc.
+A codelist (also called a value set or controlled terminology) lists the values that a
+variable may take and what each one means. When
+[`import_metadata()`](`pointblank.import_metadata`) reads a file, the codelists it finds become
+`Codelist` objects in [`MetadataImport.codelists`](`pointblank.MetadataImport`): the CodeList
+elements of a Define-XML document, the codelists of a CDISC Controlled Terminology file, the
+`enum` constraint of a Frictionless field (as a codelist named `"<field>_enum"`), and the value
+labels of an SPSS variable (as `"<variable>_values"`). Variables that use a codelist name it in
+their [`codelist_ref`](`pointblank.VariableMetadata`) and have its values in `allowed_values`.
+
+A codelist's values are what a [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
+check needs, and [`to_set()`](`pointblank.Codelist.to_set`) gives them as a list.
+[`to_dict()`](`pointblank.Codelist.to_dict`) maps each value to its label, and
+[`extended_values()`](`pointblank.Codelist.extended_values`) lists the sponsor extensions of an
+extensible codelist.
 
 Parameters
 ----------
 name
-    Codelist identifier.
+    The name of the codelist, which is also its key in `MetadataImport.codelists`.
 codes
-    List of codelist entries.
+    The entries of the codelist, as [`CodelistEntry`](`pointblank.CodelistEntry`) objects. The
+    default is an empty list.
 label
-    Human-readable name for the codelist.
+    A human-readable name for the codelist. The default is `None`.
 version
-    Version of the terminology.
+    The version of the terminology, such as a CDISC Controlled Terminology release date. The
+    default is `None`.
 source
-    Where this codelist comes from (e.g., `"CDISC CT 2024-09"`).
+    Where the codelist came from, such as `"CDISC Define-XML"` or `"SPSS .sav"`. The default
+    is `None`.
 extensible
-    Whether additional values beyond the codelist are allowed.
+    Whether values that aren't in the codelist may be added, as with CDISC codelists marked as
+    extensible. A non-extensible codelist is a closed set. The default is `False`.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+The bundled Define-XML document defines a `Sex` codelist for the Demographics dataset. Let's
+get it from the imported metadata:
+
+```{python}
+import pointblank as pb
+
+dm = pb.import_metadata(pb.load_metadata_example("define.xml"), dataset="DM")
+sex = dm.get_codelist("Sex")
+
+print(sex.label, sex.source, sex.extensible, len(sex))
+print(sex.to_dict())
+```
+
+The codelist has three entries and isn't extensible, so `M`, `F` and `U` are the only values
+allowed. Its values can be used in a validation step directly:
+
+```{python}
+import polars as pl
+
+tbl = pl.DataFrame({"SEX": ["M", "F", "F", "X"]})
+
+(
+    pb.Validate(data=tbl)
+    .col_vals_in_set(columns="SEX", set=sex.to_set())
+    .interrogate()
+)
+```
+
+The `"X"` in the last row isn't in the codelist, so one test unit fails. A codelist can also be
+built by hand:
+
+```{python}
+route = pb.Codelist(
+    name="ROUTE",
+    label="Route of Administration",
+    extensible=True,
+    codes=[
+        pb.CodelistEntry(value="ORAL", label="Oral"),
+        pb.CodelistEntry(value="INTRAVENOUS", label="Intravenous"),
+        pb.CodelistEntry(value="IV", label="Intravenous (old code)", is_deprecated=True),
+        pb.CodelistEntry(value="NASOGASTRIC TUBE", label="Nasogastric tube", is_extended=True),
+    ],
+)
+
+print(len(route))
+print(route.to_set())
+print(route.extended_values())
+```
+
+`len()` counts all four entries, but `to_set()` leaves out the deprecated `"IV"`, and
+`extended_values()` gives the one value that was added to the extensible codelist.
+
+See Also
+--------
+CodelistEntry : A single entry in a codelist.
+MetadataImport.get_codelist : Get a codelist from imported metadata.
 
 CodelistEntry(value: 'Any', label: 'str', description: 'str | None' = None, synonyms: 'list[str] | None' = None, is_deprecated: 'bool' = False, is_extended: 'bool' = False) -> None
 
-A single entry in a codelist (controlled terminology).
+A single permitted value in a codelist.
+
+A [`Codelist`](`pointblank.Codelist`) is a list of `CodelistEntry` objects, each pairing a coded
+value (the value that appears in the data, such as `"F"`) with a label that says what it means
+(such as `"Female"`). Codelist entries are created when
+[`import_metadata()`](`pointblank.import_metadata`) reads a codelist, and can also be created
+directly to build a codelist by hand.
 
 Parameters
 ----------
 value
-    The coded value.
+    The coded value, as it appears in the data.
 label
-    Human-readable label for the value.
+    A human-readable label for the value.
 description
-    Extended description of this entry.
+    A longer description of the entry. The default is `None`.
 synonyms
-    Alternative terms for this entry.
+    Other terms with the same meaning, such as the synonyms listed in CDISC Controlled
+    Terminology. The default is `None`.
 is_deprecated
-    Whether this entry is deprecated.
+    Whether the entry has been retired. A deprecated entry stays in the codelist (and in
+    [`to_dict()`](`pointblank.Codelist.to_dict`)) but is left out of the permitted values given
+    by [`to_set()`](`pointblank.Codelist.to_set`). The readers don't currently set this flag,
+    but you can for codelists you build yourself. The default is `False`.
 is_extended
-    Whether this entry is a sponsor extension of an extensible codelist (declared in
-    Define-XML with `def:ExtendedValue="Yes"`).
+    Whether the entry is a sponsor extension to an extensible codelist: a value that isn't in
+    the published terminology but was added for a study. Define-XML marks these with
+    `def:ExtendedValue="Yes"`. The default is `False`.
+
+Examples
+--------
+Each codelist imported from a file holds its entries in `codes`. Here are the entries of the
+`Sex` codelist in the bundled CDISC Controlled Terminology file:
+
+```{python}
+import pointblank as pb
+
+ct = pb.import_metadata(pb.load_metadata_example("sdtm_ct.xml"), codelist="Sex")
+sex = ct.get_codelist("Sex")
+
+for entry in sex.codes:
+    print(entry.value, "->", entry.label)
+```
+
+The values are the codes used in the data, and the labels say what they mean. An entry can
+also be created directly, for example to build a codelist that isn't in any file:
+
+```{python}
+entry = pb.CodelistEntry(value="NASOGASTRIC TUBE", label="Nasogastric tube", is_extended=True)
+
+entry
+```
+
+Setting `is_extended=True` records that this value was added to an extensible codelist rather
+than taken from the published terminology, so
+[`extended_values()`](`pointblank.Codelist.extended_values`) will list it.
+
+See Also
+--------
+Codelist : The list of entries that a codelist is made of.
 
 MissingValueCode(value: 'Any', label: 'str', category: 'str | None' = None, reason: 'str | None' = None) -> None
 
-A structured missing value definition from an external standard.
+A declared missing-value code, as read from a metadata file.
 
-In SPSS, SAS, and clinical data, missing values carry meaning (`REFUSED`, `NOT_APPLICABLE`,
-`NOT_ASKED`, etc.).
+Many data formats let a dataset declare the values that stand for missing data: the
+user-defined missing values of an SPSS variable (such as `-99` for "Refused"), or the
+`missingValues` and `null` markers of a Frictionless or CSVW schema (such as `"NA"`). When
+[`import_metadata()`](`pointblank.import_metadata`) reads these declarations, it records each
+one as a `MissingValueCode` in
+[`MetadataImport.missing_value_codes`](`pointblank.MetadataImport`), a dictionary from column
+name to that column's list of codes.
+
+These objects describe the codes. To use the codes in validation, build
+[`MissingSpec`](`pointblank.MissingSpec`) objects with
+[`MetadataImport.missing_specs()`](`pointblank.MetadataImport.missing_specs`), which works from
+each variable's [`missing_values`](`pointblank.VariableMetadata`) and their labels.
 
 Parameters
 ----------
 value
-    The sentinel value (e.g., `-99`, `".A"`, `""`).
+    The value that stands for missing data, such as `-99` or `"NA"`.
 label
-    What this missing code means.
+    What the code means, such as `"Refused"`.
 category
-    Category of missingness (e.g., `"system_missing"`, `"user_missing"`).
+    The kind of missingness. The readers use `"user_missing"` for values declared in the
+    file. The default is `None`.
 reason
-    Why data is missing.
+    Why the data is missing, if known. The default is `None`.
+
+Examples
+--------
+The bundled Frictionless Data Package declares `"NA"` and `"N/A"` as missing-value markers for
+every field. Let's look at the codes recorded for the `amount` column:
+
+```{python}
+import pointblank as pb
+
+meta = pb.import_metadata(pb.load_metadata_example("datapackage.json"))
+
+for code in meta.missing_value_codes["amount"]:
+    print(code.value, "|", code.label, "|", code.category)
+```
+
+Each marker is recorded with a generated label and the `"user_missing"` category, since it was
+declared in the file. A code can also be created directly:
+
+```{python}
+pb.MissingValueCode(value=-99, label="Refused", category="user_missing", reason="refused")
+```
+
+Creating codes yourself is mainly useful when you build a
+[`MetadataImport`](`pointblank.MetadataImport`) by hand to describe a dataset that doesn't come
+with a metadata file.
+
+See Also
+--------
+MetadataImport.missing_specs : Build missing-value specs from imported metadata.
+MissingSpec : Describe missing-value codes for use in validation.
 
 
 ## SDTM Validation
@@ -25972,179 +26604,561 @@ Validate clinical datasets against CDISC SDTM domain templates. Use `validate_sd
 
 validate_sdtm(data: 'Any', domain: 'str', study_id: 'str | None' = None, check_dates: 'bool' = True, check_lengths: 'bool' = True, label: 'str | None' = None, **kwargs: 'Any')
 
-Generate a comprehensive SDTM validation workflow for a dataset.
+Build a validation plan for a dataset from an SDTM domain template.
 
-Creates a `Validate` object with checks for:
+The `validate_sdtm()` function reads the template for an SDTM domain (see
+[`get_sdtm_domain()`](`pointblank.get_sdtm_domain`)) and turns it into a
+[`Validate`](`pointblank.Validate`) plan for a dataset of that domain. The plan isn't
+interrogated, so more steps can be added to it before calling
+[`interrogate()`](`pointblank.Validate.interrogate`).
 
-- Schema conformance (required variables present with correct types)
-- Required variables are non-null
-- Variable length constraints (for Char variables)
-- DOMAIN column value matches expected domain code
-- ISO 8601 date format for --DTC timing variables
-- Sequence number positivity and uniqueness per subject
+The steps are generated in this order, for the template variables that are columns of the
+data:
+
+1. [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`) for each required variable
+(one with a core designation of `"Req"`).
+2. [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`) to check that `DOMAIN` holds
+only the domain code.
+3. [`col_vals_gt()`](`pointblank.Validate.col_vals_gt`) to check that the sequence number (as in
+`AESEQ`) is greater than `0`. DM has one record per subject and so has no sequence number.
+4. If `check_lengths=True`, a [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`) step for
+each character variable, checking that its values are no longer than the template's maximum
+length. Null values pass.
+5. If `check_dates=True`, a [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`) step for
+each `--DTC` timing variable (such as `RFSTDTC` or `AESTDTC`), checking that its values are
+ISO 8601 dates or date-times. Null values pass.
+
+Columns that aren't in the template are left alone, and the data types of the columns aren't
+checked. A template variable that isn't a column of the data gets no steps, so a dataset that
+lacks a required variable isn't reported for it. Use
+[`validate_sdtm_structure()`](`pointblank.validate_sdtm_structure`) to find missing variables,
+or add a [`col_exists()`](`pointblank.Validate.col_exists`) step to the plan (as in the second
+example below).
+
+The date check accepts the right-truncated forms that SDTM uses for partial dates: a year
+(`2024`), a year and month (`2024-03`), a full date (`2024-03-15`), and a date with a time to
+the hour, minute or second (`2024-03-15T10:30:00`). Dates in other formats (such as
+`03/15/2024`), fractional seconds, time zones and dates with missing middle components (such
+as `2024---15`) fail. The check is on the format only, so an impossible date such as
+`2024-13-45` passes.
 
 Parameters
 ----------
 data
-    The DataFrame to validate (Pandas or Polars).
+    The dataset to validate, as a Polars or Pandas DataFrame.
 domain
-    SDTM domain code (e.g., `"DM"`, `"AE"`, `"LB"`). This is case-insensitive.
+    The SDTM domain code, such as `"DM"`, `"AE"` or `"LB"`. This is case-insensitive. See
+    [`list_sdtm_domains()`](`pointblank.list_sdtm_domains`) for the domains that have a
+    template.
 study_id
-    Optional study identifier for the validation label.
+    A study identifier to use in the default label, which becomes
+    `"SDTM {domain} — {study_id}"`. It is ignored if `label=` is given. The default is `None`.
 check_dates
-    If `True`, validate ISO 8601 format for --DTC variables.
+    Whether to add the ISO 8601 format checks for the `--DTC` timing variables. The default is
+    `True`.
 check_lengths
-    If `True`, validate string length constraints.
+    Whether to add the maximum length checks for the character variables. The default is
+    `True`.
 label
-    Custom label for the `Validate` object. Defaults to `"SDTM {domain} Validation"`.
+    A label for the validation. The default is `"SDTM {domain} Validation"`.
 **kwargs
-    Additional keyword arguments passed to the `Validate` constructor.
+    Other arguments for [`Validate`](`pointblank.Validate`), such as `tbl_name=` and
+    `thresholds=`.
 
 Returns
 -------
-`Validate`
-    A configured (but not yet interrogated) `Validate` object.
+Validate
+    The validation plan, not yet interrogated.
+
+Raises
+------
+KeyError
+    If there is no template for the domain.
 
 Examples
 --------
-```python
+```{python}
+#| echo: false
+#| output: false
 import pointblank as pb
-from pointblank.metadata._sdtm_validate import validate_sdtm
-
-validation = validate_sdtm(dm_data, domain="DM").interrogate()
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
 ```
+Here is a small Demographics (DM) dataset with a few problems: the third row has the wrong
+`DOMAIN` and no `USUBJID`, the second row's `RFSTDTC` isn't an ISO 8601 date, and the fourth
+row's `SEX` is longer than the two characters that SDTM allows:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+dm = pl.DataFrame(
+    {
+        "STUDYID": ["STUDY01"] * 4,
+        "DOMAIN": ["DM", "DM", "AE", "DM"],
+        "USUBJID": ["STUDY01-001", "STUDY01-002", None, "STUDY01-004"],
+        "SUBJID": ["001", "002", "003", "004"],
+        "RFSTDTC": ["2024-01-15", "03/15/2024", "2024-02", "2024-02-10T09:30"],
+        "SEX": ["M", "F", "F", "MALE"],
+    }
+)
+
+validation = pb.validate_sdtm(dm, domain="DM").interrogate()
+
+validation
+```
+
+The plan starts with the null checks for the five required variables in the data, then checks
+`DOMAIN`, the lengths of all six columns, and the format of `RFSTDTC`. Four steps have a
+failing test unit, one for each problem. The partial date `2024-02` and the date-time
+`2024-02-10T09:30` both pass the date check, since SDTM allows dates to be truncated.
+
+The plan doesn't report the required DM variables that the dataset lacks, such as `SITEID` and
+`COUNTRY`. Since the plan isn't interrogated yet, a
+[`col_exists()`](`pointblank.Validate.col_exists`) step for the template's required variables
+can be added to it. This example uses an Adverse Events (AE) dataset and leaves out the length
+checks to keep the plan short:
+
+```{python}
+ae = pl.DataFrame(
+    {
+        "STUDYID": ["STUDY01"] * 3,
+        "DOMAIN": ["AE"] * 3,
+        "USUBJID": ["STUDY01-001", "STUDY01-001", "STUDY01-002"],
+        "AESEQ": [1, 2, 0],
+        "AETERM": ["HEADACHE", "NAUSEA", "RASH"],
+        "AESTDTC": ["2024-01-20", "2024-02-03", "2024-02"],
+    }
+)
+
+required = pb.get_sdtm_domain("AE").required_variables
+
+validation = (
+    pb.validate_sdtm(ae, domain="AE", check_lengths=False, tbl_name="ae")
+    .col_exists(columns=required)
+    .interrogate()
+)
+
+validation
+```
+
+The `col_vals_gt()` step on `AESEQ` fails for the third row, whose sequence number is `0`. The
+`col_exists()` steps at the end show that `AEDECOD`, a required AE variable, is missing from
+the dataset. The `tbl_name=` argument was passed on to `Validate`.
+
+See Also
+--------
+validate_sdtm_structure : Check a dataset's variables against an SDTM template.
+get_sdtm_domain : Get the template that the plan is built from.
+validate_adam : The equivalent for ADaM datasets.
+validate_sdtmig : Check SDTM datasets against the SDTMIG conformance rules.
 
 validate_sdtm_structure(data: 'Any', domain: 'str', strict: 'bool' = False) -> 'dict[str, Any]'
 
-Validate the structural conformance of a dataset against an SDTM domain template.
+Check a dataset's variables against an SDTM domain template.
 
-Checks required variables, variable ordering, data types, and domainvalue consistency. Does not
-interrogate but rather returns a dict of findings.
+The `validate_sdtm_structure()` function is a quick check of a dataset's structure, run before
+(or instead of) a full validation with [`validate_sdtm()`](`pointblank.validate_sdtm`). It
+checks that every required variable of the domain is a column of the dataset, and that the
+`DOMAIN` column holds only the domain code. It returns the findings as a dictionary straight
+away, without building a [`Validate`](`pointblank.Validate`) plan.
+
+With `strict=True`, two more things are reported: the expected variables (core designation
+`"Exp"`) that are missing, and the columns that aren't variables in the template. These don't
+affect `"valid"`. SDTM expects an expected variable to be in the dataset even if all of its
+values are null, but a missing one is treated here as something to review rather than an
+error. A column that isn't in the template may still be a valid SDTM variable, since the
+templates only cover the common variables of each domain.
+
+The column order and the data types aren't checked.
 
 Parameters
 ----------
 data
-    A DataFrame (Pandas, Polars) to check.
+    The dataset to check, as a Polars or Pandas DataFrame.
 domain
-    SDTM domain code (e.g., `"DM"`, `"AE"`). This is case-insensitive.
+    The SDTM domain code, such as `"DM"` or `"AE"`. This is case-insensitive.
 strict
-    If `True`, also report missing Expected variables and unknown variables.
+    Whether to also report missing expected variables and columns that aren't in the template.
+    The default is `False`.
 
 Returns
 -------
 dict
-    A dictionary with keys:
+    A dictionary with these keys:
 
-    - "domain": the domain code
-    - "valid": `True` if no required violations found
-    - "missing_required": list of missing required variable names
-    - "missing_expected": list of missing expected variable names (strict only)
-    - "unknown_variables": list of column names not in the template (strict only)
-    - "domain_mismatch": `True` if `DOMAIN` column doesn't match expected value
-    - "issues": list of human-readable issue strings
+    - `"domain"`: the domain code, in upper case.
+    - `"valid"`: `True` if no required variable is missing and `DOMAIN` holds only the domain
+    code.
+    - `"missing_required"`: the names of the required variables that aren't columns of the
+    data.
+    - `"missing_expected"`: the names of the expected variables that aren't columns of the data
+    (filled in only with `strict=True`).
+    - `"unknown_variables"`: the columns that aren't variables of the domain (filled in only
+    with `strict=True`).
+    - `"domain_mismatch"`: `True` if the `DOMAIN` column has any value (including a null) other
+    than the domain code.
+    - `"issues"`: a message for each of the problems above.
+
+Raises
+------
+KeyError
+    If there is no template for the domain.
+
+Examples
+--------
+Let's check a small Adverse Events (AE) dataset. It has all of the required AE variables
+except `AEDECOD`, and its `DOMAIN` column has one value from another domain:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+ae = pl.DataFrame(
+    {
+        "STUDYID": ["STUDY01"] * 3,
+        "DOMAIN": ["AE", "AE", "CM"],
+        "USUBJID": ["STUDY01-001", "STUDY01-001", "STUDY01-002"],
+        "AESEQ": [1, 2, 1],
+        "AETERM": ["HEADACHE", "NAUSEA", "RASH"],
+        "AESEV": ["MILD", "MILD", "MODERATE"],
+        "AEFLAG": ["Y", "N", "Y"],
+    }
+)
+
+result = pb.validate_sdtm_structure(ae, domain="AE")
+
+print(result["valid"])
+for issue in result["issues"]:
+    print(issue)
+```
+
+The dataset isn't valid, and the issues say why. The extra column `AEFLAG` isn't mentioned,
+since that's only reported in strict mode:
+
+```{python}
+result = pb.validate_sdtm_structure(ae, domain="AE", strict=True)
+
+print(result["missing_expected"])
+print(result["unknown_variables"])
+```
+
+Strict mode adds the expected AE variables that the dataset doesn't have, such as `AESTDTC`,
+and the column that isn't an AE variable. `AESEV` is a permissible variable of the domain, so
+it isn't reported.
+
+See Also
+--------
+validate_sdtm : Build a validation plan from an SDTM domain template.
+get_sdtm_domain : Get the template that the dataset is checked against.
+validate_adam_structure : The equivalent for ADaM datasets.
 
 sdtm_to_metadata(domain: 'str', study_id: 'str | None' = None) -> 'MetadataImport'
 
 Convert an SDTM domain template to a `MetadataImport` object.
 
-This allows using the standard metadata pipeline
-([`to_schema()`](`pointblank.MetadataImport.to_schema`),
-[`to_validate()`](`pointblank.MetadataImport.to_validate`)) with SDTM domain specifications.
+The SDTM domain templates (see [`get_sdtm_domain()`](`pointblank.get_sdtm_domain`)) have their
+own classes, [`SDTMDomainTemplate`](`pointblank.SDTMDomainTemplate`) and
+[`SDTMVariableSpec`](`pointblank.SDTMVariableSpec`). The `sdtm_to_metadata()` function converts
+a template to a [`MetadataImport`](`pointblank.MetadataImport`), the same object that
+[`import_metadata()`](`pointblank.import_metadata`) returns for a metadata file. That gives the
+template the methods of a `MetadataImport`, such as
+[`to_schema()`](`pointblank.MetadataImport.to_schema`) and
+[`get_variable()`](`pointblank.MetadataImport.get_variable`), and lets it be exported with
+[`export_metadata()`](`pointblank.export_metadata`).
+
+Each variable in the template becomes a [`VariableMetadata`](`pointblank.VariableMetadata`)
+with the same name, label, role, `required` flag, maximum length and controlled terminology
+name. SDTM's `"Num"` type becomes the `"Float64"` dtype and `"Char"` becomes `"String"`. The
+dataset name and label come from the domain, and the source version is `"IG 3.4"`. The template
+names the codelist of a variable (as in `controlled_term="SEX"`) but doesn't contain the
+codelist itself, so the result has no codelists. Calling
+`import_metadata(format="cdisc_sdtm", domain=...)` gives the same result.
 
 Parameters
 ----------
 domain
-    SDTM domain code (e.g., `"DM"`, `"AE"`, `"LB"`). This is case-insensitive.
+    The SDTM domain code, such as `"DM"`, `"AE"` or `"LB"`. This is case-insensitive.
 study_id
-    Optional study identifier to include in metadata.
+    A study identifier to record in the metadata's `study_id`. The default is `None`.
 
 Returns
 -------
 MetadataImport
-    A `MetadataImport` representing the SDTM domain template.
-
-get_sdtm_domain(domain: 'str') -> 'SDTMDomainTemplate'
-
-Get the SDTM template for a specific domain.
-
-Parameters
-----------
-domain
-    Two-character domain code (e.g., `"DM"`, `"AE"`, `"LB"`, `"VS"`). This is case-insensitive.
-
-Returns
--------
-SDTMDomainTemplate
-    The structural template for the domain.
+    The metadata for the domain, with `source_format="cdisc_sdtm"`.
 
 Raises
 ------
 KeyError
-    If the domain is not supported.
+    If there is no template for the domain. See
+    [`list_sdtm_domains()`](`pointblank.list_sdtm_domains`) for the domains that have one.
 
 Examples
 --------
-```python
-from pointblank.metadata._sdtm_templates import get_sdtm_domain
+Let's convert the template for the Demographics (DM) domain:
 
-dm = get_sdtm_domain("DM")
-print(dm.required_variables)
-# ['STUDYID', 'DOMAIN', 'USUBJID', 'SUBJID', 'ARMCD', 'ARM', 'COUNTRY']
+```{python}
+import pointblank as pb
+
+dm_meta = pb.sdtm_to_metadata("DM", study_id="STUDY01")
+
+print(dm_meta.dataset_label)
+print(dm_meta.source_version)
+print(dm_meta.variable_names[:6])
 ```
 
-list_sdtm_domains() -> 'list[str]'
+The metadata has all 26 variables of the template, in the template's order. Each variable keeps
+what the template says about it:
 
-List all available SDTM domain codes.
+```{python}
+sex = dm_meta.get_variable("SEX")
 
-Returns
--------
-list[str]
-    Sorted list of domain codes.
+print(sex.dtype, sex.required, sex.max_length, sex.controlled_term)
+```
 
-SDTMDomainTemplate(domain: 'str', label: 'str', description: 'str', domain_class: 'str', repeating: 'bool', variables: 'list[SDTMVariableSpec]' = <factory>, natural_keys: 'list[str]' = <factory>) -> None
+`SEX` is a required character variable of at most two characters, with values from the `SEX`
+codelist of CDISC Controlled Terminology. The metadata can be turned into a
+[`Schema`](`pointblank.Schema`) for use in
+[`Validate.col_schema_match()`](`pointblank.Validate.col_schema_match`):
 
-Structural template for an SDTM domain.
+```{python}
+schema = dm_meta.to_schema()
+
+schema.columns[:4]
+```
+
+The schema lists every variable of the template, including the expected and permissible ones.
+A real DM dataset usually has only some of them, so a schema check against all 26 is stricter
+than SDTM requires. For checking a dataset against the template,
+[`validate_sdtm()`](`pointblank.validate_sdtm`) (which only checks the variables that are
+present) is usually the better fit.
+
+See Also
+--------
+get_sdtm_domain : Get the template that is converted.
+validate_sdtm : Build a validation plan from an SDTM domain template.
+adam_to_metadata : The equivalent for ADaM dataset templates.
+MetadataImport : The object that is returned.
+
+get_sdtm_domain(domain: 'str') -> 'SDTMDomainTemplate'
+
+Get the template for an SDTM domain.
+
+Pointblank has templates for eight domains of the CDISC Study Data Tabulation Model (SDTM),
+based on the SDTM Implementation Guide (SDTMIG) 3.4. Each template is an
+[`SDTMDomainTemplate`](`pointblank.SDTMDomainTemplate`): the domain's label and observation
+class, the variables that form its natural key, and an
+[`SDTMVariableSpec`](`pointblank.SDTMVariableSpec`) for each of its variables, giving the
+variable's label, type, role, maximum length, controlled terminology and core designation. The
+templates are what [`validate_sdtm()`](`pointblank.validate_sdtm`),
+[`validate_sdtm_structure()`](`pointblank.validate_sdtm_structure`) and
+[`sdtm_to_metadata()`](`pointblank.sdtm_to_metadata`) work from.
+
+The templates cover the common variables of each domain rather than every variable in the
+SDTMIG. Each call returns a new template object, so changing one doesn't affect later calls.
 
 Parameters
 ----------
 domain
-    Two-character domain code (e.g., `"DM"`, `"AE"`, `"LB"`).
+    The two-letter domain code, such as `"DM"`, `"AE"`, `"LB"` or `"VS"`. This is
+    case-insensitive.
+
+Returns
+-------
+SDTMDomainTemplate
+    The template for the domain.
+
+Raises
+------
+KeyError
+    If there is no template for the domain. The error message lists the domains that have one,
+    as does [`list_sdtm_domains()`](`pointblank.list_sdtm_domains`).
+
+Examples
+--------
+Let's get the template for the Vital Signs (VS) domain:
+
+```{python}
+import pointblank as pb
+
+vs = pb.get_sdtm_domain("vs")
+
+print(vs.label, "|", vs.domain_class, "| repeating:", vs.repeating)
+print(vs.natural_keys)
+```
+
+VS is a Findings domain with many records per subject, one for each test at each time point,
+so its natural key includes the test code, the date-time and the time point number. The
+template's properties list the variables by their core designation:
+
+```{python}
+print(vs.required_variables)
+print(vs.expected_variables)
+```
+
+The required variables must be in every VS dataset and can't be null. The expected ones should
+be in the dataset but may be null, and the domain's other variables are permissible: they're
+included only when there is data for them.
+
+See Also
+--------
+list_sdtm_domains : List the domains that have a template.
+SDTMDomainTemplate : The template that is returned.
+validate_sdtm : Build a validation plan from an SDTM domain template.
+get_adam_dataset : The equivalent for ADaM datasets.
+
+list_sdtm_domains() -> 'list[str]'
+
+List the SDTM domains that have a template.
+
+These are the domain codes that [`get_sdtm_domain()`](`pointblank.get_sdtm_domain`),
+[`validate_sdtm()`](`pointblank.validate_sdtm`),
+[`validate_sdtm_structure()`](`pointblank.validate_sdtm_structure`) and
+[`sdtm_to_metadata()`](`pointblank.sdtm_to_metadata`) accept.
+
+Returns
+-------
+list[str]
+    The domain codes, in alphabetical order.
+
+Examples
+--------
+Let's list the domains, together with the label and class of each one's template:
+
+```{python}
+import pointblank as pb
+
+for code in pb.list_sdtm_domains():
+    template = pb.get_sdtm_domain(code)
+    print(f"{code}  {template.label:26}{template.domain_class}")
+```
+
+The eight domains come from all four of the observation classes that the templates use:
+Special Purpose (DM), Events, Interventions and Findings.
+
+See Also
+--------
+get_sdtm_domain : Get the template for a domain.
+list_adam_datasets : The equivalent for ADaM datasets.
+
+SDTMDomainTemplate(domain: 'str', label: 'str', description: 'str', domain_class: 'str', repeating: 'bool', variables: 'list[SDTMVariableSpec]' = <factory>, natural_keys: 'list[str]' = <factory>) -> None
+
+The structural template for an SDTM domain.
+
+An `SDTMDomainTemplate` describes the structure of one domain of the CDISC Study Data
+Tabulation Model (SDTM): its label and observation class, whether it has many records per
+subject, the variables that form its natural key, and the specifications of its variables (as
+[`SDTMVariableSpec`](`pointblank.SDTMVariableSpec`) objects, in the SDTM order). Templates are
+obtained with [`get_sdtm_domain()`](`pointblank.get_sdtm_domain`).
+
+Parameters
+----------
+domain
+    The two-letter domain code, such as `"DM"`, `"AE"` or `"LB"`.
 label
-    Domain label (e.g., `"Demographics"`, `"Adverse Events"`).
+    The domain label, such as `"Demographics"` or `"Adverse Events"`.
 description
-    Brief description of the domain's purpose.
+    A short description of what the domain holds.
 domain_class
-    SDTM observation class: `"Special Purpose"`, `"Events"`, `"Interventions"`, or `"Findings"`.
+    The SDTM observation class: `"Special Purpose"`, `"Events"`, `"Interventions"` or
+    `"Findings"`.
 repeating
-    Whether the domain is a repeating (multi-row per subject) domain.
+    Whether the domain can have more than one record per subject. Only DM, which has one record
+    per subject, isn't repeating.
 variables
-    Ordered list of variable specifications.
+    The specifications of the domain's variables, in order. The default is an empty list.
 natural_keys
-    List of variable names that form the natural key.
+    The names of the variables that together identify a record. The default is an empty list.
+
+Examples
+--------
+Let's look at the template for the Adverse Events (AE) domain:
+
+```{python}
+import pointblank as pb
+
+ae = pb.get_sdtm_domain("AE")
+
+print(ae.label, "|", ae.domain_class, "| repeating:", ae.repeating)
+print(ae.description)
+print(len(ae.variables), "variables")
+```
+
+The variables are in the `variables` list. Here are the first eight, with their type, role and
+core designation:
+
+```{python}
+for var in ae.variables[:8]:
+    print(f"{var.name:9}{var.dtype:5}{var.role:12}{var.core}")
+```
+
+The template's properties collect the names of the variables with a given core designation or
+role, and [`get_variable()`](`pointblank.SDTMDomainTemplate.get_variable`) gets the
+specification of one variable.
+
+See Also
+--------
+get_sdtm_domain : Get the template for a domain.
+SDTMVariableSpec : The specification of a variable in the template.
+ADaMDatasetTemplate : The equivalent for ADaM datasets.
 
 SDTMVariableSpec(name: 'str', label: 'str', dtype: 'str', role: 'str', required: 'bool' = False, max_length: 'int | None' = None, controlled_term: 'str | None' = None, core: 'str' = 'Perm') -> None
 
-Specification for a single variable in an SDTM domain template.
+The specification of one variable in an SDTM domain template.
+
+An [`SDTMDomainTemplate`](`pointblank.SDTMDomainTemplate`) holds an `SDTMVariableSpec` for each
+variable of its domain, in its `variables` list. The specification gives what the SDTM
+Implementation Guide says about the variable: its label, its type, its role in the domain, its
+core designation, and the controlled terminology for its values.
+[`validate_sdtm()`](`pointblank.validate_sdtm`) uses `required`, `dtype`, `max_length` and
+`role` to decide which checks to make.
 
 Parameters
 ----------
 name
-    Variable name (e.g., `"STUDYID"`, `"USUBJID"`).
+    The variable name, such as `"STUDYID"` or `"AESTDTC"`.
 label
-    Variable label (e.g., `"Study Identifier"`).
+    The variable label, such as `"Study Identifier"`.
 dtype
-    Expected data type (`"Char"` or `"Num"`).
+    The SDTM data type: `"Char"` for character variables or `"Num"` for numeric ones.
 role
-    SDTM role: `"Identifier"`, `"Topic"`, `"Qualifier"`, `"Timing"`, `"Rule"`, or
-    `"Record Qualifier"`.
+    The variable's SDTM role. The templates use `"Identifier"` (variables that identify the
+    study, subject, domain or record), `"Topic"` (the focus of the observation, such as
+    `AETERM`), `"Qualifier"` (variables that describe the observation) and `"Timing"` (dates,
+    times and study days).
 required
-    Whether the variable is required (`Req="Yes"` in IG).
+    Whether the variable is required: it must be in the dataset and can't be null. In the
+    templates, this is `True` exactly when `core` is `"Req"`. The default is `False`.
 max_length
-    Maximum character length for Char variables.
+    The maximum length of the values of a character variable. The default is `None` (no
+    maximum, as for numeric variables).
 controlled_term
-    Name of the associated controlled terminology codelist.
+    The name of the controlled terminology codelist for the variable's values, such as `"SEX"`
+    or `"NY"`. The default is `None`.
 core
-    SDTM core designation: `"Req"`, `"Exp"`, or `"Perm"`.
+    The core designation: `"Req"` (required), `"Exp"` (expected: in the dataset, but values may
+    be null) or `"Perm"` (permissible: included when there is data for it). The default is
+    `"Perm"`.
+
+Examples
+--------
+Specifications are usually taken from a template. Here is the one for `AESER` in the Adverse
+Events (AE) template:
+
+```{python}
+import pointblank as pb
+
+aeser = pb.get_sdtm_domain("AE").get_variable("AESER")
+
+aeser
+```
+
+`AESER` (whether the adverse event was serious) is an expected character variable of at most
+two characters, with values from the `NY` (No Yes Response) codelist.
+
+See Also
+--------
+SDTMDomainTemplate : The template that holds the specifications of a domain's variables.
+ADaMVariableSpec : The equivalent for ADaM dataset templates.
 
 
 ## ADaM Validation
@@ -26155,158 +27169,542 @@ Validate analysis datasets against CDISC ADaM templates. Use `validate_adam()` t
 
 validate_adam(data: 'Any', dataset: 'str', study_id: 'str | None' = None, check_population_flags: 'bool' = True, check_bds_structure: 'bool' = True, check_traceability: 'bool' = True, label: 'str | None' = None, **kwargs: 'Any')
 
-Generate a comprehensive ADaM validation workflow for a dataset.
+Build a validation plan for a dataset from an ADaM dataset template.
 
-Creates a Validate object with checks for:
+The `validate_adam()` function reads an ADaM dataset template (see
+[`get_adam_dataset()`](`pointblank.get_adam_dataset`)) and turns it into a
+[`Validate`](`pointblank.Validate`) plan for an analysis dataset of that type. The plan isn't
+interrogated, so more steps can be added to it before calling
+[`interrogate()`](`pointblank.Validate.interrogate`).
 
-- Required variables present and non-null
-- Population flag values (Y/N only, no nulls in flag columns)
-- BDS structure: PARAMCD, PARAM, AVAL consistency
-- ADTTE: CNSR values (0 or 1), AVAL >= 0
-- TRT01P (planned treatment) present and non-null in ADSL
-- Traceability variable presence (SRCDOM/SRCVAR/SRCSEQ non-null when present)
+The steps are generated in this order, for the template variables that are columns of the
+data:
+
+1. [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`) for each required variable
+(one with a core designation of `"Req"`).
+2. If `check_population_flags=True`, a
+[`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`) step for each population flag
+(such as `SAFFL` or `ITTFL`), checking that its values are `"Y"` or `"N"`. A null value fails,
+since ADaM doesn't allow nulls in population flags.
+3. Checks for the type of dataset:
+    - BDS (if `check_bds_structure=True`): a
+      [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`) step checking that `PARAMCD`
+      is no longer than eight characters. Null values pass.
+    - ADTTE: `CNSR` must be `0` (an event) or `1` (censored), and `AVAL` (the time to the
+      event) must be at least `0`.
+    - ADAE: `TRTEMFL` must be `"Y"` or `"N"`, and `AESEQ` must be greater than `0`.
+    - ADSL: `TRT01P` must not be null. This is already one of the required-variable checks,
+      so it isn't added a second time.
+4. If `check_traceability=True`, a null check for each of the traceability variables `SRCDOM`,
+`SRCVAR` and `SRCSEQ`, which record the SDTM domain, variable and record that a value came
+from.
+
+Columns that aren't in the template are left alone, and the data types of the columns aren't
+checked. A template variable that isn't a column of the data gets no steps, so a dataset that
+lacks a required variable isn't reported for it. Use
+[`validate_adam_structure()`](`pointblank.validate_adam_structure`) to find missing variables,
+or add a [`col_exists()`](`pointblank.Validate.col_exists`) step to the plan.
 
 Parameters
 ----------
 data
-    The DataFrame to validate (pandas or polars).
+    The dataset to validate, as a Polars or Pandas DataFrame.
 dataset
-    ADaM dataset name (e.g., `"ADSL"`, `"BDS"`, `"ADAE"`, `"ADTTE"`). This is case-insensitive.
+    The name of the ADaM dataset template: `"ADSL"`, `"BDS"`, `"ADAE"` or `"ADTTE"`. This is
+    case-insensitive. Use `"BDS"` for any dataset with the Basic Data Structure, such as ADVS
+    or ADLB.
 study_id
-    Optional study identifier for the validation label.
+    A study identifier to use in the default label, which becomes
+    `"ADaM {dataset} — {study_id}"`. It is ignored if `label=` is given. The default is `None`.
 check_population_flags
-    If `True`, validate population flag columns (Y/N values only).
+    Whether to check that the population flags hold only `"Y"` and `"N"`. The default is `True`.
 check_bds_structure
-    If `True`, validate BDS-specific structure (`PARAMCD`/`PARAM`/`AVAL`).
+    Whether to add the `PARAMCD` length check for a BDS dataset. It has no effect for the other
+    templates. The default is `True`.
 check_traceability
-    If `True`, check that traceability variables are non-null when present.
+    Whether to add the null checks for the traceability variables. The default is `True`.
 label
-    Custom label for the Validate object.
+    A label for the validation. The default is `"ADaM {dataset} Validation"`.
 **kwargs
-    Additional keyword arguments passed to the Validate constructor.
+    Other arguments for [`Validate`](`pointblank.Validate`), such as `tbl_name=` and
+    `thresholds=`.
 
 Returns
 -------
 Validate
-    A configured (but not yet interrogated) Validate object.
-
-validate_adam_structure(data: 'Any', dataset: 'str', strict: 'bool' = False) -> 'dict[str, Any]'
-
-Validate structural conformance of a dataset against an ADaM template.
-
-Parameters
-----------
-data
-    A DataFrame (pandas, polars) to check.
-dataset
-    ADaM dataset name (e.g., `"ADSL"`, `"BDS"`, `"ADAE"`, `"ADTTE"`). This is case-insensitive.
-strict
-    If True, also reports missing conditional variables and unknown variables.
-
-Returns
--------
-dict
-    Validation results with keys:
-
-    - "dataset": the dataset name
-    - "dataset_class": ADaM class
-    - "valid": True if no required violations found
-    - "missing_required": list of missing required variable names
-    - "missing_conditional": list of missing conditionally required variables (strict)
-    - "unknown_variables": list of unknown column names (strict)
-    - "population_flags_found": list of population flag variables present
-    - "issues": list of human-readable issue strings
-
-adam_to_metadata(dataset: 'str', study_id: 'str | None' = None) -> 'MetadataImport'
-
-Convert an ADaM dataset template to a MetadataImport object.
-
-Parameters
-----------
-dataset
-    ADaM dataset name (e.g., `"ADSL"`, `"BDS"`, `"ADAE"`, `"ADTTE"`). This is case-insensitive.
-study_id
-    Optional study identifier.
-
-Returns
--------
-MetadataImport
-    A MetadataImport representing the ADaM dataset template.
-
-get_adam_dataset(name: 'str') -> 'ADaMDatasetTemplate'
-
-Get the ADaM template for a specific dataset.
-
-Parameters
-----------
-name
-    Dataset name (e.g., `"ADSL"`, `"BDS"`, `"ADAE"`, `"ADTTE"`). This is case-insensitive.
-
-Returns
--------
-ADaMDatasetTemplate
-    The structural template for the dataset.
+    The validation plan, not yet interrogated.
 
 Raises
 ------
 KeyError
-    If the dataset is not supported.
+    If there is no template with that name.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+Here is a small subject-level analysis dataset (ADSL) with two problems in its population
+flags: the fourth subject has no safety flag (`SAFFL`) and an intent-to-treat flag (`ITTFL`)
+of `"U"`:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+adsl = pl.DataFrame(
+    {
+        "STUDYID": ["STUDY01"] * 4,
+        "USUBJID": ["STUDY01-001", "STUDY01-002", "STUDY01-003", "STUDY01-004"],
+        "SUBJID": ["001", "002", "003", "004"],
+        "SITEID": ["SITE01", "SITE01", "SITE02", "SITE02"],
+        "TRT01P": ["Drug A", "Placebo", "Drug A", "Placebo"],
+        "SAFFL": ["Y", "Y", "N", None],
+        "ITTFL": ["Y", "Y", "Y", "U"],
+    }
+)
+
+validation = pb.validate_adam(adsl, dataset="ADSL").interrogate()
+
+validation
+```
+
+The five required ADSL variables get null checks, which all pass. The two population flags
+are checked for `"Y"` and `"N"`, and each of those steps has one failing test unit.
+
+For a time-to-event dataset (ADTTE), the plan also checks the censoring indicator and the
+time to the event. Here the second subject has a negative time, and the third has a `CNSR` of
+`2`:
+
+```{python}
+adtte = pl.DataFrame(
+    {
+        "STUDYID": ["STUDY01"] * 3,
+        "USUBJID": ["STUDY01-001", "STUDY01-002", "STUDY01-003"],
+        "PARAMCD": ["OS"] * 3,
+        "PARAM": ["Overall Survival (days)"] * 3,
+        "AVAL": [120.0, -3.0, 365.0],
+        "STARTDT": [19723.0, 19730.0, 19741.0],
+        "ADT": [19843.0, 19727.0, 20106.0],
+        "CNSR": [0, 1, 2],
+    }
+)
+
+validation = pb.validate_adam(adtte, dataset="ADTTE", tbl_name="adtte").interrogate()
+
+validation
+```
+
+The last two steps are the ADTTE checks, and each one finds its problem. The dates
+`STARTDT` and `ADT` are numbers of days since 1960-01-01, as is usual in ADaM datasets (which
+are often stored as SAS files).
+
+See Also
+--------
+validate_adam_structure : Check a dataset's variables against an ADaM template.
+get_adam_dataset : Get the template that the plan is built from.
+validate_sdtm : The equivalent for SDTM datasets.
+
+validate_adam_structure(data: 'Any', dataset: 'str', strict: 'bool' = False) -> 'dict[str, Any]'
+
+Check a dataset's variables against an ADaM dataset template.
+
+The `validate_adam_structure()` function is a quick check of a dataset's structure, run before
+(or instead of) a full validation with [`validate_adam()`](`pointblank.validate_adam`). It
+checks that every required variable of the template is a column of the dataset, and lists the
+population flags that the dataset has. It returns the findings as a dictionary straight away,
+without building a [`Validate`](`pointblank.Validate`) plan.
+
+For an ADSL dataset with no population flags at all, an issue is added to `"issues"`, but the
+dataset is still `"valid"`. With `strict=True`, two more things are reported: the
+conditionally required variables (core designation `"Cond"`) that are missing, and the columns
+that aren't variables in the template. These don't affect `"valid"` either, since whether a
+conditional variable is needed depends on the study, and the templates only cover the common
+variables of each type of dataset.
+
+The column order, the data types and the values aren't checked.
+
+Parameters
+----------
+data
+    The dataset to check, as a Polars or Pandas DataFrame.
+dataset
+    The name of the ADaM dataset template: `"ADSL"`, `"BDS"`, `"ADAE"` or `"ADTTE"`. This is
+    case-insensitive.
+strict
+    Whether to also report missing conditional variables and columns that aren't in the
+    template. The default is `False`.
+
+Returns
+-------
+dict
+    A dictionary with these keys:
+
+    - `"dataset"`: the template name, in upper case.
+    - `"dataset_class"`: the ADaM class of the template.
+    - `"valid"`: `True` if no required variable is missing.
+    - `"missing_required"`: the names of the required variables that aren't columns of the
+    data.
+    - `"missing_conditional"`: the names of the conditional variables that aren't columns of
+    the data (filled in only with `strict=True`).
+    - `"unknown_variables"`: the columns that aren't variables in the template, in the order of
+    the data's columns (filled in only with `strict=True`).
+    - `"population_flags_found"`: the population flags that are columns of the data.
+    - `"issues"`: a message for each of the problems above. With `strict=True`, the message for
+    a missing conditional variable includes its condition.
+
+Raises
+------
+KeyError
+    If there is no template with that name.
+
+Examples
+--------
+Let's check a small ADSL dataset that lacks the site identifier, `SITEID`, a required ADSL
+variable:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+adsl = pl.DataFrame(
+    {
+        "STUDYID": ["STUDY01"] * 3,
+        "USUBJID": ["STUDY01-001", "STUDY01-002", "STUDY01-003"],
+        "SUBJID": ["001", "002", "003"],
+        "TRT01P": ["Drug A", "Placebo", "Drug A"],
+        "SAFFL": ["Y", "Y", "N"],
+        "BMIBL": [24.1, 31.7, 22.9],
+    }
+)
+
+result = pb.validate_adam_structure(adsl, dataset="ADSL")
+
+print(result["valid"])
+print(result["missing_required"])
+print(result["population_flags_found"])
+```
+
+The dataset isn't valid because of the missing `SITEID`, and it has one population flag,
+`SAFFL`. In strict mode, the conditional variables and the unknown columns are reported too:
+
+```{python}
+result = pb.validate_adam_structure(adsl, dataset="ADSL", strict=True)
+
+print(result["missing_conditional"])
+print(result["unknown_variables"])
+```
+
+The baseline BMI column, `BMIBL`, isn't in the template. Since ADaM allows a sponsor to add
+variables like this one, it's reported only so that it can be reviewed.
+
+See Also
+--------
+validate_adam : Build a validation plan from an ADaM dataset template.
+get_adam_dataset : Get the template that the dataset is checked against.
+validate_sdtm_structure : The equivalent for SDTM datasets.
+
+adam_to_metadata(dataset: 'str', study_id: 'str | None' = None) -> 'MetadataImport'
+
+Convert an ADaM dataset template to a `MetadataImport` object.
+
+The ADaM dataset templates (see [`get_adam_dataset()`](`pointblank.get_adam_dataset`)) have
+their own classes, [`ADaMDatasetTemplate`](`pointblank.ADaMDatasetTemplate`) and
+[`ADaMVariableSpec`](`pointblank.ADaMVariableSpec`). The `adam_to_metadata()` function converts
+a template to a [`MetadataImport`](`pointblank.MetadataImport`), the same object that
+[`import_metadata()`](`pointblank.import_metadata`) returns for a metadata file. That gives the
+template the methods of a `MetadataImport`, such as
+[`to_schema()`](`pointblank.MetadataImport.to_schema`) and
+[`get_variable()`](`pointblank.MetadataImport.get_variable`), and lets it be exported with
+[`export_metadata()`](`pointblank.export_metadata`).
+
+Each variable in the template becomes a [`VariableMetadata`](`pointblank.VariableMetadata`)
+with the same name, label, `required` flag, maximum length and controlled terminology name.
+The variable's core designation (`"Req"`, `"Cond"` or `"Perm"`) goes in `cdisc_role`, and its
+expected source (such as `"SDTM.DM"`) goes in `adam_derivation`. ADaM's `"Num"` type becomes
+the `"Float64"` dtype and `"Char"` becomes `"String"`, so numeric dates such as `TRTSDT` (which
+ADaM stores as numbers of days) are `"Float64"`. The source version is `"IG 1.1"`. Calling
+`import_metadata(format="cdisc_adam", dataset=...)` gives the same result.
+
+Parameters
+----------
+dataset
+    The name of the ADaM dataset template: `"ADSL"`, `"BDS"`, `"ADAE"` or `"ADTTE"`. This is
+    case-insensitive.
+study_id
+    A study identifier to record in the metadata's `study_id`. The default is `None`.
+
+Returns
+-------
+MetadataImport
+    The metadata for the dataset, with `source_format="cdisc_adam"`.
+
+Raises
+------
+KeyError
+    If there is no template with that name.
+
+Examples
+--------
+Let's convert the template for the subject-level analysis dataset, ADSL:
+
+```{python}
+import pointblank as pb
+
+adsl_meta = pb.adam_to_metadata("ADSL", study_id="STUDY01")
+
+print(adsl_meta.dataset_label)
+print(len(adsl_meta.variables), "variables")
+```
+
+Each variable keeps what the template says about it, with the ADaM core designation in
+`cdisc_role`:
+
+```{python}
+for name in ["USUBJID", "TRT01P", "SAFFL", "TRTSDT"]:
+    var = adsl_meta.get_variable(name)
+    print(f"{name:8}{var.dtype:8}{var.cdisc_role:5}{var.adam_derivation}")
+```
+
+`USUBJID` and `TRT01P` are required, while `SAFFL` (the safety population flag) and `TRTSDT`
+(the treatment start date) are conditionally required. `USUBJID` comes from the SDTM
+Demographics (DM) domain and `TRTSDT` is derived from Exposure (EX). Only the required
+variables get `required=True`, so the conditional ones don't get the null checks that
+[`to_validate()`](`pointblank.MetadataImport.to_validate`) adds for required variables.
+
+See Also
+--------
+get_adam_dataset : Get the template that is converted.
+validate_adam : Build a validation plan from an ADaM dataset template.
+sdtm_to_metadata : The equivalent for SDTM domain templates.
+MetadataImport : The object that is returned.
+
+get_adam_dataset(name: 'str') -> 'ADaMDatasetTemplate'
+
+Get the template for a type of ADaM dataset.
+
+Pointblank has templates for four types of CDISC Analysis Data Model (ADaM) dataset: ADSL (the
+subject-level analysis dataset), BDS (the Basic Data Structure, used by datasets such as ADVS
+and ADLB), ADAE (adverse events) and ADTTE (time to event). Each template is an
+[`ADaMDatasetTemplate`](`pointblank.ADaMDatasetTemplate`): the dataset's label and class, the
+variables that form its natural key, and an [`ADaMVariableSpec`](`pointblank.ADaMVariableSpec`)
+for each of its variables. The templates are what
+[`validate_adam()`](`pointblank.validate_adam`),
+[`validate_adam_structure()`](`pointblank.validate_adam_structure`) and
+[`adam_to_metadata()`](`pointblank.adam_to_metadata`) work from.
+
+The templates cover the common variables of each type of dataset rather than every variable
+that the ADaM Implementation Guide describes. Each call returns a new template object, so
+changing one doesn't affect later calls.
+
+Parameters
+----------
+name
+    The template name: `"ADSL"`, `"BDS"`, `"ADAE"` or `"ADTTE"`. This is case-insensitive.
+
+Returns
+-------
+ADaMDatasetTemplate
+    The template for the dataset.
+
+Raises
+------
+KeyError
+    If there is no template with that name. The error message lists the templates, as does
+    [`list_adam_datasets()`](`pointblank.list_adam_datasets`).
+
+Examples
+--------
+Let's get the template for the subject-level analysis dataset:
+
+```{python}
+import pointblank as pb
+
+adsl = pb.get_adam_dataset("adsl")
+
+print(adsl.label)
+print(adsl.natural_keys)
+print(adsl.required_variables)
+```
+
+ADSL has one record per subject, so the study and subject identifiers are its natural key.
+Besides the identifiers, the planned treatment `TRT01P` is required. The template also lists
+the population flags:
+
+```{python}
+adsl.population_flags
+```
+
+These flags (safety, intent-to-treat, efficacy and so on) are conditionally required or
+permissible, and [`validate_adam()`](`pointblank.validate_adam`) checks that the ones in a
+dataset hold only `"Y"` and `"N"`.
+
+See Also
+--------
+list_adam_datasets : List the dataset templates.
+ADaMDatasetTemplate : The template that is returned.
+validate_adam : Build a validation plan from an ADaM dataset template.
+get_sdtm_domain : The equivalent for SDTM domains.
 
 list_adam_datasets() -> 'list[str]'
 
-List all available ADaM dataset template names.
+List the ADaM dataset templates.
+
+These are the names that [`get_adam_dataset()`](`pointblank.get_adam_dataset`),
+[`validate_adam()`](`pointblank.validate_adam`),
+[`validate_adam_structure()`](`pointblank.validate_adam_structure`) and
+[`adam_to_metadata()`](`pointblank.adam_to_metadata`) accept.
 
 Returns
 -------
 list[str]
-    Sorted list of dataset names.
+    The template names, in alphabetical order.
+
+Examples
+--------
+Let's list the templates, together with each one's label:
+
+```{python}
+import pointblank as pb
+
+for name in pb.list_adam_datasets():
+    print(f"{name:7}{pb.get_adam_dataset(name).label}")
+```
+
+BDS is a structure rather than a single dataset, so its template is used for any BDS dataset
+in a study, such as ADVS or ADLB.
+
+See Also
+--------
+get_adam_dataset : Get a dataset template.
+list_sdtm_domains : The equivalent for SDTM domains.
 
 ADaMDatasetTemplate(name: 'str', label: 'str', description: 'str', dataset_class: 'str', variables: 'list[ADaMVariableSpec]' = <factory>, natural_keys: 'list[str]' = <factory>) -> None
 
-Structural template for an ADaM dataset.
+The structural template for an ADaM dataset.
+
+An `ADaMDatasetTemplate` describes the structure of one type of CDISC Analysis Data Model
+(ADaM) dataset: its label and class, the variables that form its natural key, and the
+specifications of its variables (as [`ADaMVariableSpec`](`pointblank.ADaMVariableSpec`)
+objects, in order). Templates are obtained with
+[`get_adam_dataset()`](`pointblank.get_adam_dataset`).
 
 Parameters
 ----------
 name
-    Dataset name (e.g., `"ADSL"`, `"ADVS"`, `"ADAE"`, `"ADTTE"`).
+    The template name: `"ADSL"`, `"BDS"`, `"ADAE"` or `"ADTTE"`.
 label
-    Dataset label (e.g., `"Subject Level Analysis Dataset"`).
+    The dataset label, such as `"Subject Level Analysis Dataset"`.
 description
-    Brief description of the dataset's purpose.
+    A short description of what the dataset holds and what a record is.
 dataset_class
-    ADaM dataset class: `"ADSL"`, `"BDS"`, `"ADAE"`, or `"ADTTE"`.
+    The ADaM dataset class, which [`validate_adam()`](`pointblank.validate_adam`) uses to
+    choose the checks for the type of dataset. In the templates, it's the same as `name`.
 variables
-    Ordered list of variable specifications.
+    The specifications of the dataset's variables, in order. The default is an empty list.
 natural_keys
-    List of variable names that form the natural key.
+    The names of the variables that together identify a record. The default is an empty list.
+
+Examples
+--------
+Let's look at the template for the Basic Data Structure (BDS), the structure of analysis
+datasets such as ADVS (vital signs) and ADLB (laboratory results):
+
+```{python}
+import pointblank as pb
+
+bds = pb.get_adam_dataset("BDS")
+
+print(bds.label, "|", bds.dataset_class)
+print(bds.description)
+print(bds.natural_keys)
+```
+
+A BDS dataset has a record for each analysis parameter (`PARAMCD`) at each visit and date,
+for each subject. The template's properties list the required and conditionally required
+variables:
+
+```{python}
+print(bds.required_variables)
+print(bds.conditional_variables)
+```
+
+Every BDS dataset needs the identifiers, the parameter and the analysis value. The
+conditional variables, such as the baseline value `BASE` and the change from baseline `CHG`,
+are needed only for some analyses.
+
+See Also
+--------
+get_adam_dataset : Get the template for a type of dataset.
+ADaMVariableSpec : The specification of a variable in the template.
+SDTMDomainTemplate : The equivalent for SDTM domains.
 
 ADaMVariableSpec(name: 'str', label: 'str', dtype: 'str', core: 'str' = 'Perm', required: 'bool' = False, max_length: 'int | None' = None, controlled_term: 'str | None' = None, source: 'str | None' = None, condition: 'str | None' = None, is_population_flag: 'bool' = False) -> None
 
-Specification for a single variable in an ADaM dataset template.
+The specification of one variable in an ADaM dataset template.
+
+An [`ADaMDatasetTemplate`](`pointblank.ADaMDatasetTemplate`) holds an `ADaMVariableSpec` for
+each variable of its dataset, in its `variables` list. The specification gives the variable's
+label, type and core designation, the condition under which a conditionally required variable
+is needed, where its values come from, and whether it is a population flag.
+[`validate_adam()`](`pointblank.validate_adam`) uses `required` and `is_population_flag` to
+decide which checks to make.
 
 Parameters
 ----------
 name
-    Variable name (e.g., `"USUBJID"`, `"AVAL"`, `"PARAMCD"`).
+    The variable name, such as `"USUBJID"`, `"PARAMCD"` or `"AVAL"`.
 label
-    Variable label (e.g., `"Unique Subject Identifier"`).
+    The variable label, such as `"Unique Subject Identifier"`.
 dtype
-    Expected data type (`"Char"` or `"Num"`).
+    The data type: `"Char"` for character variables or `"Num"` for numeric ones (including
+    dates, which ADaM stores as numbers).
 core
-    ADaM core designation: `"Req"` (required), `"Cond"` (conditionally required), or `"Perm"`
-    (permissible).
+    The core designation: `"Req"` (required), `"Cond"` (conditionally required: needed when
+    the condition in `condition` holds) or `"Perm"` (permissible). The default is `"Perm"`.
 required
-    Whether the variable is unconditionally required.
+    Whether the variable is required in every dataset of this type. In the templates, this is
+    `True` exactly when `core` is `"Req"`. The default is `False`.
 max_length
-    Maximum character length for Char variables.
+    The maximum length of the values of a character variable. The default is `None` (no
+    maximum).
 controlled_term
-    Name of the associated controlled terminology codelist.
+    The name of the controlled terminology codelist for the variable's values, such as `"NY"`
+    for the population flags. The default is `None`.
 source
-    Traceability: expected source (e.g., `"SDTM.DM"`, `"Derived"`).
+    Where the variable's values come from, such as `"SDTM.DM"` (copied from the Demographics
+    domain) or `"Derived from SDTM.EX"`. The default is `None` (not specified).
 condition
-    For conditional variables, describes when they are required.
+    For a conditionally required variable, a description of when it is required, such as
+    `"Required if safety population defined"`. The default is `None`.
 is_population_flag
-    Whether this is a population flag variable (e.g., `"SAFFL"`, `"ITTFL"`).
+    Whether the variable is a population flag (such as `SAFFL` or `ITTFL`), whose values must
+    be `"Y"` or `"N"`. The default is `False`.
+
+Examples
+--------
+Specifications are usually taken from a template. Here is the one for the safety population
+flag, `SAFFL`, in the ADSL template:
+
+```{python}
+import pointblank as pb
+
+saffl = pb.get_adam_dataset("ADSL").get_variable("SAFFL")
+
+saffl
+```
+
+`SAFFL` is a one-character population flag with values from the `NY` codelist. It is
+conditionally required, and `condition` says when: whenever the study defines a safety
+population.
+
+See Also
+--------
+ADaMDatasetTemplate : The template that holds the specifications of a dataset's variables.
+SDTMVariableSpec : The equivalent for SDTM domain templates.
 
 
 ## CDISC Submission Conformance
@@ -45166,7 +46564,7 @@ from pointblank.metadata import validate_adam_structure
 result = validate_adam_structure(adsl_data, dataset="ADSL")
 print(f"Valid: {result['valid']}")
 print(f"Missing required: {result['missing_required']}")
-print(f"Population flags present: {result.get('population_flags_present', [])}")
+print(f"Population flags present: {result['population_flags_found']}")
 ```
 
 ### Converting ADaM Templates to MetadataImport

@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Specification for a single variable in an ADaM dataset template.">
+<meta name="description" content="The specification of one variable in an ADaM dataset template.">
 
 <title>ADaMVariableSpec | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "ADaMVariableSpec - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/ADaMVariableSpec.html"}]</script>
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="ADaMVariableSpec | Pointblank">
-<meta property="og:description" content="Specification for a single variable in an ADaM dataset template.">
+<meta property="og:description" content="The specification of one variable in an ADaM dataset template.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="ADaMVariableSpec | Pointblank">
-<meta name="twitter:description" content="Specification for a single variable in an ADaM dataset template.">
+<meta name="twitter:description" content="The specification of one variable in an ADaM dataset template.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1438,6 +1438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/load_metadata_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_metadata_example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MetadataImport</span></a>
   </div>
@@ -1643,6 +1649,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1669,11 +1677,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>Specification for a single variable in an ADaM dataset template.</p>
+<p>The specification of one variable in an ADaM dataset template.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_adam_templates.py#L16-L54" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_adam_templates.py#L16-L90" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ADaMVariableSpec</span>(</span>
@@ -1689,52 +1697,83 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">is_population_flag</span><span class="op">=</span><span class="bn">False</span>,</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
+<div class="doc-text">
+<p>An <a href="../reference/ADaMDatasetTemplate.html#pointblank.ADaMDatasetTemplate" class="gdls-link"><code>ADaMDatasetTemplate</code></a> holds an <a href="../reference/ADaMVariableSpec.html#pointblank.ADaMVariableSpec" class="gdls-link gdls-code">ADaMVariableSpec</a> for each variable of its dataset, in its <code>variables</code> list. The specification gives the variable’s label, type and core designation, the condition under which a conditionally required variable is needed, where its values come from, and whether it is a population flag. <a href="../reference/validate_adam.html#pointblank.validate_adam" class="gdls-link"><code>validate_adam()</code></a> uses <code>required</code> and <code>is_population_flag</code> to decide which checks to make.</p>
+</div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">name</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>Variable name (e.g., <code>"USUBJID"</code>, <code>"AVAL"</code>, <code>"PARAMCD"</code>).</p>
+<p>The variable name, such as <code>"USUBJID"</code>, <code>"PARAMCD"</code> or <code>"AVAL"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">label</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>Variable label (e.g., <code>"Unique Subject Identifier"</code>).</p>
+<p>The variable label, such as <code>"Unique Subject Identifier"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">dtype</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>Expected data type (<code>"Char"</code> or <code>"Num"</code>).</p>
+<p>The data type: <code>"Char"</code> for character variables or <code>"Num"</code> for numeric ones (including dates, which ADaM stores as numbers).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">core</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"Perm"</span></span></code></dt>
 <dd>
-<p>ADaM core designation: <code>"Req"</code> (required), <code>"Cond"</code> (conditionally required), or <code>"Perm"</code> (permissible).</p>
+<p>The core designation: <code>"Req"</code> (required), <code>"Cond"</code> (conditionally required: needed when the condition in <code>condition</code> holds) or <code>"Perm"</code> (permissible). The default is <code>"Perm"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">required</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
-<p>Whether the variable is unconditionally required.</p>
+<p>Whether the variable is required in every dataset of this type. In the templates, this is <code>True</code> exactly when <code>core</code> is <code>"Req"</code>. The default is <code>False</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">max_length</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Maximum character length for Char variables.</p>
+<p>The maximum length of the values of a character variable. The default is <code>None</code> (no maximum).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">controlled_term</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Name of the associated controlled terminology codelist.</p>
+<p>The name of the controlled terminology codelist for the variable’s values, such as <code>"NY"</code> for the population flags. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">source</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Traceability: expected source (e.g., <code>"SDTM.DM"</code>, <code>"Derived"</code>).</p>
+<p>Where the variable’s values come from, such as <code>"SDTM.DM"</code> (copied from the Demographics domain) or <code>"Derived from SDTM.EX"</code>. The default is <code>None</code> (not specified).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">condition</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>For conditional variables, describes when they are required.</p>
+<p>For a conditionally required variable, a description of when it is required, such as <code>"Required if safety population defined"</code>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">is_population_flag</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
-Whether this is a population flag variable (e.g., <code>"SAFFL"</code>, <code>"ITTFL"</code>).
+Whether the variable is a population flag (such as <code>SAFFL</code> or <code>ITTFL</code>), whose values must be <code>"Y"</code> or <code>"N"</code>. The default is <code>False</code>.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Specifications are usually taken from a template. Here is the one for the safety population flag, <code>SAFFL</code>, in the ADSL template:</p>
+<div id="d1ff1090" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>saffl <span class="op">=</span> pb.get_adam_dataset(<span class="st">"ADSL"</span>).get_variable(<span class="st">"SAFFL"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>saffl</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>ADaMVariableSpec(name='SAFFL', label='Safety Population Flag', dtype='Char', core='Cond', required=False, max_length=1, controlled_term='NY', source=None, condition='Required if safety population defined', is_population_flag=True)</code></pre>
+</div>
+</div>
+<p><code>SAFFL</code> is a one-character population flag with values from the <code>NY</code> codelist. It is conditionally required, and <code>condition</code> says when: whenever the study defines a safety population.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/ADaMDatasetTemplate.html#pointblank.ADaMDatasetTemplate" class="gdls-link gdls-code">ADaMDatasetTemplate</a></dt>
+<dd>
+<p>The template that holds the specifications of a dataset’s variables.</p>
+</dd>
+<dt><a href="../reference/SDTMVariableSpec.html#pointblank.SDTMVariableSpec" class="gdls-link gdls-code">SDTMVariableSpec</a></dt>
+<dd>
+<p>The equivalent for SDTM domain templates.</p>
+</dd>
+</dl>
 
 
 </section>

@@ -179,7 +179,7 @@ Pointblank `v0.26.0` is a major release focused on clinical data standards, data
 
 ##### Documentation
 
-- CDISC validation user guide examples are now fully executable against sample metadata documents bundled with the package via the new `load_metadata_example()` function. ([\#406](https://github.com/posit-dev/pointblank/issues/406))
+- CDISC validation user guide examples are now fully executable against sample metadata documents bundled with the package via the new [load_metadata_example()](./reference/load_metadata_example.md#pointblank.load_metadata_example) function. ([\#406](https://github.com/posit-dev/pointblank/issues/406))
 
 ## v0.25.0
 

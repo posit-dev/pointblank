@@ -1438,6 +1438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/load_metadata_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_metadata_example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MetadataImport</span></a>
   </div>
@@ -1644,6 +1650,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1670,11 +1679,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>Convert an ADaM dataset template to a MetadataImport object.</p>
+<p>Convert an ADaM dataset template to a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> object.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_adam_validate.py#L19-L64" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_adam_validate.py#L19-L123" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adam_to_metadata</span>(</span>
@@ -1682,17 +1691,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">study_id</span><span class="op">=</span><span class="cn">None</span>,</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
+<div class="doc-text">
+<p>The ADaM dataset templates (see <a href="../reference/get_adam_dataset.html#pointblank.get_adam_dataset" class="gdls-link"><code>get_adam_dataset()</code></a>) have their own classes, <a href="../reference/ADaMDatasetTemplate.html#pointblank.ADaMDatasetTemplate" class="gdls-link"><code>ADaMDatasetTemplate</code></a> and <a href="../reference/ADaMVariableSpec.html#pointblank.ADaMVariableSpec" class="gdls-link"><code>ADaMVariableSpec</code></a>. The <a href="../reference/adam_to_metadata.html#pointblank.adam_to_metadata" class="gdls-link gdls-code">adam_to_metadata()</a> function converts a template to a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport</code></a>, the same object that <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a> returns for a metadata file. That gives the template the methods of a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a>, such as <a href="../reference/MetadataImport.html#pointblank.MetadataImport.to_schema" class="gdls-link"><code>to_schema()</code></a> and <a href="../reference/MetadataImport.html#pointblank.MetadataImport.get_variable" class="gdls-link"><code>get_variable()</code></a>, and lets it be exported with <a href="../reference/export_metadata.html#pointblank.export_metadata" class="gdls-link"><code>export_metadata()</code></a>.</p>
+<p>Each variable in the template becomes a <a href="../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link"><code>VariableMetadata</code></a> with the same name, label, <code>required</code> flag, maximum length and controlled terminology name. The variable’s core designation (<code>"Req"</code>, <code>"Cond"</code> or <code>"Perm"</code>) goes in <code>cdisc_role</code>, and its expected source (such as <code>"SDTM.DM"</code>) goes in <code>adam_derivation</code>. ADaM’s <code>"Num"</code> type becomes the <code>"Float64"</code> dtype and <code>"Char"</code> becomes <code>"String"</code>, so numeric dates such as <code>TRTSDT</code> (which ADaM stores as numbers of days) are <code>"Float64"</code>. The source version is <code>"IG 1.1"</code>. Calling <code>import_metadata(format="cdisc_adam", dataset=...)</code> gives the same result.</p>
+</div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <div class="doc-definition-items">
 <dl>
 <dt><code><span class="doc-parameter-name">dataset</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>ADaM dataset name (e.g., <code>"ADSL"</code>, <code>"BDS"</code>, <code>"ADAE"</code>, <code>"ADTTE"</code>). This is case-insensitive.</p>
+<p>The name of the ADaM dataset template: <code>"ADSL"</code>, <code>"BDS"</code>, <code>"ADAE"</code> or <code>"ADTTE"</code>. This is case-insensitive.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">study_id</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-Optional study identifier.
+A study identifier to record in the metadata’s <code>study_id</code>. The default is <code>None</code>.
 </dd>
 </dl>
 </div>
@@ -1703,10 +1716,71 @@ Optional study identifier.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">MetadataImport</span></code></dt>
 <dd>
-A MetadataImport representing the ADaM dataset template.
+The metadata for the dataset, with <code>source_format="cdisc_adam"</code>.
 </dd>
 </dl>
 </div>
+</section>
+<section id="raises" class="level2 doc-raises">
+<h2 class="doc-raises anchored" data-anchor-id="raises">Raises</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">KeyError</span></code></dt>
+<dd>
+If there is no template with that name.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s convert the template for the subject-level analysis dataset, ADSL:</p>
+<div id="a323d68b" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>adsl_meta <span class="op">=</span> pb.adam_to_metadata(<span class="st">"ADSL"</span>, study_id<span class="op">=</span><span class="st">"STUDY01"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(adsl_meta.dataset_label)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(adsl_meta.variables), <span class="st">"variables"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Subject Level Analysis Dataset
+30 variables</code></pre>
+</div>
+</div>
+<p>Each variable keeps what the template says about it, with the ADaM core designation in <code>cdisc_role</code>:</p>
+<div id="cfdafad4" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> [<span class="st">"USUBJID"</span>, <span class="st">"TRT01P"</span>, <span class="st">"SAFFL"</span>, <span class="st">"TRTSDT"</span>]:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    var <span class="op">=</span> adsl_meta.get_variable(name)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:8}{</span>var<span class="sc">.</span>dtype<span class="sc">:8}{</span>var<span class="sc">.</span>cdisc_role<span class="sc">:5}{</span>var<span class="sc">.</span>adam_derivation<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>USUBJID String  Req  SDTM.DM
+TRT01P  String  Req  None
+SAFFL   String  Cond None
+TRTSDT  Float64 Cond Derived from SDTM.EX</code></pre>
+</div>
+</div>
+<p><code>USUBJID</code> and <code>TRT01P</code> are required, while <code>SAFFL</code> (the safety population flag) and <code>TRTSDT</code> (the treatment start date) are conditionally required. <code>USUBJID</code> comes from the SDTM Demographics (DM) domain and <code>TRTSDT</code> is derived from Exposure (EX). Only the required variables get <code>required=True</code>, so the conditional ones don’t get the null checks that <a href="../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a> adds for required variables.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/get_adam_dataset.html#pointblank.get_adam_dataset" class="gdls-link gdls-code">get_adam_dataset()</a></dt>
+<dd>
+<p>Get the template that is converted.</p>
+</dd>
+<dt><a href="../reference/validate_adam.html#pointblank.validate_adam" class="gdls-link gdls-code">validate_adam()</a></dt>
+<dd>
+<p>Build a validation plan from an ADaM dataset template.</p>
+</dd>
+<dt><a href="../reference/sdtm_to_metadata.html#pointblank.sdtm_to_metadata" class="gdls-link gdls-code">sdtm_to_metadata()</a></dt>
+<dd>
+<p>The equivalent for SDTM domain templates.</p>
+</dd>
+<dt><a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a></dt>
+<dd>
+<p>The object that is returned.</p>
+</dd>
+</dl>
 
 
 </section>

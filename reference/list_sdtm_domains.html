@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="List all available SDTM domain codes.">
+<meta name="description" content="List the SDTM domains that have a template.">
 
 <title>list_sdtm_domains() | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "list_sdtm_domains - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/list_sdtm_domains.html"}]</script>
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="list_sdtm_domains() | Pointblank">
-<meta property="og:description" content="List all available SDTM domain codes.">
+<meta property="og:description" content="List the SDTM domains that have a template.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="list_sdtm_domains() | Pointblank">
-<meta name="twitter:description" content="List all available SDTM domain codes.">
+<meta name="twitter:description" content="List the SDTM domains that have a template.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1438,6 +1438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/load_metadata_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_metadata_example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MetadataImport</span></a>
   </div>
@@ -1643,6 +1649,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#returns" id="toc-returns" class="nav-link active" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1669,14 +1677,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>List all available SDTM domain codes.</p>
+<p>List the SDTM domains that have a template.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_templates.py#L1350-L1358" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_templates.py#L1544-L1577" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list_sdtm_domains</span>()</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>These are the domain codes that <a href="../reference/get_sdtm_domain.html#pointblank.get_sdtm_domain" class="gdls-link"><code>get_sdtm_domain()</code></a>, <a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link"><code>validate_sdtm()</code></a>, <a href="../reference/validate_sdtm_structure.html#pointblank.validate_sdtm_structure" class="gdls-link"><code>validate_sdtm_structure()</code></a> and <a href="../reference/sdtm_to_metadata.html#pointblank.sdtm_to_metadata" class="gdls-link"><code>sdtm_to_metadata()</code></a> accept.</p>
 </div>
 <section id="returns" class="level2 doc-returns">
 <h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
@@ -1684,10 +1695,45 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code> <span class="doc-parameter-annotation">list[str]</span></code></dt>
 <dd>
-Sorted list of domain codes.
+The domain codes, in alphabetical order.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s list the domains, together with the label and class of each one’s template:</p>
+<div id="f6b09017" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> code <span class="kw">in</span> pb.list_sdtm_domains():</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    template <span class="op">=</span> pb.get_sdtm_domain(code)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>code<span class="sc">}</span><span class="ss">  </span><span class="sc">{</span>template<span class="sc">.</span>label<span class="sc">:26}{</span>template<span class="sc">.</span>domain_class<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>AE  Adverse Events            Events
+CM  Concomitant Medications   Interventions
+DM  Demographics              Special Purpose
+DS  Disposition               Events
+EX  Exposure                  Interventions
+LB  Laboratory Test Results   Findings
+MH  Medical History           Events
+VS  Vital Signs               Findings</code></pre>
+</div>
+</div>
+<p>The eight domains come from all four of the observation classes that the templates use: Special Purpose (DM), Events, Interventions and Findings.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/get_sdtm_domain.html#pointblank.get_sdtm_domain" class="gdls-link gdls-code">get_sdtm_domain()</a></dt>
+<dd>
+<p>Get the template for a domain.</p>
+</dd>
+<dt><a href="../reference/list_adam_datasets.html#pointblank.list_adam_datasets" class="gdls-link gdls-code">list_adam_datasets()</a></dt>
+<dd>
+<p>The equivalent for ADaM datasets.</p>
+</dd>
+</dl>
 
 
 </section>

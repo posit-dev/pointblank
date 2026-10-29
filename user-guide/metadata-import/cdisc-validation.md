@@ -32,7 +32,7 @@ Define-XML is the CDISC standard for documenting dataset structure. It describes
 
 ### Importing a Define-XML File
 
-The [import_metadata()](../../reference/import_metadata.md#pointblank.import_metadata) function with `format="cdisc_define"` reads a Define-XML file and returns a [MetadataPackage](../../reference/MetadataPackage.md#pointblank.MetadataPackage) containing metadata for all datasets defined in the document. So that you can run these examples without supplying your own files, Pointblank bundles a small set of sample metadata documents that you can locate with `load_metadata_example()`:
+The [import_metadata()](../../reference/import_metadata.md#pointblank.import_metadata) function with `format="cdisc_define"` reads a Define-XML file and returns a [MetadataPackage](../../reference/MetadataPackage.md#pointblank.MetadataPackage) containing metadata for all datasets defined in the document. So that you can run these examples without supplying your own files, Pointblank bundles a small set of sample metadata documents that you can locate with [load_metadata_example()](../../reference/load_metadata_example.md#pointblank.load_metadata_example):
 
 ``` python
 import pointblank as pb
@@ -489,12 +489,12 @@ from pointblank.metadata import validate_adam_structure
 result = validate_adam_structure(adsl_data, dataset="ADSL")
 print(f"Valid: {result['valid']}")
 print(f"Missing required: {result['missing_required']}")
-print(f"Population flags present: {result.get('population_flags_present', [])}")
+print(f"Population flags present: {result['population_flags_found']}")
 ```
 
     Valid: True
     Missing required: []
-    Population flags present: []
+    Population flags present: ['SAFFL', 'ITTFL', 'EFFFL']
 
 ### Converting ADaM Templates to MetadataImport
 

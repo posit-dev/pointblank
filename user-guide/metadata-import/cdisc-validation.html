@@ -736,8 +736,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Define-XML is the CDISC standard for documenting dataset structure. It describes every variable in a submission package: its name, label, data type, length, origin, and associated controlled terminology. Pointblank can parse Define-XML 2.0 and 2.1 documents and extract this metadata into a form suitable for validation.</p>
 <section id="importing-a-define-xml-file" class="level2">
 <h2 class="anchored" data-anchor-id="importing-a-define-xml-file">Importing a Define-XML File</h2>
-<p>The <a href="../../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link gdls-code">import_metadata()</a> function with <code>format="cdisc_define"</code> reads a Define-XML file and returns a <a href="../../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link gdls-code">MetadataPackage</a> containing metadata for all datasets defined in the document. So that you can run these examples without supplying your own files, Pointblank bundles a small set of sample metadata documents that you can locate with <code>load_metadata_example()</code>:</p>
-<div id="127fa5e0" class="cell" data-execution_count="2">
+<p>The <a href="../../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link gdls-code">import_metadata()</a> function with <code>format="cdisc_define"</code> reads a Define-XML file and returns a <a href="../../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link gdls-code">MetadataPackage</a> containing metadata for all datasets defined in the document. So that you can run these examples without supplying your own files, Pointblank bundles a small set of sample metadata documents that you can locate with <a href="../../reference/load_metadata_example.html#pointblank.load_metadata_example" class="gdls-link gdls-code">load_metadata_example()</a>:</p>
+<div id="814d9120" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Locate the bundled Define-XML example and import all of its datasets</span></span>
@@ -754,7 +754,7 @@ AE: Adverse Events (10 variables)</code></pre>
 </div>
 </div>
 <p>Each dataset in the package is a <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> object with full variable-level metadata. You can access individual datasets by name and generate validation from them. Here we validate a small Demographics table against the metadata extracted from the Define-XML:</p>
-<div id="23bcefcb" class="cell" data-execution_count="3">
+<div id="6be50342" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Get metadata for the Demographics domain</span></span>
@@ -1499,7 +1499,7 @@ tr { background-color: transparent; }
 <section id="controlled-terminology-from-define-xml" class="level2">
 <h2 class="anchored" data-anchor-id="controlled-terminology-from-define-xml">Controlled Terminology from Define-XML</h2>
 <p>Define-XML documents embed the codelists that constrain variable values. When Pointblank parses a Define-XML, all codelists are extracted and linked to their respective variables. The <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a> method then generates <code>col_vals_in_set()</code> checks for each variable that references a codelist:</p>
-<div id="702f5977" class="cell" data-execution_count="4">
+<div id="0acdf881" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect codelists referenced by the Demographics domain</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cl_name, codelist <span class="kw">in</span> dm_meta.codelists.items():</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>cl_name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>codelist<span class="sc">.</span>to_set()[:<span class="dv">5</span>]<span class="sc">}</span><span class="ss">..."</span>)  <span class="co"># first 5 values</span></span>
@@ -1519,7 +1519,7 @@ Race: ['WHITE', 'BLACK OR AFRICAN AMERICAN', 'ASIAN', 'AMERICAN INDIAN OR ALASKA
 <h1>CDISC Controlled Terminology Import</h1>
 <p>Beyond the codelists embedded in Define-XML, CDISC publishes standalone Controlled Terminology packages as XML files. These contain the canonical value sets for concepts like SEX, RACE, ROUTE OF ADMINISTRATION, and hundreds of others. Pointblank can parse these directly.</p>
 <p>Importing a CT package returns a <a href="../../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link gdls-code">MetadataPackage</a> whose entries are keyed by codelist name. Each entry is a <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> that holds the codelist itself:</p>
-<div id="249e7f39" class="cell" data-execution_count="5">
+<div id="224a67a9" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import the bundled CDISC CT example</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ct_path <span class="op">=</span> pb.load_metadata_example(<span class="st">"sdtm_ct.xml"</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>ct <span class="op">=</span> pb.import_metadata(ct_path, <span class="bu">format</span><span class="op">=</span><span class="st">"cdisc_ct"</span>)</span>
@@ -1538,7 +1538,7 @@ Extensible: False</code></pre>
 </div>
 </div>
 <p>Once you have a codelist, its permitted values feed directly into a <code>col_vals_in_set()</code> check:</p>
-<div id="3fc2ba55" class="cell" data-execution_count="6">
+<div id="87dd4f65" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the CT-derived value set in a validation</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>dm_data)</span>
@@ -1636,7 +1636,7 @@ Extensible: False</code></pre>
     <td colspan="14" class="gt_heading gt_title gt_font_normal" id="pb_tbl-title" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-10-28|16:03:12</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-10-29|15:01:09</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -1712,7 +1712,7 @@ Extensible: False</code></pre>
 <p>Pointblank includes built-in templates for eight commonly used SDTM domains. These templates encode the structural requirements from the SDTM Implementation Guide 3.4 directly, so you can validate data against the standard without needing a Define-XML file.</p>
 <section id="available-domains" class="level2">
 <h2 class="anchored" data-anchor-id="available-domains">Available Domains</h2>
-<div id="16eecce3" class="cell" data-execution_count="7">
+<div id="2c230fe0" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> list_sdtm_domains, get_sdtm_domain</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1738,7 +1738,7 @@ Extensible: False</code></pre>
 <section id="inspecting-a-domain-template" class="level2">
 <h2 class="anchored" data-anchor-id="inspecting-a-domain-template">Inspecting a Domain Template</h2>
 <p>You can examine the variable specifications for any domain to understand what Pointblank will check:</p>
-<div id="ad7a4cec" class="cell" data-execution_count="8">
+<div id="0464d0af" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the Demographics domain template</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> get_sdtm_domain(<span class="st">"DM"</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1774,7 +1774,7 @@ Required variables (core='Req'):
 <section id="structural-validation" class="level2">
 <h2 class="anchored" data-anchor-id="structural-validation">Structural Validation</h2>
 <p>The <a href="../../reference/validate_sdtm_structure.html#pointblank.validate_sdtm_structure" class="gdls-link gdls-code">validate_sdtm_structure()</a> function performs a quick check that a dataset contains all required variables for its domain. This is useful as a fast pre-check before running the full validation workflow:</p>
-<div id="b4051812" class="cell" data-execution_count="9">
+<div id="a46bea5d" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> validate_sdtm_structure</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1810,7 +1810,7 @@ Required variables (core='Req'):
 <section id="full-sdtm-validation" class="level2">
 <h2 class="anchored" data-anchor-id="full-sdtm-validation">Full SDTM Validation</h2>
 <p>The <a href="../../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link gdls-code">validate_sdtm()</a> function generates a comprehensive validation workflow that checks far more than just structure. It produces a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with checks for required variable non-nullness, DOMAIN value correctness, sequence number positivity, string length constraints, and ISO 8601 date formatting:</p>
-<div id="37d638d2" class="cell" data-execution_count="10">
+<div id="f6a1b6e0" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> validate_sdtm</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate and run the full SDTM DM validation</span></span>
@@ -3041,7 +3041,7 @@ Invalid: 15-Mar-2024           (wrong format)</code></pre>
 <section id="catching-conformance-problems" class="level2">
 <h2 class="anchored" data-anchor-id="catching-conformance-problems">Catching Conformance Problems</h2>
 <p>The examples so far have used clean data, so every check passes. The point of validation, of course, is to surface problems. Here is the same DM domain with three deliberate defects: a missing <code>USUBJID</code> (a required variable), a row where <code>DOMAIN</code> is <code>"AE"</code> instead of <code>"DM"</code>, and a <code>RFSTDTC</code> value entered in the wrong date format:</p>
-<div id="b074f180" class="cell" data-execution_count="11">
+<div id="40e235e0" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A Demographics dataset with three injected conformance issues</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>dm_data_with_issues <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"STUDYID"</span>: [<span class="st">"STUDY01"</span>] <span class="op">*</span> <span class="dv">4</span>,</span>
@@ -3640,7 +3640,7 @@ Invalid: 15-Mar-2024           (wrong format)</code></pre>
     <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
   </tr>
   <tr>
-    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">12</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
@@ -3674,12 +3674,12 @@ Invalid: 15-Mar-2024           (wrong format)</code></pre>
 </svg></td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">4</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">3<br>0.75</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">1<br>0.25</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">4<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">0<br>0.00</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLFNUVURZSUQsRE9NQUlOLFVTVUJKSUQsU1VCSklELFJGU1REVEMsU0lURUlELEFHRSxBR0VVLFNFWCxSQUNFLEFSTUNELEFSTQozLFNUVURZMDEsQUUsLDAwMywyMDI0LTAyLTAxLFNJVEUwMiwzOCxZRUFSUyxNLFdISVRFLERSVUcsQWN0aXZlIERydWcgMTBtZwo=" download="extract_0012.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
   </tr>
   <tr>
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C</td>
@@ -4073,7 +4073,7 @@ Invalid: 15-Mar-2024           (wrong format)</code></pre>
 <section id="converting-sdtm-templates-to-metadataimport" class="level2">
 <h2 class="anchored" data-anchor-id="converting-sdtm-templates-to-metadataimport">Converting SDTM Templates to MetadataImport</h2>
 <p>If you prefer to work with the standard <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> interface (for example, to use <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_schema" class="gdls-link gdls-code">to_schema()</a> or combine SDTM metadata with other sources), you can convert a domain template:</p>
-<div id="bcf4d489" class="cell" data-execution_count="12">
+<div id="b8207096" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> sdtm_to_metadata</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert the DM template to a MetadataImport</span></span>
@@ -4101,7 +4101,7 @@ Schema columns: 26</code></pre>
 <p>Pointblank includes templates for four ADaM dataset structures: <strong>ADSL</strong> (subject-level analysis), <strong>BDS</strong> (Basic Data Structure for repeated measures), <strong>ADAE</strong> (adverse events analysis), and <strong>ADTTE</strong> (time-to-event analysis).</p>
 <section id="available-adam-datasets" class="level2">
 <h2 class="anchored" data-anchor-id="available-adam-datasets">Available ADaM Datasets</h2>
-<div id="44cee76a" class="cell" data-execution_count="13">
+<div id="9e20f0ee" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> list_adam_datasets, get_adam_dataset</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># List all available ADaM dataset templates</span></span>
@@ -4127,7 +4127,7 @@ Schema columns: 26</code></pre>
 <section id="adsl-subject-level-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="adsl-subject-level-analysis">ADSL: Subject-Level Analysis</h2>
 <p>ADSL is the foundational ADaM dataset. It contains one row per subject with all the key demographic and treatment information needed for analysis. Every other ADaM dataset merges back to ADSL for population definitions.</p>
-<div id="8e8d5734" class="cell" data-execution_count="14">
+<div id="b5e32c33" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>adsl_template <span class="op">=</span> get_adam_dataset(<span class="st">"ADSL"</span>)</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset class: </span><span class="sc">{</span>adsl_template<span class="sc">.</span>dataset_class<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Population flags:"</span>)</span>
@@ -4152,7 +4152,7 @@ Population flags:
 <section id="full-adam-validation" class="level2">
 <h2 class="anchored" data-anchor-id="full-adam-validation">Full ADaM Validation</h2>
 <p>The <a href="../../reference/validate_adam.html#pointblank.validate_adam" class="gdls-link gdls-code">validate_adam()</a> function generates comprehensive checks tailored to each dataset type:</p>
-<div id="60fcd426" class="cell" data-execution_count="15">
+<div id="283a8819" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> validate_adam</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -4626,49 +4626,6 @@ Population flags:
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
     <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
   </tr>
-  <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">9</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
-        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_not_null</title>
-    <g id="pb_tbl-type_upd-8-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="pb_tbl-type_upd-8-col_vals_not_null" transform="translate(0.000000, 0.551724)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="pb_tbl-type_upd-8-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M40.6120805,47.037834 C37.4692348,47.037834 35.0126139,45.9348613 33.712234,44.0140597 C32.4118541,45.9348613 29.9552331,47.037834 26.8123883,47.037834 C22.6574397,47.037834 16.0646712,43.4437723 16.0646712,33.8021619 C16.0646712,29.3401361 17.4715879,18.962166 30.5035862,18.962166 C30.9454018,18.962166 31.3057481,19.3225124 31.3057481,19.7643279 L31.3057481,21.3686518 C31.3057481,21.8104674 30.9454018,22.1708138 30.5035862,22.1708138 C26.6400486,22.1708138 22.4819668,25.8118774 22.4819668,33.8021619 C22.4819668,37.5090277 23.7635456,43.0270243 27.2949384,43.0270243 C29.795428,43.0270243 31.224279,40.4231312 32.0985095,38.2861221 C30.5067194,35.6101596 29.7014243,33.1034035 29.7014243,30.8347892 C29.7014243,25.6238707 31.8603677,23.7751377 33.712234,23.7751377 C35.5641002,23.7751377 37.7230437,25.6238707 37.7230437,30.8347892 C37.7230437,33.1347383 36.9396828,35.5788255 35.3290916,38.2861221 C36.6294715,41.4321009 38.243196,43.0270243 40.1295295,43.0270243 C43.6609223,43.0270243 44.9425012,37.5090277 44.9425012,33.8021619 C44.9425012,25.8118774 40.7844193,22.1708138 36.9208817,22.1708138 C36.4759329,22.1708138 36.1187198,21.8104674 36.1187198,21.3686518 L36.1187198,19.7643279 C36.1187198,19.3225124 36.4759329,18.962166 36.9208817,18.962166 C49.9528801,18.962166 51.3597967,29.3401361 51.3597967,33.8021619 C51.3597967,43.4437723 44.7670282,47.037834 40.6120805,47.037834 Z" id="pb_tbl-type_upd-8-omega" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M33,7.93597705 C33.2761424,7.93597705 33.5,8.15983467 33.5,8.43597705 L33.5,57.564023 C33.5,57.8401653 33.2761424,58.064023 33,58.064023 C32.7238576,58.064023 32.5,57.8401653 32.5,57.564023 L32.5,8.43597705 C32.5,8.15983467 32.7238576,7.93597705 33,7.93597705 Z" id="pb_tbl-type_upd-8-line_black" fill="#000000" transform="translate(33.000000, 33.000000) rotate(-320.000000) translate(-33.000000, -33.000000) "></path>
-            <polygon id="pb_tbl-type_upd-8-line_white" fill="#FFFFFF" transform="translate(34.899496, 32.153303) rotate(-320.000000) translate(-34.899496, -32.153303) " points="34.3994962 8.54160469 35.3994962 8.54160469 35.3994962 55.7650019 34.3994962 55.7650019"></polygon>
-        </g>
-    </g>
-</svg>
-        </div>
-        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_not_null()</div>
-        </div>
-        
-        </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">TRT01P</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="pb_tbl-tbl-8-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="pb_tbl-tbl-8-unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="pb_tbl-tbl-8-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-8-Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-8-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
-        </g>
-    </g>
-</svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">5</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">5<br>1.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
-  </tr>
 </tbody>
 
 </table>
@@ -4707,7 +4664,7 @@ Population flags:
 </tbody>
 </table>
 <p>Here is an example validating a BDS (Basic Data Structure) dataset:</p>
-<div id="35739dd9" class="cell" data-execution_count="16">
+<div id="5b529e73" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a minimal BDS dataset (e.g., ADLB - laboratory analysis)</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>bds_data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"STUDYID"</span>: [<span class="st">"STUDY01"</span>] <span class="op">*</span> <span class="dv">6</span>,</span>
@@ -5104,24 +5061,24 @@ Population flags:
 <section id="structural-validation-1" class="level2">
 <h2 class="anchored" data-anchor-id="structural-validation-1">Structural Validation</h2>
 <p>Like SDTM, ADaM provides a quick structural check via <a href="../../reference/validate_adam_structure.html#pointblank.validate_adam_structure" class="gdls-link gdls-code">validate_adam_structure()</a>:</p>
-<div id="5e5ce4b2" class="cell" data-execution_count="17">
+<div id="5cac9020" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> validate_adam_structure</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> validate_adam_structure(adsl_data, dataset<span class="op">=</span><span class="st">"ADSL"</span>)</span>
 <span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Valid: </span><span class="sc">{</span>result[<span class="st">'valid'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Missing required: </span><span class="sc">{</span>result[<span class="st">'missing_required'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Population flags present: </span><span class="sc">{</span>result<span class="sc">.</span>get(<span class="st">'population_flags_present'</span>, [])<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Population flags present: </span><span class="sc">{</span>result[<span class="st">'population_flags_found'</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Valid: True
 Missing required: []
-Population flags present: []</code></pre>
+Population flags present: ['SAFFL', 'ITTFL', 'EFFFL']</code></pre>
 </div>
 </div>
 </section>
 <section id="converting-adam-templates-to-metadataimport" class="level2">
 <h2 class="anchored" data-anchor-id="converting-adam-templates-to-metadataimport">Converting ADaM Templates to MetadataImport</h2>
 <p>The <a href="../../reference/adam_to_metadata.html#pointblank.adam_to_metadata" class="gdls-link gdls-code">adam_to_metadata()</a> function converts an ADaM template into the standard <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> format, giving you access to <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_schema" class="gdls-link gdls-code">to_schema()</a> and <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a>:</p>
-<div id="edbad969" class="cell" data-execution_count="18">
+<div id="46e37461" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> adam_to_metadata</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert ADSL template to MetadataImport</span></span>
@@ -5149,7 +5106,7 @@ Same result: ADSL</code></pre>
 <section id="importing-a-frictionless-schema" class="level2">
 <h2 class="anchored" data-anchor-id="importing-a-frictionless-schema">Importing a Frictionless Schema</h2>
 <p>The bundled <code>datapackage.json</code> example describes a transactions table. Importing it yields a <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> with one <a href="../../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link gdls-code">VariableMetadata</a> per column:</p>
-<div id="61ecdad1" class="cell" data-execution_count="19">
+<div id="c489327d" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import the bundled Frictionless Data Package example</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>datapackage_path <span class="op">=</span> pb.load_metadata_example(<span class="st">"datapackage.json"</span>)</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(datapackage_path, <span class="bu">format</span><span class="op">=</span><span class="st">"frictionless"</span>)</span>
@@ -5210,7 +5167,7 @@ Same result: ADSL</code></pre>
 <section id="csvw-csv-on-the-web" class="level2">
 <h2 class="anchored" data-anchor-id="csvw-csv-on-the-web">CSVW (CSV on the Web)</h2>
 <p>The W3C’s CSVW standard provides similar capabilities to Frictionless but uses JSON-LD and aligns with linked data principles. Pointblank imports CSVW metadata with the same interface:</p>
-<div id="2cf8cbfa" class="cell" data-execution_count="20">
+<div id="72112ab1" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import the bundled CSVW example</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>csvw_path <span class="op">=</span> pb.load_metadata_example(<span class="st">"weather_csvw.json"</span>)</span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(csvw_path, <span class="bu">format</span><span class="op">=</span><span class="st">"csvw"</span>)</span>
@@ -5228,7 +5185,7 @@ Columns: station_id, timestamp, temperature_c, humidity_pct, wind_speed_kmh, pre
 <section id="exporting-metadata" class="level1">
 <h1>Exporting Metadata</h1>
 <p>Pointblank can also export validation metadata in Frictionless format. This is useful when you want to share data quality expectations with tools that understand the Frictionless ecosystem:</p>
-<div id="41676adc" class="cell" data-execution_count="21">
+<div id="c515b25c" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -5272,7 +5229,7 @@ Columns: station_id, timestamp, temperature_c, humidity_pct, wind_speed_kmh, pre
 <section id="combining-multiple-metadata-sources" class="level1">
 <h1>Combining Multiple Metadata Sources</h1>
 <p>In practice, clinical data validation often combines metadata from multiple sources. The Define-XML provides the authoritative variable definitions, but you might also want to check against SDTM domain rules and controlled terminology packages. Pointblank supports this by letting you compose validation workflows from different metadata sources:</p>
-<div id="732dd3b7" class="cell" data-execution_count="22">
+<div id="34c8d5f5" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata <span class="im">import</span> validate_sdtm</span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the Define-XML for variable-level constraints</span></span>
@@ -5302,7 +5259,7 @@ SDTM template checks: 25</code></pre>
 <section id="null-flavors-and-structured-missingness" class="level1">
 <h1>Null Flavors and Structured Missingness</h1>
 <p>Clinical data uses standardized HL7/CDISC <em>null flavors</em> to record <em>why</em> a value is absent (e.g., <code>"NASK"</code> = not asked, <code>"UNK"</code> = unknown, <code>"NA"</code> = not applicable). Pointblank ships a pre-built <a href="../../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> for these codes via <a href="../../reference/MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link gdls-code">MissingSpec.from_cdisc_null_flavors()</a>:</p>
-<div id="da7670cf" class="cell" data-execution_count="23">
+<div id="857c58fd" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>cdisc <span class="op">=</span> pb.MissingSpec.from_cdisc_null_flavors()</span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"NASK -&gt;"</span>, cdisc.reason_for(<span class="st">"NASK"</span>))   <span class="co"># not_asked</span></span>

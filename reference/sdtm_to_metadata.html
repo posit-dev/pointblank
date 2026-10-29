@@ -1438,6 +1438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/load_metadata_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_metadata_example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MetadataImport</span></a>
   </div>
@@ -1644,6 +1650,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1674,7 +1683,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_validate.py#L35-L89" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_validate.py#L35-L156" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sdtm_to_metadata</span>(</span>
@@ -1683,7 +1692,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>This allows using the standard metadata pipeline (<a href="../reference/MetadataImport.html#pointblank.MetadataImport.to_schema" class="gdls-link"><code>to_schema()</code></a>, <a href="../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a>) with SDTM domain specifications.</p>
+<p>The SDTM domain templates (see <a href="../reference/get_sdtm_domain.html#pointblank.get_sdtm_domain" class="gdls-link"><code>get_sdtm_domain()</code></a>) have their own classes, <a href="../reference/SDTMDomainTemplate.html#pointblank.SDTMDomainTemplate" class="gdls-link"><code>SDTMDomainTemplate</code></a> and <a href="../reference/SDTMVariableSpec.html#pointblank.SDTMVariableSpec" class="gdls-link"><code>SDTMVariableSpec</code></a>. The <a href="../reference/sdtm_to_metadata.html#pointblank.sdtm_to_metadata" class="gdls-link gdls-code">sdtm_to_metadata()</a> function converts a template to a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport</code></a>, the same object that <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a> returns for a metadata file. That gives the template the methods of a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a>, such as <a href="../reference/MetadataImport.html#pointblank.MetadataImport.to_schema" class="gdls-link"><code>to_schema()</code></a> and <a href="../reference/MetadataImport.html#pointblank.MetadataImport.get_variable" class="gdls-link"><code>get_variable()</code></a>, and lets it be exported with <a href="../reference/export_metadata.html#pointblank.export_metadata" class="gdls-link"><code>export_metadata()</code></a>.</p>
+<p>Each variable in the template becomes a <a href="../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link"><code>VariableMetadata</code></a> with the same name, label, role, <code>required</code> flag, maximum length and controlled terminology name. SDTM’s <code>"Num"</code> type becomes the <code>"Float64"</code> dtype and <code>"Char"</code> becomes <code>"String"</code>. The dataset name and label come from the domain, and the source version is <code>"IG 3.4"</code>. The template names the codelist of a variable (as in <code>controlled_term="SEX"</code>) but doesn’t contain the codelist itself, so the result has no codelists. Calling <code>import_metadata(format="cdisc_sdtm", domain=...)</code> gives the same result.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1691,11 +1701,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">domain</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>SDTM domain code (e.g., <code>"DM"</code>, <code>"AE"</code>, <code>"LB"</code>). This is case-insensitive.</p>
+<p>The SDTM domain code, such as <code>"DM"</code>, <code>"AE"</code> or <code>"LB"</code>. This is case-insensitive.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">study_id</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-Optional study identifier to include in metadata.
+A study identifier to record in the metadata’s <code>study_id</code>. The default is <code>None</code>.
 </dd>
 </dl>
 </div>
@@ -1706,10 +1716,82 @@ Optional study identifier to include in metadata.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">MetadataImport</span></code></dt>
 <dd>
-A <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> representing the SDTM domain template.
+The metadata for the domain, with <code>source_format="cdisc_sdtm"</code>.
 </dd>
 </dl>
 </div>
+</section>
+<section id="raises" class="level2 doc-raises">
+<h2 class="doc-raises anchored" data-anchor-id="raises">Raises</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">KeyError</span></code></dt>
+<dd>
+If there is no template for the domain. See <a href="../reference/list_sdtm_domains.html#pointblank.list_sdtm_domains" class="gdls-link"><code>list_sdtm_domains()</code></a> for the domains that have one.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s convert the template for the Demographics (DM) domain:</p>
+<div id="40d4e205" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>dm_meta <span class="op">=</span> pb.sdtm_to_metadata(<span class="st">"DM"</span>, study_id<span class="op">=</span><span class="st">"STUDY01"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dm_meta.dataset_label)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dm_meta.source_version)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dm_meta.variable_names[:<span class="dv">6</span>])</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Demographics
+IG 3.4
+['STUDYID', 'DOMAIN', 'USUBJID', 'SUBJID', 'RFSTDTC', 'RFENDTC']</code></pre>
+</div>
+</div>
+<p>The metadata has all 26 variables of the template, in the template’s order. Each variable keeps what the template says about it:</p>
+<div id="9514ac75" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sex <span class="op">=</span> dm_meta.get_variable(<span class="st">"SEX"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sex.dtype, sex.required, sex.max_length, sex.controlled_term)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>String True 2 SEX</code></pre>
+</div>
+</div>
+<p><code>SEX</code> is a required character variable of at most two characters, with values from the <code>SEX</code> codelist of CDISC Controlled Terminology. The metadata can be turned into a <a href="../reference/Schema.html#pointblank.Schema" class="gdls-link"><code>Schema</code></a> for use in <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>Validate.col_schema_match()</code></a>:</p>
+<div id="7056e660" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> dm_meta.to_schema()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>schema.columns[:<span class="dv">4</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>[('STUDYID', 'String'),
+ ('DOMAIN', 'String'),
+ ('USUBJID', 'String'),
+ ('SUBJID', 'String')]</code></pre>
+</div>
+</div>
+<p>The schema lists every variable of the template, including the expected and permissible ones. A real DM dataset usually has only some of them, so a schema check against all 26 is stricter than SDTM requires. For checking a dataset against the template, <a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link"><code>validate_sdtm()</code></a> (which only checks the variables that are present) is usually the better fit.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/get_sdtm_domain.html#pointblank.get_sdtm_domain" class="gdls-link gdls-code">get_sdtm_domain()</a></dt>
+<dd>
+<p>Get the template that is converted.</p>
+</dd>
+<dt><a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link gdls-code">validate_sdtm()</a></dt>
+<dd>
+<p>Build a validation plan from an SDTM domain template.</p>
+</dd>
+<dt><a href="../reference/adam_to_metadata.html#pointblank.adam_to_metadata" class="gdls-link gdls-code">adam_to_metadata()</a></dt>
+<dd>
+<p>The equivalent for ADaM dataset templates.</p>
+</dd>
+<dt><a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a></dt>
+<dd>
+<p>The object that is returned.</p>
+</dd>
+</dl>
 
 
 </section>

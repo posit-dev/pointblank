@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Get the SDTM template for a specific domain.">
+<meta name="description" content="Get the template for an SDTM domain.">
 
 <title>get_sdtm_domain() | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "get_sdtm_domain - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/get_sdtm_domain.html"}]</script>
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="get_sdtm_domain() | Pointblank">
-<meta property="og:description" content="Get the SDTM template for a specific domain.">
+<meta property="og:description" content="Get the template for an SDTM domain.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="get_sdtm_domain() | Pointblank">
-<meta name="twitter:description" content="Get the SDTM template for a specific domain.">
+<meta name="twitter:description" content="Get the template for an SDTM domain.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1438,6 +1438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/load_metadata_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_metadata_example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MetadataImport</span></a>
   </div>
@@ -1646,6 +1652,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1672,14 +1679,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>Get the SDTM template for a specific domain.</p>
+<p>Get the template for an SDTM domain.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_templates.py#L1315-L1347" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_templates.py#L1471-L1541" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_sdtm_domain</span>(<span class="va">domain</span>)</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>Pointblank has templates for eight domains of the CDISC Study Data Tabulation Model (SDTM), based on the SDTM Implementation Guide (SDTMIG) 3.4. Each template is an <a href="../reference/SDTMDomainTemplate.html#pointblank.SDTMDomainTemplate" class="gdls-link"><code>SDTMDomainTemplate</code></a>: the domain’s label and observation class, the variables that form its natural key, and an <a href="../reference/SDTMVariableSpec.html#pointblank.SDTMVariableSpec" class="gdls-link"><code>SDTMVariableSpec</code></a> for each of its variables, giving the variable’s label, type, role, maximum length, controlled terminology and core designation. The templates are what <a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link"><code>validate_sdtm()</code></a>, <a href="../reference/validate_sdtm_structure.html#pointblank.validate_sdtm_structure" class="gdls-link"><code>validate_sdtm_structure()</code></a> and <a href="../reference/sdtm_to_metadata.html#pointblank.sdtm_to_metadata" class="gdls-link"><code>sdtm_to_metadata()</code></a> work from.</p>
+<p>The templates cover the common variables of each domain rather than every variable in the SDTMIG. Each call returns a new template object, so changing one doesn’t affect later calls.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1687,7 +1698,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">domain</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-Two-character domain code (e.g., <code>"DM"</code>, <code>"AE"</code>, <code>"LB"</code>, <code>"VS"</code>). This is case-insensitive.
+The two-letter domain code, such as <code>"DM"</code>, <code>"AE"</code>, <code>"LB"</code> or <code>"VS"</code>. This is case-insensitive.
 </dd>
 </dl>
 </div>
@@ -1698,7 +1709,7 @@ Two-character domain code (e.g., <code>"DM"</code>, <code>"AE"</code>, <code>"LB
 <dl>
 <dt><code> <span class="doc-parameter-annotation">SDTMDomainTemplate</span></code></dt>
 <dd>
-The structural template for the domain.
+The template for the domain.
 </dd>
 </dl>
 </div>
@@ -1709,18 +1720,57 @@ The structural template for the domain.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">KeyError</span></code></dt>
 <dd>
-If the domain is not supported.
+If there is no template for the domain. The error message lists the domains that have one, as does <a href="../reference/list_sdtm_domains.html#pointblank.list_sdtm_domains" class="gdls-link"><code>list_sdtm_domains()</code></a>.
 </dd>
 </dl>
 </div>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata._sdtm_templates <span class="im">import</span> get_sdtm_domain</span>
+<p>Let’s get the template for the Vital Signs (VS) domain:</p>
+<div id="7b4fd19b" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> get_sdtm_domain(<span class="st">"DM"</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dm.required_variables)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ['STUDYID', 'DOMAIN', 'USUBJID', 'SUBJID', 'ARMCD', 'ARM', 'COUNTRY']</span></span></code></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>vs <span class="op">=</span> pb.get_sdtm_domain(<span class="st">"vs"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(vs.label, <span class="st">"|"</span>, vs.domain_class, <span class="st">"| repeating:"</span>, vs.repeating)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(vs.natural_keys)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Vital Signs | Findings | repeating: True
+['STUDYID', 'USUBJID', 'VSTESTCD', 'VSDTC', 'VSTPTNUM']</code></pre>
+</div>
+</div>
+<p>VS is a Findings domain with many records per subject, one for each test at each time point, so its natural key includes the test code, the date-time and the time point number. The template’s properties list the variables by their core designation:</p>
+<div id="cb84954e" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(vs.required_variables)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(vs.expected_variables)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['STUDYID', 'DOMAIN', 'USUBJID', 'VSSEQ', 'VSTESTCD', 'VSTEST']
+['VSORRES', 'VSORRESU', 'VSSTRESC', 'VSSTRESN', 'VSSTRESU', 'VSBLFL', 'VISITNUM', 'VSDTC']</code></pre>
+</div>
+</div>
+<p>The required variables must be in every VS dataset and can’t be null. The expected ones should be in the dataset but may be null, and the domain’s other variables are permissible: they’re included only when there is data for them.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/list_sdtm_domains.html#pointblank.list_sdtm_domains" class="gdls-link gdls-code">list_sdtm_domains()</a></dt>
+<dd>
+<p>List the domains that have a template.</p>
+</dd>
+<dt><a href="../reference/SDTMDomainTemplate.html#pointblank.SDTMDomainTemplate" class="gdls-link gdls-code">SDTMDomainTemplate</a></dt>
+<dd>
+<p>The template that is returned.</p>
+</dd>
+<dt><a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link gdls-code">validate_sdtm()</a></dt>
+<dd>
+<p>Build a validation plan from an SDTM domain template.</p>
+</dd>
+<dt><a href="../reference/get_adam_dataset.html#pointblank.get_adam_dataset" class="gdls-link gdls-code">get_adam_dataset()</a></dt>
+<dd>
+<p>The equivalent for ADaM datasets.</p>
+</dd>
+</dl>
 
 
 </section>

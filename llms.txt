@@ -261,38 +261,39 @@
 > Import variable-level metadata from external data standards files (CDISC Define-XML, Controlled Terminology, SPSS `.sav`, SAS XPORT, Stata `.dta`, and more) and export metadata to various formats. Use `import_metadata()` as the entry point and `export_metadata()` for the reverse.
 
 
-- [import_metadata](https://posit-dev.github.io/pointblank/reference/import_metadata.html): Import metadata from an external standard or file
-- [export_metadata](https://posit-dev.github.io/pointblank/reference/export_metadata.html): Export metadata to an external standard format
-- [MetadataImport](https://posit-dev.github.io/pointblank/reference/MetadataImport.html): Parsed metadata from an external standard
-- [MetadataPackage](https://posit-dev.github.io/pointblank/reference/MetadataPackage.html): A collection of `MetadataImport` objects from a multi-dataset source
-- [VariableMetadata](https://posit-dev.github.io/pointblank/reference/VariableMetadata.html): Metadata for a single variable/column, as imported from an external standard
-- [Codelist](https://posit-dev.github.io/pointblank/reference/Codelist.html): A controlled terminology / value set from an external standard
-- [CodelistEntry](https://posit-dev.github.io/pointblank/reference/CodelistEntry.html): A single entry in a codelist (controlled terminology)
-- [MissingValueCode](https://posit-dev.github.io/pointblank/reference/MissingValueCode.html): A structured missing value definition from an external standard
+- [import_metadata](https://posit-dev.github.io/pointblank/reference/import_metadata.html): Import metadata from a statistical-package file or a metadata standard
+- [export_metadata](https://posit-dev.github.io/pointblank/reference/export_metadata.html): Export metadata as a Frictionless Table Schema
+- [load_metadata_example](https://posit-dev.github.io/pointblank/reference/load_metadata_example.html): Get the path to a bundled metadata example file
+- [MetadataImport](https://posit-dev.github.io/pointblank/reference/MetadataImport.html): The metadata for a single dataset
+- [MetadataPackage](https://posit-dev.github.io/pointblank/reference/MetadataPackage.html): The metadata for several datasets, read from one source
+- [VariableMetadata](https://posit-dev.github.io/pointblank/reference/VariableMetadata.html): The metadata for a single variable (column)
+- [Codelist](https://posit-dev.github.io/pointblank/reference/Codelist.html): A set of permitted values, each with a label
+- [CodelistEntry](https://posit-dev.github.io/pointblank/reference/CodelistEntry.html): A single permitted value in a codelist
+- [MissingValueCode](https://posit-dev.github.io/pointblank/reference/MissingValueCode.html): A declared missing-value code, as read from a metadata file
 
 #### SDTM Validation
 > Validate clinical datasets against CDISC SDTM domain templates. Use `validate_sdtm()` to generate a full `Validate` workflow, or `validate_sdtm_structure()` for a quick structural conformance check. Retrieve domain templates with `get_sdtm_domain()` and `list_sdtm_domains()`.
 
 
-- [validate_sdtm](https://posit-dev.github.io/pointblank/reference/validate_sdtm.html): Generate a comprehensive SDTM validation workflow for a dataset
-- [validate_sdtm_structure](https://posit-dev.github.io/pointblank/reference/validate_sdtm_structure.html): Validate the structural conformance of a dataset against an SDTM domain template
+- [validate_sdtm](https://posit-dev.github.io/pointblank/reference/validate_sdtm.html): Build a validation plan for a dataset from an SDTM domain template
+- [validate_sdtm_structure](https://posit-dev.github.io/pointblank/reference/validate_sdtm_structure.html): Check a dataset's variables against an SDTM domain template
 - [sdtm_to_metadata](https://posit-dev.github.io/pointblank/reference/sdtm_to_metadata.html): Convert an SDTM domain template to a `MetadataImport` object
-- [get_sdtm_domain](https://posit-dev.github.io/pointblank/reference/get_sdtm_domain.html): Get the SDTM template for a specific domain
-- [list_sdtm_domains](https://posit-dev.github.io/pointblank/reference/list_sdtm_domains.html): List all available SDTM domain codes
-- [SDTMDomainTemplate](https://posit-dev.github.io/pointblank/reference/SDTMDomainTemplate.html): Structural template for an SDTM domain
-- [SDTMVariableSpec](https://posit-dev.github.io/pointblank/reference/SDTMVariableSpec.html): Specification for a single variable in an SDTM domain template
+- [get_sdtm_domain](https://posit-dev.github.io/pointblank/reference/get_sdtm_domain.html): Get the template for an SDTM domain
+- [list_sdtm_domains](https://posit-dev.github.io/pointblank/reference/list_sdtm_domains.html): List the SDTM domains that have a template
+- [SDTMDomainTemplate](https://posit-dev.github.io/pointblank/reference/SDTMDomainTemplate.html): The structural template for an SDTM domain
+- [SDTMVariableSpec](https://posit-dev.github.io/pointblank/reference/SDTMVariableSpec.html): The specification of one variable in an SDTM domain template
 
 #### ADaM Validation
 > Validate analysis datasets against CDISC ADaM templates. Use `validate_adam()` to generate a full `Validate` workflow, or `validate_adam_structure()` for a quick structural conformance check. Retrieve dataset templates with `get_adam_dataset()` and `list_adam_datasets()`.
 
 
-- [validate_adam](https://posit-dev.github.io/pointblank/reference/validate_adam.html): Generate a comprehensive ADaM validation workflow for a dataset
-- [validate_adam_structure](https://posit-dev.github.io/pointblank/reference/validate_adam_structure.html): Validate structural conformance of a dataset against an ADaM template
-- [adam_to_metadata](https://posit-dev.github.io/pointblank/reference/adam_to_metadata.html): Convert an ADaM dataset template to a MetadataImport object
-- [get_adam_dataset](https://posit-dev.github.io/pointblank/reference/get_adam_dataset.html): Get the ADaM template for a specific dataset
-- [list_adam_datasets](https://posit-dev.github.io/pointblank/reference/list_adam_datasets.html): List all available ADaM dataset template names
-- [ADaMDatasetTemplate](https://posit-dev.github.io/pointblank/reference/ADaMDatasetTemplate.html): Structural template for an ADaM dataset
-- [ADaMVariableSpec](https://posit-dev.github.io/pointblank/reference/ADaMVariableSpec.html): Specification for a single variable in an ADaM dataset template
+- [validate_adam](https://posit-dev.github.io/pointblank/reference/validate_adam.html): Build a validation plan for a dataset from an ADaM dataset template
+- [validate_adam_structure](https://posit-dev.github.io/pointblank/reference/validate_adam_structure.html): Check a dataset's variables against an ADaM dataset template
+- [adam_to_metadata](https://posit-dev.github.io/pointblank/reference/adam_to_metadata.html): Convert an ADaM dataset template to a `MetadataImport` object
+- [get_adam_dataset](https://posit-dev.github.io/pointblank/reference/get_adam_dataset.html): Get the template for a type of ADaM dataset
+- [list_adam_datasets](https://posit-dev.github.io/pointblank/reference/list_adam_datasets.html): List the ADaM dataset templates
+- [ADaMDatasetTemplate](https://posit-dev.github.io/pointblank/reference/ADaMDatasetTemplate.html): The structural template for an ADaM dataset
+- [ADaMVariableSpec](https://posit-dev.github.io/pointblank/reference/ADaMVariableSpec.html): The specification of one variable in an ADaM dataset template
 
 #### CDISC Submission Conformance
 > Validate SDTM datasets for CDISC conformance. `validate_sdtmig()` is the primary entry point: pass a dictionary of domain DataFrames and receive a `ConformanceReport` with 426 SDTMIG 3.4 rules evaluated in-process. For full submission-package checks (cross-dataset referential integrity, SUPP-- linkage, Define-XML) use `SubmissionPackage`. For the authoritative CDISC-certified rule set, use `validate_cdisc_submission()` (requires the CORE CLI) or `SubmissionPackage.validate_conformance(engine="core")`. All paths return a `ConformanceReport`.

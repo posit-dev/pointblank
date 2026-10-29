@@ -577,78 +577,81 @@ Create an OTel export action for use in [FinalActions](../reference/FinalActions
 Import variable-level metadata from external data standards files (CDISC Define-XML, Controlled Terminology, SPSS `.sav`, SAS XPORT, Stata `.dta`, and more) and export metadata to various formats. Use [import_metadata()](../reference/import_metadata.md#pointblank.import_metadata) as the entry point and [export_metadata()](../reference/export_metadata.md#pointblank.export_metadata) for the reverse.
 
 [import_metadata()](import_metadata.md#pointblank.import_metadata)  
-Import metadata from an external standard or file.
+Import metadata from a statistical-package file or a metadata standard.
 
 [export_metadata()](export_metadata.md#pointblank.export_metadata)  
-Export metadata to an external standard format.
+Export metadata as a Frictionless Table Schema.
+
+[load_metadata_example()](load_metadata_example.md#pointblank.load_metadata_example)  
+Get the path to a bundled metadata example file.
 
 [MetadataImport](MetadataImport.md#pointblank.MetadataImport)  
-Parsed metadata from an external standard.
+The metadata for a single dataset.
 
 [MetadataPackage](MetadataPackage.md#pointblank.MetadataPackage)  
-A collection of [MetadataImport](../reference/MetadataImport.md#pointblank.MetadataImport) objects from a multi-dataset source.
+The metadata for several datasets, read from one source.
 
 [VariableMetadata](VariableMetadata.md#pointblank.VariableMetadata)  
-Metadata for a single variable/column, as imported from an external standard.
+The metadata for a single variable (column).
 
 [Codelist](Codelist.md#pointblank.Codelist)  
-A controlled terminology / value set from an external standard.
+A set of permitted values, each with a label.
 
 [CodelistEntry](CodelistEntry.md#pointblank.CodelistEntry)  
-A single entry in a codelist (controlled terminology).
+A single permitted value in a codelist.
 
 [MissingValueCode](MissingValueCode.md#pointblank.MissingValueCode)  
-A structured missing value definition from an external standard.
+A declared missing-value code, as read from a metadata file.
 
 ## SDTM Validation
 
 Validate clinical datasets against CDISC SDTM domain templates. Use [validate_sdtm()](../reference/validate_sdtm.md#pointblank.validate_sdtm) to generate a full [Validate](../reference/Validate.md#pointblank.Validate) workflow, or [validate_sdtm_structure()](../reference/validate_sdtm_structure.md#pointblank.validate_sdtm_structure) for a quick structural conformance check. Retrieve domain templates with [get_sdtm_domain()](../reference/get_sdtm_domain.md#pointblank.get_sdtm_domain) and [list_sdtm_domains()](../reference/list_sdtm_domains.md#pointblank.list_sdtm_domains).
 
 [validate_sdtm()](validate_sdtm.md#pointblank.validate_sdtm)  
-Generate a comprehensive SDTM validation workflow for a dataset.
+Build a validation plan for a dataset from an SDTM domain template.
 
 [validate_sdtm_structure()](validate_sdtm_structure.md#pointblank.validate_sdtm_structure)  
-Validate the structural conformance of a dataset against an SDTM domain template.
+Check a dataset's variables against an SDTM domain template.
 
 [sdtm_to_metadata()](sdtm_to_metadata.md#pointblank.sdtm_to_metadata)  
 Convert an SDTM domain template to a [MetadataImport](../reference/MetadataImport.md#pointblank.MetadataImport) object.
 
 [get_sdtm_domain()](get_sdtm_domain.md#pointblank.get_sdtm_domain)  
-Get the SDTM template for a specific domain.
+Get the template for an SDTM domain.
 
 [list_sdtm_domains()](list_sdtm_domains.md#pointblank.list_sdtm_domains)  
-List all available SDTM domain codes.
+List the SDTM domains that have a template.
 
 [SDTMDomainTemplate](SDTMDomainTemplate.md#pointblank.SDTMDomainTemplate)  
-Structural template for an SDTM domain.
+The structural template for an SDTM domain.
 
 [SDTMVariableSpec](SDTMVariableSpec.md#pointblank.SDTMVariableSpec)  
-Specification for a single variable in an SDTM domain template.
+The specification of one variable in an SDTM domain template.
 
 ## ADaM Validation
 
 Validate analysis datasets against CDISC ADaM templates. Use [validate_adam()](../reference/validate_adam.md#pointblank.validate_adam) to generate a full [Validate](../reference/Validate.md#pointblank.Validate) workflow, or [validate_adam_structure()](../reference/validate_adam_structure.md#pointblank.validate_adam_structure) for a quick structural conformance check. Retrieve dataset templates with [get_adam_dataset()](../reference/get_adam_dataset.md#pointblank.get_adam_dataset) and [list_adam_datasets()](../reference/list_adam_datasets.md#pointblank.list_adam_datasets).
 
 [validate_adam()](validate_adam.md#pointblank.validate_adam)  
-Generate a comprehensive ADaM validation workflow for a dataset.
+Build a validation plan for a dataset from an ADaM dataset template.
 
 [validate_adam_structure()](validate_adam_structure.md#pointblank.validate_adam_structure)  
-Validate structural conformance of a dataset against an ADaM template.
+Check a dataset's variables against an ADaM dataset template.
 
 [adam_to_metadata()](adam_to_metadata.md#pointblank.adam_to_metadata)  
-Convert an ADaM dataset template to a MetadataImport object.
+Convert an ADaM dataset template to a [MetadataImport](../reference/MetadataImport.md#pointblank.MetadataImport) object.
 
 [get_adam_dataset()](get_adam_dataset.md#pointblank.get_adam_dataset)  
-Get the ADaM template for a specific dataset.
+Get the template for a type of ADaM dataset.
 
 [list_adam_datasets()](list_adam_datasets.md#pointblank.list_adam_datasets)  
-List all available ADaM dataset template names.
+List the ADaM dataset templates.
 
 [ADaMDatasetTemplate](ADaMDatasetTemplate.md#pointblank.ADaMDatasetTemplate)  
-Structural template for an ADaM dataset.
+The structural template for an ADaM dataset.
 
 [ADaMVariableSpec](ADaMVariableSpec.md#pointblank.ADaMVariableSpec)  
-Specification for a single variable in an ADaM dataset template.
+The specification of one variable in an ADaM dataset template.
 
 ## CDISC Submission Conformance
 

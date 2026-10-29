@@ -1403,6 +1403,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/load_metadata_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_metadata_example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MetadataImport</span></a>
   </div>
@@ -2470,35 +2476,39 @@ ul.task-list li input[type="checkbox"] {
 <dl>
 <dt><a href="../reference/import_metadata.html#pointblank.import_metadata" class="doc-function doc-label doc-label-function">import_metadata()</a></dt>
 <dd>
-<p>Import metadata from an external standard or file.</p>
+<p>Import metadata from a statistical-package file or a metadata standard.</p>
 </dd>
 <dt><a href="../reference/export_metadata.html#pointblank.export_metadata" class="doc-function doc-label doc-label-function">export_metadata()</a></dt>
 <dd>
-<p>Export metadata to an external standard format.</p>
+<p>Export metadata as a Frictionless Table Schema.</p>
+</dd>
+<dt><a href="../reference/load_metadata_example.html#pointblank.load_metadata_example" class="doc-function doc-label doc-label-function">load_metadata_example()</a></dt>
+<dd>
+<p>Get the path to a bundled metadata example file.</p>
 </dd>
 <dt><a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="doc-class doc-label doc-label-dataclass">MetadataImport</a></dt>
 <dd>
-<p>Parsed metadata from an external standard.</p>
+<p>The metadata for a single dataset.</p>
 </dd>
 <dt><a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="doc-class doc-label doc-label-dataclass">MetadataPackage</a></dt>
 <dd>
-<p>A collection of <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> objects from a multi-dataset source.</p>
+<p>The metadata for several datasets, read from one source.</p>
 </dd>
 <dt><a href="../reference/VariableMetadata.html#pointblank.VariableMetadata" class="doc-class doc-label doc-label-dataclass">VariableMetadata</a></dt>
 <dd>
-<p>Metadata for a single variable/column, as imported from an external standard.</p>
+<p>The metadata for a single variable (column).</p>
 </dd>
 <dt><a href="../reference/Codelist.html#pointblank.Codelist" class="doc-class doc-label doc-label-dataclass">Codelist</a></dt>
 <dd>
-<p>A controlled terminology / value set from an external standard.</p>
+<p>A set of permitted values, each with a label.</p>
 </dd>
 <dt><a href="../reference/CodelistEntry.html#pointblank.CodelistEntry" class="doc-class doc-label doc-label-dataclass">CodelistEntry</a></dt>
 <dd>
-<p>A single entry in a codelist (controlled terminology).</p>
+<p>A single permitted value in a codelist.</p>
 </dd>
 <dt><a href="../reference/MissingValueCode.html#pointblank.MissingValueCode" class="doc-class doc-label doc-label-dataclass">MissingValueCode</a></dt>
 <dd>
-<p>A structured missing value definition from an external standard.</p>
+<p>A declared missing-value code, as read from a metadata file.</p>
 </dd>
 </dl>
 </section>
@@ -2510,11 +2520,11 @@ ul.task-list li input[type="checkbox"] {
 <dl>
 <dt><a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="doc-function doc-label doc-label-function">validate_sdtm()</a></dt>
 <dd>
-<p>Generate a comprehensive SDTM validation workflow for a dataset.</p>
+<p>Build a validation plan for a dataset from an SDTM domain template.</p>
 </dd>
 <dt><a href="../reference/validate_sdtm_structure.html#pointblank.validate_sdtm_structure" class="doc-function doc-label doc-label-function">validate_sdtm_structure()</a></dt>
 <dd>
-<p>Validate the structural conformance of a dataset against an SDTM domain template.</p>
+<p>Check a dataset’s variables against an SDTM domain template.</p>
 </dd>
 <dt><a href="../reference/sdtm_to_metadata.html#pointblank.sdtm_to_metadata" class="doc-function doc-label doc-label-function">sdtm_to_metadata()</a></dt>
 <dd>
@@ -2522,19 +2532,19 @@ ul.task-list li input[type="checkbox"] {
 </dd>
 <dt><a href="../reference/get_sdtm_domain.html#pointblank.get_sdtm_domain" class="doc-function doc-label doc-label-function">get_sdtm_domain()</a></dt>
 <dd>
-<p>Get the SDTM template for a specific domain.</p>
+<p>Get the template for an SDTM domain.</p>
 </dd>
 <dt><a href="../reference/list_sdtm_domains.html#pointblank.list_sdtm_domains" class="doc-function doc-label doc-label-function">list_sdtm_domains()</a></dt>
 <dd>
-<p>List all available SDTM domain codes.</p>
+<p>List the SDTM domains that have a template.</p>
 </dd>
 <dt><a href="../reference/SDTMDomainTemplate.html#pointblank.SDTMDomainTemplate" class="doc-class doc-label doc-label-dataclass">SDTMDomainTemplate</a></dt>
 <dd>
-<p>Structural template for an SDTM domain.</p>
+<p>The structural template for an SDTM domain.</p>
 </dd>
 <dt><a href="../reference/SDTMVariableSpec.html#pointblank.SDTMVariableSpec" class="doc-class doc-label doc-label-dataclass">SDTMVariableSpec</a></dt>
 <dd>
-<p>Specification for a single variable in an SDTM domain template.</p>
+<p>The specification of one variable in an SDTM domain template.</p>
 </dd>
 </dl>
 </section>
@@ -2546,31 +2556,31 @@ ul.task-list li input[type="checkbox"] {
 <dl>
 <dt><a href="../reference/validate_adam.html#pointblank.validate_adam" class="doc-function doc-label doc-label-function">validate_adam()</a></dt>
 <dd>
-<p>Generate a comprehensive ADaM validation workflow for a dataset.</p>
+<p>Build a validation plan for a dataset from an ADaM dataset template.</p>
 </dd>
 <dt><a href="../reference/validate_adam_structure.html#pointblank.validate_adam_structure" class="doc-function doc-label doc-label-function">validate_adam_structure()</a></dt>
 <dd>
-<p>Validate structural conformance of a dataset against an ADaM template.</p>
+<p>Check a dataset’s variables against an ADaM dataset template.</p>
 </dd>
 <dt><a href="../reference/adam_to_metadata.html#pointblank.adam_to_metadata" class="doc-function doc-label doc-label-function">adam_to_metadata()</a></dt>
 <dd>
-<p>Convert an ADaM dataset template to a MetadataImport object.</p>
+<p>Convert an ADaM dataset template to a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> object.</p>
 </dd>
 <dt><a href="../reference/get_adam_dataset.html#pointblank.get_adam_dataset" class="doc-function doc-label doc-label-function">get_adam_dataset()</a></dt>
 <dd>
-<p>Get the ADaM template for a specific dataset.</p>
+<p>Get the template for a type of ADaM dataset.</p>
 </dd>
 <dt><a href="../reference/list_adam_datasets.html#pointblank.list_adam_datasets" class="doc-function doc-label doc-label-function">list_adam_datasets()</a></dt>
 <dd>
-<p>List all available ADaM dataset template names.</p>
+<p>List the ADaM dataset templates.</p>
 </dd>
 <dt><a href="../reference/ADaMDatasetTemplate.html#pointblank.ADaMDatasetTemplate" class="doc-class doc-label doc-label-dataclass">ADaMDatasetTemplate</a></dt>
 <dd>
-<p>Structural template for an ADaM dataset.</p>
+<p>The structural template for an ADaM dataset.</p>
 </dd>
 <dt><a href="../reference/ADaMVariableSpec.html#pointblank.ADaMVariableSpec" class="doc-class doc-label doc-label-dataclass">ADaMVariableSpec</a></dt>
 <dd>
-<p>Specification for a single variable in an ADaM dataset template.</p>
+<p>The specification of one variable in an ADaM dataset template.</p>
 </dd>
 </dl>
 </section>

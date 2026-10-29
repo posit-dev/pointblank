@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="List all available ADaM dataset template names.">
+<meta name="description" content="List the ADaM dataset templates.">
 
 <title>list_adam_datasets() | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "list_adam_datasets - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/list_adam_datasets.html"}]</script>
@@ -140,10 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="list_adam_datasets() | Pointblank">
-<meta property="og:description" content="List all available ADaM dataset template names.">
+<meta property="og:description" content="List the ADaM dataset templates.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="list_adam_datasets() | Pointblank">
-<meta name="twitter:description" content="List all available ADaM dataset template names.">
+<meta name="twitter:description" content="List the ADaM dataset templates.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1438,6 +1438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/load_metadata_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">load_metadata_example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/MetadataImport.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MetadataImport</span></a>
   </div>
@@ -1643,6 +1649,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#returns" id="toc-returns" class="nav-link active" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1669,14 +1677,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>List all available ADaM dataset template names.</p>
+<p>List the ADaM dataset templates.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_adam_templates.py#L788-L796" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_adam_templates.py#L998-L1030" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list_adam_datasets</span>()</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>These are the names that <a href="../reference/get_adam_dataset.html#pointblank.get_adam_dataset" class="gdls-link"><code>get_adam_dataset()</code></a>, <a href="../reference/validate_adam.html#pointblank.validate_adam" class="gdls-link"><code>validate_adam()</code></a>, <a href="../reference/validate_adam_structure.html#pointblank.validate_adam_structure" class="gdls-link"><code>validate_adam_structure()</code></a> and <a href="../reference/adam_to_metadata.html#pointblank.adam_to_metadata" class="gdls-link"><code>adam_to_metadata()</code></a> accept.</p>
 </div>
 <section id="returns" class="level2 doc-returns">
 <h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
@@ -1684,10 +1695,40 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code> <span class="doc-parameter-annotation">list[str]</span></code></dt>
 <dd>
-Sorted list of dataset names.
+The template names, in alphabetical order.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s list the templates, together with each one’s label:</p>
+<div id="67abf983" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> pb.list_adam_datasets():</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:7}{</span>pb<span class="sc">.</span>get_adam_dataset(name)<span class="sc">.</span>label<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADAE   Adverse Event Analysis Dataset
+ADSL   Subject Level Analysis Dataset
+ADTTE  Time-to-Event Analysis Dataset
+BDS    Basic Data Structure</code></pre>
+</div>
+</div>
+<p>BDS is a structure rather than a single dataset, so its template is used for any BDS dataset in a study, such as ADVS or ADLB.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/get_adam_dataset.html#pointblank.get_adam_dataset" class="gdls-link gdls-code">get_adam_dataset()</a></dt>
+<dd>
+<p>Get a dataset template.</p>
+</dd>
+<dt><a href="../reference/list_sdtm_domains.html#pointblank.list_sdtm_domains" class="gdls-link gdls-code">list_sdtm_domains()</a></dt>
+<dd>
+<p>The equivalent for SDTM domains.</p>
+</dd>
+</dl>
 
 
 </section>
