@@ -17,14 +17,14 @@ Richard Iannone. Maintainer.
   title = {Pointblank: data validation toolkit for assessing and monitoring data quality.},
   author = {Richard Iannone},
   year = {2026},
-  note = {Python package version 1.0.1},
+  note = {Python package version 1.1.1},
   url = {https://posit-dev.github.io/pointblank/},
 }
 ```
 
 ### APA
 
-Iannone, R. (2026). *Pointblank: data validation toolkit for assessing and monitoring data quality.* (Version 1.0.1) \[Computer software\]. https://posit-dev.github.io/pointblank/
+Iannone, R. (2026). *Pointblank: data validation toolkit for assessing and monitoring data quality.* (Version 1.1.1) \[Computer software\]. https://posit-dev.github.io/pointblank/
 
 ### RIS
 
@@ -33,7 +33,7 @@ TY  - COMP
 TI  - Pointblank: data validation toolkit for assessing and monitoring data quality.
 AU  - Iannone, Richard
 PY  - 2026
-VL  - 1.0.1
+VL  - 1.1.1
 UR  - https://posit-dev.github.io/pointblank/
 AB  - Validate data in Polars and Pandas DataFrames and database tables. Validation pipelines can be made using easily-readable, consecutive validation steps. Upon execution of the validation plan, several reporting options are available. User-defined thresholds for failure rates allow for the determination of appropriate reporting actions.
 ER  - 
