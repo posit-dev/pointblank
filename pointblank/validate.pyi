@@ -811,10 +811,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -850,10 +853,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -889,10 +895,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -928,10 +937,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -967,10 +979,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -1006,10 +1021,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -1045,10 +1063,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -1084,10 +1105,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -1123,10 +1147,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -1162,10 +1189,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -1201,10 +1231,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -1240,10 +1273,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -1279,10 +1315,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -1318,10 +1357,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
@@ -1357,10 +1399,13 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column | ReferenceColumn | None): Target value to validate against.
-                If None and reference data is set on the Validate object, defaults to
-                ref(column) to compare against the same column in the reference data.
-            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            value (float | Column | ReferenceColumn | None): Target value to validate against: a
+                number, col("other") for the same aggregate of another column, or ref("name") for
+                the same aggregate of a reference-data column. If None and reference data is set
+                on the Validate object, defaults to ref(column).
+            tol (Tolerance, optional): Tolerance around the target. A value below 1 is relative
+                (0.05 is 5% of the target), 1 or more is absolute, and a (lower, upper) tuple
+                gives asymmetric bounds. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
             brief (str | bool, optional): Explanation of validation operation. Defaults to False.
