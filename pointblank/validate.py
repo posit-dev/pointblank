@@ -265,8 +265,7 @@ def get_action_metadata() -> dict | None:
 
     See Also
     --------
-    Have a look at [`Actions`](`pointblank.Actions`) for more information on how to create custom
-    actions for validation steps that exceed a set threshold value.
+    Actions : Create custom actions for steps that exceed a threshold.
     """
     if hasattr(_action_context, "metadata"):  # pragma: no cover
         return _action_context.metadata  # pragma: no cover
@@ -399,8 +398,7 @@ def get_validation_summary() -> dict | None:
 
     See Also
     --------
-    Have a look at [`FinalActions`](`pointblank.FinalActions`) for more information on how to create
-    custom actions that are executed after all validation steps have been completed.
+    FinalActions : Create custom actions that run after all validation steps are done.
     """
     if hasattr(_final_action_context, "summary"):
         return _final_action_context.summary
@@ -795,8 +793,7 @@ def read_file(filepath: str | Path) -> Validate:
 
     See Also
     --------
-    Use the [`write_file()`](`pointblank.Validate.write_file`) method to save a validation object
-    to disk for later retrieval with this function.
+    write_file : Save a validation object to disk for later retrieval with `read_file()`.
     """
     # Handle file path and extension
     file_path = Path(filepath)
@@ -1374,8 +1371,7 @@ def write_file(
 
     See Also
     --------
-    Use the [`read_file()`](`pointblank.read_file`) function to load a validation object that was
-    previously saved with `write_file()`.
+    read_file : Load a validation object saved with `write_file()`.
     """
     # Construct the full file path
     if not filename.endswith(".pkl"):
@@ -1588,7 +1584,7 @@ def get_data_path(
 
     See Also
     --------
-    [`load_dataset()`](`pointblank.load_dataset`) for loading datasets directly as table objects.
+    load_dataset : Load a dataset directly as a table object.
     """
 
     # Validate inputs
@@ -16104,8 +16100,7 @@ class Validate:
 
         See Also
         --------
-        Look at the documentation of the [`expr_col()`](`pointblank.expr_col`) function for more
-        information on how to use it with different table backends.
+        expr_col : Build column expressions that work across table backends.
         """
 
         assertion_type = _get_fn_name()
@@ -18326,13 +18321,10 @@ class Validate:
 
         See Also
         --------
-        - [`warning()`](`pointblank.Validate.warning`): get the 'warning' status for each validation
-        step
-        - [`error()`](`pointblank.Validate.error`): get the 'error' status for each validation step
-        - [`critical()`](`pointblank.Validate.critical`): get the 'critical' status for each
-        validation step
-        - [`assert_passing()`](`pointblank.Validate.assert_passing`): assert all validations pass
-        completely
+        Validate.warning : Get the 'warning' status for each validation step.
+        Validate.error : Get the 'error' status for each validation step.
+        Validate.critical : Get the 'critical' status for each validation step.
+        Validate.assert_passing : Assert that all validations pass completely.
         """
         # Check if validation has been interrogated
         if not hasattr(self, "time_start") or self.time_start is None:
@@ -18488,13 +18480,10 @@ class Validate:
 
         See Also
         --------
-        - [`assert_below_threshold()`](`pointblank.Validate.assert_below_threshold`): a similar
-        method that raises an exception if thresholds are exceeded
-        - [`warning()`](`pointblank.Validate.warning`): get the 'warning' status for each validation
-        step
-        - [`error()`](`pointblank.Validate.error`): get the 'error' status for each validation step
-        - [`critical()`](`pointblank.Validate.critical`): get the 'critical' status for each
-        validation step
+        Validate.assert_below_threshold : Raise an exception instead if thresholds are exceeded.
+        Validate.warning : Get the 'warning' status for each validation step.
+        Validate.error : Get the 'error' status for each validation step.
+        Validate.critical : Get the 'critical' status for each validation step.
         """
         # Ensure validation has been run
         if not hasattr(self, "time_start") or self.time_start is None:
@@ -20019,8 +20008,7 @@ class Validate:
 
         See Also
         --------
-        Use [`get_health_score()`](`pointblank.Validate.get_health_score`) for a single overall
-        score across all dimensions.
+        Validate.get_health_score : Get a single overall score across all dimensions.
         """
         return _compute_dimension_scores(self.validation_info)
 
@@ -20063,8 +20051,7 @@ class Validate:
 
         See Also
         --------
-        Use [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`) for a per-dimension
-        breakdown of the score.
+        Validate.get_dimension_scores : Get a per-dimension breakdown of the score.
         """
         weights = getattr(global_config, "dimension_weights", None)
         return _compute_health_score(self.validation_info, dimension_weights=weights)
@@ -20118,9 +20105,8 @@ class Validate:
 
         See Also
         --------
-        Use [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`) to retrieve the
-        scores without raising, and [`config()`](`pointblank.config`) to set default per-dimension
-        thresholds globally.
+        Validate.get_dimension_scores : Get the scores without raising.
+        config : Set default per-dimension thresholds globally.
         """
         if thresholds is None:
             thresholds = getattr(global_config, "dimension_thresholds", None) or {}
@@ -20195,10 +20181,9 @@ class Validate:
 
         See Also
         --------
-        Use [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`) and
-        [`get_health_score()`](`pointblank.Validate.get_health_score`) for the underlying numbers,
-        and [`get_tabular_report()`](`pointblank.Validate.get_tabular_report`) for the full per-step
-        validation report.
+        Validate.get_dimension_scores : Get the per-dimension scores behind the scorecard.
+        Validate.get_health_score : Get the overall score behind the scorecard.
+        Validate.get_tabular_report : Get the full per-step validation report.
         """
         # Do we have a DataFrame library to work with?
         _check_any_df_lib(method_used="get_scorecard")
@@ -20465,10 +20450,8 @@ class Validate:
 
         See Also
         --------
-        - [`get_tabular_report()`](`pointblank.Validate.get_tabular_report`): Get a formatted HTML
-        report as a GT table
-        - [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`): Get rows that
-        failed validation
+        Validate.get_tabular_report : Get a formatted HTML report as a GT table.
+        Validate.get_data_extracts : Get the rows that failed validation.
         """
         if use_fields is not None and exclude_fields is not None:
             raise ValueError("Cannot specify both `use_fields=` and `exclude_fields=`.")
