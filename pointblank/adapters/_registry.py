@@ -120,13 +120,18 @@ def register_adapter(format_name: str | None = None):
         print(e)
     ```
 
+    The error is about the adapter, not the contract. To make the format work in both directions,
+    the adapter class would also implement
+    [`export_contract()`](`pointblank.ContractAdapter.export_contract`) and drop the
+    `supports_export = False` line.
+
     See Also
     --------
     ContractAdapter : The base class to subclass when writing an adapter.
     ContractImport : What an adapter's `import_contract()` method returns.
     list_adapters : List the registered adapters.
-    import_contract : Import a definition using a registered adapter.
-    export_contract : Export a contract using a registered adapter.
+    pointblank.import_contract : Import a definition using a registered adapter.
+    pointblank.export_contract : Export a contract using a registered adapter.
     """
 
     def decorator(cls: type[ContractAdapter]) -> type[ContractAdapter]:
@@ -229,11 +234,16 @@ def list_adapters() -> dict[str, dict[str, Any]]:
     [name for name, info in adapters.items() if info["supports_export"]]
     ```
 
+    All four built-in formats support export, so the list is the same as before. An adapter added
+    with [`register_adapter()`](`pointblank.register_adapter`) may be import-only, though, so a
+    check like this is useful before calling [`export_contract()`](`pointblank.export_contract`)
+    with a format chosen at run time.
+
     See Also
     --------
     register_adapter : Add a custom format to this list.
-    import_contract : Import a definition in one of the listed formats.
-    export_contract : Export a contract to one of the listed formats.
+    pointblank.import_contract : Import a definition in one of the listed formats.
+    pointblank.export_contract : Export a contract to one of the listed formats.
     """
     result = {}
     for name, adapter in sorted(_ADAPTER_REGISTRY.items()):
