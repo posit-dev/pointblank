@@ -628,6 +628,20 @@ def test_derive_bounds():
     assert result == expected
 
 
+def test_derive_bounds_unrounded():
+    # Relative and absolute tolerances keep their fractional part
+    assert _derive_bounds(3.2, 0.1, integer=False) == pytest.approx((0.32, 0.32))
+    assert _derive_bounds(3.0, 1.5, integer=False) == (1.5, 1.5)
+    assert _derive_bounds(10, (0.1, 2.5), integer=False) == pytest.approx((1.0, 2.5))
+
+    # A relative tolerance on a negative target still gives a positive bound
+    assert _derive_bounds(-10.0, 0.1, integer=False) == pytest.approx((1.0, 1.0))
+
+    # Invalid tolerances are still rejected
+    with pytest.raises(ValueError):
+        _derive_bounds(10, -0.5, integer=False)
+
+
 def test_is_narwhals_table():
     # Test with actual Polars/Pandas DataFrames (not narwhals wrapped)
     pd_df = pd.DataFrame({"x": [1, 2, 3]})
