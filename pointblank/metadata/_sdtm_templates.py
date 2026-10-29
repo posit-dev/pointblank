@@ -15,27 +15,62 @@ __all__ = [
 
 @dataclass
 class SDTMVariableSpec:
-    """Specification for a single variable in an SDTM domain template.
+    """The specification of one variable in an SDTM domain template.
+
+    An [`SDTMDomainTemplate`](`pointblank.SDTMDomainTemplate`) holds an `SDTMVariableSpec` for each
+    variable of its domain, in its `variables` list. The specification gives what the SDTM
+    Implementation Guide says about the variable: its label, its type, its role in the domain, its
+    core designation, and the controlled terminology for its values.
+    [`validate_sdtm()`](`pointblank.validate_sdtm`) uses `required`, `dtype`, `max_length` and
+    `role` to decide which checks to make.
 
     Parameters
     ----------
     name
-        Variable name (e.g., `"STUDYID"`, `"USUBJID"`).
+        The variable name, such as `"STUDYID"` or `"AESTDTC"`.
     label
-        Variable label (e.g., `"Study Identifier"`).
+        The variable label, such as `"Study Identifier"`.
     dtype
-        Expected data type (`"Char"` or `"Num"`).
+        The SDTM data type: `"Char"` for character variables or `"Num"` for numeric ones.
     role
-        SDTM role: `"Identifier"`, `"Topic"`, `"Qualifier"`, `"Timing"`, `"Rule"`, or
-        `"Record Qualifier"`.
+        The variable's SDTM role. The templates use `"Identifier"` (variables that identify the
+        study, subject, domain or record), `"Topic"` (the focus of the observation, such as
+        `AETERM`), `"Qualifier"` (variables that describe the observation) and `"Timing"` (dates,
+        times and study days).
     required
-        Whether the variable is required (`Req="Yes"` in IG).
+        Whether the variable is required: it must be in the dataset and can't be null. In the
+        templates, this is `True` exactly when `core` is `"Req"`. The default is `False`.
     max_length
-        Maximum character length for Char variables.
+        The maximum length of the values of a character variable. The default is `None` (no
+        maximum, as for numeric variables).
     controlled_term
-        Name of the associated controlled terminology codelist.
+        The name of the controlled terminology codelist for the variable's values, such as `"SEX"`
+        or `"NY"`. The default is `None`.
     core
-        SDTM core designation: `"Req"`, `"Exp"`, or `"Perm"`.
+        The core designation: `"Req"` (required), `"Exp"` (expected: in the dataset, but values may
+        be null) or `"Perm"` (permissible: included when there is data for it). The default is
+        `"Perm"`.
+
+    Examples
+    --------
+    Specifications are usually taken from a template. Here is the one for `AESER` in the Adverse
+    Events (AE) template:
+
+    ```{python}
+    import pointblank as pb
+
+    aeser = pb.get_sdtm_domain("AE").get_variable("AESER")
+
+    aeser
+    ```
+
+    `AESER` (whether the adverse event was serious) is an expected character variable of at most
+    two characters, with values from the `NY` (No Yes Response) codelist.
+
+    See Also
+    --------
+    SDTMDomainTemplate : The template that holds the specifications of a domain's variables.
+    ADaMVariableSpec : The equivalent for ADaM dataset templates.
     """
 
     name: str
@@ -50,24 +85,64 @@ class SDTMVariableSpec:
 
 @dataclass
 class SDTMDomainTemplate:
-    """Structural template for an SDTM domain.
+    """The structural template for an SDTM domain.
+
+    An `SDTMDomainTemplate` describes the structure of one domain of the CDISC Study Data
+    Tabulation Model (SDTM): its label and observation class, whether it has many records per
+    subject, the variables that form its natural key, and the specifications of its variables (as
+    [`SDTMVariableSpec`](`pointblank.SDTMVariableSpec`) objects, in the SDTM order). Templates are
+    obtained with [`get_sdtm_domain()`](`pointblank.get_sdtm_domain`).
 
     Parameters
     ----------
     domain
-        Two-character domain code (e.g., `"DM"`, `"AE"`, `"LB"`).
+        The two-letter domain code, such as `"DM"`, `"AE"` or `"LB"`.
     label
-        Domain label (e.g., `"Demographics"`, `"Adverse Events"`).
+        The domain label, such as `"Demographics"` or `"Adverse Events"`.
     description
-        Brief description of the domain's purpose.
+        A short description of what the domain holds.
     domain_class
-        SDTM observation class: `"Special Purpose"`, `"Events"`, `"Interventions"`, or `"Findings"`.
+        The SDTM observation class: `"Special Purpose"`, `"Events"`, `"Interventions"` or
+        `"Findings"`.
     repeating
-        Whether the domain is a repeating (multi-row per subject) domain.
+        Whether the domain can have more than one record per subject. Only DM, which has one record
+        per subject, isn't repeating.
     variables
-        Ordered list of variable specifications.
+        The specifications of the domain's variables, in order. The default is an empty list.
     natural_keys
-        List of variable names that form the natural key.
+        The names of the variables that together identify a record. The default is an empty list.
+
+    Examples
+    --------
+    Let's look at the template for the Adverse Events (AE) domain:
+
+    ```{python}
+    import pointblank as pb
+
+    ae = pb.get_sdtm_domain("AE")
+
+    print(ae.label, "|", ae.domain_class, "| repeating:", ae.repeating)
+    print(ae.description)
+    print(len(ae.variables), "variables")
+    ```
+
+    The variables are in the `variables` list. Here are the first eight, with their type, role and
+    core designation:
+
+    ```{python}
+    for var in ae.variables[:8]:
+        print(f"{var.name:9}{var.dtype:5}{var.role:12}{var.core}")
+    ```
+
+    The template's properties collect the names of the variables with a given core designation or
+    role, and [`get_variable()`](`pointblank.SDTMDomainTemplate.get_variable`) gets the
+    specification of one variable.
+
+    See Also
+    --------
+    get_sdtm_domain : Get the template for a domain.
+    SDTMVariableSpec : The specification of a variable in the template.
+    ADaMDatasetTemplate : The equivalent for ADaM datasets.
     """
 
     domain: str
@@ -80,21 +155,102 @@ class SDTMDomainTemplate:
 
     @property
     def required_variables(self) -> list[str]:
-        """Get names of all required variables."""
+        """The names of the required variables, in order.
+
+        Required variables (core designation `"Req"`) must be in every dataset of the domain and
+        can't be null. [`validate_sdtm()`](`pointblank.validate_sdtm`) adds a null check for each
+        one, and [`validate_sdtm_structure()`](`pointblank.validate_sdtm_structure`) reports the
+        ones that are missing.
+
+        Examples
+        --------
+        ```{python}
+        import pointblank as pb
+
+        pb.get_sdtm_domain("DM").required_variables
+        ```
+
+        These are the variables that every Demographics (DM) dataset must have. This is a property,
+        so it's used without parentheses.
+        """
         return [v.name for v in self.variables if v.required]
 
     @property
     def expected_variables(self) -> list[str]:
-        """Get names of all expected (Exp core) variables."""
+        """The names of the expected variables, in order.
+
+        Expected variables (core designation `"Exp"`) should be in every dataset of the domain, but
+        their values may be null when the data wasn't collected or doesn't apply.
+        [`validate_sdtm_structure()`](`pointblank.validate_sdtm_structure`) reports the ones that
+        are missing when `strict=True`.
+
+        Examples
+        --------
+        ```{python}
+        import pointblank as pb
+
+        pb.get_sdtm_domain("DM").expected_variables
+        ```
+
+        For Demographics (DM), these include the reference dates (such as `RFSTDTC`), age, race and
+        the actual arm. This is a property, so it's used without parentheses.
+        """
         return [v.name for v in self.variables if v.core == "Exp"]
 
     @property
     def identifier_variables(self) -> list[str]:
-        """Get names of all Identifier-role variables."""
+        """The names of the variables with the Identifier role, in order.
+
+        Identifier variables identify the study, the subject, the domain and the record, as with
+        `STUDYID`, `USUBJID`, `DOMAIN` and the sequence number.
+
+        Examples
+        --------
+        ```{python}
+        import pointblank as pb
+
+        pb.get_sdtm_domain("AE").identifier_variables
+        ```
+
+        Besides the identifiers that all domains share, the Adverse Events (AE) template has the
+        sequence number `AESEQ` and the optional group, reference and sponsor identifiers. This is
+        a property, so it's used without parentheses.
+        """
         return [v.name for v in self.variables if v.role == "Identifier"]
 
     def get_variable(self, name: str) -> SDTMVariableSpec | None:
-        """Get a variable spec by name."""
+        """Get the specification of a variable.
+
+        Parameters
+        ----------
+        name
+            The variable name. This is case-sensitive, and SDTM variable names are in upper case.
+
+        Returns
+        -------
+        SDTMVariableSpec | None
+            The specification of the variable, or `None` if the template has no variable with that
+            name.
+
+        Examples
+        --------
+        ```{python}
+        import pointblank as pb
+
+        dm = pb.get_sdtm_domain("DM")
+
+        dm.get_variable("AGE")
+        ```
+
+        `AGE` is an expected numeric variable, so it has no maximum length. A name that isn't in
+        the template gives `None`:
+
+        ```{python}
+        print(dm.get_variable("age"))
+        ```
+
+        The lookup is case-sensitive, so the lower-case name doesn't match `AGE`.
+        """
         for v in self.variables:
             if v.name == name:
                 return v
@@ -1313,32 +1469,70 @@ _DOMAIN_TEMPLATES: dict[str, callable] = {
 
 
 def get_sdtm_domain(domain: str) -> SDTMDomainTemplate:
-    """Get the SDTM template for a specific domain.
+    """Get the template for an SDTM domain.
+
+    Pointblank has templates for eight domains of the CDISC Study Data Tabulation Model (SDTM),
+    based on the SDTM Implementation Guide (SDTMIG) 3.4. Each template is an
+    [`SDTMDomainTemplate`](`pointblank.SDTMDomainTemplate`): the domain's label and observation
+    class, the variables that form its natural key, and an
+    [`SDTMVariableSpec`](`pointblank.SDTMVariableSpec`) for each of its variables, giving the
+    variable's label, type, role, maximum length, controlled terminology and core designation. The
+    templates are what [`validate_sdtm()`](`pointblank.validate_sdtm`),
+    [`validate_sdtm_structure()`](`pointblank.validate_sdtm_structure`) and
+    [`sdtm_to_metadata()`](`pointblank.sdtm_to_metadata`) work from.
+
+    The templates cover the common variables of each domain rather than every variable in the
+    SDTMIG. Each call returns a new template object, so changing one doesn't affect later calls.
 
     Parameters
     ----------
     domain
-        Two-character domain code (e.g., `"DM"`, `"AE"`, `"LB"`, `"VS"`). This is case-insensitive.
+        The two-letter domain code, such as `"DM"`, `"AE"`, `"LB"` or `"VS"`. This is
+        case-insensitive.
 
     Returns
     -------
     SDTMDomainTemplate
-        The structural template for the domain.
+        The template for the domain.
 
     Raises
     ------
     KeyError
-        If the domain is not supported.
+        If there is no template for the domain. The error message lists the domains that have one,
+        as does [`list_sdtm_domains()`](`pointblank.list_sdtm_domains`).
 
     Examples
     --------
-    ```python
-    from pointblank.metadata._sdtm_templates import get_sdtm_domain
+    Let's get the template for the Vital Signs (VS) domain:
 
-    dm = get_sdtm_domain("DM")
-    print(dm.required_variables)
-    # ['STUDYID', 'DOMAIN', 'USUBJID', 'SUBJID', 'ARMCD', 'ARM', 'COUNTRY']
+    ```{python}
+    import pointblank as pb
+
+    vs = pb.get_sdtm_domain("vs")
+
+    print(vs.label, "|", vs.domain_class, "| repeating:", vs.repeating)
+    print(vs.natural_keys)
     ```
+
+    VS is a Findings domain with many records per subject, one for each test at each time point,
+    so its natural key includes the test code, the date-time and the time point number. The
+    template's properties list the variables by their core designation:
+
+    ```{python}
+    print(vs.required_variables)
+    print(vs.expected_variables)
+    ```
+
+    The required variables must be in every VS dataset and can't be null. The expected ones should
+    be in the dataset but may be null, and the domain's other variables are permissible: they're
+    included only when there is data for them.
+
+    See Also
+    --------
+    list_sdtm_domains : List the domains that have a template.
+    SDTMDomainTemplate : The template that is returned.
+    validate_sdtm : Build a validation plan from an SDTM domain template.
+    get_adam_dataset : The equivalent for ADaM datasets.
     """
     domain_upper = domain.upper()
     if domain_upper not in _DOMAIN_TEMPLATES:
@@ -1348,12 +1542,37 @@ def get_sdtm_domain(domain: str) -> SDTMDomainTemplate:
 
 
 def list_sdtm_domains() -> list[str]:
-    """List all available SDTM domain codes.
+    """List the SDTM domains that have a template.
+
+    These are the domain codes that [`get_sdtm_domain()`](`pointblank.get_sdtm_domain`),
+    [`validate_sdtm()`](`pointblank.validate_sdtm`),
+    [`validate_sdtm_structure()`](`pointblank.validate_sdtm_structure`) and
+    [`sdtm_to_metadata()`](`pointblank.sdtm_to_metadata`) accept.
 
     Returns
     -------
     list[str]
-        Sorted list of domain codes.
+        The domain codes, in alphabetical order.
+
+    Examples
+    --------
+    Let's list the domains, together with the label and class of each one's template:
+
+    ```{python}
+    import pointblank as pb
+
+    for code in pb.list_sdtm_domains():
+        template = pb.get_sdtm_domain(code)
+        print(f"{code}  {template.label:26}{template.domain_class}")
+    ```
+
+    The eight domains come from all four of the observation classes that the templates use:
+    Special Purpose (DM), Events, Interventions and Findings.
+
+    See Also
+    --------
+    get_sdtm_domain : Get the template for a domain.
+    list_adam_datasets : The equivalent for ADaM datasets.
     """
     return sorted(_DOMAIN_TEMPLATES.keys())
 
@@ -1363,32 +1582,103 @@ def validate_sdtm_structure(
     domain: str,
     strict: bool = False,
 ) -> dict[str, Any]:
-    """Validate the structural conformance of a dataset against an SDTM domain template.
+    """Check a dataset's variables against an SDTM domain template.
 
-    Checks required variables, variable ordering, data types, and domainvalue consistency. Does not
-    interrogate but rather returns a dict of findings.
+    The `validate_sdtm_structure()` function is a quick check of a dataset's structure, run before
+    (or instead of) a full validation with [`validate_sdtm()`](`pointblank.validate_sdtm`). It
+    checks that every required variable of the domain is a column of the dataset, and that the
+    `DOMAIN` column holds only the domain code. It returns the findings as a dictionary straight
+    away, without building a [`Validate`](`pointblank.Validate`) plan.
+
+    With `strict=True`, two more things are reported: the expected variables (core designation
+    `"Exp"`) that are missing, and the columns that aren't variables in the template. These don't
+    affect `"valid"`. SDTM expects an expected variable to be in the dataset even if all of its
+    values are null, but a missing one is treated here as something to review rather than an
+    error. A column that isn't in the template may still be a valid SDTM variable, since the
+    templates only cover the common variables of each domain.
+
+    The column order and the data types aren't checked.
 
     Parameters
     ----------
     data
-        A DataFrame (Pandas, Polars) to check.
+        The dataset to check, as a Polars or Pandas DataFrame.
     domain
-        SDTM domain code (e.g., `"DM"`, `"AE"`). This is case-insensitive.
+        The SDTM domain code, such as `"DM"` or `"AE"`. This is case-insensitive.
     strict
-        If `True`, also report missing Expected variables and unknown variables.
+        Whether to also report missing expected variables and columns that aren't in the template.
+        The default is `False`.
 
     Returns
     -------
     dict
-        A dictionary with keys:
+        A dictionary with these keys:
 
-        - "domain": the domain code
-        - "valid": `True` if no required violations found
-        - "missing_required": list of missing required variable names
-        - "missing_expected": list of missing expected variable names (strict only)
-        - "unknown_variables": list of column names not in the template (strict only)
-        - "domain_mismatch": `True` if `DOMAIN` column doesn't match expected value
-        - "issues": list of human-readable issue strings
+        - `"domain"`: the domain code, in upper case.
+        - `"valid"`: `True` if no required variable is missing and `DOMAIN` holds only the domain
+        code.
+        - `"missing_required"`: the names of the required variables that aren't columns of the
+        data.
+        - `"missing_expected"`: the names of the expected variables that aren't columns of the data
+        (filled in only with `strict=True`).
+        - `"unknown_variables"`: the columns that aren't variables of the domain (filled in only
+        with `strict=True`).
+        - `"domain_mismatch"`: `True` if the `DOMAIN` column has any value (including a null) other
+        than the domain code.
+        - `"issues"`: a message for each of the problems above.
+
+    Raises
+    ------
+    KeyError
+        If there is no template for the domain.
+
+    Examples
+    --------
+    Let's check a small Adverse Events (AE) dataset. It has all of the required AE variables
+    except `AEDECOD`, and its `DOMAIN` column has one value from another domain:
+
+    ```{python}
+    import pointblank as pb
+    import polars as pl
+
+    ae = pl.DataFrame(
+        {
+            "STUDYID": ["STUDY01"] * 3,
+            "DOMAIN": ["AE", "AE", "CM"],
+            "USUBJID": ["STUDY01-001", "STUDY01-001", "STUDY01-002"],
+            "AESEQ": [1, 2, 1],
+            "AETERM": ["HEADACHE", "NAUSEA", "RASH"],
+            "AESEV": ["MILD", "MILD", "MODERATE"],
+            "AEFLAG": ["Y", "N", "Y"],
+        }
+    )
+
+    result = pb.validate_sdtm_structure(ae, domain="AE")
+
+    print(result["valid"])
+    for issue in result["issues"]:
+        print(issue)
+    ```
+
+    The dataset isn't valid, and the issues say why. The extra column `AEFLAG` isn't mentioned,
+    since that's only reported in strict mode:
+
+    ```{python}
+    result = pb.validate_sdtm_structure(ae, domain="AE", strict=True)
+
+    print(result["missing_expected"])
+    print(result["unknown_variables"])
+    ```
+
+    Strict mode adds the expected AE variables that the dataset doesn't have, such as `AESTDTC`,
+    and the column that isn't an AE variable. `AESEV` is a permissible variable of the domain, so
+    it isn't reported.
+
+    See Also
+    --------
+    validate_sdtm : Build a validation plan from an SDTM domain template.
+    get_sdtm_domain : Get the template that the dataset is checked against.
+    validate_adam_structure : The equivalent for ADaM datasets.
     """
     import narwhals as nw
 
@@ -1420,7 +1710,7 @@ def validate_sdtm_structure(
 
     # Check DOMAIN value
     if "DOMAIN" in columns:
-        domain_values = df["DOMAIN"].unique().to_list()
+        domain_values = df["DOMAIN"].unique(maintain_order=True).to_list()
         if domain_values != [domain.upper()]:
             result["domain_mismatch"] = True
             issues.append(
