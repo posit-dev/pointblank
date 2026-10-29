@@ -49,22 +49,33 @@ def transpose_dicts(list_of_dicts: list[dict[str, Any]]) -> dict[str, list[Any]]
 
 
 # TODO: doctest
-def _derive_single_bound(ref: int, tol: int | float) -> int:
-    """Derive a single bound using the reference."""
+def _derive_single_bound(ref: int, tol: int | float, integer: bool = True) -> int | float:
+    """Derive a single bound using the reference.
+
+    A `tol` below `1` is relative to `ref`; otherwise it's an absolute amount. With
+    `integer=False` (used for aggregates, which are often fractional), the bound isn't truncated to
+    a whole number and the relative bound is taken from the size of `ref` so it works for negative
+    targets too.
+    """
     if not isinstance(tol, float | int):
         raise TypeError("Tolerance must be a number or a tuple of numbers.")
     if tol < 0:
         raise ValueError("Tolerance must be non-negative.")
+    if not integer:
+        return tol * abs(ref) if tol < 1 else tol
     return int(tol * ref) if tol < 1 else int(tol)
 
 
 # TODO: doctest
-def _derive_bounds(ref: int, tol: Tolerance) -> AbsoluteBounds:
+def _derive_bounds(ref: int, tol: Tolerance, integer: bool = True) -> AbsoluteBounds:
     """Validate and extract the absolute bounds of the tolerance."""
     if isinstance(tol, tuple):
-        return (_derive_single_bound(ref, tol[0]), _derive_single_bound(ref, tol[1]))
+        return (
+            _derive_single_bound(ref, tol[0], integer=integer),
+            _derive_single_bound(ref, tol[1], integer=integer),
+        )
 
-    bound = _derive_single_bound(ref, tol)
+    bound = _derive_single_bound(ref, tol, integer=integer)
     return bound, bound
 
 
