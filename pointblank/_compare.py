@@ -53,8 +53,22 @@ class SchemaDiff:
     """
     Differences between the schemas of the source and target tables.
 
+    Changes to a table's columns are often more disruptive than changes to its values. A dropped
+    column breaks the queries that select it, a retyped column changes how values sort and
+    aggregate, and a renamed column looks like one column removed and another added. Every
+    [`Comparison`](`pointblank.Comparison`) checks the two schemas before comparing values and
+    records what it found in its `schema_diff` attribute, which is a `SchemaDiff`.
+
+    Whether these differences fail the comparison depends on `schema=` in
+    [`compare()`](`pointblank.compare`). With the default `"strict"`, any difference other than an
+    explicit rename means that every row counts as failing. With `"common"`, the differences are
+    only reported, and the shared columns are compared as usual. Either way, the `SchemaDiff`
+    lists the differences, and they appear in the *Schema differences* section of the comparison
+    report.
+
     Column names refer to the source table except in `only_in_target` (and the second element of
-    `renamed` and `case_only` pairs), which refer to the target table.
+    `renamed` and `case_only` pairs), which refer to the target table. A `SchemaDiff` is
+    immutable.
 
     Attributes
     ----------
@@ -72,6 +86,91 @@ class SchemaDiff:
         `column_map=` to compare them.
     reordered
         `True` if the shared columns appear in a different order in the two tables.
+
+    Examples
+    --------
+    ```{python}
+    #| echo: false
+    #| output: false
+    import pointblank as pb
+    pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+    ```
+
+    Let's compare a table of customers with a version written by a migrated job. The new version
+    stores the signup date as a string, capitalizes one column name, and adds a column.
+
+    ```{python}
+    import pointblank as pb
+    import polars as pl
+    from datetime import date
+
+    customers = pl.DataFrame(
+        {
+            "customer_id": [1, 2, 3],
+            "email": ["ana@example.com", "ben@example.com", "cho@example.com"],
+            "signup": [date(2024, 1, 5), date(2024, 2, 11), date(2024, 3, 2)],
+        }
+    )
+
+    customers_migrated = pl.DataFrame(
+        {
+            "customer_id": [1, 2, 3],
+            "Email": ["ana@example.com", "ben@example.com", "cho@example.com"],
+            "signup": ["2024-01-05", "2024-02-11", "2024-03-02"],
+            "loaded_at": ["2025-06-01"] * 3,
+        }
+    )
+
+    comparison = pb.compare(customers, customers_migrated, keys="customer_id")
+
+    comparison.schema_diff
+    ```
+
+    Each kind of difference has its own field. `email` and `Email` appear in `only_in_source` and
+    `only_in_target`, since column names are case-sensitive, and `case_only` points out that the
+    two names differ only in case. `signup` is in `dtype_changed` with both data types, and
+    `loaded_at` is new in the target.
+
+    Because the schemas differ and `schema="strict"` is the default, no row passes:
+
+    ```{python}
+    comparison.schema_diff.matches, comparison.n_passed
+    ```
+
+    Pairing up the renamed column with `column_map=` resolves the case change, and
+    `schema="common"` reports the other two differences without failing any rows:
+
+    ```{python}
+    relaxed = pb.compare(
+        customers,
+        customers_migrated,
+        keys="customer_id",
+        column_map={"email": "Email"},
+        schema="common",
+    )
+
+    relaxed.schema_diff
+    ```
+
+    The rename now appears in `renamed`, and `case_only` is empty. The retyped `signup` column is
+    still listed, but it no longer fails the comparison. When a column's two data types can't be
+    compared directly (here, a date and a string), both sides are compared as strings, so the
+    three dates still match:
+
+    ```{python}
+    relaxed.status_counts
+    ```
+
+    So `schema="common"` answers whether the values survived the migration, while the
+    `SchemaDiff` records how the columns changed along the way. For a schema check that doesn't
+    compare any values, see
+    [`Validate.col_schema_match()`](`pointblank.Validate.col_schema_match`).
+
+    See Also
+    --------
+    pointblank.compare : Compare two tables, including their schemas.
+    Comparison : The comparison result that holds a `SchemaDiff`.
+    Validate.col_schema_match : Check a table against an expected schema.
     """
 
     only_in_source: list[str] = field(default_factory=list)
@@ -83,12 +182,118 @@ class SchemaDiff:
 
     @property
     def matches(self) -> bool:
-        """`True` if the schemas match (explicit renames through `column_map=` are allowed)."""
+        """Whether the two schemas match.
+
+        This is the yes-or-no answer behind the schema check in
+        [`compare()`](`pointblank.compare`). It's `False` if any of `only_in_source`,
+        `only_in_target`, or `dtype_changed` is non-empty, or if `reordered` is `True`. Renames
+        listed in `renamed` don't count against it, because they were declared with
+        `column_map=`. Names that differ only in case do count, since they also appear in
+        `only_in_source` and `only_in_target`. Note that column order matters here: the same
+        columns in a different order don't match.
+
+        With `schema="strict"` (the default in `compare()`), a `False` value here means the
+        comparison fails as a whole, with no rows passing. With `schema="common"`, it's reported but
+        doesn't affect the result. [`Comparison.schema_ok`](`pointblank.Comparison.schema_ok`)
+        combines the two: it's this value under `"strict"` and always `True` under `"common"`.
+
+        Returns
+        -------
+        bool
+            `True` if the schemas match, allowing for explicit renames.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Two tables with the same columns in a different order have different schemas, even though
+        every value matches:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        stock = pl.DataFrame({"sku": ["A-1", "A-2"], "qty": [12, 30], "bin": ["B4", "C1"]})
+        stock_reordered = stock.select("sku", "bin", "qty")
+
+        comparison = pb.compare(stock, stock_reordered, keys="sku")
+
+        comparison.schema_diff.matches, comparison.schema_diff.reordered
+        ```
+
+        Since the default is `schema="strict"`, the comparison as a whole fails:
+
+        ```{python}
+        comparison.schema_ok, comparison.n_passed
+        ```
+
+        If column order doesn't matter for the use at hand, use `schema="common"` to compare the
+        values regardless. The `SchemaDiff` still records the reordering, so it isn't lost from
+        the report.
+        """
         return not (
             self.only_in_source or self.only_in_target or self.dtype_changed or self.reordered
         )
 
     def to_dict(self) -> dict[str, Any]:
+        """Convert the schema differences to a dictionary.
+
+        The dictionary contains only lists, strings, and booleans, so it can be written to JSON or
+        YAML as it is. That makes it useful for logging schema drift over time or for passing it to
+        another tool. It's also the `"schema_diff"` entry in the output of
+        [`Comparison.to_dict()`](`pointblank.Comparison.to_dict`) and
+        [`Comparison.to_json()`](`pointblank.Comparison.to_json`).
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with the key `"matches"` (the value of
+            [`matches`](`pointblank.SchemaDiff.matches`)) followed by one key for each field:
+            `"only_in_source"`, `"only_in_target"`, `"dtype_changed"`, `"renamed"`, `"case_only"`,
+            and `"reordered"`. The pairs and triples in the tuple-valued fields become lists.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Here, a new version of a table has changed the type of `amount` and added a column.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        payments = pl.DataFrame({"id": [1, 2], "amount": [10.5, 20.0]})
+        payments_new = pl.DataFrame(
+            {"id": [1, 2], "amount": [10.5, 20.0], "currency": ["EUR", "EUR"]}
+        ).with_columns(pl.col("amount").cast(pl.Float32))
+
+        diff = pb.compare(payments, payments_new, keys="id").schema_diff
+
+        diff.to_dict()
+        ```
+
+        Each data type change is a `[column, source dtype, target dtype]` list, and the result
+        converts directly to JSON:
+
+        ```{python}
+        import json
+
+        print(json.dumps(diff.to_dict()))
+        ```
+
+        A record like this can be stored each time a pipeline runs, so that the history of schema
+        changes can be read back later.
+        """
         return {
             "matches": self.matches,
             "only_in_source": list(self.only_in_source),
@@ -132,25 +337,40 @@ def compare(
     """
     Compare two tables row by row and report how they differ.
 
-    The `compare()` function aligns the rows of a *source* table (the reference, or expected data)
-    with those of a *target* table (the data being checked) and classifies every aligned row:
-    rows that match, rows whose values changed, rows missing from the target, and extra rows in the
-    target. It also reports schema differences (columns added, removed, retyped, or reordered). The
-    returned `Comparison` object gives you the counts, samples of the differing rows, and a
-    tabular report.
+    A common data question is *how do these two tables differ?* You may have refactored a
+    pipeline and want to know whether its output changed, migrated a table from one database to
+    another, or received a new extract of a data feed. Spot checks and row counts can tell you
+    *that* something changed. The `compare()` function tells you *which* rows changed, how, and in
+    which columns.
 
-    Rows are aligned in one of two ways:
+    It aligns the rows of a *source* table (the reference, or expected data) with those of a
+    *target* table (the data being checked) and classifies every aligned row: rows that match,
+    rows whose values changed, rows missing from the target, and extra rows in the target. It also
+    reports schema differences (columns added, removed, retyped, or reordered). The result is a
+    [`Comparison`](`pointblank.Comparison`) object. It holds the counts, gives samples of the
+    differing rows on request, and displays as a tabular report in a notebook.
 
-    - **by key** (`keys=` given): rows are matched on the values of one or more key columns, so
-      row order doesn't matter. This is the most useful mode for comparing extracts of the same
-      data (e.g., the source and target of a pipeline run).
+    Rows are aligned in one of three ways:
+
+    - **by key** (`keys=` gives one or more columns): rows are matched on the key values, so row
+      order doesn't matter. This is the most informative mode, and the one to use whenever the
+      data has an identifier.
     - **by position** (`keys=None`, the default): the first row of the source is compared with the
-      first row of the target, and so on.
+      first row of the target, and so on. This suits outputs that are supposed to be identical row
+      for row.
+    - **as multisets** (`keys="*"`): whole rows are compared regardless of their order, with
+      duplicates counted. This is for tables that have no key at all.
 
     The comparison is backend-agnostic and runs inside the table's own engine: tables can be
     Polars or Pandas DataFrames, Polars LazyFrames, Ibis tables (e.g., DuckDB, PostgreSQL), or
     paths to CSV/Parquet files. File paths are scanned lazily, and only counts and small samples of
     differing rows are ever collected, so tables that don't fit in memory can still be compared.
+
+    The same comparison is available as a validation step with
+    [`Validate.tbl_match()`](`pointblank.Validate.tbl_match`), where every aligned row is a test
+    unit that thresholds and actions can respond to. On the command line, it's available as
+    `pb compare`. To compare totals per group rather than individual rows, use
+    [`Validate.tbl_reconcile()`](`pointblank.Validate.tbl_reconcile`).
 
     Parameters
     ----------
@@ -164,6 +384,8 @@ def compare(
         Key names refer to the source table (use `column_map=` if the target names them
         differently). If `None`, rows are aligned by position, which requires the tables to have
         a defined row order (eager DataFrames, Polars LazyFrames, or any table with `order_by=`).
+        Use `"*"` to compare the tables as multisets of whole rows (see the *Test Units and Row
+        Statuses* section). `tolerance=` can't be used in that mode.
     columns
         The source columns whose values should be compared. By default, all columns present in
         both tables (other than the keys) are compared. Giving `columns=` also limits the schema
@@ -228,6 +450,10 @@ def compare(
     Rows with a null in a key column can't be matched: they count as `"missing"` (source) or
     `"extra"` (target).
 
+    In multiset mode (`keys="*"`), a row is either present in the other table or not, so there are
+    no `"changed"` or `"dup_key"` rows. Each distinct row matches as many times as it occurs in
+    both tables, and any surplus copies count as `"missing"` or `"extra"`.
+
     Large Tables
     ------------
     The comparison runs inside the tables' own engine and only counts and small samples of rows
@@ -243,35 +469,104 @@ def compare(
     Examples
     --------
     ```{python}
+    #| echo: false
+    #| output: false
+    import pointblank as pb
+    pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+    ```
+
+    Let's compare two versions of a product catalog. In the newer version, one product was
+    discontinued, one was added, one had its price lowered, and one went out of stock.
+
+    ```{python}
     import pointblank as pb
     import polars as pl
 
-    source = pl.DataFrame(
-        {"id": [1, 2, 3, 4], "amount": [10.0, 20.0, 30.0, 40.0], "region": ["N", "S", "E", "W"]}
+    catalog_v1 = pl.DataFrame(
+        {
+            "sku": ["A-101", "A-102", "A-103", "A-104", "A-105"],
+            "name": ["Desk lamp", "Office chair", "Monitor arm", "Keyboard", "Mouse pad"],
+            "price": [24.99, 149.00, 59.50, 45.00, 9.99],
+            "in_stock": [True, True, False, True, True],
+        }
     )
-    target = pl.DataFrame(
-        {"id": [1, 2, 4, 5], "amount": [10.0, 20.5, 40.0, 50.0], "region": ["N", "S", "W", "N"]}
+
+    catalog_v2 = pl.DataFrame(
+        {
+            "sku": ["A-101", "A-102", "A-104", "A-105", "A-106"],
+            "name": ["Desk lamp", "Office chair", "Keyboard", "Mouse pad", "USB hub"],
+            "price": [24.99, 139.00, 45.00, 9.99, 19.99],
+            "in_stock": [True, True, True, False, True],
+        }
+    )
+    ```
+
+    Every product has a unique `sku`, so we'll use it as the key that lines up the rows. Naming
+    the two tables makes the report easier to read.
+
+    ```{python}
+    comparison = pb.compare(
+        catalog_v1, catalog_v2, keys="sku", source_name="catalog_v1", target_name="catalog_v2"
     )
 
-    cmp = pb.compare(source, target, keys="id")
-    cmp
+    comparison
     ```
 
-    The counts are available as attributes, and the differing rows can be retrieved by status:
+    The report's header gives the verdict and a breakdown of the six aligned rows. Below it are
+    the columns with mismatched values, then samples of the changed, missing, and extra rows. For
+    changed rows, only the differing values are shown.
+
+    The same information is available programmatically. The status counts add up to the number
+    of test units (aligned rows):
 
     ```{python}
-    cmp.n_changed, cmp.n_missing, cmp.n_extra
+    comparison.status_counts
     ```
+
+    To work with the differing rows, get them by status with
+    [`rows()`](`pointblank.Comparison.rows`). Changed rows have a `<column>_source` and a
+    `<column>_target` column for each compared column.
 
     ```{python}
-    cmp.rows("changed")
+    comparison.rows("changed")
     ```
 
-    A tolerance can absorb small numeric differences:
+    `A-102` changed price and `A-105` changed its stock status. If only prices matter, list the
+    columns to compare with `columns=`. The stock change is then ignored and `A-105` matches:
 
     ```{python}
-    pb.compare(source, target, keys="id", tolerance={"amount": 1}).n_changed
+    pb.compare(catalog_v1, catalog_v2, keys="sku", columns="price").status_counts
     ```
+
+    Without `keys=`, rows are compared by position. Since a product was removed from the middle
+    of the catalog, most rows no longer line up, and four of the five rows count as changed. This
+    is why a key gives a much more useful answer when the data has one.
+
+    ```{python}
+    pb.compare(catalog_v1, catalog_v2).status_counts
+    ```
+
+    Schema changes are found too. Suppose the next version renames `price` to `unit_price`. With
+    the default `schema="strict"`, the comparison fails every row until the schemas agree.
+    `column_map=` pairs up the renamed column, after which the values are compared as before:
+
+    ```{python}
+    catalog_v3 = catalog_v2.rename({"price": "unit_price"})
+
+    pb.compare(catalog_v1, catalog_v3, keys="sku", column_map={"price": "unit_price"})
+    ```
+
+    The rename is listed as a schema difference, but it no longer causes a failure, and the
+    result is the same as the comparison of `catalog_v1` with `catalog_v2`. To make a comparison
+    like this part of a validation, with thresholds, actions, and a step in the validation report,
+    use [`Validate.tbl_match()`](`pointblank.Validate.tbl_match`) with the same arguments.
+
+    See Also
+    --------
+    Comparison : The object returned by this function.
+    SchemaDiff : The schema differences found by a comparison.
+    Validate.tbl_match : Use a table comparison as a validation step.
+    Validate.tbl_reconcile : Compare aggregates per group instead of rows.
     """
     return _compare(
         source=source,
@@ -491,10 +786,27 @@ class Comparison:
     """
     The result of comparing a source table with a target table.
 
-    `Comparison` objects are created by [`compare()`](`pointblank.compare`). They hold the row
-    status counts, per-column mismatch counts, and the schema differences, and can retrieve samples
-    of differing rows on demand. A `Comparison` is truthy only when the tables match (see
-    [`identical`](`pointblank.Comparison.identical`)), so `if pb.compare(a, b):` reads naturally.
+    `Comparison` objects are created by [`compare()`](`pointblank.compare`); they can't be created
+    directly. A comparison does its counting when it's created, inside the tables' own engine, and
+    only fetches rows when you ask for them. This keeps it cheap to create and to pass around,
+    even for very large tables.
+
+    What you do with a `Comparison` depends on the question being asked:
+
+    - **Do the tables match?** A `Comparison` is truthy only when the tables match (see
+      [`identical`](`pointblank.Comparison.identical`)), so `if pb.compare(a, b):` and
+      `assert pb.compare(a, b)` read naturally. [`n_failed`](`pointblank.Comparison.n_failed`)
+      says by how many rows they don't.
+    - **How do they differ?** [`status_counts`](`pointblank.Comparison.status_counts`) breaks the
+      rows down by status, [`schema_diff`](`pointblank.SchemaDiff`) lists the column differences,
+      and [`column_summary()`](`pointblank.Comparison.column_summary`) shows which columns have
+      mismatched values.
+    - **Which rows differ?** [`rows()`](`pointblank.Comparison.rows`) returns a sample of the rows
+      with a given status, as a table of the same type as the inputs.
+    - **How can I show or store the result?** In a notebook, a `Comparison` displays as its
+      [tabular report](`pointblank.Comparison.get_tabular_report`). For logs, files, and other
+      programs, there's [`to_dict()`](`pointblank.Comparison.to_dict`) and
+      [`to_json()`](`pointblank.Comparison.to_json`).
 
     Attributes
     ----------
@@ -504,15 +816,89 @@ class Comparison:
         The key columns used to align rows (empty for positional alignment).
     mode
         `"keyed"`, `"positional"`, or `"multiset"` (for `keys="*"`).
+    compared_columns
+        The source columns whose values were compared.
+    column_map
+        The mapping of source to target column names given in `column_map=`.
+    schema_mode
+        How schema differences affect the result: `"strict"` or `"common"`.
     schema_diff
         A [`SchemaDiff`](`pointblank.SchemaDiff`) describing schema differences.
     n_source_rows, n_target_rows
         Row counts of the two tables.
     n_match, n_changed, n_missing, n_extra, n_dup_key
         Number of test units (aligned rows) with each status.
+    n_dup_key_values
+        Number of distinct key values that are duplicated in either table.
     column_mismatches
         A dict mapping each compared source column to the number of matched rows where its values
         differ.
+
+    Examples
+    --------
+    ```{python}
+    #| echo: false
+    #| output: false
+    import pointblank as pb
+    pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+    ```
+
+    Let's compare the output of a reporting job with the output of a new version of the job. The
+    new version should produce exactly the same daily totals.
+
+    ```{python}
+    import pointblank as pb
+    import polars as pl
+
+    old_totals = pl.DataFrame(
+        {
+            "day": ["2025-06-01", "2025-06-02", "2025-06-03", "2025-06-04"],
+            "orders": [118, 131, 97, 142],
+            "revenue": [5902.10, 6611.45, 4875.00, 7120.80],
+        }
+    )
+
+    new_totals = pl.DataFrame(
+        {
+            "day": ["2025-06-01", "2025-06-02", "2025-06-03", "2025-06-04"],
+            "orders": [118, 131, 97, 142],
+            "revenue": [5902.10, 6611.45, 4857.00, 7120.80],
+        }
+    )
+
+    comparison = pb.compare(old_totals, new_totals, keys="day")
+
+    print(repr(comparison))
+    ```
+
+    The printed form is a one-line summary: one day changed and the schemas agree, so the tables
+    aren't identical. In a test or a deployment script, the comparison can be used as a condition
+    directly. Here, when the tables differ, we look at the rows that changed:
+
+    ```{python}
+    if comparison:
+        print("The new job reproduces the old totals.")
+    else:
+        print(f"{comparison.n_failed} of {comparison.n} days differ:")
+        print(comparison.rows("changed"))
+    ```
+
+    The revenue for June 3 has two digits swapped. To see where the mismatches are concentrated,
+    which matters more when there are many columns, use `column_summary()`:
+
+    ```{python}
+    comparison.column_summary()
+    ```
+
+    Only `revenue` has a mismatch, in one of the four matched rows. From here, the full report is
+    available with [`get_tabular_report()`](`pointblank.Comparison.get_tabular_report`), and the
+    result can be saved with `to_json()` to keep a record of the check.
+
+    See Also
+    --------
+    pointblank.compare : Create a `Comparison` from two tables.
+    SchemaDiff : The schema differences held in `schema_diff`.
+    Validate.tbl_match : Run the same comparison as a validation step.
     """
 
     # What a test unit is, for reporting: aligned rows, or key groups (`tbl_reconcile()`)
@@ -807,32 +1193,351 @@ class Comparison:
 
     @property
     def n(self) -> int:
-        """The number of test units (aligned rows)."""
+        """The number of test units (aligned rows).
+
+        A comparison aligns the rows of the two tables and gives each aligned row one status (see
+        the *Test Units and Row Statuses* section of [`compare()`](`pointblank.compare`)). `n` is
+        the total, so it's always the sum of the values in
+        [`status_counts`](`pointblank.Comparison.status_counts`) and of
+        [`n_passed`](`pointblank.Comparison.n_passed`) and
+        [`n_failed`](`pointblank.Comparison.n_failed`). It's the denominator to use for any
+        fraction of rows that pass or fail.
+
+        `n` isn't the row count of either table. A row that's in both tables counts once, rows in
+        only one table count once each, and a duplicated key counts as many units as the larger of
+        its two occurrence counts. The row counts of the two tables are available as
+        `n_source_rows` and `n_target_rows`.
+
+        Returns
+        -------
+        int
+            The number of test units.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        These two tables of weather station readings have four rows each, but only three stations
+        in common.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        readings_v1 = pl.DataFrame(
+            {"station": ["S1", "S2", "S3", "S4"], "temp": [12.1, 14.0, 9.8, 11.2]}
+        )
+        readings_v2 = pl.DataFrame(
+            {"station": ["S1", "S2", "S3", "S5"], "temp": [12.1, 14.3, 9.8, 8.0]}
+        )
+
+        comparison = pb.compare(readings_v1, readings_v2, keys="station")
+
+        comparison.n, comparison.n_source_rows, comparison.n_target_rows
+        ```
+
+        There are five test units: the three shared stations, `S4` (only in the source), and `S5`
+        (only in the target). Dividing by `n` gives the fraction of rows that failed:
+
+        ```{python}
+        comparison.n_failed / comparison.n
+        ```
+
+        Three of the five units failed: `S2` changed, `S4` is missing, and `S5` is extra.
+        """
         return self.n_match + self.n_changed + self.n_missing + self.n_extra + self.n_dup_key
 
     @property
     def schema_ok(self) -> bool:
-        """`True` if the schemas match, or if schema differences are tolerated (`"common"`)."""
+        """Whether the schema check passed.
+
+        A comparison checks the two tables' schemas before it compares their values. How a schema
+        difference is treated depends on `schema=` in [`compare()`](`pointblank.compare`). With
+        `schema="strict"` (the default), `schema_ok` is the same as
+        [`SchemaDiff.matches`](`pointblank.SchemaDiff.matches`), and a `False` value means that
+        every test unit fails, so [`n_passed`](`pointblank.Comparison.n_passed`) is `0`. With
+        `schema="common"`, schema differences are only reported, so `schema_ok` is always `True`.
+
+        This makes `schema_ok` the property to check when a comparison fails and it's not clear
+        whether the values or the columns are to blame. The details of the difference are in
+        `schema_diff`.
+
+        Returns
+        -------
+        bool
+            `True` if the schemas match, or if `schema="common"` was used.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Here, the target table has the same rows as the source, plus a new `humidity` column.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        readings = pl.DataFrame({"station": ["S1", "S2", "S3"], "temp": [12.1, 14.0, 9.8]})
+        readings_new = readings.with_columns(humidity=pl.Series([0.61, 0.58, 0.72]))
+
+        comparison = pb.compare(readings, readings_new, keys="station")
+
+        comparison.schema_ok, comparison.status_counts, comparison.n_passed
+        ```
+
+        Every row has a status of `"match"`, but none of them pass, because the schema check
+        failed. The cause is in the schema differences:
+
+        ```{python}
+        comparison.schema_diff.only_in_target
+        ```
+
+        If the new column is expected, `schema="common"` compares the shared columns and lets the
+        rows pass:
+
+        ```{python}
+        relaxed = pb.compare(readings, readings_new, keys="station", schema="common")
+
+        relaxed.schema_ok, relaxed.n_passed
+        ```
+
+        The new column is still listed in `relaxed.schema_diff`, so the change remains visible in
+        the report even though it no longer fails the comparison.
+        """
         return self.schema_mode == "common" or self.schema_diff.matches
 
     @property
     def n_passed(self) -> int:
-        """Test units that pass: matching rows (none, if the schema check fails)."""
+        """The number of test units that passed.
+
+        A test unit passes if its status is `"match"`, which means the row is in both tables with
+        the same values in every compared column (within any tolerance set in
+        [`compare()`](`pointblank.compare`)). If the schema check failed (see
+        [`schema_ok`](`pointblank.Comparison.schema_ok`)), no test unit passes and `n_passed` is
+        `0`, whatever the row statuses are.
+
+        `n_passed` and [`n_failed`](`pointblank.Comparison.n_failed`) are the counts that
+        [`Validate.tbl_match()`](`pointblank.Validate.tbl_match`) uses for its test units, so they
+        work with the same thresholds and fractions as any other validation step.
+
+        Returns
+        -------
+        int
+            The number of passing test units.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Two of these four stations have the same reading in both tables.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        readings_v1 = pl.DataFrame(
+            {"station": ["S1", "S2", "S3", "S4"], "temp": [12.1, 14.0, 9.8, 11.2]}
+        )
+        readings_v2 = pl.DataFrame(
+            {"station": ["S1", "S2", "S3", "S4"], "temp": [12.1, 14.3, 9.8, 11.5]}
+        )
+
+        comparison = pb.compare(readings_v1, readings_v2, keys="station")
+
+        comparison.n_passed, comparison.n_passed / comparison.n
+        ```
+
+        Half of the test units passed. The two changed rows are available with
+        [`rows("changed")`](`pointblank.Comparison.rows`).
+        """
         return self.n_match if self.schema_ok else 0
 
     @property
     def n_failed(self) -> int:
-        """Test units that fail: all non-matching rows (all rows, if the schema check fails)."""
+        """The number of test units that failed.
+
+        A test unit fails if its status is `"changed"`, `"missing"`, `"extra"`, or `"dup_key"`. If
+        the schema check failed (see [`schema_ok`](`pointblank.Comparison.schema_ok`)), every test
+        unit fails, so `n_failed` equals [`n`](`pointblank.Comparison.n`). It's always
+        `n - n_passed`.
+
+        A count of zero failures, along with a passing schema check, is what makes a comparison
+        [`identical`](`pointblank.Comparison.identical`). To see how the failures break down by
+        status, use [`status_counts`](`pointblank.Comparison.status_counts`).
+
+        Returns
+        -------
+        int
+            The number of failing test units.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        One station's reading changed, one station was dropped, and one was added.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        readings_v1 = pl.DataFrame(
+            {"station": ["S1", "S2", "S3", "S4"], "temp": [12.1, 14.0, 9.8, 11.2]}
+        )
+        readings_v2 = pl.DataFrame(
+            {"station": ["S1", "S2", "S3", "S5"], "temp": [12.1, 14.3, 9.8, 8.0]}
+        )
+
+        comparison = pb.compare(readings_v1, readings_v2, keys="station")
+
+        comparison.n_failed
+        ```
+
+        A count is useful for a quick check, for instance to stop a script when too many rows
+        differ:
+
+        ```{python}
+        if comparison.n_failed > 0.25 * comparison.n:
+            print(f"{comparison.n_failed} of {comparison.n} rows differ")
+        ```
+
+        To act on failures with thresholds and actions instead, compare the tables in a validation
+        with [`Validate.tbl_match()`](`pointblank.Validate.tbl_match`).
+        """
         return self.n - self.n_passed
 
     @property
     def identical(self) -> bool:
-        """`True` if the tables match under the comparison settings."""
+        """Whether the tables match under the comparison settings.
+
+        A comparison is identical if the schema check passed (see
+        [`schema_ok`](`pointblank.Comparison.schema_ok`)) and no test unit failed. This is the
+        single answer to "are these tables the same?", and it's also the truth value of the
+        comparison, so `if comparison:` is the same as `if comparison.identical:`.
+
+        "Identical" is relative to the settings given to [`compare()`](`pointblank.compare`).
+        Columns left out with `columns=` aren't checked, values within `tolerance=` count as equal,
+        values are compared after any `normalize=` operations, and with `schema="common"`, the
+        tables can have different columns.
+
+        Returns
+        -------
+        bool
+            `True` if the tables match.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Here, a reporting table stores the readings rounded to one decimal place.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        raw = pl.DataFrame({"station": ["S1", "S2", "S3"], "temp": [12.14, 14.02, 9.81]})
+        rounded = pl.DataFrame({"station": ["S1", "S2", "S3"], "temp": [12.1, 14.0, 9.8]})
+
+        pb.compare(raw, rounded, keys="station").identical
+        ```
+
+        An exact comparison finds every row changed. Allowing for the rounding with `tolerance=`
+        makes the tables match:
+
+        ```{python}
+        comparison = pb.compare(raw, rounded, keys="station", tolerance={"temp": 0.05})
+
+        comparison.identical
+        ```
+
+        Since a comparison has the same truth value, it can be used directly in a condition:
+
+        ```{python}
+        if comparison:
+            print("The rounded table matches the raw readings.")
+        ```
+
+        A result of `True` here means "the same within 0.05 degrees", not "exactly the same". The
+        settings belong with the result, and the comparison report lists them in its header.
+        """
         return self.schema_ok and self.n_failed == 0
 
     @property
     def status_counts(self) -> dict[str, int]:
-        """The number of test units with each row status."""
+        """The number of test units with each row status.
+
+        Where [`n_passed`](`pointblank.Comparison.n_passed`) and
+        [`n_failed`](`pointblank.Comparison.n_failed`) say how many rows differ,
+        `status_counts` says how they differ. The statuses are described in the
+        *Test Units and Row Statuses* section of [`compare()`](`pointblank.compare`). The counts
+        are computed when the comparison is made, so reading them doesn't touch the tables again.
+
+        The counts are the row statuses alone and aren't affected by the schema check. If the
+        schema check fails, there can be `"match"` rows even though no test units pass.
+
+        Returns
+        -------
+        dict[str, int]
+            A dictionary with the keys `"match"`, `"changed"`, `"missing"`, `"extra"`, and
+            `"dup_key"` (in that order). The values add up to [`n`](`pointblank.Comparison.n`).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        In this example, station `S3` appears twice in the source table.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        readings_v1 = pl.DataFrame(
+            {"station": ["S1", "S2", "S3", "S3", "S4"], "temp": [12.1, 14.0, 9.8, 9.9, 11.2]}
+        )
+        readings_v2 = pl.DataFrame(
+            {"station": ["S1", "S2", "S3", "S5"], "temp": [12.1, 14.3, 9.8, 8.0]}
+        )
+
+        comparison = pb.compare(readings_v1, readings_v2, keys="station")
+
+        comparison.status_counts
+        ```
+
+        Each status has a different cause. `S2` changed, `S4` is missing from the target, and `S5`
+        is extra. The duplicated `S3` key counts as two `"dup_key"` units, since it occurs twice in
+        the source. Those rows can't be paired up, so they're not compared. To see the rows behind
+        any of these counts, pass the status to [`rows()`](`pointblank.Comparison.rows`), as in
+        `comparison.rows("dup_key")`.
+        """
         return {
             "match": self.n_match,
             "changed": self.n_changed,
@@ -865,7 +1570,16 @@ class Comparison:
         """
         Get a sample of rows with a given status.
 
-        Only up to `limit=` rows are collected, so this is safe to use on very large tables.
+        The counts in [`status_counts`](`pointblank.Comparison.status_counts`) say how many rows
+        differ, and `rows()` shows which ones. It's the step that turns "12 rows changed" into
+        something that can be investigated: the keys to look up, the values on each side, and the
+        rows that were dropped or added.
+
+        A comparison collects counts when it's made, but it doesn't collect rows until they're
+        asked for. `rows()` then fetches up to `limit=` rows with the requested status from the
+        tables' own engine, so it's safe to use with very large tables and with database tables.
+        The result is cached, so asking for the same status and limit again returns the same table
+        without querying the tables a second time.
 
         Parameters
         ----------
@@ -873,11 +1587,11 @@ class Comparison:
             The row status to retrieve:
 
             - `"changed"`: the keys, then a `<column>_source` and a `<column>_target` column for
-              each compared column
+              each compared column (including columns whose values are equal in that row)
             - `"missing"`: source rows not in the target (source column names)
             - `"extra"`: target rows not in the source (target column names)
             - `"dup_key"`: duplicated key values with their occurrence counts in each table
-              (`n_source`, `n_target`)
+              (`n_source`, `n_target`), one row per key
             - `"match"`: the keys of matching rows
         limit
             The maximum number of rows to return.
@@ -886,7 +1600,81 @@ class Comparison:
         -------
         Any
             A table of the same type as the (collected) input tables. In positional mode, rows
-            are identified by a 1-based `_row_num_` column.
+            are identified by a 1-based `_row_num_` column, and a `"changed"` sample has the
+            `_source` and `_target` columns for every column. In multiset mode (`keys="*"`),
+            `"missing"` and `"extra"` return distinct rows, with the compared values as strings,
+            plus `n_source` and `n_target` columns giving how often each row occurs in each table.
+
+        Raises
+        ------
+        ValueError
+            If `status=` isn't one of the five row statuses.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Let's compare two versions of an employee table, where one salary changed, one employee
+        left, and one joined.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        staff_jan = pl.DataFrame(
+            {
+                "emp_id": [101, 102, 103, 104],
+                "dept": ["Sales", "Sales", "Ops", "Ops"],
+                "salary": [52000, 61000, 58000, 47000],
+            }
+        )
+        staff_feb = pl.DataFrame(
+            {
+                "emp_id": [101, 102, 103, 105],
+                "dept": ["Sales", "Sales", "Ops", "Ops"],
+                "salary": [52000, 63500, 58000, 49000],
+            }
+        )
+
+        comparison = pb.compare(staff_jan, staff_feb, keys="emp_id")
+
+        comparison.rows("changed")
+        ```
+
+        Each changed row has both versions of every compared column side by side. Here, `dept`
+        is the same on both sides and `salary` is the column that changed. The departed employee
+        is a `"missing"` row, and it's shown as it was in the source table:
+
+        ```{python}
+        comparison.rows("missing")
+        ```
+
+        The new employee is an `"extra"` row, shown as it is in the target table:
+
+        ```{python}
+        comparison.rows("extra")
+        ```
+
+        In multiset mode, rows have no identity apart from their values. So `"missing"` and
+        `"extra"` rows are listed once each, with the number of times they occur in each table.
+        Here, the target table has one fewer copy of a row than the source:
+
+        ```{python}
+        scans_source = pl.DataFrame({"badge": [7, 7, 9], "door": ["A", "A", "B"]})
+        scans_target = pl.DataFrame({"badge": [7, 9], "door": ["A", "B"]})
+
+        pb.compare(scans_source, scans_target, keys="*").rows("missing")
+        ```
+
+        The row with badge 7 at door A occurs twice in the source and once in the target, so one
+        copy is missing. For a summary of all the samples in one place, see
+        [`get_tabular_report()`](`pointblank.Comparison.get_tabular_report`), which shows up to 10
+        rows for each status by default.
         """
         if status not in ROW_STATUSES:
             raise ValueError(f"`status=` must be one of {ROW_STATUSES}, not {status!r}.")
@@ -1386,13 +2174,65 @@ class Comparison:
         """
         Get a per-column summary of value mismatches.
 
+        A row counts as `"changed"` if any compared column differs, so the row statuses don't say
+        which columns are responsible. `column_summary()` does. It's often the quickest way to find
+        the cause of a difference. A single column with mismatches in every row suggests a change
+        in how that column is computed or formatted, while mismatches spread thinly across many
+        columns suggest changed rows.
+
+        The summary also lists each column's data type on both sides and the target column it was
+        compared against, which shows the effect of `column_map=`. The counts are computed when
+        the comparison is made, so this doesn't query the tables again.
+
         Returns
         -------
         Any
             A table (Polars if available, else Pandas) with one row per compared column: the
             source and target column names and data types, the number of matched rows whose
             values differ (`n_mismatch`), and that number as a fraction of matched rows
-            (`f_mismatch`).
+            (`f_mismatch`). Matched rows are those with a status of `"match"` or `"changed"`. In
+            multiset mode, there are no matched pairs, so the last two columns are null.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Here, a rewritten job produces an orders table where the totals are rounded to whole
+        units, and one order has a different status.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        orders_old = pl.DataFrame(
+            {
+                "order_id": [1, 2, 3, 4],
+                "status": ["shipped", "shipped", "pending", "shipped"],
+                "total": [19.99, 45.50, 12.00, 80.25],
+            }
+        )
+        orders_new = pl.DataFrame(
+            {
+                "order_id": [1, 2, 3, 4],
+                "status": ["shipped", "shipped", "cancelled", "shipped"],
+                "total": [20.0, 46.0, 12.0, 80.0],
+            }
+        )
+
+        comparison = pb.compare(orders_old, orders_new, keys="order_id")
+
+        comparison.column_summary()
+        ```
+
+        `total` differs in three of the four orders, which points to a systematic change (the
+        rounding), while `status` differs in a single order. All four rows are `"changed"`, but
+        the summary separates the two causes. Once the rounding is accepted (for instance, with
+        `tolerance={"total": 0.5}`), only the status change is left.
         """
         n_matched = self.n_match + self.n_changed
         records = [
@@ -1426,6 +2266,13 @@ class Comparison:
         """
         Get the comparison results as a JSON-serializable dict.
 
+        A comparison is a live object that refers to the tables it compared. `to_dict()` turns
+        its results into plain data that can be stored or sent elsewhere: written to a log or a
+        database table, attached to a CI run, checked in a test, or passed to a dashboard.
+        Everything in the dictionary is a string, number, boolean, list, dict, or `None` (dates and
+        other values in the samples are converted to strings), so it can be serialized as it is.
+        For a JSON string, use [`to_json()`](`pointblank.Comparison.to_json`).
+
         Parameters
         ----------
         samples
@@ -1433,6 +2280,68 @@ class Comparison:
             contain sensitive values (e.g., PII) and only counts and schema details may be stored.
         limit
             The maximum number of sample rows per status.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with the comparison settings (`"source_name"`, `"target_name"`, `"mode"`,
+            `"keys"`, `"compared_columns"`, `"column_map"`, `"schema_mode"`, `"null_equal"`, and
+            `"partitions"`), the row counts of both tables, the results (`"n"`, `"n_passed"`,
+            `"n_failed"`, `"identical"`, `"status_counts"`, and `"column_mismatches"`), and the
+            schema differences (`"schema_diff"`, from
+            [`SchemaDiff.to_dict()`](`pointblank.SchemaDiff.to_dict`)). If `samples=True`, there's
+            also a `"samples"` entry, which maps each failing status that has rows to a list of
+            row dictionaries, structured as in [`rows()`](`pointblank.Comparison.rows`).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Let's compare two months of an employee table and turn the result into a dictionary.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        staff_jan = pl.DataFrame(
+            {"emp_id": [101, 102, 103, 104], "salary": [52000, 61000, 58000, 47000]}
+        )
+        staff_feb = pl.DataFrame(
+            {"emp_id": [101, 102, 103, 105], "salary": [52000, 63500, 58000, 49000]}
+        )
+
+        comparison = pb.compare(
+            staff_jan, staff_feb, keys="emp_id", source_name="staff_jan", target_name="staff_feb"
+        )
+
+        result = comparison.to_dict()
+
+        result["status_counts"]
+        ```
+
+        The samples hold the actual rows, keyed by status:
+
+        ```{python}
+        result["samples"]
+        ```
+
+        Salaries are sensitive, so a record that's kept in a shared log might leave the samples
+        out. With `samples=False`, only counts, settings, and schema details remain:
+
+        ```{python}
+        record = comparison.to_dict(samples=False)
+
+        {k: record[k] for k in ["source_name", "target_name", "n_failed", "identical"]}
+        ```
+
+        Leaving out the samples also means the tables aren't queried again, because the counts
+        were collected when the comparison was made. To limit the samples instead of dropping them,
+        set `limit=` to the number of rows to keep for each status.
         """
         out: dict[str, Any] = {
             "source_name": self.source_name,
@@ -1471,7 +2380,59 @@ class Comparison:
         """
         Get the comparison results as a JSON string.
 
-        The structure is the same as that of [`to_dict()`](`pointblank.Comparison.to_dict`).
+        JSON is the format to use when a comparison result leaves Python: written to a file
+        alongside a pipeline run, returned from an API, or read by another tool. The structure is
+        the same as that of [`to_dict()`](`pointblank.Comparison.to_dict`). The `pb compare`
+        command line tool produces the same JSON with `--format json` (to the terminal) or
+        `--output-json` (to a file), and its `--no-samples` option corresponds to `samples=False`.
+
+        Parameters
+        ----------
+        samples
+            Should samples of differing rows be included? Set to `False` when the data might
+            contain sensitive values (e.g., PII) and only counts and schema details may be stored.
+        limit
+            The maximum number of sample rows per status.
+        indent
+            The number of spaces to indent nested levels by. Use `None` for the most compact
+            output, on a single line (as for JSON Lines files, with one comparison per line).
+
+        Returns
+        -------
+        str
+            The comparison results as a JSON string.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Here, a new version of a price list has one changed price.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        prices_v1 = pl.DataFrame({"sku": ["A-1", "A-2", "A-3"], "price": [9.99, 24.50, 5.00]})
+        prices_v2 = pl.DataFrame({"sku": ["A-1", "A-2", "A-3"], "price": [9.99, 26.00, 5.00]})
+
+        comparison = pb.compare(prices_v1, prices_v2, keys="sku")
+
+        print(comparison.to_json(limit=5))
+        ```
+
+        For a compact record without row samples, set `samples=False` and `indent=None`:
+
+        ```{python}
+        print(comparison.to_json(samples=False, indent=None))
+        ```
+
+        Each such record is one line, so a series of comparisons can be appended to a single file
+        and read back later, one comparison per line.
         """
         return json.dumps(self.to_dict(samples=samples, limit=limit), indent=indent)
 
@@ -1485,10 +2446,16 @@ class Comparison:
         """
         Get a tabular report of the comparison.
 
+        The report brings everything about a comparison together in one table, for reading
+        rather than for further processing. It's what's shown when a comparison is displayed in a
+        notebook, and calling `get_tabular_report()` directly lets the report be customized and
+        saved, for example to attach to a pull request or to share with whoever owns the data.
+
         The report has a header with the verdict, the row status counts, and the comparison
         settings, followed by sections (as row groups) for schema differences, per-column
-        mismatches, and samples of changed, missing, extra, and duplicate-key rows. Sections with
-        nothing to show are omitted.
+        mismatches, and samples of changed, missing, extra, and duplicate-key rows. Changed rows
+        show only the columns that differ, with the source and target values (and the difference,
+        for numbers). Sections with nothing to show are omitted.
 
         Parameters
         ----------
@@ -1508,6 +2475,63 @@ class Comparison:
         -------
         GT
             A Great Tables object.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Let's compare two months of a payroll table. Naming the tables with `source_name=` and
+        `target_name=` makes the report easier to read.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        payroll_jan = pl.DataFrame(
+            {
+                "emp_id": [101, 102, 103, 104],
+                "dept": ["Sales", "Sales", "Ops", "Ops"],
+                "salary": [52000, 61000, 58000, 47000],
+            }
+        )
+        payroll_feb = pl.DataFrame(
+            {
+                "emp_id": [101, 102, 103, 105],
+                "dept": ["Sales", "Sales", "Ops", "Ops"],
+                "salary": [52000, 63500, 58000, 49000],
+            }
+        )
+
+        comparison = pb.compare(
+            payroll_jan,
+            payroll_feb,
+            keys="emp_id",
+            source_name="payroll_jan",
+            target_name="payroll_feb",
+        )
+
+        comparison.get_tabular_report()
+        ```
+
+        The verdict and counts are at the top, and below them are the sections that have
+        something to show: the mismatches in `salary`, the changed row for employee 102, and the
+        employees who left and joined.
+
+        The title can be replaced, and the labels can be shown in any of Pointblank's reporting
+        languages. Here's the same report in French:
+
+        ```{python}
+        comparison.get_tabular_report(title="Paie : janvier et février", lang="fr")
+        ```
+
+        Numbers are formatted for the French locale too, with a decimal comma (as in `60,0%`). Use
+        `locale=` to format them differently from the labels. To save a report as a standalone
+        HTML file, use the `write_raw_html()` method of the returned Great Tables object.
         """
         from pointblank._compare_report import _comparison_report
         from pointblank.validate import _normalize_reporting_language
