@@ -80,6 +80,10 @@ class MappedConstraint:
         print(f"{c.method:<18} {c.kwargs}  (from {c.source_description!r})")
     ```
 
+    Each JSON Schema keyword became one constraint: the `required` entry gave a not-null check
+    and `minimum` gave a lower bound. The `source_description` records where each constraint
+    came from, which helps when tracing a failing step back to the definition that produced it.
+
     See Also
     --------
     ContractImport : The import result that holds a list of constraints.
@@ -204,13 +208,15 @@ class ContractImport:
     readings
     ```
 
-    The fields hold the details. The columns come with Pointblank types, and the constraints show
-    how the primary key was expressed as not-null checks plus a `rows_distinct()` check over both
-    key columns.
+    The fields hold the details. The columns come with their Frictionless types translated to
+    Pointblank types:
 
     ```{python}
     readings.columns
     ```
+
+    The constraints show how the temperature range became a pair of bounds, and how the primary
+    key was expressed as not-null checks plus a `rows_distinct()` check over both key columns.
 
     ```{python}
     for c in readings.constraints:
@@ -247,7 +253,7 @@ class ContractImport:
 
     See Also
     --------
-    import_contract : Create a `ContractImport` from an external definition.
+    pointblank.import_contract : Create a `ContractImport` from an external definition.
     adapters.MappedConstraint : The objects in the `constraints` list.
     ContractAdapter : The base class for adapters, which create these objects.
     Contract : The Pointblank contract that `to_contract()` produces.
@@ -355,6 +361,11 @@ class ContractImport:
             .interrogate()
         )
         ```
+
+        The added rule appears as the last step, and every price passes it. The imported steps
+        fail exactly as before. Mixing imported and hand-written steps like this lets the external
+        definition stay the source of truth for its own rules, while Pointblank covers what the
+        format can't express.
         """
         from pointblank.schema import Schema
         from pointblank.validate import Validate
