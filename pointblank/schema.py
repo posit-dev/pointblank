@@ -1561,7 +1561,7 @@ def generate_dataset(
     from datetime import date, timedelta
 
     schema = pb.Schema(
-        id=pb.int_field(min_val=1, unique=True),
+        id=pb.int_field(min_val=1, max_val=1000, unique=True),
         name=pb.string_field(preset="name"),
         score=pb.float_field(min_val=0.0, max_val=100.0),
         is_active=pb.bool_field(p_true=0.75),
@@ -1575,6 +1575,10 @@ def generate_dataset(
 
     pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
+
+    Each column gets the dtype of its field: `Int64`, `String`, `Float64`, `Boolean`, `Date` and
+    `Duration`. The `session_time` column has 12 missing values out of 50, close to the
+    `null_probability=` of `0.2`, and the same `seed=` gives the same table on every run.
     """
     return schema.generate(
         n=n, seed=seed, output=output, country=country, shuffle=shuffle, weighted=weighted
@@ -1636,11 +1640,21 @@ def schema_from_tbl(
     print(schema)
     ```
 
-    Generate synthetic data matching the original's characteristics:
+    The inferred schema has a field for each column. The `user_id` and `age` fields take their
+    ranges from the data and are marked unique (every value in those columns is distinct), the
+    `email` column is matched to the `"email"` preset by its name and values, and `status` has
+    few enough distinct values to become a categorical field with an `allowed=` list.
+
+    Let's generate synthetic data matching the original's characteristics:
 
     ```{python}
     pb.preview(schema.generate(n=10, seed=23))
     ```
+
+    The new rows follow the inferred constraints: the IDs lie between 1 and 50, the ages between
+    20 and 69, and every `status` is one of the three original values. The emails are new,
+    realistic addresses from the preset rather than copies of the original `user{i}@example.com`
+    values.
     """
     return Schema.from_table(
         tbl,
