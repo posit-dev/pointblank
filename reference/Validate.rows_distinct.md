@@ -4,7 +4,7 @@ Validate whether rows in the table are distinct.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13002-L13254)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13060-L13319)
 
 ``` python
 Validate.rows_distinct(
@@ -20,6 +20,8 @@ Validate.rows_distinct(
 ```
 
 The `rows_distinct()` method checks whether rows in the table are distinct. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+
+Duplicate rows often come from loading the same data twice or from a join that matched more rows than expected. With `columns_subset=`, only the given columns are compared, which checks that a key (a single column such as an ID, or a combination of columns) is unique. Every copy of a duplicated row is a failing test unit, so two rows with the same key give two failures. To check that rows have no missing values instead, use [`rows_complete()`](../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete).
 
 ## Parameters
 

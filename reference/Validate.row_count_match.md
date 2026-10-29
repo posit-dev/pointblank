@@ -4,7 +4,7 @@ Validate whether the row count of the table matches a specified count.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14443-L14692)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14508-L14757)
 
 ``` python
 Validate.row_count_match(

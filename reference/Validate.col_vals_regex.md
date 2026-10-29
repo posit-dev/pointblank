@@ -4,7 +4,7 @@ Validate whether column values match a regular expression pattern.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10835-L11120)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10864-L11159)
 
 ``` python
 Validate.col_vals_regex(
@@ -24,6 +24,8 @@ Validate.col_vals_regex(
 ```
 
 The `col_vals_regex()` validation method checks whether column values in a table correspond to a `pattern=` matching expression. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+
+Regular expressions check the format of string values, such as identifiers and codes (e.g., `"^[A-Z]{3}-[0-9]{4}$"`), or dates and phone numbers stored as strings. A value passes when the pattern matches anywhere in it, so use `^` and `$` to match the whole value. With `inverse=True`, values must *not* match, which finds unwanted content such as leading or trailing spaces. For common formats such as email addresses, URLs, and postal codes, [`col_vals_within_spec()`](../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec) has ready-made checks; to check only string lengths, use [`col_vals_str_len()`](../reference/Validate.col_vals_str_len.md#pointblank.Validate.col_vals_str_len); and for a fixed list of allowed values, [`col_vals_in_set()`](../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) is simpler.
 
 ## Parameters
 

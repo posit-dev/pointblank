@@ -4,7 +4,7 @@ Validate column values using a custom expression.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11640-L11892)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11679-L11940)
 
 ``` python
 Validate.col_vals_expr(
@@ -20,6 +20,8 @@ Validate.col_vals_expr(
 ```
 
 The `col_vals_expr()` validation method checks whether column values in a table satisfy a custom `expr=` expression. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+
+Use it when no other validation method expresses the rule, such as a condition that involves several columns (e.g., `(pl.col("end") - pl.col("start")) <= 5`) or one that combines conditions. For a simple comparison of two columns, the comparison methods take a column as the value (e.g., `col_vals_ge(columns="end", value=pb.col("start"))`), which also names both columns in the report. To require that each row passes several expressions at once, use [`conjointly()`](../reference/Validate.conjointly.md#pointblank.Validate.conjointly), and for custom logic that doesn't fit a row-by-row expression (such as a check of the whole table), use [`specially()`](../reference/Validate.specially.md#pointblank.Validate.specially).
 
 ## Parameters
 

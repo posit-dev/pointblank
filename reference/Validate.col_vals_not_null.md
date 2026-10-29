@@ -4,7 +4,7 @@ Validate whether values in a column are not Null.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10579-L10833)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10597-L10862)
 
 ``` python
 Validate.col_vals_not_null(
@@ -20,6 +20,8 @@ Validate.col_vals_not_null(
 ```
 
 The `col_vals_not_null()` validation method checks whether column values in a table are not Null. This validation will operate over the number of test units that is equal to the number of rows in the table.
+
+This is the usual check for required fields such as identifiers, keys, and timestamps. Most other checks (e.g., [`col_vals_gt()`](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) and [`col_vals_regex()`](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex)) already fail null values unless `na_pass=True` is set, but they count them together with the other failures. A separate `col_vals_not_null()` step reports the missing values on their own. To check whole rows across several columns, use [`rows_complete()`](../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete); to allow some nulls, check their proportion with [`col_pct_null()`](../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null); and when missing values are recorded with codes such as `-99`, see [`col_missing_coded()`](../reference/Validate.col_missing_coded.md#pointblank.Validate.col_missing_coded).
 
 ## Parameters
 

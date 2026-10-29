@@ -4,7 +4,7 @@ Validate that column values exist in a reference table (referential integrity).
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15286-L15468)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15351-L15533)
 
 ``` python
 Validate.col_vals_in_table(

@@ -4,7 +4,7 @@ Raise an `AssertionError` if all tests are not passing.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18418-L18489)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18483-L18554)
 
 ``` python
 Validate.assert_passing()
@@ -48,7 +48,7 @@ validation.assert_passing()
 
     ---------------------------------------------------------------------------
     AssertionError                            Traceback (most recent call last)
-    /var/folders/s8/bj_jsx3d7jqd2btw7bwm6yx80000gp/T/ipykernel_29710/137793627.py in ?()
+    /var/folders/s8/bj_jsx3d7jqd2btw7bwm6yx80000gp/T/ipykernel_89742/137793627.py in ?()
          16     .col_vals_in_set(columns="c", set=["a", "b"])
          17 )
          18 
@@ -56,11 +56,11 @@ validation.assert_passing()
     ---> 20 validation.assert_passing()
 
     ~/py_projects/pointblank/pointblank/validate.py in ?(self)
-      18485             ]
-      18486             msg = "The following assertions failed:\n" + "\n".join(
-      18487                 [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]
-      18488             )
-    > 18489             raise AssertionError(msg)
+      18550             ]
+      18551             msg = "The following assertions failed:\n" + "\n".join(
+      18552                 [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]
+      18553             )
+    > 18554             raise AssertionError(msg)
 
     AssertionError: The following assertions failed:
     - Step 2: Expect that values in `b` should be < `9`.

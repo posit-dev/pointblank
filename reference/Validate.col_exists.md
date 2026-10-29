@@ -4,7 +4,7 @@ Validate whether one or more columns exist in the table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11894-L12079)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11942-L12137)
 
 ``` python
 Validate.col_exists(
@@ -18,6 +18,8 @@ Validate.col_exists(
 ```
 
 The `col_exists()` method checks whether one or more columns exist in the target table. The only requirement is specification of the column names. Each validation step or expectation will operate over a single test unit, which is whether the column exists or not.
+
+It's worth adding when a column might be missing, as in data from a source that may change its layout. Without it, a step on a missing column can't be evaluated: it's marked with an evaluation error and has no test units, so it can't reach a threshold. With `col_exists()`, the missing column is a failing test unit, which thresholds and actions can react to. To check the full set of columns along with their types, use [`col_schema_match()`](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match), and to check only the number of columns, use [`col_count_match()`](../reference/Validate.col_count_match.md#pointblank.Validate.col_count_match). To skip the steps on a column when it's absent, give them `active=pb.has_columns("<column>")` (see [`has_columns()`](../reference/has_columns.md#pointblank.has_columns)).
 
 ## Parameters
 

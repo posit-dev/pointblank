@@ -4,7 +4,7 @@ Validate whether column values are in a set of values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9157-L9505)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9157-L9515)
 
 ``` python
 Validate.col_vals_in_set(
@@ -22,6 +22,8 @@ Validate.col_vals_in_set(
 ```
 
 The `col_vals_in_set()` validation method checks whether column values in a table are part of a specified `set=` of values. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+
+It suits categorical columns (status values, country codes, units, and the like) where only a known list of values is allowed, and it catches typos and inconsistent spellings such as `"Active"` next to `"active"`. A null fails the check unless `None` is in the set. For the reverse check (values that must not appear), use [`col_vals_not_in_set()`](../reference/Validate.col_vals_not_in_set.md#pointblank.Validate.col_vals_not_in_set); when the allowed values come from another table, such as a lookup table, use [`col_vals_in_table()`](../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table); and for values that follow a pattern rather than a list, use [`col_vals_regex()`](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex).
 
 ## Parameters
 

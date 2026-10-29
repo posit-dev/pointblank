@@ -4,7 +4,7 @@ Generate synthetic test data from a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1312-L1585)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1312-L1595)
 
 ``` python
 generate_dataset(
@@ -19,6 +19,8 @@ generate_dataset(
 ```
 
 This function generates random data that conforms to a schema's column definitions. When the schema is defined using `Field` objects with constraints (e.g., `min_val=`, `max_val=`, `pattern=`, `preset=`), the generated data will respect those constraints.
+
+Synthetic data is useful when the real data can't be shared or doesn't exist yet. It lets you develop and try out a validation plan before the data arrives, build test fixtures, and create example tables for documentation and bug reports. Give a `seed=` to get the same data on every run. The schema's columns usually come from field functions such as [`int_field()`](../reference/int_field.md#pointblank.int_field) and [`string_field()`](../reference/string_field.md#pointblank.string_field), or from [`profile_fields()`](../reference/profile_fields.md#pointblank.profile_fields) for coherent personal details (names, emails, addresses), and [`schema_from_tbl()`](../reference/schema_from_tbl.md#pointblank.schema_from_tbl) can start a schema from an existing table. In a pytest suite, the [generate_dataset](../reference/generate_dataset.md#pointblank.generate_dataset) fixture works the same way and seeds each test automatically.
 
 ## Parameters
 

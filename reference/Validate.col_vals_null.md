@@ -4,7 +4,7 @@ Validate whether values in a column are Null.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10323-L10577)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10333-L10595)
 
 ``` python
 Validate.col_vals_null(
@@ -20,6 +20,8 @@ Validate.col_vals_null(
 ```
 
 The `col_vals_null()` validation method checks whether column values in a table are Null. This validation will operate over the number of test units that is equal to the number of rows in the table.
+
+Use it for columns that should be empty: a field that's no longer filled in, or one that only applies to some rows. For the second case, a `pre=` function that keeps only the rows in question (e.g., `lambda df: df.filter(pl.col("status") == "active")` for a `closed_on` column) turns it into a conditional check. The opposite check is [`col_vals_not_null()`](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null), and to check the proportion of nulls in a column rather than every value, use [`col_pct_null()`](../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null).
 
 ## Parameters
 
