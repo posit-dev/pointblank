@@ -1489,3 +1489,61 @@ def test_register_adds_comparator():
     assert "test_op_xyz" in COMPARATOR_REGISTRY
     assert COMPARATOR_REGISTRY["test_op_xyz"] is comp_test_op_xyz
     del COMPARATOR_REGISTRY["test_op_xyz"]
+
+
+def test_fractional_tolerance_not_truncated():
+    data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})  # mean is 3.0
+
+    # A relative tolerance of 10% around 3.2 gives [2.88, 3.52], which includes 3.0
+    Validate(data).col_avg_eq("a", 3.2, tol=0.1).interrogate().assert_passing()
+
+    # An absolute tolerance of 1.5 around 1.4 gives [-0.1, 2.9], which excludes 3.0
+    v = Validate(data).col_avg_eq("a", 1.4, tol=1.5).interrogate()
+    assert v.validation_info[0].all_passed is False
+    assert v.validation_info[0].val_info["upper_bound"] == pytest.approx(2.9)
+
+    # For `gt`, the tolerance lowers the bar: 3.0 > 3.2 - 0.32
+    Validate(data).col_avg_gt("a", 3.2, tol=0.1).interrogate().assert_passing()
+
+
+def test_relative_tolerance_negative_target():
+    data = pl.DataFrame({"a": [-10.0, -10.0, -10.0]})
+
+    # 10% of |-10.5| is 1.05, so the range [-11.55, -9.45] includes -10
+    Validate(data).col_avg_eq("a", -10.5, tol=0.1).interrogate().assert_passing()
+
+
+def test_col_value_compares_aggregates():
+    from pointblank import col
+
+    data = pl.DataFrame({"a": [1, 2, 3, 4, 5], "b": [2, 2, 2, 2, 2]})
+
+    v = (
+        Validate(data)
+        .col_sum_gt("a", col("b"))  # 15 > 10
+        .col_avg_gt("a", col("b"))  # 3.0 > 2.0
+        .col_sd_lt("b", col("a"))  # 0.0 < 1.58
+        .col_sum_eq("a", col("b"))  # 15 != 10
+        .interrogate()
+    )
+
+    assert [step.all_passed for step in v.validation_info] == [True, True, True, False]
+    assert v.validation_info[0].val_info["target"] == 10
+
+
+def test_col_value_missing_column_is_eval_error():
+    from pointblank import col
+
+    data = pl.DataFrame({"a": [1, 2, 3]})
+    v = Validate(data).col_sum_gt("a", col("zz")).interrogate()
+
+    assert v.validation_info[0].eval_error is True
+
+
+def test_col_value_selector_raises():
+    from pointblank import col, starts_with
+
+    data = pl.DataFrame({"a": [1, 2, 3], "b": [1, 2, 3]})
+
+    with pytest.raises(ValueError, match="single column name"):
+        Validate(data).col_sum_gt("a", col(starts_with("b")))
