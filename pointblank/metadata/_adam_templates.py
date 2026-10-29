@@ -15,31 +15,67 @@ __all__ = [
 
 @dataclass
 class ADaMVariableSpec:
-    """Specification for a single variable in an ADaM dataset template.
+    """The specification of one variable in an ADaM dataset template.
+
+    An [`ADaMDatasetTemplate`](`pointblank.ADaMDatasetTemplate`) holds an `ADaMVariableSpec` for
+    each variable of its dataset, in its `variables` list. The specification gives the variable's
+    label, type and core designation, the condition under which a conditionally required variable
+    is needed, where its values come from, and whether it is a population flag.
+    [`validate_adam()`](`pointblank.validate_adam`) uses `required` and `is_population_flag` to
+    decide which checks to make.
 
     Parameters
     ----------
     name
-        Variable name (e.g., `"USUBJID"`, `"AVAL"`, `"PARAMCD"`).
+        The variable name, such as `"USUBJID"`, `"PARAMCD"` or `"AVAL"`.
     label
-        Variable label (e.g., `"Unique Subject Identifier"`).
+        The variable label, such as `"Unique Subject Identifier"`.
     dtype
-        Expected data type (`"Char"` or `"Num"`).
+        The data type: `"Char"` for character variables or `"Num"` for numeric ones (including
+        dates, which ADaM stores as numbers).
     core
-        ADaM core designation: `"Req"` (required), `"Cond"` (conditionally required), or `"Perm"`
-        (permissible).
+        The core designation: `"Req"` (required), `"Cond"` (conditionally required: needed when
+        the condition in `condition` holds) or `"Perm"` (permissible). The default is `"Perm"`.
     required
-        Whether the variable is unconditionally required.
+        Whether the variable is required in every dataset of this type. In the templates, this is
+        `True` exactly when `core` is `"Req"`. The default is `False`.
     max_length
-        Maximum character length for Char variables.
+        The maximum length of the values of a character variable. The default is `None` (no
+        maximum).
     controlled_term
-        Name of the associated controlled terminology codelist.
+        The name of the controlled terminology codelist for the variable's values, such as `"NY"`
+        for the population flags. The default is `None`.
     source
-        Traceability: expected source (e.g., `"SDTM.DM"`, `"Derived"`).
+        Where the variable's values come from, such as `"SDTM.DM"` (copied from the Demographics
+        domain) or `"Derived from SDTM.EX"`. The default is `None` (not specified).
     condition
-        For conditional variables, describes when they are required.
+        For a conditionally required variable, a description of when it is required, such as
+        `"Required if safety population defined"`. The default is `None`.
     is_population_flag
-        Whether this is a population flag variable (e.g., `"SAFFL"`, `"ITTFL"`).
+        Whether the variable is a population flag (such as `SAFFL` or `ITTFL`), whose values must
+        be `"Y"` or `"N"`. The default is `False`.
+
+    Examples
+    --------
+    Specifications are usually taken from a template. Here is the one for the safety population
+    flag, `SAFFL`, in the ADSL template:
+
+    ```{python}
+    import pointblank as pb
+
+    saffl = pb.get_adam_dataset("ADSL").get_variable("SAFFL")
+
+    saffl
+    ```
+
+    `SAFFL` is a one-character population flag with values from the `NY` codelist. It is
+    conditionally required, and `condition` says when: whenever the study defines a safety
+    population.
+
+    See Also
+    --------
+    ADaMDatasetTemplate : The template that holds the specifications of a dataset's variables.
+    SDTMVariableSpec : The equivalent for SDTM domain templates.
     """
 
     name: str
@@ -56,22 +92,63 @@ class ADaMVariableSpec:
 
 @dataclass
 class ADaMDatasetTemplate:
-    """Structural template for an ADaM dataset.
+    """The structural template for an ADaM dataset.
+
+    An `ADaMDatasetTemplate` describes the structure of one type of CDISC Analysis Data Model
+    (ADaM) dataset: its label and class, the variables that form its natural key, and the
+    specifications of its variables (as [`ADaMVariableSpec`](`pointblank.ADaMVariableSpec`)
+    objects, in order). Templates are obtained with
+    [`get_adam_dataset()`](`pointblank.get_adam_dataset`).
 
     Parameters
     ----------
     name
-        Dataset name (e.g., `"ADSL"`, `"ADVS"`, `"ADAE"`, `"ADTTE"`).
+        The template name: `"ADSL"`, `"BDS"`, `"ADAE"` or `"ADTTE"`.
     label
-        Dataset label (e.g., `"Subject Level Analysis Dataset"`).
+        The dataset label, such as `"Subject Level Analysis Dataset"`.
     description
-        Brief description of the dataset's purpose.
+        A short description of what the dataset holds and what a record is.
     dataset_class
-        ADaM dataset class: `"ADSL"`, `"BDS"`, `"ADAE"`, or `"ADTTE"`.
+        The ADaM dataset class, which [`validate_adam()`](`pointblank.validate_adam`) uses to
+        choose the checks for the type of dataset. In the templates, it's the same as `name`.
     variables
-        Ordered list of variable specifications.
+        The specifications of the dataset's variables, in order. The default is an empty list.
     natural_keys
-        List of variable names that form the natural key.
+        The names of the variables that together identify a record. The default is an empty list.
+
+    Examples
+    --------
+    Let's look at the template for the Basic Data Structure (BDS), the structure of analysis
+    datasets such as ADVS (vital signs) and ADLB (laboratory results):
+
+    ```{python}
+    import pointblank as pb
+
+    bds = pb.get_adam_dataset("BDS")
+
+    print(bds.label, "|", bds.dataset_class)
+    print(bds.description)
+    print(bds.natural_keys)
+    ```
+
+    A BDS dataset has a record for each analysis parameter (`PARAMCD`) at each visit and date,
+    for each subject. The template's properties list the required and conditionally required
+    variables:
+
+    ```{python}
+    print(bds.required_variables)
+    print(bds.conditional_variables)
+    ```
+
+    Every BDS dataset needs the identifiers, the parameter and the analysis value. The
+    conditional variables, such as the baseline value `BASE` and the change from baseline `CHG`,
+    are needed only for some analyses.
+
+    See Also
+    --------
+    get_adam_dataset : Get the template for a type of dataset.
+    ADaMVariableSpec : The specification of a variable in the template.
+    SDTMDomainTemplate : The equivalent for SDTM domains.
     """
 
     name: str
@@ -83,21 +160,106 @@ class ADaMDatasetTemplate:
 
     @property
     def required_variables(self) -> list[str]:
-        """Get names of all required variables."""
+        """The names of the required variables, in order.
+
+        Required variables (core designation `"Req"`) must be in every dataset of this type.
+        [`validate_adam()`](`pointblank.validate_adam`) adds a null check for each one, and
+        [`validate_adam_structure()`](`pointblank.validate_adam_structure`) reports the ones that
+        are missing.
+
+        Examples
+        --------
+        ```{python}
+        import pointblank as pb
+
+        pb.get_adam_dataset("ADTTE").required_variables
+        ```
+
+        A time-to-event dataset (ADTTE) needs the parameter, the time to the event (`AVAL`), the
+        start and event dates, and the censoring indicator (`CNSR`). This is a property, so it's
+        used without parentheses.
+        """
         return [v.name for v in self.variables if v.required]
 
     @property
     def conditional_variables(self) -> list[str]:
-        """Get names of all conditionally required variables."""
+        """The names of the conditionally required variables, in order.
+
+        A conditionally required variable (core designation `"Cond"`) is needed only in some
+        situations, which the variable's `condition` describes.
+        [`validate_adam_structure()`](`pointblank.validate_adam_structure`) reports the ones that
+        are missing when `strict=True`.
+
+        Examples
+        --------
+        ```{python}
+        import pointblank as pb
+
+        adsl = pb.get_adam_dataset("ADSL")
+
+        for name in adsl.conditional_variables[:4]:
+            print(name, "->", adsl.get_variable(name).condition)
+        ```
+
+        These are the first four conditional variables of ADSL, with the condition for each one.
+        This is a property, so it's used without parentheses.
+        """
         return [v.name for v in self.variables if v.core == "Cond"]
 
     @property
     def population_flags(self) -> list[str]:
-        """Get names of all population flag variables."""
+        """The names of the population flag variables, in order.
+
+        Population flags, such as `SAFFL` (safety) and `ITTFL` (intent-to-treat), say whether each
+        subject is in an analysis population, with the values `"Y"` and `"N"`. Only the ADSL
+        template has them.
+
+        Examples
+        --------
+        ```{python}
+        import pointblank as pb
+
+        pb.get_adam_dataset("ADSL").population_flags
+        ```
+
+        [`validate_adam()`](`pointblank.validate_adam`) checks each of these flags that is a
+        column of the data. This is a property, so it's used without parentheses.
+        """
         return [v.name for v in self.variables if v.is_population_flag]
 
     def get_variable(self, name: str) -> ADaMVariableSpec | None:
-        """Get a variable spec by name."""
+        """Get the specification of a variable.
+
+        Parameters
+        ----------
+        name
+            The variable name. This is case-sensitive, and ADaM variable names are in upper case.
+
+        Returns
+        -------
+        ADaMVariableSpec | None
+            The specification of the variable, or `None` if the template has no variable with that
+            name.
+
+        Examples
+        --------
+        ```{python}
+        import pointblank as pb
+
+        adtte = pb.get_adam_dataset("ADTTE")
+
+        adtte.get_variable("CNSR")
+        ```
+
+        `CNSR` is the required censoring indicator of a time-to-event dataset. A name that isn't
+        in the template gives `None`:
+
+        ```{python}
+        print(adtte.get_variable("AESEQ"))
+        ```
+
+        `AESEQ` belongs to the ADAE template, not to ADTTE.
+        """
         for v in self.variables:
             if v.name == name:
                 return v
@@ -761,22 +923,70 @@ _ADAM_TEMPLATES: dict[str, callable] = {
 
 
 def get_adam_dataset(name: str) -> ADaMDatasetTemplate:
-    """Get the ADaM template for a specific dataset.
+    """Get the template for a type of ADaM dataset.
+
+    Pointblank has templates for four types of CDISC Analysis Data Model (ADaM) dataset: ADSL (the
+    subject-level analysis dataset), BDS (the Basic Data Structure, used by datasets such as ADVS
+    and ADLB), ADAE (adverse events) and ADTTE (time to event). Each template is an
+    [`ADaMDatasetTemplate`](`pointblank.ADaMDatasetTemplate`): the dataset's label and class, the
+    variables that form its natural key, and an [`ADaMVariableSpec`](`pointblank.ADaMVariableSpec`)
+    for each of its variables. The templates are what
+    [`validate_adam()`](`pointblank.validate_adam`),
+    [`validate_adam_structure()`](`pointblank.validate_adam_structure`) and
+    [`adam_to_metadata()`](`pointblank.adam_to_metadata`) work from.
+
+    The templates cover the common variables of each type of dataset rather than every variable
+    that the ADaM Implementation Guide describes. Each call returns a new template object, so
+    changing one doesn't affect later calls.
 
     Parameters
     ----------
     name
-        Dataset name (e.g., `"ADSL"`, `"BDS"`, `"ADAE"`, `"ADTTE"`). This is case-insensitive.
+        The template name: `"ADSL"`, `"BDS"`, `"ADAE"` or `"ADTTE"`. This is case-insensitive.
 
     Returns
     -------
     ADaMDatasetTemplate
-        The structural template for the dataset.
+        The template for the dataset.
 
     Raises
     ------
     KeyError
-        If the dataset is not supported.
+        If there is no template with that name. The error message lists the templates, as does
+        [`list_adam_datasets()`](`pointblank.list_adam_datasets`).
+
+    Examples
+    --------
+    Let's get the template for the subject-level analysis dataset:
+
+    ```{python}
+    import pointblank as pb
+
+    adsl = pb.get_adam_dataset("adsl")
+
+    print(adsl.label)
+    print(adsl.natural_keys)
+    print(adsl.required_variables)
+    ```
+
+    ADSL has one record per subject, so the study and subject identifiers are its natural key.
+    Besides the identifiers, the planned treatment `TRT01P` is required. The template also lists
+    the population flags:
+
+    ```{python}
+    adsl.population_flags
+    ```
+
+    These flags (safety, intent-to-treat, efficacy and so on) are conditionally required or
+    permissible, and [`validate_adam()`](`pointblank.validate_adam`) checks that the ones in a
+    dataset hold only `"Y"` and `"N"`.
+
+    See Also
+    --------
+    list_adam_datasets : List the dataset templates.
+    ADaMDatasetTemplate : The template that is returned.
+    validate_adam : Build a validation plan from an ADaM dataset template.
+    get_sdtm_domain : The equivalent for SDTM domains.
     """
     name_upper = name.upper()
     if name_upper not in _ADAM_TEMPLATES:
@@ -786,12 +996,36 @@ def get_adam_dataset(name: str) -> ADaMDatasetTemplate:
 
 
 def list_adam_datasets() -> list[str]:
-    """List all available ADaM dataset template names.
+    """List the ADaM dataset templates.
+
+    These are the names that [`get_adam_dataset()`](`pointblank.get_adam_dataset`),
+    [`validate_adam()`](`pointblank.validate_adam`),
+    [`validate_adam_structure()`](`pointblank.validate_adam_structure`) and
+    [`adam_to_metadata()`](`pointblank.adam_to_metadata`) accept.
 
     Returns
     -------
     list[str]
-        Sorted list of dataset names.
+        The template names, in alphabetical order.
+
+    Examples
+    --------
+    Let's list the templates, together with each one's label:
+
+    ```{python}
+    import pointblank as pb
+
+    for name in pb.list_adam_datasets():
+        print(f"{name:7}{pb.get_adam_dataset(name).label}")
+    ```
+
+    BDS is a structure rather than a single dataset, so its template is used for any BDS dataset
+    in a study, such as ADVS or ADLB.
+
+    See Also
+    --------
+    get_adam_dataset : Get a dataset template.
+    list_sdtm_domains : The equivalent for SDTM domains.
     """
     return sorted(_ADAM_TEMPLATES.keys())
 
@@ -801,30 +1035,102 @@ def validate_adam_structure(
     dataset: str,
     strict: bool = False,
 ) -> dict[str, Any]:
-    """Validate structural conformance of a dataset against an ADaM template.
+    """Check a dataset's variables against an ADaM dataset template.
+
+    The `validate_adam_structure()` function is a quick check of a dataset's structure, run before
+    (or instead of) a full validation with [`validate_adam()`](`pointblank.validate_adam`). It
+    checks that every required variable of the template is a column of the dataset, and lists the
+    population flags that the dataset has. It returns the findings as a dictionary straight away,
+    without building a [`Validate`](`pointblank.Validate`) plan.
+
+    For an ADSL dataset with no population flags at all, an issue is added to `"issues"`, but the
+    dataset is still `"valid"`. With `strict=True`, two more things are reported: the
+    conditionally required variables (core designation `"Cond"`) that are missing, and the columns
+    that aren't variables in the template. These don't affect `"valid"` either, since whether a
+    conditional variable is needed depends on the study, and the templates only cover the common
+    variables of each type of dataset.
+
+    The column order, the data types and the values aren't checked.
 
     Parameters
     ----------
     data
-        A DataFrame (pandas, polars) to check.
+        The dataset to check, as a Polars or Pandas DataFrame.
     dataset
-        ADaM dataset name (e.g., `"ADSL"`, `"BDS"`, `"ADAE"`, `"ADTTE"`). This is case-insensitive.
+        The name of the ADaM dataset template: `"ADSL"`, `"BDS"`, `"ADAE"` or `"ADTTE"`. This is
+        case-insensitive.
     strict
-        If True, also reports missing conditional variables and unknown variables.
+        Whether to also report missing conditional variables and columns that aren't in the
+        template. The default is `False`.
 
     Returns
     -------
     dict
-        Validation results with keys:
+        A dictionary with these keys:
 
-        - "dataset": the dataset name
-        - "dataset_class": ADaM class
-        - "valid": True if no required violations found
-        - "missing_required": list of missing required variable names
-        - "missing_conditional": list of missing conditionally required variables (strict)
-        - "unknown_variables": list of unknown column names (strict)
-        - "population_flags_found": list of population flag variables present
-        - "issues": list of human-readable issue strings
+        - `"dataset"`: the template name, in upper case.
+        - `"dataset_class"`: the ADaM class of the template.
+        - `"valid"`: `True` if no required variable is missing.
+        - `"missing_required"`: the names of the required variables that aren't columns of the
+        data.
+        - `"missing_conditional"`: the names of the conditional variables that aren't columns of
+        the data (filled in only with `strict=True`).
+        - `"unknown_variables"`: the columns that aren't variables in the template, in the order of
+        the data's columns (filled in only with `strict=True`).
+        - `"population_flags_found"`: the population flags that are columns of the data.
+        - `"issues"`: a message for each of the problems above. With `strict=True`, the message for
+        a missing conditional variable includes its condition.
+
+    Raises
+    ------
+    KeyError
+        If there is no template with that name.
+
+    Examples
+    --------
+    Let's check a small ADSL dataset that lacks the site identifier, `SITEID`, a required ADSL
+    variable:
+
+    ```{python}
+    import pointblank as pb
+    import polars as pl
+
+    adsl = pl.DataFrame(
+        {
+            "STUDYID": ["STUDY01"] * 3,
+            "USUBJID": ["STUDY01-001", "STUDY01-002", "STUDY01-003"],
+            "SUBJID": ["001", "002", "003"],
+            "TRT01P": ["Drug A", "Placebo", "Drug A"],
+            "SAFFL": ["Y", "Y", "N"],
+            "BMIBL": [24.1, 31.7, 22.9],
+        }
+    )
+
+    result = pb.validate_adam_structure(adsl, dataset="ADSL")
+
+    print(result["valid"])
+    print(result["missing_required"])
+    print(result["population_flags_found"])
+    ```
+
+    The dataset isn't valid because of the missing `SITEID`, and it has one population flag,
+    `SAFFL`. In strict mode, the conditional variables and the unknown columns are reported too:
+
+    ```{python}
+    result = pb.validate_adam_structure(adsl, dataset="ADSL", strict=True)
+
+    print(result["missing_conditional"])
+    print(result["unknown_variables"])
+    ```
+
+    The baseline BMI column, `BMIBL`, isn't in the template. Since ADaM allows a sponsor to add
+    variables like this one, it's reported only so that it can be reviewed.
+
+    See Also
+    --------
+    validate_adam : Build a validation plan from an ADaM dataset template.
+    get_adam_dataset : Get the template that the dataset is checked against.
+    validate_sdtm_structure : The equivalent for SDTM datasets.
     """
     import narwhals as nw
 
@@ -872,7 +1178,8 @@ def validate_adam_structure(
                 )
 
         template_names = {v.name for v in template.variables}
-        for col in columns:
+        # Iterate over `df.columns` (not the set) to report columns in table order
+        for col in df.columns:
             if col not in template_names:
                 result["unknown_variables"].append(col)
                 issues.append(f"Variable '{col}' is not defined in {dataset.upper()} template")
