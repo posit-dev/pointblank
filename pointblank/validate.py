@@ -5408,6 +5408,16 @@ class Validate:
         direct database access via Ibis with optional table specification using the `::table_name`
         suffix. Read the *Supported Input Table Types* section for details on the supported table
         types.
+    reference
+        An optional second table to compare the target table against, such as an earlier extract
+        of the same data or a trusted baseline. It can be any of the input types accepted by
+        `data=`. Reference data is used by the aggregate validation methods (the `col_sum_*`,
+        `col_avg_*`, and `col_sd_*` families, such as
+        [`col_sum_eq()`](`pointblank.Validate.col_sum_eq`)): a `value=` given with
+        [`ref()`](`pointblank.ref`) takes the aggregate of a column in this table, and leaving out
+        `value=` compares against the same column here. A file path or connection string given
+        here is kept, so that [`to_code()`](`pointblank.Validate.to_code`) and
+        [`to_yaml()`](`pointblank.Validate.to_yaml`) can write it back out.
     tbl_name
         An optional name to assign to the input table object. If no value is provided, a name will
         be generated based on whatever information is available. This table name will be displayed
@@ -6102,13 +6112,13 @@ class Validate:
             Actions to take based on validation results.
         active
             Whether this validation step is active.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -6260,6 +6270,11 @@ class Validate:
         ```{python}
         validation_table_2.interrogate()
         ```
+
+        Every value of `y` in the first table is below `10`, but the second table has a `10`, so
+        the second step has one failing test unit there. The plan was written once and applied to
+        both tables, each with its own name and label. This is handy for tables that share a
+        structure, such as monthly extracts or one table per region.
         """
         from copy import deepcopy
 
@@ -6538,6 +6553,14 @@ class Validate:
             default, this is `False`. Set to `True` to pass test units with missing values.
             A `NaN` in a float column also counts as missing on every backend, and that includes a
             `NaN` in a column given to `value=` via [`col()`](`pointblank.col`).
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
+            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
+            to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -6573,13 +6596,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -6839,6 +6862,14 @@ class Validate:
             default, this is `False`. Set to `True` to pass test units with missing values.
             A `NaN` in a float column also counts as missing on every backend, and that includes a
             `NaN` in a column given to `value=` via [`col()`](`pointblank.col`).
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
+            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
+            to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -6874,13 +6905,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -7147,6 +7178,14 @@ class Validate:
             default, this is `False`. Set to `True` to pass test units with missing values.
             A `NaN` in a float column also counts as missing on every backend, and that includes a
             `NaN` in a column given to `value=` via [`col()`](`pointblank.col`).
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
+            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
+            to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -7182,13 +7221,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -7455,6 +7494,14 @@ class Validate:
             default, this is `False`. Set to `True` to pass test units with missing values.
             A `NaN` in a float column also counts as missing on every backend, and that includes a
             `NaN` in a column given to `value=` via [`col()`](`pointblank.col`).
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
+            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
+            to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -7490,13 +7537,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -7761,6 +7808,14 @@ class Validate:
             default, this is `False`. Set to `True` to pass test units with missing values.
             A `NaN` in a float column also counts as missing on every backend, and that includes a
             `NaN` in a column given to `value=` via [`col()`](`pointblank.col`).
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
+            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
+            to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -7796,13 +7851,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -8070,6 +8125,14 @@ class Validate:
             default, this is `False`. Set to `True` to pass test units with missing values.
             A `NaN` in a float column also counts as missing on every backend, and that includes a
             `NaN` in a column given to `value=` via [`col()`](`pointblank.col`).
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
+            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
+            to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -8105,13 +8168,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -8391,6 +8454,14 @@ class Validate:
             default, this is `False`. Set to `True` to pass test units with missing values.
             A `NaN` in a float column also counts as missing on every backend, and that includes a
             `NaN` in a bound column given to `left=` or `right=` via [`col()`](`pointblank.col`).
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
+            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
+            to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -8426,13 +8497,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -8728,6 +8799,14 @@ class Validate:
             default, this is `False`. Set to `True` to pass test units with missing values.
             A `NaN` in a float column also counts as missing on every backend, and that includes a
             `NaN` in a bound column given to `left=` or `right=` via [`col()`](`pointblank.col`).
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
+            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
+            to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -8763,13 +8842,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -9045,6 +9124,13 @@ class Validate:
             or a collection containing Enum instances. When an Enum class is provided, all enum
             values will be used. When a collection contains Enum instances, their values will be
             extracted automatically.
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass as
+            well (create it with `null_is_missing=False` to change this).
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -9080,13 +9166,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -9431,13 +9517,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -9737,6 +9823,14 @@ class Validate:
             compared, in ascending order. If `None` (the default), the table's own row order is
             used. Tables without an inherent row order (e.g., database tables, Ibis tables, or
             PySpark DataFrames) need `order_by=`. See the *Row Order and Missing Values* section.
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
+            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
+            to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -9772,13 +9866,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -9968,6 +10062,14 @@ class Validate:
             compared, in ascending order. If `None` (the default), the table's own row order is
             used. Tables without an inherent row order (e.g., database tables, Ibis tables, or
             PySpark DataFrames) need `order_by=`. See the *Row Order and Missing Values* section.
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
+            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
+            to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -10003,13 +10105,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -10207,13 +10309,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -10463,13 +10565,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -10697,6 +10799,14 @@ class Validate:
         inverse
             Should the validation step be inverted? If `True`, then the expectation is that column
             values should *not* match the specified `pattern=` regex.
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
+            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
+            to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -10732,13 +10842,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -10976,6 +11086,14 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
+            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
+            to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -11011,13 +11129,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -11277,6 +11395,14 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+        missing
+            An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
+            for missing values in the column (such as `-99` for a survey question that was refused).
+            Rows holding one of these codes are excluded from the check (they count as passing test
+            units), so only the real values are validated, and a note in the validation report lists
+            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
+            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
+            to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -11506,13 +11632,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -11739,13 +11865,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -11939,13 +12065,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -12253,13 +12379,13 @@ class Validate:
             A boolean value or callable that determines whether the validation step should be
             active. Using `False` will make the validation step inactive (still reporting its
             presence and keeping indexes for the steps unchanged).
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -12455,13 +12581,13 @@ class Validate:
             A boolean value or callable that determines whether the validation step should be
             active. Using `False` will make the validation step inactive (still reporting its
             presence and keeping indexes for the steps unchanged).
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -12651,13 +12777,13 @@ class Validate:
             A boolean value or callable that determines whether the validation step should be
             active. Using `False` will make the validation step inactive (still reporting its
             presence and keeping indexes for the steps unchanged).
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -12855,13 +12981,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -13109,13 +13235,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -13366,13 +13492,13 @@ class Validate:
             A boolean value or callable that determines whether the validation step should be
             active. Using `False` will make the validation step inactive (still reporting its
             presence and keeping indexes for the steps unchanged).
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -13618,13 +13744,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -14080,13 +14206,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -14306,13 +14432,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -14545,13 +14671,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -14905,13 +15031,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -15341,13 +15467,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -15667,13 +15793,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -15929,13 +16055,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -16214,13 +16340,13 @@ class Validate:
             functions like [`has_columns()`](`pointblank.has_columns`) and
             [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
             based on properties of the target table.
-
         dimension
             An optional data quality dimension to categorize this validation step for health
             scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+
         Returns
         -------
         Validate
@@ -18191,9 +18317,15 @@ class Validate:
             .col_vals_in_set(columns="c", set=["a", "b"])
         )
 
-        # No need to call [`interrogate()`](`pointblank.Validate.interrogate`) explicitly
+        # No need to call `interrogate()` explicitly
         validation.assert_passing()
         ```
+
+        The `AssertionError` lists each step that had failing test units, here only step 2, with
+        a description of what it expected. In a test suite (with pytest, for instance) or a CI job,
+        that error fails the run, which is the point: the data can't move on until it passes every
+        check. When a few failures are acceptable, set thresholds on the plan and use
+        [`assert_below_threshold()`](`pointblank.Validate.assert_below_threshold`) instead.
         """
         # Check if validation has been interrogated
         if not hasattr(self, "time_start") or self.time_start is None:
@@ -18318,6 +18450,11 @@ class Validate:
         except AssertionError as e:
             print(f"Custom error: {e}")
         ```
+
+        The custom message replaces the default one, which helps when the error ends up in a log
+        or a notification read by someone who doesn't know the validation plan. Like
+        [`assert_passing()`](`pointblank.Validate.assert_passing`), this method interrogates the
+        plan first if that hasn't been done yet.
 
         See Also
         --------
@@ -18615,6 +18752,13 @@ class Validate:
         ```{python}
         validation.n()
         ```
+
+        The dictionary is keyed by step number, so it lines up with the step numbers shown in the
+        validation report. A list such as `i=[1, 3]` returns entries for just those steps. To get
+        how many of these test units passed or failed, use
+        [`n_passed()`](`pointblank.Validate.n_passed`) and
+        [`n_failed()`](`pointblank.Validate.n_failed`), which take the same `i=` and `scalar=`
+        arguments.
         """
         result = self._get_validation_dict(i, "n")
         if scalar and isinstance(i, int):
@@ -19483,18 +19627,60 @@ class Validate:
 
         Examples
         --------
-        ```python
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Let's create a validation plan for the `small_table` dataset, with thresholds and four
+        steps, and render it as code.
+
+        ```{python}
         import pointblank as pb
 
+        small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
         validation = (
-            pb.Validate(data=pb.load_dataset("small_table"))
+            pb.Validate(data=small_table, tbl_name="small_table", thresholds=(0.1, 0.2))
             .col_vals_gt(columns="d", value=100)
-            .col_vals_not_null(columns="a")
+            .col_vals_not_null(columns="c")
+            .col_vals_in_set(columns="f", set=["low", "mid", "high"])
             .rows_distinct()
         )
 
         print(validation.to_code())
         ```
+
+        The code has every step with its arguments, and the thresholds written out as a
+        [`Thresholds`](`pointblank.Thresholds`) object. The table is the placeholder `your_data`,
+        and the code doesn't call [`interrogate()`](`pointblank.Validate.interrogate`), since it
+        describes the plan rather than a run of it. Running the code with `your_data` defined
+        recreates the plan, which can then be interrogated:
+
+        ```{python}
+        namespace = {"your_data": small_table}
+
+        exec(validation.to_code(), namespace)
+
+        namespace["validation"].interrogate()
+        ```
+
+        The recreated plan finds the same failures as the original would (the two missing values
+        in `c` and the duplicated rows). When a step has something that can't be written as code,
+        such as a `pre=` function, the code still parses but a warning says what was lost:
+
+        ```{python}
+        validation_pre = pb.Validate(data=small_table).col_vals_gt(
+            columns="d", value=100, pre=lambda df: df.head(5)
+        )
+
+        print(validation_pre.to_code())
+        ```
+
+        The `pre=` function is written as `pre=None`, so the generated step would check every
+        row rather than the first five. Fix up placeholders like this one before using the code.
         """
         import warnings
 
@@ -19593,17 +19779,44 @@ class Validate:
 
         Examples
         --------
-        ```python
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Let's create a validation plan for the `small_table` dataset and write it as YAML.
+
+        ```{python}
         import pointblank as pb
 
+        small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
         validation = (
-            pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+            pb.Validate(data=small_table, tbl_name="small_table", thresholds=(0.1, 0.2))
             .col_vals_gt(columns="d", value=100)
-            .col_vals_not_null(columns="a")
+            .col_vals_not_null(columns="c")
+            .col_vals_in_set(columns="f", set=["low", "mid", "high"])
         )
 
-        print(validation.to_yaml())
+        yaml_config = validation.to_yaml()
+
+        print(yaml_config)
         ```
+
+        Each step becomes an entry under `steps`, named after its method and with its arguments
+        beneath. The `tbl` field was set from `tbl_name=`. Here, that name happens to be a dataset
+        that [`yaml_interrogate()`](`pointblank.yaml_interrogate`) can load, so the YAML runs
+        as is:
+
+        ```{python}
+        pb.yaml_interrogate(yaml_config)
+        ```
+
+        For a table of your own, set `tbl` to a file path or connection string before running the
+        YAML. To keep the configuration (for instance, in version control next to the pipeline it
+        checks), give `to_yaml()` a `path=`, which writes the file and still returns the string.
         """
         import warnings
 
@@ -19721,29 +19934,49 @@ class Validate:
 
         Examples
         --------
-        ```python
+        ```{python}
+        #| echo: false
+        #| output: false
         import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Let's write a validation plan for a table of user accounts and export it as JSON Schema.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+        import json
+
+        accounts = pl.DataFrame(
+            {
+                "name": ["Ana", "Ben", "Chloé"],
+                "age": [34, 27, 45],
+                "status": ["active", "inactive", "active"],
+            }
+        )
 
         validation = (
-            pb.Validate(data=df)
+            pb.Validate(data=accounts)
             .col_vals_gt(columns="age", value=0)
             .col_vals_not_null(columns="name")
             .col_vals_in_set(columns="status", set=["active", "inactive"])
+            .rows_distinct()
         )
 
         schema = validation.to_json_schema()
-        # {'$schema': 'https://json-schema.org/draft/2020-12/schema',
-        #  'type': 'object',
-        #  'properties': {
-        #      'age': {'exclusiveMinimum': 0, 'type': 'integer'},
-        #      'name': {'type': 'string'},
-        #      'status': {'enum': ['active', 'inactive'], 'type': 'string'}
-        #  },
-        #  'required': ['name']}
 
-        # Write to a file
-        validation.to_json_schema("output.schema.json")
+        print(json.dumps(schema, indent=2))
         ```
+
+        Each column has a property: `age > 0` became `exclusiveMinimum`, the set of statuses
+        became `enum`, and the not-null check on `name` put it in `required`. The `type` of each
+        property comes from the data attached to the plan. The
+        [`rows_distinct()`](`pointblank.Validate.rows_distinct`) step has no JSON Schema
+        equivalent (a schema describes one record at a time), so it isn't in the output. Since the
+        result is a standard schema, it can be given to any JSON Schema validator, for example to
+        check records in an API before they're loaded into the table. With `path=`, the schema is
+        also written to a file.
         """
         from pointblank.adapters._api import export_contract
 
@@ -19887,6 +20120,15 @@ class Validate:
         print(proposal.diff())
         improved = proposal.accept()
         ```
+
+        This example isn't executed here because it needs an API key and a call to the model
+        provider. The plan above only checks column `d`, so the instruction sent to the model asks
+        it to cover the other columns and to add thresholds. Printing `proposal.diff()` shows the
+        proposed steps as a diff against the current plan, so you can review them before anything
+        runs. If they look right, `accept()` returns the revised plan as a new `Validate` object.
+        That object hasn't been interrogated yet, so call
+        [`interrogate()`](`pointblank.Validate.interrogate`) on it to run the checks. The original
+        `validation` object is left unchanged.
         """
         from pointblank.edit import EditValidation
 
@@ -19948,6 +20190,17 @@ class Validate:
         )
         plan = proposal.accept()
         ```
+
+        This example isn't executed here because it needs an API key and a call to the model
+        provider. The `base` object contributes its table name (and any label and thresholds) but
+        no steps. The model writes steps that satisfy the prompt, so here you'd expect a
+        not-null check on `a` and a greater-than-zero check on `d`. Before accepting, you can
+        review the generated plan with `proposal.to_code()`. Then `accept()` returns it as a
+        `Validate` object that hasn't been interrogated yet. Call
+        [`interrogate()`](`pointblank.Validate.interrogate`) on it to run the checks. To extend a
+        plan that already has steps, use
+        [`suggest_improvements()`](`pointblank.Validate.suggest_improvements`) or
+        [`EditValidation`](`pointblank.EditValidation`) instead.
         """
         from pointblank.edit import EditValidation
 
@@ -19992,19 +20245,38 @@ class Validate:
 
         Examples
         --------
-        ```python
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Let's validate the `small_table` dataset with three steps, each of which falls into a
+        different dimension: a not-null check (completeness), a range check (validity), and a
+        check for duplicate rows (uniqueness).
+
+        ```{python}
         import pointblank as pb
 
+        small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
         validation = (
-            pb.Validate(data=pb.load_dataset("small_table"))
+            pb.Validate(data=small_table)
             .col_vals_not_null(columns="c")
-            .col_vals_gt(columns="d", value=0)
+            .col_vals_gt(columns="d", value=1000)
             .rows_distinct()
             .interrogate()
         )
 
         validation.get_dimension_scores()
         ```
+
+        Each step has 13 test units (one per row). Completeness scores 84.62 because 11 of the
+        13 values in `c` are present, and uniqueness gets the same score from the 2 duplicated
+        rows. Validity is lowest: only 7 of the 13 values in `d` are above 1000. A breakdown like
+        this points to the kind of problem to fix, which the single number from
+        [`get_health_score()`](`pointblank.Validate.get_health_score`) doesn't.
 
         See Also
         --------
@@ -20036,18 +20308,47 @@ class Validate:
 
         Examples
         --------
-        ```python
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Let's validate the `small_table` dataset with a not-null check, a range check, and a check
+        for duplicate rows, then get the overall score.
+
+        ```{python}
         import pointblank as pb
 
+        small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
         validation = (
-            pb.Validate(data=pb.load_dataset("small_table"))
+            pb.Validate(data=small_table)
             .col_vals_not_null(columns="c")
-            .col_vals_gt(columns="d", value=0)
+            .col_vals_gt(columns="d", value=1000)
+            .rows_distinct()
             .interrogate()
         )
 
         validation.get_health_score()
         ```
+
+        The three steps have 39 test units in all, and 29 of them passed, for a score of 74.36.
+        If missing values matter more to you than the other problems, give completeness a larger
+        weight:
+
+        ```{python}
+        pb.config(dimension_weights={"completeness": 3})
+
+        validation.get_health_score()
+        ```
+
+        The completeness step now counts three times, so its 84.62 pass rate pulls the score up
+        to 78.46. Note that each call to [`config()`](`pointblank.config`) sets every option,
+        so any other settings you rely on (such as those for the report) need to be included in
+        the same call. Calling `pb.config()` with no arguments goes back to the defaults, with
+        all dimensions weighted equally.
 
         See Also
         --------
@@ -20090,18 +20391,52 @@ class Validate:
 
         Examples
         --------
-        ```python
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Let's validate the `small_table` dataset with a not-null check (a completeness step) and
+        a range check (a validity step).
+
+        ```{python}
         import pointblank as pb
 
+        small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
         validation = (
-            pb.Validate(data=pb.load_dataset("small_table"))
+            pb.Validate(data=small_table)
             .col_vals_not_null(columns="c")
+            .col_vals_gt(columns="d", value=1000)
             .interrogate()
         )
 
-        # Fail if the completeness score is below 95
-        validation.assert_dimension_scores(thresholds={"completeness": 95})
+        validation.get_dimension_scores()
         ```
+
+        Requiring completeness of at least 80 and validity of at least 50 passes, so nothing
+        happens:
+
+        ```{python}
+        validation.assert_dimension_scores(thresholds={"completeness": 80, "validity": 50})
+        ```
+
+        Raising the completeness minimum to 95 makes the assertion fail. The `AssertionError` is
+        caught here so that its message can be shown:
+
+        ```{python}
+        try:
+            validation.assert_dimension_scores(thresholds={"completeness": 95, "validity": 50})
+        except AssertionError as e:
+            print(e)
+        ```
+
+        The message lists each dimension below its minimum, with the actual and required scores.
+        In a test suite or a CI job, leave the error uncaught so that it fails the run. To use the
+        same minimums everywhere, set them once with `config(dimension_thresholds=...)` and call
+        `assert_dimension_scores()` without `thresholds=`.
 
         See Also
         --------
@@ -20165,19 +20500,38 @@ class Validate:
 
         Examples
         --------
-        ```python
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Let's validate the `small_table` dataset with steps in three dimensions and get the
+        scorecard.
+
+        ```{python}
         import pointblank as pb
 
+        small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
         validation = (
-            pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+            pb.Validate(data=small_table, tbl_name="small_table")
             .col_vals_not_null(columns="c")
-            .col_vals_gt(columns="d", value=0)
+            .col_vals_gt(columns="d", value=1000)
             .rows_distinct()
             .interrogate()
         )
 
         validation.get_scorecard()
         ```
+
+        The overall health score (74%) is at the top, and each dimension has its own row with a
+        bar, its score, and the passing and total test units. Validity has the shortest bar, since
+        only 7 of the 13 values in `d` are above 1000. The scorecard leaves out the details of
+        individual steps, which makes it a good summary to share, while
+        [`get_tabular_report()`](`pointblank.Validate.get_tabular_report`) gives the full picture
+        for whoever has to fix the data.
 
         See Also
         --------
@@ -20447,6 +20801,10 @@ class Validate:
         failing_steps = [step for step in report_data if step["n_failed"] > 0]
         print(f"Number of failing validation steps: {len(failing_steps)}")
         ```
+
+        Both steps have one failing test unit: the `5` in column `a` isn't greater than `6`, and
+        the `4` in column `b` isn't less than `4`. Because the report is plain JSON, it can be
+        sent to a monitoring service or stored with each run, and read back without Pointblank.
 
         See Also
         --------
@@ -22460,6 +22818,11 @@ class Validate:
         ```{python}
         validation.get_dataframe_report(tbl_type="pandas")
         ```
+
+        Both have one row per validation step and the same columns, whatever the type of the
+        validated table. As a DataFrame, the results can be filtered (to find the steps that
+        failed), appended to a table of earlier runs to track quality over time, or written to a
+        database alongside the data.
         """
         allowed_tbl_types = ("polars", "pandas", "duckdb")
         if tbl_type not in allowed_tbl_types:
@@ -28623,6 +28986,14 @@ def _generate_agg_docstring(name: str) -> str:
         Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
         [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
         a step based on properties of the target table.
+    dimension
+        An optional data quality dimension to categorize this validation step for health
+        scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+        `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the step is
+        assigned to `"validity"`, like the other aggregate checks. A check that's really about how
+        much data there is (such as a sum of quantities against an expected total) might be better
+        labeled `"volume"` or `"consistency"`. This label appears in the validation report and
+        feeds the overall and per-dimension health scores.
 
     Returns
     -------
