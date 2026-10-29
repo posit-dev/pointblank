@@ -322,3 +322,26 @@ def test_from_folder_dataset_json():
     assert study.domains == ["DM"]
     assert study.get_dataset("DM").shape == (2, 7)
     assert study.subject_ids("DM") == {"S1-001", "S1-002"}
+
+
+# ── Built-in rules engine inputs ─────────────────────────────────────────────
+
+
+def test_rules_engine_uses_define_metadata_package():
+    # A `define` given as an imported MetadataPackage activates the Define-XML rules, just as a
+    # path to define.xml does.
+    define_path = pb.load_metadata_example("define.xml")
+    dm = _dm()
+
+    from_path = SubmissionPackage(datasets={"DM": dm}, define=define_path)
+    from_pkg = SubmissionPackage(datasets={"DM": dm}, define=pb.import_metadata(define_path))
+
+    counts_path = from_path.validate_conformance().summary()["status_counts"]
+    counts_pkg = from_pkg.validate_conformance().summary()["status_counts"]
+    assert "not_applicable" not in counts_path
+    assert counts_pkg == counts_path
+
+
+def test_validate_sdtmig_unknown_version_raises():
+    with pytest.raises(ValueError, match="3-3"):
+        pb.validate_sdtmig({"DM": _dm()}, version="3.3")
