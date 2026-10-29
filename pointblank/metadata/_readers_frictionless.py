@@ -451,8 +451,13 @@ def _parse_csvw_table(
                 dtype = _CSVW_DATATYPE_MAP.get(base, "String")
 
                 # Constraints within the datatype object
-                min_val_raw = datatype.get("minimum") or datatype.get("minInclusive")
-                max_val_raw = datatype.get("maximum") or datatype.get("maxInclusive")
+                # Use `is None` rather than `or` so that a bound of `0` isn't dropped
+                min_val_raw = datatype.get("minimum")
+                if min_val_raw is None:
+                    min_val_raw = datatype.get("minInclusive")
+                max_val_raw = datatype.get("maximum")
+                if max_val_raw is None:
+                    max_val_raw = datatype.get("maxInclusive")
                 if datatype.get("minExclusive") is not None:
                     min_val_raw = datatype["minExclusive"]
                 if datatype.get("maxExclusive") is not None:
