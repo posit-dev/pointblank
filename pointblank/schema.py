@@ -1325,6 +1325,16 @@ def generate_dataset(
     schema is defined using `Field` objects with constraints (e.g., `min_val=`, `max_val=`,
     `pattern=`, `preset=`), the generated data will respect those constraints.
 
+    Synthetic data is useful when the real data can't be shared or doesn't exist yet. It lets you
+    develop and try out a validation plan before the data arrives, build test fixtures, and create
+    example tables for documentation and bug reports. Give a `seed=` to get the same data on every
+    run. The schema's columns usually come from field functions such as
+    [`int_field()`](`pointblank.int_field`) and [`string_field()`](`pointblank.string_field`), or
+    from [`profile_fields()`](`pointblank.profile_fields`) for coherent personal details (names,
+    emails, addresses), and [`schema_from_tbl()`](`pointblank.schema_from_tbl`) can start a schema
+    from an existing table. In a pytest suite, the `generate_dataset` fixture works the same way
+    and seeds each test automatically.
+
     Parameters
     ----------
     schema
