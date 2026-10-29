@@ -2300,6 +2300,18 @@ class TestValidateSDTMStructure:
         assert result["valid"] is False
         assert result["domain_mismatch"] is True
 
+    def test_domain_mismatch_lists_values_in_order(self):
+        """The DOMAIN values in the issue are listed in order of appearance."""
+        import polars as pl
+        from pointblank.metadata._sdtm_templates import validate_sdtm_structure
+
+        dm = pl.DataFrame({"DOMAIN": ["DM", "AE", "DM", "VS", "LB", "CM"]})
+        result = validate_sdtm_structure(dm, domain="DM")
+        assert result["issues"][-1] == (
+            "DOMAIN column contains unexpected values: ['DM', 'AE', 'VS', 'LB', 'CM'] "
+            "(expected ['DM'])"
+        )
+
     def test_strict_mode_reports_expected(self):
         """Strict mode reports missing Expected variables."""
         import pandas as pd
@@ -2609,6 +2621,33 @@ class TestValidateSDTM:
             if info.assertion_type in ("col_vals_not_null", "col_vals_in_set"):
                 assert info.n_failed == 0
 
+    @pytest.mark.parametrize("frame", ["polars", "pandas"])
+    def test_length_checks_pass_null_values(self, frame):
+        """A null in an optional Char variable doesn't fail its length check."""
+        import polars as pl
+        from pointblank.metadata._sdtm_validate import validate_sdtm
+
+        dm = pl.DataFrame(
+            {
+                "STUDYID": ["S1", "S1"],
+                "DOMAIN": ["DM", "DM"],
+                "USUBJID": ["S1-001", "S1-002"],
+                "RFSTDTC": ["2024-01-15", None],
+                "SEX": ["M", "MALE"],
+            }
+        )
+        if frame == "pandas":
+            dm = dm.to_pandas()
+
+        validation = validate_sdtm(dm, domain="DM", check_dates=False).interrogate()
+        n_failed = {
+            info.brief: info.n_failed
+            for info in validation.validation_info
+            if info.assertion_type == "col_vals_expr"
+        }
+        assert n_failed["RFSTDTC length <= 64"] == 0
+        assert n_failed["SEX length <= 2"] == 1
+
 
 # =============================================================================
 # CDISC ADaM Templates & Validation
@@ -2828,6 +2867,18 @@ class TestValidateADaMStructure:
         result = validate_adam_structure(advs, dataset="BDS")
         assert result["valid"] is True
 
+    def test_unknown_variables_in_column_order(self):
+        """Unknown variables are reported in the order of the table's columns."""
+        import polars as pl
+        from pointblank.metadata._adam_templates import validate_adam_structure
+
+        extra = ["ZZZ", "AAA", "MMM", "BBB", "YYY"]
+        advs = pl.DataFrame(
+            {"STUDYID": ["S1"], "USUBJID": ["S1-001"], **{name: [1] for name in extra}}
+        )
+        result = validate_adam_structure(advs, dataset="BDS", strict=True)
+        assert result["unknown_variables"] == extra
+
 
 class TestADaMToMetadata:
     """Tests for converting ADaM templates to MetadataImport."""
@@ -2932,9 +2983,12 @@ class TestValidateADaM:
             }
         )
         validation = validate_adam(adsl, dataset="ADSL")
-        # TRT01P not_null should be there (both as required and as ADSL-specific)
-        assertion_types = [v.assertion_type for v in validation.validation_info]
-        assert "col_vals_not_null" in assertion_types
+        # TRT01P is a required ADSL variable, so it gets one null check (not a second one from
+        # the ADSL-specific checks)
+        not_null_columns = [
+            v.column for v in validation.validation_info if v.assertion_type == "col_vals_not_null"
+        ]
+        assert not_null_columns.count("TRT01P") == 1
 
     def test_adtte_cnsr_values(self):
         """ADTTE validates CNSR is 0 or 1."""
@@ -3035,6 +3089,24 @@ class TestValidateADaM:
         validation = validate_adam(advs, dataset="BDS")
         assertion_types = [v.assertion_type for v in validation.validation_info]
         assert "col_vals_expr" in assertion_types
+
+    def test_bds_paramcd_length_check_passes_nulls(self):
+        """A null PARAMCD fails only the null check, not the length check too."""
+        import polars as pl
+        from pointblank.metadata._adam_validate import validate_adam
+
+        advs = pl.DataFrame(
+            {
+                "PARAMCD": ["SYSBP", None, "DIASTOLIC"],
+                "PARAM": ["Systolic BP", "Pulse Rate", "Diastolic BP"],
+            }
+        )
+        validation = validate_adam(advs, dataset="BDS").interrogate()
+        n_failed = {
+            (info.assertion_type, info.column): info.n_failed for info in validation.validation_info
+        }
+        assert n_failed[("col_vals_not_null", "PARAMCD")] == 1
+        assert n_failed[("col_vals_expr", None)] == 1
 
     def test_custom_label(self):
         """Custom label is applied."""
