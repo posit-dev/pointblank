@@ -345,38 +345,40 @@ def get_validation_summary() -> dict | None:
     Final actions are executed after the completion of all validation steps. They provide an
     opportunity to take appropriate actions based on the overall validation results. Here's an
     example of a final action function (`send_report()`) that sends an alert when critical
-    validation failures are detected:
+    validation failures are detected. To keep the example self-contained, the alert is printed;
+    in practice, this is where you'd send an email or post a message to a chat service:
 
-    ```python
+    ```{python}
     import pointblank as pb
 
     def send_report():
         summary = pb.get_validation_summary()
         if summary["highest_severity"] == "critical":
-            # Send an alert email
-            send_alert_email(
-                subject=f"CRITICAL validation failures in {summary['tbl_name']}",
-                body=f"{summary['n_critical_steps']} steps failed with critical severity."
-            )
+            print(f"CRITICAL validation failures in {summary['tbl_name']}")
+            print(f"Steps with critical severity: {summary['n_critical_steps']}")
 
     validation = (
         pb.Validate(
-            data=my_data,
-            final_actions=pb.FinalActions(send_report)
+            data=pb.load_dataset("small_table"),
+            tbl_name="small_table",
+            thresholds=(1, 2, 3),
+            final_actions=pb.FinalActions(send_report),
         )
-        .col_vals_gt(columns="revenue", value=0)
+        .col_vals_gt(columns="d", value=1000)
+        .col_vals_not_null(columns="c")
         .interrogate()
     )
     ```
 
-    Note that `send_alert_email()` in the example above is a placeholder function that would be
-    implemented by the user to send email alerts. This function is not provided by the Pointblank
-    package.
+    The first step has six failing test units, which reaches the 'critical' threshold of three,
+    so the alert was printed during `interrogate()`. The second step's two missing values only
+    reach the 'error' threshold. Outside of a final action, `get_validation_summary()` returns
+    `None`.
 
     The `get_validation_summary()` function can also be used to create custom reporting for
     validation results:
 
-    ```python
+    ```{python}
     def log_validation_results():
         summary = pb.get_validation_summary()
 
@@ -389,12 +391,29 @@ def get_validation_summary() -> dict | None:
             f"{summary['n_critical_steps']} critical"
         )
 
-        if summary['highest_severity'] in ["error", "critical"]:
-            print("⚠️ Action required: Please review failing validation steps!")
+        if summary["highest_severity"] in ["error", "critical"]:
+            print("Action required: Please review failing validation steps!")
+
+    validation = (
+        pb.Validate(
+            data=pb.load_dataset("small_table"),
+            tbl_name="small_table",
+            thresholds=(1, 2, 3),
+            final_actions=pb.FinalActions(log_validation_results),
+        )
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_not_null(columns="c")
+        .col_vals_le(columns="a", value=7)
+        .interrogate()
+    )
     ```
 
-    Final actions work well with both simple logging and more complex notification systems, allowing
-    you to integrate validation results into your broader data quality workflows.
+    The first step passes, the second step's two missing values reach the 'error' threshold, and
+    the third step's single failure reaches the 'warning' threshold. A step that reaches a higher
+    threshold also counts toward the lower ones, which is why the severity counts can add up to
+    more than the number of failing steps. Final actions work well with both simple logging and
+    more complex notification systems, allowing you to integrate validation results into your
+    broader data quality workflows.
 
     See Also
     --------
@@ -761,35 +780,52 @@ def read_file(filepath: str | Path) -> Validate:
 
     Examples
     --------
-    Load a validation object that was previously saved:
-
-    ```python
+    ```{python}
+    #| echo: false
+    #| output: false
     import pointblank as pb
-
-    # Load a validation object from disk
-    validation = pb.read_file("my_validation.pkl")
-
-    # View the validation results
-    validation
+    pb.config(report_incl_header=False, report_incl_footer_timings=False)
     ```
 
-    You can also load using just the filename (without extension):
+    Let's first save a validation object to disk with `write_file()`. We'll use a temporary
+    directory here, and `keep_tbl=True` saves the target table along with the validation results:
 
-    ```python
-    # This will automatically look for "my_validation.pkl"
-    validation = pb.read_file("my_validation")
+    ```{python}
+    import pointblank as pb
+    import os
+    import tempfile
+
+    validation = (
+        pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+        .col_vals_gt(columns="d", value=1000)
+        .col_vals_not_null(columns="c")
+        .interrogate()
+    )
+
+    save_dir = tempfile.mkdtemp()
+    pb.write_file(validation, "my_validation", path=save_dir, keep_tbl=True, quiet=True)
     ```
 
-    The loaded validation object retains all its functionality:
+    Now we can load the validation object from disk with `read_file()`. The filename can be given
+    without its extension, in which case `read_file()` looks for `"my_validation.pkl"`:
 
-    ```python
-    # Get validation summary
-    summary = validation.get_json_report()
+    ```{python}
+    restored = pb.read_file(os.path.join(save_dir, "my_validation"))
 
-    # Get sundered data (if original table was saved)
-    if validation.data is not None:
-        failing_rows = validation.get_sundered_data(type="fail")
+    restored
     ```
+
+    The restored object has the same results as the original: the first step has 6 failing test
+    units and the second has 2. The loaded validation object retains all its functionality, so we
+    can, for example, get the rows that failed any step (since the target table was saved):
+
+    ```{python}
+    pb.preview(restored.get_sundered_data(type="fail"))
+    ```
+
+    These are the 8 rows of `small_table` that failed at least one of the two steps. Without
+    `keep_tbl=True` in `write_file()`, the table wouldn't be saved and methods that need the data,
+    like `get_sundered_data()`, wouldn't be available after loading.
 
     See Also
     --------
@@ -1498,6 +1534,10 @@ def get_data_path(
     without requiring the actual data files. The returned paths can be used with
     `Validate(data=path)` to demonstrate CSV and Parquet file loading capabilities.
 
+    Each call writes the dataset to a new temporary file and returns the path to that file. The
+    temporary file isn't deleted automatically, so it stays available for as long as the
+    operating system keeps its temporary files.
+
     Parameters
     ----------
     dataset
@@ -1509,7 +1549,7 @@ def get_data_path(
     Returns
     -------
     str
-        The file path to the requested dataset file.
+        The path to a temporary file holding the requested dataset in the requested format.
 
     Included Datasets
     -----------------
@@ -1537,7 +1577,6 @@ def get_data_path(
 
     # Get path to the small_table CSV file
     csv_path = pb.get_data_path("small_table", "csv")
-    print(csv_path)
 
     # Use the path directly with Validate
     validation = (
@@ -1550,7 +1589,10 @@ def get_data_path(
     validation
     ```
 
-    Get a Parquet file path for validation examples:
+    The CSV file is read into a table during interrogation. The three `col_exists()` steps and the
+    `col_vals_gt()` step all pass.
+
+    We can also get a Parquet file path for validation examples:
 
     ```{python}
     # Get path to the game_revenue Parquet file
@@ -1567,6 +1609,8 @@ def get_data_path(
     validation
     ```
 
+    All 2,000 rows have player and session IDs and positive revenue values, so every step passes.
+
     This is particularly useful for documentation examples where you want to demonstrate
     file-based workflows without requiring users to have specific data files:
 
@@ -1576,11 +1620,17 @@ def get_data_path(
 
     validation = (
         pb.Validate(data=sales_csv, label="Sales Data Validation")
-        .col_exists(["customer_id", "product_id", "amount"])
-        .col_vals_regex(columns="customer_id", pattern=r"CUST_[0-9]{6}")
+        .col_exists(["customer_id", "product_id", "revenue"])
+        .col_vals_regex(columns="customer_id", pattern=r"[0-9a-f]{8}")
         .interrogate()
     )
+
+    validation
     ```
+
+    All three columns exist, and every customer ID that's present is an eight-character
+    hexadecimal string. The 334 failing test units in the last step are rows where `customer_id`
+    is missing; setting `na_pass=True` would count those rows as passing.
 
     See Also
     --------
@@ -5143,6 +5193,10 @@ def connect_to_table(connection_string: str) -> Any:
     pb.preview(game_revenue)
     ```
 
+    The result is an Ibis table that stays in the database, and `preview()` shows the first and
+    last five of its 2,000 rows. The same table object can be passed to `Validate(data=)`, and
+    the validation then runs inside DuckDB.
+
     Here are some backend-specific connection examples:
 
     ```python
@@ -5168,6 +5222,10 @@ def connect_to_table(connection_string: str) -> Any:
     pip install 'ibis-framework[duckdb]'    # for DuckDB
     pip install 'ibis-framework[postgres]'  # for PostgreSQL
     ```
+
+    The connection string's backend name (e.g., `postgresql://`) determines which Ibis backend is
+    needed. If it isn't installed, `connect_to_table()` raises a `ConnectionError` that shows the
+    `pip install` command for it.
     See Also
     --------
     print_database_tables : List all available tables in a database for discovery
@@ -6270,7 +6328,7 @@ class Validate:
         validation_table_1.interrogate()
         ```
 
-        And the second table:
+        All test units pass for the first table. And here is the second table:
 
         ```{python}
         validation_table_2.interrogate()
@@ -9962,6 +10020,10 @@ class Validate:
 
         validation
         ```
+
+        With `allow_stationary=True`, the repeated `2` counts as a passing value, so all six test
+        units pass. Column `c`, where the value drops from `2` to `1`, would still fail with this
+        setting; only the `decreasing_tol=` parameter can allow drops like that.
         """
         assertion_type = "col_vals_increasing"
 
@@ -10201,6 +10263,10 @@ class Validate:
 
         validation
         ```
+
+        With `allow_stationary=True`, the repeated `4` counts as a passing value, so all six test
+        units pass. Column `c`, where the value rises from `4` to `5`, would still fail with this
+        setting; only the `increasing_tol=` parameter can allow rises like that.
         """
         assertion_type = "col_vals_decreasing"
 
@@ -11511,6 +11577,9 @@ class Validate:
 
         validation
         ```
+
+        Without an upper bound, the long string now passes, but `"ok"` fails because its two
+        characters fall short of `min_val=3`. So there's again one failing test unit out of four.
         """
 
         if min_val is None and max_val is None:
@@ -12457,6 +12526,10 @@ class Validate:
 
         validation
         ```
+
+        Both steps pass. Three of the eight values are missing codes, so the overall missing share
+        of 37.5% is within `max_pct=0.5`. The `reason="refused"` step counts only the two `-98`
+        values, and their share of 25% is within `max_pct=0.30`.
         """
         assertion_type = _get_fn_name()
 
@@ -14399,7 +14472,7 @@ class Validate:
         tol
             The tolerance allowable for the row count match. This can be specified as a single
             numeric value (integer or float) or as a tuple of two integers representing the lower
-            and upper bounds of the tolerance range. If a single integer value (greater than 1) is
+            and upper bounds of the tolerance range. If a single integer value (`1` or greater) is
             provided, it represents the absolute bounds of the tolerance, ie. plus or minus the value.
             If a float value (between 0-1) is provided, it represents the relative tolerance, ie.
             plus or minus the relative percentage of the target. If a tuple is provided, it represents
@@ -14526,36 +14599,55 @@ class Validate:
         The validation table shows that the expectation value of `13` matches the actual count of
         rows in the target table. So, the single test unit passed.
 
-
-        Let's modify our example to show the different ways we can allow some tolerance to our validation
-        by using the `tol` argument.
+        The `tol=` argument allows the row count to differ from `count=` by some amount. A tuple
+        sets separate lower and upper bounds, so here `tol=(2, 0)` accepts anywhere from 11 to 13
+        rows. A sample of 12 rows from the table passes:
 
         ```{python}
-        smaller_small_table = small_table.sample(n = 12) # within the lower bound
-        validation = (
-            pb.Validate(data=smaller_small_table)
-            .row_count_match(count=13,tol=(2, 0)) # minus 2 but plus 0, ie. 11-13
-            .interrogate()
-        )
-
-        validation
+        smaller_small_table = small_table.sample(n=12)
 
         validation = (
             pb.Validate(data=smaller_small_table)
-            .row_count_match(count=13,tol=.05) # .05% tolerance of 13
-            .interrogate()
-        )
-
-        even_smaller_table = small_table.sample(n = 2)
-        validation = (
-            pb.Validate(data=even_smaller_table)
-            .row_count_match(count=13,tol=5) # plus or minus 5; this test will fail
+            .row_count_match(count=13, tol=(2, 0))
             .interrogate()
         )
 
         validation
         ```
 
+        A float between `0` and `1` is a relative tolerance: `tol=0.1` allows a difference of 10%
+        of `13`, which is rounded down to one row. So the 12-row sample passes again:
+
+        ```{python}
+        validation = (
+            pb.Validate(data=smaller_small_table)
+            .row_count_match(count=13, tol=0.1)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        A smaller relative tolerance such as `tol=0.05` would make this step fail, since 5% of `13`
+        rounds down to zero rows. An integer of `1` or more is an absolute tolerance in both
+        directions. With `tol=5`, the row count can be anywhere from 8 to 18, so a two-row table
+        fails:
+
+        ```{python}
+        even_smaller_table = small_table.sample(n=2)
+
+        validation = (
+            pb.Validate(data=even_smaller_table)
+            .row_count_match(count=13, tol=5)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The single test unit fails because two rows is well outside the range of 8 to 18. When a
+        table should be about the same size as another table, `count=` can also take that table
+        directly and use its row count as the expected value.
         """
 
         assertion_type = _get_fn_name()
@@ -14862,6 +14954,10 @@ class Validate:
         validation
         ```
 
+        Only the first step fails: the newest record is an hour old, which is older than 30 minutes
+        but well within 2 days and 1 week. Each step has a single test unit, so these tiers show up
+        as separate rows in the report.
+
         When your data contains naive datetimes (timestamps without timezone information), use the
         `timezone=` parameter to specify what timezone those values represent. Here we have event
         data recorded in Eastern Time, so we set `timezone="America/New_York"` to ensure the
@@ -14889,17 +14985,36 @@ class Validate:
         validation
         ```
 
+        The step passes here. Note that `datetime.now()` gives the local time of the machine
+        running the code, so the age computed for this example depends on how far that machine's
+        time zone is from Eastern Time. With real data, `timezone=` should name the time zone in
+        which the timestamps were recorded.
+
         For reproducible validations or historical checks, you can use `reference_time=` to compare
         against a specific point in time instead of the current time. This is particularly useful
         for testing or when validating data snapshots. The reference time should include a timezone
         offset (like `+00:00` for UTC) to avoid ambiguity.
 
         ```{python}
+        snapshot_data = pl.DataFrame({
+            "id": [1, 2, 3],
+            "updated_at": [
+                datetime(2024, 1, 15, 10, 0),
+                datetime(2024, 1, 14, 22, 0),
+                datetime(2024, 1, 13, 9, 0),
+            ]
+        })
+
         validation = (
-            pb.Validate(data=recent_data)
+            pb.Validate(data=snapshot_data)
             .data_freshness(
                 column="updated_at",
                 max_age="24 hours",
+                reference_time="2024-01-15T12:00:00+00:00"
+            )
+            .data_freshness(
+                column="updated_at",
+                max_age="1 hour",
                 reference_time="2024-01-15T12:00:00+00:00"
             )
             .interrogate()
@@ -14907,6 +15022,10 @@ class Validate:
 
         validation
         ```
+
+        The newest timestamp is two hours before the reference time, so the 24-hour step passes and
+        the 1-hour step fails. Because neither the data nor the reference time depend on the current
+        time, this validation gives the same result whenever it runs.
         """
 
         assertion_type = _get_fn_name()
@@ -15292,6 +15411,11 @@ class Validate:
 
         validation
         ```
+
+        With composite keys, each row's combination of values must appear as a row in the reference
+        table. The third row fails because `("US", "C3")` isn't in the catalog. The second row,
+        `("EU", "A1")`, passes because the catalog has that exact pair, even though `"A1"` is also
+        listed under `"US"`.
         """
 
         assertion_type = _get_fn_name()
@@ -15645,6 +15769,11 @@ class Validate:
         ```{python}
         validation.get_step_report(i=1)
         ```
+
+        The report groups the differences: column `c` is the only column with mismatched values, the
+        row with key `2` changed (`5.0` became `5.5`), the row with key `3` is missing from the
+        target, and the row with key `5` is extra. The key values identify each row, so you can look
+        up the problem rows in either table.
         """
 
         assertion_type = _get_fn_name()
@@ -15935,6 +16064,12 @@ class Validate:
             .all_passed()
         )
         ```
+
+        The method chain ends with `all_passed()`, which returns `True`. The totals are `467.5` in
+        the source and `456.5` in the loaded table, a difference of `11` that falls within the
+        tolerance. A grand total can hide offsetting differences, though: the missing `west` orders
+        and the larger `east` total partly cancel out, which is why the per-region check above is
+        the stricter one.
         """
 
         assertion_type = _get_fn_name()
@@ -20775,6 +20910,10 @@ class Validate:
         print(json_report)
         ```
 
+        The report is a JSON array with one object per validation step. Each object holds the
+        step's settings (such as the column, the comparison value and any thresholds) along with
+        its results (the test unit counts and fractions, and whether each threshold was reached).
+
         You can also customize which fields to include:
 
         ```{python}
@@ -20785,7 +20924,8 @@ class Validate:
         print(json_report)
         ```
 
-        Or which fields to exclude:
+        Now each step object has just the five requested fields. Or we can choose which fields to
+        exclude:
 
         ```{python}
         json_report = validation.get_json_report(
