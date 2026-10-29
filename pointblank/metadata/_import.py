@@ -77,22 +77,22 @@ _XML_FORMATS: set[str] = {"cdisc_define", "define_xml", "cdisc_ct"}
 def load_metadata_example(name: str) -> Path:
     """Get the path to a bundled metadata example file.
 
-    Pointblank ships a small collection of metadata example files (CDISC Define-XML, CDISC
-    Controlled Terminology, Frictionless, CSVW, and SAS Transport) so the documentation examples can
-    run against real files without any external downloads. This function returns the filesystem path
-    to one of those bundled files, which you can then pass directly to
-    [`import_metadata()`](`pointblank.import_metadata`).
+    Pointblank ships a small collection of metadata files in the formats that
+    [`import_metadata()`](`pointblank.import_metadata`) reads: CDISC Define-XML, CDISC Controlled
+    Terminology, a Frictionless Data Package and Table Schema, CSVW, and SAS Transport (XPT). This
+    function returns the path to one of them, so you can try out metadata import (and run the
+    examples in this documentation) without supplying files of your own.
 
     Parameters
     ----------
     name
-        The file name of the example to load. Use `load_metadata_example()` with an invalid name to
-        see the available options, or consult the table below.
+        The file name of the example, such as `"define.xml"`. See the *Available Examples* section
+        for the full list. An unknown name raises a `ValueError` that lists the valid names.
 
     Returns
     -------
     Path
-        A filesystem path to the bundled example file.
+        The path to the bundled file, which can be passed directly to `import_metadata()`.
 
     Available Examples
     ------------------
@@ -105,21 +105,40 @@ def load_metadata_example(name: str) -> Path:
     | `"weather_csvw.json"` | `csvw` | W3C CSVW metadata for weather observations |
     | `"dm.xpt"` | `xpt` | SAS Transport file with a small SDTM Demographics dataset |
 
+    The XML formats need the `lxml` package and the XPT file needs `pyreadstat`. The JSON formats
+    don't need any extra packages.
+
     Examples
     --------
-    Use `load_metadata_example()` to locate a bundled Define-XML document, then import it with
-    [`import_metadata()`](`pointblank.import_metadata`):
+    Get the path to the bundled Define-XML document:
 
-    ```python
+    ```{python}
     import pointblank as pb
 
     define_path = pb.load_metadata_example("define.xml")
-    package = pb.import_metadata(define_path, format="cdisc_define")
+
+    print(define_path.name)
+    print(define_path.exists())
+    ```
+
+    The result is a `pathlib.Path` to a file inside the installed package. Pass it to
+    [`import_metadata()`](`pointblank.import_metadata`) to read the metadata:
+
+    ```{python}
+    package = pb.import_metadata(define_path)
 
     for name in package.keys():
         meta = package[name]
-        print(f"{name}: {meta.dataset_label} ({len(meta.variables)} variables)")
+        print(f"{name}: {meta.dataset_label} ({len(meta)} variables)")
     ```
+
+    The format was detected from the file's contents, and because the document describes two
+    datasets the result is a [`MetadataPackage`](`pointblank.MetadataPackage`) with one entry per
+    dataset.
+
+    See Also
+    --------
+    import_metadata : Read metadata from a file, such as one of these examples.
     """
     if name not in _METADATA_EXAMPLES:
         available = "\n".join(
@@ -306,57 +325,175 @@ def import_metadata(
     format: str | None = None,
     **kwargs: Any,
 ) -> MetadataImport | MetadataPackage:
-    """Import metadata from an external standard or file.
+    """Import metadata from a statistical-package file or a metadata standard.
 
-    Reads metadata definitions from statistical package files (SPSS, SAS, Stata), standards
-    documents (CDISC Define-XML, Frictionless), or scientific formats (NetCDF/CF) and returns a
-    structured representation that can be converted to Pointblank validation workflows.
+    Many datasets come with a description of their variables: the variable labels, value labels
+    and missing-value codes stored in an SPSS, Stata or SAS file, the field types and constraints in
+    a Frictionless or CSVW schema, or the variable definitions and codelists in a CDISC Define-XML
+    document. The `import_metadata()` function reads that description (not the data itself) into a
+    [`MetadataImport`](`pointblank.MetadataImport`) object, with one
+    [`VariableMetadata`](`pointblank.VariableMetadata`) per variable and any codelists as
+    [`Codelist`](`pointblank.Codelist`) objects.
+
+    The imported metadata is most useful as the starting point for validation. Its
+    [`to_validate()`](`pointblank.MetadataImport.to_validate`) method turns the declared types and
+    constraints into a [`Validate`](`pointblank.Validate`) plan,
+    [`to_schema()`](`pointblank.MetadataImport.to_schema`) gives a
+    [`Schema`](`pointblank.Schema`) of the column types, and
+    [`missing_specs()`](`pointblank.MetadataImport.missing_specs`) turns declared missing-value
+    codes into [`MissingSpec`](`pointblank.MissingSpec`) objects. Use
+    [`export_metadata()`](`pointblank.export_metadata`) to go the other way and write metadata out
+    as a Frictionless Table Schema.
+
+    A source that describes several datasets (a Define-XML document for a whole study, a Data
+    Package with several resources, or a Controlled Terminology file with several codelists) gives a
+    [`MetadataPackage`](`pointblank.MetadataPackage`) instead, which holds one `MetadataImport` per
+    dataset.
 
     Parameters
     ----------
     source
-        Path to a metadata file, or an object containing metadata (e.g., an xarray Dataset). For
-        file paths, the format will be auto-detected from the extension if not specified.
+        The path to the metadata file, as a string or a `pathlib.Path`. Other kinds of objects
+        raise a `TypeError`.
     format
-        Explicit format identifier. If None, auto-detected from the file extension. Supported
-        formats: `"spss"`, `"sav"`, `"xpt"`, `"sas"`, `"stata"`, `"dta"`, `"frictionless"`,
-        `"datapackage"`, `"table_schema"`, `"csvw"`, `"cdisc_define"`, `"define_xml"`, `"cdisc_ct"`.
+        The format of the file. If `None` (the default), the format is detected from the file: by
+        extension for `.sav`, `.zsav`, `.dta` and `.xpt` files, and by content for `.json` files
+        (Frictionless or CSVW) and `.xml` files (Define-XML or Controlled Terminology). Other
+        extensions need an explicit format. See the *Supported Formats* section for the values.
     **kwargs
-        Additional format-specific options passed to the reader.
+        Options for the reader of the chosen format. The Define-XML reader takes `dataset=` (such
+        as `"DM"`) to return only that dataset as a `MetadataImport`. The Controlled Terminology
+        reader takes `codelist=` to return only one codelist, and the Frictionless reader takes
+        `resource=` (a name or an index) to pick one resource from a Data Package. The
+        `"cdisc_sdtm"` and `"cdisc_adam"` formats need `domain=` and `dataset=`, respectively, and
+        also take `study_id=`.
 
     Returns
     -------
     MetadataImport | MetadataPackage
-        A MetadataImport for single-dataset sources, or a MetadataPackage for multi-dataset sources
-        (e.g., multi-domain CDISC studies).
+        A `MetadataImport` for a source that describes a single dataset, or a `MetadataPackage`
+        for a source that describes several.
 
     Raises
     ------
     ValueError
-        If the format cannot be determined or is not supported.
+        If the format can't be detected or isn't supported, or if a required option such as
+        `domain=` is missing.
+    FileNotFoundError
+        If the file doesn't exist.
     ImportError
-        If the required optional dependency is not installed.
+        If the format needs an optional package that isn't installed.
+
+    Supported Formats
+    -----------------
+    | `format=` | Reads | Needs |
+    |-----------|-------|-------|
+    | `"frictionless"` (or `"datapackage"`, `"table_schema"`) | Frictionless schema (`.json`) | |
+    | `"csvw"` | W3C CSV on the Web metadata (`.json`) | |
+    | `"cdisc_define"` (or `"define_xml"`) | CDISC Define-XML 2.0 or 2.1 (`.xml`) | `lxml` |
+    | `"cdisc_ct"` | CDISC Controlled Terminology in ODM-XML (`.xml`) | `lxml` |
+    | `"spss"` (or `"sav"`) | SPSS data file (`.sav`, `.zsav`) | `pyreadstat` |
+    | `"stata"` (or `"dta"`) | Stata data file (`.dta`) | `pyreadstat` |
+    | `"xpt"` (or `"sas"`) | SAS Transport file (`.xpt`) | `pyreadstat` |
+    | `"cdisc_sdtm"` | A built-in SDTM domain template | |
+    | `"cdisc_adam"` | A built-in ADaM dataset template | |
+
+    For SPSS, Stata and SAS files only the metadata is read, not the data. The last two formats
+    don't read a file at all: `source=` isn't used (any string will do), and the template named
+    by `domain=` or `dataset=` is returned, as with
+    [`sdtm_to_metadata()`](`pointblank.sdtm_to_metadata`) and
+    [`adam_to_metadata()`](`pointblank.adam_to_metadata`).
 
     Examples
     --------
-    Import SPSS metadata and generate validation:
+    ```{python}
+    #| echo: false
+    #| output: false
+    import pointblank as pb
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+    ```
+    Pointblank bundles a few metadata files to experiment with, which can be found with
+    [`load_metadata_example()`](`pointblank.load_metadata_example`). Let's import a Frictionless
+    Data Package that describes a table of sales transactions:
 
-    ```python
+    ```{python}
     import pointblank as pb
 
-    meta = pb.import_metadata("survey_data.sav")
-    meta.summary()
+    meta = pb.import_metadata(pb.load_metadata_example("datapackage.json"))
 
-    # Convert to a validation workflow
-    validation = meta.to_validate(data=df).interrogate()
+    meta
     ```
 
-    Import SAS Transport metadata:
+    The format was detected from the file's contents. The metadata describes eight variables and
+    one codelist (the allowed values of `category`). Each variable's metadata can be looked up by
+    name:
 
-    ```python
-    meta = pb.import_metadata("clinical_data.xpt", format="xpt")
-    schema = meta.to_schema()
+    ```{python}
+    amount = meta.get_variable("amount")
+
+    print(amount.dtype, amount.required, amount.min_val, amount.max_val)
     ```
+
+    The `amount` variable must be a non-null float from `0.01` to `99999.99`. Constraints like these
+    can be checked against a table with
+    [`to_validate()`](`pointblank.MetadataImport.to_validate`), which builds a validation plan from
+    the metadata:
+
+    ```{python}
+    import datetime
+    import polars as pl
+
+    transactions = pl.DataFrame(
+        {
+            "transaction_id": ["TXN-00001", "TXN-00002", "TXN-00003", "TXN-00004"],
+            "customer_id": ["CUST-101", "CUST-102", "CUST-101", "CUST-103"],
+            "amount": [25.50, 1200.00, 0.00, 89.99],
+            "quantity": [1, 3, 2, 1],
+            "category": ["food", "electronics", "home", "toys"],
+            "sale_date": [datetime.date(2024, 5, d) for d in (1, 1, 2, 3)],
+            "discount_pct": [0.0, 10.0, 0.0, 5.0],
+            "email": ["a@example.com", "b@example.com", "c@example.com", "not-an-email"],
+        }
+    )
+
+    meta.to_validate(data=transactions).interrogate()
+    ```
+
+    The table has the declared column types, so the schema check in step 1 passes. Three
+    later steps find a failing row each: the `amount` of `0.00` is below the minimum, `"toys"`
+    isn't one of the allowed categories, and `"not-an-email"` doesn't match the pattern given for
+    `email`.
+
+    A Define-XML document usually describes all the datasets in a study, so importing one gives a
+    [`MetadataPackage`](`pointblank.MetadataPackage`):
+
+    ```{python}
+    package = pb.import_metadata(pb.load_metadata_example("define.xml"))
+
+    package
+    ```
+
+    The package holds the Demographics (`DM`) and Adverse Events (`AE`) datasets, and
+    `package["DM"]` gives the `MetadataImport` for one of them. If only one dataset is needed, the
+    `dataset=` option of the Define-XML reader returns it directly:
+
+    ```{python}
+    dm = pb.import_metadata(pb.load_metadata_example("define.xml"), dataset="DM")
+
+    print(dm.dataset_label)
+    print(dm.variable_names)
+    ```
+
+    Options like `dataset=` are passed through to the reader for the file's format. The
+    *Supported Formats* section lists the formats, and the `**kwargs` parameter describes the
+    options that each reader accepts.
+
+    See Also
+    --------
+    load_metadata_example : Get the path to a bundled metadata file.
+    export_metadata : Export metadata as a Frictionless Table Schema.
+    MetadataImport : The metadata for a single dataset.
+    MetadataPackage : The metadata for several datasets.
     """
     # Resolve path
     if isinstance(source, (str, Path)):
