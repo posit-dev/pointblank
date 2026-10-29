@@ -181,3 +181,20 @@ def test_nan_is_missing_in_range_checks(tbl_type, method, data, left, right, exp
         counts.append(_counts(validation.interrogate()))
 
     assert counts == expected
+
+
+# The value-level helpers on `MissingSpec` follow the same rule as validation: NaN counts as a null
+@pytest.mark.parametrize("null_is_missing", [True, False])
+def test_spec_helpers_treat_nan_as_null(null_is_missing) -> None:
+    import numpy as np
+
+    spec = pb.MissingSpec(reasons={-99: "refused"}, null_is_missing=null_is_missing)
+    expected_reason = "unknown" if null_is_missing else None
+
+    for value in (None, NAN, np.float64("nan")):
+        assert spec.is_missing(value) is null_is_missing
+        assert spec.reason_for(value) == expected_reason
+
+    assert spec.is_missing(-99) is True
+    assert spec.is_missing(1.5) is False
+    assert spec.reason_for(1.5) is None
