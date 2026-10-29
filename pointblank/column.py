@@ -599,6 +599,8 @@ def ref(column_name: str) -> ReferenceColumn:
     validation
     ```
 
+    The `sales` column sums to `600` in both tables, so the single test unit passes.
+
     You can also compare different columns or use tolerance:
 
     ```{python}
@@ -614,6 +616,10 @@ def ref(column_name: str) -> ReferenceColumn:
 
     validation
     ```
+
+    The `revenue` column sums to `615`, which is `15` more than the `600` of the reference
+    `sales` column. That's within the relative tolerance of 10% (`60`), so the step passes even
+    though the sums aren't equal.
 
     See Also
     --------
