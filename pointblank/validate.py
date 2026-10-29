@@ -9175,6 +9175,16 @@ class Validate:
         that is equal to the number of rows in the table (determined after any `pre=` mutation has
         been applied).
 
+        It suits categorical columns (status values, country codes, units, and the like) where
+        only a known list of values is allowed, and it catches typos and inconsistent spellings
+        such as `"Active"` next to `"active"`. A null fails the check unless `None` is in the
+        set. For the reverse check (values that must not appear), use
+        [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`); when the allowed
+        values come from another table, such as a lookup table, use
+        [`col_vals_in_table()`](`pointblank.Validate.col_vals_in_table`); and for values that
+        follow a pattern rather than a list, use
+        [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`).
+
         Parameters
         ----------
         columns
@@ -10338,6 +10348,14 @@ class Validate:
         This validation will operate over the number of test units that is equal to the number
         of rows in the table.
 
+        Use it for columns that should be empty: a field that's no longer filled in, or one that
+        only applies to some rows. For the second case, a `pre=` function that keeps only the
+        rows in question (e.g., `lambda df: df.filter(pl.col("status") == "active")` for a
+        `closed_on` column) turns it into a conditional check. The opposite check is
+        [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`), and to check the
+        proportion of nulls in a column rather than every value, use
+        [`col_pct_null()`](`pointblank.Validate.col_pct_null`).
+
         Parameters
         ----------
         columns
@@ -10593,6 +10611,17 @@ class Validate:
         The `col_vals_not_null()` validation method checks whether column values in a table are not
         Null. This validation will operate over the number of test units that is equal to the number
         of rows in the table.
+
+        This is the usual check for required fields such as identifiers, keys, and timestamps.
+        Most other checks (e.g., [`col_vals_gt()`](`pointblank.Validate.col_vals_gt`) and
+        [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)) already fail null values
+        unless `na_pass=True` is set, but they count them together with the other failures. A
+        separate `col_vals_not_null()` step reports the missing values on their own. To check
+        whole rows across several columns, use
+        [`rows_complete()`](`pointblank.Validate.rows_complete`); to allow some nulls, check
+        their proportion with [`col_pct_null()`](`pointblank.Validate.col_pct_null`); and when
+        missing values are recorded with codes such as `-99`, see
+        [`col_missing_coded()`](`pointblank.Validate.col_missing_coded`).
 
         Parameters
         ----------
@@ -10854,6 +10883,16 @@ class Validate:
         correspond to a `pattern=` matching expression. This validation will operate over the number
         of test units that is equal to the number of rows in the table (determined after any `pre=`
         mutation has been applied).
+
+        Regular expressions check the format of string values, such as identifiers and codes
+        (e.g., `"^[A-Z]{3}-[0-9]{4}$"`), or dates and phone numbers stored as strings. A value
+        passes when the pattern matches anywhere in it, so use `^` and `$` to match the whole
+        value. With `inverse=True`, values must *not* match, which finds unwanted content such as
+        leading or trailing spaces. For common formats such as email addresses, URLs, and postal
+        codes, [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`) has
+        ready-made checks; to check only string lengths, use
+        [`col_vals_str_len()`](`pointblank.Validate.col_vals_str_len`); and for a fixed list of
+        allowed values, [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`) is simpler.
 
         Parameters
         ----------
@@ -11656,6 +11695,15 @@ class Validate:
         is equal to the number of rows in the table (determined after any `pre=` mutation has been
         applied).
 
+        Use it when no other validation method expresses the rule, such as a condition that
+        involves several columns (e.g., `(pl.col("end") - pl.col("start")) <= 5`) or one that
+        combines conditions. For a simple comparison of two columns, the comparison methods take
+        a column as the value (e.g., `col_vals_ge(columns="end", value=pb.col("start"))`), which
+        also names both columns in the report. To require that each row passes several
+        expressions at once, use [`conjointly()`](`pointblank.Validate.conjointly`), and for
+        custom logic that doesn't fit a row-by-row expression (such as a check of the whole
+        table), use [`specially()`](`pointblank.Validate.specially`).
+
         Parameters
         ----------
         expr
@@ -11906,6 +11954,16 @@ class Validate:
         The `col_exists()` method checks whether one or more columns exist in the target table. The
         only requirement is specification of the column names. Each validation step or expectation
         will operate over a single test unit, which is whether the column exists or not.
+
+        It's worth adding when a column might be missing, as in data from a source that may change
+        its layout. Without it, a step on a missing column can't be evaluated: it's marked with an
+        evaluation error and has no test units, so it can't reach a threshold. With
+        `col_exists()`, the missing column is a failing test unit, which thresholds and actions
+        can react to. To check the full set of columns along with their types, use
+        [`col_schema_match()`](`pointblank.Validate.col_schema_match`), and to check only the
+        number of columns, use [`col_count_match()`](`pointblank.Validate.col_count_match`). To
+        skip the steps on a column when it's absent, give them
+        `active=pb.has_columns("<column>")` (see [`has_columns()`](`pointblank.has_columns`)).
 
         Parameters
         ----------
@@ -13016,6 +13074,13 @@ class Validate:
         The `rows_distinct()` method checks whether rows in the table are distinct. This validation
         will operate over the number of test units that is equal to the number of rows in the table
         (determined after any `pre=` mutation has been applied).
+
+        Duplicate rows often come from loading the same data twice or from a join that matched
+        more rows than expected. With `columns_subset=`, only the given columns are compared, which
+        checks that a key (a single column such as an ID, or a combination of columns) is unique.
+        Every copy of a duplicated row is a failing test unit, so two rows with the same key give
+        two failures. To check that rows have no missing values instead, use
+        [`rows_complete()`](`pointblank.Validate.rows_complete`).
 
         Parameters
         ----------
