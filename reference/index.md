@@ -655,19 +655,19 @@ The specification of one variable in an ADaM dataset template.
 
 ## CDISC Submission Conformance
 
-Validate SDTM datasets for CDISC conformance. [validate_sdtmig()](../reference/validate_sdtmig.md#pointblank.validate_sdtmig) is the primary entry point: pass a dictionary of domain DataFrames and receive a [ConformanceReport](../reference/ConformanceReport.md#pointblank.ConformanceReport) with 426 SDTMIG 3.4 rules evaluated in-process. For full submission-package checks (cross-dataset referential integrity, SUPP- linkage, Define-XML) use [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage). For the authoritative CDISC-certified rule set, use [validate_cdisc_submission()](../reference/validate_cdisc_submission.md#pointblank.validate_cdisc_submission) (requires the CORE CLI) or `SubmissionPackage.validate_conformance(engine="core")`. All paths return a [ConformanceReport](../reference/ConformanceReport.md#pointblank.ConformanceReport).
+Validate SDTM datasets for CDISC conformance. [validate_sdtmig()](../reference/validate_sdtmig.md#pointblank.validate_sdtmig) is the primary entry point: pass a dictionary of domain DataFrames and receive a [ConformanceReport](../reference/ConformanceReport.md#pointblank.ConformanceReport) with 362 SDTMIG 3.4 rules evaluated in-process. To work with a whole submission (including cross-dataset referential integrity and SUPP- linkage, with `validate_conformance(engine="validate")`), use [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage). For the authoritative CDISC-certified rule set, use [validate_cdisc_submission()](../reference/validate_cdisc_submission.md#pointblank.validate_cdisc_submission) (requires the CORE CLI) or `SubmissionPackage.validate_conformance(engine="core")`. All paths return a [ConformanceReport](../reference/ConformanceReport.md#pointblank.ConformanceReport).
 
 [validate_sdtmig()](validate_sdtmig.md#pointblank.validate_sdtmig)  
-Validate SDTM datasets against the SDTMIG rule catalog and return a conformance report.
+Check SDTM datasets with Pointblank's bundled SDTMIG conformance rules.
 
 [validate_cdisc_submission()](validate_cdisc_submission.md#pointblank.validate_cdisc_submission)  
-Validate a CDISC submission with the CDISC CORE engine, in one call.
+Check a CDISC submission with the CDISC CORE engine.
 
 [SubmissionPackage](SubmissionPackage.md#pointblank.SubmissionPackage)  
-A data-level model of a study submission package for CDISC conformance validation.
+A study's datasets, gathered for CDISC conformance validation.
 
 [ConformanceReport](ConformanceReport.md#pointblank.ConformanceReport)  
-The result of a CDISC conformance validation run.
+The results of a CDISC conformance check.
 
 ## Integrations
 

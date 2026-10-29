@@ -421,12 +421,12 @@ The tabular report shown above is produced by [`get_tabular_report()`](../../ref
 | Green | `pass` | The rule was evaluated and no violations were found |
 | Red | `fail` | One or more records or datasets violated the rule |
 | Amber | [error](../../reference/Validate.error.md#pointblank.Validate.error) | The rule could not be evaluated (unexpected data state) |
-| Grey | `not_applicable` | The rule requires a dataset or variable that was not supplied |
+| Grey | `not_applicable` | The rule requires an input (such as a Define-XML) that was not supplied |
 | Grey | `not_supported` | The rule type is not yet implemented in the built-in engine |
 
 Rules are sorted by severity: failures first, then errors, then passes, then not-applicable.
 
-The header shows a `PASS` or `FAIL` badge alongside the standard, version, and a full status breakdown (e.g., `SDTMIG 3-4 · 410 passed · 4 failed · 12 n/a`).
+The header shows a `PASS` or `FAIL` badge alongside the standard, version, and a full status breakdown (e.g., `SDTMIG 3-4 · 346 passed · 4 failed · 12 n/a`).
 
 Call `get_tabular_report()` to get the `GT` object directly if you need to embed it in a report pipeline:
 
@@ -481,7 +481,7 @@ report_with_issues.get_findings_table()
 
 The findings table groups its columns into two spanners:
 
-- **Rule**: `Domain` and `Description` identify which rule fired and where.
+- **SDTM Rule Definition**: `Rule`, `Domain` and `Description` identify which rule fired and where.
 - **Finding**: `USUBJID` identifies the subject; `Column` and `Value` show exactly what was wrong; `Row` is the 1-based row number in the source dataset for quick lookup.
 
 At most 100 findings per rule are shown in the table. The true total for each rule is always visible in `get_tabular_report()`. To export findings to a spreadsheet or join them back to your source data, use [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) instead.
@@ -541,8 +541,8 @@ shape: (3, 2)
 |------------|--------------|
 | str        | u32          |
 | "SDTM-007" | 1            |
-| "SDTM-010" | 1            |
 | "SDTM-195" | 1            |
+| "SDTM-010" | 1            |
 
 The DataFrame is empty (with the same schema) when all rules pass, so it is safe to call unconditionally in a script. Use it to triage failures before running the more time-intensive CDISC CORE engine, or to generate a custom summary report tailored to your team's workflow.
 
@@ -553,16 +553,16 @@ The bundled SDTMIG 3.4 catalog contains 362 rules across seven types:
 | Type | Description | Examples |
 |----|----|----|
 | `RECORD_CHECK` | Per-row value checks | Codelist membership, ISO 8601 dates, numeric ranges |
-| `VARIABLE_METADATA_CHECK` | Variable presence and column ordering | USUBJID must precede domain-specific variables |
-| `DATASET_METADATA_CHECK` | Dataset-level attributes | Required sort key order |
+| `VARIABLE_METADATA_CHECK` | Variable presence, types and ordering | DM must contain SEX, RACE and COUNTRY |
+| `DATASET_METADATA_CHECK` | Identifier variables present in every dataset | STUDYID must be present in every domain |
 | `DATASET_CONTENTS_CHECK` | Dataset-level value constraints | All rows in a domain must share the same STUDYID |
-| `DOMAIN_PRESENCE_CHECK` | Required or prohibited domain presence | DM must be present |
+| `DOMAIN_PRESENCE_CHECK` | Required domain presence | DM, TS and TA must be present |
 | `DEFINE_ITEM_METADATA_CHECK` | Variable declarations against Define-XML | Activated when `define_xml` is supplied |
 | `DEFINE_CODELIST_CHECK` | Codelist values against Define-XML | Activated when `define_xml` is supplied |
 
-Only `RECORD_CHECK` and `DATASET_CONTENTS_CHECK` rules produce row-level findings accessible via [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) and [get_findings_table()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table). The other types report a violation count in `get_tabular_report()` but do not have individual record detail.
+Only `RECORD_CHECK`, `DATASET_CONTENTS_CHECK` and `DEFINE_CODELIST_CHECK` rules produce row-level findings accessible via [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) and [get_findings_table()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table). The other types report a violation count in `get_tabular_report()` but do not have individual record detail.
 
-Rules that require a domain or variable not present in your datasets are automatically marked `not_applicable` (they are not counted as failures). For example, a rule that checks `AESTDTC` in the AE domain is `not_applicable` when no AE dataset is supplied. Adding more domains to the dictionary passed to [validate_sdtmig()](../../reference/validate_sdtmig.md#pointblank.validate_sdtmig) will convert more rules from `not_applicable` to executable, giving a more complete conformance picture.
+Rules that target a domain not present in your datasets have nothing to check, so they are reported as `pass`. For example, a rule that checks `AESTDTC` in the AE domain passes when no AE dataset is supplied. A `pass` therefore doesn't mean that a domain was checked: adding more domains to the dictionary passed to [validate_sdtmig()](../../reference/validate_sdtmig.md#pointblank.validate_sdtmig) gives the rules for those domains something to evaluate, giving a more complete conformance picture. Only rules that need an input that wasn't supplied (such as a Define-XML) are marked `not_applicable`.
 
 ### Controlled Terminology
 
@@ -597,7 +597,7 @@ report = pb.validate_sdtmig(
 )
 ```
 
-Without `define_xml`, the 76 `DEFINE_ITEM_METADATA_CHECK` and `DEFINE_CODELIST_CHECK` rules are marked `not_applicable`. Supplying the file allows the engine to verify that every variable present in your datasets is declared in Define-XML with the correct type and, where applicable, a valid codelist.
+Without `define_xml`, the 12 rules that need it (the `DEFINE_ITEM_METADATA_CHECK` and `DEFINE_CODELIST_CHECK` rules, and two `VARIABLE_METADATA_CHECK` rules) are marked `not_applicable`. Supplying the file allows the engine to verify that every variable present in your datasets is declared in Define-XML with the correct type and, where applicable, a valid codelist.
 
 Define-XML also tells the CT checks about sponsor extensions. Many CDISC codelists are extensible (EPOCH, FREQ, ROUTE, and UNIT among them): a sponsor may add terms, provided Define-XML declares them with `def:ExtendedValue="Yes"` on the codelist item. When `define_xml` is supplied, such declared terms pass the codelist checks for extensible codelists. For example, a crossover study can use the epochs `TREATMENT 1` and `TREATMENT 2`. Without Define-XML, or for a codelist that isn't extensible (such as SEX), terms outside the codelist are still reported.
 

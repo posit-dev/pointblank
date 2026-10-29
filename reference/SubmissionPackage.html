@@ -8,10 +8,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="A data-level model of a study submission package for CDISC conformance validation.">
+<meta name="description" content="A study’s datasets, gathered for CDISC conformance validation.">
 
 <title>SubmissionPackage | Pointblank</title>
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "SubmissionPackage - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/SubmissionPackage.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "SubmissionPackage - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/SubmissionPackage.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -114,6 +114,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../gd-lightbox.css">
 <script defer="" src="../gd-lightbox.js"></script>
@@ -131,19 +134,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../theme-init.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
-<style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <meta name="gd-logo-tooltip" content="<code>v1.1.1</code><br>Released 2026-10-15">
+<style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/SubmissionPackage.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/SubmissionPackage.html">
 <link rel="alternate" type="text/markdown" href="SubmissionPackage.md">
 
 
 <meta property="og:title" content="SubmissionPackage | Pointblank">
-<meta property="og:description" content="A data-level model of a study submission package for CDISC conformance validation.">
+<meta property="og:description" content="A study’s datasets, gathered for CDISC conformance validation.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="SubmissionPackage | Pointblank">
-<meta name="twitter:description" content="A data-level model of a study submission package for CDISC conformance validation.">
+<meta name="twitter:description" content="A study’s datasets, gathered for CDISC conformance validation.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1650,6 +1653,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a>
   <ul class="collapse">
   <li><a href="#domains" id="toc-domains" class="nav-link" data-scroll-target="#domains"><span class="doc-object-name doc-attribute doc-label doc-label-property">domains</span></a></li>
@@ -1690,11 +1694,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>A data-level model of a study submission package for CDISC conformance validation.</p>
+<p>A study’s datasets, gathered for CDISC conformance validation.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L141-L846" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L141-L1263" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">SubmissionPackage</span>(</span>
@@ -1707,8 +1711,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>A <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> groups the datasets of a study (SDTM domains, SUPP– qualifiers, RELREC, and/or ADaM datasets) together with their Define-XML and Controlled Terminology context, and understands the <em>relationships</em> between them. This enables cross-dataset conformance checks — referential integrity, SUPP– linkage, RELREC resolution, and ADaM ⇄ SDTM traceability — that single-dataset validation cannot express.</p>
-<p>This is the data-level analog of <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>, which groups <em>metadata</em> for many datasets.</p>
+<p>A <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> holds the datasets of a study (SDTM domains, SUPP– qualifiers, RELREC and ADaM datasets) together with the study’s Define-XML. Where <a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link"><code>validate_sdtm()</code></a> and <a href="../reference/validate_adam.html#pointblank.validate_adam" class="gdls-link"><code>validate_adam()</code></a> look at one dataset at a time, a package knows about all of them, so it can check how they relate: for example, whether every subject in AE has a record in DM. It is the data-level counterpart of <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>, which holds the metadata of many datasets.</p>
+<p>A package can be built from DataFrames, as here, or from a folder of XPT and Dataset-JSON files with <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.from_folder" class="gdls-link"><code>from_folder()</code></a>. Its <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.validate_conformance" class="gdls-link"><code>validate_conformance()</code></a> method runs the conformance checks and returns a <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link"><code>ConformanceReport</code></a>. The package also has some helpers for looking across datasets, such as <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.orphan_ids" class="gdls-link"><code>orphan_ids()</code></a>, which finds the subjects in one dataset that are missing from another.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1716,47 +1720,106 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">datasets</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[str, Any]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">dict()</span></code></dt>
 <dd>
-<p>A mapping of dataset name (domain code, e.g., <code>"DM"</code>, <code>"AE"</code>, <code>"SUPPAE"</code>, <code>"ADSL"</code>) to the dataset itself (a Pandas or Polars DataFrame). Names are matched case-insensitively but conventionally uppercase.</p>
+<p>A dictionary that maps each dataset name (a domain code such as <code>"DM"</code>, <code>"AE"</code>, <code>"SUPPAE"</code> or <code>"ADSL"</code>) to the dataset, as a Polars or Pandas DataFrame. The names are case-insensitive and are stored in uppercase. The default is an empty dictionary.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">define</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional Define-XML context: a path to a <code>define.xml</code> file, or an already-imported <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. Used to supply variable definitions, codelists, and origins for define-context rules.</p>
+<p>The study’s Define-XML, as a path to a <code>define.xml</code> file or as a <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a> from <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a>. With the built-in rules engine, it activates the rules that check the datasets against Define-XML. The CORE engine only accepts a path. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">ct_version</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional Controlled Terminology version pin (e.g., <code>"2024-03-29"</code>), recorded for reproducible runs.</p>
+<p>The version of CDISC Controlled Terminology that the study uses (such as <code>"2024-03-29"</code>). It is shown by <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.summary" class="gdls-link"><code>summary()</code></a> but doesn’t affect the checks. To choose the terminology the built-in engine checks against, use the <code>ct_packages=</code> argument of <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.validate_conformance" class="gdls-link gdls-code">validate_conformance()</a>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">standard</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"sdtmig"</span></span></code></dt>
 <dd>
-<p>The data standard the package follows (<code>"sdtmig"</code> or <code>"adamig"</code>). Defaults to <code>"sdtmig"</code>.</p>
+<p>The data standard that the datasets follow, <code>"sdtmig"</code> or <code>"adamig"</code>. The default is <code>"sdtmig"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">standard_version</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"3.4"</span></span></code></dt>
 <dd>
-<p>The Implementation Guide version (e.g., <code>"3.4"</code> for SDTM IG). Defaults to <code>"3.4"</code>.</p>
+<p>The version of the standard, such as <code>"3.4"</code> for SDTMIG 3.4. The default is <code>"3.4"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">study_id</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-Optional study identifier, used in report labels.
+A study identifier. It is shown by <code>summary()</code> and used in the labels of the validations made by <code>validate_conformance(engine="validate")</code>. The default is <code>None</code>.
 </dd>
 </dl>
 </div>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Construct a package from in-memory DataFrames and validate conformance across it:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage(</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    datasets<span class="op">=</span>{<span class="st">"DM"</span>: dm_df, <span class="st">"AE"</span>: ae_df, <span class="st">"LB"</span>: lb_df},</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    standard<span class="op">=</span><span class="st">"sdtmig"</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    standard_version<span class="op">=</span><span class="st">"3.4"</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> study.validate_conformance()</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>report.summary()</span></code></pre></div>
-<p>Or ingest a folder of XPT files (Define-XML auto-detected if present):</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage.from_folder(<span class="st">"study_xyz/sdtm/"</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> study.validate_conformance(agency<span class="op">=</span><span class="st">"FDA"</span>)</span></code></pre></div>
+<p>Let’s build a package from a Demographics (DM) and an Adverse Events (AE) dataset. One of the adverse events belongs to subject <code>STUDY01-009</code>, who isn’t in DM:</p>
+<div id="ecfca6f5" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"STUDYID"</span>: [<span class="st">"STUDY01"</span>] <span class="op">*</span> <span class="dv">3</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"DOMAIN"</span>: [<span class="st">"DM"</span>] <span class="op">*</span> <span class="dv">3</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"USUBJID"</span>: [<span class="st">"STUDY01-001"</span>, <span class="st">"STUDY01-002"</span>, <span class="st">"STUDY01-003"</span>],</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"SEX"</span>: [<span class="st">"M"</span>, <span class="st">"F"</span>, <span class="st">"F"</span>],</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>ae <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"STUDYID"</span>: [<span class="st">"STUDY01"</span>] <span class="op">*</span> <span class="dv">3</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"DOMAIN"</span>: [<span class="st">"AE"</span>] <span class="op">*</span> <span class="dv">3</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"USUBJID"</span>: [<span class="st">"STUDY01-001"</span>, <span class="st">"STUDY01-002"</span>, <span class="st">"STUDY01-009"</span>],</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"AESEQ"</span>: [<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>],</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"AETERM"</span>: [<span class="st">"HEADACHE"</span>, <span class="st">"NAUSEA"</span>, <span class="st">"RASH"</span>],</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage(datasets<span class="op">=</span>{<span class="st">"dm"</span>: dm, <span class="st">"AE"</span>: ae}, study_id<span class="op">=</span><span class="st">"STUDY01"</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(study)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Submission Package
+  Study: STUDY01
+  Standard: sdtmig 3.4
+  Datasets (2): AE, DM</code></pre>
+</div>
+</div>
+<p>The dataset names are stored in uppercase, so <code>"dm"</code> became <code>DM</code>. The package can find the subject in AE that has no DM record:</p>
+<div id="ce2afb19" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>study.orphan_ids(<span class="st">"AE"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>{'STUDY01-009'}</code></pre>
+</div>
+</div>
+<p>The validation checks the whole package. The <code>"validate"</code> engine builds a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> for each dataset, with the structural checks from the SDTM templates and the checks across datasets:</p>
+<div id="a392129c" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> study.validate_conformance(engine<span class="op">=</span><span class="st">"validate"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(report)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ConformanceReport
+  [AE] 12 steps — FAIL (1 test units)
+  [DM] 9 steps — PASS</code></pre>
+</div>
+</div>
+<p>The AE validation has one failing test unit, from the check that each <code>USUBJID</code> in AE exists in DM. The default engine, the built-in rules engine, checks the package against the SDTMIG rules instead. See <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.validate_conformance" class="gdls-link"><code>validate_conformance()</code></a> for how the engines differ.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link gdls-code">validate_sdtmig()</a></dt>
+<dd>
+<p>Check SDTM datasets against the SDTMIG rules, without building a package.</p>
+</dd>
+<dt><a href="../reference/validate_cdisc_submission.html#pointblank.validate_cdisc_submission" class="gdls-link gdls-code">validate_cdisc_submission()</a></dt>
+<dd>
+<p>Check a submission with the CDISC CORE engine.</p>
+</dd>
+<dt><a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a></dt>
+<dd>
+<p>The report that validate_conformance() returns.</p>
+</dd>
+<dt><a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link gdls-code">MetadataPackage</a></dt>
+<dd>
+<p>The metadata-level counterpart of a submission package.</p>
+</dd>
+</dl>
 </section>
 <section id="attributes" class="level2 doc-attributes">
 <h2 class="doc-attributes anchored" data-anchor-id="attributes">Attributes</h2>
@@ -1770,34 +1833,96 @@ Optional study identifier, used in report labels.
 <tbody>
 <tr class="odd">
 <td><a href="#domains" class="doc-attribute doc-label doc-label-property">domains</a></td>
-<td>The names (domain codes) of all datasets in the package, sorted.</td>
+<td>The names of the datasets in the package, in alphabetical order.</td>
 </tr>
 <tr class="even">
 <td><a href="#metadata" class="doc-attribute doc-label doc-label-property">metadata</a></td>
-<td>The imported Define-XML metadata, if <code>define</code> was supplied.</td>
+<td>The package’s Define-XML, as a <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link gdls-code">MetadataPackage</a>.</td>
 </tr>
 </tbody>
 </table>
 <section id="domains" class="level3">
 <h3 class="anchored" data-anchor-id="domains"><span class="doc-object-name doc-attribute doc-label doc-label-property">domains</span></h3>
 <div class="doc-subject">
-<p>The names (domain codes) of all datasets in the package, sorted.</p>
+<p>The names of the datasets in the package, in alphabetical order.</p>
 </div>
 <div class="doc-signature doc-attribute">
 <p><code><span class="doc-parameter-name">domains</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str]</span></code></p>
 </div>
+<div class="doc-text">
+<p>The names are the domain codes (such as <code>"AE"</code> and <code>"DM"</code>) under which the datasets were added, in uppercase. This is a property, so it’s used without parentheses.</p>
+</div>
+<section id="examples-1" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<p>Let’s make a package with three datasets and get their names:</p>
+<div id="5c4e34aa" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"S-001"</span>, <span class="st">"S-002"</span>]})</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>ae <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"S-001"</span>], <span class="st">"AESEQ"</span>: [<span class="dv">1</span>]})</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>suppae <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"S-001"</span>], <span class="st">"RDOMAIN"</span>: [<span class="st">"AE"</span>]})</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage(datasets<span class="op">=</span>{<span class="st">"dm"</span>: dm, <span class="st">"SUPPAE"</span>: suppae, <span class="st">"ae"</span>: ae})</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>study.domains</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>['AE', 'DM', 'SUPPAE']</code></pre>
+</div>
+</div>
+<p>The names are in uppercase and in alphabetical order, whatever order the datasets were given in. A name can also be tested with <code>in</code>, which ignores case (<code>"ae" in study</code> is <code>True</code>), and <code>len(study)</code> gives the number of datasets.</p>
+</section>
 </section>
 <section id="metadata" class="level3">
 <h3 class="anchored" data-anchor-id="metadata"><span class="doc-object-name doc-attribute doc-label doc-label-property">metadata</span></h3>
 <div class="doc-subject">
-<p>The imported Define-XML metadata, if <code>define</code> was supplied.</p>
+<p>The package’s Define-XML, as a <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link gdls-code">MetadataPackage</a>.</p>
 </div>
 <div class="doc-signature doc-attribute">
 <p><code><span class="doc-parameter-name">metadata</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">MetadataPackage | None</span></code></p>
 </div>
 <div class="doc-text">
-<p>Lazily imports the Define-XML document (via <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a>) the first time it is accessed.</p>
+<p>If the package’s <code>define</code> is a path to a <code>define.xml</code> file, the file is imported with <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a> the first time this property is used, and the result is kept for later use. If <code>define</code> is already a <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>, that is returned. The metadata has a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport</code></a> for each dataset that the Define-XML describes, with its variables and codelists. The property is <code>None</code> if the package has no Define-XML. This is a property, so it’s used without parentheses.</p>
 </div>
+<section id="examples-2" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
+<p>Let’s make a package with the DM dataset and the Define-XML file that come with Pointblank:</p>
+<div id="01808fab" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyreadstat</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>dm, _ <span class="op">=</span> pyreadstat.read_xport(pb.load_metadata_example(<span class="st">"dm.xpt"</span>))</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage(</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    datasets<span class="op">=</span>{<span class="st">"DM"</span>: dm}, define<span class="op">=</span>pb.load_metadata_example(<span class="st">"define.xml"</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(study.metadata)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Metadata Package
+  Name: STUDY.XYZ789
+  Description: CDISC Define-XML 2.0 study metadata
+  Datasets: 2
+
+  [DM] 13 variables
+  [AE] 10 variables</code></pre>
+</div>
+</div>
+<p>The Define-XML describes two datasets, DM and AE, though the package only has DM. The metadata of a dataset can be looked at in more detail, such as the values allowed by the codelist of a variable:</p>
+<div id="16bb04f4" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>race <span class="op">=</span> study.metadata[<span class="st">"DM"</span>].get_variable(<span class="st">"RACE"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>race.allowed_values</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>['WHITE',
+ 'BLACK OR AFRICAN AMERICAN',
+ 'ASIAN',
+ 'AMERICAN INDIAN OR ALASKA NATIVE',
+ 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER']</code></pre>
+</div>
+</div>
+<p><code>BLACK</code> isn’t one of them, though one of the subjects in DM has it as their <code>RACE</code>. Without a <code>define</code>, the property is <code>None</code>.</p>
+</section>
 </section>
 </section>
 <section id="methods" class="level2 doc-methods">
@@ -1812,51 +1937,57 @@ Optional study identifier, used in report labels.
 <tbody>
 <tr class="odd">
 <td><a href="#from_folder" class="doc-function doc-label doc-label-method">from_folder()</a></td>
-<td>Build a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> by ingesting a folder of datasets.</td>
+<td>Build a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> from a folder of dataset files.</td>
 </tr>
 <tr class="even">
 <td><a href="#validate_conformance" class="doc-function doc-label doc-label-method">validate_conformance()</a></td>
-<td>Validate CDISC conformance across the whole submission package.</td>
+<td>Check the whole package for conformance to its CDISC standard.</td>
 </tr>
 <tr class="odd">
 <td><a href="#get_dataset" class="doc-function doc-label doc-label-method">get_dataset()</a></td>
-<td>Get a dataset by name (case-insensitive).</td>
+<td>Get one of the package’s datasets by name.</td>
 </tr>
 <tr class="even">
 <td><a href="#subject_ids" class="doc-function doc-label doc-label-method">subject_ids()</a></td>
-<td>Get the set of <code>USUBJID</code> values in a dataset.</td>
+<td>Get the unique subject identifiers in a dataset.</td>
 </tr>
 <tr class="odd">
 <td><a href="#orphan_ids" class="doc-function doc-label doc-label-method">orphan_ids()</a></td>
-<td>Find values of <code>column</code> in <code>child</code> that do not exist in <code>parent</code>.</td>
+<td>Find the key values in one dataset that are missing from another.</td>
 </tr>
 <tr class="even">
 <td><a href="#summary" class="doc-function doc-label doc-label-method">summary()</a></td>
-<td>Return a human-readable summary of the package contents.</td>
+<td>Summarize the package’s contents as text.</td>
 </tr>
 </tbody>
 </table>
 <section id="from_folder" class="level3">
 <h3 class="anchored" data-anchor-id="from_folder"><span class="doc-object-name doc-function doc-label doc-label-method">from_folder()</span></h3>
 <div class="doc-subject">
-<p>Build a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> by ingesting a folder of datasets.</p>
+<p>Build a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> from a folder of dataset files.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L216-L288" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L267-L403" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb4"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_folder</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">path</span>,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">define</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">standard</span><span class="op">=</span><span class="st">"sdtmig"</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">standard_version</span><span class="op">=</span><span class="st">"3.4"</span>,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">ct_version</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">study_id</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_folder</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">path</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">define</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">standard</span><span class="op">=</span><span class="st">"sdtmig"</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">standard_version</span><span class="op">=</span><span class="st">"3.4"</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">ct_version</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">study_id</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Reads every SAS Transport (<code>.xpt</code>) and CDISC Dataset-JSON (<code>.json</code>) file in the folder, deriving the dataset name from the file stem (uppercased). If a <code>define.xml</code> is present in the folder and <code>define</code> is not supplied, it is picked up automatically.</p>
+<p>Submission datasets are usually delivered as files, one per dataset, in a single folder. The <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.from_folder" class="gdls-link gdls-code">from_folder()</a> method reads the folder so the datasets don’t have to be loaded one by one. It reads these files (the folder’s subfolders are not searched):</p>
+<ul>
+<li>SAS Transport files (<code>.xpt</code>), which need the <code>pyreadstat</code> package. The dataset name is the file name without its extension, in uppercase, so <code>dm.xpt</code> becomes <code>DM</code>.</li>
+<li>CDISC Dataset-JSON files (<code>.json</code>), in the Dataset-JSON 1.1 layout (top-level <code>columns</code> and <a href="../reference/Comparison.rows.html#pointblank.Comparison.rows" class="gdls-link gdls-code">rows</a>) or the older layout (<code>clinicalData</code> or <code>referenceData</code>). The dataset name is taken from the file’s <code>name</code> (or its item group OID), or else from the file name. <code>.json</code> files that aren’t Dataset-JSON are skipped.</li>
+<li>A Define-XML file: an <code>.xml</code> file whose name starts with <code>define</code>. It is used as the package’s <code>define</code> unless <code>define=</code> is given.</li>
+</ul>
+<p>The datasets are read into Pandas DataFrames. The package remembers the folder, so that <code>validate_conformance(engine="core")</code> can give the files straight to the CORE engine instead of writing the datasets out again.</p>
 </div>
 <section id="parameters-1" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
@@ -1864,27 +1995,27 @@ Optional study identifier, used in report labels.
 <dl>
 <dt><code><span class="doc-parameter-name">path</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path</span></code></dt>
 <dd>
-<p>Path to a folder containing the study datasets.</p>
+<p>The path to the folder that holds the dataset files.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">define</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path | Any | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional Define-XML path or <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. If <code>None</code>, a <code>define.xml</code> in the folder is used when present.</p>
+<p>The study’s Define-XML, as a path to a <code>define.xml</code> file or a <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. If <code>None</code> (the default), a Define-XML file in the folder is used, if there is one.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">standard</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"sdtmig"</span></span></code></dt>
 <dd>
-<p>The data standard (<code>"sdtmig"</code> or <code>"adamig"</code>). Defaults to <code>"sdtmig"</code>.</p>
+<p>The data standard that the datasets follow, <code>"sdtmig"</code> or <code>"adamig"</code>. The default is <code>"sdtmig"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">standard_version</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"3.4"</span></span></code></dt>
 <dd>
-<p>The Implementation Guide version. Defaults to <code>"3.4"</code>.</p>
+<p>The version of the standard. The default is <code>"3.4"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">ct_version</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional Controlled Terminology version pin.</p>
+<p>The version of CDISC Controlled Terminology that the study uses, which is shown by <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.summary" class="gdls-link"><code>summary()</code></a>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">study_id</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-Optional study identifier.
+A study identifier. The default is <code>None</code>.
 </dd>
 </dl>
 </div>
@@ -1895,51 +2026,172 @@ Optional study identifier.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">SubmissionPackage</span></code></dt>
 <dd>
-A package populated with the folder’s datasets.
+A package with a dataset for each dataset file in the folder.
 </dd>
 </dl>
 </div>
+</section>
+<section id="raises" class="level4 doc-raises">
+<h4 class="doc-raises anchored" data-anchor-id="raises">Raises</h4>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">NotADirectoryError</span></code></dt>
+<dd>
+<p>If <code>path</code> isn’t a folder.</p>
+</dd>
+<dt><code> <span class="doc-parameter-annotation">ImportError</span></code></dt>
+<dd>
+If the folder has an <code>.xpt</code> file and <code>pyreadstat</code> isn’t installed.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples-3" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
+<p>Let’s make a folder with a DM dataset as an XPT file and a Define-XML file for the study. Both files come with Pointblank:</p>
+<div id="d93185e2" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>folder <span class="op">=</span> Path(tempfile.mkdtemp())</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>shutil.copy(pb.load_metadata_example(<span class="st">"dm.xpt"</span>), folder <span class="op">/</span> <span class="st">"dm.xpt"</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>shutil.copy(pb.load_metadata_example(<span class="st">"define.xml"</span>), folder <span class="op">/</span> <span class="st">"define.xml"</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage.from_folder(folder, study_id<span class="op">=</span><span class="st">"XYZ789"</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(study)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Submission Package
+  Study: XYZ789
+  Standard: sdtmig 3.4
+  Define-XML: present
+  Datasets (1): DM</code></pre>
+</div>
+</div>
+<p>The package has the <code>DM</code> dataset from <code>dm.xpt</code>, and it found the Define-XML file. The dataset is a Pandas DataFrame:</p>
+<div id="60552a2e" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>study.get_dataset(<span class="st">"DM"</span>).head(<span class="dv">3</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div>
+
+<table class="dataframe table table-sm table-striped small">
+  <thead>
+    <tr>
+      <th></th>
+      <th>STUDYID</th>
+      <th>DOMAIN</th>
+      <th>USUBJID</th>
+      <th>SUBJID</th>
+      <th>RFSTDTC</th>
+      <th>RFENDTC</th>
+      <th>SITEID</th>
+      <th>AGE</th>
+      <th>SEX</th>
+      <th>RACE</th>
+      <th>ARMCD</th>
+      <th>ARM</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>XYZ789</td>
+      <td>DM</td>
+      <td>XYZ789-101</td>
+      <td>101</td>
+      <td>2024-01-15</td>
+      <td>2024-07-15</td>
+      <td>S01</td>
+      <td>45.0</td>
+      <td>M</td>
+      <td>WHITE</td>
+      <td>TRT</td>
+      <td>Active 10mg</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>XYZ789</td>
+      <td>DM</td>
+      <td>XYZ789-102</td>
+      <td>102</td>
+      <td>2024-01-20</td>
+      <td>2024-07-20</td>
+      <td>S01</td>
+      <td>62.0</td>
+      <td>F</td>
+      <td>BLACK</td>
+      <td>PBO</td>
+      <td>Placebo</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>XYZ789</td>
+      <td>DM</td>
+      <td>XYZ789-103</td>
+      <td>103</td>
+      <td>2024-02-01</td>
+      <td>2024-08-01</td>
+      <td>S02</td>
+      <td>38.0</td>
+      <td>M</td>
+      <td>ASIAN</td>
+      <td>TRT</td>
+      <td>Active 10mg</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Since a Define-XML file was found, the built-in rules engine also runs the rules that check the datasets against it. Here, one of the subjects has a <code>RACE</code> of <code>BLACK</code>, which isn’t a term in the study’s codelist for <code>RACE</code>:</p>
+<div id="c3447999" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> study.validate_conformance()</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>[i[<span class="st">"message"</span>] <span class="cf">for</span> i <span class="kw">in</span> report.issues() <span class="cf">if</span> i[<span class="st">"rule_type"</span>] <span class="op">==</span> <span class="st">"DEFINE_CODELIST_CHECK"</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>['DM.RACE contains a value not in the Define-XML declared codelist.']</code></pre>
+</div>
+</div>
+<p>The other issues in the report come from rules that don’t need Define-XML, such as the rules for variables that DM should have.</p>
 </section>
 </section>
 <section id="validate_conformance" class="level3">
 <h3 class="anchored" data-anchor-id="validate_conformance"><span class="doc-object-name doc-function doc-label doc-label-method">validate_conformance()</span></h3>
 <div class="doc-subject">
-<p>Validate CDISC conformance across the whole submission package.</p>
+<p>Check the whole package for conformance to its CDISC standard.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L401-L526" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L684-L912" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb5"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_conformance</span>(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">agency</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">engine</span><span class="op">=</span><span class="st">"native"</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">cross_dataset</span><span class="op">=</span><span class="bn">True</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">thresholds</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">interrogate</span><span class="op">=</span><span class="bn">True</span>,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">standard</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">version</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">ct_packages</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">define_xml</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">controlled_terminology</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">core</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">core_cwd</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="va">cache</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">workdir</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_conformance</span>(</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">agency</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">engine</span><span class="op">=</span><span class="st">"native"</span>,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">cross_dataset</span><span class="op">=</span><span class="bn">True</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">thresholds</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">interrogate</span><span class="op">=</span><span class="bn">True</span>,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">standard</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">version</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">ct_packages</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">define_xml</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">controlled_terminology</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">core</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">core_cwd</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="va">cache</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">workdir</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Two engines are available:</p>
+<p>A submission has to conform to the CDISC standard that it uses, both within each dataset and across the datasets. The <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.validate_conformance" class="gdls-link gdls-code">validate_conformance()</a> method checks this for all the datasets of the package at once and returns a <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link"><code>ConformanceReport</code></a>. There are three ways of doing the checks, chosen with <code>engine=</code>:</p>
 <ul>
-<li><strong><code>"native"</code></strong> (default) — Pointblank’s own checks. For each dataset this builds a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> plan combining the single-dataset structural checks (via <a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link"><code>validate_sdtm()</code></a> / <a href="../reference/validate_adam.html#pointblank.validate_adam" class="gdls-link"><code>validate_adam()</code></a>) and cross-dataset conformance checks (when <code>cross_dataset=True</code>):
-<ul>
-<li><strong>Referential integrity</strong> — every <code>USUBJID</code> in a finding/events/interventions domain exists in DM.</li>
-<li><strong>SUPP– linkage</strong> — <code>RDOMAIN</code> references a present domain, <code>USUBJID</code> exists in DM, and <code>(USUBJID, IDVAR=IDVARVAL)</code> resolves to a record in the parent domain.</li>
-<li><strong>RELREC</strong> — each relationship record’s <code>RDOMAIN</code> is present and <code>USUBJID</code> exists in DM.</li>
-<li><strong>ADaM ⇄ SDTM traceability</strong> — <code>ADSL.USUBJID ⊆ DM.USUBJID</code>, and every other ADaM dataset’s <code>USUBJID ⊆ ADSL.USUBJID</code>.</li>
-</ul></li>
-<li><strong><code>"core"</code></strong> — hands the package to the external CDISC CORE engine (<code>cdisc-rules-engine</code>), which runs the authoritative conformance rule set, and ingests its results. Datasets are materialized to XPT (or the source folder is used directly for folder-ingested packages), CORE is invoked as a subprocess, and its JSON report becomes a CORE-form <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a>. Requires an installed CORE executable (see <code>core</code>).</li>
+<li><code>"native"</code> (the default) runs Pointblank’s bundled catalog of conformance rules for the package’s standard and version, as <a href="../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link"><code>validate_sdtmig()</code></a> does. The catalog has 362 rules for SDTMIG 3.4, which check the values of variables against their controlled terminology, the format of dates, the variables and domains that are required, and (if there’s a Define-XML) the agreement between the datasets and their Define-XML. SDTMIG 3.4 is the only standard and version with a bundled catalog, so for any other (such as an ADaM package), the <code>"validate"</code> checks are run instead.</li>
+<li><code>"validate"</code> builds a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> plan for each dataset, with the structural checks of <a href="../reference/validate_sdtm.html#pointblank.validate_sdtm" class="gdls-link"><code>validate_sdtm()</code></a> or <a href="../reference/validate_adam.html#pointblank.validate_adam" class="gdls-link"><code>validate_adam()</code></a>, and (if <code>cross_dataset=True</code>) checks that the datasets agree with each other. These cross-dataset checks are that every <code>USUBJID</code> of an SDTM domain is in DM, that a SUPP– or RELREC record’s <code>RDOMAIN</code> is a dataset in the package and its <code>USUBJID</code> is in DM, that a SUPP– record’s <code>IDVAR</code> and <code>IDVARVAL</code> identify a record of its parent domain, that every <code>USUBJID</code> of ADSL is in DM, and that every <code>USUBJID</code> of another ADaM dataset is in ADSL. The rules catalog doesn’t have these checks, so the <code>"validate"</code> engine is the one that finds orphan records.</li>
+<li><code>"core"</code> runs the CDISC CORE engine (the <code>cdisc-rules-engine</code> command-line tool, which has to be installed separately), with the published CDISC and agency rules. The datasets are written out as XPT files (or read from the package’s <code>source_folder</code>, if it was made with <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.from_folder" class="gdls-link"><code>from_folder()</code></a>), CORE is run on them, and its report is read back. This is what <a href="../reference/validate_cdisc_submission.html#pointblank.validate_cdisc_submission" class="gdls-link"><code>validate_cdisc_submission()</code></a> does.</li>
 </ul>
 </div>
 <section id="parameters-2" class="level4 doc-parameters">
@@ -1948,51 +2200,59 @@ A package populated with the folder’s datasets.
 <dl>
 <dt><code><span class="doc-parameter-name">agency</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional agency rule-set selector (<code>"FDA"</code>, <code>"PMDA"</code>, or <code>None</code> for CDISC base rules).</p>
+<p>The regulatory agency that the submission is for, such as <code>"FDA"</code> or <code>"PMDA"</code>. This is a label that is shown in the report. It doesn’t change which rules are run. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">engine</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"native"</span></span></code></dt>
 <dd>
-<p><code>"native"</code> (the default) or <code>"core"</code>.</p>
+<p>The engine for the checks: <code>"native"</code>, <code>"validate"</code> or <code>"core"</code>. The default is <code>"native"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">cross_dataset</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-<p>(Validate-based engine only.) Whether to add cross-dataset conformance checks. Defaults to <code>True</code>.</p>
+<p>Whether to add the cross-dataset checks to the <code>"validate"</code> engine’s plans. The default is <code>True</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">thresholds</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>(Validate-based engine only.) Optional thresholds passed to each dataset’s <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> (maps failing test units onto Pointblank’s warning/error/critical severity model).</p>
+<p>Thresholds for each of the <code>"validate"</code> engine’s plans, given as for <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a>. They set the severity (warning, error or critical) of a failing step. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">interrogate</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-<p>(Validate-based engine only.) Whether to interrogate (run) the validations before returning.</p>
+<p>Whether the <code>"validate"</code> engine interrogates its plans before returning them. The default is <code>True</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">standard</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>(CORE only.) Override the CDISC standard sent to CORE. Defaults to the package’s <code>standard</code> (e.g., <code>"sdtmig"</code>).</p>
+<p>The CDISC standard to check against, for the <code>"native"</code> and <code>"core"</code> engines. The default is the package’s <code>standard</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">version</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>(CORE only.) Override the standard version. Defaults to the package’s <code>standard_version</code> (e.g., <code>"3.4"</code>, sent to CORE hyphenated).</p>
+<p>The version of the standard, for the <code>"native"</code> and <code>"core"</code> engines. The default is the package’s <code>standard_version</code>.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">ct_packages</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>The bundled controlled terminology packages for the <code>"native"</code> engine, as a list of names such as <code>["sdtm-ct-2024-09-27"]</code>. The default is the latest bundled package.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">define_xml</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>A Define-XML for the <code>"native"</code> engine, as a path or a <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>. The default is the package’s <code>define</code>. Without a Define-XML, the 12 rules that need one are not applicable.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">controlled_terminology</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Sequence[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>(CORE only.) CT package name(s) for CORE’s <code>-ct</code> (e.g., <code>"sdtmct-2024-03-29"</code>).</p>
+<p>The controlled terminology package or packages for the <code>"core"</code> engine, such as <code>"sdtmct-2024-03-29"</code>. They are given to CORE’s <code>-ct</code> option. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">core</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Sequence[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>(CORE only.) How to invoke CORE — a path/name to the CORE executable, a full command prefix (e.g., <code>["python", "core.py"]</code>), or <code>None</code> to auto-discover via the <code>POINTBLANK_CDISC_CORE</code> environment variable and then <code>PATH</code>.</p>
+<p>How to run CORE, for the <code>"core"</code> engine. This can be the path or name of the CORE executable, or a command as a list (such as <code>["python", "core.py"]</code>). With the default of <code>None</code>, the command is taken from the <code>POINTBLANK_CDISC_CORE</code> environment variable, or else CORE is looked for on the <code>PATH</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">core_cwd</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>(CORE only.) Working directory to run CORE from; required when invoking a repo checkout (CORE resolves its bundled <code>resources/</code> relative to the current directory).</p>
+<p>The directory to run CORE from, for the <code>"core"</code> engine. This is needed when CORE is run from a checkout of its repository, since it looks for its <code>resources/</code> folder in the current directory. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">cache</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>(CORE only.) Path to CORE’s rules cache directory (<code>-ca</code>).</p>
+<p>The path to CORE’s rules cache (its <code>-ca</code> option), for the <code>"core"</code> engine. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">workdir</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-(CORE only.) Directory for materialized XPT and the CORE report. If <code>None</code>, a temporary directory is used and cleaned up.
+A directory for the XPT files and the CORE report, for the <code>"core"</code> engine. With the default of <code>None</code>, a temporary directory is used and then deleted.
 </dd>
 </dl>
 </div>
@@ -2003,23 +2263,130 @@ A package populated with the folder’s datasets.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ConformanceReport</span></code></dt>
 <dd>
-A built-in engine report (per-dataset validations) or a CORE-form report, depending on <code>engine</code>.
+The report. It holds the results of the rules for the <code>"native"</code> engine, a validation for each dataset for the <code>"validate"</code> engine, and CORE’s results for the <code>"core"</code> engine.
 </dd>
 </dl>
 </div>
+</section>
+<section id="raises-1" class="level4 doc-raises">
+<h4 class="doc-raises anchored" data-anchor-id="raises-1">Raises</h4>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
+<dd>
+<p>If <code>engine</code> isn’t one of <code>"native"</code>, <code>"validate"</code> or <code>"core"</code>.</p>
+</dd>
+<dt><code> <span class="doc-parameter-annotation">FileNotFoundError</span></code></dt>
+<dd>
+If one of the <code>ct_packages</code> isn’t bundled with Pointblank.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples-4" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
+<p>Let’s make a package with a DM and an AE dataset. A <code>SEX</code> value in DM isn’t in the SEX codelist, and the second subject in AE (<code>STUDY01-009</code>) has no record in DM:</p>
+<div id="1c2f9206" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"STUDYID"</span>: [<span class="st">"STUDY01"</span>] <span class="op">*</span> <span class="dv">3</span>,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"DOMAIN"</span>: [<span class="st">"DM"</span>] <span class="op">*</span> <span class="dv">3</span>,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"USUBJID"</span>: [<span class="st">"STUDY01-001"</span>, <span class="st">"STUDY01-002"</span>, <span class="st">"STUDY01-003"</span>],</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"SUBJID"</span>: [<span class="st">"001"</span>, <span class="st">"002"</span>, <span class="st">"003"</span>],</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"SITEID"</span>: [<span class="st">"S01"</span>] <span class="op">*</span> <span class="dv">3</span>,</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"SEX"</span>: [<span class="st">"M"</span>, <span class="st">"F"</span>, <span class="st">"FEMALE"</span>],</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"COUNTRY"</span>: [<span class="st">"USA"</span>] <span class="op">*</span> <span class="dv">3</span>,</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>ae <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"STUDYID"</span>: [<span class="st">"STUDY01"</span>] <span class="op">*</span> <span class="dv">2</span>,</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"DOMAIN"</span>: [<span class="st">"AE"</span>] <span class="op">*</span> <span class="dv">2</span>,</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"USUBJID"</span>: [<span class="st">"STUDY01-001"</span>, <span class="st">"STUDY01-009"</span>],</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"AESEQ"</span>: [<span class="dv">1</span>, <span class="dv">1</span>],</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"AETERM"</span>: [<span class="st">"HEADACHE"</span>, <span class="st">"NAUSEA"</span>],</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">"AEDECOD"</span>: [<span class="st">"Headache"</span>, <span class="st">"Nausea"</span>],</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage(datasets<span class="op">=</span>{<span class="st">"DM"</span>: dm, <span class="st">"AE"</span>: ae}, study_id<span class="op">=</span><span class="st">"STUDY01"</span>)</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> study.validate_conformance()</span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(report)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ConformanceReport (Built-in Rules)
+  sdtmig 3.4
+  362 rules (fail=11, not_applicable=12, pass=339)
+  11 issues — FAIL</code></pre>
+</div>
+</div>
+<p>Of the 362 rules, 11 fail. The 12 that are not applicable need a Define-XML. Here are the failing ones:</p>
+<div id="bdb0d23a" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule <span class="kw">in</span> report.rules(status<span class="op">=</span><span class="st">"fail"</span>):</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(rule.rule_id, rule.dataset, rule.message)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>SDTM-007 DM SEX value is not in the SEX codelist.
+SDTM-032 DM DM domain is missing one or more required demographic variables (SEX, RACE, COUNTRY).
+SDTM-033 DM DM domain must include RFSTDTC (Subject Reference Start Date/Time) and RFENDTC (Subject Reference End Date/Time).
+SDTM-034 DM DM domain must include SITEID, AGE, and AGEU.
+SDTM-035 DM DM domain must include treatment arm variables: ARMCD, ARM, ACTARMCD, ACTARM.
+SDTM-037 AE AE domain must include AETERM, AEDECOD (MedDRA preferred term), and AEBODSYS (body system).
+SDTM-038 AE AE domain must include AESER (serious flag).
+SDTM-121 TS Required domain(s) missing: TS
+SDTM-122 TA Required domain(s) missing: TA
+SDTM-235 AE AESTDTC must be present in AE.
+SDTM-289 AE AESER must be present in AE.</code></pre>
+</div>
+</div>
+<p>Most of them are about variables that the datasets lack, such as <code>RACE</code> and <code>AESER</code>, and SDTM-121 and SDTM-122 fail since the package has no Trial Summary (TS) or Trial Arms (TA) dataset. SDTM-007 finds the <code>SEX</code> value of <code>"FEMALE"</code>. The rules don’t look for orphan records, though, so for those the <code>"validate"</code> engine is needed:</p>
+<div id="2cf2e9f8" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> study.validate_conformance(engine<span class="op">=</span><span class="st">"validate"</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> issue <span class="kw">in</span> report.issues():</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(issue)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'dataset': 'AE', 'step': 14, 'assertion': 'specially', 'column': None, 'n_failed': 1, 'n': 2, 'severity': None}
+{'dataset': 'DM', 'step': 14, 'assertion': 'col_vals_expr', 'column': None, 'n_failed': 1, 'n': 3, 'severity': None}</code></pre>
+</div>
+</div>
+<p>The <code>"validate"</code> engine has a validation for each dataset. In AE, the last step is the check that each <code>USUBJID</code> is in DM, and it finds the one orphan record. In DM, the failing step is the length check on <code>SEX</code>, since <code>"FEMALE"</code> is longer than the two characters that SDTM allows. Each validation can be looked at with <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.get_validation" class="gdls-link"><code>get_validation()</code></a>.</p>
+</section>
+<section id="see-also-1" class="level4 doc-see-also">
+<h4 class="doc-see-also anchored" data-anchor-id="see-also-1">See Also</h4>
+<dl>
+<dt><a href="../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link gdls-code">validate_sdtmig()</a></dt>
+<dd>
+<p>Run the rules catalog on a dict of datasets.</p>
+</dd>
+<dt><a href="../reference/validate_cdisc_submission.html#pointblank.validate_cdisc_submission" class="gdls-link gdls-code">validate_cdisc_submission()</a></dt>
+<dd>
+<p>Run CDISC CORE on a folder of datasets.</p>
+</dd>
+<dt><a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a></dt>
+<dd>
+<p>The report that is returned.</p>
+</dd>
+</dl>
 </section>
 </section>
 <section id="get_dataset" class="level3">
 <h3 class="anchored" data-anchor-id="get_dataset"><span class="doc-object-name doc-function doc-label doc-label-method">get_dataset()</span></h3>
 <div class="doc-subject">
-<p>Get a dataset by name (case-insensitive).</p>
+<p>Get one of the package’s datasets by name.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L306-L327" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L446-L500" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb6"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_dataset</span>(<span class="va">name</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_dataset</span>(<span class="va">name</span>)</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p>The dataset is returned as it was given to the package, so a Polars DataFrame stays a Polars DataFrame. Indexing the package (as in <code>study["DM"]</code>) also gets a dataset, but <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.get_dataset" class="gdls-link gdls-code">get_dataset()</a> gives a more helpful error for a name that isn’t in the package.</p>
 </div>
 <section id="parameters-3" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
@@ -2027,7 +2394,7 @@ A built-in engine report (per-dataset validations) or a CORE-form report, depend
 <dl>
 <dt><code><span class="doc-parameter-name">name</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-The dataset name / domain code.
+The name of the dataset, such as <code>"DM"</code>. This is case-insensitive.
 </dd>
 </dl>
 </div>
@@ -2038,34 +2405,73 @@ The dataset name / domain code.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-The dataset (DataFrame).
+The dataset, as a DataFrame.
 </dd>
 </dl>
 </div>
 </section>
-<section id="raises" class="level4 doc-raises">
-<h4 class="doc-raises anchored" data-anchor-id="raises">Raises</h4>
+<section id="raises-2" class="level4 doc-raises">
+<h4 class="doc-raises anchored" data-anchor-id="raises-2">Raises</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">KeyError</span></code></dt>
 <dd>
-If no dataset with that name exists.
+If the package has no dataset with that name. The error message lists the names that the package has.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples-5" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-5">Examples</h4>
+<p>Let’s make a package with two datasets and get one of them:</p>
+<div id="8ab9b0ce" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"S-001"</span>, <span class="st">"S-002"</span>], <span class="st">"SEX"</span>: [<span class="st">"M"</span>, <span class="st">"F"</span>]})</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>ae <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"S-001"</span>], <span class="st">"AESEQ"</span>: [<span class="dv">1</span>], <span class="st">"AETERM"</span>: [<span class="st">"HEADACHE"</span>]})</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage(datasets<span class="op">=</span>{<span class="st">"DM"</span>: dm, <span class="st">"AE"</span>: ae})</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>study.get_dataset(<span class="st">"ae"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 3)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>USUBJID</th><th>AESEQ</th><th>AETERM</th></tr><tr><td>str</td><td>i64</td><td>str</td></tr></thead><tbody><tr><td>"S-001"</td><td>1</td><td>"HEADACHE"</td></tr></tbody></table></div>
+</div>
+</div>
+<p>The name is case-insensitive, so <code>"ae"</code> gets the <code>AE</code> dataset. Asking for a dataset that isn’t in the package raises a <code>KeyError</code>:</p>
+<div id="9838c486" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    study.get_dataset(<span class="st">"LB"</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">KeyError</span> <span class="im">as</span> e:</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(e)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>"No dataset named 'LB'. Available: ['AE', 'DM']"</code></pre>
+</div>
+</div>
+<p>The message lists the datasets that the package has.</p>
 </section>
 </section>
 <section id="subject_ids" class="level3">
 <h3 class="anchored" data-anchor-id="subject_ids"><span class="doc-object-name doc-function doc-label doc-label-method">subject_ids()</span></h3>
 <div class="doc-subject">
-<p>Get the set of <code>USUBJID</code> values in a dataset.</p>
+<p>Get the unique subject identifiers in a dataset.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L355-L373" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L563-L613" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb7"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">subject_ids</span>(<span class="va">dataset</span><span class="op">=</span><span class="st">"DM"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">subject_ids</span>(<span class="va">dataset</span><span class="op">=</span><span class="st">"DM"</span>)</span></code></pre></div>
+</div>
+<div class="doc-text">
+<p><code>USUBJID</code> identifies each subject across all the datasets of a study. DM has one record per subject, so its <code>USUBJID</code> values are the study’s subjects, and the subjects in the other datasets should all be among them. The <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.subject_ids" class="gdls-link gdls-code">subject_ids()</a> method gets these values for one dataset, which is useful for comparing the subjects of two datasets.</p>
 </div>
 <section id="parameters-4" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
@@ -2073,7 +2479,7 @@ If no dataset with that name exists.
 <dl>
 <dt><code><span class="doc-parameter-name">dataset</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"DM"</span></span></code></dt>
 <dd>
-The dataset to read subject IDs from. Defaults to <code>"DM"</code> (the reference set of all enrolled subjects).
+The name of the dataset, which is case-insensitive. The default is <code>"DM"</code>.
 </dd>
 </dl>
 </div>
@@ -2084,30 +2490,56 @@ The dataset to read subject IDs from. Defaults to <code>"DM"</code> (the referen
 <dl>
 <dt><code> <span class="doc-parameter-annotation">set</span></code></dt>
 <dd>
-The set of non-null <code>USUBJID</code> values, or an empty set if the dataset or column is absent.
+The different values of <code>USUBJID</code> in the dataset, leaving out nulls. The set is empty if the package has no dataset with that name, or if the dataset has no <code>USUBJID</code> column.
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples-6" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-6">Examples</h4>
+<p>Let’s make a package where the AE dataset has two records for one subject:</p>
+<div id="d7c8f162" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"S-001"</span>, <span class="st">"S-002"</span>, <span class="st">"S-003"</span>]})</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>ae <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"S-001"</span>, <span class="st">"S-001"</span>, <span class="st">"S-003"</span>], <span class="st">"AESEQ"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>]})</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage(datasets<span class="op">=</span>{<span class="st">"DM"</span>: dm, <span class="st">"AE"</span>: ae})</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="bu">sorted</span>(study.subject_ids(<span class="st">"AE"</span>))</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>['S-001', 'S-003']</code></pre>
+</div>
+</div>
+<p>Each subject appears once in the set, however many records they have. Sets can be compared directly, so here’s a check that every subject with an adverse event is in DM:</p>
+<div id="3ad2aca3" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>study.subject_ids(<span class="st">"AE"</span>) <span class="op">&lt;=</span> study.subject_ids()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>True</code></pre>
+</div>
+</div>
+<p>For a dataset that isn’t in the package, <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.subject_ids" class="gdls-link gdls-code">subject_ids()</a> returns an empty set rather than raising an error. To find the subjects that are missing from DM, use <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.orphan_ids" class="gdls-link"><code>orphan_ids()</code></a>.</p>
 </section>
 </section>
 <section id="orphan_ids" class="level3">
 <h3 class="anchored" data-anchor-id="orphan_ids"><span class="doc-object-name doc-function doc-label doc-label-method">orphan_ids()</span></h3>
 <div class="doc-subject">
-<p>Find values of <code>column</code> in <code>child</code> that do not exist in <code>parent</code>.</p>
+<p>Find the key values in one dataset that are missing from another.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L375-L397" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L615-L680" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb8"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">orphan_ids</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">child</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">parent</span><span class="op">=</span><span class="st">"DM"</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">column</span><span class="op">=</span><span class="st">"USUBJID"</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">orphan_ids</span>(</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">child</span>,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">parent</span><span class="op">=</span><span class="st">"DM"</span>,</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">column</span><span class="op">=</span><span class="st">"USUBJID"</span>,</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>This is the referential-integrity operator: e.g., subjects appearing in a finding domain that have no corresponding record in DM.</p>
+<p>In a study, the records of one dataset often refer to those of another. Each subject in AE should have a record in DM, for example. A value with nothing to refer to (an <em>orphan</em>) usually means that a record is missing or that a key was mistyped. The <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.orphan_ids" class="gdls-link gdls-code">orphan_ids()</a> method finds these values, by default the subjects of a dataset that are missing from DM.</p>
 </div>
 <section id="parameters-5" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
@@ -2115,15 +2547,15 @@ The set of non-null <code>USUBJID</code> values, or an empty set if the dataset 
 <dl>
 <dt><code><span class="doc-parameter-name">child</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>The referencing dataset (e.g., <code>"AE"</code>).</p>
+<p>The name of the dataset whose values are looked up, such as <code>"AE"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">parent</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"DM"</span></span></code></dt>
 <dd>
-<p>The referenced dataset (e.g., <code>"DM"</code>). Defaults to <code>"DM"</code>.</p>
+<p>The name of the dataset that the values should be in. The default is <code>"DM"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">column</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"USUBJID"</span></span></code></dt>
 <dd>
-The key column to check. Defaults to <code>"USUBJID"</code>.
+The key column, which is compared between the two datasets. The default is <code>"USUBJID"</code>.
 </dd>
 </dl>
 </div>
@@ -2134,26 +2566,107 @@ The key column to check. Defaults to <code>"USUBJID"</code>.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">set</span></code></dt>
 <dd>
-The set of orphaned values (present in <code>child.column</code> but not <code>parent.column</code>).
+The values of <code>column</code> in <code>child</code> that aren’t in <code>column</code> of <code>parent</code>. Null values are left out. If <code>child</code> has no such column, the set is empty. If <code>parent</code> has no such column, every value of <code>child</code> is returned.
 </dd>
 </dl>
 </div>
+</section>
+<section id="raises-3" class="level4 doc-raises">
+<h4 class="doc-raises anchored" data-anchor-id="raises-3">Raises</h4>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">KeyError</span></code></dt>
+<dd>
+If <code>child</code> or <code>parent</code> isn’t a dataset in the package.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples-7" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-7">Examples</h4>
+<p>Let’s make a package where the AE dataset has a subject, <code>S-009</code>, who isn’t in DM:</p>
+<div id="3af8b9b1" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"S-001"</span>, <span class="st">"S-002"</span>, <span class="st">"S-003"</span>]})</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>ae <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"S-001"</span>, <span class="st">"S-009"</span>, <span class="st">"S-009"</span>], <span class="st">"AESEQ"</span>: [<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>]})</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage(datasets<span class="op">=</span>{<span class="st">"DM"</span>: dm, <span class="st">"AE"</span>: ae})</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>study.orphan_ids(<span class="st">"AE"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>{'S-009'}</code></pre>
+</div>
+</div>
+<p>The orphan subject is found once, though they have two records in AE. The datasets that are compared can be changed with <code>parent=</code>. Here, a SUPPAE dataset holds supplemental qualifiers for adverse events, so each of its subjects should have a record in AE:</p>
+<div id="03fb9645" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>suppae <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"S-001"</span>, <span class="st">"S-002"</span>], <span class="st">"QNAM"</span>: [<span class="st">"AETRTEM"</span>, <span class="st">"AETRTEM"</span>]})</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage(datasets<span class="op">=</span>{<span class="st">"DM"</span>: dm, <span class="st">"AE"</span>: ae, <span class="st">"SUPPAE"</span>: suppae})</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(study.orphan_ids(<span class="st">"SUPPAE"</span>))</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(study.orphan_ids(<span class="st">"SUPPAE"</span>, parent<span class="op">=</span><span class="st">"AE"</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>set()
+{'S-002'}</code></pre>
+</div>
+</div>
+<p>Both SUPPAE subjects are in DM, but <code>S-002</code> has no adverse events, so their supplemental qualifier has no AE record to belong to. A key other than <code>USUBJID</code> can be compared with <code>column=</code>.</p>
 </section>
 </section>
 <section id="summary" class="level3">
 <h3 class="anchored" data-anchor-id="summary"><span class="doc-object-name doc-function doc-label doc-label-method">summary()</span></h3>
 <div class="doc-subject">
-<p>Return a human-readable summary of the package contents.</p>
+<p>Summarize the package’s contents as text.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L826-L837" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1209-L1254" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb9"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>()</span></code></pre></div>
 </div>
+<div class="doc-text">
+<p>The summary is a quick way to check what a package holds, such as after reading it with <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.from_folder" class="gdls-link"><code>from_folder()</code></a>. It has the study identifier, the standard and its version, the controlled terminology version, whether there is a Define-XML, and the names of the datasets. Lines for the study identifier, the terminology version and the Define-XML are left out when the package doesn’t have them. Printing the package gives the same text.</p>
+</div>
+<section id="returns-5" class="level4 doc-returns">
+<h4 class="doc-returns anchored" data-anchor-id="returns-5">Returns</h4>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">str</span></code></dt>
+<dd>
+The summary, over several lines.
+</dd>
+</dl>
+</div>
+</section>
+<section id="examples-8" class="level4 doc-examples">
+<h4 class="doc-examples anchored" data-anchor-id="examples-8">Examples</h4>
+<p>Let’s make a package and summarize it:</p>
+<div id="332c2096" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"S-001"</span>, <span class="st">"S-002"</span>]})</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>ae <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"S-001"</span>], <span class="st">"AESEQ"</span>: [<span class="dv">1</span>]})</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage(</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    datasets<span class="op">=</span>{<span class="st">"DM"</span>: dm, <span class="st">"AE"</span>: ae}, study_id<span class="op">=</span><span class="st">"STUDY01"</span>, ct_version<span class="op">=</span><span class="st">"2024-09-27"</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(study.summary())</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Submission Package
+  Study: STUDY01
+  Standard: sdtmig 3.4
+  CT version: 2024-09-27
+  Datasets (2): AE, DM</code></pre>
+</div>
+</div>
+<p>The package has no <code>define</code>, so there’s no line for a Define-XML. The datasets are listed in alphabetical order.</p>
 
 
+</section>
 </section>
 </section>
 

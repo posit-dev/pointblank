@@ -296,13 +296,13 @@
 - [ADaMVariableSpec](https://posit-dev.github.io/pointblank/reference/ADaMVariableSpec.html): The specification of one variable in an ADaM dataset template
 
 #### CDISC Submission Conformance
-> Validate SDTM datasets for CDISC conformance. `validate_sdtmig()` is the primary entry point: pass a dictionary of domain DataFrames and receive a `ConformanceReport` with 426 SDTMIG 3.4 rules evaluated in-process. For full submission-package checks (cross-dataset referential integrity, SUPP-- linkage, Define-XML) use `SubmissionPackage`. For the authoritative CDISC-certified rule set, use `validate_cdisc_submission()` (requires the CORE CLI) or `SubmissionPackage.validate_conformance(engine="core")`. All paths return a `ConformanceReport`.
+> Validate SDTM datasets for CDISC conformance. `validate_sdtmig()` is the primary entry point: pass a dictionary of domain DataFrames and receive a `ConformanceReport` with 362 SDTMIG 3.4 rules evaluated in-process. To work with a whole submission (including cross-dataset referential integrity and SUPP-- linkage, with `validate_conformance(engine="validate")`), use `SubmissionPackage`. For the authoritative CDISC-certified rule set, use `validate_cdisc_submission()` (requires the CORE CLI) or `SubmissionPackage.validate_conformance(engine="core")`. All paths return a `ConformanceReport`.
 
 
-- [validate_sdtmig](https://posit-dev.github.io/pointblank/reference/validate_sdtmig.html): Validate SDTM datasets against the SDTMIG rule catalog and return a conformance report
-- [validate_cdisc_submission](https://posit-dev.github.io/pointblank/reference/validate_cdisc_submission.html): Validate a CDISC submission with the CDISC CORE engine, in one call
-- [SubmissionPackage](https://posit-dev.github.io/pointblank/reference/SubmissionPackage.html): A data-level model of a study submission package for CDISC conformance validation
-- [ConformanceReport](https://posit-dev.github.io/pointblank/reference/ConformanceReport.html): The result of a CDISC conformance validation run
+- [validate_sdtmig](https://posit-dev.github.io/pointblank/reference/validate_sdtmig.html): Check SDTM datasets with Pointblank's bundled SDTMIG conformance rules
+- [validate_cdisc_submission](https://posit-dev.github.io/pointblank/reference/validate_cdisc_submission.html): Check a CDISC submission with the CDISC CORE engine
+- [SubmissionPackage](https://posit-dev.github.io/pointblank/reference/SubmissionPackage.html): A study's datasets, gathered for CDISC conformance validation
+- [ConformanceReport](https://posit-dev.github.io/pointblank/reference/ConformanceReport.html): The results of a CDISC conformance check
 
 #### Integrations
 > Classes for integrating Pointblank with external observability and monitoring systems. Use `OTelExporter` to export validation results as OpenTelemetry metrics, traces, and logs.

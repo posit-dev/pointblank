@@ -27709,159 +27709,247 @@ SDTMVariableSpec : The equivalent for SDTM domain templates.
 
 ## CDISC Submission Conformance
 
-Validate SDTM datasets for CDISC conformance. `validate_sdtmig()` is the primary entry point: pass a dictionary of domain DataFrames and receive a `ConformanceReport` with 426 SDTMIG 3.4 rules evaluated in-process. For full submission-package checks (cross-dataset referential integrity, SUPP-- linkage, Define-XML) use `SubmissionPackage`. For the authoritative CDISC-certified rule set, use `validate_cdisc_submission()` (requires the CORE CLI) or `SubmissionPackage.validate_conformance(engine="core")`. All paths return a `ConformanceReport`.
+Validate SDTM datasets for CDISC conformance. `validate_sdtmig()` is the primary entry point: pass a dictionary of domain DataFrames and receive a `ConformanceReport` with 362 SDTMIG 3.4 rules evaluated in-process. To work with a whole submission (including cross-dataset referential integrity and SUPP-- linkage, with `validate_conformance(engine="validate")`), use `SubmissionPackage`. For the authoritative CDISC-certified rule set, use `validate_cdisc_submission()` (requires the CORE CLI) or `SubmissionPackage.validate_conformance(engine="core")`. All paths return a `ConformanceReport`.
 
 
 
 validate_sdtmig(datasets: 'dict', version: 'str' = '3-4', ct_packages: 'list[str] | None' = None, define_xml: 'Any' = None, study_id: 'str | None' = None) -> 'ConformanceReport'
 
-Validate SDTM datasets against the SDTMIG rule catalog and return a conformance report.
+Check SDTM datasets with Pointblank's bundled SDTMIG conformance rules.
 
-Runs the bundled SDTMIG 3.4 rule catalog (362 rules) against the provided SDTM domain
-datasets using Pointblank's built-in conformance engine. No external tools, subprocesses,
-network calls, or CDISC CORE installation are required.
+Before SDTM datasets are submitted, they are checked for conformance to the SDTM
+Implementation Guide (SDTMIG). The `validate_sdtmig()` function does this with a catalog of
+362 rules for SDTMIG 3.4 that comes with Pointblank, so it needs no other software and no
+network access. It returns a [`ConformanceReport`](`pointblank.ConformanceReport`) with the
+result of each rule. For the published CDISC and agency rules, use
+[`validate_cdisc_submission()`](`pointblank.validate_cdisc_submission`), which runs the
+CDISC CORE engine.
 
-The catalog covers seven rule types:
+The rules are of these types:
 
-- **RECORD_CHECK** — per-row value checks (controlled terminology, ISO 8601 dates, ranges,
-  uniqueness constraints). These rules produce row-level findings accessible via
-  `findings_df()` and `get_findings_table()`.
-- **VARIABLE_METADATA_CHECK** — variable presence and ordering (e.g., USUBJID must appear
-  before domain-specific variables).
-- **DATASET_METADATA_CHECK** — dataset-level attributes (sort keys, required sort order).
-- **DATASET_CONTENTS_CHECK** — dataset-level value constraints (e.g., all rows in a domain
-  must share the same STUDYID).
-- **DOMAIN_PRESENCE_CHECK** — required or prohibited domain presence (e.g., DM must be
-  present, RELREC must not appear in an SDTM-only package).
-- **DEFINE_ITEM_METADATA_CHECK** — variable declarations in the Define-XML (activated only
-  when `define_xml` is supplied).
-- **DEFINE_CODELIST_CHECK** — codelist declarations in the Define-XML (activated only when
-  `define_xml` is supplied).
+- Record checks (221 rules) check the values of each record, such as that `SEX` uses the
+  terms of its codelist, that dates are in the ISO 8601 format, that `AGE` isn't negative
+  and that required variables aren't null. These rules give the failing records as
+  findings.
+- Variable metadata checks (116 rules) check that the required variables of a domain are
+  present, that variables have the right type and that they are in the right order.
+- Dataset contents checks (9 rules) check across the records of a dataset, such as that
+  `STUDYID` has the same value in every record and that `AESEQ` is unique for each subject.
+- Dataset metadata checks (3 rules) check that every dataset has `STUDYID`, `DOMAIN` and
+  (for subject-level data) `USUBJID`.
+- Domain presence checks (3 rules) check that the DM, TS and TA datasets are present.
+- Define-XML checks (12 rules) check the datasets against their Define-XML, such as that
+  every variable is declared in it and that values are from the codelists that it declares.
+  These rules need `define_xml=`, and are not applicable without it.
 
-Controlled Terminology
-----------------------
-By default the most recent bundled CT package (``sdtm-ct-2024-09-27``) is used. Codelist
-checks are case-insensitive: a value of ``"beats/min"`` matches a term ``"BEATS/MIN"``.
-SAS/XPT missing values (empty strings ``""``) are treated as null and skipped, so they do
-not generate false positives for codelist or format rules.
+Four of the rules are of `"Warning"` sensitivity: the presence of TA and of `USUBJID`, and
+the order of the identifier variables and of the sequence variable. All the others are of
+`"Error"` sensitivity. A rule for a domain that isn't one of the `datasets` (such as an AE
+rule when there's no AE dataset) has nothing to check, so it passes. The codelist checks
+ignore case, so `"m"` is accepted for `SEX`. Empty strings (which is how XPT files store
+missing character values) are treated as nulls. SUPP-- and RELREC datasets aren't checked
+by the rules that apply to all domains, since they have a different structure (with
+`RDOMAIN` in place of `DOMAIN`).
 
-SUPP-- and RELREC handling
---------------------------
-Supplemental Qualifiers (``SUPP--``) datasets use ``RDOMAIN`` instead of ``DOMAIN`` and
-have a fixed non-standard structure, so they are automatically excluded from catch-all rules
-(rules with no explicit domain list). RELREC is similarly excluded.
+The rules check each dataset on its own, so they don't check that the subjects of one
+dataset are in DM. For that, use the `"validate"` engine of the `SubmissionPackage` method
+[`validate_conformance()`](`pointblank.SubmissionPackage.validate_conformance`).
 
 Parameters
 ----------
 datasets
-    Mapping of SDTM domain name to a DataFrame. Keys are matched case-insensitively
-    (``"DM"`` and ``"dm"`` are equivalent). Accepts Polars, pandas, or any
-    narwhals-compatible DataFrame. Include all domains relevant to your submission;
-    rules that require a domain not in the mapping are marked ``not_applicable``.
+    The SDTM datasets, as a dict of DataFrames keyed by domain name, such as
+    `{"DM": dm, "AE": ae}`. The names are case-insensitive. The DataFrames can be Polars,
+    Pandas or any other kind that Narwhals supports.
 version
-    SDTMIG version string. Accepts either dot or hyphen notation (``"3.4"`` or ``"3-4"``).
-    Currently only ``"3-4"`` has a bundled catalog.
+    The version of SDTMIG, as `"3-4"` or `"3.4"`. Only version 3.4 has a bundled catalog. The
+    default is `"3-4"`.
 ct_packages
-    One or more CT package slugs to load (e.g., ``["sdtm-ct-2024-09-27"]``). When
-    ``None`` (the default) the most recent bundled package is used automatically.
+    The bundled controlled terminology packages for the codelist checks, as a list of names
+    such as `["sdtm-ct-2024-09-27"]`. The default is the latest bundled package, which is
+    `"sdtm-ct-2024-09-27"`.
 define_xml
-    Optional Define-XML metadata, supplied as a file path (``str`` or ``pathlib.Path``) or
-    a pre-parsed ``MetadataPackage`` object. When provided, ``DEFINE_ITEM_METADATA_CHECK``
-    and ``DEFINE_CODELIST_CHECK`` rules become active; without it they are marked
-    ``not_applicable``.
+    The study's Define-XML, as a path to a `define.xml` file or as a
+    [`MetadataPackage`](`pointblank.MetadataPackage`) from
+    [`import_metadata()`](`pointblank.import_metadata`). The default is `None`, which makes
+    the 12 Define-XML rules not applicable.
 study_id
-    Optional study identifier (e.g., ``"CDISCPILOT01"``) shown in the report header.
+    A study identifier, which is kept in the report's `package`. It isn't used by the rules
+    and isn't shown in the report. The default is `None`.
 
 Returns
 -------
 ConformanceReport
-    A built-in engine report (``is_rules`` is ``True``). In Jupyter and Quarto notebooks the
-    object renders automatically as the rule-level summary table. Call
-    ``get_tabular_report()`` for the `GT` object, ``get_findings_table()`` for a
-    record-level drill-down, or ``findings_df()`` for a Polars DataFrame of failing rows.
+    The report, whose [`is_rules`](`pointblank.ConformanceReport.is_rules`) is `True`. In a
+    notebook it is shown as the table of
+    [`get_tabular_report()`](`pointblank.ConformanceReport.get_tabular_report`).
+
+Raises
+------
+ValueError
+    If there is no bundled catalog for the `version`. The error message lists the versions
+    that have one.
+FileNotFoundError
+    If one of the `ct_packages` isn't bundled with Pointblank.
 
 Examples
 --------
-Validate a study from in-memory Polars DataFrames:
+Here is a DM dataset with all the variables that SDTMIG requires for DM, but with three
+problems: the second subject's `RFSTDTC` isn't an ISO 8601 date, and the third subject has a
+negative `AGE` and a `SEX` of `"FEMALE"` (the SEX codelist has `"F"`):
 
-```python
+```{python}
 import pointblank as pb
+import polars as pl
 
-report = pb.validate_sdtmig({"DM": dm, "AE": ae, "LB": lb})
-report  # renders the rule summary table in a notebook
+dm = pl.DataFrame(
+    {
+        "STUDYID": ["STUDY01"] * 3,
+        "DOMAIN": ["DM"] * 3,
+        "USUBJID": ["STUDY01-001", "STUDY01-002", "STUDY01-003"],
+        "SUBJID": ["001", "002", "003"],
+        "RFSTDTC": ["2024-01-15", "15JAN2024", "2024-01-17"],
+        "RFENDTC": ["2024-06-15", "2024-06-16", "2024-06-17"],
+        "SITEID": ["S01", "S01", "S02"],
+        "AGE": [34, 51, -38],
+        "AGEU": ["YEARS"] * 3,
+        "SEX": ["M", "F", "FEMALE"],
+        "RACE": ["WHITE", "ASIAN", "WHITE"],
+        "ARMCD": ["DRUGA", "PBO", "DRUGA"],
+        "ARM": ["Drug A", "Placebo", "Drug A"],
+        "ACTARMCD": ["DRUGA", "PBO", "DRUGA"],
+        "ACTARM": ["Drug A", "Placebo", "Drug A"],
+        "COUNTRY": ["USA", "USA", "CAN"],
+    }
+)
+
+report = pb.validate_sdtmig({"DM": dm})
+
+print(report)
 ```
 
-Drill down to the individual failing records:
+Five rules fail, and the 12 Define-XML rules are not applicable. Let's see which rules
+failed:
 
-```python
-report.get_findings_table()  # styled record-level table
-report.findings_df()         # Polars DataFrame for programmatic use
+```{python}
+for rule in report.rules(status="fail"):
+    print(rule.rule_id, rule.sensitivity, rule.message)
 ```
 
-Load from XPT files using pyreadstat:
+The three problems are each found by a rule. The other two failures are for the TS and TA
+datasets, which every SDTM submission needs. The failing records can be had as a DataFrame
+with [`findings_df()`](`pointblank.ConformanceReport.findings_df`) or as a table with
+[`get_findings_table()`](`pointblank.ConformanceReport.get_findings_table`).
 
-```python
-import pyreadstat, polars as pl
+With a Define-XML, the Define-XML rules are run as well. Pointblank comes with a DM dataset
+as an XPT file and a Define-XML for it:
 
-def load(path):
-    df, _ = pyreadstat.read_xport(path)
-    return pl.from_pandas(df)
+```{python}
+import pyreadstat
 
-report = pb.validate_sdtmig({
-    "DM": load("sdtm/dm.xpt"),
-    "AE": load("sdtm/ae.xpt"),
-    "LB": load("sdtm/lb.xpt"),
-}, study_id="STUDY001")
+dm, _ = pyreadstat.read_xport(pb.load_metadata_example("dm.xpt"))
+
+report = pb.validate_sdtmig({"DM": dm}, define_xml=pb.load_metadata_example("define.xml"))
+
+print(report)
+print([rule.rule_id for rule in report.rules(status="fail")])
 ```
+
+No rules are not applicable now. SDTM-057 is one of the Define-XML rules, and it finds a
+`RACE` of `"BLACK"`, which isn't in the codelist that the Define-XML declares for `RACE`.
+SDTM-008 finds the same value with the CDISC RACE codelist, and the other failures are for
+missing variables (such as `COUNTRY`) and the missing TS and TA datasets. The dataset was
+read as a Pandas DataFrame, which works as well as a Polars one.
+
+See Also
+--------
+ConformanceReport : The report that is returned.
+validate_cdisc_submission : Check a submission with the CDISC CORE engine.
+SubmissionPackage : A set of datasets to check together.
+validate_sdtm : Build a validation plan for one dataset from an SDTM template.
 
 validate_cdisc_submission(source: 'str | Path | dict | SubmissionPackage', standard: 'str | None' = None, version: 'str | None' = None, define: 'str | Path | Any | None' = None, controlled_terminology: 'str | Sequence[str] | None' = None, agency: 'str | None' = None, ct_version: 'str | None' = None, study_id: 'str | None' = None, core: 'str | Sequence[str] | None' = None, core_cwd: 'str | Path | None' = None, cache: 'str | Path | None' = None, workdir: 'str | Path | None' = None) -> 'ConformanceReport'
 
-Validate a CDISC submission with the CDISC CORE engine, in one call.
+Check a CDISC submission with the CDISC CORE engine.
 
-Convenience wrapper that builds a [`SubmissionPackage`](`pointblank.SubmissionPackage`) from
-`source` and runs [`validate_conformance()`](`pointblank.SubmissionPackage`) with
-`engine="core"`. Requires an installed CORE executable (see `core`).
+CDISC CORE is CDISC's open-source engine for its conformance rules, and it has the
+published rules of CDISC and of the FDA and PMDA. The `validate_cdisc_submission()` function
+runs CORE on a submission in a single call: it makes a
+[`SubmissionPackage`](`pointblank.SubmissionPackage`) from the `source` (unless it is one
+already), runs CORE on it, and reads CORE's results into a
+[`ConformanceReport`](`pointblank.ConformanceReport`). This is the same as calling the
+package's [`validate_conformance()`](`pointblank.SubmissionPackage.validate_conformance`)
+method with `engine="core"`.
+
+CORE is a separate command-line tool (`cdisc-rules-engine`) that has to be installed. If it
+isn't on the `PATH`, give the command with `core=` or in the `POINTBLANK_CDISC_CORE`
+environment variable. For checks that need no other software, use
+[`validate_sdtmig()`](`pointblank.validate_sdtmig`), which runs Pointblank's bundled SDTMIG
+rules.
 
 Parameters
 ----------
 source
-    The submission to validate. One of: a path to a folder of datasets (XPT / Dataset-JSON,
-    with an optional `define.xml`), a mapping of dataset name to DataFrame, or an already-built
-    `SubmissionPackage`.
+    The submission to check. This can be the path of a folder of datasets (`.xpt` or
+    Dataset-JSON files, which are read with
+    [`SubmissionPackage.from_folder()`](`pointblank.SubmissionPackage.from_folder`)), a dict of
+    DataFrames keyed by dataset name, or a `SubmissionPackage`.
 standard
-    The CDISC standard (e.g., `"sdtmig"`). Defaults to `"sdtmig"` (or the package's `standard`
-    when `source` is a `SubmissionPackage`).
+    The CDISC standard, such as `"sdtmig"`. The default is `"sdtmig"`, or the package's
+    `standard` if `source` is a `SubmissionPackage`.
 version
-    The standard version (e.g., `"3.4"`). Defaults to `"3.4"` (or the package's value).
+    The version of the standard, such as `"3.4"`. The default is `"3.4"`, or the package's
+    `standard_version` if `source` is a `SubmissionPackage`.
 define
-    Optional Define-XML path (ignored when `source` is a `SubmissionPackage` — set it on the
-    package instead). Auto-detected from a folder `source` when present.
+    The path of the study's Define-XML, which CORE uses in its checks. For a folder, a
+    `define*.xml` file in it is found without this. It is ignored if `source` is a
+    `SubmissionPackage`, whose own `define` is used. The default is `None`.
 controlled_terminology
-    CT package name(s) for CORE's `-ct` (e.g., `"sdtmct-2024-03-29"`).
+    The controlled terminology package or packages for CORE's `-ct` option, such as
+    `"sdtmct-2024-03-29"`. The default is `None`.
 agency
-    Optional agency rule-set selector recorded on the report.
+    The regulatory agency, such as `"FDA"` or `"PMDA"`, which is shown in the report. It
+    doesn't change the rules that CORE runs. The default is `None`.
 ct_version
-    Optional Controlled Terminology version pin recorded on the package.
+    The controlled terminology version to record in the package. It is only shown in the
+    package's summary and isn't given to CORE. It is ignored if `source` is a
+    `SubmissionPackage`. The default is `None`.
 study_id
-    Optional study identifier.
+    A study identifier to record in the package. It is ignored if `source` is a
+    `SubmissionPackage`. The default is `None`.
 core
-    How to invoke CORE — a path/name to the CORE executable, a full command prefix (e.g.,
-    `["python", "core.py"]`), or `None` to auto-discover via the `POINTBLANK_CDISC_CORE`
-    environment variable and then `PATH`.
+    How to run CORE. This can be the path or name of the CORE executable, or a command as a
+    list (such as `["python", "core.py"]`). With the default of `None`, the command is taken
+    from the `POINTBLANK_CDISC_CORE` environment variable, or else CORE is looked for on the
+    `PATH`.
 core_cwd
-    Working directory to run CORE from; required when invoking a repo checkout.
+    The directory to run CORE from. This is needed when CORE is run from a checkout of its
+    repository, since it looks for its `resources/` folder in the current directory. The
+    default is `None`.
 cache
-    Path to CORE's rules cache directory (`-ca`).
+    The path to CORE's rules cache (its `-ca` option). The default is `None`.
 workdir
-    Directory for materialized XPT and the CORE report. If `None`, a temporary directory is used.
+    A directory for the XPT files that the datasets are written to and for CORE's report.
+    With the default of `None`, a temporary directory is used and then deleted.
 
 Returns
 -------
 ConformanceReport
-    A CORE-form report (`is_core` is `True`).
+    A report of CORE's results, whose [`is_core`](`pointblank.ConformanceReport.is_core`) is
+    `True`.
+
+Raises
+------
+NotADirectoryError
+    If `source` is a path that isn't a folder.
+TypeError
+    If `source` isn't a path, a dict or a `SubmissionPackage`.
 
 Examples
 --------
+CORE has to be installed for this function, so these examples aren't run here. Let's check
+a folder of SDTM datasets against SDTMIG 3.4, for a submission to the FDA:
+
 ```python
 import pointblank as pb
 
@@ -27869,100 +27957,237 @@ report = pb.validate_cdisc_submission(
     "study_xyz/sdtm/",
     standard="sdtmig",
     version="3.4",
+    controlled_terminology="sdtmct-2024-03-29",
     agency="FDA",
 )
-report.summary()
+
+print(report)
 ```
+
+Printing the report gives the standard, the version of CORE, the number of rules with each
+of CORE's statuses and the total number of issues. The issues and the failing records can
+then be looked at, and the report saved for review:
+
+```python
+for issue in report.issues(status="ISSUE REPORTED"):
+    print(issue["dataset"], issue["rule_id"], issue["issues"], issue["message"])
+
+report.to_excel("study_xyz/conformance/core_report.xlsx")
+```
+
+If CORE was installed from a checkout of its repository, it has to be run from that
+directory, as in `core=["python", "core.py"], core_cwd="path/to/cdisc-rules-engine"`. A
+report that CORE wrote on its own can be read with
+[`ConformanceReport.from_core_report()`](`pointblank.ConformanceReport.from_core_report`),
+which has an example that runs without CORE.
+
+See Also
+--------
+validate_sdtmig : Check SDTM datasets with Pointblank's bundled rules.
+SubmissionPackage : A set of datasets to check together.
+ConformanceReport : The report that is returned.
 
 SubmissionPackage(datasets: 'dict[str, Any]' = <factory>, define: 'Any' = None, ct_version: 'str | None' = None, standard: 'str' = 'sdtmig', standard_version: 'str' = '3.4', study_id: 'str | None' = None) -> None
 
-A data-level model of a study submission package for CDISC conformance validation.
+A study's datasets, gathered for CDISC conformance validation.
 
-A `SubmissionPackage` groups the datasets of a study (SDTM domains, SUPP-- qualifiers,
-RELREC, and/or ADaM datasets) together with their Define-XML and Controlled Terminology
-context, and understands the *relationships* between them. This enables cross-dataset
-conformance checks — referential integrity, SUPP-- linkage, RELREC resolution, and
-ADaM ⇄ SDTM traceability — that single-dataset validation cannot express.
+A `SubmissionPackage` holds the datasets of a study (SDTM domains, SUPP-- qualifiers, RELREC
+and ADaM datasets) together with the study's Define-XML. Where
+[`validate_sdtm()`](`pointblank.validate_sdtm`) and
+[`validate_adam()`](`pointblank.validate_adam`) look at one dataset at a time, a package
+knows about all of them, so it can check how they relate: for example, whether every subject
+in AE has a record in DM. It is the data-level counterpart of
+[`MetadataPackage`](`pointblank.MetadataPackage`), which holds the metadata of many datasets.
 
-This is the data-level analog of [`MetadataPackage`](`pointblank.MetadataPackage`), which
-groups *metadata* for many datasets.
+A package can be built from DataFrames, as here, or from a folder of XPT and Dataset-JSON
+files with [`from_folder()`](`pointblank.SubmissionPackage.from_folder`). Its
+[`validate_conformance()`](`pointblank.SubmissionPackage.validate_conformance`) method runs
+the conformance checks and returns a [`ConformanceReport`](`pointblank.ConformanceReport`).
+The package also has some helpers for looking across datasets, such as
+[`orphan_ids()`](`pointblank.SubmissionPackage.orphan_ids`), which finds the subjects in one
+dataset that are missing from another.
 
 Parameters
 ----------
 datasets
-    A mapping of dataset name (domain code, e.g., `"DM"`, `"AE"`, `"SUPPAE"`, `"ADSL"`) to
-    the dataset itself (a Pandas or Polars DataFrame). Names are matched case-insensitively
-    but conventionally uppercase.
+    A dictionary that maps each dataset name (a domain code such as `"DM"`, `"AE"`,
+    `"SUPPAE"` or `"ADSL"`) to the dataset, as a Polars or Pandas DataFrame. The names are
+    case-insensitive and are stored in uppercase. The default is an empty dictionary.
 define
-    Optional Define-XML context: a path to a `define.xml` file, or an already-imported
-    [`MetadataPackage`](`pointblank.MetadataPackage`). Used to supply variable definitions,
-    codelists, and origins for define-context rules.
+    The study's Define-XML, as a path to a `define.xml` file or as a
+    [`MetadataPackage`](`pointblank.MetadataPackage`) from
+    [`import_metadata()`](`pointblank.import_metadata`). With the built-in rules engine, it
+    activates the rules that check the datasets against Define-XML. The CORE engine only
+    accepts a path. The default is `None`.
 ct_version
-    Optional Controlled Terminology version pin (e.g., `"2024-03-29"`), recorded for
-    reproducible runs.
+    The version of CDISC Controlled Terminology that the study uses (such as
+    `"2024-03-29"`). It is shown by [`summary()`](`pointblank.SubmissionPackage.summary`) but
+    doesn't affect the checks. To choose the terminology the built-in engine checks against,
+    use the `ct_packages=` argument of `validate_conformance()`. The default is `None`.
 standard
-    The data standard the package follows (`"sdtmig"` or `"adamig"`). Defaults to `"sdtmig"`.
+    The data standard that the datasets follow, `"sdtmig"` or `"adamig"`. The default is
+    `"sdtmig"`.
 standard_version
-    The Implementation Guide version (e.g., `"3.4"` for SDTM IG). Defaults to `"3.4"`.
+    The version of the standard, such as `"3.4"` for SDTMIG 3.4. The default is `"3.4"`.
 study_id
-    Optional study identifier, used in report labels.
+    A study identifier. It is shown by `summary()` and used in the labels of the validations
+    made by `validate_conformance(engine="validate")`. The default is `None`.
 
 Examples
 --------
-Construct a package from in-memory DataFrames and validate conformance across it:
+Let's build a package from a Demographics (DM) and an Adverse Events (AE) dataset. One of the
+adverse events belongs to subject `STUDY01-009`, who isn't in DM:
 
-```python
+```{python}
 import pointblank as pb
+import polars as pl
 
-study = pb.SubmissionPackage(
-    datasets={"DM": dm_df, "AE": ae_df, "LB": lb_df},
-    standard="sdtmig",
-    standard_version="3.4",
+dm = pl.DataFrame(
+    {
+        "STUDYID": ["STUDY01"] * 3,
+        "DOMAIN": ["DM"] * 3,
+        "USUBJID": ["STUDY01-001", "STUDY01-002", "STUDY01-003"],
+        "SEX": ["M", "F", "F"],
+    }
+)
+ae = pl.DataFrame(
+    {
+        "STUDYID": ["STUDY01"] * 3,
+        "DOMAIN": ["AE"] * 3,
+        "USUBJID": ["STUDY01-001", "STUDY01-002", "STUDY01-009"],
+        "AESEQ": [1, 1, 1],
+        "AETERM": ["HEADACHE", "NAUSEA", "RASH"],
+    }
 )
 
-report = study.validate_conformance()
-report.summary()
+study = pb.SubmissionPackage(datasets={"dm": dm, "AE": ae}, study_id="STUDY01")
+
+print(study)
 ```
 
-Or ingest a folder of XPT files (Define-XML auto-detected if present):
+The dataset names are stored in uppercase, so `"dm"` became `DM`. The package can find the
+subject in AE that has no DM record:
 
-```python
-study = pb.SubmissionPackage.from_folder("study_xyz/sdtm/")
-report = study.validate_conformance(agency="FDA")
+```{python}
+study.orphan_ids("AE")
 ```
+
+The validation checks the whole package. The `"validate"` engine builds a
+[`Validate`](`pointblank.Validate`) for each dataset, with the structural checks from the SDTM
+templates and the checks across datasets:
+
+```{python}
+report = study.validate_conformance(engine="validate")
+
+print(report)
+```
+
+The AE validation has one failing test unit, from the check that each `USUBJID` in AE exists
+in DM. The default engine, the built-in rules engine, checks the package against the SDTMIG
+rules instead. See
+[`validate_conformance()`](`pointblank.SubmissionPackage.validate_conformance`) for how the
+engines differ.
+
+See Also
+--------
+validate_sdtmig : Check SDTM datasets against the SDTMIG rules, without building a package.
+validate_cdisc_submission : Check a submission with the CDISC CORE engine.
+ConformanceReport : The report that validate_conformance() returns.
+MetadataPackage : The metadata-level counterpart of a submission package.
 
 ConformanceReport(validations: 'dict[str, Validate]' = <factory>, package: 'SubmissionPackage | None' = None, agency: 'str | None' = None, core: 'ParsedCoreReport | None' = None, native_result: 'NativeConformanceResult | None' = None) -> None
 
-The result of a CDISC conformance validation run.
+The results of a CDISC conformance check.
 
-A `ConformanceReport` is returned by [`validate_sdtmig()`](`pointblank.validate_sdtmig`) and
-[`SubmissionPackage.validate_conformance()`](`pointblank.SubmissionPackage.validate_conformance`).
-It exists in one of two forms depending on the engine used:
+A `ConformanceReport` holds the results of checking a set of CDISC datasets for conformance
+to their standard. It is returned by [`validate_sdtmig()`](`pointblank.validate_sdtmig`),
+[`validate_cdisc_submission()`](`pointblank.validate_cdisc_submission`) and the
+`SubmissionPackage` method
+[`validate_conformance()`](`pointblank.SubmissionPackage.validate_conformance`), and is
+rarely made directly. The report has one of three forms, depending on the engine that
+did the checks:
 
-- **Built-in rules engine** (`is_rules` is `True`) — produced by Pointblank's SDTMIG rule
-  catalog. Each rule is evaluated against the supplied datasets and receives one of five
-  statuses: `"pass"`, `"fail"`, `"error"`, `"not_applicable"`, or `"not_supported"`. Row-level
-  findings (the individual failing records) are collected for RECORD_CHECK rules and accessible
-  via [`findings_df()`](`pointblank.ConformanceReport.findings_df`) and
+- **Built-in rules** ([`is_rules`](`pointblank.ConformanceReport.is_rules`) is `True`): the
+  results of Pointblank's bundled catalog of SDTMIG rules. Each rule has a status of
+  `"pass"`, `"fail"`, `"error"` (the rule couldn't be evaluated), `"not_applicable"` (an input
+  that it needs, such as a Define-XML, wasn't given) or `"not_supported"`. The rules that
+  check values give the failing records, which are in
+  [`findings_df()`](`pointblank.ConformanceReport.findings_df`) and
   [`get_findings_table()`](`pointblank.ConformanceReport.get_findings_table`).
-- **CDISC CORE** (`is_core` is `True`) — produced by the external CDISC CORE command-line
-  engine. Rule-keyed findings and run provenance are exposed via `findings()` and `rules()`.
+- **CDISC CORE** ([`is_core`](`pointblank.ConformanceReport.is_core`) is `True`): the results
+  of the CDISC CORE engine, with CORE's own rule statuses (such as `"SUCCESS"`,
+  `"ISSUE REPORTED"` and `"SKIPPED"`). A report of this form can also be made from a saved
+  CORE report with [`from_core_report()`](`pointblank.ConformanceReport.from_core_report`).
+- **Validate-based**: a [`Validate`](`pointblank.Validate`) validation for each dataset, from
+  `SubmissionPackage.validate_conformance(engine="validate")`. Each validation can be had with
+  [`get_validation()`](`pointblank.ConformanceReport.get_validation`).
 
-In a Jupyter or Quarto notebook the report renders automatically as a color-coded rule summary
-table (calling `_repr_html_()` is equivalent to `get_tabular_report()._repr_html_()`).
+The methods [`summary()`](`pointblank.ConformanceReport.summary`),
+[`issues()`](`pointblank.ConformanceReport.issues`) and
+[`all_passed()`](`pointblank.ConformanceReport.all_passed`) work for all three forms. In a
+notebook, a report of the built-in rules is shown as the table of
+[`get_tabular_report()`](`pointblank.ConformanceReport.get_tabular_report`). A CORE report is
+shown as a short summary with a table of its issues, and a Validate-based report as the
+validation report of each dataset. Printing a report of any form gives a text summary.
 
 Parameters
 ----------
 validations
-    Reserved for legacy use; not populated by the built-in engine.
+    The validation for each dataset, keyed by dataset name, for a Validate-based report. The
+    default is an empty dict.
 package
-    The `SubmissionPackage` the report was produced from, if any.
+    The [`SubmissionPackage`](`pointblank.SubmissionPackage`) that was checked. The default is
+    `None`.
 agency
-    The agency rule-set selector used for the run (`None` for CDISC base rules).
+    The regulatory agency, such as `"FDA"`, which is only used as a label in the report. The
+    default is `None`.
 core
-    The parsed CDISC CORE report (CORE form only). `None` for built-in engine reports.
+    CORE's results, for a CDISC CORE report. The default is `None`.
 native_result
-    The `NativeConformanceResult` produced by the rules engine (native form only).
+    The results of the rules, for a report of the built-in rules. The default is `None`.
+
+Examples
+--------
+Let's check a small DM dataset with the built-in rules. It has a date that isn't in the
+ISO 8601 format, a negative age and a `SEX` value that isn't in its codelist:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+dm = pl.DataFrame(
+    {
+        "STUDYID": ["STUDY01"] * 3,
+        "DOMAIN": ["DM"] * 3,
+        "USUBJID": ["STUDY01-001", "STUDY01-002", "STUDY01-003"],
+        "RFSTDTC": ["2024-01-15", "15JAN2024", "2024-01-17"],
+        "AGE": [34, 51, -38],
+        "SEX": ["M", "F", "FEMALE"],
+    }
+)
+
+report = pb.validate_sdtmig({"DM": dm})
+
+print(report)
+```
+
+Ten of the 362 rules fail. Most of them are about what the dataset lacks, such as the DM
+variables `SUBJID` and `RACE` and the TS and TA datasets. The failing records are found by
+three of the rules:
+
+```{python}
+report.findings_df().select("rule_id", "row_index", "checked_column", "checked_value")
+```
+
+The `row_index` of a finding is the 0-based position of the record in its dataset. To see the
+results of all the rules as a table, use
+[`get_tabular_report()`](`pointblank.ConformanceReport.get_tabular_report`).
+
+See Also
+--------
+validate_sdtmig : Check SDTM datasets with the built-in rules.
+validate_cdisc_submission : Check a folder of datasets with CDISC CORE.
+SubmissionPackage : A set of datasets to check together.
 
 
 ## Integrations
@@ -46814,13 +47039,13 @@ from the SDTMIG 3.4 catalog; the colored bar on the left edge encodes its status
 | Green | `pass` | The rule was evaluated and no violations were found |
 | Red | `fail` | One or more records or datasets violated the rule |
 | Amber | `error` | The rule could not be evaluated (unexpected data state) |
-| Grey | `not_applicable` | The rule requires a dataset or variable that was not supplied |
+| Grey | `not_applicable` | The rule requires an input (such as a Define-XML) that was not supplied |
 | Grey | `not_supported` | The rule type is not yet implemented in the built-in engine |
 
 Rules are sorted by severity: failures first, then errors, then passes, then not-applicable.
 
 The header shows a `PASS` or `FAIL` badge alongside the standard, version, and a full status
-breakdown (e.g., `SDTMIG 3-4 · 410 passed · 4 failed · 12 n/a`).
+breakdown (e.g., `SDTMIG 3-4 · 346 passed · 4 failed · 12 n/a`).
 
 Call `get_tabular_report()` to get the `GT` object directly if you need to embed it in a report
 pipeline:
@@ -46871,7 +47096,7 @@ report_with_issues.get_findings_table()
 
 The findings table groups its columns into two spanners:
 
-- **Rule**: `Domain` and `Description` identify which rule fired and where.
+- **SDTM Rule Definition**: `Rule`, `Domain` and `Description` identify which rule fired and where.
 - **Finding**: `USUBJID` identifies the subject; `Column` and `Value` show exactly what was wrong;
 `Row` is the 1-based row number in the source dataset for quick lookup.
 
@@ -46925,22 +47150,23 @@ The bundled SDTMIG 3.4 catalog contains 362 rules across seven types:
 | Type | Description | Examples |
 |---|---|---|
 | `RECORD_CHECK` | Per-row value checks | Codelist membership, ISO 8601 dates, numeric ranges |
-| `VARIABLE_METADATA_CHECK` | Variable presence and column ordering | USUBJID must precede domain-specific variables |
-| `DATASET_METADATA_CHECK` | Dataset-level attributes | Required sort key order |
+| `VARIABLE_METADATA_CHECK` | Variable presence, types and ordering | DM must contain SEX, RACE and COUNTRY |
+| `DATASET_METADATA_CHECK` | Identifier variables present in every dataset | STUDYID must be present in every domain |
 | `DATASET_CONTENTS_CHECK` | Dataset-level value constraints | All rows in a domain must share the same STUDYID |
-| `DOMAIN_PRESENCE_CHECK` | Required or prohibited domain presence | DM must be present |
+| `DOMAIN_PRESENCE_CHECK` | Required domain presence | DM, TS and TA must be present |
 | `DEFINE_ITEM_METADATA_CHECK` | Variable declarations against Define-XML | Activated when `define_xml` is supplied |
 | `DEFINE_CODELIST_CHECK` | Codelist values against Define-XML | Activated when `define_xml` is supplied |
 
-Only `RECORD_CHECK` and `DATASET_CONTENTS_CHECK` rules produce row-level findings accessible via
-`findings_df()` and `get_findings_table()`. The other types report a violation count in
+Only `RECORD_CHECK`, `DATASET_CONTENTS_CHECK` and `DEFINE_CODELIST_CHECK` rules produce row-level
+findings accessible via `findings_df()` and `get_findings_table()`. The other types report a violation count in
 `get_tabular_report()` but do not have individual record detail.
 
-Rules that require a domain or variable not present in your datasets are automatically marked
-`not_applicable` (they are not counted as failures). For example, a rule that checks `AESTDTC` in
-the AE domain is `not_applicable` when no AE dataset is supplied. Adding more domains to the
-dictionary passed to `validate_sdtmig()` will convert more rules from `not_applicable` to
-executable, giving a more complete conformance picture.
+Rules that target a domain not present in your datasets have nothing to check, so they are reported
+as `pass`. For example, a rule that checks `AESTDTC` in the AE domain passes when no AE dataset is
+supplied. A `pass` therefore doesn't mean that a domain was checked: adding more domains to the
+dictionary passed to `validate_sdtmig()` gives the rules for those domains something to evaluate,
+giving a more complete conformance picture. Only rules that need an input that wasn't supplied
+(such as a Define-XML) are marked `not_applicable`.
 
 ### Controlled Terminology
 
@@ -46984,8 +47210,9 @@ report = pb.validate_sdtmig(
 )
 ```
 
-Without `define_xml`, the 76 `DEFINE_ITEM_METADATA_CHECK` and `DEFINE_CODELIST_CHECK` rules are
-marked `not_applicable`. Supplying the file allows the engine to verify that every variable present
+Without `define_xml`, the 12 rules that need it (the `DEFINE_ITEM_METADATA_CHECK` and
+`DEFINE_CODELIST_CHECK` rules, and two `VARIABLE_METADATA_CHECK` rules) are marked
+`not_applicable`. Supplying the file allows the engine to verify that every variable present
 in your datasets is declared in Define-XML with the correct type and, where applicable, a valid
 codelist.
 

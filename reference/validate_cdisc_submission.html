@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Validate a CDISC submission with the CDISC CORE engine, in one call.">
+<meta name="description" content="Check a CDISC submission with the CDISC CORE engine.">
 
 <title>validate_cdisc_submission() | Pointblank</title>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "validate_cdisc_submission - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/validate_cdisc_submission.html"}]</script>
@@ -131,19 +131,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../theme-init.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
-<style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
 <meta name="gd-logo-tooltip" content="<code>v1.1.1</code><br>Released 2026-10-15">
+<style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/validate_cdisc_submission.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/validate_cdisc_submission.html">
 <link rel="alternate" type="text/markdown" href="validate_cdisc_submission.md">
 
 
 <meta property="og:title" content="validate_cdisc_submission() | Pointblank">
-<meta property="og:description" content="Validate a CDISC submission with the CDISC CORE engine, in one call.">
+<meta property="og:description" content="Check a CDISC submission with the CDISC CORE engine.">
 <meta property="og:site_name" content="Pointblank">
 <meta name="twitter:title" content="validate_cdisc_submission() | Pointblank">
-<meta name="twitter:description" content="Validate a CDISC submission with the CDISC CORE engine, in one call.">
+<meta name="twitter:description" content="Check a CDISC submission with the CDISC CORE engine.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -1650,7 +1650,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1677,11 +1679,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>Validate a CDISC submission with the CDISC CORE engine, in one call.</p>
+<p>Check a CDISC submission with the CDISC CORE engine.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1929-L2042" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2973-L3145" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_cdisc_submission</span>(</span>
@@ -1700,7 +1702,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Convenience wrapper that builds a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>SubmissionPackage</code></a> from <code>source</code> and runs <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>validate_conformance()</code></a> with <code>engine="core"</code>. Requires an installed CORE executable (see <code>core</code>).</p>
+<p>CDISC CORE is CDISC’s open-source engine for its conformance rules, and it has the published rules of CDISC and of the FDA and PMDA. The <a href="../reference/validate_cdisc_submission.html#pointblank.validate_cdisc_submission" class="gdls-link gdls-code">validate_cdisc_submission()</a> function runs CORE on a submission in a single call: it makes a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>SubmissionPackage</code></a> from the <code>source</code> (unless it is one already), runs CORE on it, and reads CORE’s results into a <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link"><code>ConformanceReport</code></a>. This is the same as calling the package’s <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.validate_conformance" class="gdls-link"><code>validate_conformance()</code></a> method with <code>engine="core"</code>.</p>
+<p>CORE is a separate command-line tool (<code>cdisc-rules-engine</code>) that has to be installed. If it isn’t on the <code>PATH</code>, give the command with <code>core=</code> or in the <code>POINTBLANK_CDISC_CORE</code> environment variable. For checks that need no other software, use <a href="../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link"><code>validate_sdtmig()</code></a>, which runs Pointblank’s bundled SDTMIG rules.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1708,51 +1711,51 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">source</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path | dict | SubmissionPackage</span></code></dt>
 <dd>
-<p>The submission to validate. One of: a path to a folder of datasets (XPT / Dataset-JSON, with an optional <code>define.xml</code>), a mapping of dataset name to DataFrame, or an already-built <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>.</p>
+<p>The submission to check. This can be the path of a folder of datasets (<code>.xpt</code> or Dataset-JSON files, which are read with <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.from_folder" class="gdls-link"><code>SubmissionPackage.from_folder()</code></a>), a dict of DataFrames keyed by dataset name, or a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">standard</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>The CDISC standard (e.g., <code>"sdtmig"</code>). Defaults to <code>"sdtmig"</code> (or the package’s <code>standard</code> when <code>source</code> is a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>).</p>
+<p>The CDISC standard, such as <code>"sdtmig"</code>. The default is <code>"sdtmig"</code>, or the package’s <code>standard</code> if <code>source</code> is a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">version</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>The standard version (e.g., <code>"3.4"</code>). Defaults to <code>"3.4"</code> (or the package’s value).</p>
+<p>The version of the standard, such as <code>"3.4"</code>. The default is <code>"3.4"</code>, or the package’s <code>standard_version</code> if <code>source</code> is a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">define</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path | Any | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional Define-XML path (ignored when <code>source</code> is a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a> — set it on the package instead). Auto-detected from a folder <code>source</code> when present.</p>
+<p>The path of the study’s Define-XML, which CORE uses in its checks. For a folder, a <code>define*.xml</code> file in it is found without this. It is ignored if <code>source</code> is a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>, whose own <code>define</code> is used. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">controlled_terminology</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Sequence[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>CT package name(s) for CORE’s <code>-ct</code> (e.g., <code>"sdtmct-2024-03-29"</code>).</p>
+<p>The controlled terminology package or packages for CORE’s <code>-ct</code> option, such as <code>"sdtmct-2024-03-29"</code>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">agency</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional agency rule-set selector recorded on the report.</p>
+<p>The regulatory agency, such as <code>"FDA"</code> or <code>"PMDA"</code>, which is shown in the report. It doesn’t change the rules that CORE runs. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">ct_version</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional Controlled Terminology version pin recorded on the package.</p>
+<p>The controlled terminology version to record in the package. It is only shown in the package’s summary and isn’t given to CORE. It is ignored if <code>source</code> is a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">study_id</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Optional study identifier.</p>
+<p>A study identifier to record in the package. It is ignored if <code>source</code> is a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">core</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Sequence[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>How to invoke CORE — a path/name to the CORE executable, a full command prefix (e.g., <code>["python", "core.py"]</code>), or <code>None</code> to auto-discover via the <code>POINTBLANK_CDISC_CORE</code> environment variable and then <code>PATH</code>.</p>
+<p>How to run CORE. This can be the path or name of the CORE executable, or a command as a list (such as <code>["python", "core.py"]</code>). With the default of <code>None</code>, the command is taken from the <code>POINTBLANK_CDISC_CORE</code> environment variable, or else CORE is looked for on the <code>PATH</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">core_cwd</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Working directory to run CORE from; required when invoking a repo checkout.</p>
+<p>The directory to run CORE from. This is needed when CORE is run from a checkout of its repository, since it looks for its <code>resources/</code> folder in the current directory. The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">cache</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Path to CORE’s rules cache directory (<code>-ca</code>).</p>
+<p>The path to CORE’s rules cache (its <code>-ca</code> option). The default is <code>None</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">workdir</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-Directory for materialized XPT and the CORE report. If <code>None</code>, a temporary directory is used.
+A directory for the XPT files that the datasets are written to and for CORE’s report. With the default of <code>None</code>, a temporary directory is used and then deleted.
 </dd>
 </dl>
 </div>
@@ -1763,22 +1766,63 @@ Directory for materialized XPT and the CORE report. If <code>None</code>, a temp
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ConformanceReport</span></code></dt>
 <dd>
-A CORE-form report (<a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.is_core" class="gdls-link gdls-code">is_core</a> is <code>True</code>).
+A report of CORE’s results, whose <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.is_core" class="gdls-link"><code>is_core</code></a> is <code>True</code>.
+</dd>
+</dl>
+</div>
+</section>
+<section id="raises" class="level2 doc-raises">
+<h2 class="doc-raises anchored" data-anchor-id="raises">Raises</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">NotADirectoryError</span></code></dt>
+<dd>
+<p>If <code>source</code> is a path that isn’t a folder.</p>
+</dd>
+<dt><code> <span class="doc-parameter-annotation">TypeError</span></code></dt>
+<dd>
+If <code>source</code> isn’t a path, a dict or a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>.
 </dd>
 </dl>
 </div>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>CORE has to be installed for this function, so these examples aren’t run here. Let’s check a folder of SDTM datasets against SDTMIG 3.4, for a submission to the FDA:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> pb.validate_cdisc_submission(</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"study_xyz/sdtm/"</span>,</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    standard<span class="op">=</span><span class="st">"sdtmig"</span>,</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    version<span class="op">=</span><span class="st">"3.4"</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    agency<span class="op">=</span><span class="st">"FDA"</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>report.summary()</span></code></pre></div>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    controlled_terminology<span class="op">=</span><span class="st">"sdtmct-2024-03-29"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    agency<span class="op">=</span><span class="st">"FDA"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(report)</span></code></pre></div>
+<p>Printing the report gives the standard, the version of CORE, the number of rules with each of CORE’s statuses and the total number of issues. The issues and the failing records can then be looked at, and the report saved for review:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> issue <span class="kw">in</span> report.issues(status<span class="op">=</span><span class="st">"ISSUE REPORTED"</span>):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(issue[<span class="st">"dataset"</span>], issue[<span class="st">"rule_id"</span>], issue[<span class="st">"issues"</span>], issue[<span class="st">"message"</span>])</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>report.to_excel(<span class="st">"study_xyz/conformance/core_report.xlsx"</span>)</span></code></pre></div>
+<p>If CORE was installed from a checkout of its repository, it has to be run from that directory, as in <code>core=["python", "core.py"], core_cwd="path/to/cdisc-rules-engine"</code>. A report that CORE wrote on its own can be read with <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.from_core_report" class="gdls-link"><code>ConformanceReport.from_core_report()</code></a>, which has an example that runs without CORE.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link gdls-code">validate_sdtmig()</a></dt>
+<dd>
+<p>Check SDTM datasets with Pointblank’s bundled rules.</p>
+</dd>
+<dt><a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a></dt>
+<dd>
+<p>A set of datasets to check together.</p>
+</dd>
+<dt><a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a></dt>
+<dd>
+<p>The report that is returned.</p>
+</dd>
+</dl>
 
 
 </section>
