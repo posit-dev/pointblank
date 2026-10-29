@@ -167,6 +167,14 @@ class EditValidation:
 
     Examples
     --------
+    ```{python}
+    #| echo: false
+    #| output: false
+    import pointblank as pb
+    ```
+    Editing a plan with a model needs the `chatlas` package and an API key, so this first example
+    isn't run here. We start with a plan for the `small_table` dataset and ask for two changes:
+
     ```python
     import pointblank as pb
 
@@ -174,7 +182,7 @@ class EditValidation:
     validation = (
         pb.Validate(data=pb.load_dataset("small_table"))
         .col_vals_gt(columns="d", value=100)
-        .col_vals_regex(columns="b", pattern="[0-9]-[a-z]{3}")
+        .col_vals_regex(columns="b", pattern="[0-9]-[a-z]{3}-[0-9]{3}")
     )
 
     # Edit it with a plain-English instruction
@@ -188,6 +196,48 @@ class EditValidation:
     print(edited.diff())        # review the change
     plan = edited.accept()      # a Validate you can .interrogate()
     ```
+
+    Nothing runs when the `EditValidation` object is created, apart from the call to the model.
+    The diff shows the revised plan line by line against the original, and only `accept()` turns
+    the revised code into a `Validate` object, using the `data=` given here because none is passed
+    to `accept()`. Because `data=` was given, the model also saw a summary of the table, which
+    helps with edits like choosing a new bound.
+
+    The review methods don't depend on the model, and
+    [`from_plans()`](`pointblank.EditValidation.from_plans`) builds an `EditValidation` from two
+    plans you already have. Here the revised plan makes the same changes that the instruction
+    above asked for:
+
+    ```{python}
+    small_table = pb.load_dataset("small_table")
+
+    original = (
+        pb.Validate(data=small_table)
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="b", pattern="[0-9]-[a-z]{3}-[0-9]{3}")
+    )
+    revised = (
+        pb.Validate(data=small_table)
+        .col_vals_gt(columns="d", value=50)
+        .col_vals_regex(columns="b", pattern="[0-9]-[a-z]{3}-[0-9]{3}")
+        .col_vals_not_null(columns="a")
+    )
+
+    edit = pb.EditValidation.from_plans(original, revised, instruction="Loosen d; require a")
+
+    edit.review()
+    ```
+
+    The review table lists one row per changed step: the `col_vals_gt()` step is modified (its
+    `value=` went from `100` to `50`), the `col_vals_not_null()` step is added, and the unchanged
+    `col_vals_regex()` step isn't shown. Once the changes look right,
+    [`accept()`](`pointblank.EditValidation.accept`) gives the revised plan as a `Validate` object
+    that's ready to interrogate.
+
+    See Also
+    --------
+    DraftValidation : Draft a new validation plan for a table with an LLM.
+    Validate.to_code : Get a validation plan as Python code.
     """
 
     validation: Any
@@ -309,7 +359,7 @@ class EditValidation:
         [`changed_steps()`](`pointblank.EditValidation.changed_steps`), and
         [`review()`](`pointblank.EditValidation.review`). It is useful for reviewing the change
         between two saved versions of a plan (for example, in code review) and does not require an
-        LLM provider or any API key.
+        LLM provider, an API key, or the `chatlas` package.
 
         Parameters
         ----------
@@ -326,23 +376,58 @@ class EditValidation:
         Returns
         -------
         EditValidation
-            An `EditValidation` whose `original`/`revised` plans are the ones supplied, ready for
+            An `EditValidation` holding the code of the two plans, ready for
             [`diff()`](`pointblank.EditValidation.diff`),
             [`changed_steps()`](`pointblank.EditValidation.changed_steps`),
             [`review()`](`pointblank.EditValidation.review`), and
-            [`accept()`](`pointblank.EditValidation.accept`).
+            [`accept()`](`pointblank.EditValidation.accept`). It has no `data=`, so pass the table
+            to `accept()`.
 
         Examples
         --------
-        ```python
+        Two versions of a plan can be compared directly, here as `Validate` objects:
+
+        ```{python}
         import pointblank as pb
 
-        v1 = pb.Validate(data=pb.load_dataset("small_table")).col_vals_gt(columns="d", value=100)
-        v2 = pb.Validate(data=pb.load_dataset("small_table")).col_vals_gt(columns="d", value=50)
+        small_table = pb.load_dataset("small_table")
+
+        v1 = pb.Validate(data=small_table).col_vals_gt(columns="d", value=100)
+        v2 = pb.Validate(data=small_table).col_vals_gt(columns="d", value=50)
 
         comparison = pb.EditValidation.from_plans(v1, v2)
-        print(comparison.diff())
+
+        comparison.changed_steps()
         ```
+
+        The only change is the `value=` of the `col_vals_gt()` step, reported as a single
+        modification. The plans can also be YAML configurations, which are converted to Python
+        code before they're compared:
+
+        ```{python}
+        v1_yaml = '''
+        tbl: small_table
+        steps:
+          - col_vals_gt:
+              columns: d
+              value: 100
+        '''
+        v2_yaml = '''
+        tbl: small_table
+        steps:
+          - col_vals_gt:
+              columns: d
+              value: 100
+          - rows_distinct
+        '''
+
+        comparison = pb.EditValidation.from_plans(v1_yaml, v2_yaml)
+
+        comparison.changed_steps()
+        ```
+
+        The second version adds a `rows_distinct()` step. Since the inputs can be file paths too,
+        this works well for checking a change to a saved plan before it's merged.
         """
         # Bypass __init__/__post_init__ (which would call the model) and populate directly
         obj = cls.__new__(cls)
@@ -359,16 +444,113 @@ class EditValidation:
         return obj
 
     def to_code(self) -> str:
-        """Return the revised validation plan as Python code."""
+        """
+        Return the revised validation plan as Python code.
+
+        The code is in the same form as [`Validate.to_code()`](`pointblank.Validate.to_code`)
+        produces, with the table given as the placeholder `your_data`. Use it to save the revised
+        plan, to read it in full rather than as a diff, or to edit it by hand when the revision
+        isn't quite right. Printing the `EditValidation` object shows the same code.
+
+        Returns
+        -------
+        str
+            The revised plan as a string of Python code.
+
+        Examples
+        --------
+        ```{python}
+        import pointblank as pb
+
+        small_table = pb.load_dataset("small_table")
+
+        edit = pb.EditValidation.from_plans(
+            pb.Validate(data=small_table).col_vals_gt(columns="d", value=100),
+            pb.Validate(data=small_table).col_vals_gt(columns="d", value=50),
+        )
+
+        print(edit.to_code())
+        ```
+
+        The revised plan reads its table from `your_data`, so replace that with the table to use
+        before running the code yourself, or let [`accept()`](`pointblank.EditValidation.accept`)
+        fill it in.
+        """
         return self.edited_code
 
     def validate_syntax(self) -> bool:
-        """Return whether the revised plan parses and uses only known validation methods."""
+        """
+        Check whether the revised plan parses and uses only known validation methods.
+
+        The check parses the revised code and looks at each method whose name starts with `col_`,
+        `row_`, or `rows_`. It fails if the code isn't valid Python or if one of those methods
+        isn't a Pointblank validation method, which catches a model inventing a method or
+        misspelling one. The code isn't run, so a wrong argument name or value isn't caught until
+        [`accept()`](`pointblank.EditValidation.accept`) or interrogation. When `EditValidation`
+        calls a model, the same check decides whether to re-prompt it (see `max_reprompts=`), and
+        `accept()` runs it too.
+
+        Returns
+        -------
+        bool
+            `True` if the revised plan passes the check, `False` otherwise.
+
+        Examples
+        --------
+        ```{python}
+        import pointblank as pb
+
+        original = "validation = pb.Validate(data=your_data).col_vals_gt(columns='d', value=100)"
+        misspelled = "validation = pb.Validate(data=your_data).col_vals_gtt(columns='d', value=50)"
+
+        print(pb.EditValidation.from_plans(original, original).validate_syntax())
+        print(pb.EditValidation.from_plans(original, misspelled).validate_syntax())
+        ```
+
+        The second revision calls `col_vals_gtt()`, which doesn't exist, so it fails the check.
+        Calling `accept()` on it would raise a `ValueError` naming the unknown method.
+        """
         ok, _ = _check_syntax(self.edited_code)
         return ok
 
     def diff(self) -> str:
-        """Return a unified textual diff of the original plan versus the revised plan."""
+        """
+        Return a unified textual diff of the original plan versus the revised plan.
+
+        The diff compares the two plans' code line by line, in the format used by `git diff` and
+        code review tools (lines starting with `-` were removed and lines starting with `+` were
+        added). It's the quickest way to see an edit in context, but it's sensitive to formatting:
+        a step that was only reformatted shows up as changed. For a list of the changed steps that
+        ignores formatting, use [`changed_steps()`](`pointblank.EditValidation.changed_steps`).
+
+        Returns
+        -------
+        str
+            The diff as a single string, which is empty when the two plans have the same code.
+
+        Examples
+        --------
+        ```{python}
+        import pointblank as pb
+
+        small_table = pb.load_dataset("small_table")
+
+        edit = pb.EditValidation.from_plans(
+            pb.Validate(data=small_table).col_vals_gt(columns="d", value=100),
+            (
+                pb.Validate(data=small_table)
+                .col_vals_gt(columns="d", value=50)
+                .col_vals_not_null(columns="a")
+            ),
+        )
+
+        print(edit.diff())
+        ```
+
+        The old `col_vals_gt()` line is replaced by one with `value=50`, and a
+        `col_vals_not_null()` line is added. The two files in the header (`original_plan.py` and
+        `edited_plan.py`) are only labels, and nothing is written to disk.
+        """
         original = self.original_code.splitlines(keepends=True)
         edited = self.edited_code.splitlines(keepends=True)
         if original and not original[-1].endswith("\n"):
@@ -391,14 +573,45 @@ class EditValidation:
         Unlike [`diff()`](`pointblank.EditValidation.diff`), which is a textual diff sensitive to
         formatting, this compares the two plans at the level of validation steps and is robust to
         reformatting. Each entry is a dict with an `"action"` of `"add"`, `"remove"`, or
-        `"modify"`, a `"method"` name, and the relevant `"old"`/`"new"` step text.
+        `"modify"`, a `"method"` name, and the relevant `"old"`/`"new"` step text. A step whose
+        method stays the same but whose arguments change is reported as `"modify"`, and a step
+        replaced by one with a different method is reported as a `"remove"` and an `"add"`.
+        Unchanged steps aren't listed.
 
         Returns
         -------
         list[dict]
-            One record per changed step, e.g.
-            `[{"action": "modify", "method": "col_vals_gt", "old": "col_vals_gt(columns=\"d\", "
-            "value=100)", "new": "col_vals_gt(columns=\"d\", value=50)"}]`.
+            One record per changed step, in plan order. The list is empty when the plans have the
+            same steps.
+
+        Examples
+        --------
+        ```{python}
+        import pointblank as pb
+
+        small_table = pb.load_dataset("small_table")
+
+        edit = pb.EditValidation.from_plans(
+            (
+                pb.Validate(data=small_table)
+                .col_vals_gt(columns="d", value=100)
+                .rows_distinct()
+            ),
+            (
+                pb.Validate(data=small_table)
+                .col_vals_gt(columns="d", value=50)
+                .col_vals_not_null(columns="a")
+            ),
+        )
+
+        for change in edit.changed_steps():
+            print(change)
+        ```
+
+        The `col_vals_gt()` step is modified, so its record has both the old and the new step text.
+        The `rows_distinct()` step was removed and has only `"old"`, and the new
+        `col_vals_not_null()` step has only `"new"`. The same records are behind the table that
+        [`review()`](`pointblank.EditValidation.review`) shows.
         """
         old_steps = _extract_chain_steps(self.original_code)
         new_steps = _extract_chain_steps(self.edited_code)
@@ -410,12 +623,35 @@ class EditValidation:
 
         This renders the added, removed, and modified steps side by side for quick human review
         before accepting the edit. It pairs with [`accept()`](`pointblank.EditValidation.accept`):
-        review the change, then accept it.
+        review the change, then accept it. Each row is one record from
+        [`changed_steps()`](`pointblank.EditValidation.changed_steps`), colored by the kind of
+        change, and the instruction is shown as the subtitle. When nothing changed, the table has a
+        single "(no changes)" row.
 
         Returns
         -------
         GT
             A `great_tables` table with one row per changed step.
+
+        Examples
+        --------
+        ```{python}
+        import pointblank as pb
+
+        small_table = pb.load_dataset("small_table")
+
+        edit = pb.EditValidation.from_plans(
+            pb.Validate(data=small_table).col_vals_gt(columns="d", value=100).rows_distinct(),
+            pb.Validate(data=small_table).col_vals_gt(columns="d", value=50),
+            instruction="Loosen the d check and drop the duplicate-row check",
+        )
+
+        edit.review()
+        ```
+
+        The modified `col_vals_gt()` step shows its old and new text in the *Before* and *After*
+        columns, and the removed `rows_distinct()` step has only a *Before* entry. Because the
+        result is a GT object, it can be styled further or saved with the `great_tables` API.
         """
         from great_tables import GT, loc, style
 
@@ -460,7 +696,18 @@ class EditValidation:
         Execute the revised plan and return the resulting `Validate` object.
 
         The returned `Validate` has NOT been interrogated; call `.interrogate()` on it to run the
-        validation.
+        validation. Before running the code, `accept()` applies the same check as
+        [`validate_syntax()`](`pointblank.EditValidation.validate_syntax`) and raises a
+        `ValueError` if it fails. It then runs the code with the table bound to `your_data` and
+        returns the `Validate` object that the code assigns to `validation` (or the last `Validate`
+        object it assigns). Any `.interrogate()` call in the revised code is removed first.
+
+        :::{.callout-warning}
+        `accept()` runs the revised code with Python's `exec()`. Read the code (with
+        [`to_code()`](`pointblank.EditValidation.to_code`) or
+        [`review()`](`pointblank.EditValidation.review`)) before accepting an edit, as you would any
+        other code you didn't write.
+        :::
 
         Parameters
         ----------
@@ -472,6 +719,39 @@ class EditValidation:
         -------
         Validate
             The revised validation plan as a `Validate` object.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False)
+        ```
+        ```{python}
+        import pointblank as pb
+
+        small_table = pb.load_dataset("small_table")
+
+        edit = pb.EditValidation.from_plans(
+            pb.Validate(data=small_table).col_vals_gt(columns="d", value=100),
+            (
+                pb.Validate(data=small_table)
+                .col_vals_gt(columns="d", value=50)
+                .col_vals_not_null(columns="a")
+            ),
+        )
+
+        validation = edit.accept(data=small_table).interrogate()
+
+        validation
+        ```
+
+        The revised plan has both steps, and it ran against `small_table` because that's the table
+        passed to `accept()`. An `EditValidation` built by
+        [`from_plans()`](`pointblank.EditValidation.from_plans`) has no `data=` of its own, so the
+        table has to be given here. Passing a different table is also how to run the same revised
+        plan on new data.
         """
         import pointblank as pb
 
