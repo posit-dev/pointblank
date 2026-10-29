@@ -4,7 +4,7 @@ Perform multiple row-wise validations for joint validity.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15872-L16140)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15998-L16266)
 
 ``` python
 Validate.conjointly(

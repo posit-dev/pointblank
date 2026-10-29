@@ -4,7 +4,7 @@ Get a report of the validation results as a DataFrame.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22376-L22737)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22734-L23100)
 
 ``` python
 Validate.get_dataframe_report(tbl_type="polars")
@@ -93,3 +93,5 @@ validation.get_dataframe_report(tbl_type="pandas")
 |----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
 | 0 | True | 1 | col_vals_gt | d | 100 | True | 13 | True | 13 | 1.0 | 0 | 0.0 | None | None | None | Expect that values in \`d\` should be \> \`100\`. | False | False |
 | 1 | True | 2 | col_vals_regex | b | \[0-9\]-\[a-z\]{3}-\[0-9\]{3} | True | 13 | True | 13 | 1.0 | 0 | 0.0 | None | None | None | Expect that values in \`b\` should match the reg... | False | False |
+
+Both have one row per validation step and the same columns, whatever the type of the validated table. As a DataFrame, the results can be filtered (to find the steps that failed), appended to a table of earlier runs to track quality over time, or written to a database alongside the data.

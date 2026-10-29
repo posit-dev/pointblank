@@ -4,7 +4,7 @@ Validate whether column values fit within a specification.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10941-L11239)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11051-L11357)
 
 ``` python
 Validate.col_vals_within_spec(
@@ -34,6 +34,9 @@ A specification string for defining the specification type. Examples are `"email
 
 `na_pass: bool = False`  
 Should any encountered None, NA, or Null values be considered as passing test units? By default, this is `False`. Set to `True` to pass test units with missing values.
+
+`missing: MissingSpec | None = None`  
+An optional [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) declaring the codes that stand in for missing values in the column (such as `-99` for a survey question that was refused). Rows holding one of these codes are excluded from the check (they count as passing test units), so only the real values are validated, and a note in the validation report lists the codes. By default a [MissingSpec](../reference/MissingSpec.md#pointblank.MissingSpec) also treats nulls as missing, so nulls pass whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls to `na_pass=`.
 
 `pre: Callable | None = None`  
 An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the *Preprocessing* section for more information on how to use this argument.

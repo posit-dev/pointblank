@@ -4,7 +4,7 @@ Build a validation plan for this table from a natural-language prompt.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19903-L19971)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20145-L20224)
 
 ``` python
 Validate.from_prompt(
@@ -52,3 +52,5 @@ proposal = base.from_prompt(
 )
 plan = proposal.accept()
 ```
+
+This example isn't executed here because it needs an API key and a call to the model provider. The `base` object contributes its table name (and any label and thresholds) but no steps. The model writes steps that satisfy the prompt, so here you'd expect a not-null check on `a` and a greater-than-zero check on `d`. Before accepting, you can review the generated plan with `proposal.to_code()`. Then [accept()](../reference/EditValidation.md#pointblank.EditValidation.accept) returns it as a [Validate](../reference/Validate.md#pointblank.Validate) object that hasn't been interrogated yet. Call [`interrogate()`](../reference/Validate.interrogate.md#pointblank.Validate.interrogate) on it to run the checks. To extend a plan that already has steps, use [`suggest_improvements()`](../reference/Validate.suggest_improvements.md#pointblank.Validate.suggest_improvements) or [`EditValidation`](../reference/EditValidation.md#pointblank.EditValidation) instead.

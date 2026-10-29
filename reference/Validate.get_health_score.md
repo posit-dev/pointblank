@@ -4,7 +4,7 @@ Get the overall data quality health score from the validation results.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20015-L20057)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20287-L20358)
 
 ``` python
 Validate.get_health_score()
@@ -21,18 +21,37 @@ The overall health score as a percentage from `0` to `100`. Returns `100.0` if t
 
 ## Examples
 
+Let's validate the `small_table` dataset with a not-null check, a range check, and a check for duplicate rows, then get the overall score.
+
 ``` python
 import pointblank as pb
 
+small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
 validation = (
-    pb.Validate(data=pb.load_dataset("small_table"))
+    pb.Validate(data=small_table)
     .col_vals_not_null(columns="c")
-    .col_vals_gt(columns="d", value=0)
+    .col_vals_gt(columns="d", value=1000)
+    .rows_distinct()
     .interrogate()
 )
 
 validation.get_health_score()
 ```
+
+    74.36
+
+The three steps have 39 test units in all, and 29 of them passed, for a score of 74.36. If missing values matter more to you than the other problems, give completeness a larger weight:
+
+``` python
+pb.config(dimension_weights={"completeness": 3})
+
+validation.get_health_score()
+```
+
+    78.46
+
+The completeness step now counts three times, so its 84.62 pass rate pulls the score up to 78.46. Note that each call to `config()` sets every option, so any other settings you rely on (such as those for the report) need to be included in the same call. Calling `pb.config()` with no arguments goes back to the defaults, with all dimensions weighted equally.
 
 ## See Also
 

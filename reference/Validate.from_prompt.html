@@ -1675,7 +1675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19903-L19971" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20145-L20224" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">from_prompt</span>(</span>
@@ -1737,6 +1737,7 @@ An <a href="../reference/EditValidation.html#pointblank.EditValidation" class="g
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-opus-4-8"</span>,</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>plan <span class="op">=</span> proposal.accept()</span></code></pre></div>
+<p>This example isn’t executed here because it needs an API key and a call to the model provider. The <code>base</code> object contributes its table name (and any label and thresholds) but no steps. The model writes steps that satisfy the prompt, so here you’d expect a not-null check on <code>a</code> and a greater-than-zero check on <code>d</code>. Before accepting, you can review the generated plan with <code>proposal.to_code()</code>. Then <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link gdls-code">accept()</a> returns it as a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object that hasn’t been interrogated yet. Call <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> on it to run the checks. To extend a plan that already has steps, use <a href="../reference/Validate.suggest_improvements.html#pointblank.Validate.suggest_improvements" class="gdls-link"><code>suggest_improvements()</code></a> or <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link"><code>EditValidation</code></a> instead.</p>
 
 
 </section>

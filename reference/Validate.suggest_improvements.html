@@ -1675,7 +1675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19843-L19901" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20076-L20143" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">suggest_improvements</span>(</span>
@@ -1733,6 +1733,7 @@ An <a href="../reference/EditValidation.html#pointblank.EditValidation" class="g
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>proposal <span class="op">=</span> validation.suggest_improvements(model<span class="op">=</span><span class="st">"anthropic:claude-opus-4-8"</span>)</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(proposal.diff())</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>improved <span class="op">=</span> proposal.accept()</span></code></pre></div>
+<p>This example isn’t executed here because it needs an API key and a call to the model provider. The plan above only checks column <code>d</code>, so the instruction sent to the model asks it to cover the other columns and to add thresholds. Printing <code>proposal.diff()</code> shows the proposed steps as a diff against the current plan, so you can review them before anything runs. If they look right, <a href="../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link gdls-code">accept()</a> returns the revised plan as a new <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object. That object hasn’t been interrogated yet, so call <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> on it to run the checks. The original <code>validation</code> object is left unchanged.</p>
 
 
 </section>

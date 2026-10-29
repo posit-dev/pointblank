@@ -1679,7 +1679,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/draft.py#L24-L389" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/draft.py#L24-L397" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DraftValidation</span>(</span>
@@ -1724,7 +1724,11 @@ Warning
 </dd>
 <dt><code><span class="doc-parameter-name">verify_ssl</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-Whether to verify SSL certificates when making requests to the LLM provider. Set to <code>False</code> to disable SSL verification (e.g., when behind a corporate firewall with self-signed certificates). Defaults to <code>True</code>. Use with caution as disabling SSL verification can pose security risks.
+<p>Whether to verify SSL certificates when making requests to the LLM provider. Set to <code>False</code> to disable SSL verification (e.g., when behind a corporate firewall with self-signed certificates). Defaults to <code>True</code>. Use with caution as disabling SSL verification can pose security risks.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">max_reprompts</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="dv">1</span></span></code></dt>
+<dd>
+The maximum number of times to ask the model for a corrected plan when the one it returned doesn’t pass a basic check: the code must parse as Python, and every method that looks like a validation method (a name starting with <code>col_</code>, <code>row_</code>, or <code>rows_</code>) must exist, since models sometimes invent method names. The retry tells the model what the problem was. Each retry is another request to the provider, so a higher value can cost more. Set to <code>0</code> to accept the first reply as is, and check it yourself with the object’s <a href="../reference/EditValidation.html#pointblank.EditValidation.validate_syntax" class="gdls-link gdls-code">validate_syntax()</a> method. Defaults to <code>1</code>.
 </dd>
 </dl>
 </div>

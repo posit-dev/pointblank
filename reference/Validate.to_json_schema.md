@@ -4,7 +4,7 @@ Export this validation plan as a JSON Schema document.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19679-L19766)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19892-L19999)
 
 ``` python
 Validate.to_json_schema(path=None)
@@ -45,26 +45,56 @@ Steps with no JSON Schema equivalent (e.g., `rows_distinct()`, `tbl_match()`, `c
 
 ## Examples
 
+Let's write a validation plan for a table of user accounts and export it as JSON Schema.
+
 ``` python
 import pointblank as pb
+import polars as pl
+import json
+
+accounts = pl.DataFrame(
+    {
+        "name": ["Ana", "Ben", "Chloé"],
+        "age": [34, 27, 45],
+        "status": ["active", "inactive", "active"],
+    }
+)
 
 validation = (
-    pb.Validate(data=df)
+    pb.Validate(data=accounts)
     .col_vals_gt(columns="age", value=0)
     .col_vals_not_null(columns="name")
     .col_vals_in_set(columns="status", set=["active", "inactive"])
+    .rows_distinct()
 )
 
 schema = validation.to_json_schema()
-# {'$schema': 'https://json-schema.org/draft/2020-12/schema',
-#  'type': 'object',
-#  'properties': {
-#      'age': {'exclusiveMinimum': 0, 'type': 'integer'},
-#      'name': {'type': 'string'},
-#      'status': {'enum': ['active', 'inactive'], 'type': 'string'}
-#  },
-#  'required': ['name']}
 
-# Write to a file
-validation.to_json_schema("output.schema.json")
+print(json.dumps(schema, indent=2))
 ```
+
+    {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "age": {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "inactive"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+
+Each column has a property: `age > 0` became `exclusiveMinimum`, the set of statuses became `enum`, and the not-null check on `name` put it in `required`. The `type` of each property comes from the data attached to the plan. The [`rows_distinct()`](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step has no JSON Schema equivalent (a schema describes one record at a time), so it isn't in the output. Since the result is a standard schema, it can be given to any JSON Schema validator, for example to check records in an API before they're loaded into the table. With `path=`, the schema is also written to a file.

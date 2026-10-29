@@ -4,7 +4,7 @@ Validate whether column values match a regular expression pattern.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10662-L10939)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10764-L11049)
 
 ``` python
 Validate.col_vals_regex(
@@ -38,6 +38,9 @@ Should any encountered None, NA, or Null values be considered as passing test un
 
 `inverse: bool = False`  
 Should the validation step be inverted? If `True`, then the expectation is that column values should *not* match the specified `pattern=` regex.
+
+`missing: MissingSpec | None = None`  
+An optional [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) declaring the codes that stand in for missing values in the column (such as `-99` for a survey question that was refused). Rows holding one of these codes are excluded from the check (they count as passing test units), so only the real values are validated, and a note in the validation report lists the codes. By default a [MissingSpec](../reference/MissingSpec.md#pointblank.MissingSpec) also treats nulls as missing, so nulls pass whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls to `na_pass=`.
 
 `pre: Callable | None = None`  
 An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the *Preprocessing* section for more information on how to use this argument.

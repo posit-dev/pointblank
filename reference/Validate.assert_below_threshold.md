@@ -4,7 +4,7 @@ Raise an `AssertionError` if validation steps exceed a specified threshold level
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18214-L18372)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18346-L18509)
 
 ``` python
 Validate.assert_below_threshold(
@@ -105,6 +105,8 @@ except AssertionError as e:
 ```
 
     Custom error: Data quality too low for processing!
+
+The custom message replaces the default one, which helps when the error ends up in a log or a notification read by someone who doesn't know the validation plan. Like [`assert_passing()`](../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing), this method interrogates the plan first if that hasn't been done yet.
 
 ## See Also
 

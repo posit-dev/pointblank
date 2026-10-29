@@ -4,7 +4,7 @@ Set or replace the table associated with the Validate object.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6152-L6285)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6162-L6300)
 
 ``` python
 Validate.set_tbl(
@@ -106,3 +106,5 @@ validation_table_2.interrogate()
 ```
 
 [TABLE]
+
+Every value of `y` in the first table is below `10`, but the second table has a `10`, so the second step has one failing test unit there. The plan was written once and applied to both tables, each with its own name and label. This is handy for tables that share a structure, such as monthly extracts or one table per region.

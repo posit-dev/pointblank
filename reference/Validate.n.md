@@ -4,7 +4,7 @@ Provides a dictionary of the number of test units for each validation step.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18512-L18622)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18649-L18766)
 
 ``` python
 Validate.n(
@@ -98,3 +98,5 @@ validation.n()
 ```
 
     {1: 4, 2: 1, 3: 3}
+
+The dictionary is keyed by step number, so it lines up with the step numbers shown in the validation report. A list such as `i=[1, 3]` returns entries for just those steps. To get how many of these test units passed or failed, use [`n_passed()`](../reference/Validate.n_passed.md#pointblank.Validate.n_passed) and [`n_failed()`](../reference/Validate.n_failed.md#pointblank.Validate.n_failed), which take the same `i=` and `scalar=` arguments.

@@ -4,7 +4,7 @@ Raise an `AssertionError` if all tests are not passing.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18147-L18212)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18273-L18344)
 
 ``` python
 Validate.assert_passing()
@@ -42,25 +42,27 @@ validation = (
     .col_vals_in_set(columns="c", set=["a", "b"])
 )
 
-# No need to call [`interrogate()`](`pointblank.Validate.interrogate`) explicitly
+# No need to call `interrogate()` explicitly
 validation.assert_passing()
 ```
 
     ---------------------------------------------------------------------------
     AssertionError                            Traceback (most recent call last)
-    /var/folders/s8/bj_jsx3d7jqd2btw7bwm6yx80000gp/T/ipykernel_14665/2424908189.py in ?()
+    /var/folders/s8/bj_jsx3d7jqd2btw7bwm6yx80000gp/T/ipykernel_39511/137793627.py in ?()
          16     .col_vals_in_set(columns="c", set=["a", "b"])
          17 )
          18 
-         19 # No need to call [`interrogate()`](`pointblank.Validate.interrogate`) explicitly
+         19 # No need to call `interrogate()` explicitly
     ---> 20 validation.assert_passing()
 
     ~/py_projects/pointblank/pointblank/validate.py in ?(self)
-      18208             ]
-      18209             msg = "The following assertions failed:\n" + "\n".join(
-      18210                 [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]
-      18211             )
-    > 18212             raise AssertionError(msg)
+      18340             ]
+      18341             msg = "The following assertions failed:\n" + "\n".join(
+      18342                 [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]
+      18343             )
+    > 18344             raise AssertionError(msg)
 
     AssertionError: The following assertions failed:
     - Step 2: Expect that values in `b` should be < `9`.
+
+The `AssertionError` lists each step that had failing test units, here only step 2, with a description of what it expected. In a test suite (with pytest, for instance) or a CI job, that error fails the run, which is the point: the data can't move on until it passes every check. When a few failures are acceptable, set thresholds on the plan and use [`assert_below_threshold()`](../reference/Validate.assert_below_threshold.md#pointblank.Validate.assert_below_threshold) instead.

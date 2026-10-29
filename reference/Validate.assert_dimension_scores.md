@@ -4,7 +4,7 @@ Raise an `AssertionError` if any dimension's health score falls below a minimum.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20059-L20139)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20360-L20474)
 
 ``` python
 Validate.assert_dimension_scores(
@@ -34,18 +34,43 @@ If any dimension's score is below its specified minimum.
 
 ## Examples
 
+Let's validate the `small_table` dataset with a not-null check (a completeness step) and a range check (a validity step).
+
 ``` python
 import pointblank as pb
 
+small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
 validation = (
-    pb.Validate(data=pb.load_dataset("small_table"))
+    pb.Validate(data=small_table)
     .col_vals_not_null(columns="c")
+    .col_vals_gt(columns="d", value=1000)
     .interrogate()
 )
 
-# Fail if the completeness score is below 95
-validation.assert_dimension_scores(thresholds={"completeness": 95})
+validation.get_dimension_scores()
 ```
+
+    {'completeness': 84.62, 'validity': 53.85}
+
+Requiring completeness of at least 80 and validity of at least 50 passes, so nothing happens:
+
+``` python
+validation.assert_dimension_scores(thresholds={"completeness": 80, "validity": 50})
+```
+
+Raising the completeness minimum to 95 makes the assertion fail. The `AssertionError` is caught here so that its message can be shown:
+
+``` python
+try:
+    validation.assert_dimension_scores(thresholds={"completeness": 95, "validity": 50})
+except AssertionError as e:
+    print(e)
+```
+
+    Dimension health score(s) below the required minimum: completeness (84.62% < 95%)
+
+The message lists each dimension below its minimum, with the actual and required scores. In a test suite or a CI job, leave the error uncaught so that it fails the run. To use the same minimums everywhere, set them once with `config(dimension_thresholds=...)` and call [assert_dimension_scores()](../reference/Validate.assert_dimension_scores.md#pointblank.Validate.assert_dimension_scores) without `thresholds=`.
 
 ## See Also
 

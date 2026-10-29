@@ -4,7 +4,7 @@ Validate whether column values are in a set of values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9015-L9356)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9094-L9442)
 
 ``` python
 Validate.col_vals_in_set(
@@ -30,6 +30,9 @@ A single column or a list of columns to validate. Can also use [`col()`](../refe
 
 `set: Collection[Any]`  
 A collection of values to compare against. Can be a list of values, a Python Enum class, or a collection containing Enum instances. When an Enum class is provided, all enum values will be used. When a collection contains Enum instances, their values will be extracted automatically.
+
+`missing: MissingSpec | None = None`  
+An optional [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) declaring the codes that stand in for missing values in the column (such as `-99` for a survey question that was refused). Rows holding one of these codes are excluded from the check (they count as passing test units), so only the real values are validated, and a note in the validation report lists the codes. By default a [MissingSpec](../reference/MissingSpec.md#pointblank.MissingSpec) also treats nulls as missing, so nulls pass as well (create it with `null_is_missing=False` to change this).
 
 `pre: Callable | None = None`  
 An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the *Preprocessing* section for more information on how to use this argument.

@@ -4,7 +4,7 @@ Propose AI-generated improvements to this validation plan.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19843-L19901)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20076-L20143)
 
 ``` python
 Validate.suggest_improvements(
@@ -49,3 +49,5 @@ proposal = validation.suggest_improvements(model="anthropic:claude-opus-4-8")
 print(proposal.diff())
 improved = proposal.accept()
 ```
+
+This example isn't executed here because it needs an API key and a call to the model provider. The plan above only checks column `d`, so the instruction sent to the model asks it to cover the other columns and to add thresholds. Printing `proposal.diff()` shows the proposed steps as a diff against the current plan, so you can review them before anything runs. If they look right, [accept()](../reference/EditValidation.md#pointblank.EditValidation.accept) returns the revised plan as a new [Validate](../reference/Validate.md#pointblank.Validate) object. That object hasn't been interrogated yet, so call [`interrogate()`](../reference/Validate.interrogate.md#pointblank.Validate.interrogate) on it to run the checks. The original `validation` object is left unchanged.

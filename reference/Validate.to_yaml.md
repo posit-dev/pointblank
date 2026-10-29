@@ -4,7 +4,7 @@ Serialize this validation plan to a [yaml_interrogate()](../reference/yaml_inter
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19562-L19677)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19748-L19890)
 
 ``` python
 Validate.to_yaml(path=None)
@@ -28,14 +28,49 @@ As with [`to_code()`](../reference/Validate.to_code.md#pointblank.Validate.to_co
 
 ## Examples
 
+Let's create a validation plan for the `small_table` dataset and write it as YAML.
+
 ``` python
 import pointblank as pb
 
+small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
 validation = (
-    pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+    pb.Validate(data=small_table, tbl_name="small_table", thresholds=(0.1, 0.2))
     .col_vals_gt(columns="d", value=100)
-    .col_vals_not_null(columns="a")
+    .col_vals_not_null(columns="c")
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
 )
 
-print(validation.to_yaml())
+yaml_config = validation.to_yaml()
+
+print(yaml_config)
 ```
+
+    tbl: small_table
+    tbl_name: small_table
+    thresholds:
+      warning: 0.1
+      error: 0.2
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+    - col_vals_not_null:
+        columns: c
+    - col_vals_in_set:
+        columns: f
+        set:
+        - low
+        - mid
+        - high
+
+Each step becomes an entry under `steps`, named after its method and with its arguments beneath. The `tbl` field was set from `tbl_name=`. Here, that name happens to be a dataset that [`yaml_interrogate()`](../reference/yaml_interrogate.md#pointblank.yaml_interrogate) can load, so the YAML runs as is:
+
+``` python
+pb.yaml_interrogate(yaml_config)
+```
+
+[TABLE]
+
+For a table of your own, set `tbl` to a file path or connection string before running the YAML. To keep the configuration (for instance, in version control next to the pipeline it checks), give `to_yaml()` a `path=`, which writes the file and still returns the string.

@@ -1679,7 +1679,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11241-L11438" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11359-L11564" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">col_vals_str_len</span>(</span>
@@ -1719,6 +1719,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dt><code><span class="doc-parameter-name">na_pass</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
 <p>Should any encountered None, NA, or Null values be considered as passing test units? By default, this is <code>False</code>. Set to <code>True</code> to pass test units with missing values.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">missing</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">MissingSpec | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>An optional <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> declaring the codes that stand in for missing values in the column (such as <code>-99</code> for a survey question that was refused). Rows holding one of these codes are excluded from the check (they count as passing test units), so only the real values are validated, and a note in the validation report lists the codes. By default a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> also treats nulls as missing, so nulls pass whatever the value of <code>na_pass=</code>. Create it with <code>null_is_missing=False</code> to leave nulls to <code>na_pass=</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">pre</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1776,7 +1780,7 @@ If neither <code>min_val=</code> nor <code>max_val=</code> is provided.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with a string column (<code>a</code>). The table is shown below:</p>
-<div id="9ce582d9" class="cell" data-execution_count="2">
+<div id="67bf8318" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1891,7 +1895,7 @@ If neither <code>min_val=</code> nor <code>max_val=</code> is provided.
 </div>
 </div>
 <p>Let’s validate that all values in column <code>a</code> have a string length between 2 and 10 characters.</p>
-<div id="900c4dd5" class="cell" data-execution_count="3">
+<div id="4991c2c9" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_str_len(columns<span class="op">=</span><span class="st">"a"</span>, min_val<span class="op">=</span><span class="dv">2</span>, max_val<span class="op">=</span><span class="dv">10</span>)</span>
@@ -2062,7 +2066,7 @@ If neither <code>min_val=</code> nor <code>max_val=</code> is provided.
 </div>
 <p>The validation table shows one failing test unit: <code>"a very long string value"</code> (24 chars) exceeds <code>max_val=10</code>. The value <code>"ok"</code> (2 chars) passes since the lower bound is inclusive.</p>
 <p>We can also validate with only a minimum length:</p>
-<div id="fd41eab3" class="cell" data-execution_count="4">
+<div id="4b224dde" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_str_len(columns<span class="op">=</span><span class="st">"a"</span>, min_val<span class="op">=</span><span class="dv">3</span>)</span>

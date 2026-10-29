@@ -4,7 +4,7 @@ Are column data decreasing by row?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9919-L10148)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10013-L10250)
 
 ``` python
 Validate.col_vals_decreasing(
@@ -42,6 +42,9 @@ Should any encountered None, NA, or Null values be considered as passing test un
 
 `order_by: str | list[str] | None = None`  
 The column (or list of columns) that puts the rows in order before the values are compared, in ascending order. If `None` (the default), the table's own row order is used. Tables without an inherent row order (e.g., database tables, Ibis tables, or PySpark DataFrames) need `order_by=`. See the *Row Order and Missing Values* section.
+
+`missing: MissingSpec | None = None`  
+An optional [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) declaring the codes that stand in for missing values in the column (such as `-99` for a survey question that was refused). Rows holding one of these codes are excluded from the check (they count as passing test units), so only the real values are validated, and a note in the validation report lists the codes. By default a [MissingSpec](../reference/MissingSpec.md#pointblank.MissingSpec) also treats nulls as missing, so nulls pass whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls to `na_pass=`.
 
 `pre: Callable | None = None`  
 An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the *Preprocessing* section for more information on how to use this argument.

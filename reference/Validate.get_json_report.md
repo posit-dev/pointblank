@@ -4,7 +4,7 @@ Get a report of the validation results as a JSON-formatted string.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20324-L20494)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20678-L20852)
 
 ``` python
 Validate.get_json_report(
@@ -108,8 +108,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-28T22:12:43.569+00:00",
-            "proc_duration_s": 0.004014
+            "time_processed": "2026-10-29T03:54:35.311+00:00",
+            "proc_duration_s": 0.00238
         },
         {
             "i": 2,
@@ -135,8 +135,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-28T22:12:43.570+00:00",
-            "proc_duration_s": 0.001871
+            "time_processed": "2026-10-29T03:54:35.313+00:00",
+            "proc_duration_s": 0.001508
         }
     ]
 
@@ -228,6 +228,8 @@ print(f"Number of failing validation steps: {len(failing_steps)}")
 ```
 
     Number of failing validation steps: 2
+
+Both steps have one failing test unit: the `5` in column `a` isn't greater than `6`, and the `4` in column `b` isn't less than `4`. Because the report is plain JSON, it can be sent to a monitoring service or stored with each run, and read back without Pointblank.
 
 ## See Also
 

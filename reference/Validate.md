@@ -4,7 +4,7 @@ Workflow for defining a set of validations on a table and interrogating for resu
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5369-L23058)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5369-L23421)
 
 ``` python
 Validate(
@@ -35,6 +35,9 @@ The validation methods, when called, are merely instructions up to the point the
 
 `data: IntoDataFrame`  
 The table to validate, which could be a DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, a GitHub URL pointing to a CSV or Parquet file, or a database connection string. When providing a CSV or Parquet file path (as a string or `pathlib.Path` object), the file will be automatically loaded using an available DataFrame library (Polars or Pandas). Parquet input also supports glob patterns, directories containing .parquet files, and Spark-style partitioned datasets. GitHub URLs are automatically transformed to raw content URLs and downloaded. Connection strings enable direct database access via Ibis with optional table specification using the `::table_name` suffix. Read the *Supported Input Table Types* section for details on the supported table types.
+
+`reference: IntoFrame | None = None`  
+An optional second table to compare the target table against, such as an earlier extract of the same data or a trusted baseline. It can be any of the input types accepted by `data=`. Reference data is used by the aggregate validation methods (the `col_sum_*`, `col_avg_*`, and `col_sd_*` families, such as [`col_sum_eq()`](../reference/Validate.col_sum_eq.md#pointblank.Validate.col_sum_eq)): a `value=` given with [`ref()`](../reference/ref.md#pointblank.ref) takes the aggregate of a column in this table, and leaving out `value=` compares against the same column here. A file path or connection string given here is kept, so that [`to_code()`](../reference/Validate.to_code.md#pointblank.Validate.to_code) and [`to_yaml()`](../reference/Validate.to_yaml.md#pointblank.Validate.to_yaml) can write it back out.
 
 `tbl_name: str | None = None`  
 An optional name to assign to the input table object. If no value is provided, a name will be generated based on whatever information is available. This table name will be displayed in the header area of the tabular report.
