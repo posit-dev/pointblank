@@ -4,7 +4,7 @@ Get the 'error' level status for each validation step.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19220-L19324)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19355-L19459)
 
 ``` python
 Validate.error(

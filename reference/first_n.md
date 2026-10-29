@@ -4,7 +4,7 @@ Select the first `n` columns in the column list.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L1413-L1569)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L1419-L1575)
 
 ``` python
 first_n(

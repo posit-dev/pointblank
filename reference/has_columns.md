@@ -4,7 +4,7 @@ Check whether one or more columns exist in a table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/inspect.py#L6-L143)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/inspect.py#L6-L147)
 
 ``` python
 has_columns(*columns)
@@ -88,3 +88,5 @@ validation
 ```
 
 [TABLE]
+
+Passing a list is the same as passing the column names as separate arguments, so this step is active and passes. Lists are handy when the required column names are already stored in a variable.

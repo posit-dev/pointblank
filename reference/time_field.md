@@ -4,7 +4,7 @@ Create a time column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1689-L1796)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1733-L1849)
 
 ``` python
 time_field(
@@ -19,7 +19,7 @@ time_field(
 
 The [time_field()](../reference/time_field.md#pointblank.time_field) function defines the constraints and behavior for a time-of-day column when generating synthetic data with [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset). You can control the time range with `min_time=` and `max_time=`, enforce uniqueness with `unique=True`, and introduce null values with `nullable=True` and `null_probability=`.
 
-Time values are generated uniformly (at second-level resolution) within the specified range. If no range is provided, the default range is 00:00:00 to 23:59:59. Both `min_time=` and `max_time=` accept `datetime.time` objects or ISO format time strings (e.g., `"09:30:00"`).
+Time values are generated uniformly (at second-level resolution) within the specified range. If no range is provided, the default range is 00:00:00 to 23:59:59. Both `min_time=` and `max_time=` accept `datetime.time` objects or ISO format time strings (e.g., `"09:30:00"`). The column that [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset) creates currently holds the times as `"HH:MM:SS"` strings rather than as a time dtype.
 
 ## Parameters
 
@@ -39,7 +39,7 @@ Probability of generating a null value for each row when `nullable=True`. Must b
 Whether all values must be unique. Default is `False`. With second-level resolution within a time range, uniqueness is feasible for moderate dataset sizes.
 
 `generator: Callable[[], Any] | None = None`  
-Custom callable that generates values. When provided, this overrides all other constraints. The callable should take no arguments and return a single value.
+Custom callable that generates values. When provided, it's used instead of the other constraints, while `unique=` and `nullable=` still apply. The callable should take no arguments and return a single value. It isn't controlled by the `seed=` of [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset), so it needs its own seeded random number generator for reproducible data.
 
 ## Returns
 
@@ -140,3 +140,5 @@ pb.preview(pb.generate_dataset(schema, n=30, seed=7))
 | 28 | 328 | 09:51:19 | 17:00:57 |
 | 29 | 745 | 09:39:11 | 18:52:12 |
 | 30 | 742 | 07:16:53 | 18:51:19 |
+
+Every `check_in` time falls in the morning window and every non-missing `check_out` time in the late afternoon or evening one, with 6 of the 30 `check_out` values missing. The `employee_id` values are distinct three-digit numbers.

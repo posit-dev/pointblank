@@ -4,7 +4,7 @@ Validate that data in a datetime column is not older than a specified maximum ag
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14602-L14976)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14694-L15095)
 
 ``` python
 Validate.data_freshness(
@@ -204,6 +204,8 @@ validation
 
 [TABLE]
 
+Only the first step fails: the newest record is an hour old, which is older than 30 minutes but well within 2 days and 1 week. Each step has a single test unit, so these tiers show up as separate rows in the report.
+
 When your data contains naive datetimes (timestamps without timezone information), use the `timezone=` parameter to specify what timezone those values represent. Here we have event data recorded in Eastern Time, so we set `timezone="America/New_York"` to ensure the freshness comparison is done correctly.
 
 ``` python
@@ -230,14 +232,30 @@ validation
 
 [TABLE]
 
+The step passes here. Note that `datetime.now()` gives the local time of the machine running the code, so the age computed for this example depends on how far that machine's time zone is from Eastern Time. With real data, `timezone=` should name the time zone in which the timestamps were recorded.
+
 For reproducible validations or historical checks, you can use `reference_time=` to compare against a specific point in time instead of the current time. This is particularly useful for testing or when validating data snapshots. The reference time should include a timezone offset (like `+00:00` for UTC) to avoid ambiguity.
 
 ``` python
+snapshot_data = pl.DataFrame({
+    "id": [1, 2, 3],
+    "updated_at": [
+        datetime(2024, 1, 15, 10, 0),
+        datetime(2024, 1, 14, 22, 0),
+        datetime(2024, 1, 13, 9, 0),
+    ]
+})
+
 validation = (
-    pb.Validate(data=recent_data)
+    pb.Validate(data=snapshot_data)
     .data_freshness(
         column="updated_at",
         max_age="24 hours",
+        reference_time="2024-01-15T12:00:00+00:00"
+    )
+    .data_freshness(
+        column="updated_at",
+        max_age="1 hour",
         reference_time="2024-01-15T12:00:00+00:00"
     )
     .interrogate()
@@ -247,3 +265,5 @@ validation
 ```
 
 [TABLE]
+
+The newest timestamp is two hours before the reference time, so the 24-hour step passes and the 1-hour step fails. Because neither the data nor the reference time depend on the current time, this validation gives the same result whenever it runs.

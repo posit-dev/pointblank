@@ -4,7 +4,7 @@ Create a date column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1266-L1377)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1297-L1415)
 
 ``` python
 date_field(
@@ -39,7 +39,7 @@ Probability of generating a null value for each row when `nullable=True`. Must b
 Whether all values must be unique. Default is `False`. When `True`, the generator will retry until it produces `n` distinct dates. Ensure the date range is large enough to accommodate the requested number of unique dates.
 
 `generator: Callable[[], Any] | None = None`  
-Custom callable that generates values. When provided, this overrides all other constraints. The callable should take no arguments and return a single `datetime.date` value.
+Custom callable that generates values. When provided, it's used instead of the other constraints, while `unique=` and `nullable=` still apply. The callable should take no arguments and return a single `datetime.date` value. It isn't controlled by the `seed=` of [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset), so it needs its own seeded random number generator for reproducible data.
 
 ## Returns
 
@@ -142,3 +142,5 @@ pb.preview(pb.generate_dataset(schema, n=30, seed=7))
 | 28                   | 2024-03-12        | 2024-11-17         |
 | 29                   | 2024-01-18        | None               |
 | 30                   | 2024-02-07        | 2024-02-01         |
+
+All 30 `order_date` values are distinct, which is possible because the first quarter of 2024 has 91 days to choose from. About half of the `cancel_date` values are missing (20 of 30 here). Each column is generated independently, so a few cancellation dates fall before the order date in the same row.

@@ -4,7 +4,7 @@ Create a duration column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1904-L2018)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1957-L2077)
 
 ``` python
 duration_field(
@@ -39,7 +39,7 @@ Probability of generating a null value for each row when `nullable=True`. Must b
 Whether all values must be unique. Default is `False`. With second-level resolution within a duration range, uniqueness is feasible for moderate dataset sizes.
 
 `generator: Callable[[], Any] | None = None`  
-Custom callable that generates values. When provided, this overrides all other constraints. The callable should take no arguments and return a single `datetime.timedelta` value.
+Custom callable that generates values. When provided, it's used instead of the other constraints, while `unique=` and `nullable=` still apply. The callable should take no arguments and return a single `datetime.timedelta` value. It isn't controlled by the `seed=` of [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset), so it needs its own seeded random number generator for reproducible data.
 
 ## Returns
 
@@ -144,3 +144,5 @@ pb.preview(pb.generate_dataset(schema, n=30, seed=7))
 | 28 | 290 | 2:02:55 | 1:00:57 |
 | 29 | 64 | 5:45:24 | None |
 | 30 | 115 | 5:43:39 | 2:51:19 |
+
+The `time_spent` values range from one minute to eight hours, while the `overtime` column is missing in most rows (20 of 30 here, in line with the `null_probability=` of `0.6`). Both columns have a duration dtype, so they can take part in arithmetic with dates and datetimes.

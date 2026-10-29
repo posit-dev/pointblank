@@ -4,7 +4,7 @@ Set or replace the table associated with the Validate object.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6167-L6305)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6225-L6363)
 
 ``` python
 Validate.set_tbl(
@@ -99,7 +99,7 @@ validation_table_1.interrogate()
 
 [TABLE]
 
-And the second table:
+All test units pass for the first table. And here is the second table:
 
 ``` python
 validation_table_2.interrogate()

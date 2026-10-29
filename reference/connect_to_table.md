@@ -4,7 +4,7 @@ Connect to a database table using a connection string.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5092-L5268)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5142-L5326)
 
 ``` python
 connect_to_table(connection_string)
@@ -66,6 +66,8 @@ pb.preview(game_revenue)
 | 1999 | RMOSWHJGELCI675 | RMOSWHJGELCI675-vbhcsmtr | 2015-01-21 02:39:48+00:00 | 2015-01-21 02:47:12+00:00 | iap | offer5 | 26.09 | 8.4 | 2015-01-10 | other_campaign | France |
 | 2000 | GJCXNTWEBIPQ369 | GJCXNTWEBIPQ369-9elq67md | 2015-01-21 03:59:23+00:00 | 2015-01-21 04:06:29+00:00 | ad | ad_5sec | 0.12 | 18.5 | 2015-01-14 | organic | United States |
 
+The result is an Ibis table that stays in the database, and [preview()](../reference/preview.md#pointblank.preview) shows the first and last five of its 2,000 rows. The same table object can be passed to `Validate(data=)`, and the validation then runs inside DuckDB.
+
 Here are some backend-specific connection examples:
 
 ``` python
@@ -92,6 +94,4 @@ pip install 'ibis-framework[duckdb]'    # for DuckDB
 pip install 'ibis-framework[postgres]'  # for PostgreSQL
 ```
 
-## See Also
-
-print_database_tables : List all available tables in a database for discovery
+The connection string's backend name (e.g., `postgresql://`) determines which Ibis backend is needed. If it isn't installed, [connect_to_table()](../reference/connect_to_table.md#pointblank.connect_to_table) raises a `ConnectionError` that shows the `pip install` command for it. See Also ----- print_database_tables : List all available tables in a database for discovery

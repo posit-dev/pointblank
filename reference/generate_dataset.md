@@ -4,7 +4,7 @@ Generate synthetic test data from a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1312-L1581)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1312-L1585)
 
 ``` python
 generate_dataset(
@@ -223,7 +223,7 @@ We can combine several field types with nullable columns in a mixed-type dataset
 from datetime import date, timedelta
 
 schema = pb.Schema(
-    id=pb.int_field(min_val=1, unique=True),
+    id=pb.int_field(min_val=1, max_val=1000, unique=True),
     name=pb.string_field(preset="name"),
     score=pb.float_field(min_val=0.0, max_val=100.0),
     is_active=pb.bool_field(p_true=0.75),
@@ -241,13 +241,15 @@ pb.preview(pb.generate_dataset(schema, n=50, seed=23))
 | PolarsRows50Columns6 |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|
 |  | id *Int64* | name *String* | score *Float64* | is_active *Boolean* | joined *Date* | session_time *Duration* |
-| 1 | 7188536481533917197 | Doris Martin | 92.48652516259452 | False | 2024-05-15 | 1:20:09 |
-| 2 | 2674009078779859984 | Nancy Gonzalez | 94.86057779931771 | False | 2021-08-16 | 0:23:48 |
-| 3 | 7652102777077138151 | Jessica Turner | 89.24333440485793 | False | 2024-08-26 | None |
-| 4 | 157503859921753049 | George Evans | 8.355067683068363 | True | 2020-06-20 | 2:42:39 |
-| 5 | 2829213282471975080 | Patricia Williams | 59.20272268857353 | True | 2020-02-04 | None |
-| 46 | 8670836018805171304 | Michael Hoffman | 27.556446150015233 | True | 2023-03-04 | 2:12:54 |
-| 47 | 2587902378814764220 | Brian Campbell | 57.282189488843784 | True | 2024-04-05 | None |
-| 48 | 5441450987457280882 | Teresa Roberts | 82.06631808725244 | False | 2024-10-27 | None |
-| 49 | 1005771189117755519 | Vincent Rodriguez | 33.08048479932988 | True | 2022-01-25 | 2:56:24 |
-| 50 | 8302188861545620440 | Susan Ramirez | 36.96539320060992 | True | 2023-03-17 | 0:45:40 |
+| 1 | 948 | Doris Martin | 92.48652516259452 | False | 2024-05-15 | 1:20:09 |
+| 2 | 799 | Nancy Gonzalez | 94.86057779931771 | False | 2021-08-16 | 0:23:48 |
+| 3 | 972 | Jessica Turner | 89.24333440485793 | False | 2024-08-26 | None |
+| 4 | 297 | George Evans | 8.355067683068363 | True | 2020-06-20 | 2:42:39 |
+| 5 | 914 | Patricia Williams | 59.20272268857353 | True | 2020-02-04 | None |
+| 46 | 222 | Michael Hoffman | 27.556446150015233 | True | 2023-03-04 | 2:12:54 |
+| 47 | 995 | Brian Campbell | 57.282189488843784 | True | 2024-04-05 | None |
+| 48 | 753 | Teresa Roberts | 82.06631808725244 | False | 2024-10-27 | None |
+| 49 | 372 | Vincent Rodriguez | 33.08048479932988 | True | 2022-01-25 | 2:56:24 |
+| 50 | 580 | Susan Ramirez | 36.96539320060992 | True | 2023-03-17 | 0:45:40 |
+
+Each column gets the dtype of its field: `Int64`, `String`, `Float64`, `Boolean`, `Date` and `Duration`. The `session_time` column has 12 missing values out of 50, close to the `null_probability=` of `0.2`, and the same `seed=` gives the same table on every run.

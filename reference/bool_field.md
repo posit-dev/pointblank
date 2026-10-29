@@ -4,7 +4,7 @@ Create a boolean column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1070-L1168)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1094-L1199)
 
 ``` python
 bool_field(
@@ -35,7 +35,7 @@ Probability of generating a null value for each row when `nullable=True`. Must b
 Whether all values must be unique. Default is `False`. Note that boolean columns can only have 2 unique non-null values, so `n` must be `<= 2` when `unique=True` (or `<= 3` with `nullable=True`).
 
 `generator: Callable[[], Any] | None = None`  
-Custom callable that generates values. When provided, this overrides all other constraints. The callable should take no arguments and return a single boolean value.
+Custom callable that generates values. When provided, it's used instead of the other constraints, while `unique=` and `nullable=` still apply. The callable should take no arguments and return a single boolean value. It isn't controlled by the `seed=` of [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset), so it needs its own seeded random number generator for reproducible data.
 
 ## Returns
 
@@ -109,7 +109,7 @@ Boolean fields can be combined with other field types in a realistic schema:
 
 ``` python
 schema = pb.Schema(
-    user_id=pb.int_field(min_val=1, unique=True),
+    user_id=pb.int_field(min_val=1, max_val=9999, unique=True),
     name=pb.string_field(preset="name"),
     email_verified=pb.bool_field(p_true=0.9),
     is_admin=pb.bool_field(p_true=0.05),
@@ -121,13 +121,15 @@ pb.preview(pb.generate_dataset(schema, n=30, seed=10))
 | PolarsRows30Columns4 |  |  |  |  |
 |----|----|----|----|----|
 |  | user_id *Int64* | name *String* | email_verified *Boolean* | is_admin *Boolean* |
-| 1 | 300544187282452692 | Joshua Robinson | True | False |
-| 2 | 4450845842995915857 | Marie Young | True | False |
-| 3 | 136805169105849017 | Melissa Atkins | True | False |
-| 4 | 4266552081017657985 | Paisley Jackson | True | False |
-| 5 | 4531409703019074138 | Martha White | True | False |
-| 26 | 4055035012371305120 | Zachary Ramirez | False | False |
-| 27 | 3461005733469027473 | Sarah Gallagher | True | False |
-| 28 | 5376594645785815587 | Kimberly Tran | True | True |
-| 29 | 2173523867229340168 | John Marshall | True | True |
-| 30 | 1798126872665261570 | Linda Garner | True | False |
+| 1 | 9362 | Joshua Robinson | True | False |
+| 2 | 534 | Marie Young | True | False |
+| 3 | 7027 | Melissa Atkins | True | False |
+| 4 | 7907 | Paisley Jackson | True | False |
+| 5 | 9472 | Martha White | True | False |
+| 26 | 4647 | Zachary Ramirez | False | False |
+| 27 | 4298 | Sarah Gallagher | True | False |
+| 28 | 7485 | Kimberly Tran | True | True |
+| 29 | 2862 | John Marshall | True | True |
+| 30 | 4967 | Linda Garner | True | False |
+
+Here, `email_verified` is `True` in 26 of the 30 rows and `is_admin` in 3 of them. These counts are close to, but not exactly, the `p_true=` values of `0.9` and `0.05`, since each value is drawn independently.

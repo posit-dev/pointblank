@@ -4,7 +4,7 @@ Validate whether the target table matches a comparison table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15346-L15707)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15470-L15836)
 
 ``` python
 Validate.tbl_match(
@@ -213,3 +213,5 @@ validation.get_step_report(i=1)
 ```
 
 [TABLE]
+
+The report groups the differences: column `c` is the only column with mismatched values, the row with key `2` changed (`5.0` became `5.5`), the row with key `3` is missing from the target, and the row with key `5` is extra. The key values identify each row, so you can look up the problem rows in either table.

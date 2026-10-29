@@ -4,7 +4,7 @@ Check whether a table has a certain number of rows.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/inspect.py#L146-L322)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/inspect.py#L150-L326)
 
 ``` python
 has_rows(

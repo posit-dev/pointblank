@@ -4,7 +4,7 @@ Validate that column values exist in a reference table (referential integrity).
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15167-L15344)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15286-L15468)
 
 ``` python
 Validate.col_vals_in_table(
@@ -122,3 +122,5 @@ validation
 ```
 
 [TABLE]
+
+With composite keys, each row's combination of values must appear as a row in the reference table. The third row fails because `("US", "C3")` isn't in the catalog. The second row, `("EU", "A1")`, passes because the catalog has that exact pair, even though `"A1"` is also listed under `"US"`.

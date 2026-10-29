@@ -4,7 +4,7 @@ Create a column expression for use in `conjointly()` validation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L2016-L2083)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L2022-L2089)
 
 ``` python
 expr_col(column_name)

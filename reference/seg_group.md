@@ -4,7 +4,7 @@ Group together values for segmentation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/segments.py#L33-L163)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/segments.py#L33-L171)
 
 ``` python
 seg_group(values)
@@ -87,6 +87,8 @@ validation
 
 [TABLE]
 
+The Fantasy and Science Fiction books form a single segment, so the report has one step with eight test units. Only *The Name of the Wind* (445 units sold) falls short of the threshold, and the Mystery books aren't checked at all.
+
 What's more, we can create multiple segments, combining the genres in different ways.
 
 ``` python
@@ -108,3 +110,5 @@ validation
 ```
 
 [TABLE]
+
+Each group becomes its own step in the report. The Fantasy and Science Fiction segment has one failing test unit (445 units sold), the Fantasy and Mystery segment has two (445 and 389), and the Mystery and Science Fiction segment has one (389). A genre can appear in more than one group, so the same row may be checked in several steps.

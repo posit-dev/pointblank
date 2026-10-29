@@ -895,9 +895,10 @@ They're especially useful for sending notifications, generating reports, or taki
 actions based on the complete validation outcome.
 
 The following example shows how to create a final action that checks for critical failures
-and sends an alert:
+and sends an alert. The `d` column of the `small_table` dataset has many values that aren't
+greater than `1000`, so the step reaches the 'critical' threshold:
 
-```python
+```{python}
 import pointblank as pb
 
 def send_alert():
@@ -907,38 +908,54 @@ def send_alert():
 
 validation = (
     pb.Validate(
-        data=my_data,
-        final_actions=pb.FinalActions(send_alert)
+        data=pb.load_dataset("small_table"),
+        tbl_name="small_table",
+        thresholds=(1, 2, 3),
+        final_actions=pb.FinalActions(send_alert),
     )
-    .col_vals_gt(columns="revenue", value=0)
+    .col_vals_gt(columns="d", value=1000)
     .interrogate()
 )
 ```
 
 In this example, the `send_alert()` function is defined to check the validation summary for
-critical failures. If any are found, an alert message is printed to the console. The function is
+critical failures. Since some were found, the alert message was printed. The function is
 passed to the `FinalActions` class, which ensures it will be executed after all validation steps
 are complete. Note that we used the
 [`get_validation_summary()`](`pointblank.get_validation_summary`) function to retrieve the
 summary of the validation results to help craft the alert message.
 
 Multiple final actions can be provided in a sequence. They will be executed in the order they
-are specified after all validation steps have completed:
+are specified after all validation steps have completed. Here, a string message is followed by
+the `send_alert()` function and a second function that prints a count of the failing steps:
 
-```python
+```{python}
+def log_counts():
+    summary = pb.get_validation_summary()
+    print(f"{summary['n_failing_steps']} of {summary['n_steps']} steps had failures")
+
 validation = (
     pb.Validate(
-        data=my_data,
+        data=pb.load_dataset("small_table"),
+        tbl_name="small_table",
+        thresholds=(1, 2, 3),
         final_actions=pb.FinalActions(
             "Validation complete.",  # a string message
             send_alert,              # a callable function
-            generate_report          # another callable function
-        )
+            log_counts,              # another callable function
+        ),
     )
-    .col_vals_gt(columns="revenue", value=0)
+    .col_vals_gt(columns="d", value=1000)
+    .col_vals_not_null(columns="c")
+    .col_exists(columns="a")
     .interrogate()
 )
 ```
+
+The three outputs appear in the order the actions were given. A string action is printed as
+is, while the functions can use the summary to decide what to do. Two of the three steps have
+failures (`d` has values of `1000` or less and `c` has missing values), and only the
+`col_exists()` step passes.
 
 See Also
 --------
@@ -6616,6 +6633,10 @@ validation = (
 validation
 ```
 
+With `allow_stationary=True`, the repeated `2` counts as a passing value, so all six test
+units pass. Column `c`, where the value drops from `2` to `1`, would still fail with this
+setting; only the `decreasing_tol=` parameter can allow drops like that.
+
 col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, increasing_tol: 'float | None' = None, na_pass: 'bool' = False, order_by: 'str | list[str] | None' = None, missing: 'MissingSpec | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
 Are column data decreasing by row?
@@ -6787,6 +6808,10 @@ validation = (
 
 validation
 ```
+
+With `allow_stationary=True`, the repeated `4` counts as a passing value, so all six test
+units pass. Column `c`, where the value rises from `4` to `5`, would still fail with this
+setting; only the `increasing_tol=` parameter can allow rises like that.
 
 col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
@@ -7792,6 +7817,9 @@ validation = (
 validation
 ```
 
+Without an upper bound, the long string now passes, but `"ok"` fails because its two
+characters fall short of `min_val=3`. So there's again one failing test unit out of four.
+
 col_vals_in_table(self, columns: 'str | list[str]', ref_table: 'Any', ref_column: 'str | list[str]', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
 Validate that column values exist in a reference table (referential integrity).
@@ -7908,6 +7936,11 @@ validation = (
 
 validation
 ```
+
+With composite keys, each row's combination of values must appear as a row in the reference
+table. The third row fails because `("US", "C3")` isn't in the catalog. The second row,
+`("EU", "A1")`, passes because the catalog has that exact pair, even though `"A1"` is also
+listed under `"US"`.
 
 col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
@@ -8637,6 +8670,10 @@ validation = (
 
 validation
 ```
+
+Both steps pass. Three of the eight values are missing codes, so the overall missing share
+of 37.5% is within `max_pct=0.5`. The `reason="refused"` step counts only the two `-98`
+values, and their share of 25% is within `max_pct=0.30`.
 
 col_missing_coded(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', missing: 'MissingSpec', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
@@ -9676,7 +9713,7 @@ count
 tol
     The tolerance allowable for the row count match. This can be specified as a single
     numeric value (integer or float) or as a tuple of two integers representing the lower
-    and upper bounds of the tolerance range. If a single integer value (greater than 1) is
+    and upper bounds of the tolerance range. If a single integer value (`1` or greater) is
     provided, it represents the absolute bounds of the tolerance, ie. plus or minus the value.
     If a float value (between 0-1) is provided, it represents the relative tolerance, ie.
     plus or minus the relative percentage of the target. If a tuple is provided, it represents
@@ -9803,35 +9840,55 @@ validation
 The validation table shows that the expectation value of `13` matches the actual count of
 rows in the target table. So, the single test unit passed.
 
-
-Let's modify our example to show the different ways we can allow some tolerance to our validation
-by using the `tol` argument.
+The `tol=` argument allows the row count to differ from `count=` by some amount. A tuple
+sets separate lower and upper bounds, so here `tol=(2, 0)` accepts anywhere from 11 to 13
+rows. A sample of 12 rows from the table passes:
 
 ```{python}
-smaller_small_table = small_table.sample(n = 12) # within the lower bound
-validation = (
-    pb.Validate(data=smaller_small_table)
-    .row_count_match(count=13,tol=(2, 0)) # minus 2 but plus 0, ie. 11-13
-    .interrogate()
-)
-
-validation
+smaller_small_table = small_table.sample(n=12)
 
 validation = (
     pb.Validate(data=smaller_small_table)
-    .row_count_match(count=13,tol=.05) # .05% tolerance of 13
-    .interrogate()
-)
-
-even_smaller_table = small_table.sample(n = 2)
-validation = (
-    pb.Validate(data=even_smaller_table)
-    .row_count_match(count=13,tol=5) # plus or minus 5; this test will fail
+    .row_count_match(count=13, tol=(2, 0))
     .interrogate()
 )
 
 validation
 ```
+
+A float between `0` and `1` is a relative tolerance: `tol=0.1` allows a difference of 10%
+of `13`, which is rounded down to one row. So the 12-row sample passes again:
+
+```{python}
+validation = (
+    pb.Validate(data=smaller_small_table)
+    .row_count_match(count=13, tol=0.1)
+    .interrogate()
+)
+
+validation
+```
+
+A smaller relative tolerance such as `tol=0.05` would make this step fail, since 5% of `13`
+rounds down to zero rows. An integer of `1` or more is an absolute tolerance in both
+directions. With `tol=5`, the row count can be anywhere from 8 to 18, so a two-row table
+fails:
+
+```{python}
+even_smaller_table = small_table.sample(n=2)
+
+validation = (
+    pb.Validate(data=even_smaller_table)
+    .row_count_match(count=13, tol=5)
+    .interrogate()
+)
+
+validation
+```
+
+The single test unit fails because two rows is well outside the range of 8 to 18. When a
+table should be about the same size as another table, `count=` can also take that table
+directly and use its row count as the expected value.
 
 col_count_match(self, count: 'int | Any', inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
@@ -10223,6 +10280,10 @@ validation = (
 validation
 ```
 
+Only the first step fails: the newest record is an hour old, which is older than 30 minutes
+but well within 2 days and 1 week. Each step has a single test unit, so these tiers show up
+as separate rows in the report.
+
 When your data contains naive datetimes (timestamps without timezone information), use the
 `timezone=` parameter to specify what timezone those values represent. Here we have event
 data recorded in Eastern Time, so we set `timezone="America/New_York"` to ensure the
@@ -10250,17 +10311,36 @@ validation = (
 validation
 ```
 
+The step passes here. Note that `datetime.now()` gives the local time of the machine
+running the code, so the age computed for this example depends on how far that machine's
+time zone is from Eastern Time. With real data, `timezone=` should name the time zone in
+which the timestamps were recorded.
+
 For reproducible validations or historical checks, you can use `reference_time=` to compare
 against a specific point in time instead of the current time. This is particularly useful
 for testing or when validating data snapshots. The reference time should include a timezone
 offset (like `+00:00` for UTC) to avoid ambiguity.
 
 ```{python}
+snapshot_data = pl.DataFrame({
+    "id": [1, 2, 3],
+    "updated_at": [
+        datetime(2024, 1, 15, 10, 0),
+        datetime(2024, 1, 14, 22, 0),
+        datetime(2024, 1, 13, 9, 0),
+    ]
+})
+
 validation = (
-    pb.Validate(data=recent_data)
+    pb.Validate(data=snapshot_data)
     .data_freshness(
         column="updated_at",
         max_age="24 hours",
+        reference_time="2024-01-15T12:00:00+00:00"
+    )
+    .data_freshness(
+        column="updated_at",
+        max_age="1 hour",
         reference_time="2024-01-15T12:00:00+00:00"
     )
     .interrogate()
@@ -10268,6 +10348,10 @@ validation = (
 
 validation
 ```
+
+The newest timestamp is two hours before the reference time, so the 24-hour step passes and
+the 1-hour step fails. Because neither the data nor the reference time depend on the current
+time, this validation gives the same result whenever it runs.
 
 tbl_match(self, tbl_compare: 'Any', keys: 'str | list[str] | None' = None, columns: 'str | list[str] | None' = None, column_map: 'dict[str, str] | None' = None, tolerance: 'Any' = None, normalize: 'dict[str, Any] | None' = None, null_equal: 'bool' = True, schema: "Literal['strict', 'common']" = 'strict', dup_keys: "Literal['flag', 'compare']" = 'flag', order_by: 'str | list[str] | None' = None, partitions: 'int | None' = None, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
@@ -10553,6 +10637,11 @@ extra. The step report shows exactly what differs.
 validation.get_step_report(i=1)
 ```
 
+The report groups the differences: column `c` is the only column with mismatched values, the
+row with key `2` changed (`5.0` became `5.5`), the row with key `3` is missing from the
+target, and the row with key `5` is extra. The key values identify each row, so you can look
+up the problem rows in either table.
+
 tbl_reconcile(self, tbl_compare: 'Any', keys: 'str | list[str] | None' = None, measures: 'str | list[str] | None' = None, agg: 'str | dict[str, str | list[str]]' = 'sum', tolerance: 'Any' = None, column_map: 'dict[str, str] | None' = None, partitions: 'int | None' = None, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
 Validate that aggregates of the target table reconcile with a comparison table.
@@ -10767,6 +10856,12 @@ Grand totals don't need any keys. Here, the total amount matches within a tolera
     .all_passed()
 )
 ```
+
+The method chain ends with `all_passed()`, which returns `True`. The totals are `467.5` in
+the source and `456.5` in the loaded table, a difference of `11` that falls within the
+tolerance. A grand total can hide offsetting differences, though: the missing `west` orders
+and the larger `east` total partly cancel out, which is why the per-region check above is
+the stricter one.
 
 conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
@@ -16837,6 +16932,10 @@ validation = (
 validation
 ```
 
+The Fantasy and Science Fiction books form a single segment, so the report has one step with
+eight test units. Only *The Name of the Wind* (445 units sold) falls short of the threshold,
+and the Mystery books aren't checked at all.
+
 What's more, we can create multiple segments, combining the genres in different ways.
 
 ```{python}
@@ -16856,6 +16955,11 @@ validation = (
 
 validation
 ```
+
+Each group becomes its own step in the report. The Fantasy and Science Fiction segment has one
+failing test unit (445 units sold), the Fantasy and Mystery segment has two (445 and 389), and
+the Mystery and Science Fiction segment has one (389). A genre can appear in more than one
+group, so the same row may be checked in several steps.
 
 
 ## Interrogation and Reporting
@@ -17065,7 +17169,7 @@ Here is the interrogation of the first table:
 validation_table_1.interrogate()
 ```
 
-And the second table:
+All test units pass for the first table. And here is the second table:
 
 ```{python}
 validation_table_2.interrogate()
@@ -17441,6 +17545,10 @@ json_report = validation.get_json_report()
 print(json_report)
 ```
 
+The report is a JSON array with one object per validation step. Each object holds the
+step's settings (such as the column, the comparison value and any thresholds) along with
+its results (the test unit counts and fractions, and whether each threshold was reached).
+
 You can also customize which fields to include:
 
 ```{python}
@@ -17451,7 +17559,8 @@ json_report = validation.get_json_report(
 print(json_report)
 ```
 
-Or which fields to exclude:
+Now each step object has just the five requested fields. Or we can choose which fields to
+exclude:
 
 ```{python}
 json_report = validation.get_json_report(
@@ -20291,6 +20400,10 @@ These paths can be used in examples and documentation to demonstrate file-based 
 without requiring the actual data files. The returned paths can be used with
 `Validate(data=path)` to demonstrate CSV and Parquet file loading capabilities.
 
+Each call writes the dataset to a new temporary file and returns the path to that file. The
+temporary file isn't deleted automatically, so it stays available for as long as the
+operating system keeps its temporary files.
+
 Parameters
 ----------
 dataset
@@ -20302,7 +20415,7 @@ file_type
 Returns
 -------
 str
-    The file path to the requested dataset file.
+    The path to a temporary file holding the requested dataset in the requested format.
 
 Included Datasets
 -----------------
@@ -20330,7 +20443,6 @@ import pointblank as pb
 
 # Get path to the small_table CSV file
 csv_path = pb.get_data_path("small_table", "csv")
-print(csv_path)
 
 # Use the path directly with Validate
 validation = (
@@ -20343,7 +20455,10 @@ validation = (
 validation
 ```
 
-Get a Parquet file path for validation examples:
+The CSV file is read into a table during interrogation. The three `col_exists()` steps and the
+`col_vals_gt()` step all pass.
+
+We can also get a Parquet file path for validation examples:
 
 ```{python}
 # Get path to the game_revenue Parquet file
@@ -20360,6 +20475,8 @@ validation = (
 validation
 ```
 
+All 2,000 rows have player and session IDs and positive revenue values, so every step passes.
+
 This is particularly useful for documentation examples where you want to demonstrate
 file-based workflows without requiring users to have specific data files:
 
@@ -20369,11 +20486,17 @@ sales_csv = pb.get_data_path(dataset="global_sales", file_type="csv")
 
 validation = (
     pb.Validate(data=sales_csv, label="Sales Data Validation")
-    .col_exists(["customer_id", "product_id", "amount"])
-    .col_vals_regex(columns="customer_id", pattern=r"CUST_[0-9]{6}")
+    .col_exists(["customer_id", "product_id", "revenue"])
+    .col_vals_regex(columns="customer_id", pattern=r"[0-9a-f]{8}")
     .interrogate()
 )
+
+validation
 ```
+
+All three columns exist, and every customer ID that's present is an eight-character
+hexadecimal string. The 334 failing test units in the last step are rows where `customer_id`
+is missing; setting `na_pass=True` would count those rows as passing.
 
 See Also
 --------
@@ -20433,6 +20556,10 @@ game_revenue = pb.connect_to_table(f"duckdb:///{duckdb_path}::game_revenue")
 pb.preview(game_revenue)
 ```
 
+The result is an Ibis table that stays in the database, and `preview()` shows the first and
+last five of its 2,000 rows. The same table object can be passed to `Validate(data=)`, and
+the validation then runs inside DuckDB.
+
 Here are some backend-specific connection examples:
 
 ```python
@@ -20458,6 +20585,10 @@ pip install 'ibis-framework[duckdb,postgres,mysql,sqlite]'
 pip install 'ibis-framework[duckdb]'    # for DuckDB
 pip install 'ibis-framework[postgres]'  # for PostgreSQL
 ```
+
+The connection string's backend name (e.g., `postgresql://`) determines which Ibis backend is
+needed. If it isn't installed, `connect_to_table()` raises a `ConnectionError` that shows the
+`pip install` command for it.
 See Also
 --------
 print_database_tables : List all available tables in a database for discovery
@@ -22412,6 +22543,10 @@ validation = (
 validation
 ```
 
+Passing a list is the same as passing the column names as separate arguments, so this step is
+active and passes. Lists are handy when the required column names are already stored in a
+variable.
+
 has_rows(count: 'int | None' = None, *, min: 'int | None' = None, max: 'int | None' = None) -> 'Callable[[Any], bool]'
 
 Check whether a table has a certain number of rows.
@@ -23601,38 +23736,40 @@ Examples
 Final actions are executed after the completion of all validation steps. They provide an
 opportunity to take appropriate actions based on the overall validation results. Here's an
 example of a final action function (`send_report()`) that sends an alert when critical
-validation failures are detected:
+validation failures are detected. To keep the example self-contained, the alert is printed;
+in practice, this is where you'd send an email or post a message to a chat service:
 
-```python
+```{python}
 import pointblank as pb
 
 def send_report():
     summary = pb.get_validation_summary()
     if summary["highest_severity"] == "critical":
-        # Send an alert email
-        send_alert_email(
-            subject=f"CRITICAL validation failures in {summary['tbl_name']}",
-            body=f"{summary['n_critical_steps']} steps failed with critical severity."
-        )
+        print(f"CRITICAL validation failures in {summary['tbl_name']}")
+        print(f"Steps with critical severity: {summary['n_critical_steps']}")
 
 validation = (
     pb.Validate(
-        data=my_data,
-        final_actions=pb.FinalActions(send_report)
+        data=pb.load_dataset("small_table"),
+        tbl_name="small_table",
+        thresholds=(1, 2, 3),
+        final_actions=pb.FinalActions(send_report),
     )
-    .col_vals_gt(columns="revenue", value=0)
+    .col_vals_gt(columns="d", value=1000)
+    .col_vals_not_null(columns="c")
     .interrogate()
 )
 ```
 
-Note that `send_alert_email()` in the example above is a placeholder function that would be
-implemented by the user to send email alerts. This function is not provided by the Pointblank
-package.
+The first step has six failing test units, which reaches the 'critical' threshold of three,
+so the alert was printed during `interrogate()`. The second step's two missing values only
+reach the 'error' threshold. Outside of a final action, `get_validation_summary()` returns
+`None`.
 
 The `get_validation_summary()` function can also be used to create custom reporting for
 validation results:
 
-```python
+```{python}
 def log_validation_results():
     summary = pb.get_validation_summary()
 
@@ -23645,12 +23782,29 @@ def log_validation_results():
         f"{summary['n_critical_steps']} critical"
     )
 
-    if summary['highest_severity'] in ["error", "critical"]:
-        print("⚠️ Action required: Please review failing validation steps!")
+    if summary["highest_severity"] in ["error", "critical"]:
+        print("Action required: Please review failing validation steps!")
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset("small_table"),
+        tbl_name="small_table",
+        thresholds=(1, 2, 3),
+        final_actions=pb.FinalActions(log_validation_results),
+    )
+    .col_vals_gt(columns="d", value=100)
+    .col_vals_not_null(columns="c")
+    .col_vals_le(columns="a", value=7)
+    .interrogate()
+)
 ```
 
-Final actions work well with both simple logging and more complex notification systems, allowing
-you to integrate validation results into your broader data quality workflows.
+The first step passes, the second step's two missing values reach the 'error' threshold, and
+the third step's single failure reaches the 'warning' threshold. A step that reaches a higher
+threshold also counts toward the lower ones, which is why the severity counts can add up to
+more than the number of failing steps. Final actions work well with both simple logging and
+more complex notification systems, allowing you to integrate validation results into your
+broader data quality workflows.
 
 See Also
 --------
@@ -23916,35 +24070,52 @@ Validate
 
 Examples
 --------
-Load a validation object that was previously saved:
-
-```python
+```{python}
+#| echo: false
+#| output: false
 import pointblank as pb
-
-# Load a validation object from disk
-validation = pb.read_file("my_validation.pkl")
-
-# View the validation results
-validation
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
 ```
 
-You can also load using just the filename (without extension):
+Let's first save a validation object to disk with `write_file()`. We'll use a temporary
+directory here, and `keep_tbl=True` saves the target table along with the validation results:
 
-```python
-# This will automatically look for "my_validation.pkl"
-validation = pb.read_file("my_validation")
+```{python}
+import pointblank as pb
+import os
+import tempfile
+
+validation = (
+    pb.Validate(data=pb.load_dataset("small_table"), tbl_name="small_table")
+    .col_vals_gt(columns="d", value=1000)
+    .col_vals_not_null(columns="c")
+    .interrogate()
+)
+
+save_dir = tempfile.mkdtemp()
+pb.write_file(validation, "my_validation", path=save_dir, keep_tbl=True, quiet=True)
 ```
 
-The loaded validation object retains all its functionality:
+Now we can load the validation object from disk with `read_file()`. The filename can be given
+without its extension, in which case `read_file()` looks for `"my_validation.pkl"`:
 
-```python
-# Get validation summary
-summary = validation.get_json_report()
+```{python}
+restored = pb.read_file(os.path.join(save_dir, "my_validation"))
 
-# Get sundered data (if original table was saved)
-if validation.data is not None:
-    failing_rows = validation.get_sundered_data(type="fail")
+restored
 ```
+
+The restored object has the same results as the original: the first step has 6 failing test
+units and the second has 2. The loaded validation object retains all its functionality, so we
+can, for example, get the rows that failed any step (since the target table was saved):
+
+```{python}
+pb.preview(restored.get_sundered_data(type="fail"))
+```
+
+These are the 8 rows of `small_table` that failed at least one of the two steps. Without
+`keep_tbl=True` in `write_file()`, the table wouldn't be saved and methods that need the data,
+like `get_sundered_data()`, wouldn't be available after loading.
 
 See Also
 --------
@@ -24004,6 +24175,8 @@ validation = (
 validation
 ```
 
+The `sales` column sums to `600` in both tables, so the single test unit passes.
+
 You can also compare different columns or use tolerance:
 
 ```{python}
@@ -24019,6 +24192,10 @@ validation = (
 
 validation
 ```
+
+The `revenue` column sums to `615`, which is `15` more than the `600` of the reference
+`sales` column. That's within the relative tolerance of 10% (`60`), so the step passes even
+though the sums aren't equal.
 
 See Also
 --------
@@ -24275,7 +24452,7 @@ We can combine several field types with nullable columns in a mixed-type dataset
 from datetime import date, timedelta
 
 schema = pb.Schema(
-    id=pb.int_field(min_val=1, unique=True),
+    id=pb.int_field(min_val=1, max_val=1000, unique=True),
     name=pb.string_field(preset="name"),
     score=pb.float_field(min_val=0.0, max_val=100.0),
     is_active=pb.bool_field(p_true=0.75),
@@ -24289,6 +24466,10 @@ schema = pb.Schema(
 
 pb.preview(pb.generate_dataset(schema, n=50, seed=23))
 ```
+
+Each column gets the dtype of its field: `Int64`, `String`, `Float64`, `Boolean`, `Date` and
+`Duration`. The `session_time` column has 12 missing values out of 50, close to the
+`null_probability=` of `0.2`, and the same `seed=` gives the same table on every run.
 
 schema_from_tbl(tbl: 'Any', *, infer_constraints: 'bool' = True, categorical_threshold: 'int | float' = 20, detect_presets: 'bool' = True, sample_size: 'int | None' = None) -> 'Schema'
 
@@ -24338,11 +24519,21 @@ schema = pb.schema_from_tbl(df)
 print(schema)
 ```
 
-Generate synthetic data matching the original's characteristics:
+The inferred schema has a field for each column. The `user_id` and `age` fields take their
+ranges from the data and are marked unique (every value in those columns is distinct), the
+`email` column is matched to the `"email"` preset by its name and values, and `status` has
+few enough distinct values to become a categorical field with an `allowed=` list.
+
+Let's generate synthetic data matching the original's characteristics:
 
 ```{python}
 pb.preview(schema.generate(n=10, seed=23))
 ```
+
+The new rows follow the inferred constraints: the IDs lie between 1 and 50, the ages between
+20 and 69, and every `status` is one of the three original values. The emails are new,
+realistic addresses from the preset rather than copies of the original `user{i}@example.com`
+values.
 
 int_field(min_val: 'int | None' = None, max_val: 'int | None' = None, allowed: 'list[int] | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None, dtype: 'str' = 'Int64') -> 'IntField'
 
@@ -24352,8 +24543,8 @@ The `int_field()` function defines the constraints and behavior for an integer c
 generating synthetic data with `generate_dataset()`. You can control the range of values
 with `min_val=` and `max_val=`, restrict values to a specific set with `allowed=`, enforce
 uniqueness with `unique=True`, and introduce null values with `nullable=True` and
-`null_probability=`. The `dtype=` parameter lets you choose the specific integer type (e.g.,
-`"Int8"`, `"UInt16"`, `"Int64"`), which also determines the valid range of values.
+`null_probability=`. The `dtype=` parameter sets the integer type in the schema (e.g.,
+`"Int8"`, `"UInt16"`, `"Int64"`), which also limits the range of values.
 
 When no constraints are specified, values are drawn uniformly from the full range of the
 chosen integer dtype. If both `min_val=` and `max_val=` are provided, values are drawn
@@ -24378,12 +24569,16 @@ unique
     Whether all values must be unique. Default is `False`. When `True`, the generator will
     retry until it produces `n` distinct values (subject to retry limits).
 generator
-    Custom callable that generates values. When provided, this overrides all other
-    constraints (`min_val=`, `max_val=`, `allowed=`, etc.). The callable should take no
-    arguments and return a single integer value.
+    Custom callable that generates values. When provided, it's used instead of `min_val=`,
+    `max_val=` and `allowed=`, while `unique=` and `nullable=` still apply. The callable should
+    take no arguments and return a single integer value. It isn't controlled by the `seed=` of
+    `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+    data.
 dtype
     Integer dtype. Default is `"Int64"`. Options: `"Int8"`, `"Int16"`, `"Int32"`,
-    `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`.
+    `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`. The dtype limits the range of
+    values (e.g., `0` to `255` for `"UInt8"`), but the column that `generate_dataset()` creates
+    is currently always `Int64`.
 
 Returns
 -------
@@ -24415,7 +24610,7 @@ pb.preview(pb.generate_dataset(schema, n=100, seed=23))
 ```
 
 It's possible to introduce missing values with `nullable=True` and `null_probability=`,
-and to select a smaller dtype with `dtype=`:
+and to limit the range of values with a smaller `dtype=`:
 
 ```{python}
 schema = pb.Schema(
@@ -24455,6 +24650,10 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=20, seed=5))
 ```
 
+The generator is called once for each row, so every value is an even number below 100. The
+`seed=` of `generate_dataset()` doesn't reach the generator, which is why it uses its own
+`random.Random(0)`: that makes the data the same on every run.
+
 float_field(min_val: 'float | None' = None, max_val: 'float | None' = None, allowed: 'list[float] | None' = None, precision: 'int | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None, dtype: 'str' = 'Float64') -> 'FloatField'
 
 Create a floating-point column specification for use in a schema.
@@ -24463,8 +24662,8 @@ The `float_field()` function defines the constraints and behavior for a floating
 when generating synthetic data with `generate_dataset()`. You can control the range of values
 with `min_val=` and `max_val=`, restrict values to a specific set with `allowed=`, enforce
 uniqueness with `unique=True`, and introduce null values with `nullable=True` and
-`null_probability=`. The `dtype=` parameter lets you choose between `"Float32"` and
-`"Float64"` precision.
+`null_probability=`. The `dtype=` parameter sets the float type in the schema (`"Float32"` or
+`"Float64"`).
 
 When both `min_val=` and `max_val=` are provided, values are drawn from a uniform
 distribution across that range. If neither is specified, values are drawn uniformly from a
@@ -24491,10 +24690,14 @@ unique
     Whether all values must be unique. Default is `False`. When `True`, the generator will
     retry until it produces `n` distinct values.
 generator
-    Custom callable that generates values. When provided, this overrides all other
-    constraints. The callable should take no arguments and return a single float value.
+    Custom callable that generates values. When provided, it's used instead of `min_val=`,
+    `max_val=`, `allowed=` and `precision=`, while `unique=` and `nullable=` still apply. The
+    callable should take no arguments and return a single float value. It isn't controlled by
+    the `seed=` of `generate_dataset()`, so it needs its own seeded random number generator
+    for reproducible data.
 dtype
-    Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`.
+    Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`. The column that
+    `generate_dataset()` creates is currently always `Float64`.
 
 Returns
 -------
@@ -24563,8 +24766,8 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=20, seed=23))
 ```
 
-Setting `dtype="Float32"` gives reduced precision, and a custom `generator=` provides
-full control over value generation:
+A custom `generator=` provides full control over value generation, such as values from a
+distribution other than the uniform one:
 
 ```{python}
 import random, math
@@ -24572,12 +24775,17 @@ import random, math
 rng = random.Random(0)
 
 schema = pb.Schema(
-    sensor_value=pb.float_field(min_val=-10.0, max_val=10.0, dtype="Float32"),
+    sensor_value=pb.float_field(min_val=-10.0, max_val=10.0),
     log_value=pb.float_field(generator=lambda: math.log(rng.uniform(1, 1000))),
 )
 
 pb.preview(pb.generate_dataset(schema, n=20, seed=23))
 ```
+
+The `log_value` column holds the logarithm of a uniform value between 1 and 1000, so its
+values lie between 0 and about 6.9 and are bunched toward the top of that range. The
+generator has its own seeded `random.Random(0)`, since the `seed=` of `generate_dataset()`
+doesn't reach it.
 
 string_field(min_length: 'int | None' = None, max_length: 'int | None' = None, pattern: 'str | None' = None, preset: 'str | None' = None, allowed: 'list[str] | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'StringField'
 
@@ -24622,8 +24830,11 @@ unique
     Whether all values must be unique. Default is `False`. When `True`, the generator will
     retry until it produces `n` distinct values.
 generator
-    Custom callable that generates values. When provided, this overrides all other
-    constraints. The callable should take no arguments and return a single string value.
+    Custom callable that generates values. When provided, it's used instead of the other
+    constraints, while `unique=` and `nullable=` still apply. The callable should take no
+    arguments and return a single string value. It isn't controlled by the `seed=` of
+    `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+    data.
 
 Returns
 -------
@@ -24749,6 +24960,10 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=20, seed=55))
 ```
 
+Unlike the person and address presets, `"domain_name"` isn't coherent with `"company"`, so
+each domain is unrelated to the company in its row. The `industry_tag` values come from the
+`allowed=` list, also independently of the company.
+
 bool_field(p_true: 'float' = 0.5, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'BoolField'
 
 Create a boolean column specification for use in a schema.
@@ -24776,8 +24991,11 @@ unique
     only have 2 unique non-null values, so `n` must be `<= 2` when `unique=True` (or
     `<= 3` with `nullable=True`).
 generator
-    Custom callable that generates values. When provided, this overrides all other
-    constraints. The callable should take no arguments and return a single boolean value.
+    Custom callable that generates values. When provided, it's used instead of the other
+    constraints, while `unique=` and `nullable=` still apply. The callable should take no
+    arguments and return a single boolean value. It isn't controlled by the `seed=` of
+    `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+    data.
 
 Returns
 -------
@@ -24826,7 +25044,7 @@ Boolean fields can be combined with other field types in a realistic schema:
 
 ```{python}
 schema = pb.Schema(
-    user_id=pb.int_field(min_val=1, unique=True),
+    user_id=pb.int_field(min_val=1, max_val=9999, unique=True),
     name=pb.string_field(preset="name"),
     email_verified=pb.bool_field(p_true=0.9),
     is_admin=pb.bool_field(p_true=0.05),
@@ -24834,6 +25052,10 @@ schema = pb.Schema(
 
 pb.preview(pb.generate_dataset(schema, n=30, seed=10))
 ```
+
+Here, `email_verified` is `True` in 26 of the 30 rows and `is_admin` in 3 of them. These
+counts are close to, but not exactly, the `p_true=` values of `0.9` and `0.05`, since each
+value is drawn independently.
 
 date_field(min_date: 'str | date | None' = None, max_date: 'str | date | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'DateField'
 
@@ -24866,9 +25088,11 @@ unique
     retry until it produces `n` distinct dates. Ensure the date range is large enough to
     accommodate the requested number of unique dates.
 generator
-    Custom callable that generates values. When provided, this overrides all other
-    constraints. The callable should take no arguments and return a single `datetime.date`
-    value.
+    Custom callable that generates values. When provided, it's used instead of the other
+    constraints, while `unique=` and `nullable=` still apply. The callable should take no
+    arguments and return a single `datetime.date` value. It isn't controlled by the `seed=` of
+    `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+    data.
 
 Returns
 -------
@@ -24932,6 +25156,11 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=30, seed=7))
 ```
 
+All 30 `order_date` values are distinct, which is possible because the first quarter of 2024
+has 91 days to choose from. About half of the `cancel_date` values are missing (20 of 30 here).
+Each column is generated independently, so a few cancellation dates fall before the order
+date in the same row.
+
 datetime_field(min_date: 'str | datetime | None' = None, max_date: 'str | datetime | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'DatetimeField'
 
 Create a datetime column specification for use in a schema.
@@ -24965,9 +25194,11 @@ unique
     Whether all values must be unique. Default is `False`. With second-level resolution
     over a wide range, collisions are unlikely for moderate dataset sizes.
 generator
-    Custom callable that generates values. When provided, this overrides all other
-    constraints. The callable should take no arguments and return a single
-    `datetime.datetime` value.
+    Custom callable that generates values. When provided, it's used instead of the other
+    constraints, while `unique=` and `nullable=` still apply. The callable should take no
+    arguments and return a single `datetime.datetime` value. It isn't controlled by the `seed=`
+    of `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+    data.
 
 Returns
 -------
@@ -25035,6 +25266,10 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=30, seed=7))
 ```
 
+About 30% of the `shipped_at` values are missing (13 of 30 here). Since each column is
+generated independently, some `shipped_at` values come before `placed_at` in the same row, so
+these columns aren't suited for checks of date ordering without some extra processing.
+
 time_field(min_time: 'str | time | None' = None, max_time: 'str | time | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'TimeField'
 
 Create a time column specification for use in a schema.
@@ -25047,6 +25282,8 @@ values with `nullable=True` and `null_probability=`.
 Time values are generated uniformly (at second-level resolution) within the specified range.
 If no range is provided, the default range is 00:00:00 to 23:59:59. Both `min_time=` and
 `max_time=` accept `datetime.time` objects or ISO format time strings (e.g., `"09:30:00"`).
+The column that `generate_dataset()` creates currently holds the times as `"HH:MM:SS"` strings
+rather than as a time dtype.
 
 Parameters
 ----------
@@ -25065,8 +25302,11 @@ unique
     Whether all values must be unique. Default is `False`. With second-level resolution
     within a time range, uniqueness is feasible for moderate dataset sizes.
 generator
-    Custom callable that generates values. When provided, this overrides all other
-    constraints. The callable should take no arguments and return a single value.
+    Custom callable that generates values. When provided, it's used instead of the other
+    constraints, while `unique=` and `nullable=` still apply. The callable should take no
+    arguments and return a single value. It isn't controlled by the `seed=` of
+    `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+    data.
 
 Returns
 -------
@@ -25128,6 +25368,10 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=30, seed=7))
 ```
 
+Every `check_in` time falls in the morning window and every non-missing `check_out` time in the
+late afternoon or evening one, with 6 of the 30 `check_out` values missing. The `employee_id`
+values are distinct three-digit numbers.
+
 duration_field(min_duration: 'str | timedelta | None' = None, max_duration: 'str | timedelta | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'DurationField'
 
 Create a duration column specification for use in a schema.
@@ -25159,9 +25403,11 @@ unique
     Whether all values must be unique. Default is `False`. With second-level resolution
     within a duration range, uniqueness is feasible for moderate dataset sizes.
 generator
-    Custom callable that generates values. When provided, this overrides all other
-    constraints. The callable should take no arguments and return a single
-    `datetime.timedelta` value.
+    Custom callable that generates values. When provided, it's used instead of the other
+    constraints, while `unique=` and `nullable=` still apply. The callable should take no
+    arguments and return a single `datetime.timedelta` value. It isn't controlled by the `seed=`
+    of `generate_dataset()`, so it needs its own seeded random number generator for reproducible
+    data.
 
 Returns
 -------
@@ -25228,6 +25474,10 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=30, seed=7))
 ```
 
+The `time_spent` values range from one minute to eight hours, while the `overtime` column is
+missing in most rows (20 of 30 here, in line with the `null_probability=` of `0.6`). Both
+columns have a duration dtype, so they can take part in arithmetic with dates and datetimes.
+
 profile_fields(*, set: "Literal['minimal', 'standard', 'full']" = 'standard', split_name: 'bool' = True, include: 'list[str] | None' = None, exclude: 'list[str] | None' = None, prefix: 'str | None' = None) -> 'dict[str, StringField]'
 
 Create a dict of string field specifications representing a person profile.
@@ -25256,7 +25506,9 @@ exclude
     ignored.
 prefix
     Optional string to prepend to every column name. For example, `prefix="customer_"`
-    produces keys like `"customer_first_name"`, `"customer_email"`, etc.
+    produces keys like `"customer_first_name"`, `"customer_email"`, etc. The prefix doesn't
+    create a separate identity: all person-related columns in a schema currently share the
+    same person in each row.
 
 Returns
 -------
@@ -25313,18 +25565,22 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=50, seed=23, country="DE"))
 ```
 
-The `prefix=` parameter prepends a string to every column name, which is especially useful when
-a schema needs two independent profiles (e.g., a sender and a recipient). Each prefixed group
-maintains its own coherence:
+The `prefix=` parameter prepends a string to every column name, which helps when the profile
+columns sit alongside other columns in a schema:
 
 ```{python}
 schema = pb.Schema(
-    **pb.profile_fields(set="minimal", prefix="sender_"),
-    **pb.profile_fields(set="minimal", prefix="recipient_"),
+    **pb.profile_fields(set="minimal", prefix="customer_"),
+    order_total=pb.float_field(min_val=5.0, max_val=500.0, precision=2),
 )
 
 pb.preview(pb.generate_dataset(schema, n=50, seed=23))
 ```
+
+The prefix changes only the column names, so the emails are still derived from the names in
+each row. All person-related columns in a schema share one identity per row, so two prefixed
+profiles (e.g., `"sender_"` and `"recipient_"`) currently get the same names rather than two
+independent people.
 
 
 ## Prebuilt Actions

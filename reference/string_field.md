@@ -4,7 +4,7 @@ Create a string column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L809-L999)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L826-L1023)
 
 ``` python
 string_field(
@@ -51,7 +51,7 @@ Probability of generating a null value for each row when `nullable=True`. Must b
 Whether all values must be unique. Default is `False`. When `True`, the generator will retry until it produces `n` distinct values.
 
 `generator: Callable[[], Any] | None = None`  
-Custom callable that generates values. When provided, this overrides all other constraints. The callable should take no arguments and return a single string value.
+Custom callable that generates values. When provided, it's used instead of the other constraints, while `unique=` and `nullable=` still apply. The callable should take no arguments and return a single string value. It isn't controlled by the `seed=` of [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset), so it needs its own seeded random number generator for reproducible data.
 
 ## Returns
 
@@ -204,3 +204,5 @@ pb.preview(pb.generate_dataset(schema, n=20, seed=55))
 | 18 | National Systems | who.net | tech |
 | 19 | Adobe | then.cloud | finance |
 | 20 | Apex Industries Enterprises | now.us | tech |
+
+Unlike the person and address presets, `"domain_name"` isn't coherent with `"company"`, so each domain is unrelated to the company in its row. The `industry_tag` values come from the `allowed=` list, also independently of the company.

@@ -4,7 +4,7 @@ Create a Schema from an existing table with inferred Field constraints.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1584-L1651)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1588-L1665)
 
 ``` python
 schema_from_tbl(
@@ -64,7 +64,9 @@ print(schema)
       age: IntField(dtype='Int64', nullable=False, null_probability=0.0, unique=True, min_val=20, max_val=69, allowed=None)
       status: StringField(dtype='String', nullable=False, null_probability=0.0, unique=False, min_length=None, max_length=None, pattern=None, preset=None, allowed=['active', 'inactive', 'pending'])
 
-Generate synthetic data matching the original's characteristics:
+The inferred schema has a field for each column. The `user_id` and `age` fields take their ranges from the data and are marked unique (every value in those columns is distinct), the `email` column is matched to the `"email"` preset by its name and values, and `status` has few enough distinct values to become a categorical field with an `allowed=` list.
+
+Let's generate synthetic data matching the original's characteristics:
 
 ``` python
 pb.preview(schema.generate(n=10, seed=23))
@@ -83,3 +85,5 @@ pb.preview(schema.generate(n=10, seed=23))
 | 8 | 25 | vwalker@gmail.com | 44 | pending |
 | 9 | 34 | brenda.lopez@zoho.com | 53 | inactive |
 | 10 | 23 | laurendavis@aol.com | 42 | active |
+
+The new rows follow the inferred constraints: the IDs lie between 1 and 50, the ages between 20 and 69, and every `status` is one of the three original values. The emails are new, realistic addresses from the preset rather than copies of the original `user{i}@example.com` values.

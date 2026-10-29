@@ -4,7 +4,7 @@ Are column data increasing by row?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9779-L10016)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9837-L10078)
 
 ``` python
 Validate.col_vals_increasing(
@@ -147,3 +147,5 @@ validation
 ```
 
 [TABLE]
+
+With `allow_stationary=True`, the repeated `2` counts as a passing value, so all six test units pass. Column `c`, where the value drops from `2` to `1`, would still fail with this setting; only the `decreasing_tol=` parameter can allow drops like that.

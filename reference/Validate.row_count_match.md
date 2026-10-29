@@ -4,7 +4,7 @@ Validate whether the row count of the table matches a specified count.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14370-L14600)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14443-L14692)
 
 ``` python
 Validate.row_count_match(
@@ -30,7 +30,7 @@ We also have the option to invert the validation step by setting `inverse=True`.
 The expected row count of the table. This can be an integer value, a Polars or Pandas DataFrame object, or an Ibis backend table. If a DataFrame/table is provided, the row count of that object will be used as the expected count.
 
 `tol: Tolerance = 0`  
-The tolerance allowable for the row count match. This can be specified as a single numeric value (integer or float) or as a tuple of two integers representing the lower and upper bounds of the tolerance range. If a single integer value (greater than 1) is provided, it represents the absolute bounds of the tolerance, ie. plus or minus the value. If a float value (between 0-1) is provided, it represents the relative tolerance, ie. plus or minus the relative percentage of the target. If a tuple is provided, it represents the lower and upper absolute bounds of the tolerance range. See the examples for more.
+The tolerance allowable for the row count match. This can be specified as a single numeric value (integer or float) or as a tuple of two integers representing the lower and upper bounds of the tolerance range. If a single integer value (`1` or greater) is provided, it represents the absolute bounds of the tolerance, ie. plus or minus the value. If a float value (between 0-1) is provided, it represents the relative tolerance, ie. plus or minus the relative percentage of the target. If a tuple is provided, it represents the lower and upper absolute bounds of the tolerance range. See the examples for more.
 
 `inverse: bool = False`  
 Should the validation step be inverted? If `True`, then the expectation is that the row count of the target table should not match the specified `count=` value.
@@ -123,28 +123,14 @@ validation
 
 The validation table shows that the expectation value of `13` matches the actual count of rows in the target table. So, the single test unit passed.
 
-Let's modify our example to show the different ways we can allow some tolerance to our validation by using the `tol` argument.
+The `tol=` argument allows the row count to differ from `count=` by some amount. A tuple sets separate lower and upper bounds, so here `tol=(2, 0)` accepts anywhere from 11 to 13 rows. A sample of 12 rows from the table passes:
 
 ``` python
-smaller_small_table = small_table.sample(n = 12) # within the lower bound
-validation = (
-    pb.Validate(data=smaller_small_table)
-    .row_count_match(count=13,tol=(2, 0)) # minus 2 but plus 0, ie. 11-13
-    .interrogate()
-)
-
-validation
+smaller_small_table = small_table.sample(n=12)
 
 validation = (
     pb.Validate(data=smaller_small_table)
-    .row_count_match(count=13,tol=.05) # .05% tolerance of 13
-    .interrogate()
-)
-
-even_smaller_table = small_table.sample(n = 2)
-validation = (
-    pb.Validate(data=even_smaller_table)
-    .row_count_match(count=13,tol=5) # plus or minus 5; this test will fail
+    .row_count_match(count=13, tol=(2, 0))
     .interrogate()
 )
 
@@ -152,3 +138,35 @@ validation
 ```
 
 [TABLE]
+
+A float between `0` and `1` is a relative tolerance: `tol=0.1` allows a difference of 10% of `13`, which is rounded down to one row. So the 12-row sample passes again:
+
+``` python
+validation = (
+    pb.Validate(data=smaller_small_table)
+    .row_count_match(count=13, tol=0.1)
+    .interrogate()
+)
+
+validation
+```
+
+[TABLE]
+
+A smaller relative tolerance such as `tol=0.05` would make this step fail, since 5% of `13` rounds down to zero rows. An integer of `1` or more is an absolute tolerance in both directions. With `tol=5`, the row count can be anywhere from 8 to 18, so a two-row table fails:
+
+``` python
+even_smaller_table = small_table.sample(n=2)
+
+validation = (
+    pb.Validate(data=even_smaller_table)
+    .row_count_match(count=13, tol=5)
+    .interrogate()
+)
+
+validation
+```
+
+[TABLE]
+
+The single test unit fails because two rows is well outside the range of 8 to 18. When a table should be about the same size as another table, `count=` can also take that table directly and use its row count as the expected value.

@@ -4,7 +4,7 @@ Validate whether the length of string values falls within specified bounds.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11364-L11569)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11430-L11638)
 
 ``` python
 Validate.col_vals_str_len(
@@ -126,3 +126,5 @@ validation
 ```
 
 [TABLE]
+
+Without an upper bound, the long string now passes, but `"ok"` fails because its two characters fall short of `min_val=3`. So there's again one failing test unit out of four.

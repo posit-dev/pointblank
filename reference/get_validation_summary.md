@@ -4,7 +4,7 @@ Access validation summary information when authoring final actions.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L292-L406)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L292-L425)
 
 ``` python
 get_validation_summary()
@@ -50,7 +50,7 @@ Note that the summary dictionary is only available within the context of a final
 
 ## Examples
 
-Final actions are executed after the completion of all validation steps. They provide an opportunity to take appropriate actions based on the overall validation results. Here's an example of a final action function (`send_report()`) that sends an alert when critical validation failures are detected:
+Final actions are executed after the completion of all validation steps. They provide an opportunity to take appropriate actions based on the overall validation results. Here's an example of a final action function (`send_report()`) that sends an alert when critical validation failures are detected. To keep the example self-contained, the alert is printed; in practice, this is where you'd send an email or post a message to a chat service:
 
 ``` python
 import pointblank as pb
@@ -58,23 +58,26 @@ import pointblank as pb
 def send_report():
     summary = pb.get_validation_summary()
     if summary["highest_severity"] == "critical":
-        # Send an alert email
-        send_alert_email(
-            subject=f"CRITICAL validation failures in {summary['tbl_name']}",
-            body=f"{summary['n_critical_steps']} steps failed with critical severity."
-        )
+        print(f"CRITICAL validation failures in {summary['tbl_name']}")
+        print(f"Steps with critical severity: {summary['n_critical_steps']}")
 
 validation = (
     pb.Validate(
-        data=my_data,
-        final_actions=pb.FinalActions(send_report)
+        data=pb.load_dataset("small_table"),
+        tbl_name="small_table",
+        thresholds=(1, 2, 3),
+        final_actions=pb.FinalActions(send_report),
     )
-    .col_vals_gt(columns="revenue", value=0)
+    .col_vals_gt(columns="d", value=1000)
+    .col_vals_not_null(columns="c")
     .interrogate()
 )
 ```
 
-Note that `send_alert_email()` in the example above is a placeholder function that would be implemented by the user to send email alerts. This function is not provided by the Pointblank package.
+    CRITICAL validation failures in small_table
+    Steps with critical severity: 1
+
+The first step has six failing test units, which reaches the 'critical' threshold of three, so the alert was printed during [interrogate()](../reference/Validate.interrogate.md#pointblank.Validate.interrogate). The second step's two missing values only reach the 'error' threshold. Outside of a final action, [get_validation_summary()](../reference/get_validation_summary.md#pointblank.get_validation_summary) returns `None`.
 
 The [get_validation_summary()](../reference/get_validation_summary.md#pointblank.get_validation_summary) function can also be used to create custom reporting for validation results:
 
@@ -91,11 +94,30 @@ def log_validation_results():
         f"{summary['n_critical_steps']} critical"
     )
 
-    if summary['highest_severity'] in ["error", "critical"]:
-        print("⚠️ Action required: Please review failing validation steps!")
+    if summary["highest_severity"] in ["error", "critical"]:
+        print("Action required: Please review failing validation steps!")
+
+validation = (
+    pb.Validate(
+        data=pb.load_dataset("small_table"),
+        tbl_name="small_table",
+        thresholds=(1, 2, 3),
+        final_actions=pb.FinalActions(log_validation_results),
+    )
+    .col_vals_gt(columns="d", value=100)
+    .col_vals_not_null(columns="c")
+    .col_vals_le(columns="a", value=7)
+    .interrogate()
+)
 ```
 
-Final actions work well with both simple logging and more complex notification systems, allowing you to integrate validation results into your broader data quality workflows.
+    Validation completed with status: ERROR
+    Steps: 3 total
+      - 1 passing, 2 failing
+      - Severity: 2 warnings, 1 errors, 0 critical
+    Action required: Please review failing validation steps!
+
+The first step passes, the second step's two missing values reach the 'error' threshold, and the third step's single failure reaches the 'warning' threshold. A step that reaches a higher threshold also counts toward the lower ones, which is why the severity counts can add up to more than the number of failing steps. Final actions work well with both simple logging and more complex notification systems, allowing you to integrate validation results into your broader data quality workflows.
 
 ## See Also
 

@@ -1682,7 +1682,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L292-L406" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L292-L425" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_validation_summary</span>()</span></code></pre></div>
@@ -1734,43 +1734,71 @@ A dictionary containing validation metrics. If called outside of an final action
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Final actions are executed after the completion of all validation steps. They provide an opportunity to take appropriate actions based on the overall validation results. Here’s an example of a final action function (<code>send_report()</code>) that sends an alert when critical validation failures are detected:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<p>Final actions are executed after the completion of all validation steps. They provide an opportunity to take appropriate actions based on the overall validation results. Here’s an example of a final action function (<code>send_report()</code>) that sends an alert when critical validation failures are detected. To keep the example self-contained, the alert is printed; in practice, this is where you’d send an email or post a message to a chat service:</p>
+<div id="d1b37794" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> send_report():</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> summary[<span class="st">"highest_severity"</span>] <span class="op">==</span> <span class="st">"critical"</span>:</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Send an alert email</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        send_alert_email(</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            subject<span class="op">=</span><span class="ss">f"CRITICAL validation failures in </span><span class="sc">{</span>summary[<span class="st">'tbl_name'</span>]<span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>            body<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>summary[<span class="st">'n_critical_steps'</span>]<span class="sc">}</span><span class="ss"> steps failed with critical severity."</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>my_data,</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        final_actions<span class="op">=</span>pb.FinalActions(send_report)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"revenue"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"CRITICAL validation failures in </span><span class="sc">{</span>summary[<span class="st">'tbl_name'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Steps with critical severity: </span><span class="sc">{</span>summary[<span class="st">'n_critical_steps'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"small_table"</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>),</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        final_actions<span class="op">=</span>pb.FinalActions(send_report),</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"c"</span>)</span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>Note that <code>send_alert_email()</code> in the example above is a placeholder function that would be implemented by the user to send email alerts. This function is not provided by the Pointblank package.</p>
+<div class="cell-output cell-output-stdout">
+<pre><code>CRITICAL validation failures in small_table
+Steps with critical severity: 1</code></pre>
+</div>
+</div>
+<p>The first step has six failing test units, which reaches the ‘critical’ threshold of three, so the alert was printed during <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a>. The second step’s two missing values only reach the ‘error’ threshold. Outside of a final action, <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link gdls-code">get_validation_summary()</a> returns <code>None</code>.</p>
 <p>The <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link gdls-code">get_validation_summary()</a> function can also be used to create custom reporting for validation results:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_validation_results():</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Validation completed with status: </span><span class="sc">{</span>summary[<span class="st">'highest_severity'</span>]<span class="sc">.</span>upper()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Steps: </span><span class="sc">{</span>summary[<span class="st">'n_steps'</span>]<span class="sc">}</span><span class="ss"> total"</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  - </span><span class="sc">{</span>summary[<span class="st">'n_passing_steps'</span>]<span class="sc">}</span><span class="ss"> passing, </span><span class="sc">{</span>summary[<span class="st">'n_failing_steps'</span>]<span class="sc">}</span><span class="ss"> failing"</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"  - Severity: </span><span class="sc">{</span>summary[<span class="st">'n_warning_steps'</span>]<span class="sc">}</span><span class="ss"> warnings, "</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span>summary[<span class="st">'n_error_steps'</span>]<span class="sc">}</span><span class="ss"> errors, "</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span>summary[<span class="st">'n_critical_steps'</span>]<span class="sc">}</span><span class="ss"> critical"</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> summary[<span class="st">'highest_severity'</span>] <span class="kw">in</span> [<span class="st">"error"</span>, <span class="st">"critical"</span>]:</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"⚠️ Action required: Please review failing validation steps!"</span>)</span></code></pre></div>
-<p>Final actions work well with both simple logging and more complex notification systems, allowing you to integrate validation results into your broader data quality workflows.</p>
+<div id="f5e637ee" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_validation_results():</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Validation completed with status: </span><span class="sc">{</span>summary[<span class="st">'highest_severity'</span>]<span class="sc">.</span>upper()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Steps: </span><span class="sc">{</span>summary[<span class="st">'n_steps'</span>]<span class="sc">}</span><span class="ss"> total"</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  - </span><span class="sc">{</span>summary[<span class="st">'n_passing_steps'</span>]<span class="sc">}</span><span class="ss"> passing, </span><span class="sc">{</span>summary[<span class="st">'n_failing_steps'</span>]<span class="sc">}</span><span class="ss"> failing"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"  - Severity: </span><span class="sc">{</span>summary[<span class="st">'n_warning_steps'</span>]<span class="sc">}</span><span class="ss"> warnings, "</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span>summary[<span class="st">'n_error_steps'</span>]<span class="sc">}</span><span class="ss"> errors, "</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span>summary[<span class="st">'n_critical_steps'</span>]<span class="sc">}</span><span class="ss"> critical"</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> summary[<span class="st">"highest_severity"</span>] <span class="kw">in</span> [<span class="st">"error"</span>, <span class="st">"critical"</span>]:</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Action required: Please review failing validation steps!"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>),</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"small_table"</span>,</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>),</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        final_actions<span class="op">=</span>pb.FinalActions(log_validation_results),</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"c"</span>)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    .col_vals_le(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Validation completed with status: ERROR
+Steps: 3 total
+  - 1 passing, 2 failing
+  - Severity: 2 warnings, 1 errors, 0 critical
+Action required: Please review failing validation steps!</code></pre>
+</div>
+</div>
+<p>The first step passes, the second step’s two missing values reach the ‘error’ threshold, and the third step’s single failure reaches the ‘warning’ threshold. A step that reaches a higher threshold also counts toward the lower ones, which is why the severity counts can add up to more than the number of failing steps. Final actions work well with both simple logging and more complex notification systems, allowing you to integrate validation results into your broader data quality workflows.</p>
 </section>
 <section id="see-also" class="level2 doc-see-also">
 <h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>

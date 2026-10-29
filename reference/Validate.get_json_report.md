@@ -4,7 +4,7 @@ Get a report of the validation results as a JSON-formatted string.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20688-L20862)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20823-L21002)
 
 ``` python
 Validate.get_json_report(
@@ -108,8 +108,8 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-29T13:36:46.034+00:00",
-            "proc_duration_s": 0.002331
+            "time_processed": "2026-10-29T18:38:23.039+00:00",
+            "proc_duration_s": 0.003352
         },
         {
             "i": 2,
@@ -135,10 +135,12 @@ print(json_report)
             "warning": null,
             "error": null,
             "critical": null,
-            "time_processed": "2026-10-29T13:36:46.036+00:00",
-            "proc_duration_s": 0.001379
+            "time_processed": "2026-10-29T18:38:23.041+00:00",
+            "proc_duration_s": 0.001848
         }
     ]
+
+The report is a JSON array with one object per validation step. Each object holds the step's settings (such as the column, the comparison value and any thresholds) along with its results (the test unit counts and fractions, and whether each threshold was reached).
 
 You can also customize which fields to include:
 
@@ -167,7 +169,7 @@ print(json_report)
         }
     ]
 
-Or which fields to exclude:
+Now each step object has just the five requested fields. Or we can choose which fields to exclude:
 
 ``` python
 json_report = validation.get_json_report(

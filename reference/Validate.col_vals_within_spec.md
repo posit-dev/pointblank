@@ -4,7 +4,7 @@ Validate whether column values fit within a specification.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11056-L11362)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11122-L11428)
 
 ``` python
 Validate.col_vals_within_spec(

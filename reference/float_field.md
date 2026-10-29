@@ -4,7 +4,7 @@ Create a floating-point column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L530-L674)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L538-L691)
 
 ``` python
 float_field(
@@ -20,7 +20,7 @@ float_field(
 )
 ```
 
-The [float_field()](../reference/float_field.md#pointblank.float_field) function defines the constraints and behavior for a floating-point column when generating synthetic data with [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset). You can control the range of values with `min_val=` and `max_val=`, restrict values to a specific set with `allowed=`, enforce uniqueness with `unique=True`, and introduce null values with `nullable=True` and `null_probability=`. The `dtype=` parameter lets you choose between `"Float32"` and `"Float64"` precision.
+The [float_field()](../reference/float_field.md#pointblank.float_field) function defines the constraints and behavior for a floating-point column when generating synthetic data with [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset). You can control the range of values with `min_val=` and `max_val=`, restrict values to a specific set with `allowed=`, enforce uniqueness with `unique=True`, and introduce null values with `nullable=True` and `null_probability=`. The `dtype=` parameter sets the float type in the schema (`"Float32"` or `"Float64"`).
 
 When both `min_val=` and `max_val=` are provided, values are drawn from a uniform distribution across that range. If neither is specified, values are drawn uniformly from a large default range. If `allowed=` is provided, values are sampled from that specific list.
 
@@ -48,10 +48,10 @@ Probability of generating a null value for each row when `nullable=True`. Must b
 Whether all values must be unique. Default is `False`. When `True`, the generator will retry until it produces `n` distinct values.
 
 `generator: Callable[[], Any] | None = None`  
-Custom callable that generates values. When provided, this overrides all other constraints. The callable should take no arguments and return a single float value.
+Custom callable that generates values. When provided, it's used instead of `min_val=`, `max_val=`, `allowed=` and `precision=`, while `unique=` and `nullable=` still apply. The callable should take no arguments and return a single float value. It isn't controlled by the `seed=` of [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset), so it needs its own seeded random number generator for reproducible data.
 
 `dtype: str = "Float64"`  
-Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`.
+Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`. The column that [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset) creates is currently always `Float64`.
 
 ## Returns
 
@@ -172,7 +172,7 @@ pb.preview(pb.generate_dataset(schema, n=20, seed=23))
 | 19                   | 72.44           | 35.9            | 0.359                 |
 | 20                   | 12.45           | 5.8             | 0.0576                |
 
-Setting `dtype="Float32"` gives reduced precision, and a custom `generator=` provides full control over value generation:
+A custom `generator=` provides full control over value generation, such as values from a distribution other than the uniform one:
 
 ``` python
 import random, math
@@ -180,7 +180,7 @@ import random, math
 rng = random.Random(0)
 
 schema = pb.Schema(
-    sensor_value=pb.float_field(min_val=-10.0, max_val=10.0, dtype="Float32"),
+    sensor_value=pb.float_field(min_val=-10.0, max_val=10.0),
     log_value=pb.float_field(generator=lambda: math.log(rng.uniform(1, 1000))),
 )
 
@@ -200,3 +200,5 @@ pb.preview(pb.generate_dataset(schema, n=20, seed=23))
 | 18                   | 4.684181575669911      | 6.890408378292458   |
 | 19                   | -2.8200728042760055    | 6.697536613756536   |
 | 20                   | -8.848909407015631     | 6.804906921310479   |
+
+The `log_value` column holds the logarithm of a uniform value between 1 and 1000, so its values lie between 0 and about 6.9 and are bunched toward the top of that range. The generator has its own seeded `random.Random(0)`, since the `seed=` of [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset) doesn't reach it.

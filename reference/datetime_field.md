@@ -4,7 +4,7 @@ Create a datetime column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1476-L1593)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1514-L1637)
 
 ``` python
 datetime_field(
@@ -39,7 +39,7 @@ Probability of generating a null value for each row when `nullable=True`. Must b
 Whether all values must be unique. Default is `False`. With second-level resolution over a wide range, collisions are unlikely for moderate dataset sizes.
 
 `generator: Callable[[], Any] | None = None`  
-Custom callable that generates values. When provided, this overrides all other constraints. The callable should take no arguments and return a single `datetime.datetime` value.
+Custom callable that generates values. When provided, it's used instead of the other constraints, while `unique=` and `nullable=` still apply. The callable should take no arguments and return a single `datetime.datetime` value. It isn't controlled by the `seed=` of [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset), so it needs its own seeded random number generator for reproducible data.
 
 ## Returns
 
@@ -146,3 +146,5 @@ pb.preview(pb.generate_dataset(schema, n=30, seed=7))
 | 28 | 3181 | 2024-02-18 01:55:04 | 2024-08-08 14:24:37 |
 | 29 | 5744 | 2024-03-27 16:44:16 | 2024-02-19 01:55:04 |
 | 30 | 7867 | 2024-09-01 21:51:34 | 2025-01-03 22:52:16 |
+
+About 30% of the `shipped_at` values are missing (13 of 30 here). Since each column is generated independently, some `shipped_at` values come before `placed_at` in the same row, so these columns aren't suited for checks of date ordering without some extra processing.

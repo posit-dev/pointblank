@@ -1685,7 +1685,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1476-L1593" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1514-L1637" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">datetime_field</span>(</span>
@@ -1727,7 +1727,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">generator</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable[[], Any] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-Custom callable that generates values. When provided, this overrides all other constraints. The callable should take no arguments and return a single <code>datetime.datetime</code> value.
+Custom callable that generates values. When provided, it’s used instead of the other constraints, while <code>unique=</code> and <code>nullable=</code> still apply. The callable should take no arguments and return a single <code>datetime.datetime</code> value. It isn’t controlled by the <code>seed=</code> of <a href="../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a>, so it needs its own seeded random number generator for reproducible data.
 </dd>
 </dl>
 </div>
@@ -1757,7 +1757,7 @@ If <code>min_date</code> is later than <code>max_date</code>, or if a datetime s
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>The <code>min_date=</code> and <code>max_date=</code> parameters accept <code>datetime</code> objects for precise range definitions:</p>
-<div id="6230c87f" class="cell" data-execution_count="1">
+<div id="dd308a4c" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1916,7 +1916,7 @@ If <code>min_date</code> is later than <code>max_date</code>, or if a datetime s
 </div>
 </div>
 <p>For a quick setup, ISO format strings work just as well:</p>
-<div id="38253eaf" class="cell" data-execution_count="2">
+<div id="ffb4ae83" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    event_time<span class="op">=</span>pb.datetime_field(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        min_date<span class="op">=</span><span class="st">"2024-03-01T08:00:00"</span>,</span>
@@ -2056,7 +2056,7 @@ If <code>min_date</code> is later than <code>max_date</code>, or if a datetime s
 </div>
 </div>
 <p>Optional timestamps can be simulated with <code>nullable=True</code>, and datetime fields work nicely alongside other field types:</p>
-<div id="ba76ed1b" class="cell" data-execution_count="3">
+<div id="44213159" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    order_id<span class="op">=</span>pb.int_field(min_val<span class="op">=</span><span class="dv">1000</span>, max_val<span class="op">=</span><span class="dv">9999</span>, unique<span class="op">=</span><span class="va">True</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    placed_at<span class="op">=</span>pb.datetime_field(</span>
@@ -2225,6 +2225,7 @@ If <code>min_date</code> is later than <code>max_date</code>, or if a datetime s
 </div>
 </div>
 </div>
+<p>About 30% of the <code>shipped_at</code> values are missing (13 of 30 here). Since each column is generated independently, some <code>shipped_at</code> values come before <code>placed_at</code> in the same row, so these columns aren’t suited for checks of date ordering without some extra processing.</p>
 
 
 </section>

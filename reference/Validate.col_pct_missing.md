@@ -4,7 +4,7 @@ Validate that the percentage of *structured* missing values stays within a limit
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12321-L12527)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12390-L12600)
 
 ``` python
 Validate.col_pct_missing(
@@ -107,3 +107,5 @@ validation
 ```
 
 [TABLE]
+
+Both steps pass. Three of the eight values are missing codes, so the overall missing share of 37.5% is within `max_pct=0.5`. The `reason="refused"` step counts only the two `-98` values, and their share of 25% is within `max_pct=0.30`.

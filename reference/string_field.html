@@ -1687,7 +1687,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L809-L999" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L826-L1023" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">string_field</span>(</span>
@@ -1744,7 +1744,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">generator</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable[[], Any] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-Custom callable that generates values. When provided, this overrides all other constraints. The callable should take no arguments and return a single string value.
+Custom callable that generates values. When provided, it’s used instead of the other constraints, while <code>unique=</code> and <code>nullable=</code> still apply. The callable should take no arguments and return a single string value. It isn’t controlled by the <code>seed=</code> of <a href="../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a>, so it needs its own seeded random number generator for reproducible data.
 </dd>
 </dl>
 </div>
@@ -1797,7 +1797,7 @@ If more than one of <code>preset=</code>, <code>pattern=</code>, or <code>allowe
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>The <code>preset=</code> parameter generates realistic personal data, while <code>allowed=</code> restricts values to a categorical set:</p>
-<div id="77fa61db" class="cell" data-execution_count="1">
+<div id="b9dfddd0" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -1962,7 +1962,7 @@ If more than one of <code>preset=</code>, <code>pattern=</code>, or <code>allowe
 </div>
 </div>
 <p>We can also generate strings that match a regular expression with <code>pattern=</code> (e.g., product codes, identifiers):</p>
-<div id="e8c1452c" class="cell" data-execution_count="2">
+<div id="1e46e25e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    product_code<span class="op">=</span>pb.string_field(pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[A-Z]</span><span class="op">{3}</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{4}</span><span class="vs">"</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    batch_id<span class="op">=</span>pb.string_field(pattern<span class="op">=</span><span class="vs">r"BATCH-</span><span class="pp">[A-Z][0-9]</span><span class="op">{3}</span><span class="vs">"</span>),</span>
@@ -2125,7 +2125,7 @@ If more than one of <code>preset=</code>, <code>pattern=</code>, or <code>allowe
 </div>
 </div>
 <p>For random alphanumeric strings, <code>min_length=</code> and <code>max_length=</code> control the length. Adding <code>nullable=True</code> introduces missing values:</p>
-<div id="22a0c94b" class="cell" data-execution_count="3">
+<div id="6c85446b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    short_code<span class="op">=</span>pb.string_field(min_length<span class="op">=</span><span class="dv">3</span>, max_length<span class="op">=</span><span class="dv">5</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    notes<span class="op">=</span>pb.string_field(</span>
@@ -2278,7 +2278,7 @@ If more than one of <code>preset=</code>, <code>pattern=</code>, or <code>allowe
 </div>
 </div>
 <p>It’s possible to combine business and internet presets to build a company directory:</p>
-<div id="71b481e0" class="cell" data-execution_count="4">
+<div id="adcf6ccf" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    company<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"company"</span>),</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    domain<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"domain_name"</span>),</span>
@@ -2440,6 +2440,7 @@ If more than one of <code>preset=</code>, <code>pattern=</code>, or <code>allowe
 </div>
 </div>
 </div>
+<p>Unlike the person and address presets, <code>"domain_name"</code> isn’t coherent with <code>"company"</code>, so each domain is unrelated to the company in its row. The <code>industry_tag</code> values come from the <code>allowed=</code> list, also independently of the company.</p>
 
 
 </section>

@@ -1687,7 +1687,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14602-L14976" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14694-L15095" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">data_freshness</span>(</span>
@@ -1837,7 +1837,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>The simplest use of <code>data_freshness()</code> requires just two arguments: the <code>column=</code> containing your timestamps and <code>max_age=</code> specifying how old the data can be. In this first example, we create sample data with an <code>"updated_at"</code> column containing timestamps from 1, 12, and 20 hours ago. By setting <code>max_age="24 hours"</code>, we’re asserting that the most recent timestamp should be within 24 hours of the current time. Since the newest record is only 1 hour old, this validation passes.</p>
-<div id="3b7f706f" class="cell" data-execution_count="2">
+<div id="9d681f81" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime, timedelta</span>
@@ -2010,14 +2010,14 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </tbody>
 <tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
 <strong>Notes</strong>
-<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-10-29 08:36:23</code> (age: <strong>1.0h</strong>, max allowed: 1d)</p></span></td></tr></tfoot>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-10-29 13:38:00</code> (age: <strong>1.0h</strong>, max allowed: 1d)</p></span></td></tr></tfoot>
 </table>
 
 </div>
 </div>
 </div>
 <p>The <code>max_age=</code> parameter accepts human-readable strings with various time units. You can chain multiple <code>data_freshness()</code> calls to check different freshness thresholds simultaneously—useful for tiered SLAs where you might want warnings at 30 minutes but errors at 2 days.</p>
-<div id="e6b2ac0a" class="cell" data-execution_count="3">
+<div id="0d329ba3" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check data is fresh within different time windows</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>recent_data)</span>
@@ -2267,16 +2267,17 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </tbody>
 <tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
 <strong>Notes</strong>
-<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✗ Most recent data: <code>2026-10-29 08:36:23</code> (age: <strong>1.0h</strong>, max allowed: 30.0m)</p>
-<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 2</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-10-29 08:36:23</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p>
-<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 3</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-10-29 08:36:23</code> (age: <strong>1.0h</strong>, max allowed: 1w)</p></span></td></tr></tfoot>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✗ Most recent data: <code>2026-10-29 13:38:00</code> (age: <strong>1.0h</strong>, max allowed: 30.0m)</p>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 2</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-10-29 13:38:00</code> (age: <strong>1.0h</strong>, max allowed: 2d)</p>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 3</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-10-29 13:38:00</code> (age: <strong>1.0h</strong>, max allowed: 1w)</p></span></td></tr></tfoot>
 </table>
 
 </div>
 </div>
 </div>
+<p>Only the first step fails: the newest record is an hour old, which is older than 30 minutes but well within 2 days and 1 week. Each step has a single test unit, so these tiers show up as separate rows in the report.</p>
 <p>When your data contains naive datetimes (timestamps without timezone information), use the <code>timezone=</code> parameter to specify what timezone those values represent. Here we have event data recorded in Eastern Time, so we set <code>timezone="America/New_York"</code> to ensure the freshness comparison is done correctly.</p>
-<div id="561a1e7d" class="cell" data-execution_count="4">
+<div id="24609581" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data with naive datetimes (assume they're in Eastern Time)</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>eastern_data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"event_time"</span>: [</span>
@@ -2448,25 +2449,40 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
 <strong>Notes</strong>
 <p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(tz_warning)</span> ⚠️ Column has naive datetimes but reference time is timezone-aware. Naive datetimes are being treated as if they're in the reference timezone.</p>
-<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #999999;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-10-29 07:36:23</code> (age: <strong>2.0h</strong>, max allowed: 12.0h)</p></span></td></tr></tfoot>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #999999;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-10-29 12:38:00</code> (age: <strong>2.0h</strong>, max allowed: 12.0h)</p></span></td></tr></tfoot>
 </table>
 
 </div>
 </div>
 </div>
+<p>The step passes here. Note that <code>datetime.now()</code> gives the local time of the machine running the code, so the age computed for this example depends on how far that machine’s time zone is from Eastern Time. With real data, <code>timezone=</code> should name the time zone in which the timestamps were recorded.</p>
 <p>For reproducible validations or historical checks, you can use <code>reference_time=</code> to compare against a specific point in time instead of the current time. This is particularly useful for testing or when validating data snapshots. The reference time should include a timezone offset (like <code>+00:00</code> for UTC) to avoid ambiguity.</p>
-<div id="5e977437" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>recent_data)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    .data_freshness(</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        column<span class="op">=</span><span class="st">"updated_at"</span>,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        max_age<span class="op">=</span><span class="st">"24 hours"</span>,</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        reference_time<span class="op">=</span><span class="st">"2024-01-15T12:00:00+00:00"</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
+<div id="f2399934" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>snapshot_data <span class="op">=</span> pl.DataFrame({</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"updated_at"</span>: [</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        datetime(<span class="dv">2024</span>, <span class="dv">1</span>, <span class="dv">15</span>, <span class="dv">10</span>, <span class="dv">0</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        datetime(<span class="dv">2024</span>, <span class="dv">1</span>, <span class="dv">14</span>, <span class="dv">22</span>, <span class="dv">0</span>),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        datetime(<span class="dv">2024</span>, <span class="dv">1</span>, <span class="dv">13</span>, <span class="dv">9</span>, <span class="dv">0</span>),</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>snapshot_data)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    .data_freshness(</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        column<span class="op">=</span><span class="st">"updated_at"</span>,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        max_age<span class="op">=</span><span class="st">"24 hours"</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        reference_time<span class="op">=</span><span class="st">"2024-01-15T12:00:00+00:00"</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    .data_freshness(</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        column<span class="op">=</span><span class="st">"updated_at"</span>,</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        max_age<span class="op">=</span><span class="st">"1 hour"</span>,</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        reference_time<span class="op">=</span><span class="st">"2024-01-15T12:00:00+00:00"</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -2615,16 +2631,63 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
     <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
   </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">2</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>data_freshness</title>
+    <g id="pb_tbl-type_upd-1-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-1-data_freshness" transform="translate(1.500000, 1.500000)">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="pb_tbl-type_upd-1-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+            <circle id="pb_tbl-type_upd-1-clock-face" stroke="#000000" stroke-width="2" cx="32" cy="32" r="20"></circle>
+            <line x1="32" y1="32" x2="32" y2="17.2394543" id="pb_tbl-type_upd-1-hour-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="32" y1="32" x2="42.5" y2="32" id="pb_tbl-type_upd-1-minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <circle id="pb_tbl-type_upd-1-center-dot" fill="#000000" fill-rule="nonzero" cx="32" cy="32" r="2"></circle>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>data_freshness()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">updated_at</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">1.0h<br><span style="font-size: 9px;">@2024-01-15<br> 12:00:00+0000</span></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-1-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-1-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-1-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-1-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-1-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
+  </tr>
 </tbody>
 <tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
 <strong>Notes</strong>
 <p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(tz_warning)</span> ⚠️ Column has naive datetimes but reference time is timezone-aware. Naive datetimes are being treated as if they're in the reference timezone.</p>
-<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #999999;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2026-10-29 08:36:23</code> (age: <strong>-87942983.0s</strong>, max allowed: 1d)</p></span></td></tr></tfoot>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #999999;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✓ Most recent data: <code>2024-01-15 10:00:00</code> (age: <strong>2.0h</strong>, max allowed: 1d)</p>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 2</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(tz_warning)</span> ⚠️ Column has naive datetimes but reference time is timezone-aware. Naive datetimes are being treated as if they're in the reference timezone.</p>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #999999;">Step 2</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(freshness_details)</span> ✗ Most recent data: <code>2024-01-15 10:00:00</code> (age: <strong>2.0h</strong>, max allowed: 1.0h)</p></span></td></tr></tfoot>
 </table>
 
 </div>
 </div>
 </div>
+<p>The newest timestamp is two hours before the reference time, so the 24-hour step passes and the 1-hour step fails. Because neither the data nor the reference time depend on the current time, this validation gives the same result whenever it runs.</p>
 
 
 </section>

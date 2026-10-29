@@ -1655,7 +1655,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#supported-connection-string-formats" id="toc-supported-connection-string-formats" class="nav-link" data-scroll-target="#supported-connection-string-formats">Supported Connection String Formats</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
-  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -1686,7 +1685,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5092-L5268" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5142-L5326" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">connect_to_table</span>(<span class="va">connection_string</span>)</span></code></pre></div>
@@ -1730,7 +1729,7 @@ Snowflake:  "snowflake://user:password@account/database/schema::table_name"</cod
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Connect to a DuckDB table:</p>
-<div id="51e978f6" class="cell" data-execution_count="1">
+<div id="a4a5118f" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Get path to a DuckDB database file from package data</span></span>
@@ -1991,6 +1990,7 @@ Snowflake:  "snowflake://user:password@account/database/schema::table_name"</cod
 </div>
 </div>
 </div>
+<p>The result is an Ibis table that stays in the database, and <a href="../reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> shows the first and last five of its 2,000 rows. The same table object can be passed to <code>Validate(data=)</code>, and the validation then runs inside DuckDB.</p>
 <p>Here are some backend-specific connection examples:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PostgreSQL</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>pg_table <span class="op">=</span> pb.connect_to_table(</span>
@@ -2009,10 +2009,7 @@ Snowflake:  "snowflake://user:password@account/database/schema::table_name"</cod
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ...or specific backends as needed:</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">'ibis-framework[duckdb]'</span>    <span class="co"># for DuckDB</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">'ibis-framework[postgres]'</span>  <span class="co"># for PostgreSQL</span></span></code></pre></div>
-</section>
-<section id="see-also" class="level2">
-<h2 class="anchored" data-anchor-id="see-also">See Also</h2>
-<p>print_database_tables : List all available tables in a database for discovery</p>
+<p>The connection string’s backend name (e.g., <code>postgresql://</code>) determines which Ibis backend is needed. If it isn’t installed, <a href="../reference/connect_to_table.html#pointblank.connect_to_table" class="gdls-link gdls-code">connect_to_table()</a> raises a <code>ConnectionError</code> that shows the <code>pip install</code> command for it. See Also ——– print_database_tables : List all available tables in a database for discovery</p>
 
 
 </section>

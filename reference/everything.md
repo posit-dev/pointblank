@@ -4,7 +4,7 @@ Select all columns.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L1276-L1410)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L1282-L1416)
 
 ``` python
 everything()

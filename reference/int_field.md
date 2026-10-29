@@ -4,7 +4,7 @@ Create an integer column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L299-L428)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L299-L436)
 
 ``` python
 int_field(
@@ -19,7 +19,7 @@ int_field(
 )
 ```
 
-The [int_field()](../reference/int_field.md#pointblank.int_field) function defines the constraints and behavior for an integer column when generating synthetic data with [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset). You can control the range of values with `min_val=` and `max_val=`, restrict values to a specific set with `allowed=`, enforce uniqueness with `unique=True`, and introduce null values with `nullable=True` and `null_probability=`. The `dtype=` parameter lets you choose the specific integer type (e.g., `"Int8"`, `"UInt16"`, `"Int64"`), which also determines the valid range of values.
+The [int_field()](../reference/int_field.md#pointblank.int_field) function defines the constraints and behavior for an integer column when generating synthetic data with [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset). You can control the range of values with `min_val=` and `max_val=`, restrict values to a specific set with `allowed=`, enforce uniqueness with `unique=True`, and introduce null values with `nullable=True` and `null_probability=`. The `dtype=` parameter sets the integer type in the schema (e.g., `"Int8"`, `"UInt16"`, `"Int64"`), which also limits the range of values.
 
 When no constraints are specified, values are drawn uniformly from the full range of the chosen integer dtype. If both `min_val=` and `max_val=` are provided, values are drawn uniformly from that range. If `allowed=` is provided, values are sampled from that specific list.
 
@@ -44,10 +44,10 @@ Probability of generating a null value for each row when `nullable=True`. Must b
 Whether all values must be unique. Default is `False`. When `True`, the generator will retry until it produces `n` distinct values (subject to retry limits).
 
 `generator: Callable[[], Any] | None = None`  
-Custom callable that generates values. When provided, this overrides all other constraints (`min_val=`, `max_val=`, `allowed=`, etc.). The callable should take no arguments and return a single integer value.
+Custom callable that generates values. When provided, it's used instead of `min_val=`, `max_val=` and `allowed=`, while `unique=` and `nullable=` still apply. The callable should take no arguments and return a single integer value. It isn't controlled by the `seed=` of [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset), so it needs its own seeded random number generator for reproducible data.
 
 `dtype: str = "Int64"`  
-Integer dtype. Default is `"Int64"`. Options: `"Int8"`, `"Int16"`, `"Int32"`, `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`.
+Integer dtype. Default is `"Int64"`. Options: `"Int8"`, `"Int16"`, `"Int32"`, `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`. The dtype limits the range of values (e.g., `0` to `255` for `"UInt8"`), but the column that [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset) creates is currently always `Int64`.
 
 ## Returns
 
@@ -89,7 +89,7 @@ pb.preview(pb.generate_dataset(schema, n=100, seed=23))
 | 99                    | 1522653102058131295 | 114         | 1              |
 | 100                   | 5690877051669225499 | 99          | 5              |
 
-It's possible to introduce missing values with `nullable=True` and `null_probability=`, and to select a smaller dtype with `dtype=`:
+It's possible to introduce missing values with `nullable=True` and `null_probability=`, and to limit the range of values with a smaller `dtype=`:
 
 ``` python
 schema = pb.Schema(
@@ -169,3 +169,5 @@ pb.preview(pb.generate_dataset(schema, n=20, seed=5))
 | 18                   | 96                   |
 | 19                   | 12                   |
 | 20                   | 78                   |
+
+The generator is called once for each row, so every value is an even number below 100. The `seed=` of [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset) doesn't reach the generator, which is why it uses its own `random.Random(0)`: that makes the data the same on every run.
