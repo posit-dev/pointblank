@@ -133,6 +133,10 @@ def seg_group(values: list[Any]) -> Segment:
     validation
     ```
 
+    The Fantasy and Science Fiction books form a single segment, so the report has one step with
+    eight test units. Only *The Name of the Wind* (445 units sold) falls short of the threshold,
+    and the Mystery books aren't checked at all.
+
     What's more, we can create multiple segments, combining the genres in different ways.
 
     ```{python}
@@ -153,6 +157,10 @@ def seg_group(values: list[Any]) -> Segment:
     validation
     ```
 
+    Each group becomes its own step in the report. The Fantasy and Science Fiction segment has one
+    failing test unit (445 units sold), the Fantasy and Mystery segment has two (445 and 389), and
+    the Mystery and Science Fiction segment has one (389). A genre can appear in more than one
+    group, so the same row may be checked in several steps.
     """
     if isinstance(values, list):
         if all(isinstance(v, list) for v in values):
