@@ -271,8 +271,7 @@ class Schema:
 
     See Also
     --------
-    The [`col_schema_match()`](`pointblank.Validate.col_schema_match`) validation method, where a
-    `Schema` object is used in a validation workflow.
+    Validate.col_schema_match : The validation step that checks a table against a `Schema`.
     """
 
     columns: list[tuple[str, ...]] | None = None
