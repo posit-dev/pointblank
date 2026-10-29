@@ -4,7 +4,7 @@ Validate that aggregates of the target table reconcile with a comparison table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15704-L15996)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15709-L16001)
 
 ``` python
 Validate.tbl_reconcile(

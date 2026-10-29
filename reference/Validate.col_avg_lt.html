@@ -1647,7 +1647,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#using-reference-data" id="toc-using-reference-data" class="nav-link" data-scroll-target="#using-reference-data">Using Reference Data</a></li>
   <li><a href="#understanding-tolerance" id="toc-understanding-tolerance" class="nav-link" data-scroll-target="#understanding-tolerance">Understanding Tolerance</a></li>
   <li><a href="#thresholds" id="toc-thresholds" class="nav-link" data-scroll-target="#thresholds">Thresholds</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
@@ -1681,7 +1680,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1111-L1148" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1135-L1175" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">col_avg_lt</span>(</span>
@@ -1696,8 +1695,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="../reference/Validate.col_avg_lt.html#pointblank.Validate.col_avg_lt" class="gdls-link gdls-code">col_avg_lt()</a> validation method checks whether the average of values in a column is less than a specified <code>value=</code>. This is an aggregation-based validation where the entire column is reduced to a single average value that is then compared against the target. The comparison used in this function is <code>average(column) &lt; value</code>.</p>
-<p>Unlike row-level validations (e.g., <code>col_vals_gt()</code>), this method treats the entire column as a single test unit. The validation either passes completely (if the aggregated value satisfies the comparison) or fails completely.</p>
+<p>The <a href="../reference/Validate.col_avg_lt.html#pointblank.Validate.col_avg_lt" class="gdls-link gdls-code">col_avg_lt()</a> validation method checks whether the average of a column is less than a target <code>value=</code>. The whole column is reduced to a single number and compared with the target (<code>average(column) &lt; value</code>), so the step has exactly one test unit, which either passes or fails.</p>
+<p>Aggregate checks catch problems that row-level checks can’t see. Every value in a column can be within its allowed range while the column as a whole is wrong: a daily total that doesn’t match the control figure from the source system, an average that has shifted after a change upstream, or a sensor whose readings have stopped varying (a standard deviation near zero). Use row-level methods like <a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link"><code>col_vals_between()</code></a> to check individual values, and an aggregate method to check what they add up to. The target can be a fixed number, the same aggregate of another column, or the same aggregate of a column in reference data. The last option makes these methods a good fit for comparing a new load of a table with the last one that was known to be good.</p>
+<p>Null values are left out of the computation. The column must be numeric, and a non-numeric column raises an error during interrogation. Unlike the row-level methods, the aggregate methods don’t take <code>pre=</code> or <code>segments=</code>: the average is computed over the whole table, so filter the table before passing it to <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> if you need the average of a subset.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1709,15 +1709,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">value</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">float | Column | ReferenceColumn | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>The value to compare the column average against. This can be: (1) a numeric literal (<code>int</code> or <code>float</code>), (2) a <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> object referencing another column whose average will be used for comparison, (3) a <a href="../reference/ref.html#pointblank.ref" class="gdls-link"><code>ref()</code></a> object referencing a column in reference data (when <code>Validate(reference=)</code> has been set), or (4) <code>None</code> to automatically compare against the same column in reference data (shorthand for <code>ref(column_name)</code> when reference data is set).</p>
+<p>The target to compare the column average against. This can be: (1) a number, (2) a <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a> object naming another column, in which case the target is the average of that column in the same table, (3) a <a href="../reference/ref.html#pointblank.ref" class="gdls-link"><code>ref()</code></a> object naming a column in the reference data (set with <code>Validate(reference=)</code>), in which case the target is the average of that column there, or (4) <code>None</code> (the default), which is shorthand for <a href="../reference/ref.html#pointblank.ref" class="gdls-link gdls-code">ref()</a> of the same column. Using <code>None</code> without reference data raises a <code>ValueError</code>. <a href="../reference/col.html#pointblank.col" class="gdls-link gdls-code">col()</a> takes a single column name here, not a column selector.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">tol</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Tolerance</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="dv">0</span></span></code></dt>
 <dd>
-<p>A tolerance value for the comparison. The default is <code>0</code>, meaning exact comparison. When set to a positive value, the comparison becomes more lenient. For example, with <code>tol=0.5</code>, a average that differs from the target by up to <code>0.5</code> will still pass. The <code>tol=</code> parameter expands the acceptable range for the comparison. For <a href="../reference/Validate.col_avg_lt.html#pointblank.Validate.col_avg_lt" class="gdls-link gdls-code">col_avg_lt()</a>, a tolerance of <code>tol=0.5</code> would mean the average can be within <code>0.5</code> of the target value and still pass validation.</p>
+<p>The tolerance around the target. The default is <code>0</code>, an exact comparison. A value below <code>1</code> is a fraction of the target’s size (<code>tol=0.05</code> allows 5%), and a value of <code>1</code> or more is an absolute amount (<code>tol=2</code> allows <code>2</code> either way). A tuple of two values, <code>(lower, upper)</code>, sets the two sides separately, with each value read the same way. See the <em>Understanding Tolerance</em> section for how the tolerance applies to each comparison.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">thresholds</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">float | bool | tuple | dict | Thresholds | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>Failure threshold levels so that the validation step can react accordingly when failing test units are level. Since this is an aggregation-based validation with only one test unit, threshold values typically should be set as absolute counts (e.g., <code>1</code>) to indicate pass/fail, or as proportions where any value less than <code>1.0</code> means failure is acceptable.</p>
+<p>Failure threshold levels for the step. They override any thresholds set in <code>Validate(thresholds=)</code>. Because the step has a single test unit, every level that’s set is reached when the step fails. See the <em>Thresholds</em> section for details.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">brief</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
@@ -1729,7 +1729,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">active</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool | Callable</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-<p>A boolean value or callable that determines whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated <em>before</em> any <code>pre=</code> processing. Inspection functions like <a href="../reference/has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="../reference/has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.</p>
+<p>A boolean value or callable that determines whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. Inspection functions like <a href="../reference/has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a> and <a href="../reference/has_rows.html#pointblank.has_rows" class="gdls-link"><code>has_rows()</code></a> can be used here to conditionally activate a step based on properties of the target table.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">dimension</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1749,32 +1749,21 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </dl>
 </div>
 </section>
-<section id="using-reference-data" class="level2 doc-using-reference-data">
-<h2 class="doc-using-reference-data anchored" data-anchor-id="using-reference-data">Using Reference Data</h2>
-<p>The <a href="../reference/Validate.col_avg_lt.html#pointblank.Validate.col_avg_lt" class="gdls-link gdls-code">col_avg_lt()</a> method supports comparing column aggregations against reference data. This is useful for validating that statistical properties remain consistent across different versions of a dataset, or for comparing current data against historical baselines.</p>
-<p>To use reference data, set the <code>reference=</code> parameter when creating the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>current_data, reference<span class="op">=</span>baseline_data)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_lt(columns<span class="op">=</span><span class="st">"revenue"</span>)  <span class="co"># Compares sum(current.revenue) vs sum(baseline.revenue)</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>When <code>value=None</code> and reference data is set, the method automatically compares against the same column in the reference data. You can also explicitly specify reference columns using the <a href="../reference/ref.html#pointblank.ref" class="gdls-link gdls-code">ref()</a> helper:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>.col_avg_lt(columns<span class="op">=</span><span class="st">"revenue"</span>, value<span class="op">=</span>pb.ref(<span class="st">"baseline_revenue"</span>))</span></code></pre></div>
-</section>
 <section id="understanding-tolerance" class="level2 doc-understanding-tolerance">
 <h2 class="doc-understanding-tolerance anchored" data-anchor-id="understanding-tolerance">Understanding Tolerance</h2>
-<p>The <code>tol=</code> parameter allows for fuzzy comparisons, which is especially important for floating-point aggregations where exact equality is often unreliable.</p>
-<p>The <code>tol=</code> parameter expands the acceptable range for the comparison. For <a href="../reference/Validate.col_avg_lt.html#pointblank.Validate.col_avg_lt" class="gdls-link gdls-code">col_avg_lt()</a>, a tolerance of <code>tol=0.5</code> would mean the average can be within <code>0.5</code> of the target value and still pass validation.</p>
-<p>For equality comparisons (<code>col_*_eq</code>), the tolerance creates a range <code>[value - tol, value + tol]</code> within which the aggregation is considered valid. For inequality comparisons, the tolerance shifts the comparison boundary.</p>
+<p>Exact comparisons are often too strict for aggregates. A sum of floating-point values can differ from the expected total in the last decimal places, and an average or standard deviation computed from real data is rarely a round number. The <code>tol=</code> parameter turns the target into a range:</p>
+<ul>
+<li>with <code>tol=0.05</code>, the allowance is 5% of the target (<code>0.05 * abs(target)</code>)</li>
+<li>with <code>tol=2</code>, the allowance is <code>2</code></li>
+<li>with <code>tol=(0.1, 0)</code>, the allowance is 10% below the target and nothing above it</li>
+</ul>
+<p>Because values below <code>1</code> are relative, an absolute allowance smaller than <code>1</code> can’t be given directly. Express it as a fraction of the target instead (for a target of <code>50</code>, <code>tol=0.01</code> allows <code>0.5</code>). A relative tolerance has no effect when the target is <code>0</code>.</p>
+<p>How the allowance is used depends on the comparison. For <code>eq</code>, the aggregate passes if it’s anywhere from <code>target - lower</code> to <code>target + upper</code>. For <code>gt</code> and <code>ge</code>, it’s compared with <code>target - lower</code>, so the tolerance lowers the bar. For <code>lt</code> and <code>le</code>, it’s compared with <code>target + upper</code>, which raises the ceiling. In those four cases the other side of the tolerance isn’t used. For <a href="../reference/Validate.col_avg_lt.html#pointblank.Validate.col_avg_lt" class="gdls-link gdls-code">col_avg_lt()</a>, the step passes when <code>average(column) &lt; target + upper</code>.</p>
 </section>
 <section id="thresholds" class="level2 doc-thresholds">
 <h2 class="doc-thresholds anchored" data-anchor-id="thresholds">Thresholds</h2>
 <p>The <code>thresholds=</code> parameter is used to set the failure-condition levels for the validation step. If they are set here at the step level, these thresholds will override any thresholds set at the global level in <code>Validate(thresholds=...)</code>.</p>
-<p>There are three threshold levels: ‘warning’, ‘error’, and ‘critical’. Since aggregation validations operate on a single test unit (the aggregated value), threshold values are typically set as absolute counts:</p>
-<ul>
-<li><code>thresholds=1</code> means any failure triggers a ‘warning’</li>
-<li><code>thresholds=(1, 1, 1)</code> means any failure triggers all three levels</li>
-</ul>
+<p>An aggregate step has a single test unit, so the fraction of failing test units is either <code>0</code> or <code>1</code>. Any level that’s set, whether as a count (such as <code>1</code>) or as a fraction (such as <code>0.1</code>), is reached when the step fails, so the levels can’t be graded within one step. Set only the level that a failure should reach: <code>thresholds=pb.Thresholds(error=1)</code> makes a failure an ‘error’ without a ‘warning’, and <code>thresholds=(1, 1, 1)</code> makes it reach all three levels.</p>
 <p>Thresholds can be defined using one of these input schemes:</p>
 <ol type="1">
 <li>use the <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> class (the most direct way to create thresholds)</li>
@@ -1785,19 +1774,19 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>For the examples, we’ll use a simple Polars DataFrame with numeric columns. The table is shown below:</p>
-<div id="f3852e50" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>],</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"b"</span>: [<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>],</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>pb.preview(tbl)</span></code></pre></div>
+<p>For the examples, we’ll use a simple Polars DataFrame with two numeric columns. The table is shown below:</p>
+<div id="f851f4b8" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"b"</span>: [<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>pb.preview(tbl)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -1912,15 +1901,15 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 </div>
-<p>Let’s validate that the average of column <code>a</code> is less than <code>3</code>:</p>
-<div id="2fa9e755" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
+<p>Let’s validate that the average of column <code>a</code> is less than <code>4</code>:</p>
+<div id="7e8f3d70" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -2026,7 +2015,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </thead>
 <tbody class="gt_table_body">
   <tr>
-    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
@@ -2052,7 +2041,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
         
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">a</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">3</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">4</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="pb_tbl-tbl-0-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="pb_tbl-tbl-0-unchanged" transform="translate(0.500000, 0.570147)">
@@ -2064,8 +2053,8 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </svg></td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">1</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">0<br>0.00</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
@@ -2078,16 +2067,16 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 </div>
-<p>The validation result shows whether the average comparison passed or failed. Since this is an aggregation-based validation, there is exactly one test unit per column.</p>
+<p>The average of <code>a</code> is <code>3</code>, and <code>3 &lt; 4</code> holds, so the step’s one test unit passes.</p>
 <p>When validating multiple columns, each column gets its own validation step:</p>
-<div id="35b39715" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_lt(columns<span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>], value<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
+<div id="1035a585" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_lt(columns<span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>], value<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -2193,6 +2182,326 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </thead>
 <tbody class="gt_table_body">
   <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_avg_lt</title>
+    <g id="pb_tbl-type_upd-0-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-0-col_avg_lt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="pb_tbl-type_upd-0-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="pb_tbl-type_upd-0-avg" transform="translate(20.058000, 50.000000)" fill="#000000">
+                <path d="M2.94,7.14 C2.03466667,7.14 1.31833333,6.93466667 0.791,6.524 C0.263666667,6.11333333 0,5.558 0,4.858 C0,4.158 0.277666667,3.60266667 0.833,3.192 C1.38833333,2.78133333 2.14666667,2.576 3.108,2.576 C3.612,2.576 4.06233333,2.64133333 4.459,2.772 C4.85566667,2.90266667 5.17533333,3.08 5.418,3.304 L5.418,2.604 C5.418,2.1 5.257,1.715 4.935,1.449 C4.613,1.183 4.13933333,1.05 3.514,1.05 C2.68333333,1.05 1.96466667,1.24133333 1.358,1.624 C1.18066667,1.72666667 1.02666667,1.778 0.896,1.778 C0.774666667,1.778 0.653333333,1.72666667 0.532,1.624 C0.429333333,1.52133333 0.378,1.4 0.378,1.26 C0.378,1.10133333 0.457333333,0.956666667 0.616,0.826 C0.952,0.574 1.37666667,0.373333333 1.89,0.224 C2.40333333,0.0746666667 2.94,0 3.5,0 C4.51733333,0 5.31066667,0.231 5.88,0.693 C6.44933333,1.155 6.734,1.80133333 6.734,2.632 L6.734,6.51 C6.734,6.71533333 6.68033333,6.87166667 6.573,6.979 C6.46566667,7.08633333 6.30933333,7.14 6.104,7.14 C5.89866667,7.14 5.74,7.08633333 5.628,6.979 C5.516,6.87166667 5.46,6.72466667 5.46,6.538 L5.46,6.146 C4.9,6.80866667 4.06,7.14 2.94,7.14 Z M3.164,6.146 C3.84533333,6.146 4.39366667,6.02233333 4.809,5.775 C5.22433333,5.52766667 5.432,5.20333333 5.432,4.802 C5.432,4.41 5.23366667,4.10433333 4.837,3.885 C4.44033333,3.66566667 3.892,3.556 3.192,3.556 C2.58533333,3.556 2.11866667,3.668 1.792,3.892 C1.46533333,4.116 1.302,4.438 1.302,4.858 C1.302,5.26866667 1.463,5.586 1.785,5.81 C2.107,6.034 2.56666667,6.146 3.164,6.146 Z" id="pb_tbl-type_upd-0-a"></path>
+                <path d="M11.494,7.14 C10.5326667,7.14 9.85133333,6.56133333 9.45,5.404 L7.798,0.784 C7.77,0.709333333 7.756,0.644 7.756,0.588 C7.756,0.466666667 7.798,0.357 7.882,0.259 C7.966,0.161 8.078,0.0886666667 8.218,0.042 C8.302,0.014 8.386,0 8.47,0 C8.61,0 8.73133333,0.035 8.834,0.105 C8.93666667,0.175 9.00666667,0.270666667 9.044,0.392 L10.738,5.138 C10.8593333,5.48333333 10.976,5.726 11.088,5.866 C11.2,6.006 11.3353333,6.076 11.494,6.076 C11.6526667,6.076 11.788,6.00833333 11.9,5.873 C12.012,5.73766667 12.1286667,5.502 12.25,5.166 L13.944,0.392 C13.9906667,0.270666667 14.063,0.177333333 14.161,0.112 C14.259,0.0466666667 14.378,0.014 14.518,0.014 C14.7326667,0.014 14.9053333,0.0723333333 15.036,0.189 C15.1666667,0.305666667 15.232,0.443333333 15.232,0.602 C15.232,0.686 15.2226667,0.746666667 15.204,0.784 L13.538,5.432 C13.3233333,6.01066667 13.0503333,6.44 12.719,6.72 C12.3876667,7 11.9793333,7.14 11.494,7.14 Z" id="pb_tbl-type_upd-0-v"></path>
+                <path d="M19.81,10.514 C19.1193333,10.514 18.4916667,10.4113333 17.927,10.206 C17.3623333,10.0006667 16.9073333,9.71133333 16.562,9.338 C16.4686667,9.23533333 16.422,9.12333333 16.422,9.002 C16.422,8.84333333 16.5106667,8.68933333 16.688,8.54 C16.772,8.46533333 16.8793333,8.428 17.01,8.428 C17.206,8.428 17.3926667,8.52133333 17.57,8.708 C17.794,8.94133333 18.0856667,9.12566667 18.445,9.261 C18.8043333,9.39633333 19.2266667,9.464 19.712,9.464 C20.5613333,9.464 21.2146667,9.24466667 21.672,8.806 C22.1293333,8.36733333 22.3533333,7.742 22.344,6.93 L22.344,5.866 C22.0266667,6.26733333 21.6253333,6.587 21.14,6.825 C20.6546667,7.063 20.0853333,7.182 19.432,7.182 C18.256,7.182 17.346,6.867 16.702,6.237 C16.058,5.607 15.736,4.75066667 15.736,3.668 C15.736,2.55733333 16.0626667,1.66833333 16.716,1.001 C17.3693333,0.333666667 18.3026667,0 19.516,0 C20.0946667,0 20.622,0.116666667 21.098,0.35 C21.574,0.583333333 21.9893333,0.914666667 22.344,1.344 L22.344,0.63 C22.344,0.443333333 22.407,0.291666667 22.533,0.175 C22.659,0.0583333333 22.8153333,0 23.002,0 C23.198,0 23.3543333,0.056 23.471,0.168 C23.5876667,0.28 23.646,0.434 23.646,0.63 L23.646,6.93 C23.646,7.64866667 23.4873333,8.27866667 23.17,8.82 C22.8526667,9.36133333 22.4046667,9.779 21.826,10.073 C21.2473333,10.367 20.5753333,10.514 19.81,10.514 Z M19.614,6.09 C20.1086667,6.09 20.5636667,5.99666667 20.979,5.81 C21.3943333,5.62333333 21.7256667,5.34333333 21.973,4.97 C22.2203333,4.59666667 22.344,4.13933333 22.344,3.598 C22.344,2.85133333 22.106,2.24466667 21.63,1.778 C21.154,1.31133333 20.496,1.078 19.656,1.078 C18.8253333,1.078 18.1813333,1.30433333 17.724,1.757 C17.2666667,2.20966667 17.038,2.84666667 17.038,3.668 C17.038,4.41466667 17.2596667,5.005 17.703,5.439 C18.1463333,5.873 18.7833333,6.09 19.614,6.09 Z" id="pb_tbl-type_upd-0-g"></path>
+            </g>
+            <path d="M46.6818182,10 L17.3181818,10 C16.0413706,10 15,11.0413705 15,12.3181818 L15,41.6818182 C15,42.9586295 16.0413706,44 17.3181818,44 L46.6818182,44 C47.9586295,44 49,42.9586295 49,41.6818182 L49,12.3181818 C49,11.0413705 47.9586295,10 46.6818182,10 Z M37.1827058,37.2718397 L36.0900215,38.364524 L24.7254976,27 L36.0900215,15.635476 L37.1827058,16.7281603 L26.9108669,27 L37.1827058,37.2718397 Z" id="pb_tbl-type_upd-0-less_than" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_avg_lt()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">a</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">4</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-0-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-0-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-0-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-0-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-0-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">2</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_avg_lt</title>
+    <g id="pb_tbl-type_upd-1-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-1-col_avg_lt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="pb_tbl-type_upd-1-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="pb_tbl-type_upd-1-avg" transform="translate(20.058000, 50.000000)" fill="#000000">
+                <path d="M2.94,7.14 C2.03466667,7.14 1.31833333,6.93466667 0.791,6.524 C0.263666667,6.11333333 0,5.558 0,4.858 C0,4.158 0.277666667,3.60266667 0.833,3.192 C1.38833333,2.78133333 2.14666667,2.576 3.108,2.576 C3.612,2.576 4.06233333,2.64133333 4.459,2.772 C4.85566667,2.90266667 5.17533333,3.08 5.418,3.304 L5.418,2.604 C5.418,2.1 5.257,1.715 4.935,1.449 C4.613,1.183 4.13933333,1.05 3.514,1.05 C2.68333333,1.05 1.96466667,1.24133333 1.358,1.624 C1.18066667,1.72666667 1.02666667,1.778 0.896,1.778 C0.774666667,1.778 0.653333333,1.72666667 0.532,1.624 C0.429333333,1.52133333 0.378,1.4 0.378,1.26 C0.378,1.10133333 0.457333333,0.956666667 0.616,0.826 C0.952,0.574 1.37666667,0.373333333 1.89,0.224 C2.40333333,0.0746666667 2.94,0 3.5,0 C4.51733333,0 5.31066667,0.231 5.88,0.693 C6.44933333,1.155 6.734,1.80133333 6.734,2.632 L6.734,6.51 C6.734,6.71533333 6.68033333,6.87166667 6.573,6.979 C6.46566667,7.08633333 6.30933333,7.14 6.104,7.14 C5.89866667,7.14 5.74,7.08633333 5.628,6.979 C5.516,6.87166667 5.46,6.72466667 5.46,6.538 L5.46,6.146 C4.9,6.80866667 4.06,7.14 2.94,7.14 Z M3.164,6.146 C3.84533333,6.146 4.39366667,6.02233333 4.809,5.775 C5.22433333,5.52766667 5.432,5.20333333 5.432,4.802 C5.432,4.41 5.23366667,4.10433333 4.837,3.885 C4.44033333,3.66566667 3.892,3.556 3.192,3.556 C2.58533333,3.556 2.11866667,3.668 1.792,3.892 C1.46533333,4.116 1.302,4.438 1.302,4.858 C1.302,5.26866667 1.463,5.586 1.785,5.81 C2.107,6.034 2.56666667,6.146 3.164,6.146 Z" id="pb_tbl-type_upd-1-a"></path>
+                <path d="M11.494,7.14 C10.5326667,7.14 9.85133333,6.56133333 9.45,5.404 L7.798,0.784 C7.77,0.709333333 7.756,0.644 7.756,0.588 C7.756,0.466666667 7.798,0.357 7.882,0.259 C7.966,0.161 8.078,0.0886666667 8.218,0.042 C8.302,0.014 8.386,0 8.47,0 C8.61,0 8.73133333,0.035 8.834,0.105 C8.93666667,0.175 9.00666667,0.270666667 9.044,0.392 L10.738,5.138 C10.8593333,5.48333333 10.976,5.726 11.088,5.866 C11.2,6.006 11.3353333,6.076 11.494,6.076 C11.6526667,6.076 11.788,6.00833333 11.9,5.873 C12.012,5.73766667 12.1286667,5.502 12.25,5.166 L13.944,0.392 C13.9906667,0.270666667 14.063,0.177333333 14.161,0.112 C14.259,0.0466666667 14.378,0.014 14.518,0.014 C14.7326667,0.014 14.9053333,0.0723333333 15.036,0.189 C15.1666667,0.305666667 15.232,0.443333333 15.232,0.602 C15.232,0.686 15.2226667,0.746666667 15.204,0.784 L13.538,5.432 C13.3233333,6.01066667 13.0503333,6.44 12.719,6.72 C12.3876667,7 11.9793333,7.14 11.494,7.14 Z" id="pb_tbl-type_upd-1-v"></path>
+                <path d="M19.81,10.514 C19.1193333,10.514 18.4916667,10.4113333 17.927,10.206 C17.3623333,10.0006667 16.9073333,9.71133333 16.562,9.338 C16.4686667,9.23533333 16.422,9.12333333 16.422,9.002 C16.422,8.84333333 16.5106667,8.68933333 16.688,8.54 C16.772,8.46533333 16.8793333,8.428 17.01,8.428 C17.206,8.428 17.3926667,8.52133333 17.57,8.708 C17.794,8.94133333 18.0856667,9.12566667 18.445,9.261 C18.8043333,9.39633333 19.2266667,9.464 19.712,9.464 C20.5613333,9.464 21.2146667,9.24466667 21.672,8.806 C22.1293333,8.36733333 22.3533333,7.742 22.344,6.93 L22.344,5.866 C22.0266667,6.26733333 21.6253333,6.587 21.14,6.825 C20.6546667,7.063 20.0853333,7.182 19.432,7.182 C18.256,7.182 17.346,6.867 16.702,6.237 C16.058,5.607 15.736,4.75066667 15.736,3.668 C15.736,2.55733333 16.0626667,1.66833333 16.716,1.001 C17.3693333,0.333666667 18.3026667,0 19.516,0 C20.0946667,0 20.622,0.116666667 21.098,0.35 C21.574,0.583333333 21.9893333,0.914666667 22.344,1.344 L22.344,0.63 C22.344,0.443333333 22.407,0.291666667 22.533,0.175 C22.659,0.0583333333 22.8153333,0 23.002,0 C23.198,0 23.3543333,0.056 23.471,0.168 C23.5876667,0.28 23.646,0.434 23.646,0.63 L23.646,6.93 C23.646,7.64866667 23.4873333,8.27866667 23.17,8.82 C22.8526667,9.36133333 22.4046667,9.779 21.826,10.073 C21.2473333,10.367 20.5753333,10.514 19.81,10.514 Z M19.614,6.09 C20.1086667,6.09 20.5636667,5.99666667 20.979,5.81 C21.3943333,5.62333333 21.7256667,5.34333333 21.973,4.97 C22.2203333,4.59666667 22.344,4.13933333 22.344,3.598 C22.344,2.85133333 22.106,2.24466667 21.63,1.778 C21.154,1.31133333 20.496,1.078 19.656,1.078 C18.8253333,1.078 18.1813333,1.30433333 17.724,1.757 C17.2666667,2.20966667 17.038,2.84666667 17.038,3.668 C17.038,4.41466667 17.2596667,5.005 17.703,5.439 C18.1463333,5.873 18.7833333,6.09 19.614,6.09 Z" id="pb_tbl-type_upd-1-g"></path>
+            </g>
+            <path d="M46.6818182,10 L17.3181818,10 C16.0413706,10 15,11.0413705 15,12.3181818 L15,41.6818182 C15,42.9586295 16.0413706,44 17.3181818,44 L46.6818182,44 C47.9586295,44 49,42.9586295 49,41.6818182 L49,12.3181818 C49,11.0413705 47.9586295,10 46.6818182,10 Z M37.1827058,37.2718397 L36.0900215,38.364524 L24.7254976,27 L36.0900215,15.635476 L37.1827058,16.7281603 L26.9108669,27 L37.1827058,37.2718397 Z" id="pb_tbl-type_upd-1-less_than" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_avg_lt()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">b</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">4</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-1-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-1-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-1-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-1-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-1-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>Each column gets its own step: step 1 is for <code>a</code> and step 2 is for <code>b</code>. The average of <code>b</code> is <code>2</code>, so step 2 passes. The report doesn’t show the computed average, but the step report does:</p>
+<div id="bda5583e" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">2</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div id="pb_step_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_step_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_step_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_step_tbl p { margin: 0; padding: 0; }
+ #pb_step_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_step_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_step_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_step_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_step_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_step_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_step_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_step_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: solid; border-left-width: 1px; border-left-color: #F2F2F2; border-right-style: solid; border-right-width: 1px; border-right-color: #F2F2F2; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_step_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_step_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_step_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_step_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_step_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_step_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_step_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_step_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_step_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_step_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: solid; border-left-width: 1px; border-left-color: #E9E9E9; border-right-style: solid; border-right-width: 1px; border-right-color: #E9E9E9; vertical-align: middle; overflow-x: hidden; }
+ #pb_step_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_step_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_step_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_step_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_step_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_step_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_step_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_step_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_step_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_step_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_step_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_step_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_step_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_step_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_step_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_step_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_step_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_step_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_step_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_step_tbl .gt_left { text-align: left; }
+ #pb_step_tbl .gt_center { text-align: center; }
+ #pb_step_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_step_tbl .gt_font_normal { font-weight: normal; }
+ #pb_step_tbl .gt_font_bold { font-weight: bold; }
+ #pb_step_tbl .gt_font_italic { font-style: italic; }
+ #pb_step_tbl .gt_super { font-size: 65%; }
+ #pb_step_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_step_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_step_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_step_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_step_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_step_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 0px" class="gt_table" aria-labelledby="pb_step_tbl-title" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:226px;">
+  <col style="width:226px;">
+  <col style="width:170px;">
+  <col style="width:228px;">
+  <col style="width:50px;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="5" class="gt_heading gt_title gt_font_normal" id="pb_step_tbl-title">Report for Validation Step 2 <span style="color: #4CA64C;">✓</span><div style="font-size: 13.6px; "><div style="padding-top: 7px;">ASSERTION <span style="border-style: solid; border-width: thin; border-color: lightblue; padding-left: 2px; padding-right: 2px;"><code style="color: #303030; background-color: transparent; position: relative; bottom: 1px;"><code style="color: #303030; font-family: monospace; font-size: smaller;">AVG(b) &lt; 4</code></code></span></div><div style="padding-top: 7px;">The aggregate value for column <code>b</code> satisfies the condition.</div></div></td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_step_tbl-actual">ACTUAL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_step_tbl-target">EXPECTED</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_step_tbl-tolerance">TOL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_step_tbl-difference">DIFFERENCE</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_step_tbl-status"></th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; border-top: 1px solid #E9E9E9;border-bottom: 1px solid #E9E9E9;" headers="pb_step_tbl-actual" class="gt_row gt_center">2</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; border-top: 1px solid #E9E9E9;border-bottom: 1px solid #E9E9E9;" headers="pb_step_tbl-target" class="gt_row gt_center">4</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; border-top: 1px solid #E9E9E9;border-bottom: 1px solid #E9E9E9;" headers="pb_step_tbl-tolerance" class="gt_row gt_center">—</td>
+    <td style="color: black;font-family: IBM Plex Mono;font-size: 13px; border-top: 1px solid #E9E9E9;border-bottom: 1px solid #E9E9E9;" headers="pb_step_tbl-difference" class="gt_row gt_center">-2</td>
+    <td style="font-size: 13px; border-top: 1px solid #E9E9E9;border-bottom: 1px solid #E9E9E9; color: #006400; background-color: #4CA64C33;" headers="pb_step_tbl-status" class="gt_row gt_center"><span style="color: #4CA64C;">✓</span></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>The step report shows the average computed for <code>b</code> (<em>ACTUAL</em>), the target (<em>EXPECTED</em>), the tolerance (<em>TOL</em>, none here), and <em>DIFFERENCE</em>, which is how far the computed value is from the boundary it had to meet. Here that’s <code>-2</code>, with positive values above the boundary and negative values below it.</p>
+<p>Next, a target that the average of <code>a</code> just misses, first with an exact comparison and then with a 5% tolerance:</p>
+<div id="cb2237ab" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="fl">2.9</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    .col_avg_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="fl">2.9</span>, tol<span class="op">=</span><span class="fl">0.05</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_tbl p { margin: 0; padding: 0; }
+ #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_left { text-align: left; }
+ #pb_tbl .gt_center { text-align: center; }
+ #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_tbl .gt_font_normal { font-weight: normal; }
+ #pb_tbl .gt_font_bold { font-weight: bold; }
+ #pb_tbl .gt_font_italic { font-style: italic; }
+ #pb_tbl .gt_super { font-size: 65%; }
+ #pb_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:4px;">
+  <col style="width:35px;">
+  <col style="width:190px;">
+  <col style="width:120px;">
+  <col style="width:120px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:65px;">
+</colgroup>
+
+<thead>
+
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
     <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C66</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
@@ -2219,7 +2528,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
         
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">a</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">3</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">2.9</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="pb_tbl-tbl-0-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="pb_tbl-tbl-0-unchanged" transform="translate(0.500000, 0.570147)">
@@ -2264,8 +2573,8 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
         </div>
         
         </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">b</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">3</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">a</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">2.9<br>tol=0.05</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="pb_tbl-tbl-1-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="pb_tbl-tbl-1-unchanged" transform="translate(0.500000, 0.570147)">
@@ -2291,16 +2600,188 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 </div>
-<p>Using tolerance for flexible comparisons:</p>
-<div id="0c862858" class="cell" data-execution_count="5">
+<p>The average of <code>a</code> is <code>3</code>, so <code>3 &lt; 2.9</code> doesn’t hold, if only just, and step 1 fails. In step 2, <code>tol=0.05</code> allows 5% of the target (<code>0.145</code>), so the average only has to be less than <code>3.045</code>, and the step passes.</p>
+<p>The target can also be the same aggregate of another column, given with <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>:</p>
+<div id="4f934e10" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">3</span>, tol<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span>pb.col(<span class="st">"b"</span>))</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_tbl p { margin: 0; padding: 0; }
+ #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_left { text-align: left; }
+ #pb_tbl .gt_center { text-align: center; }
+ #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_tbl .gt_font_normal { font-weight: normal; }
+ #pb_tbl .gt_font_bold { font-weight: bold; }
+ #pb_tbl .gt_font_italic { font-style: italic; }
+ #pb_tbl .gt_super { font-size: 65%; }
+ #pb_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:4px;">
+  <col style="width:35px;">
+  <col style="width:190px;">
+  <col style="width:120px;">
+  <col style="width:120px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:65px;">
+</colgroup>
+
+<thead>
+
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_avg_lt</title>
+    <g id="pb_tbl-type_upd-0-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-0-col_avg_lt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="pb_tbl-type_upd-0-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="pb_tbl-type_upd-0-avg" transform="translate(20.058000, 50.000000)" fill="#000000">
+                <path d="M2.94,7.14 C2.03466667,7.14 1.31833333,6.93466667 0.791,6.524 C0.263666667,6.11333333 0,5.558 0,4.858 C0,4.158 0.277666667,3.60266667 0.833,3.192 C1.38833333,2.78133333 2.14666667,2.576 3.108,2.576 C3.612,2.576 4.06233333,2.64133333 4.459,2.772 C4.85566667,2.90266667 5.17533333,3.08 5.418,3.304 L5.418,2.604 C5.418,2.1 5.257,1.715 4.935,1.449 C4.613,1.183 4.13933333,1.05 3.514,1.05 C2.68333333,1.05 1.96466667,1.24133333 1.358,1.624 C1.18066667,1.72666667 1.02666667,1.778 0.896,1.778 C0.774666667,1.778 0.653333333,1.72666667 0.532,1.624 C0.429333333,1.52133333 0.378,1.4 0.378,1.26 C0.378,1.10133333 0.457333333,0.956666667 0.616,0.826 C0.952,0.574 1.37666667,0.373333333 1.89,0.224 C2.40333333,0.0746666667 2.94,0 3.5,0 C4.51733333,0 5.31066667,0.231 5.88,0.693 C6.44933333,1.155 6.734,1.80133333 6.734,2.632 L6.734,6.51 C6.734,6.71533333 6.68033333,6.87166667 6.573,6.979 C6.46566667,7.08633333 6.30933333,7.14 6.104,7.14 C5.89866667,7.14 5.74,7.08633333 5.628,6.979 C5.516,6.87166667 5.46,6.72466667 5.46,6.538 L5.46,6.146 C4.9,6.80866667 4.06,7.14 2.94,7.14 Z M3.164,6.146 C3.84533333,6.146 4.39366667,6.02233333 4.809,5.775 C5.22433333,5.52766667 5.432,5.20333333 5.432,4.802 C5.432,4.41 5.23366667,4.10433333 4.837,3.885 C4.44033333,3.66566667 3.892,3.556 3.192,3.556 C2.58533333,3.556 2.11866667,3.668 1.792,3.892 C1.46533333,4.116 1.302,4.438 1.302,4.858 C1.302,5.26866667 1.463,5.586 1.785,5.81 C2.107,6.034 2.56666667,6.146 3.164,6.146 Z" id="pb_tbl-type_upd-0-a"></path>
+                <path d="M11.494,7.14 C10.5326667,7.14 9.85133333,6.56133333 9.45,5.404 L7.798,0.784 C7.77,0.709333333 7.756,0.644 7.756,0.588 C7.756,0.466666667 7.798,0.357 7.882,0.259 C7.966,0.161 8.078,0.0886666667 8.218,0.042 C8.302,0.014 8.386,0 8.47,0 C8.61,0 8.73133333,0.035 8.834,0.105 C8.93666667,0.175 9.00666667,0.270666667 9.044,0.392 L10.738,5.138 C10.8593333,5.48333333 10.976,5.726 11.088,5.866 C11.2,6.006 11.3353333,6.076 11.494,6.076 C11.6526667,6.076 11.788,6.00833333 11.9,5.873 C12.012,5.73766667 12.1286667,5.502 12.25,5.166 L13.944,0.392 C13.9906667,0.270666667 14.063,0.177333333 14.161,0.112 C14.259,0.0466666667 14.378,0.014 14.518,0.014 C14.7326667,0.014 14.9053333,0.0723333333 15.036,0.189 C15.1666667,0.305666667 15.232,0.443333333 15.232,0.602 C15.232,0.686 15.2226667,0.746666667 15.204,0.784 L13.538,5.432 C13.3233333,6.01066667 13.0503333,6.44 12.719,6.72 C12.3876667,7 11.9793333,7.14 11.494,7.14 Z" id="pb_tbl-type_upd-0-v"></path>
+                <path d="M19.81,10.514 C19.1193333,10.514 18.4916667,10.4113333 17.927,10.206 C17.3623333,10.0006667 16.9073333,9.71133333 16.562,9.338 C16.4686667,9.23533333 16.422,9.12333333 16.422,9.002 C16.422,8.84333333 16.5106667,8.68933333 16.688,8.54 C16.772,8.46533333 16.8793333,8.428 17.01,8.428 C17.206,8.428 17.3926667,8.52133333 17.57,8.708 C17.794,8.94133333 18.0856667,9.12566667 18.445,9.261 C18.8043333,9.39633333 19.2266667,9.464 19.712,9.464 C20.5613333,9.464 21.2146667,9.24466667 21.672,8.806 C22.1293333,8.36733333 22.3533333,7.742 22.344,6.93 L22.344,5.866 C22.0266667,6.26733333 21.6253333,6.587 21.14,6.825 C20.6546667,7.063 20.0853333,7.182 19.432,7.182 C18.256,7.182 17.346,6.867 16.702,6.237 C16.058,5.607 15.736,4.75066667 15.736,3.668 C15.736,2.55733333 16.0626667,1.66833333 16.716,1.001 C17.3693333,0.333666667 18.3026667,0 19.516,0 C20.0946667,0 20.622,0.116666667 21.098,0.35 C21.574,0.583333333 21.9893333,0.914666667 22.344,1.344 L22.344,0.63 C22.344,0.443333333 22.407,0.291666667 22.533,0.175 C22.659,0.0583333333 22.8153333,0 23.002,0 C23.198,0 23.3543333,0.056 23.471,0.168 C23.5876667,0.28 23.646,0.434 23.646,0.63 L23.646,6.93 C23.646,7.64866667 23.4873333,8.27866667 23.17,8.82 C22.8526667,9.36133333 22.4046667,9.779 21.826,10.073 C21.2473333,10.367 20.5753333,10.514 19.81,10.514 Z M19.614,6.09 C20.1086667,6.09 20.5636667,5.99666667 20.979,5.81 C21.3943333,5.62333333 21.7256667,5.34333333 21.973,4.97 C22.2203333,4.59666667 22.344,4.13933333 22.344,3.598 C22.344,2.85133333 22.106,2.24466667 21.63,1.778 C21.154,1.31133333 20.496,1.078 19.656,1.078 C18.8253333,1.078 18.1813333,1.30433333 17.724,1.757 C17.2666667,2.20966667 17.038,2.84666667 17.038,3.668 C17.038,4.41466667 17.2596667,5.005 17.703,5.439 C18.1463333,5.873 18.7833333,6.09 19.614,6.09 Z" id="pb_tbl-type_upd-0-g"></path>
+            </g>
+            <path d="M46.6818182,10 L17.3181818,10 C16.0413706,10 15,11.0413705 15,12.3181818 L15,41.6818182 C15,42.9586295 16.0413706,44 17.3181818,44 L46.6818182,44 C47.9586295,44 49,42.9586295 49,41.6818182 L49,12.3181818 C49,11.0413705 47.9586295,10 46.6818182,10 Z M37.1827058,37.2718397 L36.0900215,38.364524 L24.7254976,27 L36.0900215,15.635476 L37.1827058,16.7281603 L26.9108669,27 L37.1827058,37.2718397 Z" id="pb_tbl-type_upd-0-less_than" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_avg_lt()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">a</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">b</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-0-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-0-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-0-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-0-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-0-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>Here the target is the average of <code>b</code> (<code>2</code>) rather than a fixed number. The average of <code>a</code> is <code>3</code>, so <code>3 &lt; 2</code> does not hold and the step fails. Both aggregates are computed from the same table when the validation is interrogated.</p>
+<p>Finally, the target can come from reference data, such as an earlier load of the same table that passed its checks:</p>
+<div id="ee2372f9" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>current <span class="op">=</span> pl.DataFrame({<span class="st">"revenue"</span>: [<span class="fl">120.0</span>, <span class="fl">95.5</span>, <span class="fl">143.2</span>, <span class="fl">88.0</span>]})</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> pl.DataFrame({<span class="st">"revenue"</span>: [<span class="fl">110.0</span>, <span class="fl">101.0</span>, <span class="fl">150.0</span>, <span class="fl">90.0</span>]})</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>current, reference<span class="op">=</span>baseline)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    .col_avg_lt(columns<span class="op">=</span><span class="st">"revenue"</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    .col_avg_lt(columns<span class="op">=</span><span class="st">"revenue"</span>, value<span class="op">=</span>pb.ref(<span class="st">"revenue"</span>), tol<span class="op">=</span><span class="fl">0.05</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
@@ -2430,14 +2911,60 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
         </div>
         
         </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">a</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">3<br>tol=1.0</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">revenue</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">ref('revenue')</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="pb_tbl-tbl-0-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="pb_tbl-tbl-0-unchanged" transform="translate(0.500000, 0.570147)">
             <rect id="pb_tbl-tbl-0-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
             <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-0-Shape" fill="#000000" fill-rule="nonzero"></path>
             <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-0-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">2</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_avg_lt</title>
+    <g id="pb_tbl-type_upd-1-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-1-col_avg_lt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="pb_tbl-type_upd-1-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="pb_tbl-type_upd-1-avg" transform="translate(20.058000, 50.000000)" fill="#000000">
+                <path d="M2.94,7.14 C2.03466667,7.14 1.31833333,6.93466667 0.791,6.524 C0.263666667,6.11333333 0,5.558 0,4.858 C0,4.158 0.277666667,3.60266667 0.833,3.192 C1.38833333,2.78133333 2.14666667,2.576 3.108,2.576 C3.612,2.576 4.06233333,2.64133333 4.459,2.772 C4.85566667,2.90266667 5.17533333,3.08 5.418,3.304 L5.418,2.604 C5.418,2.1 5.257,1.715 4.935,1.449 C4.613,1.183 4.13933333,1.05 3.514,1.05 C2.68333333,1.05 1.96466667,1.24133333 1.358,1.624 C1.18066667,1.72666667 1.02666667,1.778 0.896,1.778 C0.774666667,1.778 0.653333333,1.72666667 0.532,1.624 C0.429333333,1.52133333 0.378,1.4 0.378,1.26 C0.378,1.10133333 0.457333333,0.956666667 0.616,0.826 C0.952,0.574 1.37666667,0.373333333 1.89,0.224 C2.40333333,0.0746666667 2.94,0 3.5,0 C4.51733333,0 5.31066667,0.231 5.88,0.693 C6.44933333,1.155 6.734,1.80133333 6.734,2.632 L6.734,6.51 C6.734,6.71533333 6.68033333,6.87166667 6.573,6.979 C6.46566667,7.08633333 6.30933333,7.14 6.104,7.14 C5.89866667,7.14 5.74,7.08633333 5.628,6.979 C5.516,6.87166667 5.46,6.72466667 5.46,6.538 L5.46,6.146 C4.9,6.80866667 4.06,7.14 2.94,7.14 Z M3.164,6.146 C3.84533333,6.146 4.39366667,6.02233333 4.809,5.775 C5.22433333,5.52766667 5.432,5.20333333 5.432,4.802 C5.432,4.41 5.23366667,4.10433333 4.837,3.885 C4.44033333,3.66566667 3.892,3.556 3.192,3.556 C2.58533333,3.556 2.11866667,3.668 1.792,3.892 C1.46533333,4.116 1.302,4.438 1.302,4.858 C1.302,5.26866667 1.463,5.586 1.785,5.81 C2.107,6.034 2.56666667,6.146 3.164,6.146 Z" id="pb_tbl-type_upd-1-a"></path>
+                <path d="M11.494,7.14 C10.5326667,7.14 9.85133333,6.56133333 9.45,5.404 L7.798,0.784 C7.77,0.709333333 7.756,0.644 7.756,0.588 C7.756,0.466666667 7.798,0.357 7.882,0.259 C7.966,0.161 8.078,0.0886666667 8.218,0.042 C8.302,0.014 8.386,0 8.47,0 C8.61,0 8.73133333,0.035 8.834,0.105 C8.93666667,0.175 9.00666667,0.270666667 9.044,0.392 L10.738,5.138 C10.8593333,5.48333333 10.976,5.726 11.088,5.866 C11.2,6.006 11.3353333,6.076 11.494,6.076 C11.6526667,6.076 11.788,6.00833333 11.9,5.873 C12.012,5.73766667 12.1286667,5.502 12.25,5.166 L13.944,0.392 C13.9906667,0.270666667 14.063,0.177333333 14.161,0.112 C14.259,0.0466666667 14.378,0.014 14.518,0.014 C14.7326667,0.014 14.9053333,0.0723333333 15.036,0.189 C15.1666667,0.305666667 15.232,0.443333333 15.232,0.602 C15.232,0.686 15.2226667,0.746666667 15.204,0.784 L13.538,5.432 C13.3233333,6.01066667 13.0503333,6.44 12.719,6.72 C12.3876667,7 11.9793333,7.14 11.494,7.14 Z" id="pb_tbl-type_upd-1-v"></path>
+                <path d="M19.81,10.514 C19.1193333,10.514 18.4916667,10.4113333 17.927,10.206 C17.3623333,10.0006667 16.9073333,9.71133333 16.562,9.338 C16.4686667,9.23533333 16.422,9.12333333 16.422,9.002 C16.422,8.84333333 16.5106667,8.68933333 16.688,8.54 C16.772,8.46533333 16.8793333,8.428 17.01,8.428 C17.206,8.428 17.3926667,8.52133333 17.57,8.708 C17.794,8.94133333 18.0856667,9.12566667 18.445,9.261 C18.8043333,9.39633333 19.2266667,9.464 19.712,9.464 C20.5613333,9.464 21.2146667,9.24466667 21.672,8.806 C22.1293333,8.36733333 22.3533333,7.742 22.344,6.93 L22.344,5.866 C22.0266667,6.26733333 21.6253333,6.587 21.14,6.825 C20.6546667,7.063 20.0853333,7.182 19.432,7.182 C18.256,7.182 17.346,6.867 16.702,6.237 C16.058,5.607 15.736,4.75066667 15.736,3.668 C15.736,2.55733333 16.0626667,1.66833333 16.716,1.001 C17.3693333,0.333666667 18.3026667,0 19.516,0 C20.0946667,0 20.622,0.116666667 21.098,0.35 C21.574,0.583333333 21.9893333,0.914666667 22.344,1.344 L22.344,0.63 C22.344,0.443333333 22.407,0.291666667 22.533,0.175 C22.659,0.0583333333 22.8153333,0 23.002,0 C23.198,0 23.3543333,0.056 23.471,0.168 C23.5876667,0.28 23.646,0.434 23.646,0.63 L23.646,6.93 C23.646,7.64866667 23.4873333,8.27866667 23.17,8.82 C22.8526667,9.36133333 22.4046667,9.779 21.826,10.073 C21.2473333,10.367 20.5753333,10.514 19.81,10.514 Z M19.614,6.09 C20.1086667,6.09 20.5636667,5.99666667 20.979,5.81 C21.3943333,5.62333333 21.7256667,5.34333333 21.973,4.97 C22.2203333,4.59666667 22.344,4.13933333 22.344,3.598 C22.344,2.85133333 22.106,2.24466667 21.63,1.778 C21.154,1.31133333 20.496,1.078 19.656,1.078 C18.8253333,1.078 18.1813333,1.30433333 17.724,1.757 C17.2666667,2.20966667 17.038,2.84666667 17.038,3.668 C17.038,4.41466667 17.2596667,5.005 17.703,5.439 C18.1463333,5.873 18.7833333,6.09 19.614,6.09 Z" id="pb_tbl-type_upd-1-g"></path>
+            </g>
+            <path d="M46.6818182,10 L17.3181818,10 C16.0413706,10 15,11.0413705 15,12.3181818 L15,41.6818182 C15,42.9586295 16.0413706,44 17.3181818,44 L46.6818182,44 C47.9586295,44 49,42.9586295 49,41.6818182 L49,12.3181818 C49,11.0413705 47.9586295,10 46.6818182,10 Z M37.1827058,37.2718397 L36.0900215,38.364524 L24.7254976,27 L36.0900215,15.635476 L37.1827058,16.7281603 L26.9108669,27 L37.1827058,37.2718397 Z" id="pb_tbl-type_upd-1-less_than" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_avg_lt()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">revenue</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">ref('revenue')<br>tol=0.05</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-1-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-1-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-1-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-1-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-1-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
         </g>
     </g>
 </svg></td>
@@ -2457,6 +2984,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 </div>
+<p>With <code>reference=</code> set, leaving out <code>value=</code> compares against the same column in the reference table. Step 1 checks <code>111.675 &lt; 112.75</code> (the average of <code>revenue</code> in <code>current</code>, then in <code>baseline</code>), so it passes. Step 2 names the target column with <a href="../reference/ref.html#pointblank.ref" class="gdls-link"><code>ref()</code></a>, which you’d need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.</p>
 
 
 </section>
