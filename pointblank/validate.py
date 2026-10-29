@@ -6129,6 +6129,11 @@ class Validate:
         ValueError
             If `value` is None and no reference data is set on the Validate object.
         """
+        if isinstance(value, Column) and not isinstance(value, ColumnLiteral):
+            raise ValueError(
+                f"`value=` in {assertion_type}() accepts `col()` with a single column name only "
+                "(e.g., `col('b')`), not a column selector."
+            )
         if isinstance(columns, str):
             columns = [columns]
         for column in columns:
@@ -17676,10 +17681,15 @@ class Validate:
                                 )
                             ref_vec = nw.from_native(self.reference).select(raw_value.column_name)
                             target: float | int = agg(ref_vec)
+                        # Handle col(): compare against the same aggregate of another column
+                        elif isinstance(raw_value, ColumnLiteral):
+                            other_vec = nw.from_native(data_tbl_step).select(raw_value.exprs)
+                            target = agg(other_vec)
                         else:
                             target = raw_value
 
-                        lower_diff, upper_diff = _derive_bounds(target, tol)
+                        # Aggregates are often fractional, so keep the bounds unrounded
+                        lower_diff, upper_diff = _derive_bounds(target, tol, integer=False)
 
                         lower_bound = target - lower_diff
                         upper_bound = target + upper_diff
@@ -28900,49 +28910,172 @@ def _generate_agg_docstring(name: str) -> str:
         "le": "<=",
     }
 
-    agg_name, agg_verb = agg_names[agg_type]
+    agg_name, _ = agg_names[agg_type]
     comp_desc, comp_phrase, comp_article = comp_descriptions[comp_type]
     comp_symbol = comp_symbols[comp_type]
 
-    # Determine the appropriate example values based on the aggregation and comparison
-    if agg_type == "sum":
-        example_value = "15"
-        example_data = '{"a": [1, 2, 3, 4, 5], "b": [2, 2, 2, 2, 2]}'
-        example_sum = "15"  # sum of a
-        example_ref_sum = "10"  # sum of b
-    elif agg_type == "avg":
-        example_value = "3"
-        example_data = '{"a": [1, 2, 3, 4, 5], "b": [2, 2, 2, 2, 2]}'
-        example_sum = "3.0"  # avg of a
-        example_ref_sum = "2.0"  # avg of b
-    else:  # sd
-        example_value = "2"
-        example_data = '{"a": [1, 2, 3, 4, 5], "b": [2, 2, 2, 2, 2]}'
-        example_sum = "~1.58"  # sd of a
-        example_ref_sum = "0.0"  # sd of b
+    # The example values are computed here (with the same tolerance rules used at interrogation
+    # time) so that the prose after each example describes its actual result
+    import statistics
 
-    # Build appropriate tolerance explanation based on comparison type
-    if comp_type == "eq":
-        tol_explanation = f"""The `tol=` parameter is particularly useful with `{name}()` since exact equality
-        comparisons on floating-point aggregations can be problematic due to numerical precision.
-        Setting a small tolerance (e.g., `tol=0.001`) allows for minor differences that arise from
-        floating-point arithmetic."""
+    agg_fns = {"sum": sum, "avg": statistics.mean, "sd": statistics.stdev}
+    comp_fns = {
+        "eq": lambda x, lo, hi: lo <= x <= hi,
+        "gt": lambda x, lo, hi: x > lo,
+        "ge": lambda x, lo, hi: x >= lo,
+        "lt": lambda x, lo, hi: x < hi,
+        "le": lambda x, lo, hi: x <= hi,
+    }
+
+    def _bounds(target: float, tol: float) -> tuple[float, float]:
+        allowance = tol * abs(target) if tol < 1 else tol
+        return target - allowance, target + allowance
+
+    def _passes(actual: float, target: float, tol: float = 0) -> bool:
+        lower, upper = _bounds(target, tol)
+        return comp_fns[comp_type](actual, lower, upper)
+
+    def _fmt(x: float) -> str:
+        return f"{x:.6g}"
+
+    def _outcome(passed: bool) -> str:
+        return "passes" if passed else "fails"
+
+    agg_fn = agg_fns[agg_type]
+    val_a = agg_fn([1, 2, 3, 4, 5])
+    val_b = agg_fn([2, 2, 2, 2, 2])
+
+    # A target for the first examples, and a near-miss target for the tolerance example
+    first_targets = {
+        "sum": {"eq": 15, "gt": 10, "ge": 15, "lt": 20, "le": 15},
+        "avg": {"eq": 3, "gt": 2, "ge": 3, "lt": 4, "le": 3},
+        "sd": {"eq": 1.58, "gt": 1, "ge": 1, "lt": 2, "le": 2},
+    }
+    near_targets = {
+        "sum": {"eq": 15.5, "gt": 15.5, "ge": 15.5, "lt": 14.5, "le": 14.5},
+        "avg": {"eq": 3.1, "gt": 3.1, "ge": 3.1, "lt": 2.9, "le": 2.9},
+        "sd": {"eq": 1.65, "gt": 1.65, "ge": 1.65, "lt": 1.52, "le": 1.52},
+    }
+    target_1 = first_targets[agg_type][comp_type]
+    target_near = near_targets[agg_type][comp_type]
+
+    # First example
+    passed_a = _passes(val_a, target_1)
+    if passed_a:
+        first_result = (
+            f"The {agg_name} of `a` is `{_fmt(val_a)}`, and `{_fmt(val_a)} {comp_symbol} "
+            f"{target_1}` holds, so the step's one test unit passes."
+        )
     else:
-        tol_explanation = f"""The `tol=` parameter expands the acceptable range for the comparison. For
-        `{name}()`, a tolerance of `tol=0.5` would mean the {agg_name} can be within `0.5` of the
-        target value and still pass validation."""
+        first_result = (
+            f"The {agg_name} of `a` is `{_fmt(val_a)}`, so `{_fmt(val_a)} {comp_symbol} "
+            f"{target_1}` doesn't hold and the step's one test unit fails. "
+            "Exact equality is rarely a good test for a computed value like this one, and the "
+            "tolerance example below shows how to allow some leeway."
+        )
+
+    # Multiple columns
+    passed_b = _passes(val_b, target_1)
+    second_result = (
+        f"Each column gets its own step: step 1 is for `a` and step 2 is for `b`. The {agg_name} "
+        f"of `b` is `{_fmt(val_b)}`, so step 2 {_outcome(passed_b)}."
+    )
+
+    # Step report for step 2 (no tolerance, so the difference is from the target itself)
+    diff_b = val_b - target_1
+    diff_b_text = "0" if diff_b == 0 else (f"+{_fmt(diff_b)}" if diff_b > 0 else _fmt(diff_b))
+    diff_b_note = (
+        " A difference of `0` fails here because the comparison is strict."
+        if diff_b == 0 and comp_type in ("gt", "lt")
+        else ""
+    )
+
+    # Tolerance example
+    passed_exact = _passes(val_a, target_near)
+    passed_tol = _passes(val_a, target_near, tol=0.05)
+    lower_near, upper_near = _bounds(target_near, 0.05)
+    allowance_near = _fmt(0.05 * abs(target_near))
+    if comp_type == "eq":
+        tol_range = f"any {agg_name} from `{_fmt(lower_near)}` to `{_fmt(upper_near)}` is accepted"
+    elif comp_type in ("gt", "ge"):
+        word = "greater than" if comp_type == "gt" else "at least"
+        tol_range = f"the {agg_name} only has to be {word} `{_fmt(lower_near)}`"
+    else:
+        word = "less than" if comp_type == "lt" else "at most"
+        tol_range = f"the {agg_name} only has to be {word} `{_fmt(upper_near)}`"
+    exact_text = "holds" if passed_exact else "doesn't hold, if only just,"
+    tol_result = (
+        f"The {agg_name} of `a` is `{_fmt(val_a)}`, so `{_fmt(val_a)} {comp_symbol} "
+        f"{target_near}` {exact_text} and step 1 "
+        f"{_outcome(passed_exact)}. In step 2, `tol=0.05` allows 5% of the target "
+        f"(`{allowance_near}`), so {tol_range}, and the step {_outcome(passed_tol)}."
+    )
+
+    # Comparing with another column
+    passed_col = _passes(val_a, val_b)
+    col_result = (
+        f"Here the target is the {agg_name} of `b` (`{_fmt(val_b)}`) rather than a fixed number. "
+        f"The {agg_name} of `a` is `{_fmt(val_a)}`, so `{_fmt(val_a)} {comp_symbol} "
+        f"{_fmt(val_b)}` {'holds' if passed_col else 'does not hold'} and the step "
+        f"{_outcome(passed_col)}. Both aggregates are computed from the same table when the "
+        "validation is interrogated."
+    )
+
+    # Comparing with reference data
+    val_cur = agg_fn([120.0, 95.5, 143.2, 88.0])
+    val_base = agg_fn([110.0, 101.0, 150.0, 90.0])
+    passed_ref = _passes(val_cur, val_base)
+    passed_ref_tol = _passes(val_cur, val_base, tol=0.05)
+    ref_result = (
+        "With `reference=` set, leaving out `value=` compares against the same column in the "
+        f"reference table. Step 1 checks `{_fmt(val_cur)} {comp_symbol} {_fmt(val_base)}` (the "
+        f"{agg_name} of `revenue` in `current`, then in `baseline`), so it "
+        f"{_outcome(passed_ref)}. Step 2 names the target column with [`ref()`](`pointblank.ref`), "
+        "which you'd need if the column had a different name in the reference table, and allows "
+        f"a 5% tolerance, so it {_outcome(passed_ref_tol)}. Comparing each new load of a table "
+        "with the last one known to be good like this catches drift that no single row would "
+        "reveal."
+    )
+
+    # The rule applied by the comparison, once a tolerance is included
+    tol_rules = {
+        "eq": f"`target - lower <= {agg_name}(column) <= target + upper`",
+        "gt": f"`{agg_name}(column) > target - lower`",
+        "ge": f"`{agg_name}(column) >= target - lower`",
+        "lt": f"`{agg_name}(column) < target + upper`",
+        "le": f"`{agg_name}(column) <= target + upper`",
+    }
+    tol_rule = tol_rules[comp_type]
+
+    sd_note = (
+        ", and the standard deviation is the sample standard deviation (dividing by `n - 1`)"
+        if agg_type == "sd"
+        else ""
+    )
 
     docstring = f"""
     Does the column {agg_name} satisfy {comp_article} {comp_desc} comparison?
 
-    The `{name}()` validation method checks whether the {agg_name} of values in a column
-    {comp_phrase} a specified `value=`. This is an aggregation-based validation where the entire
-    column is reduced to a single {agg_name} value that is then compared against the target. The
-    comparison used in this function is `{agg_name}(column) {comp_symbol} value`.
+    The `{name}()` validation method checks whether the {agg_name} of a column {comp_phrase} a
+    target `value=`. The whole column is reduced to a single number and compared with the target
+    (`{agg_name}(column) {comp_symbol} value`), so the step has exactly one test unit, which
+    either passes or fails.
 
-    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
-    a single test unit. The validation either passes completely (if the aggregated value satisfies
-    the comparison) or fails completely.
+    Aggregate checks catch problems that row-level checks can't see. Every value in a column can be
+    within its allowed range while the column as a whole is wrong: a daily total that doesn't match
+    the control figure from the source system, an average that has shifted after a change upstream,
+    or a sensor whose readings have stopped varying (a standard deviation near zero). Use row-level
+    methods like [`col_vals_between()`](`pointblank.Validate.col_vals_between`) to check individual
+    values, and an aggregate method to check what they add up to. The target can be a fixed number,
+    the same aggregate of another column, or the same aggregate of a column in reference data. The
+    last option makes these methods a good fit for comparing a new load of a table with the last
+    one that was known to be good.
+
+    Null values are left out of the computation{sd_note}. The column must be numeric, and a
+    non-numeric column raises an error during interrogation. Unlike the row-level methods, the
+    aggregate methods don't take `pre=` or `segments=`: the {agg_name} is computed over the whole
+    table, so filter the table before passing it to `Validate` if you need the {agg_name} of a
+    subset.
 
     Parameters
     ----------
@@ -28951,22 +29084,23 @@ def _generate_agg_docstring(name: str) -> str:
         there will be a separate validation step generated for each column. The columns must
         contain numeric data for the {agg_name} to be computed.
     value
-        The value to compare the column {agg_name} against. This can be: (1) a numeric literal
-        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
-        whose {agg_name} will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
-        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
-        `None` to automatically compare against the same column in reference data (shorthand for
-        `ref(column_name)` when reference data is set).
+        The target to compare the column {agg_name} against. This can be: (1) a number, (2) a
+        [`col()`](`pointblank.col`) object naming another column, in which case the target is the
+        {agg_name} of that column in the same table, (3) a [`ref()`](`pointblank.ref`) object naming
+        a column in the reference data (set with `Validate(reference=)`), in which case the target
+        is the {agg_name} of that column there, or (4) `None` (the default), which is shorthand for
+        `ref()` of the same column. Using `None` without reference data raises a `ValueError`.
+        `col()` takes a single column name here, not a column selector.
     tol
-        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
-        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
-        a {agg_name} that differs from the target by up to `0.5` will still pass. {tol_explanation}
+        The tolerance around the target. The default is `0`, an exact comparison. A value below
+        `1` is a fraction of the target's size (`tol=0.05` allows 5%), and a value of `1` or more
+        is an absolute amount (`tol=2` allows `2` either way). A tuple of two values,
+        `(lower, upper)`, sets the two sides separately, with each value read the same way. See
+        the *Understanding Tolerance* section for how the tolerance applies to each comparison.
     thresholds
-        Failure threshold levels so that the validation step can react accordingly when
-        failing test units are level. Since this is an aggregation-based validation with only
-        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
-        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
-        acceptable.
+        Failure threshold levels for the step. They override any thresholds set in
+        `Validate(thresholds=)`. Because the step has a single test unit, every level that's set
+        is reached when the step fails. See the *Thresholds* section for details.
     brief
         An optional brief description of the validation step that will be displayed in the
         reporting table. You can use the templating elements like `"{{step}}"` to insert
@@ -28982,7 +29116,7 @@ def _generate_agg_docstring(name: str) -> str:
         active. Using `False` will make the validation step inactive (still reporting its
         presence and keeping indexes for the steps unchanged). A callable can also be
         provided; it will receive the data table as its single argument and must return a
-        boolean value. The callable is evaluated *before* any `pre=` processing.
+        boolean value.
         Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
         [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
         a step based on properties of the target table.
@@ -29000,40 +29134,26 @@ def _generate_agg_docstring(name: str) -> str:
     Validate
         The `Validate` object with the added validation step.
 
-    Using Reference Data
-    --------------------
-    The `{name}()` method supports comparing column aggregations against reference data. This
-    is useful for validating that statistical properties remain consistent across different
-    versions of a dataset, or for comparing current data against historical baselines.
-
-    To use reference data, set the `reference=` parameter when creating the `Validate` object:
-
-    ```python
-    validation = (
-        pb.Validate(data=current_data, reference=baseline_data)
-        .{name}(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
-        .interrogate()
-    )
-    ```
-
-    When `value=None` and reference data is set, the method automatically compares against the
-    same column in the reference data. You can also explicitly specify reference columns using
-    the `ref()` helper:
-
-    ```python
-    .{name}(columns="revenue", value=pb.ref("baseline_revenue"))
-    ```
-
     Understanding Tolerance
     -----------------------
-    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
-    floating-point aggregations where exact equality is often unreliable.
+    Exact comparisons are often too strict for aggregates. A sum of floating-point values can
+    differ from the expected total in the last decimal places, and an average or standard deviation
+    computed from real data is rarely a round number. The `tol=` parameter turns the target into a
+    range:
 
-    {tol_explanation}
+    - with `tol=0.05`, the allowance is 5% of the target (`0.05 * abs(target)`)
+    - with `tol=2`, the allowance is `2`
+    - with `tol=(0.1, 0)`, the allowance is 10% below the target and nothing above it
 
-    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
-    within which the aggregation is considered valid. For inequality comparisons, the tolerance
-    shifts the comparison boundary.
+    Because values below `1` are relative, an absolute allowance smaller than `1` can't be given
+    directly. Express it as a fraction of the target instead (for a target of `50`, `tol=0.01`
+    allows `0.5`). A relative tolerance has no effect when the target is `0`.
+
+    How the allowance is used depends on the comparison. For `eq`, the aggregate passes if it's
+    anywhere from `target - lower` to `target + upper`. For `gt` and `ge`, it's compared with
+    `target - lower`, so the tolerance lowers the bar. For `lt` and `le`, it's compared with
+    `target + upper`, which raises the ceiling. In those four cases the other side of the tolerance
+    isn't used. For `{name}()`, the step passes when {tol_rule}.
 
     Thresholds
     ----------
@@ -29041,12 +29161,11 @@ def _generate_agg_docstring(name: str) -> str:
     step. If they are set here at the step level, these thresholds will override any thresholds
     set at the global level in `Validate(thresholds=...)`.
 
-    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
-    validations operate on a single test unit (the aggregated value), threshold values are
-    typically set as absolute counts:
-
-    - `thresholds=1` means any failure triggers a 'warning'
-    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+    An aggregate step has a single test unit, so the fraction of failing test units is either `0`
+    or `1`. Any level that's set, whether as a count (such as `1`) or as a fraction (such as
+    `0.1`), is reached when the step fails, so the levels can't be graded within one step. Set
+    only the level that a failure should reach: `thresholds=pb.Thresholds(error=1)` makes a failure
+    an 'error' without a 'warning', and `thresholds=(1, 1, 1)` makes it reach all three levels.
 
     Thresholds can be defined using one of these input schemes:
 
@@ -29067,7 +29186,7 @@ def _generate_agg_docstring(name: str) -> str:
     import pointblank as pb
     pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
-    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    For the examples, we'll use a simple Polars DataFrame with two numeric columns. The table is
     shown below:
 
     ```{{python}}
@@ -29084,44 +29203,92 @@ def _generate_agg_docstring(name: str) -> str:
     pb.preview(tbl)
     ```
 
-    Let's validate that the {agg_name} of column `a` {comp_phrase} `{example_value}`:
+    Let's validate that the {agg_name} of column `a` {comp_phrase} `{target_1}`:
 
     ```{{python}}
     validation = (
         pb.Validate(data=tbl)
-        .{name}(columns="a", value={example_value})
+        .{name}(columns="a", value={target_1})
         .interrogate()
     )
 
     validation
     ```
 
-    The validation result shows whether the {agg_name} comparison passed or failed. Since this
-    is an aggregation-based validation, there is exactly one test unit per column.
+    {first_result}
 
     When validating multiple columns, each column gets its own validation step:
 
     ```{{python}}
     validation = (
         pb.Validate(data=tbl)
-        .{name}(columns=["a", "b"], value={example_value})
+        .{name}(columns=["a", "b"], value={target_1})
         .interrogate()
     )
 
     validation
     ```
 
-    Using tolerance for flexible comparisons:
+    {second_result} The report doesn't show the computed {agg_name}, but the step report does:
+
+    ```{{python}}
+    validation.get_step_report(i=2)
+    ```
+
+    The step report shows the {agg_name} computed for `b` (*ACTUAL*), the target (*EXPECTED*),
+    the tolerance (*TOL*, none here), and *DIFFERENCE*, which is how far the computed value is from
+    the boundary it had to meet. Here that's `{diff_b_text}`, with positive values above the
+    boundary and negative values below it.{diff_b_note}
+
+    Next, a target that the {agg_name} of `a` just misses, first with an exact comparison and then
+    with a 5% tolerance:
 
     ```{{python}}
     validation = (
         pb.Validate(data=tbl)
-        .{name}(columns="a", value={example_value}, tol=1.0)
+        .{name}(columns="a", value={target_near})
+        .{name}(columns="a", value={target_near}, tol=0.05)
         .interrogate()
     )
 
     validation
     ```
+
+    {tol_result}
+
+    The target can also be the same aggregate of another column, given with
+    [`col()`](`pointblank.col`):
+
+    ```{{python}}
+    validation = (
+        pb.Validate(data=tbl)
+        .{name}(columns="a", value=pb.col("b"))
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    {col_result}
+
+    Finally, the target can come from reference data, such as an earlier load of the same table
+    that passed its checks:
+
+    ```{{python}}
+    current = pl.DataFrame({{"revenue": [120.0, 95.5, 143.2, 88.0]}})
+    baseline = pl.DataFrame({{"revenue": [110.0, 101.0, 150.0, 90.0]}})
+
+    validation = (
+        pb.Validate(data=current, reference=baseline)
+        .{name}(columns="revenue")
+        .{name}(columns="revenue", value=pb.ref("revenue"), tol=0.05)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    {ref_result}
     """
 
     return docstring.strip()
