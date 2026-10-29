@@ -240,9 +240,14 @@ def import_contract(source: Any, *, format: str | None = None, **kwargs: Any) ->
     print(orders_contract.to_yaml())
     ```
 
+    The contract now has a name and an owner, and the dbt model's four translated tests are its
+    steps. From here it works like any other contract: it can be saved as YAML next to the dbt
+    project, enforced with [`Contract.validate()`](`pointblank.Contract.validate`), or used as a
+    boundary in a [`Pipeline`](`pointblank.Pipeline`).
+
     See Also
     --------
-    export_contract : Export a `Validate` object or `Contract` to an external format.
+    pointblank.export_contract : Export a `Validate` object or `Contract` to an external format.
     ContractImport : The object returned by this function.
     list_adapters : List the formats available for import and export.
     register_adapter : Add support for another format.
@@ -413,9 +418,15 @@ def export_contract(
     print(pb.import_contract(orders_json_schema).summary())
     ```
 
+    All five constraints in the JSON Schema were mapped back, so the coverage is 100%. The range
+    check returns as two steps (one each for `minimum` and `maximum`), and the uniqueness check is
+    gone because it was dropped on export. Coverage measures how much of the *document* was
+    understood, not how much of the original contract survived. To find what an export loses,
+    compare the steps before and after.
+
     See Also
     --------
-    import_contract : Import an external definition into Pointblank.
+    pointblank.import_contract : Import an external definition into Pointblank.
     list_adapters : List the formats available for import and export.
     register_adapter : Add support for another format.
     Contract : The declarative contract that exports most completely.
