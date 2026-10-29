@@ -163,6 +163,10 @@ class Step:
     )
     ```
 
+    The first four steps give the same results as in the contract. The new length check, in
+    step 5, also catches `"PT-03"`, which has five characters instead of six. Defining the steps
+    once as a list lets a contract and an ordinary validation share them.
+
     See Also
     --------
     Contract : Collect steps, a schema, and metadata into a reusable contract.
@@ -232,6 +236,10 @@ class Step:
             "col_vals_not_null", columns="email", thresholds=pb.Thresholds(warning=1, error=0.05)
         ).to_dict()
         ```
+
+        The `critical` level isn't set, so it's left out. Each of these dictionaries is ready to be
+        written as YAML or JSON. Reading one back with [`from_dict()`](`pointblank.Step.from_dict`)
+        gives a step that runs the same check.
         """
         from pointblank.thresholds import Thresholds, _normalize_thresholds_creation
 
@@ -308,6 +316,11 @@ class Step:
 
         pb.Step.from_dict(step.to_dict()) == step
         ```
+
+        The round trip gives back an equal step, so steps can be stored as YAML, as JSON, or in a
+        database and rebuilt later. The parsed steps above could go straight into a
+        [`Contract`](`pointblank.Contract`) or, wrapped in [`Steps`](`pointblank.Steps`), into an
+        ordinary validation.
         """
         if len(data) != 1:
             raise ValueError(
@@ -641,8 +654,8 @@ class Contract:
     Step : A single declarative validation step, used in a contract's `steps=`.
     Schema : The column names and types used in a contract's `schema=`.
     Pipeline : Enforce source and target contracts around a transformation.
-    export_contract : Convert a contract to JSON Schema, Frictionless, dbt, or ODCS.
-    import_contract : Read an external contract format, then call `to_contract()` on the result.
+    pointblank.export_contract : Convert a contract to JSON Schema, Frictionless, dbt, or ODCS.
+    pointblank.import_contract : Read an external format, then call `to_contract()` on it.
     """
 
     name: str
@@ -956,6 +969,9 @@ class Contract:
 
         print(json.dumps(accounts_contract.to_dict(), indent=2))
         ```
+
+        The JSON text can be stored in a database column or sent to an API. After it's parsed with
+        `json.loads()`, [`from_dict()`](`pointblank.Contract.from_dict`) rebuilds the contract.
         """
         result: dict[str, Any] = {"name": self.name}
 
@@ -1319,6 +1335,12 @@ class Contract:
 
         pb.Contract.from_yaml(contract_path) == sessions_contract
         ```
+
+        The file holds everything needed to rebuild the contract. A natural place for it is
+        version control, next to the code that produces the data, so that changes to the rules
+        are reviewed like any other change. Wherever the contract is enforced, it can be loaded
+        with [`from_yaml()`](`pointblank.Contract.from_yaml`) (or as part of a pipeline with
+        [`Pipeline.from_yaml()`](`pointblank.Pipeline.from_yaml`)).
         """
         import yaml
 
