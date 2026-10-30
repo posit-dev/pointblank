@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040.0 788.0" width="1040.0" height="788.0" role="img" aria-label="Terminal recording frame">
+<style>.gd-tp-text{font-family:JetBrains Mono, Fira Code, SF Mono, Menlo, Consolas, monospace;font-size:14px;white-space:pre;dominant-baseline:text-before-edge}.gd-tp-bold{font-weight:700}.gd-tp-italic{font-style:italic}.gd-tp-underline{text-decoration:underline}.gd-tp-strikethrough{text-decoration:line-through}.gd-tp-dim{opacity:0.6}@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}.gd-tp-cursor{animation:blink 1s step-end infinite}</style>
+<rect width="1040.0" height="788.0" fill="#282a36" rx="8" ry="8"/>
+<g transform="translate(16,16)">
+<text x="0.0" y="0.0" class="gd-tp-text" fill="#f8f8f2">  Examples:</text>
+<text x="0.0" y="42.0" class="gd-tp-text" fill="#f8f8f2">  pb validate data.csv                               # Uses default validation (rows-distinct)</text>
+<text x="0.0" y="63.0" class="gd-tp-text" fill="#f8f8f2">  pb validate data.csv --list-checks                 # Show all available checks</text>
+<text x="0.0" y="84.0" class="gd-tp-text" fill="#f8f8f2">  pb validate data.csv --check rows-distinct</text>
+<text x="0.0" y="105.0" class="gd-tp-text" fill="#f8f8f2">  pb validate data.csv --check rows-distinct --show-extract</text>
+<text x="0.0" y="126.0" class="gd-tp-text" fill="#f8f8f2">  pb validate data.csv --check rows-distinct --write-extract failing_rows_folder</text>
+<text x="0.0" y="147.0" class="gd-tp-text" fill="#f8f8f2">  pb validate data.csv --check rows-distinct --exit-code</text>
+<text x="0.0" y="168.0" class="gd-tp-text" fill="#f8f8f2">  pb validate data.csv --check col-exists --column price</text>
+<text x="0.0" y="189.0" class="gd-tp-text" fill="#f8f8f2">  pb validate data.csv --check col-vals-not-null --column email</text>
+<text x="0.0" y="210.0" class="gd-tp-text" fill="#f8f8f2">  pb validate data.csv --check col-vals-gt --column score --value 50</text>
+<text x="0.0" y="231.0" class="gd-tp-text" fill="#f8f8f2">  pb validate data.csv --check col-vals-in-set --column status --set "active,inactive,pending"</text>
+<text x="0.0" y="273.0" class="gd-tp-text" fill="#f8f8f2">  Multiple validations in one command: pb validate data.csv --check rows-</text>
+<text x="0.0" y="294.0" class="gd-tp-text" fill="#f8f8f2">  distinct --check rows-complete</text>
+<text x="0.0" y="336.0" class="gd-tp-text" fill="#f8f8f2">Options:</text>
+<text x="0.0" y="357.0" class="gd-tp-text" fill="#f8f8f2">  --list-checks         List available validation checks and exit</text>
+<text x="0.0" y="378.0" class="gd-tp-text" fill="#f8f8f2">  --check CHECK_TYPE    Type of validation check to perform. Can be used</text>
+<text x="0.0" y="399.0" class="gd-tp-text" fill="#f8f8f2">                        multiple times for multiple checks.</text>
+<text x="0.0" y="420.0" class="gd-tp-text" fill="#f8f8f2">  --column TEXT         Column name or integer position as #N (1-based index)</text>
+<text x="0.0" y="441.0" class="gd-tp-text" fill="#f8f8f2">                        for validation.</text>
+<text x="0.0" y="462.0" class="gd-tp-text" fill="#f8f8f2">  --set TEXT            Comma-separated allowed values for col-vals-in-set</text>
+<text x="0.0" y="483.0" class="gd-tp-text" fill="#f8f8f2">                        checks.</text>
+<text x="0.0" y="504.0" class="gd-tp-text" fill="#f8f8f2">  --value FLOAT         Numeric value for comparison checks.</text>
+<text x="0.0" y="525.0" class="gd-tp-text" fill="#f8f8f2">  --show-extract        Show extract of failing rows if validation fails</text>
+<text x="0.0" y="546.0" class="gd-tp-text" fill="#f8f8f2">  --write-extract TEXT  Save failing rows to folder. Provide base name for</text>
+<text x="0.0" y="567.0" class="gd-tp-text" fill="#f8f8f2">                        folder.</text>
+<text x="0.0" y="588.0" class="gd-tp-text" fill="#f8f8f2">  --limit INTEGER       Maximum number of failing rows to save to CSV</text>
+<text x="0.0" y="609.0" class="gd-tp-text" fill="#f8f8f2">                        (default: 500)</text>
+<text x="0.0" y="630.0" class="gd-tp-text" fill="#f8f8f2">  --exit-code           Exit with non-zero code if validation fails</text>
+<text x="0.0" y="651.0" class="gd-tp-text" fill="#f8f8f2">  --help                Show this message and exit.</text>
+<text x="0.0" y="672.0" class="gd-tp-text" fill="#f8f8f2">&gt;</text>
+<text x="0.0" y="693.0" class="gd-tp-text" fill="#f8f8f2">&gt; # Your first validation: check for duplicates with rows-distinct</text>
+<text x="0.0" y="714.0" class="gd-tp-text" fill="#f8f8f2">&gt; pb validate small_table --check rows-distinct</text>
+<text x="0.0" y="735.0" class="gd-tp-text" fill="#50fa7b">⠋</text>
+<text x="8.4" y="735.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="16.8" y="735.0" class="gd-tp-text gd-tp-bold" fill="#69ff94">Loading data...</text>
+</g>
+</svg>

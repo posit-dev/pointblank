@@ -1,0 +1,228 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1082.0 1208.0" width="1082.0" height="1208.0" role="img" aria-label="Terminal recording frame">
+<style>.gd-tp-text{font-family:JetBrains Mono, Fira Code, SF Mono, Menlo, Consolas, monospace;font-size:14px;white-space:pre;dominant-baseline:text-before-edge}.gd-tp-bold{font-weight:700}.gd-tp-italic{font-style:italic}.gd-tp-underline{text-decoration:underline}.gd-tp-strikethrough{text-decoration:line-through}.gd-tp-dim{opacity:0.6}@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}.gd-tp-cursor{animation:blink 1s step-end infinite}</style>
+<rect width="1082.0" height="1208.0" fill="#282a36" rx="8" ry="8"/>
+<g transform="translate(16,16)">
+<text x="0.0" y="0.0" class="gd-tp-text" fill="#50fa7b">╭─────────────────────────────────────────────────────────────────────────────────────╮</text>
+<text x="0.0" y="21.0" class="gd-tp-text" fill="#50fa7b">│</text>
+<text x="8.4" y="21.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="16.8" y="21.0" class="gd-tp-text" fill="#50fa7b">✓ Validation PASSED: All values in column 'latitude' are &lt;= 90.0 in worldcities.csv</text>
+<text x="714.0" y="21.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="722.4" y="21.0" class="gd-tp-text" fill="#50fa7b">│</text>
+<text x="0.0" y="42.0" class="gd-tp-text" fill="#50fa7b">╰─────────────────────────────────────────────────────────────────────────────────────╯</text>
+<text x="0.0" y="63.0" class="gd-tp-text" fill="#f8f8f2">&gt;</text>
+<text x="0.0" y="84.0" class="gd-tp-text" fill="#f8f8f2">&gt; # Step 6: Create a comprehensive validation script for production use</text>
+<text x="0.0" y="105.0" class="gd-tp-text" fill="#f8f8f2">&gt; cat validation.py</text>
+<text x="0.0" y="126.0" class="gd-tp-text" fill="#f8f8f2">import pointblank as pb</text>
+<text x="0.0" y="168.0" class="gd-tp-text" fill="#f8f8f2">validation = (</text>
+<text x="0.0" y="189.0" class="gd-tp-text" fill="#f8f8f2">    pb.Validate(</text>
+<text x="0.0" y="210.0" class="gd-tp-text" fill="#f8f8f2">        data="worldcities.csv",</text>
+<text x="0.0" y="231.0" class="gd-tp-text" fill="#f8f8f2">        thresholds=pb.Thresholds(</text>
+<text x="0.0" y="252.0" class="gd-tp-text" fill="#f8f8f2">            warning=1,  # 1 failure</text>
+<text x="0.0" y="273.0" class="gd-tp-text" fill="#f8f8f2">            error=0.05,  # 5% of rows failing</text>
+<text x="0.0" y="294.0" class="gd-tp-text" fill="#f8f8f2">        ),</text>
+<text x="0.0" y="315.0" class="gd-tp-text" fill="#f8f8f2">    )</text>
+<text x="0.0" y="336.0" class="gd-tp-text" fill="#f8f8f2">    .col_schema_match(</text>
+<text x="0.0" y="357.0" class="gd-tp-text" fill="#f8f8f2">        schema=pb.Schema(</text>
+<text x="0.0" y="378.0" class="gd-tp-text" fill="#f8f8f2">            columns=[</text>
+<text x="0.0" y="399.0" class="gd-tp-text" fill="#f8f8f2">                ("city_name", "String"),</text>
+<text x="0.0" y="420.0" class="gd-tp-text" fill="#f8f8f2">                ("latitude", "Float64"),</text>
+<text x="0.0" y="441.0" class="gd-tp-text" fill="#f8f8f2">                ("longitude", "Float64"),</text>
+<text x="0.0" y="462.0" class="gd-tp-text" fill="#f8f8f2">                ("country", "String"),</text>
+<text x="0.0" y="483.0" class="gd-tp-text" fill="#f8f8f2">                ("population", "Int64"),</text>
+<text x="0.0" y="504.0" class="gd-tp-text" fill="#f8f8f2">            ]</text>
+<text x="0.0" y="525.0" class="gd-tp-text" fill="#f8f8f2">        ),</text>
+<text x="0.0" y="546.0" class="gd-tp-text" fill="#f8f8f2">    )</text>
+<text x="0.0" y="567.0" class="gd-tp-text" fill="#f8f8f2">    .col_vals_not_null(columns="city_name")</text>
+<text x="0.0" y="588.0" class="gd-tp-text" fill="#f8f8f2">    .col_vals_not_null(columns="population")</text>
+<text x="0.0" y="609.0" class="gd-tp-text" fill="#f8f8f2">    .col_vals_gt(columns="population", value=0, na_pass=True)</text>
+<text x="0.0" y="630.0" class="gd-tp-text" fill="#f8f8f2">    .col_vals_between(columns="latitude", left=-90, right=90)</text>
+<text x="0.0" y="651.0" class="gd-tp-text" fill="#f8f8f2">    .col_vals_between(columns="longitude", left=-180, right=180)</text>
+<text x="0.0" y="672.0" class="gd-tp-text" fill="#f8f8f2">    .interrogate()</text>
+<text x="0.0" y="693.0" class="gd-tp-text" fill="#f8f8f2">)</text>
+<text x="0.0" y="714.0" class="gd-tp-text" fill="#f8f8f2">&gt;</text>
+<text x="0.0" y="735.0" class="gd-tp-text" fill="#f8f8f2">&gt; # Step 7: Run that comprehensive validation and get a validation reporting table</text>
+<text x="0.0" y="756.0" class="gd-tp-text" fill="#f8f8f2">&gt; pb run validation.py</text>
+<text x="0.0" y="777.0" class="gd-tp-text" fill="#50fa7b">✓</text>
+<text x="8.4" y="777.0" class="gd-tp-text" fill="#f8f8f2"> Found </text>
+<text x="67.2" y="777.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff">1</text>
+<text x="75.6" y="777.0" class="gd-tp-text" fill="#f8f8f2"> validation </text>
+<text x="176.4" y="777.0" class="gd-tp-text gd-tp-bold" fill="#ff92df">object</text>
+<text x="226.8" y="777.0" class="gd-tp-text gd-tp-bold" fill="#f8f8f2">(</text>
+<text x="235.2" y="777.0" class="gd-tp-text" fill="#f8f8f2">s</text>
+<text x="243.6" y="777.0" class="gd-tp-text gd-tp-bold" fill="#f8f8f2">)</text>
+<text x="0.0" y="819.0" class="gd-tp-text" fill="#bd93f9">Validation Report</text>
+<text x="0.0" y="840.0" class="gd-tp-text" fill="#f8f8f2">Steps: </text>
+<text x="58.8" y="840.0" class="gd-tp-text gd-tp-bold" fill="#ffffff">6</text>
+<text x="67.2" y="840.0" class="gd-tp-text" fill="#f8f8f2"> / P: </text>
+<text x="117.6" y="840.0" class="gd-tp-text gd-tp-bold" fill="#ffffff">4</text>
+<text x="126.0" y="840.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="134.4" y="840.0" class="gd-tp-text gd-tp-bold" fill="#ffffff">(4</text>
+<text x="151.2" y="840.0" class="gd-tp-text" fill="#f8f8f2"> AP</text>
+<text x="176.4" y="840.0" class="gd-tp-text gd-tp-bold" fill="#ffffff">)</text>
+<text x="184.8" y="840.0" class="gd-tp-text" fill="#f8f8f2"> / W: </text>
+<text x="235.2" y="840.0" class="gd-tp-text gd-tp-bold" fill="#ffffff">2</text>
+<text x="243.6" y="840.0" class="gd-tp-text" fill="#f8f8f2"> / E: </text>
+<text x="294.0" y="840.0" class="gd-tp-text gd-tp-bold" fill="#ffffff">0</text>
+<text x="302.4" y="840.0" class="gd-tp-text" fill="#f8f8f2"> / C: </text>
+<text x="352.8" y="840.0" class="gd-tp-text gd-tp-bold" fill="#ffffff">0</text>
+<text x="361.2" y="840.0" class="gd-tp-text" fill="#f8f8f2"> / </text>
+<text x="386.4" y="840.0" class="gd-tp-text" fill="#6272a4">warning</text>
+<text x="0.0" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="882.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff">   </text>
+<text x="33.6" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="42.0" y="882.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff"> Step              </text>
+<text x="201.6" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="210.0" y="882.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff"> Column     </text>
+<text x="310.8" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="319.2" y="882.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff"> Values      </text>
+<text x="428.4" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="436.8" y="882.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff"> Units </text>
+<text x="495.6" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="504.0" y="882.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff"> Pass      </text>
+<text x="596.4" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="604.8" y="882.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff"> Fail     </text>
+<text x="688.8" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="697.2" y="882.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff"> W </text>
+<text x="722.4" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="730.8" y="882.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff"> E </text>
+<text x="756.0" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="764.4" y="882.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff"> C </text>
+<text x="789.6" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="798.0" y="882.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff"> Ext</text>
+<text x="0.0" y="903.0" class="gd-tp-text" fill="#f8f8f2"> ───────────────────────────────────────────────────────────────────────────────────────────────────</text>
+<text x="0.0" y="924.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="924.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2"> 1 </text>
+<text x="33.6" y="924.0" class="gd-tp-text" fill="#f8f8f2">  col_schema_match   </text>
+<text x="210.0" y="924.0" class="gd-tp-text" fill="#8be9fd"> —          </text>
+<text x="310.8" y="924.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="319.2" y="924.0" class="gd-tp-text" fill="#f1fa8c"> —          </text>
+<text x="420.0" y="924.0" class="gd-tp-text" fill="#f8f8f2">33m  </text>
+<text x="462.0" y="924.0" class="gd-tp-text" fill="#bd93f9"> 1     </text>
+<text x="520.8" y="924.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="529.2" y="924.0" class="gd-tp-text" fill="#50fa7b"> 1/1.00    </text>
+<text x="621.6" y="924.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="630.0" y="924.0" class="gd-tp-text" fill="#ff5555"> 0/0.00   </text>
+<text x="714.0" y="924.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="722.4" y="924.0" class="gd-tp-text" fill="#6272a4"> ○ </text>
+<text x="747.6" y="924.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="756.0" y="924.0" class="gd-tp-text" fill="#f1fa8c"> ○ </text>
+<text x="781.2" y="924.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="789.6" y="924.0" class="gd-tp-text" fill="#ff5555"> — </text>
+<text x="814.8" y="924.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="823.2" y="924.0" class="gd-tp-text" fill="#bd93f9">  </text>
+<text x="840.0" y="924.0" class="gd-tp-text" fill="#6272a4">—</text>
+<text x="0.0" y="945.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="945.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2"> 2 </text>
+<text x="33.6" y="945.0" class="gd-tp-text" fill="#f8f8f2">  col_vals_not_null  </text>
+<text x="210.0" y="945.0" class="gd-tp-text" fill="#8be9fd"> city_name  </text>
+<text x="310.8" y="945.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="319.2" y="945.0" class="gd-tp-text" fill="#f1fa8c"> —           </text>
+<text x="428.4" y="945.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="436.8" y="945.0" class="gd-tp-text" fill="#bd93f9"> 41K   </text>
+<text x="495.6" y="945.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="504.0" y="945.0" class="gd-tp-text" fill="#50fa7b"> 41K/1.00  </text>
+<text x="596.4" y="945.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="604.8" y="945.0" class="gd-tp-text" fill="#ff5555"> 0/0.00   </text>
+<text x="688.8" y="945.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="697.2" y="945.0" class="gd-tp-text" fill="#6272a4"> ○ </text>
+<text x="722.4" y="945.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="730.8" y="945.0" class="gd-tp-text" fill="#f1fa8c"> ○ </text>
+<text x="756.0" y="945.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="764.4" y="945.0" class="gd-tp-text" fill="#ff5555"> — </text>
+<text x="789.6" y="945.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="798.0" y="945.0" class="gd-tp-text" fill="#bd93f9">  </text>
+<text x="814.8" y="945.0" class="gd-tp-text" fill="#6272a4">—</text>
+<text x="0.0" y="966.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="966.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2"> 3 </text>
+<text x="33.6" y="966.0" class="gd-tp-text" fill="#f8f8f2">  col_vals_not_null  </text>
+<text x="210.0" y="966.0" class="gd-tp-text" fill="#8be9fd"> population </text>
+<text x="310.8" y="966.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="319.2" y="966.0" class="gd-tp-text" fill="#f1fa8c"> —           </text>
+<text x="428.4" y="966.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="436.8" y="966.0" class="gd-tp-text" fill="#bd93f9"> 41K   </text>
+<text x="495.6" y="966.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="504.0" y="966.0" class="gd-tp-text" fill="#50fa7b"> 40K/0.98  </text>
+<text x="596.4" y="966.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="604.8" y="966.0" class="gd-tp-text" fill="#ff5555"> 738/0.02 </text>
+<text x="688.8" y="966.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="697.2" y="966.0" class="gd-tp-text" fill="#6272a4"> ● </text>
+<text x="722.4" y="966.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="730.8" y="966.0" class="gd-tp-text" fill="#f1fa8c"> ○ </text>
+<text x="756.0" y="966.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="764.4" y="966.0" class="gd-tp-text" fill="#ff5555"> — </text>
+<text x="789.6" y="966.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="798.0" y="966.0" class="gd-tp-text" fill="#bd93f9">  ✓</text>
+<text x="0.0" y="987.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="987.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2"> 4 </text>
+<text x="33.6" y="987.0" class="gd-tp-text" fill="#f8f8f2">  col_vals_gt        </text>
+<text x="210.0" y="987.0" class="gd-tp-text" fill="#8be9fd"> population </text>
+<text x="310.8" y="987.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="319.2" y="987.0" class="gd-tp-text" fill="#f1fa8c"> 0           </text>
+<text x="428.4" y="987.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="436.8" y="987.0" class="gd-tp-text" fill="#bd93f9"> 41K   </text>
+<text x="495.6" y="987.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="504.0" y="987.0" class="gd-tp-text" fill="#50fa7b"> 41K/&gt;0.99 </text>
+<text x="596.4" y="987.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="604.8" y="987.0" class="gd-tp-text" fill="#ff5555"> 3/&lt;0.01  </text>
+<text x="688.8" y="987.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="697.2" y="987.0" class="gd-tp-text" fill="#6272a4"> ● </text>
+<text x="722.4" y="987.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="730.8" y="987.0" class="gd-tp-text" fill="#f1fa8c"> ○ </text>
+<text x="756.0" y="987.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="764.4" y="987.0" class="gd-tp-text" fill="#ff5555"> — </text>
+<text x="789.6" y="987.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="798.0" y="987.0" class="gd-tp-text" fill="#bd93f9">  ✓</text>
+<text x="0.0" y="1008.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="1008.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2"> 5 </text>
+<text x="33.6" y="1008.0" class="gd-tp-text" fill="#f8f8f2">  col_vals_between   </text>
+<text x="210.0" y="1008.0" class="gd-tp-text" fill="#8be9fd"> latitude   </text>
+<text x="310.8" y="1008.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="319.2" y="1008.0" class="gd-tp-text" fill="#f1fa8c"> [-90, 90]   </text>
+<text x="428.4" y="1008.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="436.8" y="1008.0" class="gd-tp-text" fill="#bd93f9"> 41K   </text>
+<text x="495.6" y="1008.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="504.0" y="1008.0" class="gd-tp-text" fill="#50fa7b"> 41K/1.00  </text>
+<text x="596.4" y="1008.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="604.8" y="1008.0" class="gd-tp-text" fill="#ff5555"> 0/0.00   </text>
+<text x="688.8" y="1008.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="697.2" y="1008.0" class="gd-tp-text" fill="#6272a4"> ○ </text>
+<text x="722.4" y="1008.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="730.8" y="1008.0" class="gd-tp-text" fill="#f1fa8c"> ○ </text>
+<text x="756.0" y="1008.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="764.4" y="1008.0" class="gd-tp-text" fill="#ff5555"> — </text>
+<text x="789.6" y="1008.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="798.0" y="1008.0" class="gd-tp-text" fill="#bd93f9">  </text>
+<text x="814.8" y="1008.0" class="gd-tp-text" fill="#6272a4">—</text>
+<text x="0.0" y="1029.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="1029.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2"> 6 </text>
+<text x="33.6" y="1029.0" class="gd-tp-text" fill="#f8f8f2">  col_vals_between   36m </text>
+<text x="243.6" y="1029.0" class="gd-tp-text" fill="#8be9fd">longitude  </text>
+<text x="336.0" y="1029.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="344.4" y="1029.0" class="gd-tp-text" fill="#f1fa8c"> [-180, 180] </text>
+<text x="453.6" y="1029.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="462.0" y="1029.0" class="gd-tp-text" fill="#bd93f9"> 41K   </text>
+<text x="520.8" y="1029.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="529.2" y="1029.0" class="gd-tp-text" fill="#50fa7b"> 41K/1.00  </text>
+<text x="621.6" y="1029.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="630.0" y="1029.0" class="gd-tp-text" fill="#ff5555"> 0/0.00   </text>
+<text x="714.0" y="1029.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="722.4" y="1029.0" class="gd-tp-text" fill="#6272a4"> ○ </text>
+<text x="747.6" y="1029.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="756.0" y="1029.0" class="gd-tp-text" fill="#f1fa8c"> ○ </text>
+<text x="781.2" y="1029.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="789.6" y="1029.0" class="gd-tp-text" fill="#ff5555"> — </text>
+<text x="814.8" y="1029.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="823.2" y="1029.0" class="gd-tp-text" fill="#bd93f9">  </text>
+<text x="840.0" y="1029.0" class="gd-tp-text" fill="#6272a4">—</text>
+<text x="0.0" y="1071.0" class="gd-tp-text" fill="#6272a4">╭───────────────────────────────────────────╮</text>
+<text x="0.0" y="1092.0" class="gd-tp-text" fill="#6272a4">│</text>
+<text x="8.4" y="1092.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="16.8" y="1092.0" class="gd-tp-text" fill="#6272a4">✗ Validation failed with warning severity</text>
+<text x="361.2" y="1092.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="369.6" y="1092.0" class="gd-tp-text" fill="#6272a4">│</text>
+<text x="0.0" y="1113.0" class="gd-tp-text" fill="#6272a4">╰───────────────────────────────────────────╯</text>
+<text x="0.0" y="1134.0" class="gd-tp-text" fill="#f8f8f2">&gt;</text>
+<text x="0.0" y="1155.0" class="gd-tp-text" fill="#f8f8f2">&gt; # Step 8</text>
+<rect x="84.0" y="1155.0" width="8.4" height="21.0" fill="#f8f8f2" opacity="0.7" class="gd-tp-cursor"/>
+</g>
+</svg>

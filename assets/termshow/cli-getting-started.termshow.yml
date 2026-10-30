@@ -1,0 +1,39 @@
+# Converted from vhs/cli-getting-started.tape with `great-docs termshow import-tape`.
+# Record it (with `pb` on the PATH) with:
+#   great-docs termshow record --steps assets/termshow/cli-getting-started.termshow.yml
+
+settings:
+  theme: dracula
+  window_chrome: colorful
+
+record:
+  shell: bash --noprofile --norc
+  cols: 120
+  rows: 36
+  cwd: demo
+  env:
+    PS1: '> '
+  prompt_pattern: '> $'
+
+steps:
+  - run: '# Getting Started with the Pointblank CLI'
+  - sleep: 2
+  - run: ''
+  - run: '# See all available commands for the Pointblank CLI'
+  - run: pb --help
+  - sleep: 5
+  - run: ''
+  - run: '# There are a number of datasets you can use for testing'
+  - run: pb datasets
+  - sleep: 4
+  - run: ''
+  - run: '# Learn about all the `pb validate` options'
+  - run: pb validate --help
+  - sleep: 6
+  - run: ''
+  - run: '# Your first validation: check for duplicates with rows-distinct'
+  - run: pb validate small_table --check rows-distinct
+  - sleep: 5
+  - run: ''
+  - run: '# You can validate any sort of dataset you want: CSV, Parquet, or a DB table'
+  - sleep: 3

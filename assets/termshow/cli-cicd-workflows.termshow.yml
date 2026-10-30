@@ -1,0 +1,38 @@
+# Converted from cli-cicd-workflows.tape (VHS) with `great-docs termshow import-tape`, then adjusted:
+# commands are `run:` steps, which wait for the prompt.
+# Record it (with `pb` on the PATH) with:
+#   great-docs termshow record --steps assets/termshow/cli-cicd-workflows.termshow.yml
+
+settings:
+  theme: dracula
+  window_chrome: colorful
+record:
+  shell: bash --noprofile --norc
+  cols: 120
+  rows: 36
+  cwd: demo
+  env:
+    PS1: '> '
+  prompt_pattern: '> $'
+steps:
+- run: '# Example of a Production CI/CD Data Validation Workflow with the Pointblank CLI'
+- sleep: 2
+- run: ''
+- run: '# Pipeline Step 1: Checking for duplicates while using exit codes (this fails)'
+- run: pb validate small_table --check rows-distinct --exit-code
+  timeout: 60
+- sleep: 5
+- run: ''
+- run: '# Pipeline Step 2: Checking for null values in an important column (this passes)'
+- run: pb validate small_table --check col-vals-not-null --column date_time --exit-code
+  timeout: 60
+- sleep: 5
+- run: ''
+- run: '# Pipeline Step 3: Checking for values greater than 2 (this one fails)'
+- run: pb validate small_table --check col-vals-gt --column a --value 2 --exit-code
+  timeout: 60
+- sleep: 5
+- run: ''
+- run: '# Make use of --exit-code in GitHub Actions or any other automation platform'
+- run: '# Exit codes: 0 = success, 1 = validation failed'
+- sleep: 3

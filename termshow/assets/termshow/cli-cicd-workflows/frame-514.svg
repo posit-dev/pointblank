@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040.0 788.0" width="1040.0" height="788.0" role="img" aria-label="Terminal recording frame">
+<style>.gd-tp-text{font-family:JetBrains Mono, Fira Code, SF Mono, Menlo, Consolas, monospace;font-size:14px;white-space:pre;dominant-baseline:text-before-edge}.gd-tp-bold{font-weight:700}.gd-tp-italic{font-style:italic}.gd-tp-underline{text-decoration:underline}.gd-tp-strikethrough{text-decoration:line-through}.gd-tp-dim{opacity:0.6}@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}.gd-tp-cursor{animation:blink 1s step-end infinite}</style>
+<rect width="1040.0" height="788.0" fill="#282a36" rx="8" ry="8"/>
+<g transform="translate(16,16)">
+<text x="0.0" y="0.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="0.0" class="gd-tp-text" fill="#8be9fd"> Failing Rows      </text>
+<text x="168.0" y="0.0" class="gd-tp-text" fill="#f8f8f2">  2</text>
+<text x="0.0" y="21.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="21.0" class="gd-tp-text" fill="#8be9fd"> Result            </text>
+<text x="168.0" y="21.0" class="gd-tp-text" fill="#f8f8f2">  </text>
+<text x="184.8" y="21.0" class="gd-tp-text" fill="#ff5555">✗ FAILED</text>
+<text x="0.0" y="42.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="42.0" class="gd-tp-text" fill="#8be9fd"> Duplicate Rows    </text>
+<text x="168.0" y="42.0" class="gd-tp-text" fill="#f8f8f2">  </text>
+<text x="184.8" y="42.0" class="gd-tp-text" fill="#ff5555">2 found0m</text>
+<text x="0.0" y="105.0" class="gd-tp-text" fill="#ff5555">╭────────────────────────────────────────────────────────────╮</text>
+<text x="0.0" y="126.0" class="gd-tp-text" fill="#ff5555">│</text>
+<text x="8.4" y="126.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="16.8" y="126.0" class="gd-tp-text" fill="#ff5555">✗ Validation FAILED: 2 duplicate rows found in small_table</text>
+<text x="504.0" y="126.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="512.4" y="126.0" class="gd-tp-text" fill="#ff5555">│</text>
+<text x="0.0" y="147.0" class="gd-tp-text" fill="#ff5555">│</text>
+<text x="8.4" y="147.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="16.8" y="147.0" class="gd-tp-text" fill="#d6acff">💡</text>
+<text x="33.6" y="147.0" class="gd-tp-text" fill="#d6acff"> Tip:</text>
+<text x="75.6" y="147.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="147.0" class="gd-tp-text" fill="#8be9fd">Use --show-extract to see the failing rows</text>
+<text x="436.8" y="147.0" class="gd-tp-text" fill="#f8f8f2">         </text>
+<text x="512.4" y="147.0" class="gd-tp-text" fill="#ff5555">│</text>
+<text x="0.0" y="168.0" class="gd-tp-text" fill="#ff5555">╰────────────────────────────────────────────────────────────╯</text>
+<text x="0.0" y="189.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">Exiting with non-zero code due to validation failure</text>
+<text x="0.0" y="210.0" class="gd-tp-text" fill="#f8f8f2">&gt;</text>
+<text x="0.0" y="231.0" class="gd-tp-text" fill="#f8f8f2">&gt; # Pipeline Step 2: Checking for null values in an important column (this passes)</text>
+<text x="0.0" y="252.0" class="gd-tp-text" fill="#f8f8f2">&gt; pb validate small_table --check col-vals-not-null --column date_time --exit-code</text>
+<text x="0.0" y="273.0" class="gd-tp-text" fill="#50fa7b">✓</text>
+<text x="8.4" y="273.0" class="gd-tp-text" fill="#f8f8f2"> Loaded data source: small_table</text>
+<text x="0.0" y="294.0" class="gd-tp-text" fill="#50fa7b">✓</text>
+<text x="8.4" y="294.0" class="gd-tp-text" fill="#f8f8f2"> col-vals-not-null validation completed</text>
+<text x="0.0" y="336.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff">Validation Result: Column Values Not Null</text>
+<text x="0.0" y="378.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="378.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> Property          </text>
+<text x="168.0" y="378.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="176.4" y="378.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> Value</text>
+<text x="0.0" y="399.0" class="gd-tp-text" fill="#f8f8f2"> ───────────────────────────────────────</text>
+<text x="0.0" y="420.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="420.0" class="gd-tp-text" fill="#8be9fd"> Data Source       </text>
+<text x="168.0" y="420.0" class="gd-tp-text" fill="#f8f8f2">  small_table</text>
+<text x="0.0" y="441.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="441.0" class="gd-tp-text" fill="#8be9fd"> Check Type        </text>
+<text x="168.0" y="441.0" class="gd-tp-text" fill="#f8f8f2">  col-vals-not-null</text>
+<text x="0.0" y="462.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="462.0" class="gd-tp-text" fill="#8be9fd"> Column            </text>
+<text x="168.0" y="462.0" class="gd-tp-text" fill="#f8f8f2">  date_time</text>
+<text x="0.0" y="483.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="483.0" class="gd-tp-text" fill="#8be9fd"> Total Rows Tested </text>
+<text x="168.0" y="483.0" class="gd-tp-text" fill="#f8f8f2">  13</text>
+<text x="0.0" y="504.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="504.0" class="gd-tp-text" fill="#8be9fd"> Passing Rows      </text>
+<text x="168.0" y="504.0" class="gd-tp-text" fill="#f8f8f2">  13</text>
+<text x="0.0" y="525.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="525.0" class="gd-tp-text" fill="#8be9fd"> Failing Rows      </text>
+<text x="168.0" y="525.0" class="gd-tp-text" fill="#f8f8f2">  0</text>
+<text x="0.0" y="546.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="546.0" class="gd-tp-text" fill="#8be9fd"> Result           0m </text>
+<text x="184.8" y="546.0" class="gd-tp-text" fill="#f8f8f2">  </text>
+<text x="201.6" y="546.0" class="gd-tp-text" fill="#50fa7b">✓ PASSED</text>
+<text x="0.0" y="567.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="567.0" class="gd-tp-text" fill="#8be9fd"> Null Values       </text>
+<text x="168.0" y="567.0" class="gd-tp-text" fill="#f8f8f2">  </text>
+<text x="184.8" y="567.0" class="gd-tp-text" fill="#50fa7b">None found</text>
+<text x="0.0" y="630.0" class="gd-tp-text" fill="#50fa7b">╭────────────────────────────────────────────────────────────────────────────────╮</text>
+<text x="0.0" y="651.0" class="gd-tp-text" fill="#50fa7b">│</text>
+<text x="8.4" y="651.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="16.8" y="651.0" class="gd-tp-text" fill="#50fa7b">✓ Validation PASSED: No null values found in column 'date_time' in small_table</text>
+<text x="672.0" y="651.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="680.4" y="651.0" class="gd-tp-text" fill="#50fa7b">│</text>
+<text x="0.0" y="672.0" class="gd-tp-text" fill="#50fa7b">╰────────────────────────────────────────────────────────────────────────────────╯</text>
+<text x="0.0" y="693.0" class="gd-tp-text" fill="#f8f8f2">&gt;</text>
+<text x="0.0" y="714.0" class="gd-tp-text" fill="#f8f8f2">&gt; # Pipeline Step 3: Checking for values greater than 2 (this one fails)</text>
+<text x="0.0" y="735.0" class="gd-tp-text" fill="#f8f8f2">&gt; pb validate small_table --check col-vals-gt</text>
+<rect x="386.4" y="735.0" width="8.4" height="21.0" fill="#f8f8f2" opacity="0.7" class="gd-tp-cursor"/>
+</g>
+</svg>

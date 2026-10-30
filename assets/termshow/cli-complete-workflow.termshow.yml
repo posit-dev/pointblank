@@ -1,0 +1,71 @@
+# Converted from cli-complete-workflow.tape (VHS) with `great-docs termshow import-tape`, then adjusted:
+# commands are `run:` steps, which wait for the prompt, and the data is written out
+# (hidden), then removed when the shell exits.
+# Record it (with `pb` on the PATH) with:
+#   great-docs termshow record --steps assets/termshow/cli-complete-workflow.termshow.yml
+
+settings:
+  theme: dracula
+  window_chrome: colorful
+record:
+  shell: bash --noprofile --norc
+  cols: 125
+  rows: 56
+  cwd: demo
+  env:
+    PS1: '> '
+  prompt_pattern: '> $'
+steps:
+- hide
+# data_raw/worldcities.csv writes 39 populations as 108860.00 or 50.789, which makes
+# pl.read_csv() fail; this writes them as integers, giving the original file back
+- run: >-
+    perl -pe 's/,(\d+)\.00(\r?)$/,$1$2/; s/,(\d+)\.(\d{3})(\r?)$/,$1$2$3/'
+    ../../../data_raw/worldcities.csv > worldcities.csv &&
+    trap 'rm -f worldcities.csv validation_report.html' EXIT
+- run: clear
+- show
+- run: '# This is a Demo of a Complete Data Quality Workflow Using the Pointblank CLI'
+- sleep: 2
+- run: ''
+- run: '# Step 1: Quickly preview a dataset'
+- run: pb preview worldcities.csv
+  timeout: 60
+- sleep: 2
+- run: ''
+- run: '# Step 2: Quickly check for missing values in the dataset'
+- run: pb missing worldcities.csv
+  timeout: 60
+- sleep: 3
+- run: ''
+- run: '# Step 3: Validate that population values are provided for each city (i.e., not null)'
+- run: pb validate worldcities.csv --check col-vals-not-null --column population
+  timeout: 60
+- sleep: 4
+- run: ''
+- run: '# Step 4: Check for missing city names (and show the problematic rows)'
+- run: pb validate worldcities.csv --check col-vals-not-null --column city_name --show-extract
+  timeout: 60
+- sleep: 4
+- run: ''
+- run: '# Step 5: Validate latitude range (latitude: -90 to 90) in two steps'
+- run: pb validate worldcities.csv --check col-vals-ge --column latitude --value -90 --check col-vals-le --column latitude --value 90
+  timeout: 60
+- sleep: 4
+- run: ''
+- run: '# Step 6: Create a comprehensive validation script for production use'
+- run: cat validation.py
+- sleep: 4
+- run: ''
+- run: '# Step 7: Run that comprehensive validation and get a validation reporting table'
+- run: pb run validation.py
+  timeout: 60
+- sleep: 5
+- run: ''
+- run: '# Step 8: Generate an HTML validation report file and show the failing rows'
+- run: pb run validation.py --output-html validation_report.html --show-extract
+  timeout: 60
+- sleep: 4
+- run: ''
+- run: '# That was a complete workflow, moving from quick checks to more involved validations'
+- sleep: 2

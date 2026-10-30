@@ -1,0 +1,301 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1082.0 1208.0" width="1082.0" height="1208.0" role="img" aria-label="Terminal recording frame">
+<style>.gd-tp-text{font-family:JetBrains Mono, Fira Code, SF Mono, Menlo, Consolas, monospace;font-size:14px;white-space:pre;dominant-baseline:text-before-edge}.gd-tp-bold{font-weight:700}.gd-tp-italic{font-style:italic}.gd-tp-underline{text-decoration:underline}.gd-tp-strikethrough{text-decoration:line-through}.gd-tp-dim{opacity:0.6}@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}.gd-tp-cursor{animation:blink 1s step-end infinite}</style>
+<rect width="1082.0" height="1208.0" fill="#282a36" rx="8" ry="8"/>
+<g transform="translate(16,16)">
+<text x="0.0" y="0.0" class="gd-tp-text" fill="#f8f8f2">&gt; # Polars Data Manipulation with the Pointblank CLI</text>
+<text x="0.0" y="21.0" class="gd-tp-text" fill="#f8f8f2">&gt;</text>
+<text x="0.0" y="42.0" class="gd-tp-text" fill="#f8f8f2">&gt; # 1. Load and explore the worldcities CSV dataset</text>
+<text x="0.0" y="63.0" class="gd-tp-text" fill="#f8f8f2">&gt; pb pl 'pl.read_csv("worldcities.csv").head(10)'</text>
+<text x="0.0" y="84.0" class="gd-tp-text" fill="#50fa7b">✓</text>
+<text x="8.4" y="84.0" class="gd-tp-text" fill="#f8f8f2"> Polars expression executed successfully</text>
+<text x="0.0" y="126.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff">Data Preview / Polars expression / polars</text>
+<text x="0.0" y="147.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#a4ffff">10 rows / 5 columns</text>
+<text x="0.0" y="189.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="189.0" class="gd-tp-text gd-tp-bold" fill="#ff92df">        </text>
+<text x="75.6" y="189.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="189.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> city_name   </text>
+<text x="193.2" y="189.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="201.6" y="189.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> latitude </text>
+<text x="285.6" y="189.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="294.0" y="189.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> longitude </text>
+<text x="386.4" y="189.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="394.8" y="189.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> country      </text>
+<text x="512.4" y="189.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="520.8" y="189.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> population</text>
+<text x="0.0" y="210.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="210.0" class="gd-tp-text gd-tp-bold" fill="#ff92df">        </text>
+<text x="75.6" y="210.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="210.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> </text>
+<text x="92.4" y="210.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#ffffa5">&lt;str&gt;</text>
+<text x="134.4" y="210.0" class="gd-tp-text gd-tp-bold" fill="#ff92df">       </text>
+<text x="193.2" y="210.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="201.6" y="210.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> </text>
+<text x="210.0" y="210.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#ffffa5">&lt;f64&gt;</text>
+<text x="252.0" y="210.0" class="gd-tp-text gd-tp-bold" fill="#ff92df">    </text>
+<text x="285.6" y="210.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="294.0" y="210.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> </text>
+<text x="302.4" y="210.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#ffffa5">&lt;f64&gt;</text>
+<text x="344.4" y="210.0" class="gd-tp-text gd-tp-bold" fill="#ff92df">     </text>
+<text x="386.4" y="210.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="394.8" y="210.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> </text>
+<text x="403.2" y="210.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#ffffa5">&lt;str&gt;</text>
+<text x="445.2" y="210.0" class="gd-tp-text gd-tp-bold" fill="#ff92df">        </text>
+<text x="512.4" y="210.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="520.8" y="210.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> </text>
+<text x="529.2" y="210.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#ffffa5">&lt;i64&gt;</text>
+<text x="0.0" y="231.0" class="gd-tp-text" fill="#f8f8f2"> ─────────────────────────────────────────────────────────────────────────</text>
+<text x="0.0" y="252.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="252.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      1 </text>
+<text x="75.6" y="252.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="252.0" class="gd-tp-text" fill="#8be9fd"> Tokyo       </text>
+<text x="193.2" y="252.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="201.6" y="252.0" class="gd-tp-text" fill="#8be9fd"> 35.6897  </text>
+<text x="285.6" y="252.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="294.0" y="252.0" class="gd-tp-text" fill="#8be9fd"> 139.6922  </text>
+<text x="386.4" y="252.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="394.8" y="252.0" class="gd-tp-text" fill="#8be9fd"> Japan        </text>
+<text x="512.4" y="252.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="520.8" y="252.0" class="gd-tp-text" fill="#8be9fd"> 37977000</text>
+<text x="0.0" y="273.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="273.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      2 </text>
+<text x="75.6" y="273.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="273.0" class="gd-tp-text" fill="#8be9fd"> Jakarta     </text>
+<text x="193.2" y="273.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="201.6" y="273.0" class="gd-tp-text" fill="#8be9fd"> -6.2146  </text>
+<text x="285.6" y="273.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="294.0" y="273.0" class="gd-tp-text" fill="#8be9fd"> 106.8451  </text>
+<text x="386.4" y="273.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="394.8" y="273.0" class="gd-tp-text" fill="#8be9fd"> Indonesia    </text>
+<text x="512.4" y="273.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="520.8" y="273.0" class="gd-tp-text" fill="#8be9fd"> 34540000</text>
+<text x="0.0" y="294.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="294.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      3 </text>
+<text x="75.6" y="294.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="294.0" class="gd-tp-text" fill="#8be9fd"> Delhi       </text>
+<text x="193.2" y="294.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="201.6" y="294.0" class="gd-tp-text" fill="#8be9fd"> 28.66    </text>
+<text x="285.6" y="294.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="294.0" y="294.0" class="gd-tp-text" fill="#8be9fd"> 77.23     </text>
+<text x="386.4" y="294.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="394.8" y="294.0" class="gd-tp-text" fill="#8be9fd"> India        </text>
+<text x="512.4" y="294.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="520.8" y="294.0" class="gd-tp-text" fill="#8be9fd"> 29617000</text>
+<text x="0.0" y="315.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="315.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      4 </text>
+<text x="75.6" y="315.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="315.0" class="gd-tp-text" fill="#8be9fd"> Mumbai      </text>
+<text x="193.2" y="315.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="201.6" y="315.0" class="gd-tp-text" fill="#8be9fd"> 18.9667  </text>
+<text x="285.6" y="315.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="294.0" y="315.0" class="gd-tp-text" fill="#8be9fd"> 72.8333   </text>
+<text x="386.4" y="315.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="394.8" y="315.0" class="gd-tp-text" fill="#8be9fd"> India        </text>
+<text x="512.4" y="315.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="520.8" y="315.0" class="gd-tp-text" fill="#8be9fd"> 23355000  </text>
+<text x="613.2" y="315.0" class="gd-tp-text" fill="#f8f8f2">36m</text>
+<text x="0.0" y="336.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="336.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      5 </text>
+<text x="75.6" y="336.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="336.0" class="gd-tp-text" fill="#8be9fd"> Manila      </text>
+<text x="193.2" y="336.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="201.6" y="336.0" class="gd-tp-text" fill="#8be9fd"> 14.6     </text>
+<text x="285.6" y="336.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="294.0" y="336.0" class="gd-tp-text" fill="#8be9fd"> 120.9833  </text>
+<text x="386.4" y="336.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="394.8" y="336.0" class="gd-tp-text" fill="#8be9fd"> Philippines  </text>
+<text x="512.4" y="336.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="520.8" y="336.0" class="gd-tp-text" fill="#8be9fd"> 23088000</text>
+<text x="0.0" y="357.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="357.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      6 </text>
+<text x="75.6" y="357.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="357.0" class="gd-tp-text" fill="#8be9fd"> Shanghai    </text>
+<text x="193.2" y="357.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="201.6" y="357.0" class="gd-tp-text" fill="#8be9fd"> 31.1667  </text>
+<text x="285.6" y="357.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="294.0" y="357.0" class="gd-tp-text" fill="#8be9fd"> 121.4667  </text>
+<text x="386.4" y="357.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="394.8" y="357.0" class="gd-tp-text" fill="#8be9fd"> China        </text>
+<text x="512.4" y="357.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="520.8" y="357.0" class="gd-tp-text" fill="#8be9fd"> 22120000</text>
+<text x="0.0" y="378.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="378.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      7 </text>
+<text x="75.6" y="378.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="378.0" class="gd-tp-text" fill="#8be9fd"> São Paulo   </text>
+<text x="193.2" y="378.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="201.6" y="378.0" class="gd-tp-text" fill="#8be9fd"> -23.5504 </text>
+<text x="285.6" y="378.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="294.0" y="378.0" class="gd-tp-text" fill="#8be9fd"> -46.6339  </text>
+<text x="386.4" y="378.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="394.8" y="378.0" class="gd-tp-text" fill="#8be9fd"> Brazil       </text>
+<text x="512.4" y="378.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="520.8" y="378.0" class="gd-tp-text" fill="#8be9fd"> 22046000</text>
+<text x="0.0" y="399.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="399.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      8 </text>
+<text x="75.6" y="399.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="399.0" class="gd-tp-text" fill="#8be9fd"> Seoul       </text>
+<text x="193.2" y="399.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="201.6" y="399.0" class="gd-tp-text" fill="#8be9fd"> 37.56    </text>
+<text x="285.6" y="399.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="294.0" y="399.0" class="gd-tp-text" fill="#8be9fd"> 126.99    </text>
+<text x="386.4" y="399.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="394.8" y="399.0" class="gd-tp-text" fill="#8be9fd"> Korea, South </text>
+<text x="512.4" y="399.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="520.8" y="399.0" class="gd-tp-text" fill="#8be9fd"> 21794000</text>
+<text x="0.0" y="420.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="420.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      9 </text>
+<text x="75.6" y="420.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="420.0" class="gd-tp-text" fill="#8be9fd"> Mexico City </text>
+<text x="193.2" y="420.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="201.6" y="420.0" class="gd-tp-text" fill="#8be9fd"> 19.4333  </text>
+<text x="285.6" y="420.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="294.0" y="420.0" class="gd-tp-text" fill="#8be9fd"> -99.1333  </text>
+<text x="386.4" y="420.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="394.8" y="420.0" class="gd-tp-text" fill="#8be9fd"> Mexico       </text>
+<text x="512.4" y="420.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="520.8" y="420.0" class="gd-tp-text" fill="#8be9fd"> 20996000</text>
+<text x="0.0" y="441.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="441.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">     10 </text>
+<text x="75.6" y="441.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="441.0" class="gd-tp-text" fill="#8be9fd"> Guangzhou   </text>
+<text x="193.2" y="441.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="201.6" y="441.0" class="gd-tp-text" fill="#8be9fd"> 23.1288  </text>
+<text x="285.6" y="441.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="294.0" y="441.0" class="gd-tp-text" fill="#8be9fd"> 113.259   </text>
+<text x="386.4" y="441.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="394.8" y="441.0" class="gd-tp-text" fill="#8be9fd"> China        </text>
+<text x="512.4" y="441.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="520.8" y="441.0" class="gd-tp-text" fill="#8be9fd"> 20902000</text>
+<text x="0.0" y="504.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">Showing all </text>
+<text x="100.8" y="504.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#a4ffff">10</text>
+<text x="117.6" y="504.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2"> rows.</text>
+<text x="0.0" y="525.0" class="gd-tp-text" fill="#f8f8f2">&gt;</text>
+<text x="0.0" y="546.0" class="gd-tp-text" fill="#f8f8f2">&gt; # 2. Use the Polars methods for filtering and selecting columns</text>
+<text x="0.0" y="567.0" class="gd-tp-text" fill="#f8f8f2">&gt; pb pl 'pl.read_csv("worldcities.csv").select(["city_name", "country", "population"]).filter(pl.col("population") &gt; 1000000)</text>
+<text x="0.0" y="588.0" class="gd-tp-text" fill="#f8f8f2">'</text>
+<text x="0.0" y="609.0" class="gd-tp-text" fill="#50fa7b">✓</text>
+<text x="8.4" y="609.0" class="gd-tp-text" fill="#f8f8f2"> Polars expression executed successfully</text>
+<text x="0.0" y="651.0" class="gd-tp-text gd-tp-bold" fill="#a4ffff">Data Preview / Polars expression / polars</text>
+<text x="0.0" y="672.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#a4ffff">723 rows / 3 columns</text>
+<text x="0.0" y="714.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="714.0" class="gd-tp-text gd-tp-bold" fill="#ff92df">        </text>
+<text x="75.6" y="714.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="714.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> city_name </text>
+<text x="176.4" y="714.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="184.8" y="714.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> country     </text>
+<text x="294.0" y="714.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="302.4" y="714.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> population</text>
+<text x="0.0" y="735.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="735.0" class="gd-tp-text gd-tp-bold" fill="#ff92df">        </text>
+<text x="75.6" y="735.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="735.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> </text>
+<text x="92.4" y="735.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#ffffa5">&lt;str&gt;</text>
+<text x="134.4" y="735.0" class="gd-tp-text gd-tp-bold" fill="#ff92df">     </text>
+<text x="176.4" y="735.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="184.8" y="735.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> </text>
+<text x="193.2" y="735.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#ffffa5">&lt;str&gt;</text>
+<text x="235.2" y="735.0" class="gd-tp-text gd-tp-bold" fill="#ff92df">       </text>
+<text x="294.0" y="735.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="302.4" y="735.0" class="gd-tp-text gd-tp-bold" fill="#ff92df"> </text>
+<text x="310.8" y="735.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#ffffa5">&lt;i64&gt;</text>
+<text x="0.0" y="756.0" class="gd-tp-text" fill="#f8f8f2"> ───────────────────────────────────────────────</text>
+<text x="0.0" y="777.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="777.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      1 </text>
+<text x="75.6" y="777.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="777.0" class="gd-tp-text" fill="#8be9fd"> Tokyo     </text>
+<text x="176.4" y="777.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="184.8" y="777.0" class="gd-tp-text" fill="#8be9fd"> Japan       </text>
+<text x="294.0" y="777.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="302.4" y="777.0" class="gd-tp-text" fill="#8be9fd"> 37977000</text>
+<text x="0.0" y="798.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="798.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      2 </text>
+<text x="75.6" y="798.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="798.0" class="gd-tp-text" fill="#8be9fd"> Jakarta   </text>
+<text x="176.4" y="798.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="184.8" y="798.0" class="gd-tp-text" fill="#8be9fd"> Indonesia   </text>
+<text x="294.0" y="798.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="302.4" y="798.0" class="gd-tp-text" fill="#8be9fd"> 34540000</text>
+<text x="0.0" y="819.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="819.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      3 </text>
+<text x="75.6" y="819.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="819.0" class="gd-tp-text" fill="#8be9fd"> Delhi     </text>
+<text x="176.4" y="819.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="184.8" y="819.0" class="gd-tp-text" fill="#8be9fd"> India       </text>
+<text x="294.0" y="819.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="302.4" y="819.0" class="gd-tp-text" fill="#8be9fd"> 29617000</text>
+<text x="0.0" y="840.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="840.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      4 </text>
+<text x="75.6" y="840.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="840.0" class="gd-tp-text" fill="#8be9fd"> Mumbai    </text>
+<text x="176.4" y="840.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="184.8" y="840.0" class="gd-tp-text" fill="#8be9fd"> India       </text>
+<text x="294.0" y="840.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="302.4" y="840.0" class="gd-tp-text" fill="#8be9fd"> 23355000</text>
+<text x="0.0" y="861.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="861.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      5 </text>
+<text x="75.6" y="861.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="861.0" class="gd-tp-text" fill="#8be9fd"> Manila    </text>
+<text x="176.4" y="861.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="184.8" y="861.0" class="gd-tp-text" fill="#8be9fd"> Philippines </text>
+<text x="294.0" y="861.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="302.4" y="861.0" class="gd-tp-text" fill="#8be9fd"> 23088000</text>
+<text x="0.0" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="882.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">      ⋮ </text>
+<text x="75.6" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="882.0" class="gd-tp-text gd-tp-dim" fill="#8be9fd"> ───       </text>
+<text x="176.4" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="184.8" y="882.0" class="gd-tp-text gd-tp-dim" fill="#8be9fd"> ───         </text>
+<text x="294.0" y="882.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="302.4" y="882.0" class="gd-tp-text gd-tp-dim" fill="#8be9fd"> ───</text>
+<text x="0.0" y="903.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="903.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">    719 </text>
+<text x="75.6" y="903.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="903.0" class="gd-tp-text" fill="#8be9fd"> Zaoyang   </text>
+<text x="176.4" y="903.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="184.8" y="903.0" class="gd-tp-text" fill="#8be9fd"> China       </text>
+<text x="294.0" y="903.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="302.4" y="903.0" class="gd-tp-text" fill="#8be9fd"> 1004741</text>
+<text x="0.0" y="924.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="924.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">    720 </text>
+<text x="75.6" y="924.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="924.0" class="gd-tp-text" fill="#8be9fd"> Shuizhai  </text>
+<text x="176.4" y="924.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="184.8" y="924.0" class="gd-tp-text" fill="#8be9fd"> China       </text>
+<text x="294.0" y="924.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="302.4" y="924.0" class="gd-tp-text" fill="#8be9fd"> 1003698   </text>
+<text x="394.8" y="924.0" class="gd-tp-text" fill="#f8f8f2">36m</text>
+<text x="0.0" y="945.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="945.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">    721 </text>
+<text x="75.6" y="945.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="945.0" class="gd-tp-text" fill="#8be9fd"> Dnipro    </text>
+<text x="176.4" y="945.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="184.8" y="945.0" class="gd-tp-text" fill="#8be9fd"> Ukraine     </text>
+<text x="294.0" y="945.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="302.4" y="945.0" class="gd-tp-text" fill="#8be9fd"> 1002111</text>
+<text x="0.0" y="966.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="966.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">    722 </text>
+<text x="75.6" y="966.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="966.0" class="gd-tp-text" fill="#8be9fd"> Kota      </text>
+<text x="176.4" y="966.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="184.8" y="966.0" class="gd-tp-text" fill="#8be9fd"> India       </text>
+<text x="294.0" y="966.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="302.4" y="966.0" class="gd-tp-text" fill="#8be9fd"> 1001694</text>
+<text x="0.0" y="987.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="987.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">    723 </text>
+<text x="75.6" y="987.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="84.0" y="987.0" class="gd-tp-text" fill="#8be9fd"> Quetta    </text>
+<text x="176.4" y="987.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="184.8" y="987.0" class="gd-tp-text" fill="#8be9fd"> Pakistan    </text>
+<text x="294.0" y="987.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="302.4" y="987.0" class="gd-tp-text" fill="#8be9fd"> 1001205</text>
+<text x="0.0" y="1050.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">Showing first </text>
+<text x="117.6" y="1050.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#a4ffff">5</text>
+<text x="126.0" y="1050.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2"> and last </text>
+<text x="210.0" y="1050.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#a4ffff">5</text>
+<text x="218.4" y="1050.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2"> rows from </text>
+<text x="310.8" y="1050.0" class="gd-tp-text gd-tp-bold gd-tp-dim" fill="#a4ffff">723</text>
+<text x="336.0" y="1050.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2"> total rows.</text>
+<text x="0.0" y="1071.0" class="gd-tp-text" fill="#f8f8f2">&gt;</text>
+<text x="0.0" y="1092.0" class="gd-tp-text" fill="#f8f8f2">&gt; # 3. Data manipulation -&gt; missing data analysis via -</text>
+<rect x="462.0" y="1092.0" width="8.4" height="21.0" fill="#f8f8f2" opacity="0.7" class="gd-tp-cursor"/>
+</g>
+</svg>

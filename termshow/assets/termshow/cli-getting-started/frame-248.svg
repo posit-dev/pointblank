@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040.0 788.0" width="1040.0" height="788.0" role="img" aria-label="Terminal recording frame">
+<style>.gd-tp-text{font-family:JetBrains Mono, Fira Code, SF Mono, Menlo, Consolas, monospace;font-size:14px;white-space:pre;dominant-baseline:text-before-edge}.gd-tp-bold{font-weight:700}.gd-tp-italic{font-style:italic}.gd-tp-underline{text-decoration:underline}.gd-tp-strikethrough{text-decoration:line-through}.gd-tp-dim{opacity:0.6}@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}.gd-tp-cursor{animation:blink 1s step-end infinite}</style>
+<rect width="1040.0" height="788.0" fill="#282a36" rx="8" ry="8"/>
+<g transform="translate(16,16)">
+<text x="0.0" y="0.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="8.4" y="0.0" class="gd-tp-text" fill="#8be9fd"> global_sales </text>
+<text x="126.0" y="0.0" class="gd-tp-text" fill="#f8f8f2"> </text>
+<text x="134.4" y="0.0" class="gd-tp-text" fill="#50fa7b"> 50,000 rows × 20 columns  </text>
+<text x="361.2" y="0.0" class="gd-tp-text" fill="#f8f8f2">  Global sales data across regions</text>
+<text x="0.0" y="63.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">Use these dataset names directly with any pb CLI command.</text>
+<text x="0.0" y="84.0" class="gd-tp-text gd-tp-dim" fill="#f8f8f2">Example: pb preview small_table</text>
+<text x="0.0" y="105.0" class="gd-tp-text" fill="#f8f8f2">&gt;</text>
+<text x="0.0" y="126.0" class="gd-tp-text" fill="#f8f8f2">&gt; # Learn about all the `pb validate` options</text>
+<text x="0.0" y="147.0" class="gd-tp-text" fill="#f8f8f2">&gt; pb validate --help</text>
+<text x="0.0" y="168.0" class="gd-tp-text" fill="#f8f8f2">Usage: pb validate [OPTIONS] [DATA_SOURCE]</text>
+<text x="0.0" y="210.0" class="gd-tp-text" fill="#f8f8f2">  Perform single or multiple data validations.</text>
+<text x="0.0" y="252.0" class="gd-tp-text" fill="#f8f8f2">  Run one or more validation checks on your data in a single command. Use</text>
+<text x="0.0" y="273.0" class="gd-tp-text" fill="#f8f8f2">  multiple --check options to perform multiple validations.</text>
+<text x="0.0" y="315.0" class="gd-tp-text" fill="#f8f8f2">  DATA_SOURCE can be:</text>
+<text x="0.0" y="357.0" class="gd-tp-text" fill="#f8f8f2">  - CSV file path (e.g., data.csv)</text>
+<text x="0.0" y="378.0" class="gd-tp-text" fill="#f8f8f2">  - Parquet file path or pattern (e.g., data.parquet, data/*.parquet)</text>
+<text x="0.0" y="399.0" class="gd-tp-text" fill="#f8f8f2">  - GitHub URL to CSV/Parquet (e.g., https://github.com/user/repo/blob/main/data.csv)</text>
+<text x="0.0" y="420.0" class="gd-tp-text" fill="#f8f8f2">  - Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)</text>
+<text x="0.0" y="441.0" class="gd-tp-text" fill="#f8f8f2">  - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)</text>
+<text x="0.0" y="483.0" class="gd-tp-text" fill="#f8f8f2">  AVAILABLE CHECK_TYPES:</text>
+<text x="0.0" y="525.0" class="gd-tp-text" fill="#f8f8f2">  Require no additional options:</text>
+<text x="0.0" y="567.0" class="gd-tp-text" fill="#f8f8f2">  - rows-distinct: Check if all rows in the dataset are unique (no duplicates)</text>
+<text x="0.0" y="588.0" class="gd-tp-text" fill="#f8f8f2">  - rows-complete: Check if all rows are complete (no missing values in any column)</text>
+<text x="0.0" y="630.0" class="gd-tp-text" fill="#f8f8f2">  Require --column:</text>
+<text x="0.0" y="672.0" class="gd-tp-text" fill="#f8f8f2">  - col-exists: Check if a specific column exists in the dataset</text>
+<text x="0.0" y="693.0" class="gd-tp-text" fill="#f8f8f2">  - col-vals-not-null: Check if all values in a column are not null/missing</text>
+<text x="0.0" y="735.0" class="gd-tp-text" fill="#f8f8f2">  Req</text>
+<rect x="42.0" y="735.0" width="8.4" height="21.0" fill="#f8f8f2" opacity="0.7" class="gd-tp-cursor"/>
+</g>
+</svg>
