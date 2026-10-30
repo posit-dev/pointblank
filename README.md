@@ -323,7 +323,7 @@ This approach is suitable for:
 Pointblank includes a powerful CLI utility called `pb` that lets you run data validation workflows directly from the command line. Perfect for CI/CD pipelines, scheduled data quality checks, or quick validation tasks.
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-complete-workflow.gif" width="100%">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-complete-workflow.svg" width="100%">
 </div>
 
 **Explore Your Data**
@@ -375,13 +375,13 @@ pb run validation.yaml --exit-code
 pb run validation.py --exit-code
 ```
 
-Click the following headings to see some video demonstrations of the CLI:
+Click the following headings to see some terminal recordings of the CLI in action:
 
 <details>
 <summary>Getting Started with the Pointblank CLI</summary>
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-getting-started.gif" width="100%">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-getting-started.svg" width="100%">
 </div>
 
 </details>
@@ -389,7 +389,7 @@ Click the following headings to see some video demonstrations of the CLI:
 <summary>Doing Some Data Exploration</summary>
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-data-exploration.gif" width="100%">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-data-exploration.svg" width="100%">
 </div>
 
 </details>
@@ -397,7 +397,7 @@ Click the following headings to see some video demonstrations of the CLI:
 <summary>Validating Data with the CLI</summary>
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-essential-validations.gif" width="100%">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-essential-validations.svg" width="100%">
 </div>
 
 </details>
@@ -405,7 +405,7 @@ Click the following headings to see some video demonstrations of the CLI:
 <summary>Using Polars in the CLI</summary>
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-using-polars.gif" width="100%">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-using-polars.svg" width="100%">
 </div>
 
 </details>
@@ -413,7 +413,7 @@ Click the following headings to see some video demonstrations of the CLI:
 <summary>Integrating Pointblank with CI/CD</summary>
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-cicd-workflows.gif" width="100%">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-cicd-workflows.svg" width="100%">
 </div>
 
 </details>
