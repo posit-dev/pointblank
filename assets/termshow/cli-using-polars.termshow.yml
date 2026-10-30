@@ -1,0 +1,63 @@
+# Converted from cli-using-polars.tape (VHS) with `great-docs termshow import-tape`, then adjusted:
+# commands are `run:` steps, which wait for the prompt, and the data is written out
+# (hidden), then removed when the shell exits.
+# Record it (with `pb` on the PATH) with:
+#   great-docs termshow record --steps assets/termshow/cli-using-polars.termshow.yml
+
+settings:
+  theme: dracula
+  window_chrome: colorful
+record:
+  shell: bash --noprofile --norc
+  cols: 125
+  rows: 56
+  cwd: demo
+  env:
+    PS1: '> '
+  prompt_pattern: '> $'
+steps:
+- hide
+# data_raw/worldcities.csv writes 39 populations as 108860.00 or 50.789, which makes
+# pl.read_csv() fail; this writes them as integers, giving the original file back
+- run: >-
+    perl -pe 's/,(\d+)\.00(\r?)$/,$1$2/; s/,(\d+)\.(\d{3})(\r?)$/,$1$2$3/'
+    ../../../data_raw/worldcities.csv > worldcities.csv &&
+    trap 'rm -f worldcities.csv validation_report.html' EXIT
+- run: clear
+- show
+- run: '# Polars Data Manipulation with the Pointblank CLI'
+- sleep: 2
+- run: ''
+- run: '# 1. Load and explore the worldcities CSV dataset'
+- run: pb pl 'pl.read_csv("worldcities.csv").head(10)'
+  timeout: 60
+- sleep: 4
+- run: ''
+- run: '# 2. Use the Polars methods for filtering and selecting columns'
+- run: pb pl 'pl.read_csv("worldcities.csv").select(["city_name", "country", "population"]).filter(pl.col("population") > 1000000)'
+  timeout: 60
+- sleep: 5
+- run: ''
+- run: '# 3. Data manipulation -> missing data analysis via --output-format missing'
+- run: pb pl 'pl.read_csv("worldcities.csv").select(["city_name", "country", "population"])' --output-format missing
+  timeout: 60
+- sleep: 5
+- run: ''
+- run: '# 4. Behold the power of piping! Filter large cities and validate for duplicates with --pipe | pb validate'
+- run: pb pl 'pl.read_csv("worldcities.csv").filter(pl.col("population") > 5000000)' --pipe | pb validate --check rows-distinct
+  timeout: 60
+- sleep: 5
+- run: ''
+- run: '# 5. Do a complex transformation and pipe into a data scan'
+- run: pb pl 'pl.read_csv("worldcities.csv").filter(pl.col("country").is_in(["United States", "China", "India"])).select(["city_name", "latitude", "longitude"])' --pipe | pb scan
+  timeout: 60
+- sleep: 6
+- run: ''
+- run: '# 6. Create derived metrics and pipe to a validation: so cool!'
+- run: pb pl 'pl.read_csv("worldcities.csv").with_columns((pl.col("population") / 1000000).alias("pop_millions")).filter(pl.col("pop_millions") > 0.5)' --pipe | pb validate --check col-vals-gt --column
+    pop_millions --value 0
+  timeout: 60
+- sleep: 6
+- run: ''
+- run: '# The pb pl command truly enables a powerful new class of data quality pipelines!'
+- sleep: 2
