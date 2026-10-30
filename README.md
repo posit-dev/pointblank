@@ -323,7 +323,7 @@ This approach is suitable for:
 Pointblank includes a powerful CLI utility called `pb` that lets you run data validation workflows directly from the command line. Perfect for CI/CD pipelines, scheduled data quality checks, or quick validation tasks.
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-complete-workflow.svg" width="100%">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-complete-workflow.gif" width="100%">
 </div>
 
 **Explore Your Data**
@@ -381,7 +381,7 @@ Click the following headings to see some terminal recordings of the CLI in actio
 <summary>Getting Started with the Pointblank CLI</summary>
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-getting-started.svg" width="100%">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-getting-started.gif" width="100%">
 </div>
 
 </details>
@@ -389,7 +389,7 @@ Click the following headings to see some terminal recordings of the CLI in actio
 <summary>Doing Some Data Exploration</summary>
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-data-exploration.svg" width="100%">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-data-exploration.gif" width="100%">
 </div>
 
 </details>
@@ -397,7 +397,7 @@ Click the following headings to see some terminal recordings of the CLI in actio
 <summary>Validating Data with the CLI</summary>
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-essential-validations.svg" width="100%">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-essential-validations.gif" width="100%">
 </div>
 
 </details>
@@ -405,7 +405,7 @@ Click the following headings to see some terminal recordings of the CLI in actio
 <summary>Using Polars in the CLI</summary>
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-using-polars.svg" width="100%">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-using-polars.gif" width="100%">
 </div>
 
 </details>
@@ -413,7 +413,7 @@ Click the following headings to see some terminal recordings of the CLI in actio
 <summary>Integrating Pointblank with CI/CD</summary>
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-cicd-workflows.svg" width="100%">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-cicd-workflows.gif" width="100%">
 </div>
 
 </details>
