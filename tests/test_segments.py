@@ -10,6 +10,7 @@ from pointblank.segments import (
     seg_group,
 )
 
+import pandas as pd
 import polars as pl
 
 
@@ -243,3 +244,49 @@ def test_seg_group_float_column_int_values(lazy):
     assert validation.n_passed(i=1, scalar=True) == 1
     assert validation.n_failed(i=1, scalar=True) == 1
     assert validation.n_passed(i=2, scalar=True) == 2
+
+
+@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
+def test_segments_str_with_null_values(tbl_type):
+    # Column `c` has missing values; deriving segments from it should give every backend the same
+    # sorted set of segments with a single `None` segment at the end
+    validation = (
+        Validate(data=load_dataset(dataset="small_table", tbl_type=tbl_type))
+        .col_vals_gt(
+            columns="d",
+            value=100,
+            segments="c",
+        )
+        .interrogate()
+    )
+
+    assert [v.segments[1] for v in validation.validation_info] == [2, 3, 4, 7, 8, 9, None]
+    assert not any(v.eval_error for v in validation.validation_info)
+    assert validation.n(i=1, scalar=True) == 1
+    assert validation.n(i=2, scalar=True) == 3
+    assert validation.n(i=7, scalar=True) == 2
+    assert validation.n_passed(i=7, scalar=True) == 2
+
+
+@pytest.mark.parametrize(
+    "dtype", [None, "string", pytest.param("string[pyarrow]", id="string-pyarrow")]
+)
+def test_segments_str_with_null_values_pandas_string_columns(dtype):
+    # Pandas represents a missing string as `nan` or `pd.NA` depending on the dtype; both must be
+    # treated as a `None` segment rather than making the step an evaluation error
+    df = pd.DataFrame({"x": [1, -1, 2, 3], "region": ["US", "US", None, "EU"]})
+    if dtype is not None:
+        df = df.astype({"region": dtype})
+
+    validation = Validate(data=df).col_vals_gt("x", 0, segments="region").interrogate()
+
+    assert [v.segments for v in validation.validation_info] == [
+        ("region", "EU"),
+        ("region", "US"),
+        ("region", None),
+    ]
+    assert not any(v.eval_error for v in validation.validation_info)
+    assert validation.n_passed(i=1, scalar=True) == 1
+    assert validation.n_passed(i=2, scalar=True) == 1
+    assert validation.n_passed(i=3, scalar=True) == 1
+    assert validation.n_failed(i=2, scalar=True) == 1

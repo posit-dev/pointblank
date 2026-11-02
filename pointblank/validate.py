@@ -25103,7 +25103,10 @@ def _seg_expr_from_string(data_tbl: Any, segments_expr: str) -> tuple[str, str]:
     # Determine if the table is a DataFrame or a DB table
     tbl_type = _get_tbl_type(data=data_tbl)
 
-    # Obtain the segmentation categories from the table column given as `segments_expr`
+    # Obtain the segmentation categories from the table column given as `segments_expr`; missing
+    # values are tracked separately since Pandas represents them as `nan` or `pd.NA` rather than
+    # `None`, which can't be sorted alongside the other values and wouldn't match the `is_null()`
+    # filter used in `_apply_segments()`
     if tbl_type in ["polars", "pandas", "pyspark"]:
         # Use Narwhals for supported DataFrame types
         data_nw = nw.from_native(data_tbl)
@@ -25113,16 +25116,23 @@ def _seg_expr_from_string(data_tbl: Any, segments_expr: str) -> tuple[str, str]:
         if is_narwhals_lazyframe(unique_vals):
             unique_vals = unique_vals.collect()
 
-        # Convert to list of values
-        seg_categories = unique_vals[segments_expr].to_list()
+        # Convert to list of values, setting aside missing values
+        unique_col = unique_vals[segments_expr]
+        has_missing = bool(unique_col.is_null().any())
+        seg_categories = unique_col.drop_nulls().to_list()
     elif tbl_type in IBIS_BACKENDS:
         distinct_col_vals = data_tbl.select(segments_expr).distinct()
         seg_categories = distinct_col_vals[segments_expr].to_list()
+        has_missing = any(category is None for category in seg_categories)
+        seg_categories = [category for category in seg_categories if category is not None]
     else:  # pragma: no cover
         raise ValueError(f"Unsupported table type: {tbl_type}")
 
-    # Ensure that the categories are sorted, and allow for None values
-    seg_categories.sort(key=lambda x: (x is None, x))
+    # Ensure that the categories are sorted, placing a single `None` segment last if the column has
+    # missing values
+    seg_categories.sort()
+    if has_missing:
+        seg_categories.append(None)
 
     # Place each category and each value in a list of tuples as: `(column, value)`
     seg_tuples = [(segments_expr, category) for category in seg_categories]
