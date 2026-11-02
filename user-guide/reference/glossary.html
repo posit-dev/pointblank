@@ -98,7 +98,6 @@ ul.task-list li input[type="checkbox"] {
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.1.1</code><br>Released 2026-10-15">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/reference/glossary.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/reference/glossary.html">
@@ -146,15 +145,11 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="../../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../changelog.html"> 
-<span class="menu-text">Changelog</span></a>
-  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="499" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -428,12 +423,6 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Data Validation</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../user-guide/the-pointblank-cli/cli-reference.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">CLI Reference</span></a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -650,7 +639,7 @@ The organization that sets data standards for clinical trials, including <strong
 </dd>
 <dt>CLI (command-line interface)</dt>
 <dd>
-The <code>pb</code> command, which you run in a terminal to use Pointblank without writing Python. <code>pb preview</code>, <code>pb scan</code>, <code>pb missing</code>, and <code>pb info</code> let you look at a table. <code>pb validate</code> runs quick one-off checks, and <code>pb run</code> runs a full validation written in Python or YAML. <code>pb compare</code> runs a <strong>table comparison</strong>, <code>pb make-template</code> creates a starter file, and <code>pb edit</code> opens the <strong>AI Validation Editor</strong>. See also <strong>exit code</strong>. <a href="../../user-guide/the-pointblank-cli/cli-reference.html">Learn more</a>.
+The <code>pb</code> command, which you run in a terminal to use Pointblank without writing Python. <code>pb preview</code>, <code>pb scan</code>, <code>pb missing</code>, and <code>pb info</code> let you look at a table. <code>pb validate</code> runs quick one-off checks, and <code>pb run</code> runs a full validation written in Python or YAML. <code>pb compare</code> runs a <strong>table comparison</strong>, <code>pb make-template</code> creates a starter file, and <code>pb edit</code> opens the <strong>AI Validation Editor</strong>. See also <strong>exit code</strong>. <a href="../../reference/cli/index.html">Learn more</a>.
 </dd>
 <dt>Coded missing value</dt>
 <dd>
@@ -690,7 +679,7 @@ A single <strong>validation step</strong> that checks several conditions on each
 </dd>
 <dt>Connection string</dt>
 <dd>
-A piece of text that points to a database table, such as <code>"duckdb:///path/to/db.ddb::table_name"</code>. The part before <code>::</code> says how to reach the database, and the part after it names the table. You can pass a connection string as the data for <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> or for <strong>CLI</strong> commands, instead of a table you’ve already loaded. <a href="../../user-guide/the-pointblank-cli/cli-reference.html">Learn more</a>.
+A piece of text that points to a database table, such as <code>"duckdb:///path/to/db.ddb::table_name"</code>. The part before <code>::</code> says how to reach the database, and the part after it names the table. You can pass a connection string as the data for <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> or for <strong>CLI</strong> commands, instead of a table you’ve already loaded. <a href="../../user-guide/the-pointblank-cli/cli-data-inspection.html">Learn more</a>.
 </dd>
 <dt>Contract</dt>
 <dd>
@@ -766,7 +755,7 @@ See <strong>warning, error, and critical</strong>.
 </dd>
 <dt>Exit code</dt>
 <dd>
-The number a command gives back when it finishes, which scripts and CI systems use to tell whether it succeeded (<code>0</code> means success). <code>pb validate --exit-code</code> gives a non-zero code if any check fails, and <code>pb run --fail-on</code> does so when a chosen <strong>threshold</strong> level is reached. <code>pb compare</code> gives <code>0</code> if the tables match, <code>1</code> if they differ, and <code>2</code> if there was an error. <a href="../../user-guide/the-pointblank-cli/cli-reference.html">Learn more</a>.
+The number a command gives back when it finishes, which scripts and CI systems use to tell whether it succeeded (<code>0</code> means success). <code>pb validate --exit-code</code> gives a non-zero code if any check fails, and <code>pb run --fail-on</code> does so when a chosen <strong>threshold</strong> level is reached. <code>pb compare</code> gives <code>0</code> if the tables match, <code>1</code> if they differ, and <code>2</code> if there was an error. <a href="../../user-guide/the-pointblank-cli/cli-data-validation.html">Learn more</a>.
 </dd>
 <dt>Expression check</dt>
 <dd>

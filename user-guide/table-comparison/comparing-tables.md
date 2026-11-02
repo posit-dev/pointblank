@@ -355,6 +355,6 @@ The `pb compare` command runs a comparison on files, database tables, or built-i
 pb compare orders_source.csv orders_target.csv --key order_id --output-html diff.html
 ```
 
-Its exit code makes it easy to use in scripts and CI pipelines: `0` if the tables match, `1` if they differ, and `2` if there was an error. Use `--format json` to print the results as JSON. All the comparison settings have command-line options (e.g., `--tolerance amount=0.01`, `--schema common`); see the [CLI reference](../the-pointblank-cli/cli-reference.md) for the full list.
+Its exit code makes it easy to use in scripts and CI pipelines: `0` if the tables match, `1` if they differ, and `2` if there was an error. Use `--format json` to print the results as JSON. All the comparison settings have command-line options (e.g., `--tolerance amount=0.01`, `--schema common`); see the [`pb compare` reference](../../reference/cli/compare.md) for the full list.
 
 For tables that are too large to fit in memory, see [Comparing Large Files](comparing-large-files.md).

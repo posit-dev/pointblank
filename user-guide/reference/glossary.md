@@ -39,7 +39,7 @@ CDISC (Clinical Data Interchange Standards Consortium)
 The organization that sets data standards for clinical trials, including **SDTM**, **ADaM**, and **Define-XML**. Pointblank can read CDISC metadata, check that datasets have the expected structure, and check a set of trial datasets against CDISC's rules. It can do that last part with its own built-in rules ([validate_sdtmig()](../../reference/validate_sdtmig.md#pointblank.validate_sdtmig)) or by running the **CORE** engine. [Learn more](../metadata-import/cdisc-validation.md).
 
 CLI (command-line interface)  
-The `pb` command, which you run in a terminal to use Pointblank without writing Python. `pb preview`, `pb scan`, `pb missing`, and `pb info` let you look at a table. `pb validate` runs quick one-off checks, and `pb run` runs a full validation written in Python or YAML. `pb compare` runs a **table comparison**, `pb make-template` creates a starter file, and `pb edit` opens the **AI Validation Editor**. See also **exit code**. [Learn more](../the-pointblank-cli/cli-reference.md).
+The `pb` command, which you run in a terminal to use Pointblank without writing Python. `pb preview`, `pb scan`, `pb missing`, and `pb info` let you look at a table. `pb validate` runs quick one-off checks, and `pb run` runs a full validation written in Python or YAML. `pb compare` runs a **table comparison**, `pb make-template` creates a starter file, and `pb edit` opens the **AI Validation Editor**. See also **exit code**. [Learn more](../../reference/cli/index.md).
 
 Coded missing value  
 A stand-in value, such as `-99` or `"UNK"`, that means a value is missing for a known reason (for example, the person refused to answer or wasn't asked). The [MissingSpec](../../reference/MissingSpec.md#pointblank.MissingSpec) class lists which codes a column uses and what each one means. Validation methods like `col_missing_coded()` and the **missing values table** can then treat these codes as missing data. See also **null flavor**. [Learn more](../data-inspection/missing-vals-tbl.md).
@@ -69,7 +69,7 @@ Conjointly
 A single **validation step** that checks several conditions on each row at once. A row passes only if every condition is true for that row. This is different from adding one step per condition, where each condition is judged on its own. Added with `conjointly()`. [Learn more](../validation-plan/validation-methods.md).
 
 Connection string  
-A piece of text that points to a database table, such as `"duckdb:///path/to/db.ddb::table_name"`. The part before `::` says how to reach the database, and the part after it names the table. You can pass a connection string as the data for [Validate](../../reference/Validate.md#pointblank.Validate) or for **CLI** commands, instead of a table you've already loaded. [Learn more](../the-pointblank-cli/cli-reference.md).
+A piece of text that points to a database table, such as `"duckdb:///path/to/db.ddb::table_name"`. The part before `::` says how to reach the database, and the part after it names the table. You can pass a connection string as the data for [Validate](../../reference/Validate.md#pointblank.Validate) or for **CLI** commands, instead of a table you've already loaded. [Learn more](../the-pointblank-cli/cli-data-inspection.md).
 
 Contract  
 A written-down agreement about what a table should look like. It combines a **schema** (the expected columns and their types), a list of rules, and details like the owner and version. You create one with the [Contract](../../reference/Contract.md#pointblank.Contract) class and check a table against it with `.validate(data)`. Contracts can be saved as YAML, imported from other formats (such as JSON Schema, Frictionless, dbt, and ODCS) with [`import_contract()`](../../reference/import_contract.md#pointblank.import_contract), and exported with [`export_contract()`](../../reference/export_contract.md#pointblank.export_contract). See also **pipeline**, **contract import**, and **violation handling**. [Learn more](../contracts-and-pipelines/contracts.md).
@@ -126,7 +126,7 @@ Error
 See **warning, error, and critical**.
 
 Exit code  
-The number a command gives back when it finishes, which scripts and CI systems use to tell whether it succeeded (`0` means success). `pb validate --exit-code` gives a non-zero code if any check fails, and `pb run --fail-on` does so when a chosen **threshold** level is reached. `pb compare` gives `0` if the tables match, `1` if they differ, and `2` if there was an error. [Learn more](../the-pointblank-cli/cli-reference.md).
+The number a command gives back when it finishes, which scripts and CI systems use to tell whether it succeeded (`0` means success). `pb validate --exit-code` gives a non-zero code if any check fails, and `pb run --fail-on` does so when a chosen **threshold** level is reached. `pb compare` gives `0` if the tables match, `1` if they differ, and `2` if there was an error. [Learn more](../the-pointblank-cli/cli-data-validation.md).
 
 Expression check  
 A **validation step** that checks each row against a condition written in your table library's own syntax. For example, with Polars you might check `pl.col("end") > pl.col("start")`. Added with `col_vals_expr()`. [Learn more](../advanced-validation/expressions.md).
