@@ -40,7 +40,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../user-guide/table-comparison/comparing-large-files.html" rel="prev">
+<link href="../../user-guide/metadata-import/cdisc-submission-conformance.html" rel="prev">
 <link href="../../favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -98,6 +98,7 @@ ul.task-list li input[type="checkbox"] {
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+<meta name="gd-logo-tooltip" content="<code>v1.1.1</code><br>Released 2026-10-15">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/reference/glossary.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/reference/glossary.html">
@@ -145,11 +146,15 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="../../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="499" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -310,29 +315,9 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="true">
- <span class="menu-text" id="quarto-sidebar-section-4-label">YAML</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+ <span class="menu-text" id="quarto-sidebar-section-4-label">Post Interrogation</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
       <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../user-guide/yaml/yaml-validation-workflows.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">YAML Validation Workflows</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../user-guide/yaml/yaml-reference.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">YAML Reference</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="true">
- <span class="menu-text" id="quarto-sidebar-section-5-label">Post Interrogation</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
-      </div>
-      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/post-interrogation/validation-reports.html" class="sidebar-item-text sidebar-link">
@@ -367,10 +352,10 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-controls="quarto-sidebar-section-6" aria-expanded="true">
- <span class="menu-text" id="quarto-sidebar-section-6-label">Data Inspection</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">Data Inspection</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-6" aria-labelledby="quarto-sidebar-section-6-label" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/data-inspection/preview.html" class="sidebar-item-text sidebar-link">
@@ -393,14 +378,52 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-controls="quarto-sidebar-section-6" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-6-label">Table Comparison</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-6" aria-labelledby="quarto-sidebar-section-6-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/table-comparison/comparing-tables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Finding Differences Between Tables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/table-comparison/comparing-large-files.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling Up to Large Files</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
             <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-controls="quarto-sidebar-section-7" aria-expanded="true">
  <span class="menu-text" id="quarto-sidebar-section-7-label">Test Data Generation</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
       <ul id="quarto-sidebar-section-7" aria-labelledby="quarto-sidebar-section-7-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../user-guide/test-data-generation/test-data-generation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Test Data Generation</span></a>
+  <a href="../../user-guide/test-data-generation/generating-test-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Generating Test Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/test-data-generation/profile-fields.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Profile Fields</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/test-data-generation/country-specific-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Country-Specific Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/test-data-generation/pytest-fixture.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The pytest Fixture</span></a>
   </div>
 </li>
       </ul>
@@ -408,19 +431,19 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-controls="quarto-sidebar-section-8" aria-expanded="true">
- <span class="menu-text" id="quarto-sidebar-section-8-label">The Pointblank CLI</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+ <span class="menu-text" id="quarto-sidebar-section-8-label">YAML</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
       <ul id="quarto-sidebar-section-8" aria-labelledby="quarto-sidebar-section-8-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../user-guide/the-pointblank-cli/cli-data-inspection.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data Inspection</span></a>
+  <a href="../../user-guide/yaml/yaml-validation-workflows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YAML Validation Workflows</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../user-guide/the-pointblank-cli/cli-data-validation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data Validation</span></a>
+  <a href="../../user-guide/yaml/yaml-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YAML Reference</span></a>
   </div>
 </li>
       </ul>
@@ -428,37 +451,9 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-controls="quarto-sidebar-section-9" aria-expanded="true">
- <span class="menu-text" id="quarto-sidebar-section-9-label">MCP Server</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+ <span class="menu-text" id="quarto-sidebar-section-9-label">Contracts &amp; Pipelines</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
       <ul id="quarto-sidebar-section-9" aria-labelledby="quarto-sidebar-section-9-label" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../user-guide/mcp-server/mcp-quick-start.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">MCP Quick Start</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-controls="quarto-sidebar-section-10" aria-expanded="true">
- <span class="menu-text" id="quarto-sidebar-section-10-label">Integrations</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
-      </div>
-      <ul id="quarto-sidebar-section-10" aria-labelledby="quarto-sidebar-section-10-label" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../user-guide/integrations/otel-integration.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">OpenTelemetry Integration</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-controls="quarto-sidebar-section-11" aria-expanded="true">
- <span class="menu-text" id="quarto-sidebar-section-11-label">Contracts &amp; Pipelines</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
-      </div>
-      <ul id="quarto-sidebar-section-11" aria-labelledby="quarto-sidebar-section-11-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/contracts-and-pipelines/contracts.html" class="sidebar-item-text sidebar-link">
@@ -487,6 +482,46 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/contracts-and-pipelines/custom-adapters.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Custom Adapters</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-controls="quarto-sidebar-section-10" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-10-label">The Pointblank CLI</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-10" aria-labelledby="quarto-sidebar-section-10-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-data-inspection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Inspection</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/the-pointblank-cli/cli-data-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Validation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-controls="quarto-sidebar-section-11" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-11-label">Integrations</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-11" aria-labelledby="quarto-sidebar-section-11-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/integrations/mcp-quick-start.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP Quick Start</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/integrations/otel-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OpenTelemetry Integration</span></a>
   </div>
 </li>
       </ul>
@@ -526,29 +561,9 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-controls="quarto-sidebar-section-13" aria-expanded="true">
- <span class="menu-text" id="quarto-sidebar-section-13-label">Table Comparison</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+ <span class="menu-text" id="quarto-sidebar-section-13-label">Reference</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
       <ul id="quarto-sidebar-section-13" aria-labelledby="quarto-sidebar-section-13-label" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../user-guide/table-comparison/comparing-tables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Comparing Two Tables</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../user-guide/table-comparison/comparing-large-files.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Comparing Large Files</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-controls="quarto-sidebar-section-14" aria-expanded="true">
- <span class="menu-text" id="quarto-sidebar-section-14-label">Reference</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
-      </div>
-      <ul id="quarto-sidebar-section-14" aria-labelledby="quarto-sidebar-section-14-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/reference/glossary.html" class="sidebar-item-text sidebar-link active">
@@ -711,7 +726,7 @@ A <strong>validation step</strong> that uses a function you write, for rules tha
 </dd>
 <dt>Data coherence</dt>
 <dd>
-In <strong>test data generation</strong>, the way related columns are made to fit together within each row. For example, an email address is made from the person’s name, and the address, city, postcode, phone number, and coordinates all belong to the same place. This happens on its own when related <strong>presets</strong> are used together, and it still holds when rows from several countries are mixed. <a href="../../user-guide/test-data-generation/test-data-generation.html">Learn more</a>.
+In <strong>test data generation</strong>, the way related columns are made to fit together within each row. For example, an email address is made from the person’s name, and the address, city, postcode, phone number, and coordinates all belong to the same place. This happens on its own when related <strong>presets</strong> are used together, and it still holds when rows from several countries are mixed. <a href="../../user-guide/test-data-generation/country-specific-data.html#data-coherence">Learn more</a>.
 </dd>
 <dt>Data extract</dt>
 <dd>
@@ -763,7 +778,7 @@ A <strong>validation step</strong> that checks each row against a condition writ
 </dd>
 <dt>Field</dt>
 <dd>
-A description of one column for <strong>test data generation</strong>, made with a helper such as <a href="../../reference/int_field.html#pointblank.int_field" class="gdls-link gdls-code">int_field()</a>, <a href="../../reference/float_field.html#pointblank.float_field" class="gdls-link gdls-code">float_field()</a>, <a href="../../reference/string_field.html#pointblank.string_field" class="gdls-link gdls-code">string_field()</a>, <a href="../../reference/bool_field.html#pointblank.bool_field" class="gdls-link gdls-code">bool_field()</a>, or <a href="../../reference/date_field.html#pointblank.date_field" class="gdls-link gdls-code">date_field()</a>. The options say what values are allowed, for example <code>min_val=</code>, <code>max_val=</code>, <code>allowed=</code>, <code>pattern=</code>, <code>preset=</code>, or <code>unique=True</code>, depending on the type. You put fields together in a <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> and pass it to <a href="../../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a>. <a href="../../user-guide/test-data-generation/test-data-generation.html">Learn more</a>.
+A description of one column for <strong>test data generation</strong>, made with a helper such as <a href="../../reference/int_field.html#pointblank.int_field" class="gdls-link gdls-code">int_field()</a>, <a href="../../reference/float_field.html#pointblank.float_field" class="gdls-link gdls-code">float_field()</a>, <a href="../../reference/string_field.html#pointblank.string_field" class="gdls-link gdls-code">string_field()</a>, <a href="../../reference/bool_field.html#pointblank.bool_field" class="gdls-link gdls-code">bool_field()</a>, or <a href="../../reference/date_field.html#pointblank.date_field" class="gdls-link gdls-code">date_field()</a>. The options say what values are allowed, for example <code>min_val=</code>, <code>max_val=</code>, <code>allowed=</code>, <code>pattern=</code>, <code>preset=</code>, or <code>unique=True</code>, depending on the type. You put fields together in a <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> and pass it to <a href="../../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a>. <a href="../../user-guide/test-data-generation/generating-test-data.html#field-types">Learn more</a>.
 </dd>
 <dt>Final action</dt>
 <dd>
@@ -795,7 +810,7 @@ The validation results as JSON text, which other programs can read. You get it w
 </dd>
 <dt>MCP server</dt>
 <dd>
-A way for AI assistants (such as the AI chat in VS Code or Positron) to use Pointblank for you. MCP (Model Context Protocol) is a standard way for AI tools to connect to other programs. Through it, an assistant can load data, build and run validations, and show previews and summaries. <a href="../../user-guide/mcp-server/mcp-quick-start.html">Learn more</a>.
+A way for AI assistants (such as the AI chat in VS Code or Positron) to use Pointblank for you. MCP (Model Context Protocol) is a standard way for AI tools to connect to other programs. Through it, an assistant can load data, build and run validations, and show previews and summaries. <a href="../../user-guide/integrations/mcp-quick-start.html">Learn more</a>.
 </dd>
 <dt>Metadata import</dt>
 <dd>
@@ -839,7 +854,7 @@ Changing the table for just one step before it’s checked, using the <code>pre=
 </dd>
 <dt>Preset</dt>
 <dd>
-A ready-made kind of realistic text for <strong>test data generation</strong>, chosen with <code>string_field(preset=...)</code>. There are presets for names, email addresses, street addresses, cities, phone numbers, company names, URLs, credit card numbers, and more. <a href="../../reference/profile_fields.html#pointblank.profile_fields" class="gdls-link gdls-code">profile_fields()</a> gives a whole set of person-related presets at once. Presets follow the <code>country=</code> given to <a href="../../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a>, and related presets fit together within a row (see <strong>data coherence</strong>). <a href="../../user-guide/test-data-generation/test-data-generation.html">Learn more</a>.
+A ready-made kind of realistic text for <strong>test data generation</strong>, chosen with <code>string_field(preset=...)</code>. There are presets for names, email addresses, street addresses, cities, phone numbers, company names, URLs, credit card numbers, and more. <a href="../../reference/profile_fields.html#pointblank.profile_fields" class="gdls-link gdls-code">profile_fields()</a> gives a whole set of person-related presets at once. Presets follow the <code>country=</code> given to <a href="../../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a>, and related presets fit together within a row (see <strong>data coherence</strong>). <a href="../../user-guide/test-data-generation/generating-test-data.html#available-presets">Learn more</a>.
 </dd>
 <dt>Preview</dt>
 <dd>
@@ -899,7 +914,7 @@ CDISC’s detailed rules for how data should be laid out in <strong>SDTM</strong
 </dd>
 <dt>Seed</dt>
 <dd>
-A number that makes randomly generated data repeatable: <code>generate_dataset(schema, seed=23)</code> gives the same rows each time with the same version of Pointblank. The <a href="../../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset</a> pytest fixture picks a seed from each test’s name, so every test gets its own data, which stays the same from one run to the next. <a href="../../user-guide/test-data-generation/test-data-generation.html">Learn more</a>.
+A number that makes randomly generated data repeatable: <code>generate_dataset(schema, seed=23)</code> gives the same rows each time with the same version of Pointblank. The <a href="../../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset</a> pytest fixture picks a seed from each test’s name, so every test gets its own data, which stays the same from one run to the next. <a href="../../user-guide/test-data-generation/pytest-fixture.html">Learn more</a>.
 </dd>
 <dt>Segment</dt>
 <dd>
@@ -943,7 +958,7 @@ Finding the differences between two tables. <a href="../../reference/compare.htm
 </dd>
 <dt>Test data generation</dt>
 <dd>
-Making realistic fake tables for testing and demos. You describe each column in a <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> with <strong>fields</strong>, such as <code>int_field(min_val=1)</code> or <code>string_field(preset="email")</code>, and then create rows with <a href="../../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a>. Use <code>country=</code> for data that fits one or more countries, and <code>seed=</code> to get the same rows every time. When Pointblank is installed, a <a href="../../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset</a> fixture is also available in pytest. Not to be confused with <strong>test datasets</strong>. See also <strong>preset</strong>, <strong>data coherence</strong>, and <strong>seed</strong>. <a href="../../user-guide/test-data-generation/test-data-generation.html">Learn more</a>.
+Making realistic fake tables for testing and demos. You describe each column in a <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> with <strong>fields</strong>, such as <code>int_field(min_val=1)</code> or <code>string_field(preset="email")</code>, and then create rows with <a href="../../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a>. Use <code>country=</code> for data that fits one or more countries, and <code>seed=</code> to get the same rows every time. When Pointblank is installed, a <a href="../../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset</a> fixture is also available in pytest. Not to be confused with <strong>test datasets</strong>. See also <strong>preset</strong>, <strong>data coherence</strong>, and <strong>seed</strong>. <a href="../../user-guide/test-data-generation/generating-test-data.html">Learn more</a>.
 </dd>
 <dt>Test dataset</dt>
 <dd>
@@ -1422,8 +1437,8 @@ A validation written in a YAML file instead of Python code. The file lists the d
   </script>
 <nav class="page-navigation" aria-label="Page">
   <div class="nav-page nav-page-previous">
-      <a href="../../user-guide/table-comparison/comparing-large-files.html" class="pagination-link" aria-label="Comparing Large Files">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Comparing Large Files</span>
+      <a href="../../user-guide/metadata-import/cdisc-submission-conformance.html" class="pagination-link" aria-label="CDISC Submission Conformance">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">CDISC Submission Conformance</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

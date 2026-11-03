@@ -1,4 +1,4 @@
-# Comparing Two Tables
+# Finding Differences Between Tables
 
 A very common data question is *how do these two tables differ?* Maybe you refactored a pipeline and want to know whether its output changed, migrated a table from one database to another, or received a new extract of a data feed. In each case there's a *source* table (the reference, or the data you expect) and a *target* table (the data you want to check), and you want to know:
 
@@ -357,4 +357,4 @@ pb compare orders_source.csv orders_target.csv --key order_id --output-html diff
 
 Its exit code makes it easy to use in scripts and CI pipelines: `0` if the tables match, `1` if they differ, and `2` if there was an error. Use `--format json` to print the results as JSON. All the comparison settings have command-line options (e.g., `--tolerance amount=0.01`, `--schema common`); see the [`pb compare` reference](../../reference/cli/compare.md) for the full list.
 
-For tables that are too large to fit in memory, see [Comparing Large Files](comparing-large-files.md).
+For tables that are too large to fit in memory, see [Scaling Up to Large Files](comparing-large-files.md).

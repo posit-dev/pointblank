@@ -1,4 +1,4 @@
-# Comparing Large Files
+# Scaling Up to Large Files
 
 Here's a situation that comes up all the time: a pipeline run produces a target CSV file from a source CSV file, and you need to check that nothing went wrong. Specifically, you want to find
 
@@ -154,4 +154,4 @@ pb compare source.csv target.csv --key order_id --engine duckdb --partitions 8 \
   --output-html diff.html --output-json diff.json
 ```
 
-The HTML report can be kept as a build artifact for anyone to look at. If the data is sensitive, add `--no-samples` to keep row values out of the JSON output. To make the comparison one check among others in a validation, use [Validate.tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match), which accepts the same settings, including `partitions=` (see [Comparing Two Tables](comparing-tables.md)).
+The HTML report can be kept as a build artifact for anyone to look at. If the data is sensitive, add `--no-samples` to keep row values out of the JSON output. To make the comparison one check among others in a validation, use [Validate.tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match), which accepts the same settings, including `partitions=` (see [Finding Differences Between Tables](comparing-tables.md)).
