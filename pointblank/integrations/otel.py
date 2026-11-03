@@ -17,6 +17,9 @@ try:
 except ImportError:
     HAS_OTEL = False
 
+# The accepted `log_level=` values, from lowest to highest
+_LOG_LEVELS = ("warning", "error", "critical")
+
 
 def _check_otel_installed() -> None:
     """Raise ImportError with install hint if OTel packages are missing."""
@@ -37,7 +40,7 @@ class OTelExporter:
     [`export()`](`pointblank.integrations.otel.OTelExporter.export`) after
     [`interrogate()`](`pointblank.Validate.interrogate`) to send the results. For an export that
     happens at the end of every interrogation, use [`emit_otel()`](`pointblank.emit_otel`) in
-    [`FinalActions`](`pointblank.FinalActions`) instead (it sends metrics only).
+    [`FinalActions`](`pointblank.FinalActions`) instead (it sends the same signals).
 
     An export can produce three kinds of signal:
 
@@ -106,6 +109,9 @@ class OTelExporter:
     ------
     ImportError
         If the OTel packages aren't installed.
+    ValueError
+        If `enable_logging=True` is given without `logger_provider=`, or if `log_level=` isn't one
+        of the accepted values (they're matched without regard to case).
 
     Examples
     --------
@@ -214,6 +220,18 @@ class OTelExporter:
     ) -> None:
         _check_otel_installed()
 
+        if enable_logging and logger_provider is None:
+            raise ValueError(
+                "`enable_logging=True` needs a `logger_provider=`: OTel has no global logger "
+                "provider to send log records to."
+            )
+
+        if not isinstance(log_level, str) or log_level.lower() not in _LOG_LEVELS:
+            raise ValueError(
+                f"`log_level=` must be one of {', '.join(repr(lvl) for lvl in _LOG_LEVELS)}, "
+                f"not {log_level!r}."
+            )
+
         self.meter_name = meter_name
         self.meter_version = meter_version or self._get_pointblank_version()
         self.enable_metrics = enable_metrics
@@ -223,7 +241,7 @@ class OTelExporter:
         self.tracer_provider = tracer_provider
         self.logger_provider = logger_provider
         self.metric_prefix = metric_prefix
-        self.log_level = log_level
+        self.log_level = log_level.lower()
         self.extra_attributes = extra_attributes or {}
         self._instruments_initialized = False
 
@@ -261,9 +279,7 @@ class OTelExporter:
         Raises
         ------
         ValueError
-            If `validation` hasn't been interrogated, or if logging is enabled and there is no
-            `logger_provider=`. In the second case, the metrics and traces have already been sent
-            when the error is raised.
+            If `validation` hasn't been interrogated. Nothing is sent in that case.
         ImportError
             If the OTel packages aren't installed.
 
@@ -363,13 +379,6 @@ class OTelExporter:
         if self.enable_logging:
             self._emit_logs(validation, attrs)
 
-    def _export_from_summary(self, summary: dict) -> None:
-        """Export validation metrics from a FinalActions summary dict."""
-        attrs = self._build_common_attributes_from_summary(summary)
-
-        if self.enable_metrics:
-            self._emit_metrics_from_summary(summary, attrs)
-
     # ── Attribute Builders ──────────────────────────────────────────
 
     def _build_common_attributes(self, validation: Validate) -> dict[str, Any]:
@@ -382,14 +391,6 @@ class OTelExporter:
             attrs["pb.owner"] = validation.owner
         if getattr(validation, "version", None) is not None:
             attrs["pb.version"] = validation.version
-        attrs.update(self.extra_attributes)
-        return attrs
-
-    def _build_common_attributes_from_summary(self, summary: dict) -> dict[str, Any]:
-        attrs: dict[str, Any] = {}
-        tbl_name = summary.get("tbl_name")
-        if tbl_name is not None and tbl_name != "Unknown":
-            attrs["pb.tbl_name"] = tbl_name
         attrs.update(self.extra_attributes)
         return attrs
 
@@ -523,40 +524,6 @@ class OTelExporter:
             if vi.proc_duration_s is not None:
                 self._histogram_step_duration.record(vi.proc_duration_s, step_attrs)
 
-    def _emit_metrics_from_summary(self, summary: dict, attrs: dict) -> None:
-        meter = self._get_meter()
-        self._ensure_instruments(meter)
-
-        n_steps = summary.get("n_steps", 0)
-        n_passing = summary.get("n_passing_steps", 0)
-        n_failing = summary.get("n_failing_steps", 0)
-
-        dict_n_passed = summary.get("dict_n_passed", {})
-        dict_n_failed = summary.get("dict_n_failed", {})
-
-        units_passed = sum(v or 0 for v in dict_n_passed.values())
-        units_failed = sum(v or 0 for v in dict_n_failed.values())
-        units_total = units_passed + units_failed
-
-        pass_rate = units_passed / units_total if units_total > 0 else 1.0
-        duration = summary.get("validation_duration", 0.0)
-
-        n_warning = summary.get("n_warning_steps", 0)
-        n_error = summary.get("n_error_steps", 0)
-        n_critical = summary.get("n_critical_steps", 0)
-
-        self._counter_steps_total.add(n_steps, attrs)
-        self._counter_steps_passed.add(n_passing, attrs)
-        self._counter_steps_failed.add(n_failing, attrs)
-        self._counter_units_total.add(units_total, attrs)
-        self._counter_units_passed.add(units_passed, attrs)
-        self._counter_units_failed.add(units_failed, attrs)
-        self._gauge_pass_rate.set(pass_rate, attrs)
-        self._gauge_duration.set(duration, attrs)
-        self._counter_threshold_warning.add(n_warning, attrs)
-        self._counter_threshold_error.add(n_error, attrs)
-        self._counter_threshold_critical.add(n_critical, attrs)
-
     # ── Trace Emission ──────────────────────────────────────────────
 
     def _emit_traces(self, validation: Validate, attrs: dict) -> None:
@@ -650,8 +617,8 @@ class OTelExporter:
             "error": (SeverityNumber.ERROR, "ERROR"),
             "critical": (SeverityNumber.FATAL, "CRITICAL"),
         }
-        log_level_order = {"warning": 0, "error": 1, "critical": 2}
-        min_level = log_level_order.get(self.log_level, 0)
+        log_level_order = {level: rank for rank, level in enumerate(_LOG_LEVELS)}
+        min_level = log_level_order[self.log_level]
 
         for vi in validation.validation_info:
             # Find the highest exceeded threshold for this step
@@ -698,6 +665,7 @@ class OTelExporter:
 def emit_otel(
     *,
     meter_name: str = "pointblank",
+    meter_version: str | None = None,
     enable_metrics: bool = True,
     enable_tracing: bool = False,
     enable_logging: bool = False,
@@ -708,54 +676,58 @@ def emit_otel(
     log_level: str = "warning",
     extra_attributes: dict[str, str] | None = None,
 ) -> Callable:
-    """Create a final action that sends a validation's metrics to OpenTelemetry.
+    """Create a final action that sends a validation's results to OpenTelemetry.
 
     The `emit_otel()` function returns an action for [`FinalActions`](`pointblank.FinalActions`)
-    that sends validation metrics to OpenTelemetry (OTel) at the end of every
+    that sends validation results to OpenTelemetry (OTel) at the end of every
     [`interrogate()`](`pointblank.Validate.interrogate`) call. With the action in the validation
     plan, every run reports to the monitoring backend without any code after the validation. That
     suits validations that run on a schedule, such as checks in a data pipeline.
 
-    The action sends the metrics of
-    [`OTelExporter`](`pointblank.integrations.otel.OTelExporter`), with these differences:
+    The action sends the same signals as
+    [`OTelExporter.export()`](`pointblank.integrations.otel.OTelExporter.export`) called right
+    after the interrogation: metrics (on by default), trace spans (`enable_tracing=True`) and log
+    records for the steps that exceeded a threshold (`enable_logging=True`), with the same names
+    and attributes. See [`OTelExporter`](`pointblank.integrations.otel.OTelExporter`) for the list
+    of signals. Since the signals are sent during `interrogate()`, the `pb.validate` span is a child
+    of whatever span is current at that point, such as the span of a pipeline task.
 
-    - It sends metrics only. The `enable_tracing=`, `enable_logging=`, `tracer_provider=`,
-    `logger_provider=` and `log_level=` arguments currently have no effect. Use
-    [`OTelExporter.export()`](`pointblank.integrations.otel.OTelExporter.export`) after the
-    interrogation for traces and log records.
-    - It doesn't send the step duration histogram (`{prefix}.step.duration`), so there are 11
-    metrics instead of 12.
-    - The only attributes are `pb.tbl_name` (when the validation has a `tbl_name=`) and those in
-    `extra_attributes=`.
-
-    Without `meter_provider=`, the metrics go to OTel's global meter provider, which discards them
-    until the application sets up the OTel SDK. The OTel packages are an optional dependency,
-    installed with `pip install pointblank[otel]`.
+    Without `meter_provider=` and `tracer_provider=`, the metrics and traces go to OTel's global
+    providers, which discard them until the application sets up the OTel SDK. Log records have no
+    global provider, so logging needs `logger_provider=`. The OTel packages are an optional
+    dependency, installed with `pip install pointblank[otel]`.
 
     Parameters
     ----------
     meter_name
-        The name that identifies Pointblank as the source of the metrics (the OTel instrumentation
-        scope). The default is `"pointblank"`.
+        The name that identifies Pointblank as the source of the signals (the OTel instrumentation
+        scope), used for the meter, the tracer and the logger. The default is `"pointblank"`.
+    meter_version
+        The version of the instrumentation scope. The default is `None`, which uses the installed
+        version of Pointblank.
     enable_metrics
         Whether to send the metrics. The default is `True`.
     enable_tracing
-        Currently has no effect. The default is `False`.
+        Whether to send the trace spans. The default is `False`.
     enable_logging
-        Currently has no effect. The default is `False`.
+        Whether to send log records for the steps that exceeded a threshold. This needs
+        `logger_provider=`. The default is `False`.
     meter_provider
         An OTel `MeterProvider` for the metrics. The default is `None`, which uses the global meter
         provider.
     tracer_provider
-        Currently has no effect. The default is `None`.
+        An OTel `TracerProvider` for the trace spans. The default is `None`, which uses the global
+        tracer provider.
     logger_provider
-        Currently has no effect. The default is `None`.
+        An OTel `LoggerProvider` for the log records, needed when `enable_logging=True`. The
+        default is `None`.
     metric_prefix
         The prefix for the names of the metrics. The default is `"pb.validation"`.
     log_level
-        Currently has no effect. The default is `"warning"`.
+        The lowest threshold level that produces a log record: `"warning"` (every step that
+        exceeded a threshold), `"error"` or `"critical"`. The default is `"warning"`.
     extra_attributes
-        A dictionary of attributes to add to every metric, such as the environment or the name of
+        A dictionary of attributes to add to every signal, such as the environment or the name of
         the pipeline. The default is `None`.
 
     Returns
@@ -767,6 +739,10 @@ def emit_otel(
     ------
     ImportError
         If the OTel packages aren't installed.
+    ValueError
+        If `enable_logging=True` is given without `logger_provider=`, or if `log_level=` isn't one
+        of the accepted values. Both are raised by `emit_otel()` itself, when the validation plan is
+        built, rather than during `interrogate()`.
 
     Examples
     --------
@@ -807,18 +783,56 @@ def emit_otel(
     metrics = reader.get_metrics_data().resource_metrics[0].scope_metrics[0].metrics
 
     for metric in metrics:
-        print(metric.name, metric.data.data_points[0].value)
+        for point in metric.data.data_points:
+            value = point.count if hasattr(point, "count") else point.value
+            print(metric.name, value)
     ```
 
     The metrics were sent during `interrogate()`. Both steps failed, 7 of the 10 test units passed,
-    and the second step exceeded all three thresholds. Each metric has the `pb.tbl_name` and `env`
-    attributes:
+    and the second step exceeded all three thresholds. The step duration histogram has a data point
+    for each step, and the value printed for it is its count of one observation. Each data point
+    has the `pb.tbl_name` and `env` attributes:
 
     ```{python}
     dict(metrics[0].data.data_points[0].attributes)
     ```
 
-    Since `FinalActions` takes any number of actions, the metrics can be sent along with other
+    To also send traces, give the action `enable_tracing=True` and a tracer provider. Here, an
+    in-memory span exporter keeps the spans:
+
+    ```{python}
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+    from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+
+    span_exporter = InMemorySpanExporter()
+    tracer_provider = TracerProvider()
+    tracer_provider.add_span_processor(SimpleSpanProcessor(span_exporter))
+
+    validation = (
+        pb.Validate(
+            data=orders,
+            tbl_name="orders",
+            thresholds=(0.05, 0.20, 0.40),
+            final_actions=pb.FinalActions(
+                pb.emit_otel(
+                    enable_metrics=False, enable_tracing=True, tracer_provider=tracer_provider
+                )
+            ),
+        )
+        .col_vals_not_null(columns="customer")
+        .col_vals_gt(columns="amount", value=0)
+        .interrogate()
+    )
+
+    for span in span_exporter.get_finished_spans():
+        print(span.name, span.attributes.get("pb.step.assertion_type"))
+    ```
+
+    There's a `pb.validate.step` span for each step, inside the `pb.validate` span of the whole
+    interrogation, just as with `OTelExporter`.
+
+    Since `FinalActions` takes any number of actions, the signals can be sent along with other
     notifications. Here, a [`send_slack_notification()`](`pointblank.send_slack_notification`)
     action without a webhook URL prints the message it would send:
 
@@ -853,6 +867,7 @@ def emit_otel(
 
     exporter = OTelExporter(
         meter_name=meter_name,
+        meter_version=meter_version,
         enable_metrics=enable_metrics,
         enable_tracing=enable_tracing,
         enable_logging=enable_logging,
@@ -865,11 +880,12 @@ def emit_otel(
     )
 
     def _otel_final_action() -> None:
-        from pointblank import get_validation_summary
+        from pointblank.validate import _get_current_validation
 
-        summary = get_validation_summary()
-        if summary is None:
+        # Outside of a final action there's no validation to export
+        validation = _get_current_validation()
+        if validation is None:
             return
-        exporter._export_from_summary(summary)
+        exporter.export(validation)
 
     return _otel_final_action
