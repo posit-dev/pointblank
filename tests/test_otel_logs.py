@@ -107,6 +107,37 @@ def test_log_level_error_filters_warnings(otel_log_exporter, validation_mixed_th
 def test_get_logger_without_provider_raises():
     import pytest
 
-    exporter = OTelExporter(enable_logging=True, enable_metrics=False)
+    exporter = OTelExporter(enable_metrics=False)
     with pytest.raises(ValueError, match="logger_provider must be set"):
         exporter._get_logger()
+
+
+def test_enable_logging_without_provider_raises_at_init():
+    """The missing provider is caught before anything is sent, not partway through export()."""
+    import pytest
+
+    with pytest.raises(ValueError, match="needs a `logger_provider=`"):
+        OTelExporter(enable_logging=True)
+
+
+def test_unknown_log_level_raises_at_init():
+    import pytest
+
+    for log_level in ("warn", "info", "", None):
+        with pytest.raises(ValueError, match="`log_level=` must be one of"):
+            OTelExporter(log_level=log_level)
+
+
+def test_log_level_is_case_insensitive(otel_log_exporter, validation_mixed_thresholds):
+    exporter, provider = otel_log_exporter
+    otel = OTelExporter(
+        enable_logging=True,
+        enable_metrics=False,
+        logger_provider=provider,
+        log_level="ERROR",
+    )
+    assert otel.log_level == "error"
+
+    # The fixture's only breach is at the warning level, so "ERROR" filters it out
+    otel.export(validation_mixed_thresholds)
+    assert len(exporter.get_finished_logs()) == 0
