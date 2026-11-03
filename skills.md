@@ -1238,11 +1238,6 @@ pb.Actions(
     ),
 )
 
-# OpenTelemetry
-pb.Actions(
-    warning=pb.emit_otel(service_name="data-pipeline"),
-)
-
 # Multiple actions per level
 pb.Actions(
     error=[
@@ -1325,14 +1320,21 @@ pb.Validate(
 )
 ```
 
-### Log to OpenTelemetry
+### Send to OpenTelemetry
+
+`emit_otel()` is a final action (use it in `FinalActions`, not `Actions`).
+It sends metrics by default, plus trace spans and log records when asked,
+after every `interrogate()`:
 
 ```python
 pb.Validate(
     data=df,
     thresholds=pb.Thresholds(warning=0.05),
-    actions=pb.Actions(
-        warning=pb.emit_otel(service_name="my-pipeline"),
+    final_actions=pb.FinalActions(
+        pb.emit_otel(
+            enable_tracing=True,
+            extra_attributes={"pipeline": "my-pipeline"},
+        ),
     ),
 )
 ```

@@ -4,7 +4,7 @@ Validate whether rows in the table are distinct.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13060-L13319)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13078-L13337)
 
 ``` python
 Validate.rows_distinct(

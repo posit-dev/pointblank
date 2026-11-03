@@ -1621,7 +1621,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/integrations/otel.py#L30-L695" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/integrations/otel.py#L33-L662" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">integrations</span><span class="op">.</span><span class="va">otel</span><span class="op">.</span><span class="va">OTelExporter</span>(</span>
@@ -1640,7 +1640,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>OpenTelemetry (OTel) is a vendor-neutral standard for application telemetry, which backends such as Grafana, Datadog, New Relic and Prometheus can receive. An <a href="../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a> sends the results of an interrogated <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object to OTel, so that data quality shows up in the same dashboards and alerts as the rest of a pipeline’s telemetry. Call <a href="../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter.export" class="gdls-link"><code>export()</code></a> after <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> to send the results. For an export that happens at the end of every interrogation, use <a href="../reference/emit_otel.html#pointblank.emit_otel" class="gdls-link"><code>emit_otel()</code></a> in <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> instead (it sends metrics only).</p>
+<p>OpenTelemetry (OTel) is a vendor-neutral standard for application telemetry, which backends such as Grafana, Datadog, New Relic and Prometheus can receive. An <a href="../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a> sends the results of an interrogated <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object to OTel, so that data quality shows up in the same dashboards and alerts as the rest of a pipeline’s telemetry. Call <a href="../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter.export" class="gdls-link"><code>export()</code></a> after <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> to send the results. For an export that happens at the end of every interrogation, use <a href="../reference/emit_otel.html#pointblank.emit_otel" class="gdls-link"><code>emit_otel()</code></a> in <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link"><code>FinalActions</code></a> instead (it sends the same signals).</p>
 <p>An export can produce three kinds of signal:</p>
 <ul>
 <li><strong>Metrics</strong> (on by default). There are counters of the steps (<code>{prefix}.steps.total</code>, <code>{prefix}.steps.passed</code> and <code>{prefix}.steps.failed</code>), of the test units (<code>{prefix}.test_units.total</code>, <code>{prefix}.test_units.passed</code> and <code>{prefix}.test_units.failed</code>) and of the steps that exceeded each threshold level (<code>{prefix}.threshold.warning</code>, <code>{prefix}.threshold.error</code> and <code>{prefix}.threshold.critical</code>). There are gauges of the overall pass rate (<code>{prefix}.pass_rate</code>) and of the interrogation time in seconds (<code>{prefix}.duration</code>), and a histogram of the step processing times (<code>{prefix}.step.duration</code>). Here <code>{prefix}</code> is the <code>metric_prefix=</code> value. Counters add up over exports, while a gauge keeps the latest value.</li>
@@ -1708,7 +1708,11 @@ A dictionary of attributes to add to every signal, such as the environment or th
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ImportError</span></code></dt>
 <dd>
-If the OTel packages aren’t installed.
+<p>If the OTel packages aren’t installed.</p>
+</dd>
+<dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
+<dd>
+If <code>enable_logging=True</code> is given without <code>logger_provider=</code>, or if <code>log_level=</code> isn’t one of the accepted values (they’re matched without regard to case).
 </dd>
 </dl>
 </div>
@@ -1716,7 +1720,7 @@ If the OTel packages aren’t installed.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s validate a small table of orders, which has a missing customer name and two amounts that aren’t positive:</p>
-<div id="577564de" class="cell" data-execution_count="1">
+<div id="2baef3c4" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1736,7 +1740,7 @@ If the OTel packages aren’t installed.
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>In production, the exporter would use providers that send to a collector. Here, the OTel SDK’s <code>InMemoryMetricReader</code> keeps the metrics in memory so we can look at them:</p>
-<div id="e85aa377" class="cell" data-execution_count="2">
+<div id="adcda653" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics <span class="im">import</span> MeterProvider</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics.export <span class="im">import</span> InMemoryMetricReader</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.integrations.otel <span class="im">import</span> OTelExporter</span>
@@ -1761,7 +1765,7 @@ pb.validation.test_units.total 10
 pb.validation.test_units.passed 7
 pb.validation.test_units.failed 3
 pb.validation.pass_rate 0.7
-pb.validation.duration 0.004554
+pb.validation.duration 0.009653
 pb.validation.threshold.warning 2
 pb.validation.threshold.error 2
 pb.validation.threshold.critical 1
@@ -1770,14 +1774,14 @@ pb.validation.step.duration 1</code></pre>
 </div>
 </div>
 <p>Both steps failed, and 7 of the 10 test units passed, for a pass rate of <code>0.7</code>. The first step (20% failing) exceeded the warning and error thresholds, and the second (40% failing) exceeded all three. The step duration histogram has a data point for each step, and the value printed for it is its count of one observation. Every data point has the <code>pb.tbl_name</code> and <code>env</code> attributes (and the histogram’s also have the <code>pb.step.*</code> ones):</p>
-<div id="74416756" class="cell" data-execution_count="3">
+<div id="394783a4" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">dict</span>(metrics[<span class="dv">0</span>].data.data_points[<span class="dv">0</span>].attributes)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>{'pb.tbl_name': 'orders', 'env': 'dev'}</code></pre>
 </div>
 </div>
 <p>For traces, we give the exporter a <code>TracerProvider</code> with an in-memory span exporter. This exporter sends traces only:</p>
-<div id="92335070" class="cell" data-execution_count="4">
+<div id="71af7d2e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace <span class="im">import</span> TracerProvider</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace.export <span class="im">import</span> SimpleSpanProcessor</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace.export.in_memory_span_exporter <span class="im">import</span> InMemorySpanExporter</span>
@@ -1837,7 +1841,7 @@ pb.validate None None</code></pre>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/integrations/otel.py#L241-L364" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/integrations/otel.py#L259-L380" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb9"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">export</span>(<span class="va">validation</span>)</span></code></pre></div>
@@ -1873,7 +1877,7 @@ The signals are sent to the providers.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
 <dd>
-<p>If <code>validation</code> hasn’t been interrogated, or if logging is enabled and there is no <code>logger_provider=</code>. In the second case, the metrics and traces have already been sent when the error is raised.</p>
+<p>If <code>validation</code> hasn’t been interrogated. Nothing is sent in that case.</p>
 </dd>
 <dt><code> <span class="doc-parameter-annotation">ImportError</span></code></dt>
 <dd>
@@ -1885,7 +1889,7 @@ If the OTel packages aren’t installed.
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
 <p>Let’s send log records for the steps of a validation that exceeded a threshold. The OTel SDK’s <code>InMemoryLogRecordExporter</code> keeps the records in memory so we can look at them:</p>
-<div id="10282ed7" class="cell" data-execution_count="5">
+<div id="a1ba3b17" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk._logs <span class="im">import</span> LoggerProvider</span>
@@ -1927,7 +1931,7 @@ CRITICAL Validation step 2 (col_vals_gt on 'amount') exceeded critical threshold
 </div>
 <p>Each step has one record, at the highest threshold level it exceeded. With <code>log_level="critical"</code>, only the second step’s record would be sent.</p>
 <p>A pipeline that checks several tables can use one exporter for all of them. Here, we export a second validation, of a table of customers, with a metrics-only exporter that also gets the first validation:</p>
-<div id="866b53df" class="cell" data-execution_count="6">
+<div id="23675a1f" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics <span class="im">import</span> MeterProvider</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics.export <span class="im">import</span> InMemoryMetricReader</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>

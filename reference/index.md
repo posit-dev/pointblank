@@ -570,7 +570,7 @@ Prebuilt action functions for common notification patterns.
 Create an action that sends a Slack notification about a validation.
 
 [emit_otel()](emit_otel.md#pointblank.emit_otel)  
-Create a final action that sends a validation's metrics to OpenTelemetry.
+Create a final action that sends a validation's results to OpenTelemetry.
 
 ## Metadata Import/Export
 

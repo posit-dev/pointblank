@@ -4,7 +4,7 @@ Export Pointblank validation results as OpenTelemetry signals.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/integrations/otel.py#L30-L695)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/integrations/otel.py#L33-L662)
 
 ``` python
 integrations.otel.OTelExporter(
@@ -23,7 +23,7 @@ integrations.otel.OTelExporter(
 )
 ```
 
-OpenTelemetry (OTel) is a vendor-neutral standard for application telemetry, which backends such as Grafana, Datadog, New Relic and Prometheus can receive. An [OTelExporter](../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) sends the results of an interrogated [`Validate`](../reference/Validate.md#pointblank.Validate) object to OTel, so that data quality shows up in the same dashboards and alerts as the rest of a pipeline's telemetry. Call [`export()`](../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter.export) after [`interrogate()`](../reference/Validate.interrogate.md#pointblank.Validate.interrogate) to send the results. For an export that happens at the end of every interrogation, use [`emit_otel()`](../reference/emit_otel.md#pointblank.emit_otel) in [`FinalActions`](../reference/FinalActions.md#pointblank.FinalActions) instead (it sends metrics only).
+OpenTelemetry (OTel) is a vendor-neutral standard for application telemetry, which backends such as Grafana, Datadog, New Relic and Prometheus can receive. An [OTelExporter](../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) sends the results of an interrogated [`Validate`](../reference/Validate.md#pointblank.Validate) object to OTel, so that data quality shows up in the same dashboards and alerts as the rest of a pipeline's telemetry. Call [`export()`](../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter.export) after [`interrogate()`](../reference/Validate.interrogate.md#pointblank.Validate.interrogate) to send the results. For an export that happens at the end of every interrogation, use [`emit_otel()`](../reference/emit_otel.md#pointblank.emit_otel) in [`FinalActions`](../reference/FinalActions.md#pointblank.FinalActions) instead (it sends the same signals).
 
 An export can produce three kinds of signal:
 
@@ -77,6 +77,9 @@ A dictionary of attributes to add to every signal, such as the environment or th
 `ImportError`  
 If the OTel packages aren't installed.
 
+`ValueError`  
+If `enable_logging=True` is given without `logger_provider=`, or if `log_level=` isn't one of the accepted values (they're matched without regard to case).
+
 ## Examples
 
 Let's validate a small table of orders, which has a missing customer name and two amounts that aren't positive:
@@ -129,7 +132,7 @@ for metric in metrics:
     pb.validation.test_units.passed 7
     pb.validation.test_units.failed 3
     pb.validation.pass_rate 0.7
-    pb.validation.duration 0.004554
+    pb.validation.duration 0.009653
     pb.validation.threshold.warning 2
     pb.validation.threshold.error 2
     pb.validation.threshold.critical 1
@@ -190,7 +193,7 @@ Send the results of an interrogated validation as OTel signals.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/integrations/otel.py#L241-L364)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/integrations/otel.py#L259-L380)
 
 ``` python
 export(validation)
@@ -211,7 +214,7 @@ The signals are sent to the providers.
 #### Raises
 
 `ValueError`  
-If `validation` hasn't been interrogated, or if logging is enabled and there is no `logger_provider=`. In the second case, the metrics and traces have already been sent when the error is raised.
+If `validation` hasn't been interrogated. Nothing is sent in that case.
 
 `ImportError`  
 If the OTel packages aren't installed.

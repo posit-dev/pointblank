@@ -83,7 +83,7 @@ Because the export happens after [interrogate()](../../reference/Validate.interr
 
 ### Pattern B: FinalActions (Automatic)
 
-Use [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) inside [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions) so metrics are emitted automatically at the end of every [interrogate()](../../reference/Validate.interrogate.md#pointblank.Validate.interrogate) call (no extra code needed after the validation).
+Use [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) inside [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions) so the signals are emitted automatically at the end of every [interrogate()](../../reference/Validate.interrogate.md#pointblank.Validate.interrogate) call (no extra code needed after the validation).
 
 ``` python
 import pointblank as pb
@@ -121,7 +121,7 @@ validation = (
 )
 ```
 
-The two patterns differ in what they send. [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) sends metrics only (its `enable_tracing=` and `enable_logging=` arguments currently have no effect), leaves out the per-step duration histogram, and attaches only the `pb.tbl_name` attribute plus any `extra_attributes`. Choose explicit export when you want traces, log records, or the full set of attributes, and [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions) when you want every validation run to emit metrics automatically.
+Both patterns send the same signals, with the same names and attributes: [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) takes the same `enable_tracing=`, `enable_logging=` and provider arguments as [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter). Since [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) runs inside [interrogate()](../../reference/Validate.interrogate.md#pointblank.Validate.interrogate), its `pb.validate` span becomes a child of whatever span is current at that point (such as the span of an Airflow or Dagster task). Choose explicit export when you want to look at the results before deciding whether to send them, and [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions) when you want every validation run to report automatically.
 
 ## Working Example with Console Output
 
@@ -281,7 +281,7 @@ The table below lists all constructor parameters for [OTelExporter](../../refere
 | `log_level` | `"warning"` | Minimum threshold severity for log emission |
 | `extra_attributes` | `None` | Additional key-value pairs on all signals |
 
-The [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) factory function accepts the same parameters except `meter_version`, and returns a callable suitable for use in [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions). Since it sends metrics only, its tracing and logging parameters currently have no effect.
+The [emit_otel()](../../reference/emit_otel.md#pointblank.emit_otel) factory function accepts the same parameters and returns a callable suitable for use in [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions). Both raise a `ValueError` when they're created if `enable_logging=True` is given without a `logger_provider=`, or if `log_level=` isn't `"warning"`, `"error"` or `"critical"` (in any case), so a misconfigured exporter fails before any validation runs.
 
 ### Log Level Filtering
 

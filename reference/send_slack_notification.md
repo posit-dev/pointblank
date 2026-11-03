@@ -121,7 +121,7 @@ validation = (
     • Level: critical
     • Step: 2
     • Column: amount
-    • Time: 2026-10-29 12:56:57.021509
+    • Time: 2026-11-03 23:22:06.080144
     ==============
 
 Only the second step, with 40% of its test units failing, reached the critical threshold, so there is one message. The first step (20% failing) exceeded the error threshold, which has no action here.
@@ -148,7 +148,7 @@ validation = (
     • Highest Severity: critical
     • Total Steps: 2
     • Failed Steps: 2
-    • Time: 2026-10-29 12:56:57.029036
+    • Time: 2026-11-03 23:22:06.094717
     ==============
 
 The summary is sent once per interrogation, whether or not any step failed. Both steps failed here, and the highest threshold level reached was critical.
@@ -219,4 +219,4 @@ Get the information that step messages are made from.
 Get the information that summary messages are made from.
 
 [emit_otel()](../reference/emit_otel.md#pointblank.emit_otel)  
-Send validation metrics to OpenTelemetry from a final action.
+Send validation results to OpenTelemetry from a final action.
