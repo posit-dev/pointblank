@@ -221,7 +221,7 @@ Under the hood, `to_json_schema()` delegates to the
 convenience method adds type enrichment from the data and handles file output. If you need the raw
 adapter behavior (for example, to export without type enrichment, or to work with a `Contract`
 object rather than a `Validate` object), use `export_contract()` directly. See the [Importing and
-Exporting Contracts](../10-contracts-and-pipelines/04-importing-contracts.qmd) guide for the full
+Exporting Contracts](../08-contracts-and-pipelines/04-importing-contracts.qmd) guide for the full
 story on contract adapters.
 
 ## Conclusion

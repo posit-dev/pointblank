@@ -432,7 +432,7 @@ rule libraries that stay portable across datasets, teams, and environments. The 
 tailor shared checks without forking the underlying library.
 
 For a complementary approach to reusable validation rules, see
-[Data Contracts](../10-contracts-and-pipelines/01-contracts.qmd), which define expectations as
+[Data Contracts](../08-contracts-and-pipelines/01-contracts.qmd), which define expectations as
 declarative, serializable specifications using the [`Step`](`pointblank.Step`) class. Both
 approaches produce the same validation steps at interrogation time. Choose `Steps` for fluent,
 code-first composition and `Contract` for declarative, YAML-friendly definitions.

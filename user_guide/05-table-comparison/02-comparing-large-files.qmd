@@ -24,7 +24,7 @@ source CSV file, and you need to check that nothing went wrong. Specifically, yo
 and the files are big enough that loading both of them into memory is slow, or impossible.
 
 This article looks at why the usual approaches struggle with this, and how to do it with
-Pointblank's [`compare()`](../12-table-comparison/01-comparing-tables.qmd) function and the
+Pointblank's [`compare()`](../05-table-comparison/01-comparing-tables.qmd) function and the
 `pb compare` command.
 
 ## Why the Usual Approaches Fall Short
