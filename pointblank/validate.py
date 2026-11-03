@@ -278,15 +278,33 @@ _final_action_context = threading.local()
 
 
 @contextlib.contextmanager
-def _final_action_context_manager(summary):
-    """Context manager for storing validation summary during final action execution."""
+def _final_action_context_manager(summary, validation=None):
+    """Context manager for storing the validation summary (and the `Validate` object) during
+    final action execution."""
+    # Keep any values already set, so that a final action that runs another validation (with
+    # final actions of its own) gets its own summary back afterwards
+    previous = {
+        name: getattr(_final_action_context, name)
+        for name in ("summary", "validation")
+        if hasattr(_final_action_context, name)
+    }
     _final_action_context.summary = summary
+    _final_action_context.validation = validation
     try:
         yield
     finally:
-        # Clean up after execution
-        if hasattr(_final_action_context, "summary"):
-            delattr(_final_action_context, "summary")
+        # Clean up after execution, restoring the values of an enclosing final action
+        for name in ("summary", "validation"):
+            if name in previous:
+                setattr(_final_action_context, name, previous[name])
+            elif hasattr(_final_action_context, name):
+                delattr(_final_action_context, name)
+
+
+def _get_current_validation() -> Validate | None:
+    """Get the `Validate` object whose final actions are running, or `None` outside of a final
+    action."""
+    return getattr(_final_action_context, "validation", None)
 
 
 def get_validation_summary() -> dict | None:
@@ -23620,7 +23638,7 @@ class Validate:
         action = self.final_actions.actions
 
         # Execute the action within the context manager
-        with _final_action_context_manager(summary):
+        with _final_action_context_manager(summary, validation=self):
             if isinstance(action, str):
                 print(action)
             elif callable(action):
