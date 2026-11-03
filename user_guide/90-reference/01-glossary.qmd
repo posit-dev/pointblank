@@ -213,7 +213,7 @@ Data coherence
   For example, an email address is made from the person's name, and the address, city, postcode,
   phone number, and coordinates all belong to the same place. This happens on its own when related
   **presets** are used together, and it still holds when rows from several countries are mixed.
-  [Learn more](../test-data-generation/test-data-generation.qmd).
+  [Learn more](../test-data-generation/country-specific-data.qmd#data-coherence).
 
 Data extract
 : The rows that failed a **validation step**, saved during **interrogation** so you can look at
@@ -287,7 +287,8 @@ Field
   `int_field()`, `float_field()`, `string_field()`, `bool_field()`, or `date_field()`. The options
   say what values are allowed, for example `min_val=`, `max_val=`, `allowed=`, `pattern=`,
   `preset=`, or `unique=True`, depending on the type. You put fields together in a `Schema` and
-  pass it to `generate_dataset()`. [Learn more](../test-data-generation/test-data-generation.qmd).
+  pass it to `generate_dataset()`. [Learn
+  more](../test-data-generation/generating-test-data.qmd#field-types).
 
 Final action
 : An **action** that runs once, after all the **validation steps** are finished, whatever the
@@ -336,7 +337,7 @@ MCP server
 : A way for AI assistants (such as the AI chat in VS Code or Positron) to use Pointblank for
   you. MCP (Model Context Protocol) is a standard way for AI tools to connect to
   other programs. Through it, an assistant can load data, build and run validations, and show
-  previews and summaries. [Learn more](../mcp-server/mcp-quick-start.qmd).
+  previews and summaries. [Learn more](../integrations/mcp-quick-start.qmd).
 
 Metadata import
 : Reading a description of a dataset from a file made by another tool, and turning it into
@@ -410,7 +411,7 @@ Preset
   cities, phone numbers, company names, URLs, credit card numbers, and more. `profile_fields()`
   gives a whole set of person-related presets at once. Presets follow the `country=` given to
   `generate_dataset()`, and related presets fit together within a row (see **data coherence**).
-  [Learn more](../test-data-generation/test-data-generation.qmd).
+  [Learn more](../test-data-generation/generating-test-data.qmd#available-presets).
 
 Preview
 : A quick look at a table showing the first and last few rows along with each column's type, made
@@ -509,7 +510,7 @@ Seed
 : A number that makes randomly generated data repeatable: `generate_dataset(schema, seed=23)` gives
   the same rows each time with the same version of Pointblank. The `generate_dataset` pytest
   fixture picks a seed from each test's name, so every test gets its own data, which stays the
-  same from one run to the next. [Learn more](../test-data-generation/test-data-generation.qmd).
+  same from one run to the next. [Learn more](../test-data-generation/pytest-fixture.qmd).
 
 Segment
 : A group of rows that gets checked and reported on its own. Using `segments=` splits one step
@@ -581,7 +582,7 @@ Test data generation
   `seed=` to get the same rows every time. When Pointblank is installed, a `generate_dataset`
   fixture is also available in pytest. Not to be confused with **test datasets**. See also
   **preset**, **data coherence**, and **seed**. [Learn
-  more](../test-data-generation/test-data-generation.qmd).
+  more](../test-data-generation/generating-test-data.qmd).
 
 Test dataset
 : One of the sample tables that comes with Pointblank, loaded with `load_dataset()`. The choices

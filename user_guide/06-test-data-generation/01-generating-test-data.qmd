@@ -1,0 +1,334 @@
+---
+title: Generating Test Data
+aliases:
+  - ../test-data-generation/test-data-generation.html
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+Pointblank provides a built-in test data generation system that creates realistic, locale-aware
+synthetic data based on schema definitions. This is useful for testing validation rules, creating
+sample datasets, and generating fixture data for development.
+
+This page covers the basics: defining a schema with typed fields, the available presets, and
+the output formats. The rest of this section covers [profile fields](profile-fields.qmd) for
+bundles of person data, [country-specific data](country-specific-data.qmd) for locale-aware
+generation, and the [pytest fixture](pytest-fixture.qmd) for using generated data in tests.
+
+::: {.callout-note}
+Throughout this guide, we use `pb.preview()` to display generated datasets with nice HTML
+formatting. This is optional: `pb.generate_dataset()` returns a standard DataFrame that you can
+display or manipulate however you prefer.
+:::
+
+## Quick Start
+
+Generate test data using a schema with field constraints:
+
+```{python}
+import pointblank as pb
+
+# Define a schema with typed field specifications
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=80),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# Generate 100 rows of test data (seed ensures reproducibility)
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+## Field Types
+
+Pointblank provides helper functions for defining typed columns with constraints:
+
+| Function | Description | Key Parameters |
+|----------|-------------|----------------|
+| `int_field()` | Integer columns | `min_val`, `max_val`, `allowed`, `unique` |
+| `float_field()` | Float columns | `min_val`, `max_val`, `allowed` |
+| `string_field()` | String columns | `preset`, `pattern`, `allowed`, `unique` |
+| `bool_field()` | Boolean columns | `p_true` (probability of True) |
+| `date_field()` | Date columns | `min_val`, `max_val` |
+| `datetime_field()` | Datetime columns | `min_val`, `max_val` |
+| `time_field()` | Time columns | `min_val`, `max_val` |
+| `duration_field()` | Duration columns | `min_val`, `max_val` |
+| `profile_fields()` | Bundled person-profile fields | `set`, `split_name`, `include`, `exclude`, `prefix` |
+
+### Integer Fields
+
+Integer fields support range constraints with `min_val` and `max_val`, discrete allowed values with
+`allowed`, and uniqueness enforcement with `unique=True`:
+
+```{python}
+schema = pb.Schema(
+    id=pb.int_field(min_val=1000, max_val=9999, unique=True),
+    quantity=pb.int_field(min_val=1, max_val=100),
+    rating=pb.int_field(allowed=[1, 2, 3, 4, 5]),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+The `unique=True` constraint ensures no duplicate values appear in that column, which is useful for
+generating primary keys or identifiers.
+
+### Float Fields
+
+Float fields work similarly to integers, with `min_val` and `max_val` defining the range of
+generated values:
+
+```{python}
+schema = pb.Schema(
+    price=pb.float_field(min_val=0.0, max_val=1000.0),
+    discount=pb.float_field(min_val=0.0, max_val=0.5),
+    temperature=pb.float_field(min_val=-40.0, max_val=50.0),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+Values are uniformly distributed across the specified range, making this useful for simulating
+measurements, prices, or any continuous numeric data.
+
+### String Fields with Presets
+
+Presets generate realistic data like names, emails, and addresses. When you include related
+fields like `name` and `email` in the same schema, Pointblank ensures **coherence** (e.g., the email
+address will be derived from the person's name), making the generated data more realistic:
+
+```{python}
+schema = pb.Schema(
+    full_name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    company=pb.string_field(preset="company"),
+    city=pb.string_field(preset="city"),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+This coherence extends to other related fields like `user_name`, which will also reflect the
+person's name when included alongside name and email fields.
+
+### String Fields with Patterns
+
+Use regex patterns to generate strings matching specific formats:
+
+```{python}
+schema = pb.Schema(
+    product_code=pb.string_field(pattern=r"[A-Z]{3}-[0-9]{4}"),
+    phone=pb.string_field(pattern=r"\([0-9]{3}\) [0-9]{3}-[0-9]{4}"),
+    hex_color=pb.string_field(pattern=r"#[0-9A-F]{6}"),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+Patterns support standard regex character classes and quantifiers, giving you flexibility to
+generate data matching virtually any format specification.
+
+### Boolean Fields
+
+Control the probability of `True` values:
+
+```{python}
+schema = pb.Schema(
+    is_active=pb.bool_field(p_true=0.8),      # 80% True
+    is_premium=pb.bool_field(p_true=0.2),     # 20% True
+    is_verified=pb.bool_field(),              # 50% True (default)
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+This probabilistic control is helpful when you need to simulate real-world distributions where
+certain states are more common than others.
+
+### Date and Datetime Fields
+
+Temporal fields accept Python `date` and `datetime` objects for their range boundaries, generating
+values uniformly distributed within the specified period:
+
+```{python}
+from datetime import date, datetime
+
+schema = pb.Schema(
+    birth_date=pb.date_field(
+        min_date=date(1960, 1, 1),
+        max_date=date(2005, 12, 31)
+    ),
+    created_at=pb.datetime_field(
+        min_date=datetime(2024, 1, 1),
+        max_date=datetime(2024, 12, 31)
+    ),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+The same pattern applies to `time_field()` and `duration_field()`, allowing you to generate
+realistic temporal data for any use case.
+
+## Available Presets
+
+The `preset=` parameter in `string_field()` supports many data types:
+
+**Personal Data:**
+
+- `name`: full name (first + last)
+- `name_full`: full name with optional prefix/suffix (e.g., "Dr. Ana Sousa", "Prof. Tanaka Yuki")
+- `first_name`: first name only
+- `last_name`: last name only
+- `gender`: person's gender (`"male"` or `"female"`), coherent with name fields
+- `email`: email address
+- `phone_number`: phone number in country-specific format
+
+**Location Data:**
+
+- `address`: full street address
+- `city`: city name
+- `state`: state/province name
+- `country`: country name
+- `country_code_2`: ISO 3166-1 alpha-2 country code (e.g., `"US"`)
+- `country_code_3`: ISO 3166-1 alpha-3 country code (e.g., `"USA"`)
+- `postcode`: postal/ZIP code
+- `latitude`: latitude coordinate
+- `longitude`: longitude coordinate
+
+**Business Data:**
+
+- `company`: company name
+- `job`: job title
+- `catch_phrase`: business catch phrase
+
+**Internet Data:**
+
+- `url`: website URL
+- `domain_name`: domain name
+- `ipv4`: IPv4 address
+- `ipv6`: IPv6 address
+- `user_name`: username
+- `password`: password
+
+**Financial Data:**
+
+- `credit_card_number`: credit card number
+- `credit_card_provider`: card network name (Visa, Mastercard, American Express, or Discover); coherent with `credit_card_number`
+- `iban`: International Bank Account Number
+- `currency_code`: currency code (USD, EUR, etc.)
+
+**Identifiers:**
+
+- `uuid4`: UUID version 4
+- `md5`: MD5 hash (32 hex characters)
+- `sha1`: SHA-1 hash (40 hex characters)
+- `sha256`: SHA-256 hash (64 hex characters)
+- `ssn`: Social Security Number (country-specific format)
+- `license_plate`: vehicle license plate (location-aware for CA, US, DE, AU, GB)
+
+**Barcodes:**
+
+- `ean8`: EAN-8 barcode with valid check digit
+- `ean13`: EAN-13 barcode with valid check digit
+
+**Date/Time:**
+
+- `date_this_year`: a date within the current year
+- `date_this_decade`: a date within the current decade
+- `date_between`: a random date between 2000 and 2025
+- `date_range`: two dates joined with an en-dash (e.g., `"2012-05-12 – 2015-11-22"`)
+- `future_date`: a date up to 1 year in the future
+- `past_date`: a date up to 10 years in the past
+- `time`: a time value
+
+**Text:**
+
+- `word`: single word
+- `sentence`: full sentence
+- `paragraph`: paragraph of text
+- `text`: multiple paragraphs
+
+**Miscellaneous:**
+
+- `color_name`: color name
+- `file_name`: file name
+- `file_extension`: file extension
+- `mime_type`: MIME type
+- `user_agent`: browser user agent string (country-weighted)
+- `locale_code`: locale identifier (e.g., `"en_US"`, `"de_DE"`; multilingual countries return a random official locale)
+
+## Output Formats
+
+The `generate_dataset()` function supports multiple output formats via the `output=` parameter,
+making it easy to integrate with your preferred data processing library.
+
+```{python}
+schema = pb.Schema(
+    id=pb.int_field(min_val=1),
+    name=pb.string_field(preset="name"),
+)
+```
+
+The default output is a Polars DataFrame, which offers excellent performance and a modern API for
+data manipulation:
+
+```{python}
+polars_df = pb.generate_dataset(schema, n=100, seed=23, output="polars")
+
+pb.preview(polars_df)
+```
+
+If your workflow uses Pandas, simply specify `output="pandas"` to get a **Pandas DataFrame**:
+
+```{python}
+pandas_df = pb.generate_dataset(schema, n=100, seed=23, output="pandas")
+
+pb.preview(pandas_df)
+```
+
+Both formats work seamlessly with Pointblank's validation functions, so you can choose whichever
+fits best with your existing data pipeline.
+
+## Using Generated Data for Validation Testing
+
+A common use case is generating test data to validate your validation rules:
+
+```{python}
+# Define a schema with constraints
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# Generate test data
+test_data = pb.generate_dataset(schema, n=100, seed=23)
+
+# Validate the generated data (it should pass all checks)
+validation = (
+    pb.Validate(test_data)
+    .col_vals_gt("user_id", 0)
+    .col_vals_regex("email", r".+@.+\..+")
+    .col_vals_between("age", 18, 100)
+    .col_vals_in_set("status", ["active", "pending", "inactive"])
+    .interrogate()
+)
+
+validation
+```
+
+Since the generated data respects the constraints defined in the schema, it should pass all
+validation checks. This workflow is particularly useful for testing validation logic before
+applying it to production data, or for creating reproducible test fixtures in your CI/CD pipeline.

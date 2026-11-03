@@ -109,7 +109,7 @@ _Data validation toolkit for assessing and monitoring data quality._
 
 Pointblank takes a different approach to data quality. It doesn't have to be a tedious technical task. Rather, it can become a process focused on clear communication between team members. While other validation libraries focus solely on catching errors, Pointblank is great at both **finding issues and sharing insights**. Our beautiful, customizable reports turn validation results into conversations with stakeholders, making data quality issues immediately understandable and actionable for everyone on your team.
 
-**Get started in minutes, not hours.** Pointblank's AI-powered [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) feature analyzes your data and suggests intelligent validation rules automatically. So there's no need to stare at an empty validation script wondering where to begin. Pointblank can kickstart your data quality journey so you can focus on what matters most.
+**Get started in minutes, not hours.** Pointblank's AI-powered [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/draft-validation.html) feature analyzes your data and suggests intelligent validation rules automatically. So there's no need to stare at an empty validation script wondering where to begin. Pointblank can kickstart your data quality journey so you can focus on what matters most.
 
 Whether you're a data scientist who needs to quickly communicate data quality findings, a data engineer building robust pipelines, or an analyst presenting data quality results to business stakeholders, Pointblank helps you to turn data quality from an afterthought into a competitive advantage.
 
