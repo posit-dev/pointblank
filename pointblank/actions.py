@@ -217,7 +217,7 @@ def send_slack_notification(
     FinalActions : Run actions after an interrogation.
     get_action_metadata : Get the information that step messages are made from.
     get_validation_summary : Get the information that summary messages are made from.
-    emit_otel : Send validation metrics to OpenTelemetry from a final action.
+    emit_otel : Send validation results to OpenTelemetry from a final action.
     """
     # Default templates
     default_step = """*Data Validation Alert*
