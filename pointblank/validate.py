@@ -12,6 +12,7 @@ import pickle
 import re
 import tempfile
 import threading
+from collections.abc import Collection
 from dataclasses import dataclass
 from enum import Enum
 from functools import partial
@@ -155,7 +156,6 @@ P = ParamSpec("P")
 R = TypeVar("R")
 
 if TYPE_CHECKING:
-    from collections.abc import Collection
     from typing import Any
 
     from narwhals.typing import IntoDataFrame, IntoFrame
@@ -25032,7 +25032,8 @@ def _prep_values_text(
     if isinstance(values, ColumnLiteral):
         return f"`{values}`"
 
-    if isinstance(values, (str, int, float, datetime.datetime, datetime.date)):
+    # A single value (a number, a string, a `Decimal`, a date, a time, etc.) is listed on its own
+    if isinstance(values, str) or not isinstance(values, Collection):
         values = [values]
 
     length_values = len(values)
