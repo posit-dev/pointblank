@@ -1,4 +1,4 @@
-# MCP Quick Start
+# MCP Server
 
 Transform your data validation workflow with conversational AI in VS Code or Positron IDE. Here are three simple steps to start validating data through conversation (and no complex configuration required).
 

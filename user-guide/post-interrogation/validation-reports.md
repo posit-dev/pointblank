@@ -121,9 +121,9 @@ This visual indicator allows you to quickly scan the report and identify problem
 
 The second column is unlabeled and contains the sequential step number, starting from 1. This number is used when referencing specific steps in other methods like `get_step_report(i=2)` or when extracting data from specific validation steps.
 
-#### TYPE
+#### STEP
 
-The TYPE column displays the validation method name along with an icon that visually represents the type of validation being performed. The validation method indicates what aspect of data quality is being checked, such as:
+The STEP column displays the validation method name along with an icon that visually represents the type of validation being performed. The validation method indicates what aspect of data quality is being checked, such as:
 
 - `col_vals_gt()`: column values greater than
 - `col_vals_in_set()`: column values in a set
@@ -131,10 +131,10 @@ The TYPE column displays the validation method name along with an icon that visu
 - `rows_distinct()`: row uniqueness check
 - and many others…
 
-When you provide a brief message (via `brief=True` for auto-generated briefs or `brief="custom text"` for custom messages), it appears within the TYPE column below the validation method name. These briefs provide human-readable explanations of what each validation step is checking, making the report more accessible to non-technical stakeholders.
+When you provide a brief message (via `brief=True` for auto-generated briefs or `brief="custom text"` for custom messages), it appears within the STEP column below the validation method name. These briefs provide human-readable explanations of what each validation step is checking, making the report more accessible to non-technical stakeholders.
 
 ``` python
-# Example showing brief messages in the TYPE column
+# Example showing brief messages in the STEP column
 validation_with_briefs = (
     pb.Validate(data=data, tbl_name="sales_data")
     .col_vals_gt(
@@ -306,13 +306,13 @@ Since the validation report is a Great Tables object, you can leverage the full 
 
 When working with Great Tables methods to customize the validation report, you'll need to use the *internal column names* rather than the display labels you see in the rendered table. This is because Great Tables operates on the underlying data table structure, where columns have technical names that differ from their user-facing labels.
 
-For example, the column labeled `"STEP"` in the report is actually stored internally as `"i"`, and the `"TYPE"` column is internally named `"type_upd"`. Most Great Tables methods that target specific columns (like `tab_style()`, `cols_width()`, `cols_hide()`, etc.) require these internal names.
+For example, the column labeled `"STEP"` in the report is actually stored internally as `"type_upd"`, and the unlabeled step-number column is internally named `"i"`. Most Great Tables methods that target specific columns (like `tab_style()`, `cols_width()`, `cols_hide()`, etc.) require these internal names.
 
 Here's the complete mapping from display labels to internal column names:
 
 1.  Status indicator (no label): `"status_color"`
 2.  Step number (no label): `"i"`
-3.  `TYPE`: `"type_upd"`
+3.  `STEP`: `"type_upd"`
 4.  `COLUMNS`: `"columns_upd"`
 5.  `VALUES`: `"values_upd"`
 6.  `TBL`: `"tbl"`
@@ -325,7 +325,7 @@ Here's the complete mapping from display labels to internal column names:
 13. `C`: `"c_upd"`
 14. `EXT`: `"extract_upd"`
 
-Always use these internal names when calling Great Tables methods. Using the display labels (like `"STEP"` or `"TYPE"`) will result in errors since these labels only exist in the rendered output, not in the underlying data structure.
+Always use these internal names when calling Great Tables methods. Using the display labels (like `"STEP"` or `"UNITS"`) will result in errors since these labels only exist in the rendered output, not in the underlying data structure.
 
 In the examples that follow, you'll see how to use these internal column names to customize various aspects of the validation report.
 
@@ -348,7 +348,7 @@ report = (
     )
     .tab_style(
         style=style.text(weight="bold"),
-        locations=loc.body(columns="type_upd")  # Internal name for TYPE
+        locations=loc.body(columns="type_upd")  # Internal name for STEP
     )
 )
 
@@ -369,7 +369,7 @@ report = (
         cases={
             "status_color": "20px", # Status indicator column
             "i": "40px",            # Step number column
-            "type_upd": "170px",    # TYPE column
+            "type_upd": "170px",    # STEP column
             "columns_upd": "100px", # COLUMNS column
         }
     )
