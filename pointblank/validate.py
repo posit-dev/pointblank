@@ -21387,8 +21387,18 @@ class Validate:
         'error', and 'critical' levels.
 
         You could simply display the validation table without the use of the `get_tabular_report()`
-        method. However, the method provides a way to customize the title of the report. In the
-        future this method may provide additional options for customizing the report.
+        method. However, the method provides a way to customize the title of the report and to
+        control which header and footer elements are shown.
+
+        Because the returned object is a GT table, it can be further customized with Great Tables
+        methods such as `cols_hide()`, `cols_label()`, `cols_width()`, and `tab_style()`. These
+        methods need the table's internal column names rather than the labels shown in the report:
+        `"status_color"` (status indicator), `"i"` (step number), `"type_upd"` (STEP),
+        `"columns_upd"` (COLUMNS), `"values_upd"` (VALUES), `"tbl"` (TBL), `"eval"` (EVAL),
+        `"test_units"` (UNITS), `"pass"` (PASS), `"fail"` (FAIL), `"w_upd"` (W), `"e_upd"` (E),
+        `"c_upd"` (C), and `"extract_upd"` (EXT). For programmatic access to the validation results
+        themselves, use [`get_dataframe_report()`](`pointblank.Validate.get_dataframe_report`) or
+        [`get_json_report()`](`pointblank.Validate.get_json_report`) instead.
 
         Parameters
         ----------
