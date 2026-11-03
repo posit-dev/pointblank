@@ -62,8 +62,8 @@ generate = [
 # See: https://github.com/posit-dev/pointblank/issues/415
 mcp = ["fastmcp>=2.14.2", "pytest-asyncio>=1.0.0"]
 otel = [
-    "opentelemetry-api>=1.22.0",
-    "opentelemetry-sdk>=1.22.0",
+    "opentelemetry-api>=1.23.0",  # 1.22.0 has no `Meter.create_gauge()`
+    "opentelemetry-sdk>=1.23.0",
 ]
 
 excel = ["openpyxl>=3.0.0"]
@@ -100,8 +100,8 @@ docs = [
     "duckdb>=1.2.0,<2",                          # 2.0 breaks ibis's `list_tables()` and Narwhals' joins
     "lxml>=4.9.0",                               # CDISC Define-XML / Controlled Terminology examples
     "pyreadstat>=1.2.0",                         # SAS Transport (XPT) metadata example
-    "opentelemetry-api>=1.22.0",                 # OTelExporter and emit_otel() examples
-    "opentelemetry-sdk>=1.22.0",
+    "opentelemetry-api>=1.23.0",                 # OTelExporter and emit_otel() examples
+    "opentelemetry-sdk>=1.23.0",
 ]
 
 [dependency-groups]
@@ -112,6 +112,8 @@ dev = [
     "hypothesis>=6.129.2",
     "ibis-framework[duckdb,mysql,postgres,sqlite]>=11.0.0", # ibis 10.x fails on DuckDB 1.4+
     "narwhals>=2.8.0",                                      # Older Narwhals fails on DuckDB 1.5+
+    "opentelemetry-api>=1.23.0",                            # So the otel tests run (1.22.0 has no `Meter.create_gauge()`)
+    "opentelemetry-sdk>=1.23.0",
     "sqlglot>=23.4,<30.18",                                 # 30.18+ omits table names in DROP statements (breaks DuckDB/SQLite)
     "jupyter",
     "nbclient>=0.10.0",
