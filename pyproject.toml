@@ -38,7 +38,7 @@ dependencies = [
     "commonmark>=0.9.1",
     "importlib-metadata",
     "great-tables>=1.1.0",  # 1.1.0 escapes unformatted cells; `fmt_passthrough()` needs 1.0.0+
-    "narwhals>=2.0.1",
+    "narwhals>=2.8.0",      # The lowest version tested (the dev group and the `minimum` CI job)
     "typing_extensions>=3.10.0.0",
     "requests>=2.31.0",
     "click>=8.0.0",
@@ -52,7 +52,7 @@ pd = ["pandas>=2.2.3"]
 pl = ["polars>=1.33.0"]
 pyspark = ["pyspark==3.5.6"]
 generate = [
-    "chatlas>=0.3.0",
+    "chatlas>=0.10.0",  # Older chatlas passes the wrong HTTP client to anthropic 0.68+
     "anthropic[bedrock]>=0.68.0",
     "openai>=1.63.0",
     "httpx>=0.28.0",
