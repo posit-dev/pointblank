@@ -143,6 +143,7 @@ from pointblank.validate import (
     read_file,
     Validate,
     write_file,
+    _DATASET_DATE_COLUMNS,
     _create_table_time_html,
     _create_table_type_html,
     _create_thresholds_html,
@@ -10575,18 +10576,162 @@ def test_get_data_path_files_in_temp_dir() -> None:
     assert path.startswith(temp_dir)
 
 
-def test_get_data_path_multiple_calls_different_files() -> None:
+@pytest.fixture
+def fresh_data_path_cache(monkeypatch):
+    """Make `get_data_path()` forget the files written earlier in the session."""
+    import pointblank.validate as validate_module
+
+    monkeypatch.setattr(validate_module, "_DATA_PATH_FILES", {})
+
+
+@pytest.mark.parametrize("file_type", ["csv", "parquet", "duckdb"])
+def test_get_data_path_multiple_calls_same_file(file_type) -> None:
+    path1 = get_data_path("small_table", file_type)
+    with open(path1, "rb") as f:
+        content = f.read()
+    path2 = get_data_path("small_table", file_type)
+
+    # The file written by the first call is reused, unchanged
+    assert path1 == path2
+    with open(path2, "rb") as f:
+        assert f.read() == content
+
+
+def test_get_data_path_one_file_per_dataset_and_type() -> None:
+    paths = {
+        (dataset, file_type): get_data_path(dataset, file_type)
+        for dataset in ["small_table", "game_revenue"]
+        for file_type in ["csv", "parquet", "duckdb"]
+    }
+    assert len(set(paths.values())) == 6
+
+    # All the files are in one directory for the session
+    assert len({os.path.dirname(path) for path in paths.values()}) == 1
+
+
+def test_get_data_path_repeated_calls_dont_add_files() -> None:
+    path = get_data_path("small_table", "csv")
+    files_before = set(os.listdir(os.path.dirname(path)))
+    for _ in range(5):
+        get_data_path("small_table", "csv")
+    assert set(os.listdir(os.path.dirname(path))) == files_before
+
+
+def test_get_data_path_modified_file_gets_fresh_copy() -> None:
     path1 = get_data_path("small_table", "csv")
+    with open(path1, "rb") as f:
+        original = f.read()
+    with open(path1, "w") as f:
+        f.write("x\n1\n")
+
     path2 = get_data_path("small_table", "csv")
 
-    # Should be different files (different temp file names)
-    assert path1 != path2
+    # A new copy of the dataset, and the modified file is left alone
+    assert path2 != path1
+    with open(path2, "rb") as f:
+        assert f.read() == original
+    with open(path1) as f:
+        assert f.read() == "x\n1\n"
 
-    # But both should exist and be valid
-    assert os.path.exists(path1)
+    # The fresh copy is the one that's reused from now on
+    assert get_data_path("small_table", "csv") == path2
+
+
+def test_get_data_path_deleted_file_gets_fresh_copy() -> None:
+    path1 = get_data_path("small_table", "parquet")
+    os.remove(path1)
+
+    path2 = get_data_path("small_table", "parquet")
+
     assert os.path.exists(path2)
-    assert os.path.getsize(path1) > 0
+    assert Validate(data=path2).col_exists("a").interrogate().all_passed()
+
+
+def test_get_data_path_deleted_directory_is_recreated() -> None:
+    import shutil
+
+    path1 = get_data_path("small_table", "csv")
+    shutil.rmtree(os.path.dirname(path1))
+
+    path2 = get_data_path("small_table", "csv")
+
+    assert os.path.exists(path2)
     assert os.path.getsize(path2) > 0
+
+
+def test_get_data_path_failed_write_leaves_no_file(fresh_data_path_cache) -> None:
+    from pointblank.validate import _get_data_path_dir
+
+    data_dir = _get_data_path_dir()
+    files_before = set(os.listdir(data_dir))
+
+    with patch("pointblank.validate._write_dataset_file", side_effect=OSError("disk full")):
+        with pytest.raises(OSError, match="disk full"):
+            get_data_path("small_table", "csv")
+
+    assert set(os.listdir(data_dir)) == files_before
+
+    # The next call writes the file
+    assert os.path.getsize(get_data_path("small_table", "csv")) > 0
+
+
+def test_get_data_path_files_removed_at_exit() -> None:
+    import subprocess
+    import sys
+
+    code = (
+        "import os, pointblank as pb\n"
+        "paths = [pb.get_data_path('small_table', t) for t in ('csv', 'parquet', 'duckdb')]\n"
+        "assert all(os.path.exists(p) for p in paths)\n"
+        "print('\\n'.join(paths))\n"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", code], capture_output=True, text=True, check=True
+    )
+    paths = result.stdout.split()
+
+    assert len(paths) == 3
+    assert not any(os.path.exists(path) for path in paths)
+    assert not os.path.exists(os.path.dirname(paths[0]))
+
+
+def test_remove_data_path_dir_only_in_creating_process(tmp_path) -> None:
+    from pointblank.validate import _remove_data_path_dir
+
+    data_dir = tmp_path / "pointblank-data"
+    data_dir.mkdir()
+    (data_dir / "small_table.csv").write_text("a\n1\n")
+
+    # A forked child (a different process ID) leaves the parent's files alone
+    _remove_data_path_dir(str(data_dir), os.getpid() + 1)
+    assert data_dir.exists()
+
+    _remove_data_path_dir(str(data_dir), os.getpid())
+    assert not data_dir.exists()
+
+
+def test_github_url_temp_file_removed() -> None:
+    from unittest.mock import MagicMock
+
+    response = MagicMock()
+    response.__enter__.return_value.read.return_value = b"a,b\n1,x\n2,y\n"
+
+    read_paths = []
+    real_process_csv_input = _process_csv_input
+
+    def record_csv_path(data, lazy=False):
+        read_paths.append(data)
+        return real_process_csv_input(data, lazy=lazy)
+
+    with (
+        patch("urllib.request.urlopen", return_value=response),
+        patch("pointblank.validate._process_csv_input", side_effect=record_csv_path),
+    ):
+        result = _process_github_url("https://github.com/user/repo/blob/main/data.csv")
+
+    assert result.shape == (2, 2)
+    assert len(read_paths) == 1
+    assert not os.path.exists(read_paths[0])
 
 
 def test_get_data_path_works_with_validate() -> None:
@@ -10639,7 +10784,7 @@ def test_get_data_path_example_usage_patterns() -> None:
     assert validation.all_passed()
 
 
-def test_get_data_path_parquet_pandas_only() -> None:
+def test_get_data_path_parquet_pandas_only(fresh_data_path_cache) -> None:
     """Test get_data_path parquet creation when only pandas is available."""
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
 
@@ -10666,8 +10811,26 @@ def test_get_data_path_parquet_pandas_only() -> None:
         assert len(df) > 0
         assert len(df.columns) > 0
 
+        # The date columns are stored as datetimes, as when Polars writes the file
+        assert pd.api.types.is_datetime64_any_dtype(df["date_time"])
+        assert pd.api.types.is_datetime64_any_dtype(df["date"])
 
-def test_get_data_path_parquet_no_libraries() -> None:
+
+@pytest.mark.parametrize("dataset", ["small_table", "game_revenue", "global_sales"])
+def test_get_data_path_parquet_pandas_only_dates(dataset, fresh_data_path_cache) -> None:
+    import pandas as pd
+
+    with patch(
+        "pointblank.validate._is_lib_present", side_effect=lambda lib_name: lib_name == "pandas"
+    ):
+        path = get_data_path(dataset=dataset, file_type="parquet")
+    df = pd.read_parquet(path)
+
+    for date_col in _DATASET_DATE_COLUMNS[dataset]:
+        assert pd.api.types.is_datetime64_any_dtype(df[date_col]), date_col
+
+
+def test_get_data_path_parquet_no_libraries(fresh_data_path_cache) -> None:
     """Test get_data_path parquet creation when neither polars nor pandas available."""
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         # Neither polars nor pandas are available
