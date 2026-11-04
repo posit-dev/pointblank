@@ -605,6 +605,128 @@ def test_to_yaml_after_interrogation_writes_original_segments(small_table):
     assert _results(rebuilt) == _results(validation)
 
 
+def _active_plan(data):
+    import polars as pl
+
+    return (
+        Validate(data=data, tbl_name="tbl")
+        .col_vals_gt(columns="x", value=0)
+        .col_vals_gt(columns="z", value=0)
+        .col_vals_gt(columns="x", value=1, active=False)
+        .col_vals_gt(columns="x", value=2, active=pb.has_columns("y"))
+        .col_vals_gt(columns="x", value=3, active=lambda tbl: 1 / 0)
+        .col_vals_gt(columns="x", value=4, pre=lambda tbl: tbl.not_a_method())
+        .col_vals_expr(expr=pl.col("q") > 0)
+    )
+
+
+def _serialize_quietly(validation):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        return validation.to_code(), validation.to_yaml()
+
+
+@pytest.mark.parametrize("backend", ["polars", "pandas"])
+def test_serializing_after_interrogation_keeps_original_active(backend):
+    # Interrogation sets `active` to the value resolved against the table (`False` for a step that
+    # can't be evaluated or whose callable is falsy or raises); serializing writes the `active=`
+    # values as given, so the exported plan doesn't depend on the data it was last run on
+    import pandas as pd
+    import polars as pl
+
+    data = pl.DataFrame({"x": [1, 2]}) if backend == "polars" else pd.DataFrame({"x": [1, 2]})
+    validation = _active_plan(data)
+    before = _serialize_quietly(validation)
+
+    validation.interrogate()
+    assert [s.active for s in validation.validation_info] == [True] + [False] * 6
+    assert _serialize_quietly(validation) == before
+
+    # A second interrogation doesn't change the serialized plan either
+    validation.interrogate()
+    assert _serialize_quietly(validation) == before
+
+    code, yaml_str = before
+    # The callable `active=` values are written with the `True` placeholder
+    assert code.count("active=False") == 1
+    assert code.count("active=True") == 2
+    assert yaml_str.count("active: false") == 1
+    assert yaml_str.count("active: true") == 2
+
+
+@pytest.mark.parametrize("backend", ["polars", "pandas"])
+def test_serializing_after_interrogating_empty_table_keeps_steps_active(backend):
+    # Every row-based step on a table with no rows can't be evaluated, and running the exported
+    # plan on a table with rows should still evaluate the step
+    import pandas as pd
+    import polars as pl
+
+    if backend == "polars":
+        empty = pl.DataFrame({"x": pl.Series([], dtype=pl.Int64)})
+        good = pl.DataFrame({"x": [1, 2]})
+    else:
+        empty = pd.DataFrame({"x": pd.Series([], dtype="int64")})
+        good = pd.DataFrame({"x": [1, 2]})
+
+    validation = Validate(data=empty, tbl_name="tbl").col_vals_gt(columns="x", value=0)
+    before = (validation.to_code(), validation.to_yaml())
+
+    validation.interrogate()
+    assert validation.validation_info[0].eval_error
+    assert validation.validation_info[0].active is False
+
+    code, yaml_str = validation.to_code(), validation.to_yaml()
+    assert (code, yaml_str) == before
+    assert "active" not in code
+    assert "active" not in yaml_str
+
+    for rebuilt in [
+        _exec_code(code, good).interrogate(),
+        yaml_interrogate(yaml_str, set_tbl=good),
+    ]:
+        step = rebuilt.validation_info[0]
+        assert step.active is True
+        assert not step.eval_error
+        assert step.n_passed == 2
+
+
+def test_to_yaml_callable_active_placeholder_loads(small_table):
+    # The placeholder for a callable `active=` is the boolean `true`, not the string 'true' (which
+    # `yaml_interrogate()` would try to evaluate as Python code)
+    validation = Validate(data=small_table, tbl_name="small_table").col_vals_gt(
+        columns="a", value=0, active=lambda tbl: False
+    )
+    with pytest.warns(UserWarning, match="callable `active=` condition"):
+        yaml_str = validation.to_yaml()
+    assert "active: true\n" in yaml_str
+
+    rebuilt = yaml_interrogate(yaml_str)
+    assert rebuilt.validation_info[0].active is True
+    assert rebuilt.validation_info[0].n_passed == 13
+
+
+def test_add_steps_from_interrogated_validation_keeps_original_active():
+    import polars as pl
+
+    data = pl.DataFrame({"x": [1, 2]})
+    source = _active_plan(data)
+    # Drop the `col_vals_expr()` step, which `add_steps()` can't copy from a `Validate` object
+    source.validation_info = source.validation_info[:-1]
+    source.interrogate()
+
+    expected = [s.active_spec for s in source.validation_info]
+    assert expected[:3] == [True, True, False]
+    assert all(callable(active) for active in expected[3:5])
+    assert expected[5] is True
+
+    validation = Validate(data=data).add_steps(source)
+    assert [s.active for s in validation.validation_info] == expected
+
+    validation.interrogate()
+    assert [s.active for s in validation.validation_info] == [True] + [False] * 5
+    assert validation.validation_info[0].n_passed == 2
+
+
 def test_yaml_segments_pairs_and_columns(small_table):
     # In a `segments:` list, a string is a column and a two-item list is a (column, value) pair
     yaml_str = """
