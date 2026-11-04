@@ -2523,6 +2523,7 @@ def data_freshness(
     reference_time: Any | None,  # datetime.datetime | None
     timezone: str | None,
     allow_tz_mismatch: bool,
+    allow_future: Any = False,  # bool | datetime.timedelta
 ) -> dict:
     """
     Check if the most recent datetime value in a column is within the allowed max_age.
@@ -2541,6 +2542,9 @@ def data_freshness(
         The timezone to use for interpretation.
     allow_tz_mismatch
         Whether to suppress timezone mismatch warnings.
+    allow_future
+        How far the most recent datetime may be later than the reference time: `False` (none),
+        `True` (any amount), or a timedelta.
 
     Returns
     -------
@@ -2552,6 +2556,7 @@ def data_freshness(
         - 'age': the calculated age (timedelta)
         - 'max_age': the maximum allowed age
         - 'tz_warning': any timezone warning message
+        - 'future': whether the most recent datetime is later than the reference time
     """
     import datetime
 
@@ -2565,6 +2570,7 @@ def data_freshness(
         "max_age": max_age,
         "tz_warning": None,
         "column_empty": False,
+        "future": False,
     }
 
     # Get the maximum datetime value from the column using lazy-compatible aggregation
@@ -2695,8 +2701,14 @@ def data_freshness(
         result["age"] = age
         result["reference_time"] = ref_time
 
-        # Check if within max_age
-        result["passed"] = age <= max_age
+        # Check if within max_age; a negative age means the data is later than the reference time,
+        # which fails unless `allow_future=` permits it
+        result["future"] = age < datetime.timedelta(0)
+        if result["future"] and allow_future is not True:
+            future_tol = datetime.timedelta(0) if allow_future is False else allow_future
+            result["passed"] = -age <= future_tol
+        else:
+            result["passed"] = age <= max_age
 
     except Exception as e:  # pragma: no cover
         result["error"] = str(e)

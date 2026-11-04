@@ -607,6 +607,7 @@ class Validate:
         reference_time: datetime.datetime | str | None = None,
         timezone: str | None = None,
         allow_tz_mismatch: bool = False,
+        allow_future: bool | str | datetime.timedelta = False,
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,

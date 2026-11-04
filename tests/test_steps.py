@@ -381,6 +381,21 @@ class TestAddStepsColumnsMap:
         v = pb.Validate(data=df).add_steps(s, columns_map={"ts": "updated_at"})
         assert v.validation_info[0].column == "updated_at"
 
+    def test_data_freshness_allow_future(self):
+        df = pd.DataFrame({"ts": pd.to_datetime(["2026-09-11 13:00"])})
+        s = (
+            Steps()
+            .data_freshness(column="ts", max_age="1d", reference_time="2026-09-11T12:00:00")
+            .data_freshness(
+                column="ts", max_age="1d", reference_time="2026-09-11T12:00:00", allow_future="2h"
+            )
+        )
+        assert "allow_future" not in repr(s).splitlines()[1]
+        assert "allow_future='2h'" in repr(s).splitlines()[2]
+
+        v = pb.Validate(data=df).add_steps(s).interrogate()
+        assert [step.all_passed for step in v.validation_info] == [False, True]
+
 
 # ---------------------------------------------------------------------------
 # Integration: end-to-end with interrogate

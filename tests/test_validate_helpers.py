@@ -21,6 +21,7 @@ from pointblank.validate import (
     _format_timedelta,
     _get_dimension_label,
     _health_score_color,
+    _parse_allow_future,
     _parse_max_age,
     _parse_reference_time,
     _parse_timezone,
@@ -31,6 +32,7 @@ from pointblank.validate import (
     _render_thresholds_code,
     _schema_to_yaml,
     _thresholds_as_dict,
+    _timedelta_to_duration_str,
     _transform_auto_brief,
     _UnserializablePlaceholder,
     _validation_info_to_step,
@@ -124,6 +126,33 @@ class TestCreateTextDataFreshness:
             for_failure=True,
         )
         assert "unknown" in text
+
+    def test_failure_text_column_backticked_once(self):
+        text = _create_text_data_freshness(
+            lang="en",
+            column="updated_at",
+            value={"max_age": datetime.timedelta(hours=1), "age": datetime.timedelta(hours=3)},
+            for_failure=True,
+        )
+        assert text == "Data in column `updated_at` is older than 1.0h (age: 3.0h)."
+
+    def test_failure_text_for_future_data(self):
+        text = _create_text_data_freshness(
+            lang="en",
+            column="updated_at",
+            value={"max_age": datetime.timedelta(hours=1), "age": datetime.timedelta(hours=-2)},
+            for_failure=True,
+        )
+        assert text == "Data in column `updated_at` is dated 2.0h later than the reference time."
+
+    def test_failure_text_for_future_data_localized(self):
+        text = _create_text_data_freshness(
+            lang="de",
+            column="updated_at",
+            value={"max_age": datetime.timedelta(hours=1), "age": datetime.timedelta(hours=-2)},
+            for_failure=True,
+        )
+        assert text == "Daten in Spalte `updated_at` liegen 2.0h nach der Referenzzeit."
 
 
 # ─── _create_text_col_pct_missing ────────────────────────────────────────────────
@@ -998,6 +1027,57 @@ class TestFormatTimedelta:
 
     def test_boundary_exactly_one_week(self):
         assert _format_timedelta(datetime.timedelta(weeks=1)) == "1w"
+
+    def test_negative(self):
+        assert _format_timedelta(datetime.timedelta(hours=-2)) == "-2.0h"
+        assert _format_timedelta(datetime.timedelta(seconds=-30)) == "-30.0s"
+
+
+# ─── _timedelta_to_duration_str / _parse_allow_future ───────────────────────────
+
+
+class TestTimedeltaToDurationStr:
+    @pytest.mark.parametrize(
+        "td, expected",
+        [
+            (datetime.timedelta(0), "0s"),
+            (datetime.timedelta(seconds=45), "45s"),
+            (datetime.timedelta(hours=1, minutes=30), "1h 30m"),
+            (datetime.timedelta(days=1), "1d"),
+            (datetime.timedelta(weeks=2, hours=3), "14d 3h"),
+            (datetime.timedelta(seconds=1, microseconds=500000), "1.5s"),
+            (datetime.timedelta(days=8, seconds=59, microseconds=123456), "8d 59.123456s"),
+        ],
+    )
+    def test_round_trips_through_parse_max_age(self, td, expected):
+        result = _timedelta_to_duration_str(td)
+        assert result == expected
+        assert _parse_max_age(result) == td
+
+
+class TestParseAllowFuture:
+    @pytest.mark.parametrize("value", [True, False])
+    def test_booleans_unchanged(self, value):
+        assert _parse_allow_future(value) is value
+
+    def test_duration_string(self):
+        assert _parse_allow_future("5 minutes") == datetime.timedelta(minutes=5)
+
+    def test_timedelta(self):
+        assert _parse_allow_future(datetime.timedelta(seconds=10)) == datetime.timedelta(seconds=10)
+
+    @pytest.mark.parametrize("value", [None, 5, 1.5, ["5m"]])
+    def test_invalid_type_raises(self, value):
+        with pytest.raises(TypeError, match="`allow_future` parameter must be a boolean"):
+            _parse_allow_future(value)
+
+    def test_invalid_string_raises(self):
+        with pytest.raises(ValueError, match="Unknown time unit 'fortnights' in allow_future"):
+            _parse_allow_future("5 fortnights")
+
+    def test_negative_timedelta_raises(self):
+        with pytest.raises(ValueError, match="must not be negative"):
+            _parse_allow_future(datetime.timedelta(minutes=-5))
 
 
 # ─── _parse_max_age ─────────────────────────────────────────────────────────────

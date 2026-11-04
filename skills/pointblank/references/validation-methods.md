@@ -118,7 +118,9 @@ compares against the reference column.
 ```
 
 `max_age` accepts strings like `"2h"`, `"30m"`, `"1d"`, or
-`datetime.timedelta` objects.
+`datetime.timedelta` objects. Data dated later than the reference time
+fails unless `allow_future=` allows it (a duration such as `"1m"` for
+clock skew, or `True` for any amount).
 
 ## Table comparison
 
