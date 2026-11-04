@@ -1721,7 +1721,7 @@ If <code>enable_logging=True</code> is given without <code>logger_provider=</cod
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s add the action to a validation of a small table of orders. The OTel SDK’s <code>InMemoryMetricReader</code> keeps the metrics in memory so we can look at them (in production, the meter provider would send them to a collector instead):</p>
-<div id="4621cdb4" class="cell" data-execution_count="1">
+<div id="09071c01" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics <span class="im">import</span> MeterProvider</span>
@@ -1765,7 +1765,7 @@ pb.validation.test_units.total 10
 pb.validation.test_units.passed 7
 pb.validation.test_units.failed 3
 pb.validation.pass_rate 0.7
-pb.validation.duration 0.009765
+pb.validation.duration 0.009534
 pb.validation.threshold.warning 2
 pb.validation.threshold.error 2
 pb.validation.threshold.critical 1
@@ -1774,14 +1774,14 @@ pb.validation.step.duration 1</code></pre>
 </div>
 </div>
 <p>The metrics were sent during <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a>. Both steps failed, 7 of the 10 test units passed, and the second step exceeded all three thresholds. The step duration histogram has a data point for each step, and the value printed for it is its count of one observation. Each data point has the <code>pb.tbl_name</code> and <code>env</code> attributes:</p>
-<div id="8ca3f074" class="cell" data-execution_count="2">
+<div id="cb64355d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">dict</span>(metrics[<span class="dv">0</span>].data.data_points[<span class="dv">0</span>].attributes)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>{'pb.tbl_name': 'orders', 'env': 'dev'}</code></pre>
 </div>
 </div>
 <p>To also send traces, give the action <code>enable_tracing=True</code> and a tracer provider. Here, an in-memory span exporter keeps the spans:</p>
-<div id="4f6a652d" class="cell" data-execution_count="3">
+<div id="419140f7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace <span class="im">import</span> TracerProvider</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace.export <span class="im">import</span> SimpleSpanProcessor</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace.export.in_memory_span_exporter <span class="im">import</span> InMemorySpanExporter</span>
@@ -1816,7 +1816,7 @@ pb.validate None</code></pre>
 </div>
 <p>There’s a <code>pb.validate.step</code> span for each step, inside the <code>pb.validate</code> span of the whole interrogation, just as with <a href="../reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a>.</p>
 <p>Since <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> takes any number of actions, the signals can be sent along with other notifications. Here, a <a href="../reference/send_slack_notification.html#pointblank.send_slack_notification" class="gdls-link"><code>send_slack_notification()</code></a> action without a webhook URL prints the message it would send:</p>
-<div id="08fcc05a" class="cell" data-execution_count="4">
+<div id="b61a7e72" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>orders,</span>
@@ -1839,7 +1839,7 @@ Would send to Slack:
 • Highest Severity: critical
 • Total Steps: 2
 • Failed Steps: 2
-• Time: 2026-11-04 15:29:25.177210
+• Time: 2026-11-04 16:05:14.769363
 ==============
 </code></pre>
 </div>

@@ -4,7 +4,7 @@ Validate whether column values are in a set of values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9175-L9533)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9191-L9551)
 
 ``` python
 Validate.col_vals_in_set(
@@ -91,7 +91,7 @@ A list with a combination of column names and tuples can be provided as well. Th
     # Segments from all unique values in the `region` and `date` columns
     segments=["region", "date"]
 
-The segmentation is performed during interrogation, and the resulting validation steps will be numbered sequentially. Each segment will have its own validation step, and the results will be reported separately. This allows for a more granular analysis of the data and helps identify issues within specific segments.
+The segmentation is performed during interrogation, and the resulting validation steps will be numbered sequentially. Each segment will have its own validation step, and the results will be reported separately. This allows for a more granular analysis of the data and helps identify issues within specific segments. If no segments are found (e.g., the table has no rows), a single step is kept with a note explaining why, so the steps after it keep their numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data table. Because of this, one can conceivably use the `pre=` argument to generate a column that can be used for segmentation. For example, you could create a new column called `"segment"` through use of `pre=` and then use that column for segmentation.
 

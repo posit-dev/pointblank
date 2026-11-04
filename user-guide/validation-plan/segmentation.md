@@ -89,6 +89,8 @@ validation_2
 
 In this example, we only create validation steps for the `"low"` and `"high"` segments, ignoring any rows with `f` equal to `"mid"`.
 
+If no segments are found (for example, because the table has no rows or the list of values is empty), the step is kept as a single step with a note explaining why. That way the step still shows up in the report and the steps after it keep their numbers.
+
 ## Multiple Segmentation Criteria
 
 For more complex segmentation, you can provide a list of columns or column-value tuples. This creates segments based on combinations of criteria:

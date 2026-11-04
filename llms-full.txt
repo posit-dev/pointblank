@@ -4032,7 +4032,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -4283,7 +4285,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -4534,7 +4538,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -4785,7 +4791,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -5036,7 +5044,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -5285,7 +5295,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -5544,7 +5556,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -5815,7 +5829,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -6066,7 +6082,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -6347,7 +6365,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -6941,7 +6961,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -7154,7 +7176,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -7383,7 +7407,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -7638,7 +7664,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -8118,7 +8146,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -9277,7 +9307,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -9483,7 +9515,9 @@ segments=["region", "date"]
 The segmentation is performed during interrogation, and the resulting validation steps will
 be numbered sequentially. Each segment will have its own validation step, and the results
 will be reported separately. This allows for a more granular analysis of the data and helps
-identify issues within specific segments.
+identify issues within specific segments. If no segments are found (e.g., the table has no
+rows), a single step is kept with a note explaining why, so the steps after it keep their
+numbers.
 
 Importantly, the segmentation process will be performed after any preprocessing of the data
 table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -32158,6 +32192,10 @@ validation_2
 
 In this example, we only create validation steps for the `"low"` and `"high"` segments, ignoring any
 rows with `f` equal to `"mid"`.
+
+If no segments are found (for example, because the table has no rows or the list of values is
+empty), the step is kept as a single step with a note explaining why. That way the step still shows
+up in the report and the steps after it keep their numbers.
 
 ## Multiple Segmentation Criteria
 
