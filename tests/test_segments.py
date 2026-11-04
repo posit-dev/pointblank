@@ -290,3 +290,113 @@ def test_segments_str_with_null_values_pandas_string_columns(dtype):
     assert validation.n_passed(i=2, scalar=True) == 1
     assert validation.n_passed(i=3, scalar=True) == 1
     assert validation.n_failed(i=2, scalar=True) == 1
+
+
+def _empty_segment_tbl(tbl_type):
+    df = pl.DataFrame({"x": pl.Series([], dtype=pl.Int64), "s": pl.Series([], dtype=pl.String)})
+    if tbl_type == "polars":
+        return df
+    if tbl_type == "polars-lazy":
+        return df.lazy()
+    if tbl_type == "pandas":
+        return df.to_pandas()
+    import ibis
+
+    return ibis.memtable(df.to_arrow())
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "polars-lazy", "pandas", "duckdb"])
+def test_segments_str_on_empty_table_keeps_step(tbl_type):
+    # A table with no rows has no segment values; the segmented step is kept (with no test units,
+    # like any step on an empty table) rather than vanishing from the report
+    validation = (
+        Validate(data=_empty_segment_tbl(tbl_type), thresholds=(1, 2))
+        .col_vals_gt("x", 0, segments="s")
+        .col_vals_gt("x", 0)
+        .interrogate()
+    )
+
+    assert len(validation.validation_info) == 2
+    assert [v.i for v in validation.validation_info] == [1, 2]
+
+    step = validation.validation_info[0]
+    assert step.n == 0
+    assert step.eval_error is True
+    assert step.segments is None
+    assert step.segments_spec == "s"
+    assert "no_segments" in step.notes
+    assert "No segments were found" in step.notes["no_segments"]["text"]
+
+    # The step after it is unaffected
+    assert validation.validation_info[1].n == 0
+    assert "no_segments" not in (validation.validation_info[1].notes or {})
+
+    validation.get_tabular_report()
+
+
+def test_segments_on_table_emptied_by_pre_keeps_step():
+    tbl = pl.DataFrame({"x": [1, 2, 3], "s": ["a", "b", "a"]})
+
+    validation = (
+        Validate(data=tbl)
+        .col_vals_gt("x", 0, pre=lambda df: df.filter(pl.col("x") > 10), segments="s")
+        .col_vals_gt("x", 0, segments="s")
+        .interrogate()
+    )
+
+    assert len(validation.validation_info) == 3
+    assert validation.validation_info[0].n == 0
+    assert "no_segments" in validation.validation_info[0].notes
+    assert [v.segments for v in validation.validation_info[1:]] == [("s", "a"), ("s", "b")]
+    assert validation.n_passed(i=2, scalar=True) == 2
+    assert validation.n_passed(i=3, scalar=True) == 1
+
+
+@pytest.mark.parametrize("segments", [("s", []), [("s", [])]])
+def test_segments_with_no_values_on_nonempty_table_is_eval_error(segments):
+    # With an empty list of segment values there is nothing to check; the step must not fall back
+    # to checking every row of the table
+    tbl = pl.DataFrame({"x": [1, -2, 3], "s": ["a", "b", "a"]})
+
+    validation = (
+        Validate(data=tbl)
+        .col_vals_gt("x", 0, segments=segments)
+        .col_vals_gt("x", 0, segments="s")
+        .interrogate()
+    )
+
+    assert len(validation.validation_info) == 3
+    step = validation.validation_info[0]
+    assert step.eval_error is True
+    assert step.n is None
+    assert step.n_failed is None
+    assert step.segments is None
+    assert "no_segments" in step.notes
+
+    assert [v.segments for v in validation.validation_info[1:]] == [("s", "a"), ("s", "b")]
+    assert validation.n_failed(i=3, scalar=True) == 1
+
+
+def test_segments_with_no_segments_found_serializes_segments():
+    validation = (
+        Validate(data=_empty_segment_tbl("polars"))
+        .col_vals_gt("x", 0, segments="s")
+        .col_vals_gt("x", 0, segments=("s", []))
+        .interrogate()
+    )
+
+    code = validation.to_code()
+    assert 'segments="s"' in code
+    assert 'segments=("s", [])' in code
+    assert code.count(".col_vals_gt(") == 2
+
+
+def test_segments_no_segments_note_is_localized():
+    validation = (
+        Validate(data=_empty_segment_tbl("polars"), locale="fr")
+        .col_vals_gt("x", 0, segments="s")
+        .interrogate()
+    )
+
+    note_text = validation.validation_info[0].notes["no_segments"]["text"]
+    assert note_text.startswith("Aucun segment n'a été trouvé")
