@@ -706,6 +706,11 @@ fails, you'll see exactly how old the most recent data is and what threshold was
 context helps quickly diagnose whether you're dealing with a minor delay or a major pipeline
 failure.
 
+Data that is dated later than the comparison time also fails, since timestamps from the future
+usually mean a clock is set wrong or a timezone was mixed up when the data was loaded. If the system
+that writes the data has a clock that may run slightly ahead, allow a small margin with something
+like `allow_future="1m"`. To accept future-dated data of any amount, use `allow_future=True`.
+
 Data freshness validation is particularly valuable for:
 
 - monitoring ETL pipelines to catch failures before they cascade to reports and dashboards
