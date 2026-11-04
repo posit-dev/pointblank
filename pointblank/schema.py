@@ -588,12 +588,16 @@ class Schema:
         Returns
         -------
         DataFrame or dict
-            Generated data in the requested format.
+            Generated data in the requested format. In a DataFrame, each numeric column has its
+            field's dtype (e.g., `int_field(dtype="Int32")` gives an `Int32` column), and a
+            `time_field()` column holds `datetime.time` values.
 
         Raises
         ------
         ValueError
-            If the schema has no columns or if constraints cannot be satisfied.
+            If the schema has no columns, if constraints cannot be satisfied, or if a custom
+            `generator=` of a numeric field returns a value that doesn't fit the field's dtype
+            (such as `1.5` for an integer field, or `300` for a `"UInt8"` one).
         ImportError
             If required optional dependencies are not installed.
 
@@ -1372,12 +1376,16 @@ def generate_dataset(
     Returns
     -------
     DataFrame or dict
-        Generated data in the requested format.
+        Generated data in the requested format. In a DataFrame, each numeric column has its
+        field's dtype (e.g., `int_field(dtype="Int32")` gives an `Int32` column), and a
+        `time_field()` column holds `datetime.time` values.
 
     Raises
     ------
     ValueError
-        If the schema has no columns or if constraints cannot be satisfied.
+        If the schema has no columns, if constraints cannot be satisfied, or if a custom
+        `generator=` of a numeric field returns a value that doesn't fit the field's dtype (such
+        as `1.5` for an integer field, or `300` for a `"UInt8"` one).
     ImportError
         If required optional dependencies are not installed.
 
