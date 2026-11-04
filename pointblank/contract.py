@@ -440,7 +440,8 @@ class Contract:
         take precedence.
     on_violation
         What a [`Pipeline`](`pointblank.Pipeline`) should do when data fails this contract:
-        `"warn"` (the default) issues a `UserWarning`, `"raise"` raises a `RuntimeError`, and
+        `"warn"` (the default) issues a `UserWarning`, `"raise"` raises a
+        [`ContractViolationError`](`pointblank.ContractViolationError`) (a `RuntimeError`), and
         `"log"` writes a warning to the `"pointblank.contract"` logger. This setting applies only
         when the contract is enforced through a `Pipeline`. Calling
         [`validate()`](`pointblank.Contract.validate`) directly always returns the validation
