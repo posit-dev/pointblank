@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from pointblank.thresholds import Actions, FinalActions, Thresholds
     from pointblank.validate import Validate
 
-__all__ = ["Pipeline", "PipelineResult"]
+__all__ = ["ContractViolationError", "Pipeline", "PipelineResult"]
 
 
 @dataclass
@@ -25,7 +25,9 @@ class PipelineResult:
     alert someone) and still have the full reports at hand to explain the decision.
 
     You don't normally create a `PipelineResult` yourself. Get one from `run()` and read its
-    attributes and properties.
+    attributes and properties. When `run()` raises a
+    [`ContractViolationError`](`pointblank.ContractViolationError`) instead, the error's `result`
+    attribute holds the `PipelineResult`.
 
     Attributes
     ----------
@@ -277,6 +279,95 @@ def _append_validation_summary(lines: list[str], validation: Validate) -> None:
         lines.append("  (unable to retrieve summary)")
 
 
+class ContractViolationError(RuntimeError):
+    """The error raised when data fails a contract with `on_violation="raise"`.
+
+    A [`Pipeline`](`pointblank.Pipeline`) raises this error when a boundary validation has any
+    failing test units and that boundary's [`Contract`](`pointblank.Contract`) was created with
+    `on_violation="raise"`. It's raised by [`run()`](`pointblank.Pipeline.run`),
+    [`validate_source()`](`pointblank.Pipeline.validate_source`), and
+    [`validate_target()`](`pointblank.Pipeline.validate_target`). The message names the contract
+    and its direction, and the error carries the failing validation, so the code that catches it
+    can report or log the details before stopping.
+
+    It's a subclass of `RuntimeError`, so `except RuntimeError:` catches it as well.
+
+    Attributes
+    ----------
+    contract
+        The [`Contract`](`pointblank.Contract`) that the data failed.
+    validation
+        The interrogated [`Validate`](`pointblank.Validate`) object for the failing boundary.
+        Display it to see the validation report.
+    result
+        The [`PipelineResult`](`pointblank.PipelineResult`) of the run, holding everything the run
+        produced before it stopped (the source validation, and the transformed data and target
+        validation if they were reached). It's `None` when the error comes from
+        `validate_source()` or `validate_target()`.
+
+    Examples
+    --------
+    ```{python}
+    #| echo: false
+    #| output: false
+    import pointblank as pb
+    pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+    ```
+
+    Let's make a pipeline whose target contract must hold for the output to be published. It
+    uses `on_violation="raise"`, so a failing output stops the run with an error.
+
+    ```{python}
+    import pointblank as pb
+    import polars as pl
+
+    pipeline = pb.Pipeline(
+        target=pb.Contract(
+            name="prices",
+            direction="target",
+            steps=[pb.Step("col_vals_gt", columns="price", value=0)],
+            on_violation="raise",
+        ),
+    )
+
+    raw_prices = pl.DataFrame({"item": ["a", "b", "c"], "price": [4.5, 0.0, 12.0]})
+    ```
+
+    The transformation passes a zero price through, so the run raises. The error holds the
+    result of the run, which still has the transformed data and the target validation:
+
+    ```{python}
+    try:
+        pipeline.run(data=raw_prices, transform=lambda df: df)
+    except pb.ContractViolationError as e:
+        print(e)
+        failed_run = e.result
+
+    failed_run.target_validation
+    ```
+
+    The report shows the one failing test unit in the `col_vals_gt` step, the row for item
+    `"b"`. Nothing after the `run()` call was reached, so the prices weren't published.
+
+    See Also
+    --------
+    Pipeline : Enforce contracts at both ends of a transformation.
+    Contract : Set `on_violation=` to choose what happens when data fails.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        contract: Contract,
+        validation: Validate,
+        result: PipelineResult | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.contract = contract
+        self.validation = validation
+        self.result = result
+
+
 @dataclass
 class Pipeline:
     """Enforce data contracts at both ends of a data transformation.
@@ -328,7 +419,8 @@ class Pipeline:
         With `True` (the default), the transformation isn't called and the target isn't validated,
         so bad input never reaches your transformation code or anything it writes to. Use `False`
         to always run the transformation and validate both boundaries, for example to see every
-        problem at once while developing.
+        problem at once while developing. A source contract with `on_violation="raise"` still
+        raises with `False`, but only after the target has been validated.
 
     Returns
     -------
@@ -371,13 +463,12 @@ class Pipeline:
 
     When a boundary fails, the pipeline applies that contract's `on_violation=` setting. With
     `"warn"` (the default), a `UserWarning` is issued. With `"log"`, a warning-level message is
-    written to the `"pointblank.contract"` logger. With `"raise"`,
-    [`validate_source()`](`pointblank.Pipeline.validate_source`) and
-    [`validate_target()`](`pointblank.Pipeline.validate_target`) raise a `RuntimeError`.
-    [`run()`](`pointblank.Pipeline.run`) is different: it always returns a
-    [`PipelineResult`](`pointblank.PipelineResult`) so that both validations can be inspected, so
-    a `"raise"` violation is recorded in the result without an exception or warning. To stop a job
-    after `run()`, check [`PipelineResult.passed`](`pointblank.PipelineResult.passed`).
+    written to the `"pointblank.contract"` logger. With `"raise"`, a
+    [`ContractViolationError`](`pointblank.ContractViolationError`) (a `RuntimeError`) is raised,
+    which stops the code that called the pipeline. When it's raised by
+    [`run()`](`pointblank.Pipeline.run`), its `result` attribute holds the
+    [`PipelineResult`](`pointblank.PipelineResult`) of the run, so both validations can still be
+    inspected.
 
     Serialization
     -------------
@@ -560,9 +651,8 @@ class Pipeline:
 
         The validation is built the same way as in [`run()`](`pointblank.Pipeline.run`), with the
         pipeline's label, thresholds, and actions. If the data fails, the source contract's
-        `on_violation=` setting is applied. Unlike `run()`, this method lets a `"raise"` violation
-        propagate, which makes it a simple gate: with `on_violation="raise"`, the code after the
-        call only runs when the data meets the contract.
+        `on_violation=` setting is applied. With `on_violation="raise"`, this makes the method a
+        simple gate: the code after the call only runs when the data meets the contract.
 
         Parameters
         ----------
@@ -579,8 +669,10 @@ class Pipeline:
         ------
         ValueError
             If the pipeline has no source contract.
-        RuntimeError
-            If the data fails the source contract and the contract has `on_violation="raise"`.
+        ContractViolationError
+            If the data fails the source contract and the contract has `on_violation="raise"`. It's a
+            subclass of `RuntimeError`, and its `validation` attribute holds the failing
+            validation.
 
         Examples
         --------
@@ -622,8 +714,9 @@ class Pipeline:
         ingest.validate_source(readings)
         ```
 
-        A batch with an impossible temperature raises a `RuntimeError` naming the contract, so a
-        job that loads the data can stop before anything is written.
+        A batch with an impossible temperature raises a `ContractViolationError` (a kind of
+        `RuntimeError`) naming the contract, so a job that loads the data can stop before anything
+        is written.
 
         ```{python}
         bad_readings = pl.DataFrame({"sensor_id": ["s1", "s2"], "temp_c": [21.5, 85.0]})
@@ -661,7 +754,7 @@ class Pipeline:
         The validation is built the same way as in [`run()`](`pointblank.Pipeline.run`), with the
         pipeline's label, thresholds, and actions. If the data fails, the target contract's
         `on_violation=` setting is applied, and a `"raise"` violation propagates as a
-        `RuntimeError`.
+        [`ContractViolationError`](`pointblank.ContractViolationError`).
 
         Parameters
         ----------
@@ -678,8 +771,10 @@ class Pipeline:
         ------
         ValueError
             If the pipeline has no target contract.
-        RuntimeError
-            If the data fails the target contract and the contract has `on_violation="raise"`.
+        ContractViolationError
+            If the data fails the target contract and the contract has `on_violation="raise"`. It's a
+            subclass of `RuntimeError`, and its `validation` attribute holds the failing
+            validation.
 
         Examples
         --------
@@ -741,7 +836,7 @@ class Pipeline:
 
         Here the job would hold the summary back until the duplicate day is resolved. To make a
         failure stop the job instead, set `on_violation="raise"` on the contract, which turns a
-        failing validation into a `RuntimeError`.
+        failing validation into a `ContractViolationError`.
         """
         if self.target is None:
             raise ValueError("No target contract defined for this pipeline.")
@@ -775,12 +870,14 @@ class Pipeline:
         boundary is skipped.
 
         When a boundary fails, its contract's `on_violation=` setting is applied: `"warn"` issues
-        a `UserWarning` and `"log"` writes to the `"pointblank.contract"` logger. A `"raise"`
-        violation doesn't raise here, though, because `run()` always returns its result so that
-        both boundaries can be inspected. To stop a job when the pipeline fails, check the
-        result's [`passed`](`pointblank.PipelineResult.passed`) property, or use
-        [`validate_source()`](`pointblank.Pipeline.validate_source`) and
-        [`validate_target()`](`pointblank.Pipeline.validate_target`), which do raise.
+        a `UserWarning` and `"log"` writes to the `"pointblank.contract"` logger. With `"raise"`,
+        `run()` raises a [`ContractViolationError`](`pointblank.ContractViolationError`) instead
+        of returning. A failing source raises right away with `short_circuit=True`, and after the
+        target has been validated with `short_circuit=False`. The error's `result` attribute holds
+        the [`PipelineResult`](`pointblank.PipelineResult`) of the run, with the validations and
+        any transformed data. With `"warn"` or `"log"`, check the result's
+        [`passed`](`pointblank.PipelineResult.passed`) property to stop a job when the pipeline
+        fails.
 
         Parameters
         ----------
@@ -799,6 +896,13 @@ class Pipeline:
             The results of the run. `source_validation` and `target_validation` hold the
             interrogated `Validate` objects (or `None` for a boundary that wasn't validated), and
             `transform_output` holds the transformed table (or `None` if the run stopped early).
+
+        Raises
+        ------
+        ContractViolationError
+            If a boundary fails and its contract has `on_violation="raise"`. If both boundaries
+            fail that way (possible with `short_circuit=False`), the error is for the source
+            contract. Either way, the error's `result` attribute holds the `PipelineResult`.
 
         Examples
         --------
@@ -898,20 +1002,24 @@ class Pipeline:
         """
         result = PipelineResult()
 
+        # A `"raise"` violation is raised once the run has stopped, with the result attached so
+        # that both validations can still be inspected
+        source_error: ContractViolationError | None = None
+
         # Step 1: Validate source if a source contract is defined
         if self.source is not None:
             source_validation = self._build_validation(self.source, data)
             source_validation = source_validation.interrogate()
             result.source_validation = source_validation
 
-            # Handle violation for source
             try:
                 self._handle_violation(self.source, source_validation)
-            except RuntimeError:
+            except ContractViolationError as e:
+                e.result = result
                 if self.short_circuit:
-                    # Source failed critically and short_circuit is True
-                    return result
-                # If not short_circuit, continue despite source failure
+                    raise
+                # Without short-circuiting, the transformation and target validation still run
+                source_error = e
 
             # Check if source passed; if not and short_circuit is True, skip transform
             if self.short_circuit and not result.source_passed:
@@ -927,11 +1035,15 @@ class Pipeline:
             target_validation = target_validation.interrogate()
             result.target_validation = target_validation
 
-            # Handle violation for target
             try:
                 self._handle_violation(self.target, target_validation)
-            except RuntimeError:
-                pass  # Already stored in result
+            except ContractViolationError as e:
+                e.result = result
+                if source_error is None:
+                    raise
+
+        if source_error is not None:
+            raise source_error
 
         return result
 
@@ -995,7 +1107,7 @@ class Pipeline:
 
         Raises
         ------
-        RuntimeError
+        ContractViolationError
             If on_violation="raise" and the validation has failures.
         """
         # Check if there are any failures
@@ -1005,9 +1117,11 @@ class Pipeline:
             return
 
         if contract.on_violation == "raise":
-            raise RuntimeError(
+            raise ContractViolationError(
                 f"Contract '{contract.name}' ({contract.direction}) violated: "
-                f"validation has failing steps."
+                f"validation has failing steps.",
+                contract=contract,
+                validation=validation,
             )
         elif contract.on_violation == "warn":
             warnings.warn(
