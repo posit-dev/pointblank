@@ -4468,8 +4468,8 @@ steps:
 
   # Data freshness check (uncomment and modify as needed)
   # - data_freshness:
-  #     columns: event_date
-  #     freshness: "24h"
+  #     column: event_date
+  #     max_age: "24h"
 
 # Add more validation steps as needed
 # See the Pointblank documentation for the full list of available validation functions
