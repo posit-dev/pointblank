@@ -1260,8 +1260,8 @@ def yaml_interrogate(
     tbl: events.csv
     steps:
     - data_freshness:
-        columns: event_date
-        freshness: "24h"
+        column: event_date
+        max_age: "24h"
     ```
 
     ### Active Parameter Shortcut
