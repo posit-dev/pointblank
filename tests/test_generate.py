@@ -250,16 +250,10 @@ class TestGenerateColumnTime:
         values = generate_column(field, config)
 
         assert len(values) == 10
-        assert all(isinstance(v, str) for v in values)
+        assert all(isinstance(v, time) for v in values)
 
-        # Verify time format HH:MM:SS
-        for v in values:
-            parts = v.split(":")
-
-            assert len(parts) == 3
-            assert 0 <= int(parts[0]) <= 23
-            assert 0 <= int(parts[1]) <= 59
-            assert 0 <= int(parts[2]) <= 59
+        # Times are generated at second resolution
+        assert all(v.microsecond == 0 for v in values)
 
     def test_generate_time_with_constraints(self):
         """Test generating a Time column with min/max constraints."""
@@ -271,15 +265,7 @@ class TestGenerateColumnTime:
 
         # Verify all times are within the 9:00-12:00 range
         for v in values:
-            parts = v.split(":")
-            hour = int(parts[0])
-            minute = int(parts[1])
-            second = int(parts[2])
-            time_seconds = hour * 3600 + minute * 60 + second
-            min_seconds = 9 * 3600  # 09:00:00
-            max_seconds = 12 * 3600  # 12:00:00
-
-            assert min_seconds <= time_seconds <= max_seconds
+            assert time(9, 0, 0) <= v <= time(12, 0, 0)
 
     def test_generate_time_different_fields_have_different_values(self):
         """Test that different time fields generate different values (not the same row values)."""
@@ -302,14 +288,10 @@ class TestGenerateColumnTime:
             assert st != et
 
             # Verify start_time is in 9-12 range
-            st_hour = int(st.split(":")[0])
-
-            assert 9 <= st_hour <= 12
+            assert 9 <= st.hour <= 12
 
             # Verify end_time is in 13-17 range
-            et_hour = int(et.split(":")[0])
-
-            assert 13 <= et_hour <= 17
+            assert 13 <= et.hour <= 17
 
     def test_generate_time_with_string_constraints(self):
         """Test generating a Time column with string min/max constraints."""
@@ -320,15 +302,7 @@ class TestGenerateColumnTime:
         assert len(values) == 100
 
         for v in values:
-            parts = v.split(":")
-            hour = int(parts[0])
-            minute = int(parts[1])
-            second = int(parts[2])
-            time_seconds = hour * 3600 + minute * 60 + second
-            min_seconds = 14 * 3600  # 14:00:00
-            max_seconds = 18 * 3600 + 30 * 60  # 18:30:00
-
-            assert min_seconds <= time_seconds <= max_seconds
+            assert time(14, 0, 0) <= v <= time(18, 30, 0)
 
 
 class TestGenerateColumnDuration:
@@ -603,6 +577,228 @@ class TestGenerateDataframe:
         assert list(data.keys()) == ["a", "b"]
         assert len(data["a"]) == 5
         assert len(data["b"]) == 5
+
+
+INT_DTYPES = ["Int8", "Int16", "Int32", "Int64", "UInt8", "UInt16", "UInt32", "UInt64"]
+FLOAT_DTYPES = ["Float32", "Float64"]
+
+
+class TestGenerateDataframeDtypes:
+    """Tests that generated columns have the dtypes of their fields."""
+
+    @pytest.mark.parametrize("dtype", INT_DTYPES + FLOAT_DTYPES)
+    def test_polars_numeric_dtype(self, dtype):
+        pl = pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        field = int_field(dtype=dtype) if dtype in INT_DTYPES else float_field(dtype=dtype)
+        nullable = (
+            int_field(dtype=dtype, nullable=True, null_probability=0.5)
+            if dtype in INT_DTYPES
+            else float_field(dtype=dtype, nullable=True, null_probability=0.5)
+        )
+        df = generate_dataset(Schema(x=field, y=nullable), n=20, seed=23)
+
+        assert df.schema["x"] == getattr(pl, dtype)
+        assert df.schema["y"] == getattr(pl, dtype)
+        assert df["y"].null_count() > 0
+
+    @pytest.mark.parametrize("dtype", INT_DTYPES)
+    def test_pandas_int_dtype(self, dtype):
+        pytest.importorskip("pandas")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(
+            x=int_field(dtype=dtype),
+            y=int_field(dtype=dtype, nullable=True, null_probability=0.5),
+        )
+        df = generate_dataset(schema, n=20, seed=23, output="pandas")
+
+        # A NumPy integer, or pandas' nullable integer (keeping its dtype) when there are nulls
+        assert str(df["x"].dtype) == dtype.lower()
+        assert str(df["y"].dtype) == dtype
+        assert df["y"].isna().sum() > 0
+
+    @pytest.mark.parametrize("dtype", FLOAT_DTYPES)
+    def test_pandas_float_dtype(self, dtype):
+        pytest.importorskip("pandas")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(
+            x=float_field(dtype=dtype),
+            y=float_field(dtype=dtype, nullable=True, null_probability=0.5),
+        )
+        df = generate_dataset(schema, n=20, seed=23, output="pandas")
+
+        assert str(df["x"].dtype) == dtype.lower()
+        assert str(df["y"].dtype) == dtype.lower()
+        assert df["y"].isna().sum() > 0
+
+    def test_dtype_strings_in_schema(self):
+        """A dtype-only schema (e.g., `x="Int16"`) gives the same dtypes."""
+        pl = pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(a="Int16", b="UInt32", c="Float32", d="int8")
+        df = generate_dataset(schema, n=5, seed=23)
+
+        assert df.schema == pl.Schema(
+            {"a": pl.Int16, "b": pl.UInt32, "c": pl.Float32, "d": pl.Int8}
+        )
+
+    def test_full_uint64_range(self):
+        """Values above the Int64 range are kept exactly."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        big = 2**64 - 1
+        schema = Schema(x=int_field(dtype="UInt64", allowed=[big]))
+
+        assert generate_dataset(schema, n=3, seed=23)["x"].to_list() == [big] * 3
+        assert generate_dataset(schema, n=3, seed=23, output="pandas")["x"].tolist() == [big] * 3
+
+    def test_zero_rows_keep_dtypes(self):
+        """With no values to infer from, every column still gets its field's dtype."""
+        pl = pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(
+            a=int_field(dtype="Int32"),
+            b=float_field(dtype="Float32"),
+            s=string_field(),
+            o=bool_field(),
+            d=date_field(),
+            dt=datetime_field(),
+            du=duration_field(),
+            t=time_field(),
+        )
+        df = generate_dataset(schema, n=0, seed=23)
+
+        assert df.schema == pl.Schema(
+            {
+                "a": pl.Int32,
+                "b": pl.Float32,
+                "s": pl.String,
+                "o": pl.Boolean,
+                "d": pl.Date,
+                "dt": pl.Datetime("us"),
+                "du": pl.Duration("us"),
+                "t": pl.Time,
+            }
+        )
+
+        # The inferred dtypes of non-empty columns are the same
+        assert generate_dataset(schema, n=3, seed=23).schema == df.schema
+
+    def test_all_null_column_keeps_dtype(self):
+        pl = pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(
+            s=string_field(generator=lambda: None),
+            t=time_field(generator=lambda: None),
+        )
+        df = generate_dataset(schema, n=3, seed=23)
+
+        assert df.schema == pl.Schema({"s": pl.String, "t": pl.Time})
+        assert df.null_count().row(0) == (3, 3)
+
+    @pytest.mark.parametrize("output", ["polars", "pandas"])
+    def test_generated_table_matches_its_schema(self, output):
+        """The generated table passes `col_schema_match()` against the schema it came from."""
+        pytest.importorskip(output)
+        import pointblank as pb
+
+        schema = pb.Schema(
+            a=int_field(dtype="Int8", min_val=0, max_val=100),
+            b=int_field(dtype="UInt16", nullable=True, null_probability=0.3),
+            c=float_field(dtype="Float32", min_val=0.0, max_val=1.0),
+            d=int_field(),
+        )
+        df = pb.generate_dataset(schema, n=30, seed=23, output=output)
+
+        # pandas spells NumPy dtypes in lowercase (`int8`), so compare case-insensitively there
+        validation = (
+            pb.Validate(df)
+            .col_schema_match(schema, case_sensitive_dtypes=output == "polars")
+            .interrogate()
+        )
+
+        assert validation.all_passed()
+
+    def test_time_column_polars(self):
+        pl = pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(t=time_field(min_time="09:00:00", max_time="17:00:00"))
+        df = generate_dataset(schema, n=20, seed=23)
+
+        assert df.schema["t"] == pl.Time
+        assert all(time(9, 0, 0) <= v <= time(17, 0, 0) for v in df["t"].to_list())
+
+    def test_time_column_pandas_and_dict(self):
+        pytest.importorskip("pandas")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(t=time_field(nullable=True, null_probability=0.3))
+
+        df = generate_dataset(schema, n=20, seed=23, output="pandas")
+        assert all(isinstance(v, time) for v in df["t"].dropna())
+
+        data = generate_dataset(schema, n=20, seed=23, output="dict")
+        assert all(v is None or isinstance(v, time) for v in data["t"])
+        assert None in data["t"]
+
+    def test_time_column_unique(self):
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(t=time_field(min_time="09:00:00", max_time="09:01:00", unique=True))
+        data = generate_dataset(schema, n=61, seed=23, output="dict")
+
+        assert len(set(data["t"])) == 61
+
+    def test_dict_output_is_unchanged(self):
+        """The dict output holds the generated Python values, with no casting."""
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(x=int_field(dtype="UInt8"), y=float_field(dtype="Float32"))
+        data = generate_dataset(schema, n=5, seed=23, output="dict")
+
+        assert all(type(v) is int for v in data["x"])
+        assert all(type(v) is float for v in data["y"])
+
+    @pytest.mark.parametrize("output", ["polars", "pandas"])
+    @pytest.mark.parametrize(
+        "field, match",
+        [
+            (int_field(generator=lambda: 1.5), "has the dtype Int64, but it got the value 1.5"),
+            (int_field(generator=lambda: True), "got the value True"),
+            (int_field(dtype="UInt8", generator=lambda: 300), "an integer from 0 to 255"),
+            (int_field(dtype="Int8", generator=lambda: -129), "an integer from -128 to 127"),
+            (float_field(generator=lambda: "1.5"), "got the value '1.5', which isn't a number"),
+        ],
+    )
+    def test_generator_value_that_doesnt_fit_raises(self, output, field, match):
+        pytest.importorskip(output)
+        from pointblank import Schema, generate_dataset
+
+        with pytest.raises(ValueError, match=match):
+            generate_dataset(Schema(x=field), n=3, seed=23, output=output)
+
+    def test_generator_numpy_values_are_accepted(self):
+        np = pytest.importorskip("numpy")
+        pl = pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(
+            x=int_field(dtype="Int16", generator=lambda: np.int64(7)),
+            y=float_field(dtype="Float32", generator=lambda: np.float64(0.5)),
+            z=float_field(generator=lambda: 3),
+        )
+        df = generate_dataset(schema, n=3, seed=23)
+
+        assert df.schema == pl.Schema({"x": pl.Int16, "y": pl.Float32, "z": pl.Float64})
+        assert df["z"].to_list() == [3.0, 3.0, 3.0]
 
 
 class TestSchemaGenerate:
