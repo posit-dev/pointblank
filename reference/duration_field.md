@@ -4,7 +4,7 @@ Create a duration column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1958-L2078)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1962-L2082)
 
 ``` python
 duration_field(

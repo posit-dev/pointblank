@@ -4,7 +4,7 @@ Create a dict of string field specifications representing a person profile.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L2145-L2334)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L2149-L2352)
 
 ``` python
 profile_fields(
@@ -34,7 +34,7 @@ List of additional preset names to add to the base set. For example, `include=["
 List of preset names to remove from the (possibly augmented) set. For example, `exclude=["postcode"]` removes the postcode column. Presets not in the set are silently ignored.
 
 `prefix: str | None = None`  
-Optional string to prepend to every column name. For example, `prefix="customer_"` produces keys like `"customer_first_name"`, `"customer_email"`, etc. The prefix doesn't create a separate identity: all person-related columns in a schema currently share the same person in each row.
+Optional string to prepend to every column name. For example, `prefix="customer_"` produces keys like `"customer_first_name"`, `"customer_email"`, etc. Each prefixed profile in a schema is a separate person, with its own name, location, and employer in each row. Other preset columns whose names start with the same prefix (e.g., a hand-written `"customer_city"` column) belong to that profile.
 
 ## Returns
 
@@ -149,4 +149,29 @@ pb.preview(pb.generate_dataset(schema, n=50, seed=23))
 | 49 | Christina | Cannon | ccannon13@aol.com | \(320\) 486-6471 | 168.75 |
 | 50 | Melissa | Nelson | m_nelson@yandex.com | \(260\) 590-0851 | 187.98 |
 
-The prefix changes only the column names, so the emails are still derived from the names in each row. All person-related columns in a schema share one identity per row, so two prefixed profiles (e.g., `"sender_"` and `"recipient_"`) currently get the same names rather than two independent people.
+The emails are still derived from the names in each row. A schema can hold several prefixed profiles, and each one is a different person:
+
+``` python
+schema = pb.Schema(
+    **pb.profile_fields(set="minimal", prefix="sender_"),
+    **pb.profile_fields(set="minimal", prefix="recipient_"),
+)
+
+pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+```
+
+| PolarsRows50Columns8 |  |  |  |  |  |  |  |  |
+|----|----|----|----|----|----|----|----|----|
+|  | sender_first_name *String* | sender_last_name *String* | sender_email *String* | sender_phone_number *String* | recipient_first_name *String* | recipient_last_name *String* | recipient_email *String* | recipient_phone_number *String* |
+| 1 | Paul | Woods | paulwoods@hotmail.com | \(512\) 899-4802 | Paul | Martinez | paul.martinez23@yandex.com | \(740\) 697-1613 |
+| 2 | Mark | Smith | mark684@icloud.com | \(310\) 986-0270 | Michelle | Mullins | michelle.mullins42@hotmail.com | \(267\) 624-3393 |
+| 3 | Willow | Fowler | willowfowler@gmail.com | \(623\) 938-2304 | Victoria | Peterson | vpeterson68@zoho.com | \(214\) 408-0462 |
+| 4 | Roger | Graham | roger.graham@zoho.com | \(970\) 514-7904 | Margaret | Carter | mcarter48@icloud.com | \(713\) 346-2154 |
+| 5 | Karen | Horn | karen.horn70@gmail.com | \(210\) 987-2966 | Dawson | Ramirez | d_ramirez@outlook.com | \(317\) 656-4191 |
+| 46 | Hannah | Weaver | hannahweaver@yahoo.com | \(419\) 998-5523 | Linda | Patel | linda245@protonmail.com | \(720\) 936-4962 |
+| 47 | Martin | Ramos | martin_ramos@yahoo.com | \(951\) 234-6078 | Amy | Green | agreen24@outlook.com | \(614\) 403-9572 |
+| 48 | Audrey | Jackson | audrey_jackson@aol.com | \(252\) 401-8878 | Catherine | King | cking15@hotmail.com | \(832\) 873-2603 |
+| 49 | Christina | Cannon | ccannon13@aol.com | \(320\) 486-6471 | Angela | Sparks | a_sparks@hotmail.com | \(423\) 793-8254 |
+| 50 | Melissa | Nelson | m_nelson@yandex.com | \(260\) 590-0851 | Kelly | Morgan | kellymorgan@aol.com | \(317\) 675-9250 |
+
+Each sender's email matches the sender's name and each recipient's email matches the recipient's name, but the sender and the recipient in a row are two independent people.

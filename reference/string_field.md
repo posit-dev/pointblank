@@ -4,7 +4,7 @@ Create a string column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L827-L1024)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L831-L1028)
 
 ``` python
 string_field(

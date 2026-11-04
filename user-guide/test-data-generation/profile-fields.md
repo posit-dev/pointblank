@@ -186,18 +186,18 @@ pb.preview(pb.generate_dataset(schema, n=100, seed=23))
 | PolarsRows100Columns8 |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
 |  | sender_first_name *String* | sender_last_name *String* | sender_email *String* | sender_phone_number *String* | recipient_first_name *String* | recipient_last_name *String* | recipient_email *String* | recipient_phone_number *String* |
-| 1 | Weston | Parker | weston.parker23@gmail.com | \(214\) 673-2777 | Weston | Parker | weston.parker@outlook.com | \(915\) 827-6385 |
-| 2 | Hazel | Torres | hazel723@hotmail.com | \(213\) 828-0231 | Hazel | Torres | hazeltorres@yandex.com | \(510\) 430-0382 |
-| 3 | Lawrence | Mitchell | lawrence_mitchell@zoho.com | \(623\) 370-0982 | Lawrence | Mitchell | lmitchell@hotmail.com | \(480\) 609-6977 |
-| 4 | Maria | Garcia | m_garcia@hotmail.com | \(970\) 694-0476 | Maria | Garcia | maria993@zoho.com | \(303\) 564-2441 |
-| 5 | Michael | Hoffman | michael.hoffman@gmail.com | \(682\) 391-2143 | Michael | Hoffman | michael.hoffman84@gmail.com | \(940\) 486-1122 |
-| 96 | Daniel | Torres | daniel_torres@icloud.com | \(915\) 504-6717 | Daniel | Torres | daniel.torres@gmail.com | \(832\) 313-0333 |
-| 97 | Helen | Simpson | hsimpson20@yandex.com | \(940\) 869-0705 | Helen | Simpson | helensimpson@gmail.com | \(512\) 818-5803 |
-| 98 | Mark | Graham | mark.graham65@mail.com | \(984\) 800-0885 | Mark | Graham | markgraham@gmail.com | \(984\) 656-7349 |
-| 99 | Brian | Moore | bmoore95@zoho.com | \(650\) 955-2724 | Brian | Moore | bmoore93@yahoo.com | \(408\) 902-9175 |
-| 100 | Michael | Ward | michael_ward@yahoo.com | \(949\) 771-2134 | Michael | Ward | michael.ward4@hotmail.com | \(650\) 916-0907 |
+| 1 | Weston | Parker | weston.parker23@gmail.com | \(214\) 673-2777 | Joseph | Davis | j_davis@zoho.com | \(440\) 723-0069 |
+| 2 | Hazel | Torres | hazel723@hotmail.com | \(213\) 828-0231 | Julie | Jimenez | jjimenez@icloud.com | \(814\) 949-8327 |
+| 3 | Lawrence | Mitchell | lawrence_mitchell@zoho.com | \(623\) 370-0982 | Elizabeth | Taylor | etaylor52@protonmail.com | \(682\) 407-0969 |
+| 4 | Maria | Garcia | m_garcia@hotmail.com | \(970\) 694-0476 | Carter | Wallace | carterwallace@yahoo.com | \(832\) 746-6516 |
+| 5 | Michael | Hoffman | michael.hoffman@gmail.com | \(682\) 391-2143 | Mark | Maxwell | mmaxwell23@protonmail.com | \(812\) 981-8561 |
+| 96 | Daniel | Torres | daniel_torres@icloud.com | \(915\) 504-6717 | George | Campbell | gcampbell@gmail.com | \(507\) 412-5358 |
+| 97 | Helen | Simpson | hsimpson20@yandex.com | \(940\) 869-0705 | Olivia | Price | oliviaprice@outlook.com | \(253\) 325-8394 |
+| 98 | Mark | Graham | mark.graham65@mail.com | \(984\) 800-0885 | Alexander | Wong | alexander.wong@yahoo.com | \(281\) 932-8319 |
+| 99 | Brian | Moore | bmoore95@zoho.com | \(650\) 955-2724 | William | Mendez | wmendez33@mail.com | \(765\) 322-0865 |
+| 100 | Michael | Ward | michael_ward@yahoo.com | \(949\) 771-2134 | Ashley | Warren | awarren@hotmail.com | \(425\) 549-2918 |
 
-Each prefixed group maintains its own coherence: the sender's email is derived from the sender's name, and the recipient's email from the recipient's name.
+Each prefixed profile is a separate person with its own coherence: the sender's email is derived from the sender's name, and the recipient's email from the recipient's name. The two profiles also get their own locations and employers, so a row's sender and recipient are independent of each other. Other preset columns whose names start with a profile's prefix (e.g., a hand-written `sender_city=pb.string_field(preset="city")` added to a `"minimal"` sender profile) belong to that profile.
 
 ## Combining with Other Field Types
 

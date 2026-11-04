@@ -4,7 +4,7 @@ Generate synthetic test data from a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1316-L1603)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1316-L1605)
 
 ``` python
 generate_dataset(
@@ -68,7 +68,7 @@ Several [string_field()](../reference/string_field.md#pointblank.string_field) p
 - **Financial presets** (`"iban"`, `"ssn"`, `"license_plate"`): produce identifiers in the format used by the specified country.
 - **Locale preset** (`"locale_code"`): returns a locale identifier (e.g., `"en_US"`, `"de_DE"`) derived from the country. Multilingual countries randomly select among their official locale codes (e.g., `"CH"` yields `"de_CH"`, `"fr_CH"`, or `"it_CH"`).
 
-When multiple columns in the same schema use related presets, the generated data is automatically coherent across those columns within each row. Person-related presets will share the same identity (e.g., the email is derived from the name), address-related presets will share the same location (e.g., the city matches the address), and business-related presets will share the same industry context.
+When multiple columns in the same schema use related presets, the generated data is automatically coherent across those columns within each row. Person-related presets will share the same identity (e.g., the email is derived from the name), address-related presets will share the same location (e.g., the city matches the address), and business-related presets will share the same industry context. Profiles made by [profile_fields()](../reference/profile_fields.md#pointblank.profile_fields) with different `prefix=` values (e.g., `"customer_"` and `"seller_"`) are coherent separately, so each one is a different person with its own location and employer.
 
 ## Locale Mixing
 

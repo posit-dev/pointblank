@@ -4,7 +4,7 @@ Create a time column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1734-L1850)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1738-L1854)
 
 ``` python
 time_field(

@@ -3592,11 +3592,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb18-174"><a href="#cb18-174" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-175"><a href="#cb18-175" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
 <span id="cb18-176"><a href="#cb18-176" aria-hidden="true" tabindex="-1"></a>fields <span class="op">=</span> pb.profile_fields(</span>
-<span id="cb18-177"><a href="#cb18-177" aria-hidden="true" tabindex="-1"></a>    <span class="bu">set</span><span class="op">=</span><span class="st">"standard"</span>,        <span class="co"># "standard" or "extended"</span></span>
+<span id="cb18-177"><a href="#cb18-177" aria-hidden="true" tabindex="-1"></a>    <span class="bu">set</span><span class="op">=</span><span class="st">"standard"</span>,        <span class="co"># "minimal", "standard" or "full"</span></span>
 <span id="cb18-178"><a href="#cb18-178" aria-hidden="true" tabindex="-1"></a>    split_name<span class="op">=</span><span class="va">True</span>,       <span class="co"># first_name + last_name vs full name</span></span>
 <span id="cb18-179"><a href="#cb18-179" aria-hidden="true" tabindex="-1"></a>    include<span class="op">=</span><span class="va">None</span>,          <span class="co"># specific fields to include</span></span>
 <span id="cb18-180"><a href="#cb18-180" aria-hidden="true" tabindex="-1"></a>    exclude<span class="op">=</span><span class="va">None</span>,          <span class="co"># specific fields to exclude</span></span>
-<span id="cb18-181"><a href="#cb18-181" aria-hidden="true" tabindex="-1"></a>    prefix<span class="op">=</span><span class="va">None</span>,           <span class="co"># prefix for field names</span></span>
+<span id="cb18-181"><a href="#cb18-181" aria-hidden="true" tabindex="-1"></a>    prefix<span class="op">=</span><span class="va">None</span>,           <span class="co"># prefix for field names (each prefix is a separate person)</span></span>
 <span id="cb18-182"><a href="#cb18-182" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb18-183"><a href="#cb18-183" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-184"><a href="#cb18-184" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -3802,7 +3802,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb19-104"><a href="#cb19-104" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-105"><a href="#cb19-105" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
 <span id="cb19-106"><a href="#cb19-106" aria-hidden="true" tabindex="-1"></a>pb.profile_fields(</span>
-<span id="cb19-107"><a href="#cb19-107" aria-hidden="true" tabindex="-1"></a>    <span class="bu">set</span>: <span class="bu">str</span> <span class="op">=</span> <span class="st">"standard"</span>,        <span class="co"># "standard" or "extended"</span></span>
+<span id="cb19-107"><a href="#cb19-107" aria-hidden="true" tabindex="-1"></a>    <span class="bu">set</span>: <span class="bu">str</span> <span class="op">=</span> <span class="st">"standard"</span>,        <span class="co"># "minimal", "standard" or "full"</span></span>
 <span id="cb19-108"><a href="#cb19-108" aria-hidden="true" tabindex="-1"></a>    split_name: <span class="bu">bool</span> <span class="op">=</span> <span class="va">True</span>,      <span class="co"># first_name + last_name vs name</span></span>
 <span id="cb19-109"><a href="#cb19-109" aria-hidden="true" tabindex="-1"></a>    include: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">|</span> <span class="va">None</span> <span class="op">=</span> <span class="va">None</span>,</span>
 <span id="cb19-110"><a href="#cb19-110" aria-hidden="true" tabindex="-1"></a>    exclude: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">|</span> <span class="va">None</span> <span class="op">=</span> <span class="va">None</span>,</span>
@@ -3813,10 +3813,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb19-115"><a href="#cb19-115" aria-hidden="true" tabindex="-1"></a>Returns a dict of StringField objects suitable for <span class="in">`**`</span>-unpacking</span>
 <span id="cb19-116"><a href="#cb19-116" aria-hidden="true" tabindex="-1"></a>into <span class="in">`Schema()`</span>.</span>
 <span id="cb19-117"><a href="#cb19-117" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-118"><a href="#cb19-118" aria-hidden="true" tabindex="-1"></a>Standard set includes: name (or first_name + last_name), email,</span>
-<span id="cb19-119"><a href="#cb19-119" aria-hidden="true" tabindex="-1"></a>phone_number, address, city, country.</span>
-<span id="cb19-120"><a href="#cb19-120" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-121"><a href="#cb19-121" aria-hidden="true" tabindex="-1"></a>Extended set adds: company, job, url, and more.</span></code></pre></div>
+<span id="cb19-118"><a href="#cb19-118" aria-hidden="true" tabindex="-1"></a>Minimal set: first_name + last_name (or name), email, phone_number.</span>
+<span id="cb19-119"><a href="#cb19-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-120"><a href="#cb19-120" aria-hidden="true" tabindex="-1"></a>Standard set: first_name + last_name (or name), email, city, state,</span>
+<span id="cb19-121"><a href="#cb19-121" aria-hidden="true" tabindex="-1"></a>postcode, phone_number.</span>
+<span id="cb19-122"><a href="#cb19-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-123"><a href="#cb19-123" aria-hidden="true" tabindex="-1"></a>Full set: the standard set plus address, company, job.</span>
+<span id="cb19-124"><a href="#cb19-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-125"><a href="#cb19-125" aria-hidden="true" tabindex="-1"></a>Each <span class="in">`prefix=`</span> makes a separate person: two prefixed profiles in one</span>
+<span id="cb19-126"><a href="#cb19-126" aria-hidden="true" tabindex="-1"></a>schema (e.g., <span class="in">`customer_`</span> and <span class="in">`seller_`</span>) get different names,</span>
+<span id="cb19-127"><a href="#cb19-127" aria-hidden="true" tabindex="-1"></a>locations and employers in each row. Other preset columns whose names</span>
+<span id="cb19-128"><a href="#cb19-128" aria-hidden="true" tabindex="-1"></a>start with the prefix belong to that profile.</span></code></pre></div>
 </pre>
 <h3 id="generate-data-references-presets-reference-md" class="gd-skills-file-heading anchored">references/presets-reference.md</h3>
 <pre class="gd-skills-raw"><div class="sourceCode" id="cb20"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># String presets reference</span></span>
