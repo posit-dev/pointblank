@@ -4,6 +4,7 @@ Per-dtype value generators for synthetic data generation.
 
 from __future__ import annotations
 
+import numbers
 import random
 import re
 import string
@@ -292,8 +293,8 @@ def _generate_duration(field: Field, rng: random.Random, generator: Any | None =
     return timedelta(seconds=random_seconds)
 
 
-def _generate_time(field: Field, rng: random.Random, generator: Any | None = None) -> str:
-    """Generate a random time value as string, respecting field constraints."""
+def _generate_time(field: Field, rng: random.Random, generator: Any | None = None) -> time:
+    """Generate a random time value (at second resolution), respecting field constraints."""
     min_time = getattr(field, "min_time", None)
     max_time = getattr(field, "max_time", None)
 
@@ -325,7 +326,7 @@ def _generate_time(field: Field, rng: random.Random, generator: Any | None = Non
     minute = (random_seconds % 3600) // 60
     second = random_seconds % 60
 
-    return f"{hour:02d}:{minute:02d}:{second:02d}"
+    return time(hour, minute, second)
 
 
 # Mapping from dtype to generator function
@@ -655,7 +656,7 @@ def generate_dataframe(
         )
 
     # Convert to requested output format
-    return _to_output_format(data, config.output)
+    return _to_output_format(data, config.output, fields)
 
 
 def _generate_single_country(
@@ -843,10 +844,54 @@ def _generate_multi_country(
     return data
 
 
-def _to_output_format(data: dict[str, list[Any]], output: str) -> Any:
-    """Convert a dict-of-lists to the requested output format."""
+def _check_numeric_values(col_name: str, field: Field, values: list[Any]) -> None:
+    """Check that a numeric column's values fit its field's dtype before the column is cast."""
+    if field.is_integer():
+        min_val, max_val = INTEGER_BOUNDS[field.dtype]
+        for value in values:
+            if value is None:
+                continue
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, numbers.Integral)
+                or not min_val <= value <= max_val
+            ):
+                raise ValueError(
+                    f"Column '{col_name}' has the dtype {field.dtype}, but it got the value "
+                    f"{value!r}, which isn't an integer from {min_val} to {max_val}."
+                )
+    elif field.is_float():
+        for value in values:
+            if value is None:
+                continue
+            if isinstance(value, bool) or not isinstance(value, numbers.Real):
+                raise ValueError(
+                    f"Column '{col_name}' has the dtype {field.dtype}, but it got the value "
+                    f"{value!r}, which isn't a number."
+                )
+
+
+def _to_output_format(
+    data: dict[str, list[Any]], output: str, fields: dict[str, Field] | None = None
+) -> Any:
+    """Convert a dict-of-lists to the requested output format.
+
+    Numeric columns get the dtype of their field (e.g., `Int32` or `Float32`) rather than the
+    `Int64`/`Float64` that would be inferred from Python values. In Polars, a column with no values
+    gets its field's dtype too.
+    """
     if output == "dict":
         return data
+
+    # The numeric fields whose dtype is set explicitly (other dtypes are inferred correctly)
+    numeric_fields = {
+        col_name: field
+        for col_name, field in (fields or {}).items()
+        if field.is_numeric() and col_name in data
+    }
+    if output in ("polars", "pandas"):
+        for col_name, field in numeric_fields.items():
+            _check_numeric_values(col_name, field, data[col_name])
 
     if output == "polars":
         if not _is_lib_present("polars"):
@@ -856,7 +901,29 @@ def _to_output_format(data: dict[str, list[Any]], output: str) -> Any:
             )
         import polars as pl
 
-        return pl.DataFrame(data)
+        schema_overrides = {
+            col_name: getattr(pl, field.dtype) for col_name, field in numeric_fields.items()
+        }
+
+        # A column with no values (no rows, or only nulls) would otherwise get the `Null` dtype;
+        # it can be given its field's dtype as there's no value that could conflict with it
+        empty_dtypes = {
+            "String": pl.String,
+            "Boolean": pl.Boolean,
+            "Date": pl.Date,
+            "Datetime": pl.Datetime("us"),
+            "Duration": pl.Duration("us"),
+            "Time": pl.Time,
+        }
+        for col_name, field in (fields or {}).items():
+            if (
+                field.dtype in empty_dtypes
+                and col_name in data
+                and all(value is None for value in data[col_name])
+            ):
+                schema_overrides[col_name] = empty_dtypes[field.dtype]
+
+        return pl.DataFrame(data, schema_overrides=schema_overrides)
 
     if output == "pandas":
         if not _is_lib_present("pandas"):
@@ -866,6 +933,20 @@ def _to_output_format(data: dict[str, list[Any]], output: str) -> Any:
             )
         import pandas as pd
 
-        return pd.DataFrame(data)
+        columns: dict[str, Any] = dict(data)
+        for col_name, field in numeric_fields.items():
+            values = data[col_name]
+            if field.is_float():
+                # NumPy floats hold missing values as NaN
+                dtype = field.dtype.lower()
+            elif field.nullable or any(value is None for value in values):
+                # A nullable integer column uses pandas' nullable dtype (e.g., `Int32`), since a
+                # NumPy integer can't be missing (and would otherwise become `float64`)
+                dtype = field.dtype
+            else:
+                dtype = field.dtype.lower()
+            columns[col_name] = pd.Series(values, dtype=dtype)
+
+        return pd.DataFrame(columns)
 
     raise ValueError(f"Unknown output format: {output}")
