@@ -712,8 +712,8 @@ Two additional validation methods support common data quality checks:
 ``` yaml
 steps:
   - data_freshness:
-      columns: event_date
-      freshness: "24h"
+      column: event_date
+      max_age: "24h"
 ```
 
 **`col_pct_null`**: Validate that the percentage of null values is within bounds:

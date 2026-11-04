@@ -824,54 +824,56 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a><span class="in">`max_age`</span> accepts strings like <span class="in">`"2h"`</span>, <span class="in">`"30m"`</span>, <span class="in">`"1d"`</span>, or</span>
-<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a><span class="in">`datetime.timedelta`</span> objects.</span>
-<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a><span class="fu">## Table comparison</span></span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a><span class="in">`datetime.timedelta`</span> objects. Data dated later than the reference time</span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>fails unless <span class="in">`allow_future=`</span> allows it (a duration such as <span class="in">`"1m"`</span> for</span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a>clock skew, or <span class="in">`True`</span> for any amount).</span>
 <span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a>.tbl_match(tbl_compare<span class="op">=</span>other_df, ...)</span>
-<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a><span class="fu">## Compound and custom checks</span></span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a><span class="fu">## Table comparison</span></span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a>.tbl_match(tbl_compare<span class="op">=</span>other_df, ...)</span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple conditions must all hold for each row</span></span>
-<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a>.conjointly(</span>
-<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a>    <span class="kw">lambda</span> v: v.col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>),</span>
-<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a>    <span class="kw">lambda</span> v: v.col_vals_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">100</span>),</span>
-<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a><span class="co"># Fully custom check</span></span>
-<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a>.specially(<span class="kw">lambda</span> tbl: <span class="bu">len</span>(tbl) <span class="op">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb4-140"><a href="#cb4-140" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-142"><a href="#cb4-142" aria-hidden="true" tabindex="-1"></a><span class="fu">## LLM-based validation</span></span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a><span class="fu">## Compound and custom checks</span></span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple conditions must all hold for each row</span></span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a>.conjointly(</span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a>    <span class="kw">lambda</span> v: v.col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>),</span>
+<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a>    <span class="kw">lambda</span> v: v.col_vals_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">100</span>),</span>
+<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-140"><a href="#cb4-140" aria-hidden="true" tabindex="-1"></a><span class="co"># Fully custom check</span></span>
+<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a>.specially(<span class="kw">lambda</span> tbl: <span class="bu">len</span>(tbl) <span class="op">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb4-142"><a href="#cb4-142" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb4-143"><a href="#cb4-143" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-144"><a href="#cb4-144" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb4-145"><a href="#cb4-145" aria-hidden="true" tabindex="-1"></a>.prompt(</span>
-<span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a>    prompt<span class="op">=</span><span class="st">"Check if product names are appropriate"</span>,</span>
-<span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-sonnet-4-6"</span>,</span>
-<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a>    columns_subset<span class="op">=</span>[<span class="st">"product_name"</span>],</span>
-<span id="cb4-149"><a href="#cb4-149" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span><span class="dv">1000</span>,</span>
-<span id="cb4-150"><a href="#cb4-150" aria-hidden="true" tabindex="-1"></a>    max_concurrent<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb4-151"><a href="#cb4-151" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-152"><a href="#cb4-152" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-153"><a href="#cb4-153" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-154"><a href="#cb4-154" aria-hidden="true" tabindex="-1"></a><span class="fu">## Common parameters</span></span>
+<span id="cb4-144"><a href="#cb4-144" aria-hidden="true" tabindex="-1"></a><span class="fu">## LLM-based validation</span></span>
+<span id="cb4-145"><a href="#cb4-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a>.prompt(</span>
+<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a>    prompt<span class="op">=</span><span class="st">"Check if product names are appropriate"</span>,</span>
+<span id="cb4-149"><a href="#cb4-149" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-sonnet-4-6"</span>,</span>
+<span id="cb4-150"><a href="#cb4-150" aria-hidden="true" tabindex="-1"></a>    columns_subset<span class="op">=</span>[<span class="st">"product_name"</span>],</span>
+<span id="cb4-151"><a href="#cb4-151" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span><span class="dv">1000</span>,</span>
+<span id="cb4-152"><a href="#cb4-152" aria-hidden="true" tabindex="-1"></a>    max_concurrent<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb4-153"><a href="#cb4-153" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-154"><a href="#cb4-154" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb4-155"><a href="#cb4-155" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-156"><a href="#cb4-156" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Parameter    <span class="pp">|</span> Type                    <span class="pp">|</span> Description                              <span class="pp">|</span></span>
-<span id="cb4-157"><a href="#cb4-157" aria-hidden="true" tabindex="-1"></a><span class="pp">|--------------|-------------------------|------------------------------------------|</span></span>
-<span id="cb4-158"><a href="#cb4-158" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`columns`</span>    <span class="pp">|</span> <span class="in">`str \| list \| selector`</span> <span class="pp">|</span> Target column(s)                       <span class="pp">|</span></span>
-<span id="cb4-159"><a href="#cb4-159" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`value`</span>      <span class="pp">|</span> <span class="in">`numeric \| col()`</span>      <span class="pp">|</span> Comparison value or column reference     <span class="pp">|</span></span>
-<span id="cb4-160"><a href="#cb4-160" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`na_pass`</span>    <span class="pp">|</span> <span class="in">`bool`</span>                  <span class="pp">|</span> Treat nulls as passing (default <span class="in">`False`</span>) <span class="pp">|</span></span>
-<span id="cb4-161"><a href="#cb4-161" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`missing`</span>    <span class="pp">|</span> <span class="in">`MissingSpec`</span>           <span class="pp">|</span> Structured missingness definition        <span class="pp">|</span></span>
-<span id="cb4-162"><a href="#cb4-162" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`pre`</span>        <span class="pp">|</span> <span class="in">`Callable`</span>              <span class="pp">|</span> Transform data before check              <span class="pp">|</span></span>
-<span id="cb4-163"><a href="#cb4-163" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`segments`</span>   <span class="pp">|</span> <span class="in">`SegmentSpec`</span>           <span class="pp">|</span> Segment validation by groups             <span class="pp">|</span></span>
-<span id="cb4-164"><a href="#cb4-164" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`thresholds`</span> <span class="pp">|</span> <span class="in">`Thresholds`</span>            <span class="pp">|</span> Per-step failure thresholds              <span class="pp">|</span></span>
-<span id="cb4-165"><a href="#cb4-165" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`actions`</span>    <span class="pp">|</span> <span class="in">`Actions`</span>               <span class="pp">|</span> Per-step actions on threshold breach     <span class="pp">|</span></span>
-<span id="cb4-166"><a href="#cb4-166" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`brief`</span>      <span class="pp">|</span> <span class="in">`str \| bool`</span>           <span class="pp">|</span> Step description text                    <span class="pp">|</span></span>
-<span id="cb4-167"><a href="#cb4-167" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`active`</span>     <span class="pp">|</span> <span class="in">`bool \| Callable`</span>      <span class="pp">|</span> Conditionally skip step                  <span class="pp">|</span></span>
-<span id="cb4-168"><a href="#cb4-168" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`dimension`</span>  <span class="pp">|</span> <span class="in">`str`</span>                   <span class="pp">|</span> Tag for dimensional scoring              <span class="pp">|</span></span></code></pre></div>
+<span id="cb4-156"><a href="#cb4-156" aria-hidden="true" tabindex="-1"></a><span class="fu">## Common parameters</span></span>
+<span id="cb4-157"><a href="#cb4-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-158"><a href="#cb4-158" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Parameter    <span class="pp">|</span> Type                    <span class="pp">|</span> Description                              <span class="pp">|</span></span>
+<span id="cb4-159"><a href="#cb4-159" aria-hidden="true" tabindex="-1"></a><span class="pp">|--------------|-------------------------|------------------------------------------|</span></span>
+<span id="cb4-160"><a href="#cb4-160" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`columns`</span>    <span class="pp">|</span> <span class="in">`str \| list \| selector`</span> <span class="pp">|</span> Target column(s)                       <span class="pp">|</span></span>
+<span id="cb4-161"><a href="#cb4-161" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`value`</span>      <span class="pp">|</span> <span class="in">`numeric \| col()`</span>      <span class="pp">|</span> Comparison value or column reference     <span class="pp">|</span></span>
+<span id="cb4-162"><a href="#cb4-162" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`na_pass`</span>    <span class="pp">|</span> <span class="in">`bool`</span>                  <span class="pp">|</span> Treat nulls as passing (default <span class="in">`False`</span>) <span class="pp">|</span></span>
+<span id="cb4-163"><a href="#cb4-163" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`missing`</span>    <span class="pp">|</span> <span class="in">`MissingSpec`</span>           <span class="pp">|</span> Structured missingness definition        <span class="pp">|</span></span>
+<span id="cb4-164"><a href="#cb4-164" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`pre`</span>        <span class="pp">|</span> <span class="in">`Callable`</span>              <span class="pp">|</span> Transform data before check              <span class="pp">|</span></span>
+<span id="cb4-165"><a href="#cb4-165" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`segments`</span>   <span class="pp">|</span> <span class="in">`SegmentSpec`</span>           <span class="pp">|</span> Segment validation by groups             <span class="pp">|</span></span>
+<span id="cb4-166"><a href="#cb4-166" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`thresholds`</span> <span class="pp">|</span> <span class="in">`Thresholds`</span>            <span class="pp">|</span> Per-step failure thresholds              <span class="pp">|</span></span>
+<span id="cb4-167"><a href="#cb4-167" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`actions`</span>    <span class="pp">|</span> <span class="in">`Actions`</span>               <span class="pp">|</span> Per-step actions on threshold breach     <span class="pp">|</span></span>
+<span id="cb4-168"><a href="#cb4-168" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`brief`</span>      <span class="pp">|</span> <span class="in">`str \| bool`</span>           <span class="pp">|</span> Step description text                    <span class="pp">|</span></span>
+<span id="cb4-169"><a href="#cb4-169" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`active`</span>     <span class="pp">|</span> <span class="in">`bool \| Callable`</span>      <span class="pp">|</span> Conditionally skip step                  <span class="pp">|</span></span>
+<span id="cb4-170"><a href="#cb4-170" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`dimension`</span>  <span class="pp">|</span> <span class="in">`str`</span>                   <span class="pp">|</span> Tag for dimensional scoring              <span class="pp">|</span></span></code></pre></div>
 </pre>
 </div>
 <div class="gd-skill-panel" hidden="">

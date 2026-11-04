@@ -916,8 +916,10 @@ Examples:
 
 ``` yaml
 - data_freshness:
-    columns: [date_column]             # REQUIRED: Date/datetime column
-    freshness: "24h"                   # REQUIRED: Maximum age of data
+    column: date_column                # REQUIRED: Date/datetime column
+    max_age: "24h"                     # REQUIRED: Maximum age of data
+    timezone: "UTC"                    # OPTIONAL: Timezone for naive datetimes
+    allow_future: "5m"                 # OPTIONAL: Allow data this far ahead (true for any amount)
     thresholds:                        # OPTIONAL: Step-level thresholds
       warning: 0.1
     actions:                           # OPTIONAL: Step-level actions

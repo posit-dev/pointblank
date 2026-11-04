@@ -4,7 +4,7 @@ Validate that data in a datetime column is not older than a specified maximum ag
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14811-L15212)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14817-L15287)
 
 ``` python
 Validate.data_freshness(
@@ -13,6 +13,7 @@ Validate.data_freshness(
     reference_time=None,
     timezone=None,
     allow_tz_mismatch=False,
+    allow_future=False,
     pre=None,
     thresholds=None,
     actions=None,
@@ -24,7 +25,7 @@ Validate.data_freshness(
 
 The `data_freshness()` validation method checks whether the most recent timestamp in the specified datetime column is within the allowed `max_age=` from the `reference_time=` (which defaults to the current time). This is useful for ensuring data pipelines are delivering fresh data and for enforcing data SLAs.
 
-This method helps detect stale data by comparing the maximum (most recent) value in a datetime column against an expected freshness threshold.
+This method helps detect stale data by comparing the maximum (most recent) value in a datetime column against an expected freshness threshold. Data dated later than the reference time fails too, unless `allow_future=` permits it (see the *Future-Dated Data* section).
 
 ## Parameters
 
@@ -42,6 +43,9 @@ The timezone to use for interpreting the data and reference time. Accepts IANA t
 
 `allow_tz_mismatch: bool = False`  
 Whether to allow timezone mismatches between the column data and reference time. By default (`False`), a warning note is added when comparing timezone-naive with timezone-aware datetimes. Set to `True` to suppress these warnings.
+
+`allow_future: bool | str | datetime.timedelta = False`  
+How far the most recent timestamp may be later than the reference time. The default, `False`, makes the step fail when any timestamp is later than the reference time. A duration (a string like `"5 minutes"` or a `datetime.timedelta`) allows timestamps up to that far ahead, which absorbs small differences between the clocks that wrote the data and the clock that runs the validation. Use `True` to allow future-dated data of any amount. See the *Future-Dated Data* section for details.
 
 `pre: Callable | None = None`  
 An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table.
@@ -157,6 +161,12 @@ When working with datetime data, storing timestamps in UTC in your databases is 
 
 If you're working with naive datetimes (which lack timezone information), always specify the `timezone=` parameter so Pointblank knows how to interpret those values. When providing `reference_time=` as a string, use ISO 8601 format with the timezone offset included (e.g., `"2024-01-15T10:30:00+00:00"`) to ensure unambiguous parsing. Finally, prefer IANA timezone names (like `"America/New_York"`) over fixed offsets (like `"-05:00"`) when daylight saving time transitions matter, since IANA names automatically handle the twice-yearly offset changes. To see all available IANA timezone names in Python, use `zoneinfo.available_timezones()` from the standard library's `zoneinfo` module.
 
+## Future-Dated Data
+
+When the most recent timestamp is later than the reference time, the data's age is negative. This usually points to a problem: a clock that is set wrong, a timezone mix-up when the data was loaded, or a snapshot validated against a `reference_time=` that comes before it. By default, such a step fails, and the report notes how far ahead of the reference time the data is.
+
+The `allow_future=` parameter changes this. A small duration such as `allow_future="1m"` is useful when the reference time is the current time and the data comes from a system whose clock may run slightly ahead. Timestamps up to that far ahead pass, while anything further ahead still fails. With `allow_future=True`, any amount of future-dated data passes, and only `max_age=` is checked.
+
 ## Examples
 
 The simplest use of `data_freshness()` requires just two arguments: the `column=` containing your timestamps and `max_age=` specifying how old the data can be. In this first example, we create sample data with an `"updated_at"` column containing timestamps from 1, 12, and 20 hours ago. By setting `max_age="24 hours"`, we're asserting that the most recent timestamp should be within 24 hours of the current time. Since the newest record is only 1 hour old, this validation passes.
@@ -267,3 +277,35 @@ validation
 [TABLE]
 
 The newest timestamp is two hours before the reference time, so the 24-hour step passes and the 1-hour step fails. Because neither the data nor the reference time depend on the current time, this validation gives the same result whenever it runs.
+
+If the reference time comes before the newest timestamp, the data is future-dated. Here the reference time is two hours before the newest record. The first step fails because of that, the second step allows timestamps up to three hours ahead, and the third allows future-dated data of any amount.
+
+``` python
+validation = (
+    pb.Validate(data=snapshot_data)
+    .data_freshness(
+        column="updated_at",
+        max_age="24 hours",
+        reference_time="2024-01-15T08:00:00+00:00"
+    )
+    .data_freshness(
+        column="updated_at",
+        max_age="24 hours",
+        reference_time="2024-01-15T08:00:00+00:00",
+        allow_future="3 hours"
+    )
+    .data_freshness(
+        column="updated_at",
+        max_age="24 hours",
+        reference_time="2024-01-15T08:00:00+00:00",
+        allow_future=True
+    )
+    .interrogate()
+)
+
+validation
+```
+
+[TABLE]
+
+The steps that allow future-dated data say so below `max_age=` in the report, and the note for each step gives how far ahead of the reference time the newest record is.

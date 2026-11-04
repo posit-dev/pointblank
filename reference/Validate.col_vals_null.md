@@ -4,7 +4,7 @@ Validate whether values in a column are Null.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10371-L10635)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10377-L10641)
 
 ``` python
 Validate.col_vals_null(

@@ -10208,7 +10208,7 @@ validation
 The validation table shows that the expectation value of `11` matches the actual count of
 columns in the target table. So, the single test unit passed.
 
-data_freshness(self, column: 'str', max_age: 'str | datetime.timedelta', reference_time: 'datetime.datetime | str | None' = None, timezone: 'str | None' = None, allow_tz_mismatch: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+data_freshness(self, column: 'str', max_age: 'str | datetime.timedelta', reference_time: 'datetime.datetime | str | None' = None, timezone: 'str | None' = None, allow_tz_mismatch: 'bool' = False, allow_future: 'bool | str | datetime.timedelta' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
 Validate that data in a datetime column is not older than a specified maximum age.
 
@@ -10218,7 +10218,9 @@ defaults to the current time). This is useful for ensuring data pipelines are de
 fresh data and for enforcing data SLAs.
 
 This method helps detect stale data by comparing the maximum (most recent) value in a
-datetime column against an expected freshness threshold.
+datetime column against an expected freshness threshold. Data dated later than the
+reference time fails too, unless `allow_future=` permits it (see the *Future-Dated Data*
+section).
 
 Parameters
 ----------
@@ -10245,6 +10247,13 @@ allow_tz_mismatch
     Whether to allow timezone mismatches between the column data and reference time.
     By default (`False`), a warning note is added when comparing timezone-naive with
     timezone-aware datetimes. Set to `True` to suppress these warnings.
+allow_future
+    How far the most recent timestamp may be later than the reference time. The default,
+    `False`, makes the step fail when any timestamp is later than the reference time. A
+    duration (a string like `"5 minutes"` or a `datetime.timedelta`) allows timestamps up to
+    that far ahead, which absorbs small differences between the clocks that wrote the data
+    and the clock that runs the validation. Use `True` to allow future-dated data of any
+    amount. See the *Future-Dated Data* section for details.
 pre
     An optional preprocessing function or lambda to apply to the data table during
     interrogation. This function should take a table as input and return a modified table.
@@ -10400,6 +10409,20 @@ time transitions matter, since IANA names automatically handle the twice-yearly 
 changes. To see all available IANA timezone names in Python, use
 `zoneinfo.available_timezones()` from the standard library's `zoneinfo` module.
 
+Future-Dated Data
+-----------------
+When the most recent timestamp is later than the reference time, the data's age is negative.
+This usually points to a problem: a clock that is set wrong, a timezone mix-up when the data
+was loaded, or a snapshot validated against a `reference_time=` that comes before it. By
+default, such a step fails, and the report notes how far ahead of the reference time the
+data is.
+
+The `allow_future=` parameter changes this. A small duration such as `allow_future="1m"` is
+useful when the reference time is the current time and the data comes from a system whose
+clock may run slightly ahead. Timestamps up to that far ahead pass, while anything further
+ahead still fails. With `allow_future=True`, any amount of future-dated
+data passes, and only `max_age=` is checked.
+
 Examples
 --------
 ```{python}
@@ -10530,6 +10553,40 @@ validation
 The newest timestamp is two hours before the reference time, so the 24-hour step passes and
 the 1-hour step fails. Because neither the data nor the reference time depend on the current
 time, this validation gives the same result whenever it runs.
+
+If the reference time comes before the newest timestamp, the data is future-dated. Here the
+reference time is two hours before the newest record. The first step fails because of
+that, the second step allows timestamps up to three hours ahead, and the third allows
+future-dated data of any amount.
+
+```{python}
+validation = (
+    pb.Validate(data=snapshot_data)
+    .data_freshness(
+        column="updated_at",
+        max_age="24 hours",
+        reference_time="2024-01-15T08:00:00+00:00"
+    )
+    .data_freshness(
+        column="updated_at",
+        max_age="24 hours",
+        reference_time="2024-01-15T08:00:00+00:00",
+        allow_future="3 hours"
+    )
+    .data_freshness(
+        column="updated_at",
+        max_age="24 hours",
+        reference_time="2024-01-15T08:00:00+00:00",
+        allow_future=True
+    )
+    .interrogate()
+)
+
+validation
+```
+
+The steps that allow future-dated data say so below `max_age=` in the report, and the note
+for each step gives how far ahead of the reference time the newest record is.
 
 tbl_match(self, tbl_compare: 'Any', keys: 'str | list[str] | None' = None, columns: 'str | list[str] | None' = None, column_map: 'dict[str, str] | None' = None, tolerance: 'Any' = None, normalize: 'dict[str, Any] | None' = None, null_equal: 'bool' = True, schema: "Literal['strict', 'common']" = 'strict', dup_keys: "Literal['flag', 'compare']" = 'flag', order_by: 'str | list[str] | None' = None, partitions: 'int | None' = None, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
@@ -23116,8 +23173,8 @@ Check that a date/datetime column has recent data using `data_freshness`:
 tbl: events.csv
 steps:
 - data_freshness:
-    columns: event_date
-    freshness: "24h"
+    column: event_date
+    max_age: "24h"
 ```
 
 ### Active Parameter Shortcut
@@ -31063,6 +31120,11 @@ When validation succeeds, the report includes details about the data's age in th
 fails, you'll see exactly how old the most recent data is and what threshold was exceeded. This
 context helps quickly diagnose whether you're dealing with a minor delay or a major pipeline
 failure.
+
+Data that is dated later than the comparison time also fails, since timestamps from the future
+usually mean a clock is set wrong or a timezone was mixed up when the data was loaded. If the system
+that writes the data has a clock that may run slightly ahead, allow a small margin with something
+like `allow_future="1m"`. To accept future-dated data of any amount, use `allow_future=True`.
 
 Data freshness validation is particularly valuable for:
 
@@ -40954,8 +41016,8 @@ Two additional validation methods support common data quality checks:
 ```yaml
 steps:
   - data_freshness:
-      columns: event_date
-      freshness: "24h"
+      column: event_date
+      max_age: "24h"
 ```
 
 **`col_pct_null`**: Validate that the percentage of null values is within bounds:
@@ -42187,8 +42249,10 @@ Examples:
 
 ```yaml
 - data_freshness:
-    columns: [date_column]             # REQUIRED: Date/datetime column
-    freshness: "24h"                   # REQUIRED: Maximum age of data
+    column: date_column                # REQUIRED: Date/datetime column
+    max_age: "24h"                     # REQUIRED: Maximum age of data
+    timezone: "UTC"                    # OPTIONAL: Timezone for naive datetimes
+    allow_future: "5m"                 # OPTIONAL: Allow data this far ahead (true for any amount)
     thresholds:                        # OPTIONAL: Step-level thresholds
       warning: 0.1
     actions:                           # OPTIONAL: Step-level actions
