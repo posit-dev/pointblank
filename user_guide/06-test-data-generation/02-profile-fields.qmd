@@ -125,8 +125,12 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=100, seed=23))
 ```
 
-Each prefixed group maintains its own coherence: the sender's email is derived from the sender's
-name, and the recipient's email from the recipient's name.
+Each prefixed profile is a separate person with its own coherence: the sender's email is derived
+from the sender's name, and the recipient's email from the recipient's name. The two profiles also
+get their own locations and employers, so a row's sender and recipient are independent of each
+other. Other preset columns whose names start with a profile's prefix (e.g., a hand-written
+`sender_city=pb.string_field(preset="city")` added to a `"minimal"` sender profile) belong to that
+profile.
 
 ## Combining with Other Field Types
 
