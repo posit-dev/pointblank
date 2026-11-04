@@ -23186,15 +23186,235 @@ def test_data_freshness_future_data() -> None:
 
     df = pl.DataFrame({"updated_at": [future_data]})
 
-    # Negative age (future data) - should pass since it's "fresh"
+    # Negative age (future data) fails by default, however small `max_age=` is
+    validation = (
+        Validate(df, thresholds=(1,))
+        .data_freshness(column="updated_at", max_age="1 hour", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 0
+    assert validation.n_failed(i=1, scalar=True) == 1
+
+    step = validation.validation_info[0]
+    assert step.val_info["future"] is True
+    assert step.val_info["age"] == datetime.timedelta(hours=-1)
+    assert step.notes["freshness_details"]["text"] == (
+        "Most recent data: `2024-06-15 13:00:00` (1.0h later than the reference time)"
+    )
+    assert step.notes["freshness_details"]["markdown"].startswith("✗ ")
+    assert "**1.0h**" in step.notes["freshness_details"]["markdown"]
+    assert step.failure_text == (
+        "Data in column `updated_at` is dated 1.0h later than the reference time."
+    )
+
+
+def _freshness_tbl(tbl_type: str, values: list):
+    df = pl.DataFrame({"updated_at": values})
+    if tbl_type == "polars":
+        return df
+    if tbl_type == "pandas":
+        return df.to_pandas()
+    return ibis.memtable(df.to_arrow())
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+@pytest.mark.parametrize(
+    "allow_future, passed",
+    [
+        (False, False),
+        (True, True),
+        ("30 minutes", False),
+        ("1 hour", True),
+        ("2h", True),
+        (datetime.timedelta(minutes=59), False),
+        (datetime.timedelta(hours=2), True),
+    ],
+)
+def test_data_freshness_allow_future(tbl_type, allow_future, passed) -> None:
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    tbl = _freshness_tbl(
+        tbl_type, [ref_time - datetime.timedelta(days=1), ref_time + datetime.timedelta(hours=1)]
+    )
+
+    validation = (
+        Validate(tbl)
+        .data_freshness(
+            column="updated_at",
+            max_age="1 hour",
+            reference_time=ref_time,
+            allow_future=allow_future,
+        )
+        .interrogate()
+    )
+
+    step = validation.validation_info[0]
+    assert step.all_passed is passed
+    assert step.val_info["future"] is True
+    assert "1.0h later than the reference time" in step.notes["freshness_details"]["text"]
+    assert step.notes["freshness_details"]["markdown"].startswith("✓ " if passed else "✗ ")
+
+
+def test_data_freshness_allow_future_still_checks_max_age() -> None:
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    df = pl.DataFrame({"updated_at": [ref_time - datetime.timedelta(hours=3)]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at", max_age="1 hour", reference_time=ref_time, allow_future=True
+        )
+        .data_freshness(
+            column="updated_at", max_age="1 hour", reference_time=ref_time, allow_future="1h"
+        )
+        .interrogate()
+    )
+
+    assert [step.all_passed for step in validation.validation_info] == [False, False]
+    assert all(not step.val_info["future"] for step in validation.validation_info)
+
+
+def test_data_freshness_age_zero_passes_with_note() -> None:
+    # Data exactly at the reference time is not future-dated
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    df = pl.DataFrame({"updated_at": [ref_time]})
+
     validation = (
         Validate(df)
         .data_freshness(column="updated_at", max_age="1 hour", reference_time=ref_time)
         .interrogate()
     )
 
-    # Future data has negative age, which is <= max_age
-    assert validation.n_passed(i=1, scalar=True) == 1
+    step = validation.validation_info[0]
+    assert step.all_passed is True
+    assert step.val_info["future"] is False
+    assert step.notes["freshness_details"]["text"] == (
+        "Most recent data: `2024-06-15 12:00:00` (age: 0.0s, max allowed: 1.0h)"
+    )
+
+
+def test_data_freshness_future_data_against_current_time() -> None:
+    now = datetime.datetime.now(datetime.timezone.utc)
+    df = pl.DataFrame({"updated_at": [now + datetime.timedelta(hours=1)]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 day")
+        .data_freshness(column="updated_at", max_age="1 day", allow_future="2 hours")
+        .interrogate()
+    )
+
+    assert [step.all_passed for step in validation.validation_info] == [False, True]
+
+
+def test_data_freshness_future_note_is_localized() -> None:
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    df = pl.DataFrame({"updated_at": [ref_time + datetime.timedelta(hours=2)]})
+
+    validation = (
+        Validate(df, locale="de")
+        .data_freshness(column="updated_at", max_age="1 hour", reference_time=ref_time)
+        .interrogate()
+    )
+
+    note = validation.validation_info[0].notes["freshness_details"]
+    assert note["text"] == "Neueste Daten: `2024-06-15 14:00:00` (2.0h nach der Referenzzeit)"
+    assert (
+        note["markdown"]
+        == "✗ Neueste Daten: `2024-06-15 14:00:00` (**2.0h** nach der Referenzzeit)"
+    )
+
+
+@pytest.mark.parametrize(
+    "allow_future, error, match",
+    [
+        (None, TypeError, "`allow_future` parameter must be a boolean"),
+        (5, TypeError, "`allow_future` parameter must be a boolean"),
+        ("soon", ValueError, "Invalid allow_future format"),
+        (datetime.timedelta(minutes=-1), ValueError, "must not be negative"),
+    ],
+)
+def test_data_freshness_allow_future_invalid(allow_future, error, match) -> None:
+    df = pl.DataFrame({"updated_at": [datetime.datetime(2024, 6, 15, 12, 0, 0)]})
+
+    with pytest.raises(error, match=match):
+        Validate(df).data_freshness(column="updated_at", max_age="1h", allow_future=allow_future)
+
+
+def test_data_freshness_allow_future_serialization() -> None:
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    df = pl.DataFrame({"updated_at": [ref_time + datetime.timedelta(minutes=30)]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1h", reference_time=ref_time)
+        .data_freshness(
+            column="updated_at", max_age="1h", reference_time=ref_time, allow_future=True
+        )
+        .data_freshness(
+            column="updated_at", max_age="1h", reference_time=ref_time, allow_future="45 minutes"
+        )
+        .data_freshness(
+            column="updated_at",
+            max_age=datetime.timedelta(hours=1, minutes=30),
+            reference_time=ref_time,
+            allow_future=datetime.timedelta(minutes=10),
+        )
+    )
+
+    code = validation.to_code()
+    assert code.count("allow_future=") == 3
+    assert "allow_future=True" in code
+    assert 'allow_future="45 minutes"' in code
+    assert 'max_age="1h 30m"' in code
+    assert 'allow_future="10m"' in code
+
+    # The YAML round trip gives the same plan and the same results
+    from pointblank.yaml import yaml_interrogate
+
+    yaml_validation = yaml_interrogate(validation.to_yaml(), set_tbl=df)
+    original = validation.interrogate()
+    assert [step.values["allow_future"] for step in yaml_validation.validation_info] == [
+        False,
+        True,
+        datetime.timedelta(minutes=45),
+        datetime.timedelta(minutes=10),
+    ]
+    assert yaml_validation.validation_info[3].values["max_age"] == datetime.timedelta(
+        hours=1, minutes=30
+    )
+    assert (
+        [step.all_passed for step in yaml_validation.validation_info]
+        == [step.all_passed for step in original.validation_info]
+        == [False, True, True, False]
+    )
+
+
+def test_data_freshness_allow_future_in_reports() -> None:
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    df = pl.DataFrame({"updated_at": [ref_time + datetime.timedelta(minutes=30)]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1h", reference_time=ref_time)
+        .data_freshness(
+            column="updated_at", max_age="1h", reference_time=ref_time, allow_future=True
+        )
+        .data_freshness(
+            column="updated_at", max_age="1h", reference_time=ref_time, allow_future="45m"
+        )
+        .interrogate()
+    )
+
+    report_html = validation.get_tabular_report().as_raw_html()
+    assert "+future" in report_html
+    assert "+45.0m future" in report_html
+
+    step_reports = [validation.get_step_report(i=i).as_raw_html() for i in (1, 2, 3)]
+    assert "0 &le; AGE(MAX(updated_at)) &le; 1.0h" in step_reports[0]
+    assert "&le; AGE(MAX(updated_at))" not in step_reports[1]
+    assert "-45.0m &le; AGE(MAX(updated_at)) &le; 1.0h" in step_reports[2]
+    assert "-30.0m" in step_reports[0]
 
 
 def test_data_freshness_empty_dataframe() -> None:
