@@ -104,7 +104,7 @@ pb.duration_field(
 
 ```python
 pb.profile_fields(
-    set: str = "standard",        # "standard" or "extended"
+    set: str = "standard",        # "minimal", "standard" or "full"
     split_name: bool = True,      # first_name + last_name vs name
     include: list[str] | None = None,
     exclude: list[str] | None = None,
@@ -115,7 +115,14 @@ pb.profile_fields(
 Returns a dict of StringField objects suitable for `**`-unpacking
 into `Schema()`.
 
-Standard set includes: name (or first_name + last_name), email,
-phone_number, address, city, country.
+Minimal set: first_name + last_name (or name), email, phone_number.
 
-Extended set adds: company, job, url, and more.
+Standard set: first_name + last_name (or name), email, city, state,
+postcode, phone_number.
+
+Full set: the standard set plus address, company, job.
+
+Each `prefix=` makes a separate person: two prefixed profiles in one
+schema (e.g., `customer_` and `seller_`) get different names,
+locations and employers in each row. Other preset columns whose names
+start with the prefix belong to that profile.

@@ -174,11 +174,11 @@ Generate person-related fields as a group:
 
 ```python
 fields = pb.profile_fields(
-    set="standard",        # "standard" or "extended"
+    set="standard",        # "minimal", "standard" or "full"
     split_name=True,       # first_name + last_name vs full name
     include=None,          # specific fields to include
     exclude=None,          # specific fields to exclude
-    prefix=None,           # prefix for field names
+    prefix=None,           # prefix for field names (each prefix is a separate person)
 )
 
 schema = pb.Schema(

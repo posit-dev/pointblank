@@ -659,32 +659,67 @@ def generate_dataframe(
     return _to_output_format(data, config.output, fields)
 
 
-def _generate_single_country(
+def _get_coherence_groups(fields: dict[str, Field]) -> dict[str | None, dict[str, Field]]:
+    """
+    Split the preset fields into groups that each share one row context.
+
+    Fields from a `profile_fields(prefix=)` call form a group keyed by the prefix, and other
+    preset fields whose column names start with one of those prefixes join that group (e.g., a
+    hand-written `customer_city` column joins the `"customer_"` profile). All remaining preset
+    fields form the `None` group. Groups are ordered by their first column in the schema.
+    """
+    prefixes = sorted(
+        {
+            group
+            for field in fields.values()
+            if (group := getattr(field, "_coherence_group", None)) is not None
+        },
+        key=len,
+        reverse=True,
+    )
+
+    groups: dict[str | None, dict[str, Field]] = {}
+    for col_name, field in fields.items():
+        if getattr(field, "preset", None) is None:
+            continue
+        group = getattr(field, "_coherence_group", None)
+        if group is None:
+            group = next((prefix for prefix in prefixes if col_name.startswith(prefix)), None)
+        groups.setdefault(group, {})[col_name] = field
+
+    return groups
+
+
+def _generate_coherent_group(
     fields: dict[str, Field],
     config: GeneratorConfig,
     country: str,
+    seed: int | None,
 ) -> dict[str, list[Any]]:
-    """Generate data for a single country (original code path)."""
-    # Check what coherence is needed
-    needs_address, needs_person, needs_business, needs_credit_card = _get_coherence_needs(fields)
-    needs_coherence = needs_address or needs_person or needs_business or needs_credit_card
+    """
+    Generate the coherent columns of one coherence group, sharing one row context.
 
-    # Set up shared locale generator if any coherence is needed
-    shared_locale_gen = None
-    if needs_coherence:
-        shared_locale_gen = _get_locale_generator(country, config.seed, config.weighted)
-        if needs_address:
+    Returns only the columns that take part in coherence; the other preset columns of the group
+    are left to `generate_column()`.
+    """
+    needs_address, needs_person, needs_business, needs_credit_card = _get_coherence_needs(fields)
+    if not (needs_address or needs_person or needs_business or needs_credit_card):
+        return {}
+
+    # Set up the shared locale generator for this group
+    shared_locale_gen = _get_locale_generator(country, seed, config.weighted)
+    if needs_address:
+        shared_locale_gen.init_row_locations(config.n)
+    if needs_person:
+        shared_locale_gen.init_row_persons(config.n)
+    if needs_business:
+        # Business coherence also needs location context for templates like
+        # "{city} General Hospital", so init locations if not already done
+        if not needs_address:
             shared_locale_gen.init_row_locations(config.n)
-        if needs_person:
-            shared_locale_gen.init_row_persons(config.n)
-        if needs_business:
-            # Business coherence also needs location context for templates like
-            # "{city} General Hospital", so init locations if not already done
-            if not needs_address:
-                shared_locale_gen.init_row_locations(config.n)
-            shared_locale_gen.init_row_employers(config.n)
-        if needs_credit_card:
-            shared_locale_gen.init_row_card_prefixes(config.n)
+        shared_locale_gen.init_row_employers(config.n)
+    if needs_credit_card:
+        shared_locale_gen.init_row_card_prefixes(config.n)
 
     # Determine which presets need row context
     coherent_presets = set()
@@ -697,10 +732,47 @@ def _generate_single_country(
     if needs_credit_card:
         coherent_presets.update(CREDIT_CARD_RELATED_PRESETS)
 
+    coherent_fields = {
+        col_name: field
+        for col_name, field in fields.items()
+        if getattr(field, "preset", None) in coherent_presets
+    }
+
+    # Coherent columns with `unique=True` must be generated together, row by row, so that a
+    # duplicate can be resolved by re-drawing the row's shared context
+    if any(field.unique for field in coherent_fields.values()):
+        data = _generate_unique_columns_with_row_context(coherent_fields, config, shared_locale_gen)
+    else:
+        data = {
+            col_name: _generate_column_with_row_context(field, config, shared_locale_gen)
+            for col_name, field in coherent_fields.items()
+        }
+
+    # Clean up
+    if needs_address or needs_business:
+        shared_locale_gen.clear_row_locations()
+    if needs_person:
+        shared_locale_gen.clear_row_persons()
+    if needs_business:
+        shared_locale_gen.clear_row_employers()
+    if needs_credit_card:
+        shared_locale_gen.clear_row_card_prefixes()
+
+    return data
+
+
+def _generate_single_country(
+    fields: dict[str, Field],
+    config: GeneratorConfig,
+    country: str,
+) -> dict[str, list[Any]]:
+    """Generate data for a single country (original code path)."""
+    groups = _get_coherence_groups(fields)
+
     # When business coherence is active, constrain age-like integer columns to
     # working-age range so generated data doesn't have 15-year-old professionals
     # or 85-year-old active employees with fictitious employers.
-    if needs_business:
+    if any(_get_coherence_needs(group_fields)[2] for group_fields in groups.values()):
         fields = dict(fields)  # shallow copy so we don't mutate the caller's dict
         for col_name, col_field in list(fields.items()):
             if col_field.is_integer() and _AGE_COLUMN_RE.search(col_name):
@@ -716,40 +788,24 @@ def _generate_single_country(
                 if new_min != cur_min or new_max != cur_max:
                     fields[col_name] = dc_replace(col_field, min_val=new_min, max_val=new_max)
 
-    # Coherent columns with `unique=True` must be generated together, row by row, so that a
-    # duplicate can be resolved by re-drawing the row's shared context
-    coherent_fields = {
-        col_name: field
-        for col_name, field in fields.items()
-        if needs_coherence and getattr(field, "preset", None) in coherent_presets
-    }
-    unique_coherent_data: dict[str, list[Any]] = {}
-    if any(field.unique for field in coherent_fields.values()):
-        unique_coherent_data = _generate_unique_columns_with_row_context(
-            coherent_fields, config, shared_locale_gen
-        )
+    # Each coherence group (e.g., the `customer_` and `seller_` profiles) gets its own row
+    # context. The first group uses the base seed, so a schema with a single group generates the
+    # same data as with one shared context; later groups get a seed derived from their prefix.
+    coherent_data: dict[str, list[Any]] = {}
+    for group, group_fields in groups.items():
+        if not coherent_data or config.seed is None:
+            group_seed = config.seed
+        else:
+            group_seed = random.Random(f"{config.seed}:{group or ''}").getrandbits(32)
+        coherent_data.update(_generate_coherent_group(group_fields, config, country, group_seed))
 
     # Generate data for each column
     data: dict[str, list[Any]] = {}
     for col_name, field in fields.items():
-        if col_name in unique_coherent_data:
-            data[col_name] = unique_coherent_data[col_name]
-        elif col_name in coherent_fields:
-            # Use shared locale generator for coherent presets
-            data[col_name] = _generate_column_with_row_context(field, config, shared_locale_gen)
+        if col_name in coherent_data:
+            data[col_name] = coherent_data[col_name]
         else:
             data[col_name] = generate_column(field, config)
-
-    # Clean up
-    if shared_locale_gen is not None:
-        if needs_address or needs_business:
-            shared_locale_gen.clear_row_locations()
-        if needs_person:
-            shared_locale_gen.clear_row_persons()
-        if needs_business:
-            shared_locale_gen.clear_row_employers()
-        if needs_credit_card:
-            shared_locale_gen.clear_row_card_prefixes()
 
     return data
 

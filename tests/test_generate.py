@@ -17,6 +17,7 @@ from pointblank.field import (
 )
 from pointblank.generate.base import GeneratorConfig
 from pointblank.generate.generators import (
+    _get_coherence_groups,
     generate_column,
     generate_dataframe,
 )
@@ -465,6 +466,62 @@ class TestGenerateCoherentUnique:
         config = GeneratorConfig(n=2000, seed=99, country="US", output="dict")
 
         assert generate_dataframe(fields, config) == generate_dataframe(fields, config)
+
+
+class TestCoherenceGroups:
+    """Tests for grouping preset columns by `profile_fields(prefix=)`."""
+
+    def test_groups_by_prefix_in_schema_order(self):
+        from pointblank.field import profile_fields
+
+        fields = {
+            "id": int_field(),
+            "rep": string_field(preset="name"),
+            **profile_fields(set="minimal", prefix="b_"),
+            "note": string_field(),
+            **profile_fields(set="minimal", prefix="a_"),
+        }
+        groups = _get_coherence_groups(fields)
+        assert list(groups) == [None, "b_", "a_"]
+        assert list(groups[None]) == ["rep"]
+        assert list(groups["b_"]) == ["b_first_name", "b_last_name", "b_email", "b_phone_number"]
+        assert list(groups["a_"]) == ["a_first_name", "a_last_name", "a_email", "a_phone_number"]
+
+    def test_hand_written_columns_join_longest_matching_prefix(self):
+        from pointblank.field import profile_fields
+
+        fields = {
+            **profile_fields(set="minimal", prefix="a_"),
+            **profile_fields(set="minimal", prefix="a_b_"),
+            "a_b_city": string_field(preset="city"),
+            "a_city": string_field(preset="city"),
+            "city": string_field(preset="city"),
+        }
+        groups = _get_coherence_groups(fields)
+        assert "a_b_city" in groups["a_b_"]
+        assert "a_city" in groups["a_"]
+        assert list(groups[None]) == ["city"]
+
+    def test_no_profiles_is_one_group(self):
+        fields = {
+            "name": string_field(preset="name"),
+            "customer_email": string_field(preset="email"),
+            "code": string_field(pattern=r"[A-Z]{3}"),
+        }
+        assert _get_coherence_groups(fields) == {
+            None: {"name": fields["name"], "customer_email": fields["customer_email"]}
+        }
+
+    def test_unseeded_profiles_are_different_people(self):
+        from pointblank.field import profile_fields
+
+        fields = {
+            **profile_fields(set="minimal", prefix="a_"),
+            **profile_fields(set="minimal", prefix="b_"),
+        }
+        data = generate_dataframe(fields, GeneratorConfig(n=50, country="US", output="dict"))
+        same = sum(a == b for a, b in zip(data["a_email"], data["b_email"]))
+        assert same <= 2
 
 
 class TestGenerateColumnNullable:

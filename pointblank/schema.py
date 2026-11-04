@@ -1418,7 +1418,9 @@ def generate_dataset(
     automatically coherent across those columns within each row. Person-related presets will share
     the same identity (e.g., the email is derived from the name), address-related presets will
     share the same location (e.g., the city matches the address), and business-related presets
-    will share the same industry context.
+    will share the same industry context. Profiles made by `profile_fields()` with different
+    `prefix=` values (e.g., `"customer_"` and `"seller_"`) are coherent separately, so each one is a
+    different person with its own location and employer.
 
     Locale Mixing
     -------------

@@ -266,6 +266,19 @@ class TestPrefix:
         combined = {**sender, **recipient}
         assert len(combined) == 8
 
+    def test_prefix_sets_coherence_group(self):
+        result = profile_fields(set="minimal", prefix="customer_")
+        assert all(f._coherence_group == "customer_" for f in result.values())
+
+    def test_no_prefix_no_coherence_group(self):
+        assert all(f._coherence_group is None for f in profile_fields().values())
+        assert all(f._coherence_group is None for f in profile_fields(prefix="").values())
+
+    def test_coherence_group_not_in_repr_or_equality(self):
+        field = profile_fields(set="minimal", prefix="customer_")["customer_email"]
+        assert "_coherence_group" not in repr(field)
+        assert field == StringField(preset="email")
+
 
 # =============================================================================
 # Error handling
@@ -441,6 +454,143 @@ class TestIntegration:
         assert df.shape == (5, 8)
         assert "sender_first_name" in df.columns
         assert "recipient_first_name" in df.columns
+
+    @pytest.mark.parametrize("output", ["polars", "pandas"])
+    def test_two_prefixed_profiles_are_different_people(self, output):
+        import pointblank as pb
+
+        schema = pb.Schema(
+            **pb.profile_fields(set="full", prefix="customer_"),
+            **pb.profile_fields(set="full", prefix="seller_"),
+        )
+        df = pb.generate_dataset(schema, n=100, seed=23, output=output)
+        rows = df.to_dicts() if output == "polars" else df.to_dict(orient="records")
+
+        def full_name(row, prefix):
+            return (row[f"{prefix}first_name"], row[f"{prefix}last_name"])
+
+        # Different people, locations and employers in (almost) every row
+        assert sum(full_name(r, "customer_") == full_name(r, "seller_") for r in rows) <= 2
+        for col in ["email", "address", "phone_number", "company"]:
+            assert sum(r[f"customer_{col}"] == r[f"seller_{col}"] for r in rows) <= 2, col
+
+        # Each profile stays coherent within itself
+        for prefix in ["customer_", "seller_"]:
+            assert all(r[f"{prefix}city"] in r[f"{prefix}address"] for r in rows)
+            email_matches = sum(
+                r[f"{prefix}last_name"].lower() in r[f"{prefix}email"].lower()
+                or r[f"{prefix}first_name"].lower()[0] in r[f"{prefix}email"].split("@")[0].lower()
+                for r in rows
+            )
+            assert email_matches >= 80, prefix
+
+    def test_single_prefixed_profile_matches_unprefixed(self):
+        """A prefix on its own only renames the columns (the seeded data is the same)."""
+        import pointblank as pb
+
+        plain = pb.generate_dataset(pb.Schema(**pb.profile_fields(set="full")), n=30, seed=23)
+        prefixed = pb.generate_dataset(
+            pb.Schema(**pb.profile_fields(set="full", prefix="c_")), n=30, seed=23
+        )
+        assert prefixed.rename(lambda col: col.removeprefix("c_")).equals(plain)
+
+    def test_first_profile_unchanged_by_second(self):
+        """Adding a second profile leaves the first profile's seeded data as it was."""
+        import pointblank as pb
+
+        one = pb.generate_dataset(
+            pb.Schema(**pb.profile_fields(prefix="a_")), n=30, seed=23, country="DE"
+        )
+        two = pb.generate_dataset(
+            pb.Schema(**pb.profile_fields(prefix="a_"), **pb.profile_fields(prefix="b_")),
+            n=30,
+            seed=23,
+            country="DE",
+        )
+        assert two.select(one.columns).equals(one)
+        assert (two["a_email"] != two["b_email"]).all()
+
+    def test_two_prefixed_profiles_reproducible(self):
+        import pointblank as pb
+
+        schema = pb.Schema(
+            **pb.profile_fields(prefix="sender_"),
+            **pb.profile_fields(prefix="recipient_"),
+        )
+        for country in ["US", ["US", "FR"]]:
+            df1 = pb.generate_dataset(schema, n=20, seed=23, country=country)
+            df2 = pb.generate_dataset(schema, n=20, seed=23, country=country)
+            assert df1.equals(df2)
+
+    def test_two_prefixed_profiles_locale_mixing(self):
+        import pointblank as pb
+
+        schema = pb.Schema(
+            **pb.profile_fields(set="minimal", prefix="sender_"),
+            **pb.profile_fields(set="minimal", prefix="recipient_"),
+        )
+        df = pb.generate_dataset(schema, n=60, seed=23, country=["US", "DE"])
+        assert df.shape == (60, 8)
+        same = (df["sender_first_name"] == df["recipient_first_name"]) & (
+            df["sender_last_name"] == df["recipient_last_name"]
+        )
+        assert same.sum() <= 2
+
+    def test_hand_written_column_joins_prefixed_profile(self):
+        """A preset column named with a profile's prefix shares that profile's row context."""
+        import pointblank as pb
+
+        schema = pb.Schema(
+            **pb.profile_fields(set="full", prefix="customer_", exclude=["city"]),
+            customer_city=pb.string_field(preset="city"),
+            **pb.profile_fields(set="full", prefix="seller_"),
+        )
+        df = pb.generate_dataset(schema, n=50, seed=23)
+        rows = df.to_dicts()
+        assert all(r["customer_city"] in r["customer_address"] for r in rows)
+        assert sum(r["customer_city"] == r["seller_city"] for r in rows) < 25
+
+    def test_unprefixed_person_column_is_separate_person(self):
+        import pointblank as pb
+
+        schema = pb.Schema(
+            **pb.profile_fields(set="minimal", prefix="customer_"),
+            sales_rep=pb.string_field(preset="name"),
+        )
+        df = pb.generate_dataset(schema, n=50, seed=23)
+        customer = df["customer_first_name"] + " " + df["customer_last_name"]
+        assert (customer == df["sales_rep"]).sum() <= 2
+
+    def test_unique_column_in_prefixed_profile(self):
+        """`unique=True` on a profile column keeps it coherent with its own profile only."""
+        from dataclasses import replace
+
+        import pointblank as pb
+
+        customer = pb.profile_fields(set="minimal", prefix="customer_")
+        customer["customer_email"] = replace(customer["customer_email"], unique=True)
+        schema = pb.Schema(**customer, **pb.profile_fields(set="minimal", prefix="seller_"))
+        df = pb.generate_dataset(schema, n=200, seed=23)
+        assert df["customer_email"].n_unique() == 200
+        rows = df.to_dicts()
+        email_matches = sum(
+            r["customer_last_name"].lower() in r["customer_email"].lower() for r in rows
+        )
+        assert email_matches >= 150
+        assert sum(r["customer_email"] == r["seller_email"] for r in rows) == 0
+
+    def test_business_coherence_per_profile(self):
+        """Working-age bounds apply when any profile has both a job and a company."""
+        import pointblank as pb
+
+        schema = pb.Schema(
+            **pb.profile_fields(set="full", prefix="customer_"),
+            **pb.profile_fields(set="full", prefix="seller_"),
+            age=pb.int_field(min_val=0, max_val=120),
+        )
+        df = pb.generate_dataset(schema, n=100, seed=23)
+        assert df["age"].min() >= 22
+        assert df["age"].max() <= 65
 
     def test_reproducibility(self):
         """Verify that same seed produces same output."""
