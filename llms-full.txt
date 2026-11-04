@@ -1793,7 +1793,8 @@ thresholds
     take precedence.
 on_violation
     What a [`Pipeline`](`pointblank.Pipeline`) should do when data fails this contract:
-    `"warn"` (the default) issues a `UserWarning`, `"raise"` raises a `RuntimeError`, and
+    `"warn"` (the default) issues a `UserWarning`, `"raise"` raises a
+    [`ContractViolationError`](`pointblank.ContractViolationError`) (a `RuntimeError`), and
     `"log"` writes a warning to the `"pointblank.contract"` logger. This setting applies only
     when the contract is enforced through a `Pipeline`. Calling
     [`validate()`](`pointblank.Contract.validate`) directly always returns the validation
@@ -2522,7 +2523,8 @@ short_circuit
     With `True` (the default), the transformation isn't called and the target isn't validated,
     so bad input never reaches your transformation code or anything it writes to. Use `False`
     to always run the transformation and validate both boundaries, for example to see every
-    problem at once while developing.
+    problem at once while developing. A source contract with `on_violation="raise"` still
+    raises with `False`, but only after the target has been validated.
 
 Returns
 -------
@@ -2565,13 +2567,12 @@ example with [`above_threshold()`](`pointblank.Validate.above_threshold`).
 
 When a boundary fails, the pipeline applies that contract's `on_violation=` setting. With
 `"warn"` (the default), a `UserWarning` is issued. With `"log"`, a warning-level message is
-written to the `"pointblank.contract"` logger. With `"raise"`,
-[`validate_source()`](`pointblank.Pipeline.validate_source`) and
-[`validate_target()`](`pointblank.Pipeline.validate_target`) raise a `RuntimeError`.
-[`run()`](`pointblank.Pipeline.run`) is different: it always returns a
-[`PipelineResult`](`pointblank.PipelineResult`) so that both validations can be inspected, so
-a `"raise"` violation is recorded in the result without an exception or warning. To stop a job
-after `run()`, check [`PipelineResult.passed`](`pointblank.PipelineResult.passed`).
+written to the `"pointblank.contract"` logger. With `"raise"`, a
+[`ContractViolationError`](`pointblank.ContractViolationError`) (a `RuntimeError`) is raised,
+which stops the code that called the pipeline. When it's raised by
+[`run()`](`pointblank.Pipeline.run`), its `result` attribute holds the
+[`PipelineResult`](`pointblank.PipelineResult`) of the run, so both validations can still be
+inspected.
 
 Serialization
 -------------
@@ -2730,7 +2731,9 @@ the code that runs a pipeline can decide what to do next (publish the output, st
 alert someone) and still have the full reports at hand to explain the decision.
 
 You don't normally create a `PipelineResult` yourself. Get one from `run()` and read its
-attributes and properties.
+attributes and properties. When `run()` raises a
+[`ContractViolationError`](`pointblank.ContractViolationError`) instead, the error's `result`
+attribute holds the `PipelineResult`.
 
 Attributes
 ----------
@@ -2836,6 +2839,82 @@ See Also
 --------
 Pipeline : Define the boundaries and run the transformation.
 Validate.all_passed : The test used to decide whether a boundary passes.
+
+ContractViolationError(message: 'str', contract: 'Contract', validation: 'Validate', result: 'PipelineResult | None' = None) -> 'None'
+
+The error raised when data fails a contract with `on_violation="raise"`.
+
+A [`Pipeline`](`pointblank.Pipeline`) raises this error when a boundary validation has any
+failing test units and that boundary's [`Contract`](`pointblank.Contract`) was created with
+`on_violation="raise"`. It's raised by [`run()`](`pointblank.Pipeline.run`),
+[`validate_source()`](`pointblank.Pipeline.validate_source`), and
+[`validate_target()`](`pointblank.Pipeline.validate_target`). The message names the contract
+and its direction, and the error carries the failing validation, so the code that catches it
+can report or log the details before stopping.
+
+It's a subclass of `RuntimeError`, so `except RuntimeError:` catches it as well.
+
+Attributes
+----------
+contract
+    The [`Contract`](`pointblank.Contract`) that the data failed.
+validation
+    The interrogated [`Validate`](`pointblank.Validate`) object for the failing boundary.
+    Display it to see the validation report.
+result
+    The [`PipelineResult`](`pointblank.PipelineResult`) of the run, holding everything the run
+    produced before it stopped (the source validation, and the transformed data and target
+    validation if they were reached). It's `None` when the error comes from
+    `validate_source()` or `validate_target()`.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's make a pipeline whose target contract must hold for the output to be published. It
+uses `on_violation="raise"`, so a failing output stops the run with an error.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+pipeline = pb.Pipeline(
+    target=pb.Contract(
+        name="prices",
+        direction="target",
+        steps=[pb.Step("col_vals_gt", columns="price", value=0)],
+        on_violation="raise",
+    ),
+)
+
+raw_prices = pl.DataFrame({"item": ["a", "b", "c"], "price": [4.5, 0.0, 12.0]})
+```
+
+The transformation passes a zero price through, so the run raises. The error holds the
+result of the run, which still has the transformed data and the target validation:
+
+```{python}
+try:
+    pipeline.run(data=raw_prices, transform=lambda df: df)
+except pb.ContractViolationError as e:
+    print(e)
+    failed_run = e.result
+
+failed_run.target_validation
+```
+
+The report shows the one failing test unit in the `col_vals_gt` step, the row for item
+`"b"`. Nothing after the `run()` call was reached, so the prices weren't published.
+
+See Also
+--------
+Pipeline : Enforce contracts at both ends of a transformation.
+Contract : Set `on_violation=` to choose what happens when data fails.
 
 
 ## Contract Import/Export
@@ -42951,8 +43030,8 @@ suited to different stages of your development and deployment lifecycle:
 
 - **`"warn"`** (default): Issues a Python `UserWarning`. The pipeline continues, and the failure
 is recorded in the result. Ideal for development and monitoring.
-- **`"raise"`**: Raises a `RuntimeError` immediately. The pipeline halts. Ideal for production
-gates where invalid data must never proceed.
+- **`"raise"`**: Raises a `ContractViolationError` (a `RuntimeError`). The pipeline halts. Ideal
+for production gates where invalid data must never proceed.
 - **`"log"`**: Writes a warning-level message to the `pointblank.contract` logger. The pipeline
 continues silently. Ideal for background monitoring and observability integrations.
 
@@ -42986,21 +43065,31 @@ with warnings.catch_warnings(record=True) as w:
 
 Use `on_violation="raise"` to halt execution immediately when data is invalid. This is the strictest
 mode and the right choice for production pipelines where bad data must never reach downstream
-systems. When a validation fails with this mode, a `RuntimeError` is raised with a message
-identifying which contract failed, giving you a clear stack trace for debugging:
+systems. When a validation fails with this mode, a `ContractViolationError` (a subclass of
+`RuntimeError`) is raised with a message identifying which contract failed. This applies to
+`run()` as well as to `validate_source()` and `validate_target()`. The error keeps the results, so
+the code that catches it can still look at what went wrong:
 
-```python
+```{python}
 strict_contract = pb.Contract(
     name="strict_check",
     steps=[pb.Step("col_vals_not_null", columns=["txn_id"])],
-    on_violation="raise",  # Raises RuntimeError
+    on_violation="raise",  # Raises ContractViolationError
 )
 
 pipeline = pb.Pipeline(source=strict_contract)
 
-# This will raise RuntimeError:
-# pipeline.validate_source(bad_raw_data)
+try:
+    pipeline.run(data=bad_raw_data, transform=process_transactions)
+except pb.ContractViolationError as e:
+    print(f"Stopped: {e}")
+    print(f"Source passed: {e.result.source_passed}")
 ```
+
+The error's `validation` attribute holds the failing validation, and when it comes from `run()`,
+its `result` attribute holds the `PipelineResult` of the run. With `short_circuit=False`, a failing
+source contract with `"raise"` doesn't stop the run right away: the transformation runs and the
+target is validated first, and then the error is raised.
 
 ### Log Mode
 

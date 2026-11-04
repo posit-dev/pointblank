@@ -292,7 +292,7 @@ print(f"Target validated: {result.target_validation is not None}")
 When a contract's validation fails, the pipeline needs to *do something* about it. The `on_violation` parameter on each [Contract](../../reference/Contract.md#pointblank.Contract) controls this behavior. There are three modes, each suited to different stages of your development and deployment lifecycle:
 
 - **`"warn"`** (default): Issues a Python `UserWarning`. The pipeline continues, and the failure is recorded in the result. Ideal for development and monitoring.
-- **`"raise"`**: Raises a `RuntimeError` immediately. The pipeline halts. Ideal for production gates where invalid data must never proceed.
+- **`"raise"`**: Raises a [ContractViolationError](../../reference/ContractViolationError.md#pointblank.ContractViolationError) (a `RuntimeError`). The pipeline halts. Ideal for production gates where invalid data must never proceed.
 - **`"log"`**: Writes a warning-level message to the `pointblank.contract` logger. The pipeline continues silently. Ideal for background monitoring and observability integrations.
 
 Each contract in a pipeline can use a different violation mode. For example, you might use `"warn"` on the source contract (so you can still inspect the data) and `"raise"` on the target contract (to guarantee output quality).
@@ -321,20 +321,28 @@ with warnings.catch_warnings(record=True) as w:
 
 ### Raise Mode
 
-Use `on_violation="raise"` to halt execution immediately when data is invalid. This is the strictest mode and the right choice for production pipelines where bad data must never reach downstream systems. When a validation fails with this mode, a `RuntimeError` is raised with a message identifying which contract failed, giving you a clear stack trace for debugging:
+Use `on_violation="raise"` to halt execution immediately when data is invalid. This is the strictest mode and the right choice for production pipelines where bad data must never reach downstream systems. When a validation fails with this mode, a [ContractViolationError](../../reference/ContractViolationError.md#pointblank.ContractViolationError) (a subclass of `RuntimeError`) is raised with a message identifying which contract failed. This applies to [run()](../../reference/Pipeline.md#pointblank.Pipeline.run) as well as to [validate_source()](../../reference/Pipeline.md#pointblank.Pipeline.validate_source) and [validate_target()](../../reference/Pipeline.md#pointblank.Pipeline.validate_target). The error keeps the results, so the code that catches it can still look at what went wrong:
 
 ``` python
 strict_contract = pb.Contract(
     name="strict_check",
     steps=[pb.Step("col_vals_not_null", columns=["txn_id"])],
-    on_violation="raise",  # Raises RuntimeError
+    on_violation="raise",  # Raises ContractViolationError
 )
 
 pipeline = pb.Pipeline(source=strict_contract)
 
-# This will raise RuntimeError:
-# pipeline.validate_source(bad_raw_data)
+try:
+    pipeline.run(data=bad_raw_data, transform=process_transactions)
+except pb.ContractViolationError as e:
+    print(f"Stopped: {e}")
+    print(f"Source passed: {e.result.source_passed}")
 ```
+
+    Stopped: Contract 'strict_check' (source) violated: validation has failing steps.
+    Source passed: False
+
+The error's `validation` attribute holds the failing validation, and when it comes from [run()](../../reference/Pipeline.md#pointblank.Pipeline.run), its `result` attribute holds the [PipelineResult](../../reference/PipelineResult.md#pointblank.PipelineResult) of the run. With `short_circuit=False`, a failing source contract with `"raise"` doesn't stop the run right away: the transformation runs and the target is validated first, and then the error is raised.
 
 ### Log Mode
 

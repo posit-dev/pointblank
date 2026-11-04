@@ -4,7 +4,7 @@ A declarative boundary contract for pipeline data.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L373-L1368)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L373-L1369)
 
 ``` python
 Contract(
@@ -59,7 +59,7 @@ An optional longer description of the contract's purpose. It's kept with the con
 Default [`Thresholds`](../reference/Thresholds.md#pointblank.Thresholds) for the validation built from this contract. These set when a failing step is considered a 'warning', 'error', or 'critical' issue. If the contract is used in a [Pipeline](../reference/Pipeline.md#pointblank.Pipeline) that has its own thresholds, the pipeline's thresholds take precedence.
 
 `on_violation: Literal["warn", "raise", "log"] = "warn"`  
-What a [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline) should do when data fails this contract: `"warn"` (the default) issues a `UserWarning`, `"raise"` raises a `RuntimeError`, and `"log"` writes a warning to the `"pointblank.contract"` logger. This setting applies only when the contract is enforced through a [Pipeline](../reference/Pipeline.md#pointblank.Pipeline). Calling [`validate()`](../reference/Contract.md#pointblank.Contract.validate) directly always returns the validation without warning or raising, so check the result yourself (e.g., with [`assert_passing()`](../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing)).
+What a [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline) should do when data fails this contract: `"warn"` (the default) issues a `UserWarning`, `"raise"` raises a [`ContractViolationError`](../reference/ContractViolationError.md#pointblank.ContractViolationError) (a `RuntimeError`), and `"log"` writes a warning to the `"pointblank.contract"` logger. This setting applies only when the contract is enforced through a [Pipeline](../reference/Pipeline.md#pointblank.Pipeline). Calling [`validate()`](../reference/Contract.md#pointblank.Contract.validate) directly always returns the validation without warning or raising, so check the result yourself (e.g., with [`assert_passing()`](../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing)).
 
 ## Returns
 
@@ -271,7 +271,7 @@ Check a table against the contract.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L824-L916)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L825-L917)
 
 ``` python
 validate(data)
@@ -345,7 +345,7 @@ Compile the contract into a validation plan for a table, without running it.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L705-L822)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L706-L823)
 
 ``` python
 to_validate(data)
@@ -416,7 +416,7 @@ Write the contract as YAML.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1264-L1358)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1265-L1359)
 
 ``` python
 to_yaml(path=None)
@@ -512,7 +512,7 @@ Read a contract from a YAML file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1137-L1262)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1138-L1263)
 
 ``` python
 from_yaml(path)
@@ -614,7 +614,7 @@ Convert the contract to a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L918-L1005)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L919-L1006)
 
 ``` python
 to_dict()
@@ -703,7 +703,7 @@ Create a contract from a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1007-L1135)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1008-L1136)
 
 ``` python
 from_dict(data)

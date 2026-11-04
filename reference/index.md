@@ -50,6 +50,9 @@ Enforce data contracts at both ends of a data transformation.
 [PipelineResult](PipelineResult.md#pointblank.PipelineResult)  
 The outcome of running a data pipeline.
 
+[ContractViolationError](ContractViolationError.md#pointblank.ContractViolationError)  
+The error raised when data fails a contract with `on_violation="raise"`.
+
 ## Contract Import/Export
 
 Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use `import_contract()` as the entry point, `export_contract()` for the reverse, and [register_adapter()](../reference/register_adapter.md#pointblank.register_adapter) to add support for custom formats.

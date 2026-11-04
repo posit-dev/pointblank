@@ -322,6 +322,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">PipelineResult</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ContractViolationError.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ContractViolationError</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1634,7 +1640,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L280-L1441" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L371-L1555" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Pipeline</span>(</span>
@@ -1681,7 +1687,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">short_circuit</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-Whether <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link"><code>run()</code></a> should stop when the source validation fails. With <code>True</code> (the default), the transformation isn’t called and the target isn’t validated, so bad input never reaches your transformation code or anything it writes to. Use <code>False</code> to always run the transformation and validate both boundaries, for example to see every problem at once while developing.
+Whether <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link"><code>run()</code></a> should stop when the source validation fails. With <code>True</code> (the default), the transformation isn’t called and the target isn’t validated, so bad input never reaches your transformation code or anything it writes to. Use <code>False</code> to always run the transformation and validate both boundaries, for example to see every problem at once while developing. A source contract with <code>on_violation="raise"</code> still raises with <code>False</code>, but only after the target has been validated.
 </dd>
 </dl>
 </div>
@@ -1726,7 +1732,7 @@ If neither <code>source=</code> nor <code>target=</code> is given.
 <section id="passing-and-failing" class="level2 doc-passing-and-failing">
 <h2 class="doc-passing-and-failing anchored" data-anchor-id="passing-and-failing">Passing And Failing</h2>
 <p>A boundary <em>passes</em> only when every test unit in every step passes, which is the same test as <a href="../reference/Validate.all_passed.html#pointblank.Validate.all_passed" class="gdls-link"><code>Validate.all_passed()</code></a>. Thresholds don’t change this: a single failing row makes the boundary fail, even if it’s well below the warning level. For decisions based on threshold levels instead, inspect the boundary validations directly, for example with <a href="../reference/Validate.above_threshold.html#pointblank.Validate.above_threshold" class="gdls-link"><code>above_threshold()</code></a>.</p>
-<p>When a boundary fails, the pipeline applies that contract’s <code>on_violation=</code> setting. With <code>"warn"</code> (the default), a <code>UserWarning</code> is issued. With <code>"log"</code>, a warning-level message is written to the <code>"pointblank.contract"</code> logger. With <code>"raise"</code>, <a href="../reference/Pipeline.html#pointblank.Pipeline.validate_source" class="gdls-link"><code>validate_source()</code></a> and <a href="../reference/Pipeline.html#pointblank.Pipeline.validate_target" class="gdls-link"><code>validate_target()</code></a> raise a <code>RuntimeError</code>. <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link"><code>run()</code></a> is different: it always returns a <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link"><code>PipelineResult</code></a> so that both validations can be inspected, so a <code>"raise"</code> violation is recorded in the result without an exception or warning. To stop a job after <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">run()</a>, check <a href="../reference/PipelineResult.html#pointblank.PipelineResult.passed" class="gdls-link"><code>PipelineResult.passed</code></a>.</p>
+<p>When a boundary fails, the pipeline applies that contract’s <code>on_violation=</code> setting. With <code>"warn"</code> (the default), a <code>UserWarning</code> is issued. With <code>"log"</code>, a warning-level message is written to the <code>"pointblank.contract"</code> logger. With <code>"raise"</code>, a <a href="../reference/ContractViolationError.html#pointblank.ContractViolationError" class="gdls-link"><code>ContractViolationError</code></a> (a <code>RuntimeError</code>) is raised, which stops the code that called the pipeline. When it’s raised by <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link"><code>run()</code></a>, its <code>result</code> attribute holds the <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link"><code>PipelineResult</code></a> of the run, so both validations can still be inspected.</p>
 </section>
 <section id="serialization" class="level2 doc-serialization">
 <h2 class="doc-serialization anchored" data-anchor-id="serialization">Serialization</h2>
@@ -1735,7 +1741,7 @@ If neither <code>source=</code> nor <code>target=</code> is given.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s build a pipeline around a transformation that prepares raw order records for reporting. The raw records store amounts in cents with lowercase currency codes. The source contract says what the transformation needs from them: an order ID on every record, no negative amounts, and a known currency.</p>
-<div id="b830c90e" class="cell" data-execution_count="2">
+<div id="dea6d381" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1749,7 +1755,7 @@ If neither <code>source=</code> nor <code>target=</code> is given.
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>The target contract describes what the transformation promises to deliver: a fixed schema, one row per order, positive amounts, and uppercase currency codes.</p>
-<div id="c7d7f468" class="cell" data-execution_count="3">
+<div id="b831c3e1" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>orders_contract <span class="op">=</span> pb.Contract(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"orders"</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    direction<span class="op">=</span><span class="st">"target"</span>,</span>
@@ -1774,7 +1780,7 @@ If neither <code>source=</code> nor <code>target=</code> is given.
 </div>
 </div>
 <p>The transformation is an ordinary function that takes a table and returns a table. This one removes zero-amount test orders, converts cents to whole currency units, and uppercases the currency codes.</p>
-<div id="6a6df053" class="cell" data-execution_count="4">
+<div id="9f7d26f5" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> prepare_orders(df: pl.DataFrame) <span class="op">-&gt;</span> pl.DataFrame:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df.<span class="bu">filter</span>(pl.col(<span class="st">"amount_cents"</span>) <span class="op">&gt;</span> <span class="dv">0</span>).select(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>,</span>
@@ -1783,7 +1789,7 @@ If neither <code>source=</code> nor <code>target=</code> is given.
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <p>Now we can give the pipeline a day of raw orders and the transformation function. <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link"><code>run()</code></a> validates the input, transforms it, and validates the output.</p>
-<div id="43209612" class="cell" data-execution_count="5">
+<div id="c35b6550" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>raw_orders <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="st">"A1"</span>, <span class="st">"A2"</span>, <span class="st">"A3"</span>, <span class="st">"A4"</span>],</span>
@@ -1804,7 +1810,7 @@ If neither <code>source=</code> nor <code>target=</code> is given.
 </div>
 </div>
 <p>Both boundaries pass, so the <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link"><code>PipelineResult</code></a> reports <code>passed=True</code>. Its <code>transform_output</code> attribute holds the prepared table, ready to be written out:</p>
-<div id="9d4af44e" class="cell" data-execution_count="6">
+<div id="7a7cf393" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>result.transform_output</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div><style>
@@ -1818,7 +1824,7 @@ If neither <code>source=</code> nor <code>target=</code> is given.
 </div>
 </div>
 <p>Each boundary validation is kept as an interrogated <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, so the full report is available. Here’s the target validation, with the label built from the pipeline label and the contract’s direction.</p>
-<div id="72d17415" class="cell" data-execution_count="7">
+<div id="d4e8b0bc" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>result.target_validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2251,7 +2257,7 @@ tr { background-color: transparent; }
 </div>
 </div>
 <p>The next day’s raw orders have problems: a record with no order ID, a negative amount, and a currency the transformation can’t handle. Since <code>short_circuit=</code> is <code>True</code> by default, the pipeline stops after the source validation fails. The source contract uses the default <code>on_violation="warn"</code>, so a warning is also issued.</p>
-<div id="2735155d" class="cell" data-execution_count="8">
+<div id="510f50f6" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>bad_raw_orders <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="st">"B1"</span>, <span class="va">None</span>, <span class="st">"B3"</span>, <span class="st">"B4"</span>],</span>
@@ -2273,7 +2279,7 @@ transform output: None</code></pre>
 </div>
 </div>
 <p>The transformation never ran, so there’s no output and no target validation. The source validation shows why the input was rejected, with one failing test unit in each step:</p>
-<div id="aab8ad8c" class="cell" data-execution_count="9">
+<div id="f17a5b89" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>result.source_validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2583,7 +2589,7 @@ transform output: None</code></pre>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L756-L936" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L851-L1048" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb14"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">run</span>(</span>
@@ -2594,7 +2600,7 @@ transform output: None</code></pre>
 <div class="doc-text">
 <p>This is the main way to use a pipeline. It checks <code>data</code> against the source contract, calls <code>transform</code> on it, checks the output against the target contract, and returns everything in a <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link"><code>PipelineResult</code></a>: the two interrogated validations, the transformed data, and pass/fail properties for each boundary and overall. A failure is attributed to a boundary, so you can tell whether the input was bad or the transformation went wrong.</p>
 <p>If the source validation has any failing test units and the pipeline has <code>short_circuit=True</code> (the default), the run stops there. The transformation isn’t called, and the result has no transformed data and no target validation. With <code>short_circuit=False</code>, the transformation is called and the target is validated whatever the outcome of the source validation. If the pipeline has only one contract, the other boundary is skipped.</p>
-<p>When a boundary fails, its contract’s <code>on_violation=</code> setting is applied: <code>"warn"</code> issues a <code>UserWarning</code> and <code>"log"</code> writes to the <code>"pointblank.contract"</code> logger. A <code>"raise"</code> violation doesn’t raise here, though, because <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">run()</a> always returns its result so that both boundaries can be inspected. To stop a job when the pipeline fails, check the result’s <a href="../reference/PipelineResult.html#pointblank.PipelineResult.passed" class="gdls-link"><code>passed</code></a> property, or use <a href="../reference/Pipeline.html#pointblank.Pipeline.validate_source" class="gdls-link"><code>validate_source()</code></a> and <a href="../reference/Pipeline.html#pointblank.Pipeline.validate_target" class="gdls-link"><code>validate_target()</code></a>, which do raise.</p>
+<p>When a boundary fails, its contract’s <code>on_violation=</code> setting is applied: <code>"warn"</code> issues a <code>UserWarning</code> and <code>"log"</code> writes to the <code>"pointblank.contract"</code> logger. With <code>"raise"</code>, <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">run()</a> raises a <a href="../reference/ContractViolationError.html#pointblank.ContractViolationError" class="gdls-link"><code>ContractViolationError</code></a> instead of returning. A failing source raises right away with <code>short_circuit=True</code>, and after the target has been validated with <code>short_circuit=False</code>. The error’s <code>result</code> attribute holds the <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link"><code>PipelineResult</code></a> of the run, with the validations and any transformed data. With <code>"warn"</code> or <code>"log"</code>, check the result’s <a href="../reference/PipelineResult.html#pointblank.PipelineResult.passed" class="gdls-link"><code>passed</code></a> property to stop a job when the pipeline fails.</p>
 </div>
 <section id="parameters-1" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
@@ -2622,10 +2628,21 @@ The results of the run. <code>source_validation</code> and <code>target_validati
 </dl>
 </div>
 </section>
+<section id="raises-1" class="level4 doc-raises">
+<h4 class="doc-raises anchored" data-anchor-id="raises-1">Raises</h4>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">ContractViolationError</span></code></dt>
+<dd>
+If a boundary fails and its contract has <code>on_violation="raise"</code>. If both boundaries fail that way (possible with <code>short_circuit=False</code>), the error is for the source contract. Either way, the error’s <code>result</code> attribute holds the <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a>.
+</dd>
+</dl>
+</div>
+</section>
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
 <p>Let’s set up a pipeline for a customer table. The raw data must have an ID and a sign-up date for every customer, and the cleaned output must have one row per customer and a two-letter country code.</p>
-<div id="6a0cffc7" class="cell" data-execution_count="11">
+<div id="ae810bb9" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2653,7 +2670,7 @@ The results of the run. <code>source_validation</code> and <code>target_validati
 <span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>The raw table meets the source contract, but our transformation has a bug: it uppercases the country codes but forgets to remove the duplicated record for customer 3.</p>
-<div id="8f100f52" class="cell" data-execution_count="12">
+<div id="db1d40bb" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clean_customers(df):</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df.with_columns(pl.col(<span class="st">"country"</span>).<span class="bu">str</span>.to_uppercase())</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2670,7 +2687,7 @@ target passed: False</code></pre>
 </div>
 </div>
 <p>The input was fine and the output wasn’t, which points to the transformation. In the target validation, the <code>rows_distinct</code> step flags both rows for customer 3. The default <code>on_violation="warn"</code> setting also issued a warning.</p>
-<div id="b959bb8f" class="cell" data-execution_count="13">
+<div id="ca976db7" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>result.target_validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2879,7 +2896,7 @@ target passed: False</code></pre>
 </div>
 </div>
 <p>During development, it’s often useful to see the problems at both boundaries in a single run, even when the input is bad. A pipeline with <code>short_circuit=False</code> always runs the transformation and the target validation. Here, the input is missing a sign-up date, and the corrected transformation runs anyway:</p>
-<div id="71cb6dae" class="cell" data-execution_count="14">
+<div id="87208e50" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>dev_pipeline <span class="op">=</span> pb.Pipeline(</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    source<span class="op">=</span>pipeline.source, target<span class="op">=</span>pipeline.target, short_circuit<span class="op">=</span><span class="va">False</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -2930,14 +2947,14 @@ Overall: FAILED</code></pre>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L551-L649" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L642-L742" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb23"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_source</span>(<span class="va">data</span>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>This method validates one table against the pipeline’s source contract and returns the interrogated <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object. Use it when you want an ingestion check without running a transformation through the pipeline: for example, when data lands in one task of an orchestrated workflow and is transformed in another, or when the transformation is written in SQL or another tool. Pair it with <a href="../reference/Pipeline.html#pointblank.Pipeline.validate_target" class="gdls-link"><code>validate_target()</code></a> to check the other boundary.</p>
-<p>The validation is built the same way as in <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link"><code>run()</code></a>, with the pipeline’s label, thresholds, and actions. If the data fails, the source contract’s <code>on_violation=</code> setting is applied. Unlike <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">run()</a>, this method lets a <code>"raise"</code> violation propagate, which makes it a simple gate: with <code>on_violation="raise"</code>, the code after the call only runs when the data meets the contract.</p>
+<p>The validation is built the same way as in <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link"><code>run()</code></a>, with the pipeline’s label, thresholds, and actions. If the data fails, the source contract’s <code>on_violation=</code> setting is applied. With <code>on_violation="raise"</code>, this makes the method a simple gate: the code after the call only runs when the data meets the contract.</p>
 </div>
 <section id="parameters-2" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
@@ -2961,17 +2978,17 @@ An interrogated <a href="../reference/Validate.html#pointblank.Validate" class="
 </dl>
 </div>
 </section>
-<section id="raises-1" class="level4 doc-raises">
-<h4 class="doc-raises anchored" data-anchor-id="raises-1">Raises</h4>
+<section id="raises-2" class="level4 doc-raises">
+<h4 class="doc-raises anchored" data-anchor-id="raises-2">Raises</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
 <dd>
 <p>If the pipeline has no source contract.</p>
 </dd>
-<dt><code> <span class="doc-parameter-annotation">RuntimeError</span></code></dt>
+<dt><code> <span class="doc-parameter-annotation">ContractViolationError</span></code></dt>
 <dd>
-If the data fails the source contract and the contract has <code>on_violation="raise"</code>.
+If the data fails the source contract and the contract has <code>on_violation="raise"</code>. It’s a subclass of <code>RuntimeError</code>, and its <code>validation</code> attribute holds the failing validation.
 </dd>
 </dl>
 </div>
@@ -2979,7 +2996,7 @@ If the data fails the source contract and the contract has <code>on_violation="r
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
 <p>Let’s make a pipeline that guards the ingestion of sensor readings. The source contract uses <code>on_violation="raise"</code>, so readings that don’t meet it are rejected with an error.</p>
-<div id="f2d06334" class="cell" data-execution_count="16">
+<div id="4344523f" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2995,7 +3012,7 @@ If the data fails the source contract and the contract has <code>on_violation="r
 <span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>ingest <span class="op">=</span> pb.Pipeline(source<span class="op">=</span>readings_contract, label<span class="op">=</span><span class="st">"Sensor ingest"</span>)</span></code></pre></div>
 </div>
 <p>A batch of good readings passes, and we get the validation back:</p>
-<div id="7553c42e" class="cell" data-execution_count="17">
+<div id="12cab3cc" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>readings <span class="op">=</span> pl.DataFrame({<span class="st">"sensor_id"</span>: [<span class="st">"s1"</span>, <span class="st">"s2"</span>, <span class="st">"s3"</span>], <span class="st">"temp_c"</span>: [<span class="fl">21.5</span>, <span class="fl">19.0</span>, <span class="fl">22.1</span>]})</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>ingest.validate_source(readings)</span></code></pre></div>
@@ -3200,8 +3217,8 @@ If the data fails the source contract and the contract has <code>on_violation="r
 </div>
 </div>
 </div>
-<p>A batch with an impossible temperature raises a <code>RuntimeError</code> naming the contract, so a job that loads the data can stop before anything is written.</p>
-<div id="acf6593a" class="cell" data-execution_count="18">
+<p>A batch with an impossible temperature raises a <a href="../reference/ContractViolationError.html#pointblank.ContractViolationError" class="gdls-link gdls-code">ContractViolationError</a> (a kind of <code>RuntimeError</code>) naming the contract, so a job that loads the data can stop before anything is written.</p>
+<div id="106bc682" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>bad_readings <span class="op">=</span> pl.DataFrame({<span class="st">"sensor_id"</span>: [<span class="st">"s1"</span>, <span class="st">"s2"</span>], <span class="st">"temp_c"</span>: [<span class="fl">21.5</span>, <span class="fl">85.0</span>]})</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
@@ -3222,14 +3239,14 @@ If the data fails the source contract and the contract has <code>on_violation="r
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L651-L754" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L744-L849" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb28"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_target</span>(<span class="va">data</span>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>This method validates one table against the pipeline’s target contract and returns the interrogated <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object. It’s the outbound counterpart of <a href="../reference/Pipeline.html#pointblank.Pipeline.validate_source" class="gdls-link"><code>validate_source()</code></a>. Use it to check the output of a transformation that runs outside the pipeline (for example, a table produced by a SQL model or a separate task) before it’s published to the people and systems that depend on it.</p>
-<p>The validation is built the same way as in <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link"><code>run()</code></a>, with the pipeline’s label, thresholds, and actions. If the data fails, the target contract’s <code>on_violation=</code> setting is applied, and a <code>"raise"</code> violation propagates as a <code>RuntimeError</code>.</p>
+<p>The validation is built the same way as in <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link"><code>run()</code></a>, with the pipeline’s label, thresholds, and actions. If the data fails, the target contract’s <code>on_violation=</code> setting is applied, and a <code>"raise"</code> violation propagates as a <a href="../reference/ContractViolationError.html#pointblank.ContractViolationError" class="gdls-link"><code>ContractViolationError</code></a>.</p>
 </div>
 <section id="parameters-3" class="level4 doc-parameters">
 <h4 class="doc-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
@@ -3253,17 +3270,17 @@ An interrogated <a href="../reference/Validate.html#pointblank.Validate" class="
 </dl>
 </div>
 </section>
-<section id="raises-2" class="level4 doc-raises">
-<h4 class="doc-raises anchored" data-anchor-id="raises-2">Raises</h4>
+<section id="raises-3" class="level4 doc-raises">
+<h4 class="doc-raises anchored" data-anchor-id="raises-3">Raises</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
 <dd>
 <p>If the pipeline has no target contract.</p>
 </dd>
-<dt><code> <span class="doc-parameter-annotation">RuntimeError</span></code></dt>
+<dt><code> <span class="doc-parameter-annotation">ContractViolationError</span></code></dt>
 <dd>
-If the data fails the target contract and the contract has <code>on_violation="raise"</code>.
+If the data fails the target contract and the contract has <code>on_violation="raise"</code>. It’s a subclass of <code>RuntimeError</code>, and its <code>validation</code> attribute holds the failing validation.
 </dd>
 </dl>
 </div>
@@ -3271,7 +3288,7 @@ If the data fails the target contract and the contract has <code>on_violation="r
 <section id="examples-3" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
 <p>Suppose a daily revenue summary is built by a separate SQL job, and we want to check it before it goes to a dashboard. The target contract requires one row per day and non-negative revenue. It uses <code>on_violation="log"</code>, so failures are logged rather than raised.</p>
-<div id="670740ce" class="cell" data-execution_count="20">
+<div id="9a96e330" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -3288,7 +3305,7 @@ If the data fails the target contract and the contract has <code>on_violation="r
 <span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>publish <span class="op">=</span> pb.Pipeline(target<span class="op">=</span>summary_contract, label<span class="op">=</span><span class="st">"Revenue summary"</span>)</span></code></pre></div>
 </div>
 <p>Here’s the job’s output, which has a repeated day:</p>
-<div id="8ecda632" class="cell" data-execution_count="21">
+<div id="d4f5f329" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"day"</span>: [<span class="st">"2025-03-01"</span>, <span class="st">"2025-03-02"</span>, <span class="st">"2025-03-02"</span>],</span>
@@ -3506,13 +3523,13 @@ If the data fails the target contract and the contract has <code>on_violation="r
 </div>
 </div>
 <p>The <code>rows_distinct</code> step fails for both copies of <code>"2025-03-02"</code>, and a message is written to the <code>"pointblank.contract"</code> logger. Because the method returns the validation, the job can decide what to do with the result:</p>
-<div id="dac9798d" class="cell" data-execution_count="22">
+<div id="57cf0c17" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>validation.all_passed()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="22">
 <pre><code>False</code></pre>
 </div>
 </div>
-<p>Here the job would hold the summary back until the duplicate day is resolved. To make a failure stop the job instead, set <code>on_violation="raise"</code> on the contract, which turns a failing validation into a <code>RuntimeError</code>.</p>
+<p>Here the job would hold the summary back until the duplicate day is resolved. To make a failure stop the job instead, set <code>on_violation="raise"</code> on the contract, which turns a failing validation into a <a href="../reference/ContractViolationError.html#pointblank.ContractViolationError" class="gdls-link gdls-code">ContractViolationError</a>.</p>
 </section>
 </section>
 <section id="to_yaml" class="level3">
@@ -3522,7 +3539,7 @@ If the data fails the target contract and the contract has <code>on_violation="r
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1352-L1429" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1466-L1543" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb34"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_yaml</span>(<span class="va">path</span><span class="op">=</span><span class="cn">None</span>)</span></code></pre></div>
@@ -3553,8 +3570,8 @@ The YAML text. It’s returned whether or not <code>path=</code> is given.
 </dl>
 </div>
 </section>
-<section id="raises-3" class="level4 doc-raises">
-<h4 class="doc-raises anchored" data-anchor-id="raises-3">Raises</h4>
+<section id="raises-4" class="level4 doc-raises">
+<h4 class="doc-raises anchored" data-anchor-id="raises-4">Raises</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
@@ -3567,7 +3584,7 @@ If a contract step argument can’t be represented in YAML (for example, a colum
 <section id="examples-4" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
 <p>Let’s create a pipeline for a product catalog and get its YAML representation.</p>
-<div id="4e54088a" class="cell" data-execution_count="23">
+<div id="cd4da5df" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>catalog_pipeline <span class="op">=</span> pb.Pipeline(</span>
@@ -3623,7 +3640,7 @@ target:
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1222-L1350" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1336-L1464" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb37"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_yaml</span>(<span class="va">path</span>)</span></code></pre></div>
@@ -3668,8 +3685,8 @@ A new <a href="../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link 
 </dl>
 </div>
 </section>
-<section id="raises-4" class="level4 doc-raises">
-<h4 class="doc-raises anchored" data-anchor-id="raises-4">Raises</h4>
+<section id="raises-5" class="level4 doc-raises">
+<h4 class="doc-raises anchored" data-anchor-id="raises-5">Raises</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">FileNotFoundError</span></code></dt>
@@ -3686,7 +3703,7 @@ If the file is empty, if it has neither a <code>source</code> nor a <code>target
 <section id="examples-5" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-5">Examples</h4>
 <p>Let’s write the pipeline file shown above to a temporary directory, then load it.</p>
-<div id="21878b3d" class="cell" data-execution_count="25">
+<div id="7d456f56" class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -3725,7 +3742,7 @@ If the file is empty, if it has neither a <code>source</code> nor a <code>target
 </div>
 </div>
 <p>The loaded pipeline works like one defined in Python. Here it runs a transformation that converts weights from pounds to kilograms:</p>
-<div id="3148e8b6" class="cell" data-execution_count="26">
+<div id="7b13ad12" class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>raw_shipments <span class="op">=</span> pl.DataFrame({<span class="st">"shipment_id"</span>: [<span class="st">"S1"</span>, <span class="st">"S2"</span>], <span class="st">"weight_lb"</span>: [<span class="fl">26.5</span>, <span class="fl">410.0</span>]})</span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> shipments_pipeline.run(</span>
@@ -3750,7 +3767,7 @@ If the file is empty, if it has neither a <code>source</code> nor a <code>target
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1028-L1098" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1142-L1212" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb43"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_dict</span>()</span></code></pre></div>
@@ -3773,7 +3790,7 @@ A dictionary representation of the pipeline.
 <section id="examples-6" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-6">Examples</h4>
 <p>Let’s create a pipeline with a label, thresholds, and short-circuiting turned off, and convert it to a dictionary.</p>
-<div id="51ad00b2" class="cell" data-execution_count="27">
+<div id="fc8e391c" class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> pb.Pipeline(</span>
@@ -3812,7 +3829,7 @@ A dictionary representation of the pipeline.
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1100-L1220" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1214-L1334" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb46"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_dict</span>(<span class="va">data</span>)</span></code></pre></div>
@@ -3843,8 +3860,8 @@ A new <a href="../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link 
 </dl>
 </div>
 </section>
-<section id="raises-5" class="level4 doc-raises">
-<h4 class="doc-raises anchored" data-anchor-id="raises-5">Raises</h4>
+<section id="raises-6" class="level4 doc-raises">
+<h4 class="doc-raises anchored" data-anchor-id="raises-6">Raises</h4>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
@@ -3857,7 +3874,7 @@ If the dictionary has neither a <code>"source"</code> nor a <code>"target"</code
 <section id="examples-7" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-7">Examples</h4>
 <p>Here’s a pipeline definition written as JSON. It only has a target contract, so it acts as an output guard.</p>
-<div id="44f896e9" class="cell" data-execution_count="29">
+<div id="7bf612de" class="cell" data-execution_count="29">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -3887,7 +3904,7 @@ If the dictionary has neither a <code>"source"</code> nor a <code>"target"</code
 </div>
 </div>
 <p>The target contract didn’t specify a direction, so it was given <code>"target"</code>. The pipeline can now check an export:</p>
-<div id="9e6e34de" class="cell" data-execution_count="30">
+<div id="322190c3" class="cell" data-execution_count="30">
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>invoices <span class="op">=</span> pl.DataFrame({<span class="st">"invoice_id"</span>: [<span class="st">"I-1"</span>, <span class="st">"I-2"</span>, <span class="st">"I-3"</span>], <span class="st">"total"</span>: [<span class="fl">120.0</span>, <span class="fl">0.0</span>, <span class="fl">75.5</span>]})</span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>export_pipeline.validate_target(invoices)</span></code></pre></div>

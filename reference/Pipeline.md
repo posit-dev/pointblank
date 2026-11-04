@@ -4,7 +4,7 @@ Enforce data contracts at both ends of a data transformation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L280-L1441)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L371-L1555)
 
 ``` python
 Pipeline(
@@ -43,7 +43,7 @@ The [`Contract`](../reference/Contract.md#pointblank.Contract) that the transfor
 A label for the pipeline. Each boundary validation is labeled `"<label> [source]"` or `"<label> [target]"`. Without a label, the contract name is used instead, as in `"Pipeline: raw_orders [source]"`.
 
 `short_circuit: bool = True`  
-Whether [`run()`](../reference/Pipeline.md#pointblank.Pipeline.run) should stop when the source validation fails. With `True` (the default), the transformation isn't called and the target isn't validated, so bad input never reaches your transformation code or anything it writes to. Use `False` to always run the transformation and validate both boundaries, for example to see every problem at once while developing.
+Whether [`run()`](../reference/Pipeline.md#pointblank.Pipeline.run) should stop when the source validation fails. With `True` (the default), the transformation isn't called and the target isn't validated, so bad input never reaches your transformation code or anything it writes to. Use `False` to always run the transformation and validate both boundaries, for example to see every problem at once while developing. A source contract with `on_violation="raise"` still raises with `False`, but only after the target has been validated.
 
 ## Returns
 
@@ -73,7 +73,7 @@ Each boundary validation is built the same way as in [`Contract.to_validate()`](
 
 A boundary *passes* only when every test unit in every step passes, which is the same test as [`Validate.all_passed()`](../reference/Validate.all_passed.md#pointblank.Validate.all_passed). Thresholds don't change this: a single failing row makes the boundary fail, even if it's well below the warning level. For decisions based on threshold levels instead, inspect the boundary validations directly, for example with [`above_threshold()`](../reference/Validate.above_threshold.md#pointblank.Validate.above_threshold).
 
-When a boundary fails, the pipeline applies that contract's `on_violation=` setting. With `"warn"` (the default), a `UserWarning` is issued. With `"log"`, a warning-level message is written to the `"pointblank.contract"` logger. With `"raise"`, [`validate_source()`](../reference/Pipeline.md#pointblank.Pipeline.validate_source) and [`validate_target()`](../reference/Pipeline.md#pointblank.Pipeline.validate_target) raise a `RuntimeError`. [`run()`](../reference/Pipeline.md#pointblank.Pipeline.run) is different: it always returns a [`PipelineResult`](../reference/PipelineResult.md#pointblank.PipelineResult) so that both validations can be inspected, so a `"raise"` violation is recorded in the result without an exception or warning. To stop a job after [run()](../reference/Pipeline.md#pointblank.Pipeline.run), check [`PipelineResult.passed`](../reference/PipelineResult.md#pointblank.PipelineResult.passed).
+When a boundary fails, the pipeline applies that contract's `on_violation=` setting. With `"warn"` (the default), a `UserWarning` is issued. With `"log"`, a warning-level message is written to the `"pointblank.contract"` logger. With `"raise"`, a [`ContractViolationError`](../reference/ContractViolationError.md#pointblank.ContractViolationError) (a `RuntimeError`) is raised, which stops the code that called the pipeline. When it's raised by [`run()`](../reference/Pipeline.md#pointblank.Pipeline.run), its `result` attribute holds the [`PipelineResult`](../reference/PipelineResult.md#pointblank.PipelineResult) of the run, so both validations can still be inspected.
 
 ## Serialization
 
@@ -240,7 +240,7 @@ Validate the input, transform it, and validate the output.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L756-L936)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L851-L1048)
 
 ``` python
 run(
@@ -253,7 +253,7 @@ This is the main way to use a pipeline. It checks `data` against the source cont
 
 If the source validation has any failing test units and the pipeline has `short_circuit=True` (the default), the run stops there. The transformation isn't called, and the result has no transformed data and no target validation. With `short_circuit=False`, the transformation is called and the target is validated whatever the outcome of the source validation. If the pipeline has only one contract, the other boundary is skipped.
 
-When a boundary fails, its contract's `on_violation=` setting is applied: `"warn"` issues a `UserWarning` and `"log"` writes to the `"pointblank.contract"` logger. A `"raise"` violation doesn't raise here, though, because [run()](../reference/Pipeline.md#pointblank.Pipeline.run) always returns its result so that both boundaries can be inspected. To stop a job when the pipeline fails, check the result's [`passed`](../reference/PipelineResult.md#pointblank.PipelineResult.passed) property, or use [`validate_source()`](../reference/Pipeline.md#pointblank.Pipeline.validate_source) and [`validate_target()`](../reference/Pipeline.md#pointblank.Pipeline.validate_target), which do raise.
+When a boundary fails, its contract's `on_violation=` setting is applied: `"warn"` issues a `UserWarning` and `"log"` writes to the `"pointblank.contract"` logger. With `"raise"`, [run()](../reference/Pipeline.md#pointblank.Pipeline.run) raises a [`ContractViolationError`](../reference/ContractViolationError.md#pointblank.ContractViolationError) instead of returning. A failing source raises right away with `short_circuit=True`, and after the target has been validated with `short_circuit=False`. The error's `result` attribute holds the [`PipelineResult`](../reference/PipelineResult.md#pointblank.PipelineResult) of the run, with the validations and any transformed data. With `"warn"` or `"log"`, check the result's [`passed`](../reference/PipelineResult.md#pointblank.PipelineResult.passed) property to stop a job when the pipeline fails.
 
 #### Parameters
 
@@ -267,6 +267,11 @@ A function that takes the input table and returns the transformed table. It's ca
 
 `PipelineResult`  
 The results of the run. `source_validation` and `target_validation` hold the interrogated [Validate](../reference/Validate.md#pointblank.Validate) objects (or `None` for a boundary that wasn't validated), and `transform_output` holds the transformed table (or `None` if the run stopped early).
+
+#### Raises
+
+`ContractViolationError`  
+If a boundary fails and its contract has `on_violation="raise"`. If both boundaries fail that way (possible with `short_circuit=False`), the error is for the source contract. Either way, the error's `result` attribute holds the [PipelineResult](../reference/PipelineResult.md#pointblank.PipelineResult).
 
 #### Examples
 
@@ -375,7 +380,7 @@ Check incoming data against the source contract.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L551-L649)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L642-L742)
 
 ``` python
 validate_source(data)
@@ -383,7 +388,7 @@ validate_source(data)
 
 This method validates one table against the pipeline's source contract and returns the interrogated [`Validate`](../reference/Validate.md#pointblank.Validate) object. Use it when you want an ingestion check without running a transformation through the pipeline: for example, when data lands in one task of an orchestrated workflow and is transformed in another, or when the transformation is written in SQL or another tool. Pair it with [`validate_target()`](../reference/Pipeline.md#pointblank.Pipeline.validate_target) to check the other boundary.
 
-The validation is built the same way as in [`run()`](../reference/Pipeline.md#pointblank.Pipeline.run), with the pipeline's label, thresholds, and actions. If the data fails, the source contract's `on_violation=` setting is applied. Unlike [run()](../reference/Pipeline.md#pointblank.Pipeline.run), this method lets a `"raise"` violation propagate, which makes it a simple gate: with `on_violation="raise"`, the code after the call only runs when the data meets the contract.
+The validation is built the same way as in [`run()`](../reference/Pipeline.md#pointblank.Pipeline.run), with the pipeline's label, thresholds, and actions. If the data fails, the source contract's `on_violation=` setting is applied. With `on_violation="raise"`, this makes the method a simple gate: the code after the call only runs when the data meets the contract.
 
 #### Parameters
 
@@ -400,8 +405,8 @@ An interrogated [Validate](../reference/Validate.md#pointblank.Validate) object 
 `ValueError`  
 If the pipeline has no source contract.
 
-`RuntimeError`  
-If the data fails the source contract and the contract has `on_violation="raise"`.
+`ContractViolationError`  
+If the data fails the source contract and the contract has `on_violation="raise"`. It's a subclass of `RuntimeError`, and its `validation` attribute holds the failing validation.
 
 #### Examples
 
@@ -433,7 +438,7 @@ ingest.validate_source(readings)
 
 [TABLE]
 
-A batch with an impossible temperature raises a `RuntimeError` naming the contract, so a job that loads the data can stop before anything is written.
+A batch with an impossible temperature raises a [ContractViolationError](../reference/ContractViolationError.md#pointblank.ContractViolationError) (a kind of `RuntimeError`) naming the contract, so a job that loads the data can stop before anything is written.
 
 ``` python
 bad_readings = pl.DataFrame({"sensor_id": ["s1", "s2"], "temp_c": [21.5, 85.0]})
@@ -454,7 +459,7 @@ Check transformed data against the target contract.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L651-L754)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L744-L849)
 
 ``` python
 validate_target(data)
@@ -462,7 +467,7 @@ validate_target(data)
 
 This method validates one table against the pipeline's target contract and returns the interrogated [`Validate`](../reference/Validate.md#pointblank.Validate) object. It's the outbound counterpart of [`validate_source()`](../reference/Pipeline.md#pointblank.Pipeline.validate_source). Use it to check the output of a transformation that runs outside the pipeline (for example, a table produced by a SQL model or a separate task) before it's published to the people and systems that depend on it.
 
-The validation is built the same way as in [`run()`](../reference/Pipeline.md#pointblank.Pipeline.run), with the pipeline's label, thresholds, and actions. If the data fails, the target contract's `on_violation=` setting is applied, and a `"raise"` violation propagates as a `RuntimeError`.
+The validation is built the same way as in [`run()`](../reference/Pipeline.md#pointblank.Pipeline.run), with the pipeline's label, thresholds, and actions. If the data fails, the target contract's `on_violation=` setting is applied, and a `"raise"` violation propagates as a [`ContractViolationError`](../reference/ContractViolationError.md#pointblank.ContractViolationError).
 
 #### Parameters
 
@@ -479,8 +484,8 @@ An interrogated [Validate](../reference/Validate.md#pointblank.Validate) object 
 `ValueError`  
 If the pipeline has no target contract.
 
-`RuntimeError`  
-If the data fails the target contract and the contract has `on_violation="raise"`.
+`ContractViolationError`  
+If the data fails the target contract and the contract has `on_violation="raise"`. It's a subclass of `RuntimeError`, and its `validation` attribute holds the failing validation.
 
 #### Examples
 
@@ -530,7 +535,7 @@ validation.all_passed()
 
     False
 
-Here the job would hold the summary back until the duplicate day is resolved. To make a failure stop the job instead, set `on_violation="raise"` on the contract, which turns a failing validation into a `RuntimeError`.
+Here the job would hold the summary back until the duplicate day is resolved. To make a failure stop the job instead, set `on_violation="raise"` on the contract, which turns a failing validation into a [ContractViolationError](../reference/ContractViolationError.md#pointblank.ContractViolationError).
 
 ### to_yaml()
 
@@ -538,7 +543,7 @@ Write the pipeline as YAML.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1352-L1429)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1466-L1543)
 
 ``` python
 to_yaml(path=None)
@@ -620,7 +625,7 @@ Read a pipeline from a YAML file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1222-L1350)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1336-L1464)
 
 ``` python
 from_yaml(path)
@@ -732,7 +737,7 @@ Convert the pipeline to a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1028-L1098)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1142-L1212)
 
 ``` python
 to_dict()
@@ -788,7 +793,7 @@ Create a pipeline from a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1100-L1220)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1214-L1334)
 
 ``` python
 from_dict(data)
