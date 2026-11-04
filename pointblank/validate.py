@@ -4731,6 +4731,12 @@ def _validation_info_to_step(
             params["timezone"] = values["timezone"]
         if values.get("allow_tz_mismatch"):
             params["allow_tz_mismatch"] = True
+        allow_future = values.get("allow_future", False)
+        if allow_future is True:
+            params["allow_future"] = True
+        elif isinstance(allow_future, datetime.timedelta):
+            allow_future_str = values.get("allow_future_str")
+            params["allow_future"] = allow_future_str or _timedelta_to_duration_str(allow_future)
     elif at == "col_schema_match":
         values = vi.values or {}
         params["schema"] = values.get("schema")
@@ -14815,6 +14821,7 @@ class Validate:
         reference_time: datetime.datetime | str | None = None,
         timezone: str | None = None,
         allow_tz_mismatch: bool = False,
+        allow_future: bool | str | datetime.timedelta = False,
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
@@ -14831,7 +14838,9 @@ class Validate:
         fresh data and for enforcing data SLAs.
 
         This method helps detect stale data by comparing the maximum (most recent) value in a
-        datetime column against an expected freshness threshold.
+        datetime column against an expected freshness threshold. Data dated later than the
+        reference time fails too, unless `allow_future=` permits it (see the *Future-Dated Data*
+        section).
 
         Parameters
         ----------
@@ -14858,6 +14867,13 @@ class Validate:
             Whether to allow timezone mismatches between the column data and reference time.
             By default (`False`), a warning note is added when comparing timezone-naive with
             timezone-aware datetimes. Set to `True` to suppress these warnings.
+        allow_future
+            How far the most recent timestamp may be later than the reference time. The default,
+            `False`, makes the step fail when any timestamp is later than the reference time. A
+            duration (a string like `"5 minutes"` or a `datetime.timedelta`) allows timestamps up to
+            that far ahead, which absorbs small differences between the clocks that wrote the data
+            and the clock that runs the validation. Use `True` to allow future-dated data of any
+            amount. See the *Future-Dated Data* section for details.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -15013,6 +15029,20 @@ class Validate:
         changes. To see all available IANA timezone names in Python, use
         `zoneinfo.available_timezones()` from the standard library's `zoneinfo` module.
 
+        Future-Dated Data
+        -----------------
+        When the most recent timestamp is later than the reference time, the data's age is negative.
+        This usually points to a problem: a clock that is set wrong, a timezone mix-up when the data
+        was loaded, or a snapshot validated against a `reference_time=` that comes before it. By
+        default, such a step fails, and the report notes how far ahead of the reference time the
+        data is.
+
+        The `allow_future=` parameter changes this. A small duration such as `allow_future="1m"` is
+        useful when the reference time is the current time and the data comes from a system whose
+        clock may run slightly ahead. Timestamps up to that far ahead pass, while anything further
+        ahead still fails. With `allow_future=True`, any amount of future-dated
+        data passes, and only `max_age=` is checked.
+
         Examples
         --------
         ```{python}
@@ -15143,6 +15173,40 @@ class Validate:
         The newest timestamp is two hours before the reference time, so the 24-hour step passes and
         the 1-hour step fails. Because neither the data nor the reference time depend on the current
         time, this validation gives the same result whenever it runs.
+
+        If the reference time comes before the newest timestamp, the data is future-dated. Here the
+        reference time is two hours before the newest record. The first step fails because of
+        that, the second step allows timestamps up to three hours ahead, and the third allows
+        future-dated data of any amount.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=snapshot_data)
+            .data_freshness(
+                column="updated_at",
+                max_age="24 hours",
+                reference_time="2024-01-15T08:00:00+00:00"
+            )
+            .data_freshness(
+                column="updated_at",
+                max_age="24 hours",
+                reference_time="2024-01-15T08:00:00+00:00",
+                allow_future="3 hours"
+            )
+            .data_freshness(
+                column="updated_at",
+                max_age="24 hours",
+                reference_time="2024-01-15T08:00:00+00:00",
+                allow_future=True
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The steps that allow future-dated data say so below `max_age=` in the report, and the note
+        for each step gives how far ahead of the reference time the newest record is.
         """
 
         assertion_type = _get_fn_name()
@@ -15152,8 +15216,9 @@ class Validate:
         _check_active_input(param=active, param_name="active")
         _check_boolean_input(param=allow_tz_mismatch, param_name="allow_tz_mismatch")
 
-        # Validate and parse the max_age parameter
+        # Validate and parse the max_age and allow_future parameters
         max_age_td = _parse_max_age(max_age)
+        allow_future_parsed = _parse_allow_future(allow_future)
 
         # Validate the column parameter
         if not isinstance(column, str):
@@ -15186,10 +15251,20 @@ class Validate:
         # Package up the parameters for later interrogation
         values = {
             "max_age": max_age_td,
-            "max_age_str": max_age if isinstance(max_age, str) else str(max_age),
+            "max_age_str": (
+                max_age if isinstance(max_age, str) else _timedelta_to_duration_str(max_age_td)
+            ),
             "reference_time": parsed_reference_time,
             "timezone": timezone,
             "allow_tz_mismatch": allow_tz_mismatch,
+            "allow_future": allow_future_parsed,
+            "allow_future_str": (
+                allow_future
+                if isinstance(allow_future, str)
+                else _timedelta_to_duration_str(allow_future_parsed)
+                if isinstance(allow_future_parsed, datetime.timedelta)
+                else None
+            ),
         }
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
@@ -17711,6 +17786,7 @@ class Validate:
                             reference_time=value["reference_time"],
                             timezone=value["timezone"],
                             allow_tz_mismatch=value["allow_tz_mismatch"],
+                            allow_future=value.get("allow_future", False),
                         )
 
                         result_bool = freshness_result["passed"]
@@ -17755,7 +17831,10 @@ class Validate:
                             )
 
                         # Add informational note about the freshness check
-                        if freshness_result.get("max_datetime") and freshness_result.get("age"):
+                        if (
+                            freshness_result.get("max_datetime") is not None
+                            and freshness_result.get("age") is not None
+                        ):
                             max_dt = freshness_result["max_datetime"]
                             # Format datetime without microseconds for cleaner display
                             if hasattr(max_dt, "replace"):
@@ -17765,14 +17844,17 @@ class Validate:
                             age = freshness_result["age"]
                             age_str = _format_timedelta(age)
                             max_age_str = _format_timedelta(value["max_age"])
+                            prefix = "✓" if result_bool else "✗"
 
-                            # Get translated template for pass/fail
-                            if result_bool:
+                            # Get translated template for pass/fail (future-dated data, with its
+                            # negative age, gets its own wording)
+                            if freshness_result.get("future"):
+                                details_key = "data_freshness_details_future"
+                                age_str = _format_timedelta(-age)
+                            elif result_bool:
                                 details_key = "data_freshness_details_pass"
-                                prefix = "✓"
                             else:
                                 details_key = "data_freshness_details_fail"
-                                prefix = "✗"
 
                             details_template = NOTES_TEXT.get(details_key, {}).get(
                                 self.locale,
@@ -17787,9 +17869,7 @@ class Validate:
                                 max_dt=max_dt_display, age=age_str, max_age=max_age_str
                             )
                             # For markdown, make the age bold
-                            note_md_template = details_template.replace(
-                                "(age: {age}", "(age: **{age}**"
-                            )
+                            note_md_template = details_template.replace("{age}", "**{age}**")
                             note_md = f"{prefix} {note_md_template.format(max_dt=max_dt_display, age=age_str, max_age=max_age_str)}"
 
                             validation._add_note(
@@ -21988,6 +22068,13 @@ class Validate:
                 if tz_line_parts:  # pragma: no cover
                     extra_lines.append(" ".join(tz_line_parts))  # pragma: no cover
 
+                # Future-dated data that `allow_future=` permits: any amount or up to a duration
+                allow_future = value.get("allow_future", False)
+                if allow_future is True:
+                    extra_lines.append("+future")
+                elif isinstance(allow_future, datetime.timedelta):
+                    extra_lines.append(f"+{_format_timedelta(allow_future)} future")
+
                 if extra_lines:  # pragma: no cover
                     extra_html = "<br/>".join(extra_lines)  # pragma: no cover
                     values_upd.append(  # pragma: no cover
@@ -24082,7 +24169,9 @@ def _process_brief(
     return brief
 
 
-def _parse_max_age(max_age: str | datetime.timedelta) -> datetime.timedelta:
+def _parse_max_age(
+    max_age: str | datetime.timedelta, param_name: str = "max_age"
+) -> datetime.timedelta:
     """
     Parse a max_age specification into a timedelta.
 
@@ -24091,6 +24180,8 @@ def _parse_max_age(max_age: str | datetime.timedelta) -> datetime.timedelta:
     max_age
         Either a timedelta object or a string like "24 hours", "1 day", "30 minutes",
         or compound expressions like "2 hours 15 minutes", "1 day 6 hours", etc.
+    param_name
+        The name of the parameter being parsed, used in error messages.
 
     Returns
     -------
@@ -24107,7 +24198,8 @@ def _parse_max_age(max_age: str | datetime.timedelta) -> datetime.timedelta:
 
     if not isinstance(max_age, str):
         raise TypeError(
-            f"The `max_age` parameter must be a string or timedelta, got {type(max_age).__name__}."
+            f"The `{param_name}` parameter must be a string or timedelta, "
+            f"got {type(max_age).__name__}."
         )
 
     # Parse string format like "24 hours", "1 day", "30 minutes", etc.
@@ -24149,7 +24241,7 @@ def _parse_max_age(max_age: str | datetime.timedelta) -> datetime.timedelta:
 
     if not matches:
         raise ValueError(
-            f"Invalid max_age format: '{max_age}'. Expected format like '24 hours', "
+            f"Invalid {param_name} format: '{max_age}'. Expected format like '24 hours', "
             f"'1 day', '30 minutes', '2 hours 15 minutes', etc."
         )
 
@@ -24164,7 +24256,7 @@ def _parse_max_age(max_age: str | datetime.timedelta) -> datetime.timedelta:
         unit_lower = unit.lower()
         if unit_lower not in unit_mappings:
             raise ValueError(
-                f"Unknown time unit '{unit}' in max_age '{max_age}'. "
+                f"Unknown time unit '{unit}' in {param_name} '{max_age}'. "
                 f"Valid units are: {', '.join(valid_units)} (or their abbreviations)."
             )
 
@@ -24183,6 +24275,62 @@ def _parse_max_age(max_age: str | datetime.timedelta) -> datetime.timedelta:
             total_td += datetime.timedelta(weeks=value)
 
     return total_td
+
+
+def _timedelta_to_duration_str(td: datetime.timedelta) -> str:
+    """
+    Write a timedelta as a duration string that `_parse_max_age()` reads back exactly.
+
+    Parameters
+    ----------
+    td
+        The (non-negative) timedelta to write.
+
+    Returns
+    -------
+    str
+        A string like `"1d 2h 30m"`, `"90s"`, or `"0s"`.
+    """
+    hours, rem = divmod(td.seconds, 3600)
+    minutes, seconds = divmod(rem, 60)
+
+    if td.microseconds:
+        seconds_str = f"{seconds}.{td.microseconds:06d}".rstrip("0") + "s"
+    else:
+        seconds_str = f"{seconds}s" if seconds else ""
+
+    parts = [
+        f"{td.days}d" if td.days else "",
+        f"{hours}h" if hours else "",
+        f"{minutes}m" if minutes else "",
+        seconds_str,
+    ]
+    return " ".join(part for part in parts if part) or "0s"
+
+
+def _parse_allow_future(
+    allow_future: bool | str | datetime.timedelta,
+) -> bool | datetime.timedelta:
+    """
+    Check and normalize the `allow_future=` argument of `data_freshness()`.
+
+    Returns `True` or `False` unchanged, and a duration (string or timedelta) as a timedelta.
+    """
+    if isinstance(allow_future, bool):
+        return allow_future
+
+    if not isinstance(allow_future, (str, datetime.timedelta)):
+        raise TypeError(
+            "The `allow_future` parameter must be a boolean, a duration string, or a timedelta, "
+            f"got {type(allow_future).__name__}."
+        )
+
+    allow_future_td = _parse_max_age(allow_future, param_name="allow_future")
+
+    if allow_future_td < datetime.timedelta(0):
+        raise ValueError("The `allow_future` duration must not be negative.")
+
+    return allow_future_td
 
 
 def _parse_timezone(timezone: str) -> datetime.tzinfo:
@@ -24318,6 +24466,9 @@ def _format_timedelta(td: datetime.timedelta) -> str:
         A human-readable string like "24 hours", "2 days 5 hours", etc.
     """
     total_seconds = td.total_seconds()
+
+    if total_seconds < 0:
+        return f"-{_format_timedelta(-td)}"
 
     if total_seconds < 60:
         val = round(total_seconds, 1)
@@ -24900,7 +25051,15 @@ def _create_text_data_freshness(
 
     if for_failure:
         age = value.get("age")
-        age_text = _format_timedelta(age) if age else "unknown"
+
+        # A negative age means the data is later than the reference time
+        if age is not None and age < datetime.timedelta(0):
+            return EXPECT_FAIL_TEXT["data_freshness_future_failure_text"][lang].format(
+                column_text=column_text,
+                ahead_text=_format_timedelta(-age),
+            )
+
+        age_text = _format_timedelta(age) if age is not None else "unknown"
         return EXPECT_FAIL_TEXT[f"data_freshness_{type_}_text"][lang].format(
             column_text=column_text,
             max_age_text=max_age_text,
@@ -28566,6 +28725,14 @@ def _step_report_table_level(
         max_age = info.get("max_age", params.get("max_age"))
         max_age_display = _format_timedelta(max_age) if max_age is not None else "&mdash;"
         assertion_text = f"AGE(MAX({column_html})) &le; {max_age_display}"
+
+        # Unless `allow_future=True`, the age also has a lower bound (data later than the reference
+        # time has a negative age)
+        allow_future = params.get("allow_future", False)
+        if allow_future is False:
+            assertion_text = f"0 &le; {assertion_text}"
+        elif isinstance(allow_future, datetime.timedelta):
+            assertion_text = f"-{_format_timedelta(allow_future)} &le; {assertion_text}"
 
         def format_datetime(dt: Any) -> str:
             if dt is None:
