@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import atexit
 import base64
 import contextlib
 import copy
@@ -8,8 +9,10 @@ import difflib
 import html as html_module
 import inspect
 import json
+import os
 import pickle
 import re
+import shutil
 import tempfile
 import threading
 from dataclasses import dataclass
@@ -587,6 +590,16 @@ def _infer_dimension_from_assertion_type(assertion_type: str | None) -> str | No
     return _base_dimension_from_assertion_type(assertion_type)
 
 
+# The date and datetime columns of each bundled dataset, parsed when pandas reads the CSV (Polars
+# finds them with `try_parse_dates=True`)
+_DATASET_DATE_COLUMNS = {
+    "small_table": ["date_time", "date"],
+    "game_revenue": ["session_start", "time", "start_day"],
+    "nycflights": [],
+    "global_sales": ["timestamp"],
+}
+
+
 def load_dataset(
     dataset: Literal["small_table", "game_revenue", "nycflights", "global_sales"] = "small_table",
     tbl_type: Literal["polars", "pandas", "duckdb"] = "polars",
@@ -734,14 +747,7 @@ def load_dataset(
 
         import pandas as pd
 
-        parse_date_columns = {
-            "small_table": ["date_time", "date"],
-            "game_revenue": ["session_start", "time", "start_day"],
-            "nycflights": [],
-            "global_sales": ["timestamp"],
-        }
-
-        dataset = pd.read_csv(data_path, parse_dates=parse_date_columns[dataset])
+        dataset = pd.read_csv(data_path, parse_dates=_DATASET_DATE_COLUMNS[dataset])
 
     if tbl_type == "duckdb":  # pragma: no cover
         if not _is_lib_present(lib_name="ibis"):
@@ -1552,9 +1558,10 @@ def get_data_path(
     without requiring the actual data files. The returned paths can be used with
     `Validate(data=path)` to demonstrate CSV and Parquet file loading capabilities.
 
-    Each call writes the dataset to a new temporary file and returns the path to that file. The
-    temporary file isn't deleted automatically, so it stays available for as long as the
-    operating system keeps its temporary files.
+    The first call for a dataset and file type writes the dataset to a temporary file and returns
+    its path. Later calls with the same arguments return the same path, unless the file has been
+    changed or deleted since, in which case a fresh copy is written. All of these files are deleted
+    when the Python session ends, so copy a file elsewhere if you need to keep it.
 
     Parameters
     ----------
@@ -1567,7 +1574,8 @@ def get_data_path(
     Returns
     -------
     str
-        The path to a temporary file holding the requested dataset in the requested format.
+        The path to a temporary file holding the requested dataset in the requested format. The
+        file is deleted when the Python session ends.
 
     Included Datasets
     -----------------
@@ -1673,51 +1681,92 @@ def get_data_path(
             "- `duckdb`"
         )
 
-    if file_type == "csv":
-        # Return path to CSV file inside the zip
-        data_path = files("pointblank.data") / f"{dataset}.zip"
+    if file_type == "parquet" and not (
+        _is_lib_present(lib_name="polars") or _is_lib_present(lib_name="pandas")
+    ):
+        raise ImportError("Either Polars or Pandas is required to create temporary Parquet files.")
 
-        # For CSV files, we need to extract from zip to a temporary location
-        # since most libraries expect actual file paths, not zip contents
-        with tempfile.NamedTemporaryFile(mode="wb", suffix=".csv", delete=False) as tmp_file:
-            with ZipFile(data_path) as zip_file:
-                csv_content = zip_file.read(f"{dataset}.csv")
-                tmp_file.write(csv_content)
-                return tmp_file.name
+    with _DATA_PATH_LOCK:
+        # Reuse the file written earlier in this session, unless it's been changed or removed
+        cached = _DATA_PATH_FILES.get((dataset, file_type))
+        if cached is not None:
+            path, size, mtime_ns = cached
+            try:
+                stat = os.stat(path)
+            except OSError:
+                stat = None
+            if stat is not None and (stat.st_size, stat.st_mtime_ns) == (size, mtime_ns):
+                return path
+
+        suffix = {"csv": ".csv", "parquet": ".parquet", "duckdb": ".ddb"}[file_type]
+        with tempfile.NamedTemporaryFile(
+            mode="wb", dir=_get_data_path_dir(), prefix=f"{dataset}_", suffix=suffix, delete=False
+        ) as tmp_file:
+            path = tmp_file.name
+        try:
+            _write_dataset_file(dataset, file_type, path)
+        except BaseException:
+            os.remove(path)
+            raise
+
+        stat = os.stat(path)
+        _DATA_PATH_FILES[(dataset, file_type)] = (path, stat.st_size, stat.st_mtime_ns)
+        return path
+
+
+# The files written by `get_data_path()`, as `(dataset, file_type) -> (path, size, mtime_ns)`; the
+# size and modification time tell whether a file can be returned again unchanged
+_DATA_PATH_FILES: dict[tuple[str, str], tuple[str, int, int]] = {}
+_DATA_PATH_DIR: str | None = None
+_DATA_PATH_LOCK = threading.Lock()
+
+
+def _get_data_path_dir() -> str:
+    """Get the session's directory for `get_data_path()` files, which is removed at exit."""
+    global _DATA_PATH_DIR
+    if _DATA_PATH_DIR is None or not os.path.isdir(_DATA_PATH_DIR):
+        _DATA_PATH_DIR = tempfile.mkdtemp(prefix="pointblank-data-")
+        atexit.register(_remove_data_path_dir, _DATA_PATH_DIR, os.getpid())
+    return _DATA_PATH_DIR
+
+
+def _remove_data_path_dir(path: str, pid: int) -> None:
+    """Remove a `get_data_path()` directory at exit, in the process that created it."""
+    # A forked child process inherits the exit hook, but the files belong to its parent
+    if os.getpid() == pid:
+        shutil.rmtree(path, ignore_errors=True)
+
+
+def _write_dataset_file(dataset: str, file_type: str, path: str) -> None:
+    """Write a bundled dataset to `path` as a CSV, Parquet or DuckDB file."""
+    if file_type == "csv":
+        # Extract the CSV from its zip, since most libraries expect actual file paths
+        with ZipFile(files("pointblank.data") / f"{dataset}.zip") as zip_file:
+            content = zip_file.read(f"{dataset}.csv")
+        with open(path, "wb") as out_file:
+            out_file.write(content)
 
     elif file_type == "parquet":
-        # Create a temporary parquet file from the CSV data
+        # Convert the CSV data to Parquet
         data_path = files("pointblank.data") / f"{dataset}.zip"
+        if _is_lib_present(lib_name="polars"):
+            import polars as pl
 
-        # We'll need to convert CSV to Parquet temporarily
-        with tempfile.NamedTemporaryFile(mode="wb", suffix=".parquet", delete=False) as tmp_file:
-            # Load CSV data and save as Parquet
-            if _is_lib_present(lib_name="polars"):
-                import polars as pl
-
-                df = pl.read_csv(ZipFile(data_path).read(f"{dataset}.csv"), try_parse_dates=True)
-                df.write_parquet(tmp_file.name)
-            elif _is_lib_present(lib_name="pandas"):
-                import pandas as pd
-
-                df = pd.read_csv(data_path)
-                df.to_parquet(tmp_file.name, index=False)
-            else:
-                raise ImportError(
-                    "Either Polars or Pandas is required to create temporary Parquet files."
-                )
-            return tmp_file.name
-
-    elif file_type == "duckdb":
-        # Return path to DuckDB file
-        data_path = files("pointblank.data") / f"{dataset}-duckdb.zip"
-
-        # Extract DuckDB file to temporary location
-        with tempfile.NamedTemporaryFile(mode="wb", suffix=".ddb", delete=False) as tmp_file:
             with ZipFile(data_path) as zip_file:
-                ddb_content = zip_file.read(f"{dataset}.ddb")
-                tmp_file.write(ddb_content)
-                return tmp_file.name
+                content = zip_file.read(f"{dataset}.csv")
+            pl.read_csv(content, try_parse_dates=True).write_parquet(path)
+        else:
+            import pandas as pd
+
+            df = pd.read_csv(data_path, parse_dates=_DATASET_DATE_COLUMNS[dataset])
+            df.to_parquet(path, index=False)
+
+    else:
+        # Extract the DuckDB database file from its zip
+        with ZipFile(files("pointblank.data") / f"{dataset}-duckdb.zip") as zip_file:
+            content = zip_file.read(f"{dataset}.ddb")
+        with open(path, "wb") as out_file:
+            out_file.write(content)
 
 
 def _process_data(data: Any, lazy: bool = False) -> Any:
@@ -1865,11 +1914,16 @@ def _process_github_url(data: Any) -> Any:
             tmp_file.write(content)
             tmp_file_path = tmp_file.name
 
-        # Process the temporary file using existing CSV or Parquet processing functions
-        if file_ext == ".csv":
-            return _process_csv_input(tmp_file_path)
-        else:  # .parquet
-            return _process_parquet_input(tmp_file_path)
+        # Process the temporary file using existing CSV or Parquet processing functions; both
+        # read it into memory, so the file can be removed afterwards
+        try:
+            if file_ext == ".csv":
+                return _process_csv_input(tmp_file_path)
+            else:  # .parquet
+                return _process_parquet_input(tmp_file_path)
+        finally:
+            with contextlib.suppress(OSError):
+                os.remove(tmp_file_path)
 
     except Exception:  # pragma: no cover
         # If download or processing fails, return original data
