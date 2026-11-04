@@ -1587,7 +1587,9 @@ col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -1833,7 +1835,9 @@ col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -2079,7 +2083,9 @@ col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -2325,7 +2331,9 @@ col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -2571,7 +2579,9 @@ col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -2815,7 +2825,9 @@ col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -3069,7 +3081,9 @@ col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | Col
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -3335,7 +3349,9 @@ col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | Col
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -3581,7 +3597,9 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -3857,7 +3875,9 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -4434,7 +4454,9 @@ col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | Column
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -4642,7 +4664,9 @@ col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | Co
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -4866,7 +4890,9 @@ col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | Colum
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -5116,7 +5142,9 @@ col_vals_within_spec(self, columns: 'str | list[str] | Column | ColumnSelector |
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -5328,7 +5356,9 @@ col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'Segme
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -8983,7 +9013,9 @@ rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -9184,7 +9216,9 @@ rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
