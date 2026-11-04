@@ -763,6 +763,10 @@ class StringField(Field):
     # Override dtype with fixed value
     dtype: str = "String"
 
+    # Set by `profile_fields(prefix=)` so that each prefixed profile gets its own coherent row
+    # context (person, location, employer) during generation
+    _coherence_group: str | None = field(default=None, init=False, repr=False, compare=False)
+
     def _validate(self) -> None:
         """Validate string field constraints."""
         super()._validate()
@@ -2177,9 +2181,10 @@ def profile_fields(
         ignored.
     prefix
         Optional string to prepend to every column name. For example, `prefix="customer_"`
-        produces keys like `"customer_first_name"`, `"customer_email"`, etc. The prefix doesn't
-        create a separate identity: all person-related columns in a schema currently share the
-        same person in each row.
+        produces keys like `"customer_first_name"`, `"customer_email"`, etc. Each prefixed
+        profile in a schema is a separate person, with its own name, location, and employer in
+        each row. Other preset columns whose names start with the same prefix (e.g., a
+        hand-written `"customer_city"` column) belong to that profile.
 
     Returns
     -------
@@ -2248,10 +2253,20 @@ def profile_fields(
     pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
 
-    The prefix changes only the column names, so the emails are still derived from the names in
-    each row. All person-related columns in a schema share one identity per row, so two prefixed
-    profiles (e.g., `"sender_"` and `"recipient_"`) currently get the same names rather than two
-    independent people.
+    The emails are still derived from the names in each row. A schema can hold several prefixed
+    profiles, and each one is a different person:
+
+    ```{python}
+    schema = pb.Schema(
+        **pb.profile_fields(set="minimal", prefix="sender_"),
+        **pb.profile_fields(set="minimal", prefix="recipient_"),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    Each sender's email matches the sender's name and each recipient's email matches the
+    recipient's name, but the sender and the recipient in a row are two independent people.
     """
 
     # --- Validate set parameter ---
@@ -2329,6 +2344,9 @@ def profile_fields(
     result: dict[str, StringField] = {}
     for preset_name in ordered_presets:
         col_name = f"{prefix}{preset_name}" if prefix else preset_name
-        result[col_name] = StringField(preset=preset_name)
+        col_field = StringField(preset=preset_name)
+        if prefix:
+            col_field._coherence_group = prefix
+        result[col_name] = col_field
 
     return result
