@@ -1,3 +1,4 @@
+import datetime
 import pyexpat
 import pytest
 import pandas as pd
@@ -1045,6 +1046,34 @@ class TestDataFreshness:
             allow_tz_mismatch=True,
         )
         assert result["passed"] is True
+
+    @pytest.mark.parametrize(
+        "allow_future, passed",
+        [
+            (False, False),
+            (True, True),
+            (datetime.timedelta(minutes=30), False),
+            (datetime.timedelta(hours=1), True),
+        ],
+    )
+    def test_future_data(self, allow_future, passed):
+        import datetime
+        from pointblank._interrogation import data_freshness
+
+        ref = datetime.datetime(2023, 6, 15, 12, 0, 0)
+        df = pd.DataFrame({"ts": [ref + datetime.timedelta(hours=1)]})
+        result = data_freshness(
+            df,
+            "ts",
+            max_age=datetime.timedelta(hours=2),
+            reference_time=ref,
+            timezone=None,
+            allow_tz_mismatch=False,
+            allow_future=allow_future,
+        )
+        assert result["passed"] is passed
+        assert result["future"] is True
+        assert result["age"] == datetime.timedelta(hours=-1)
 
 
 class TestIsDatetimeAware:
