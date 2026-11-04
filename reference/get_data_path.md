@@ -4,7 +4,7 @@ Get the file path to a dataset included with the Pointblank package.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1543-L1720)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1549-L1714)
 
 ``` python
 get_data_path(
@@ -15,7 +15,7 @@ get_data_path(
 
 This function provides direct access to the file paths of datasets included with Pointblank. These paths can be used in examples and documentation to demonstrate file-based data loading without requiring the actual data files. The returned paths can be used with `Validate(data=path)` to demonstrate CSV and Parquet file loading capabilities.
 
-Each call writes the dataset to a new temporary file and returns the path to that file. The temporary file isn't deleted automatically, so it stays available for as long as the operating system keeps its temporary files.
+The first call for a dataset and file type writes the dataset to a temporary file and returns its path. Later calls with the same arguments return the same path, unless the file has been changed or deleted since, in which case a fresh copy is written. All of these files are deleted when the Python session ends, so copy a file elsewhere if you need to keep it.
 
 ## Parameters
 
@@ -28,7 +28,7 @@ The file format to get the path for. Options are `"csv"`, `"parquet"`, or `"duck
 ## Returns
 
 `str`  
-The path to a temporary file holding the requested dataset in the requested format.
+The path to a temporary file holding the requested dataset in the requested format. The file is deleted when the Python session ends.
 
 ## Included Datasets
 

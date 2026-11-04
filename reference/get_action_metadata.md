@@ -4,7 +4,7 @@ Access step-level metadata when authoring custom actions.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L201-L273)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L204-L276)
 
 ``` python
 get_action_metadata()
