@@ -851,6 +851,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "autobrief",
         "dimension",
         "active",
+        "active_spec",
         "expr_source",
         "eval_error",
         "all_passed",
@@ -884,6 +885,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
     assert val_info.brief is None
     assert val_info.autobrief is None
     assert val_info.active is True
+    assert val_info.active_spec is None
     assert val_info.eval_error is None
     assert val_info.all_passed is None
     assert val_info.n is None
@@ -937,6 +939,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "autobrief",
         "dimension",
         "active",
+        "active_spec",
         "expr_source",
         "eval_error",
         "all_passed",
@@ -971,6 +974,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
     assert val_info.brief is None
     assert val_info.autobrief is not None
     assert val_info.active is True
+    assert val_info.active_spec is True
     assert val_info.eval_error is None
     assert val_info.all_passed is True
     assert val_info.n == 4
