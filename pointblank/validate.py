@@ -6758,7 +6758,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -7067,7 +7069,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -7383,7 +7387,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -7699,7 +7705,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -8013,7 +8021,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -8330,7 +8340,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -8661,7 +8673,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -9006,7 +9020,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -9328,7 +9344,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -9679,7 +9697,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -10476,7 +10496,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -10743,7 +10765,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -11030,7 +11054,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -11351,7 +11377,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -11841,7 +11869,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -13202,7 +13232,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -13456,7 +13488,9 @@ class Validate:
         The segmentation is performed during interrogation, and the resulting validation steps will
         be numbered sequentially. Each segment will have its own validation step, and the results
         will be reported separately. This allows for a more granular analysis of the data and helps
-        identify issues within specific segments.
+        identify issues within specific segments. If no segments are found (e.g., the table has no
+        rows), a single step is kept with a note explaining why, so the steps after it keep their
+        numbers.
 
         Importantly, the segmentation process will be performed after any preprocessing of the data
         table. Because of this, one can conceivably use the `pre=` argument to generate a column
@@ -23468,8 +23502,8 @@ class Validate:
         Evaluate any segmentation expressions stored in the `segments` attribute and expand each
         validation step with such directives into multiple. This is done by evaluating the
         segmentation expression and creating a new validation step for each segment. Errors in
-        evaluation (such as no segments matched) will be caught and recorded in the `eval_error`
-        attribute.
+        evaluation will be caught and recorded in the `eval_error` attribute. If no segments are
+        found, a single unsegmented step with a note is kept in place of the segmented step.
 
         Parameters
         ----------
@@ -23540,6 +23574,33 @@ class Validate:
             except Exception:  # pragma: no cover
                 validation.eval_error = True
                 expanded_validation_info.append(validation)
+                continue
+
+            # If no segments were found (the table has no rows, or an empty list of segment values
+            # was given), keep the step as a single unsegmented step so that it still appears in
+            # the report and the steps after it keep their numbers
+            if not seg_tuples:
+                new_validation = copy.deepcopy(validation)
+
+                new_validation.segments = None
+                new_validation.segments_spec = segments_expr
+
+                no_segments_text = NOTES_TEXT.get("no_segments_found", {}).get(
+                    self.locale, NOTES_TEXT.get("no_segments_found", {}).get("en", "")
+                )
+                new_validation._add_note(
+                    key="no_segments",
+                    markdown=no_segments_text,
+                    text=no_segments_text,
+                )
+
+                # On a table with no rows, the step has no test units (like any step on an empty
+                # table); otherwise the step can't be evaluated, since checking every row would
+                # ignore the `segments=` directive
+                if get_row_count(table) > 0:
+                    new_validation.eval_error = True
+
+                expanded_validation_info.append(new_validation)
                 continue
 
             # For each segmentation resolved, create a new validation step and add it to the list of
