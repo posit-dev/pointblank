@@ -4,7 +4,7 @@ Create an integer column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L299-L436)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L299-L437)
 
 ``` python
 int_field(
@@ -47,7 +47,7 @@ Whether all values must be unique. Default is `False`. When `True`, the generato
 Custom callable that generates values. When provided, it's used instead of `min_val=`, `max_val=` and `allowed=`, while `unique=` and `nullable=` still apply. The callable should take no arguments and return a single integer value. It isn't controlled by the `seed=` of [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset), so it needs its own seeded random number generator for reproducible data.
 
 `dtype: str = "Int64"`  
-Integer dtype. Default is `"Int64"`. Options: `"Int8"`, `"Int16"`, `"Int32"`, `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`. The dtype limits the range of values (e.g., `0` to `255` for `"UInt8"`), but the column that [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset) creates is currently always `Int64`.
+Integer dtype. Default is `"Int64"`. Options: `"Int8"`, `"Int16"`, `"Int32"`, `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`. The dtype limits the range of values (e.g., `0` to `255` for `"UInt8"`) and is the dtype of the column that [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset) creates. With `output="pandas"`, the column is a NumPy integer (e.g., `int32`), or a pandas nullable integer (e.g., `Int32`) when `nullable=True`.
 
 ## Returns
 
@@ -105,7 +105,7 @@ pb.preview(pb.generate_dataset(schema, n=50, seed=23))
 
 | PolarsRows50Columns2 |               |                      |
 |----------------------|---------------|----------------------|
-|                      | score *Int64* | optional_val *Int64* |
+|                      | score *UInt8* | optional_val *Int64* |
 | 1                    | 148           | 50                   |
 | 2                    | 42            | 19                   |
 | 3                    | 8             | None                 |

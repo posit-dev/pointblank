@@ -4,7 +4,7 @@ Create a date column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1297-L1415)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1298-L1416)
 
 ``` python
 date_field(

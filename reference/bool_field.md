@@ -4,7 +4,7 @@ Create a boolean column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1094-L1199)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1095-L1200)
 
 ``` python
 bool_field(

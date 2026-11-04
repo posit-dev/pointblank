@@ -4,7 +4,7 @@ Create a time column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1733-L1849)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L1734-L1850)
 
 ``` python
 time_field(
@@ -19,7 +19,7 @@ time_field(
 
 The [time_field()](../reference/time_field.md#pointblank.time_field) function defines the constraints and behavior for a time-of-day column when generating synthetic data with [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset). You can control the time range with `min_time=` and `max_time=`, enforce uniqueness with `unique=True`, and introduce null values with `nullable=True` and `null_probability=`.
 
-Time values are generated uniformly (at second-level resolution) within the specified range. If no range is provided, the default range is 00:00:00 to 23:59:59. Both `min_time=` and `max_time=` accept `datetime.time` objects or ISO format time strings (e.g., `"09:30:00"`). The column that [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset) creates currently holds the times as `"HH:MM:SS"` strings rather than as a time dtype.
+Time values are generated uniformly (at second-level resolution) within the specified range. If no range is provided, the default range is 00:00:00 to 23:59:59. Both `min_time=` and `max_time=` accept `datetime.time` objects or ISO format time strings (e.g., `"09:30:00"`). The column that [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset) creates holds `datetime.time` values: a `Time` column in Polars, and an `object` column in pandas (which has no time dtype).
 
 ## Parameters
 
@@ -73,19 +73,19 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=100, seed=23))
 ```
 
-| PolarsRows100Columns2 |                     |                   |
-|-----------------------|---------------------|-------------------|
-|                       | start_time *String* | end_time *String* |
-| 1                     | 10:19:09            | 16:32:49          |
-| 2                     | 09:22:48            | 14:19:09          |
-| 3                     | 09:04:39            | 16:46:32          |
-| 4                     | 11:41:39            | 13:22:48          |
-| 5                     | 10:23:45            | 13:04:39          |
-| 96                    | 10:53:39            | 15:29:54          |
-| 97                    | 10:47:25            | 13:59:36          |
-| 98                    | 09:06:22            | 14:10:33          |
-| 99                    | 09:44:23            | 13:40:49          |
-| 100                   | 10:01:36            | 13:29:15          |
+| PolarsRows100Columns2 |                   |                 |
+|-----------------------|-------------------|-----------------|
+|                       | start_time *Time* | end_time *Time* |
+| 1                     | 10:19:09          | 16:32:49        |
+| 2                     | 09:22:48          | 14:19:09        |
+| 3                     | 09:04:39          | 16:46:32        |
+| 4                     | 11:41:39          | 13:22:48        |
+| 5                     | 10:23:45          | 13:04:39        |
+| 96                    | 10:53:39          | 15:29:54        |
+| 97                    | 10:47:25          | 13:59:36        |
+| 98                    | 09:06:22          | 14:10:33        |
+| 99                    | 09:44:23          | 13:40:49        |
+| 100                   | 10:01:36          | 13:29:15        |
 
 ISO format strings can also be used for convenience:
 
@@ -98,19 +98,19 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=30, seed=23))
 ```
 
-| PolarsRows30Columns2 |                     |                     |
-|----------------------|---------------------|---------------------|
-|                      | login_time *String* | alarm_time *String* |
-| 1                    | 22:50:11            | 08:32:49            |
-| 2                    | 20:11:17            | 06:19:09            |
-| 3                    | 23:16:07            | 08:46:32            |
-| 4                    | 11:16:39            | 05:22:48            |
-| 5                    | 22:14:46            | 05:04:39            |
-| 26                   | 07:55:40            | 06:55:01            |
-| 27                   | 07:33:41            | 05:05:20            |
-| 28                   | 23:51:48            | 07:19:58            |
-| 29                   | 18:55:31            | 07:51:23            |
-| 30                   | 15:04:12            | 08:20:29            |
+| PolarsRows30Columns2 |                   |                   |
+|----------------------|-------------------|-------------------|
+|                      | login_time *Time* | alarm_time *Time* |
+| 1                    | 22:50:11          | 08:32:49          |
+| 2                    | 20:11:17          | 06:19:09          |
+| 3                    | 23:16:07          | 08:46:32          |
+| 4                    | 11:16:39          | 05:22:48          |
+| 5                    | 22:14:46          | 05:04:39          |
+| 26                   | 07:55:40          | 06:55:01          |
+| 27                   | 07:33:41          | 05:05:20          |
+| 28                   | 23:51:48          | 07:19:58          |
+| 29                   | 18:55:31          | 07:51:23          |
+| 30                   | 15:04:12          | 08:20:29          |
 
 It's possible to introduce optional time values with `nullable=True` and combine them with other field types:
 
@@ -127,18 +127,18 @@ schema = pb.Schema(
 pb.preview(pb.generate_dataset(schema, n=30, seed=7))
 ```
 
-| PolarsRows30Columns3 |  |  |  |
-|----|----|----|----|
-|  | employee_id *Int64* | check_in *String* | check_out *String* |
-| 1 | 431 | 08:28:25 | 17:28:25 |
-| 2 | 254 | 07:41:11 | 16:41:11 |
-| 3 | 504 | 08:47:48 | None |
-| 4 | 766 | 09:57:44 | 18:57:44 |
-| 5 | 149 | 07:13:11 | None |
-| 26 | 679 | 08:00:57 | 18:34:24 |
-| 27 | 226 | 09:52:12 | 16:33:48 |
-| 28 | 328 | 09:51:19 | 17:00:57 |
-| 29 | 745 | 09:39:11 | 18:52:12 |
-| 30 | 742 | 07:16:53 | 18:51:19 |
+| PolarsRows30Columns3 |                     |                 |                  |
+|----------------------|---------------------|-----------------|------------------|
+|                      | employee_id *Int64* | check_in *Time* | check_out *Time* |
+| 1                    | 431                 | 08:28:25        | 17:28:25         |
+| 2                    | 254                 | 07:41:11        | 16:41:11         |
+| 3                    | 504                 | 08:47:48        | None             |
+| 4                    | 766                 | 09:57:44        | 18:57:44         |
+| 5                    | 149                 | 07:13:11        | None             |
+| 26                   | 679                 | 08:00:57        | 18:34:24         |
+| 27                   | 226                 | 09:52:12        | 16:33:48         |
+| 28                   | 328                 | 09:51:19        | 17:00:57         |
+| 29                   | 745                 | 09:39:11        | 18:52:12         |
+| 30                   | 742                 | 07:16:53        | 18:51:19         |
 
 Every `check_in` time falls in the morning window and every non-missing `check_out` time in the late afternoon or evening one, with 6 of the 30 `check_out` values missing. The `employee_id` values are distinct three-digit numbers.

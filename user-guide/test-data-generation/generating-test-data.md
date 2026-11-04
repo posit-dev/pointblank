@@ -52,10 +52,10 @@ Pointblank provides helper functions for defining typed columns with constraints
 | [float_field()](../../reference/float_field.md#pointblank.float_field) | Float columns | `min_val`, `max_val`, `allowed` |
 | [string_field()](../../reference/string_field.md#pointblank.string_field) | String columns | `preset`, `pattern`, `allowed`, `unique` |
 | [bool_field()](../../reference/bool_field.md#pointblank.bool_field) | Boolean columns | `p_true` (probability of True) |
-| [date_field()](../../reference/date_field.md#pointblank.date_field) | Date columns | `min_val`, `max_val` |
-| [datetime_field()](../../reference/datetime_field.md#pointblank.datetime_field) | Datetime columns | `min_val`, `max_val` |
-| [time_field()](../../reference/time_field.md#pointblank.time_field) | Time columns | `min_val`, `max_val` |
-| [duration_field()](../../reference/duration_field.md#pointblank.duration_field) | Duration columns | `min_val`, `max_val` |
+| [date_field()](../../reference/date_field.md#pointblank.date_field) | Date columns | `min_date`, `max_date` |
+| [datetime_field()](../../reference/datetime_field.md#pointblank.datetime_field) | Datetime columns | `min_date`, `max_date` |
+| [time_field()](../../reference/time_field.md#pointblank.time_field) | Time columns | `min_time`, `max_time` |
+| [duration_field()](../../reference/duration_field.md#pointblank.duration_field) | Duration columns | `min_duration`, `max_duration` |
 | [profile_fields()](../../reference/profile_fields.md#pointblank.profile_fields) | Bundled person-profile fields | `set`, `split_name`, `include`, `exclude`, `prefix` |
 
 ### Integer Fields
@@ -377,7 +377,7 @@ pb.preview(pandas_df)
 
 | PandasRows100Columns2 |                     |                    |
 |-----------------------|---------------------|--------------------|
-|                       | id *int64*          | name *object*      |
+|                       | id *int64*          | name *str*         |
 | 1                     | 7188536481533917197 | Doris Martin       |
 | 2                     | 2674009078779859984 | Nancy Gonzalez     |
 | 3                     | 7652102777077138151 | Jessica Turner     |

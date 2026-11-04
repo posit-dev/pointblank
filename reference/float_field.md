@@ -4,7 +4,7 @@ Create a floating-point column specification for use in a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L538-L691)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L539-L692)
 
 ``` python
 float_field(
@@ -51,7 +51,7 @@ Whether all values must be unique. Default is `False`. When `True`, the generato
 Custom callable that generates values. When provided, it's used instead of `min_val=`, `max_val=`, `allowed=` and `precision=`, while `unique=` and `nullable=` still apply. The callable should take no arguments and return a single float value. It isn't controlled by the `seed=` of [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset), so it needs its own seeded random number generator for reproducible data.
 
 `dtype: str = "Float64"`  
-Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`. The column that [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset) creates is currently always `Float64`.
+Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`. It's the dtype of the column that [generate_dataset()](../reference/generate_dataset.md#pointblank.generate_dataset) creates.
 
 ## Returns
 

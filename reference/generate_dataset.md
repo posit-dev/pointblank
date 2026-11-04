@@ -4,7 +4,7 @@ Generate synthetic test data from a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1312-L1595)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1316-L1603)
 
 ``` python
 generate_dataset(
@@ -48,12 +48,12 @@ When `True`, names and locations are sampled according to real-world frequency t
 ## Returns
 
 `DataFrame or dict`  
-Generated data in the requested format.
+Generated data in the requested format. In a DataFrame, each numeric column has its field's dtype (e.g., `int_field(dtype="Int32")` gives an `Int32` column), and a [time_field()](../reference/time_field.md#pointblank.time_field) column holds `datetime.time` values.
 
 ## Raises
 
 `ValueError`  
-If the schema has no columns or if constraints cannot be satisfied.
+If the schema has no columns, if constraints cannot be satisfied, or if a custom `generator=` of a numeric field returns a value that doesn't fit the field's dtype (such as `1.5` for an integer field, or `300` for a `"UInt8"` one).
 
 `ImportError`  
 If required optional dependencies are not installed.
@@ -181,7 +181,7 @@ pb.preview(pb.generate_dataset(schema, n=50, seed=23, output="pandas"))
 
 | PandasRows50Columns3 |                     |                      |               |
 |----------------------|---------------------|----------------------|---------------|
-|                      | name *object*       | age *int64*          | active *bool* |
+|                      | name *str*          | age *int64*          | active *bool* |
 | 1                    | 51fbLtByHw          | -1406612057389349638 | False         |
 | 2                    | UmrCa               | -2617964757147985650 | False         |
 | 3                    | ND5bgfTF            | -5681649629593590626 | False         |

@@ -24338,12 +24338,16 @@ weighted
 Returns
 -------
 DataFrame or dict
-    Generated data in the requested format.
+    Generated data in the requested format. In a DataFrame, each numeric column has its
+    field's dtype (e.g., `int_field(dtype="Int32")` gives an `Int32` column), and a
+    `time_field()` column holds `datetime.time` values.
 
 Raises
 ------
 ValueError
-    If the schema has no columns or if constraints cannot be satisfied.
+    If the schema has no columns, if constraints cannot be satisfied, or if a custom
+    `generator=` of a numeric field returns a value that doesn't fit the field's dtype (such
+    as `1.5` for an integer field, or `300` for a `"UInt8"` one).
 ImportError
     If required optional dependencies are not installed.
 
@@ -24662,8 +24666,9 @@ generator
 dtype
     Integer dtype. Default is `"Int64"`. Options: `"Int8"`, `"Int16"`, `"Int32"`,
     `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`. The dtype limits the range of
-    values (e.g., `0` to `255` for `"UInt8"`), but the column that `generate_dataset()` creates
-    is currently always `Int64`.
+    values (e.g., `0` to `255` for `"UInt8"`) and is the dtype of the column that
+    `generate_dataset()` creates. With `output="pandas"`, the column is a NumPy integer (e.g.,
+    `int32`), or a pandas nullable integer (e.g., `Int32`) when `nullable=True`.
 
 Returns
 -------
@@ -24781,8 +24786,8 @@ generator
     the `seed=` of `generate_dataset()`, so it needs its own seeded random number generator
     for reproducible data.
 dtype
-    Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`. The column that
-    `generate_dataset()` creates is currently always `Float64`.
+    Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`. It's the dtype of
+    the column that `generate_dataset()` creates.
 
 Returns
 -------
@@ -25367,8 +25372,8 @@ values with `nullable=True` and `null_probability=`.
 Time values are generated uniformly (at second-level resolution) within the specified range.
 If no range is provided, the default range is 00:00:00 to 23:59:59. Both `min_time=` and
 `max_time=` accept `datetime.time` objects or ISO format time strings (e.g., `"09:30:00"`).
-The column that `generate_dataset()` creates currently holds the times as `"HH:MM:SS"` strings
-rather than as a time dtype.
+The column that `generate_dataset()` creates holds `datetime.time` values: a `Time` column in
+Polars, and an `object` column in pandas (which has no time dtype).
 
 Parameters
 ----------
@@ -39268,10 +39273,10 @@ Pointblank provides helper functions for defining typed columns with constraints
 | `float_field()` | Float columns | `min_val`, `max_val`, `allowed` |
 | `string_field()` | String columns | `preset`, `pattern`, `allowed`, `unique` |
 | `bool_field()` | Boolean columns | `p_true` (probability of True) |
-| `date_field()` | Date columns | `min_val`, `max_val` |
-| `datetime_field()` | Datetime columns | `min_val`, `max_val` |
-| `time_field()` | Time columns | `min_val`, `max_val` |
-| `duration_field()` | Duration columns | `min_val`, `max_val` |
+| `date_field()` | Date columns | `min_date`, `max_date` |
+| `datetime_field()` | Datetime columns | `min_date`, `max_date` |
+| `time_field()` | Time columns | `min_time`, `max_time` |
+| `duration_field()` | Duration columns | `min_duration`, `max_duration` |
 | `profile_fields()` | Bundled person-profile fields | `set`, `split_name`, `include`, `exclude`, `prefix` |
 
 ### Integer Fields

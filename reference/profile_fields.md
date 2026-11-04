@@ -4,7 +4,7 @@ Create a dict of string field specifications representing a person profile.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L2144-L2333)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/field.py#L2145-L2334)
 
 ``` python
 profile_fields(
