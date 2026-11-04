@@ -90,7 +90,7 @@ from pointblank.metadata import (
     validate_sdtm_structure,
     validate_sdtmig,
 )
-from pointblank.pipeline import Pipeline, PipelineResult
+from pointblank.pipeline import ContractViolationError, Pipeline, PipelineResult
 from pointblank.schema import Schema, generate_dataset, schema_from_tbl
 from pointblank.segments import seg_group
 from pointblank.thresholds import Actions, FinalActions, Thresholds
@@ -128,6 +128,7 @@ __all__ = [
     "Steps",
     "Pipeline",
     "PipelineResult",
+    "ContractViolationError",
     "Comparison",
     "SchemaDiff",
     "compare",
