@@ -10,7 +10,7 @@ import yaml
 
 import pointblank as pb
 from pointblank.contract import Contract, Step
-from pointblank.pipeline import Pipeline, PipelineResult
+from pointblank.pipeline import ContractViolationError, Pipeline, PipelineResult
 
 
 # ─── Fixtures ────────────────────────────────────────────────────────────────────
@@ -431,7 +431,7 @@ class TestPipelineRun:
         assert received_data[0].equals(raw_data)
 
     def test_run_with_on_violation_raise_source(self, raw_data_with_issues, target_contract):
-        """on_violation=raise in source with short_circuit should abort."""
+        """on_violation=raise in source with short_circuit raises before the transform."""
         source = Contract(
             name="strict_source",
             direction="source",
@@ -439,12 +439,131 @@ class TestPipelineRun:
             on_violation="raise",
         )
         pipeline = Pipeline(source=source, target=target_contract, short_circuit=True)
+        calls = []
 
-        # When short_circuit=True and on_violation=raise, the pipeline should
-        # catch the error and short circuit
-        result = pipeline.run(data=raw_data_with_issues, transform=lambda df: df)
+        with pytest.raises(ContractViolationError, match="strict_source") as exc_info:
+            pipeline.run(data=raw_data_with_issues, transform=lambda df: calls.append(df) or df)
+
+        result = exc_info.value.result
+        assert calls == []
         assert result.source_passed is False
         assert result.target_validation is None
+        assert result.transform_output is None
+
+
+# ─── Raise Mode Tests ────────────────────────────────────────────────────────────
+
+
+def _strict(contract: Contract) -> Contract:
+    contract.on_violation = "raise"
+    return contract
+
+
+class TestPipelineRaise:
+    """Tests for on_violation="raise" in run(), validate_source() and validate_target()."""
+
+    def test_error_is_exported_runtime_error(self):
+        assert pb.ContractViolationError is ContractViolationError
+        assert issubclass(ContractViolationError, RuntimeError)
+
+    def test_run_source_raise_short_circuit_attributes(self, raw_data_with_issues, source_contract):
+        source = _strict(source_contract)
+        pipeline = Pipeline(source=source)
+
+        with pytest.raises(ContractViolationError) as exc_info:
+            pipeline.run(data=raw_data_with_issues, transform=lambda df: df)
+
+        error = exc_info.value
+        assert (
+            str(error) == "Contract 'raw_orders' (source) violated: validation has failing steps."
+        )
+        assert error.contract is source
+        assert error.validation is error.result.source_validation
+        assert error.validation.all_passed() is False
+
+    def test_run_source_raise_without_short_circuit_finishes_run(
+        self, raw_data_with_issues, source_contract
+    ):
+        target = Contract(
+            name="out",
+            direction="target",
+            steps=[Step("col_vals_gt", columns="status_code", value=-1)],
+        )
+        pipeline = Pipeline(source=_strict(source_contract), target=target, short_circuit=False)
+
+        with pytest.raises(ContractViolationError, match="raw_orders") as exc_info:
+            pipeline.run(data=raw_data_with_issues, transform=lambda df: df)
+
+        result = exc_info.value.result
+        assert result.source_passed is False
+        assert result.transform_output is not None
+        assert result.target_validation is not None
+        assert result.target_passed is True
+
+    def test_run_both_raise_without_short_circuit_reports_source(
+        self, raw_data_with_issues, source_contract
+    ):
+        target = Contract(
+            name="out",
+            direction="target",
+            steps=[Step("col_vals_gt", columns="status_code", value=50)],
+            on_violation="raise",
+        )
+        pipeline = Pipeline(source=_strict(source_contract), target=target, short_circuit=False)
+
+        with pytest.raises(ContractViolationError) as exc_info:
+            pipeline.run(data=raw_data_with_issues, transform=lambda df: df)
+
+        error = exc_info.value
+        assert error.contract.name == "raw_orders"
+        assert error.result.target_passed is False
+
+    def test_run_warn_source_and_raise_target(self, raw_data_with_issues, source_contract):
+        target = Contract(
+            name="out",
+            direction="target",
+            steps=[Step("col_vals_gt", columns="status_code", value=50)],
+            on_violation="raise",
+        )
+        pipeline = Pipeline(source=source_contract, target=target, short_circuit=False)
+
+        with pytest.warns(UserWarning, match="raw_orders"):
+            with pytest.raises(ContractViolationError, match="out") as exc_info:
+                pipeline.run(data=raw_data_with_issues, transform=lambda df: df)
+
+        assert exc_info.value.contract is target
+
+    def test_run_raise_contracts_that_pass_return_result(
+        self, raw_data, source_contract, target_contract, transform_fn
+    ):
+        pipeline = Pipeline(source=_strict(source_contract), target=_strict(target_contract))
+
+        result = pipeline.run(data=raw_data, transform=transform_fn)
+
+        assert result.passed is True
+
+    def test_validate_source_and_target_errors_have_no_result(
+        self, raw_data_with_issues, source_contract
+    ):
+        source = _strict(source_contract)
+        target = Contract(
+            name="out",
+            direction="target",
+            steps=[Step("col_vals_gt", columns="status_code", value=50)],
+            on_violation="raise",
+        )
+        pipeline = Pipeline(source=source, target=target)
+
+        with pytest.raises(ContractViolationError) as exc_info:
+            pipeline.validate_source(raw_data_with_issues)
+        assert exc_info.value.contract is source
+        assert exc_info.value.validation.all_passed() is False
+        assert exc_info.value.result is None
+
+        with pytest.raises(ContractViolationError) as exc_info:
+            pipeline.validate_target(raw_data_with_issues)
+        assert exc_info.value.contract is target
+        assert exc_info.value.result is None
 
 
 # ─── Pipeline Threshold Override Tests ───────────────────────────────────────────
@@ -775,8 +894,8 @@ class TestPipelineEdgeCases:
         _append_validation_summary(lines, BrokenValidation())  # type: ignore
         assert any("unable" in line for line in lines)
 
-    def test_run_target_on_violation_raise_caught(self, raw_data, source_contract, transform_fn):
-        """run() catches RuntimeError from target on_violation='raise'."""
+    def test_run_target_on_violation_raise(self, raw_data, source_contract, transform_fn):
+        """run() raises for a target with on_violation='raise', keeping the result."""
         target = Contract(
             name="strict_target",
             direction="target",
@@ -784,7 +903,12 @@ class TestPipelineEdgeCases:
             on_violation="raise",
         )
         pipeline = Pipeline(source=source_contract, target=target)
-        result = pipeline.run(data=raw_data, transform=transform_fn)
+
+        with pytest.raises(ContractViolationError, match="strict_target") as exc_info:
+            pipeline.run(data=raw_data, transform=transform_fn)
+
+        result = exc_info.value.result
+        assert result.source_passed is True
         assert result.target_passed is False
         assert result.transform_output is not None
 

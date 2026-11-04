@@ -260,6 +260,8 @@ reference:
             - from_dict
         - name: PipelineResult
           members: true
+        - name: ContractViolationError
+          members: false
 
     - title: Contract Import/Export
       desc: >
