@@ -18415,7 +18415,9 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
     automatically coherent across those columns within each row. Person-related presets will share
     the same identity (e.g., the email is derived from the name), address-related presets will
     share the same location (e.g., the city matches the address), and business-related presets
-    will share the same industry context.
+    will share the same industry context. Profiles made by `profile_fields()` with different
+    `prefix=` values (e.g., `"customer_"` and `"seller_"`) are coherent separately, so each one is a
+    different person with its own location and employer.
 
     Locale Mixing
     -------------
@@ -19569,9 +19571,10 @@ profile_fields(*, set: "Literal['minimal', 'standard', 'full']" = 'standard', sp
         ignored.
     prefix
         Optional string to prepend to every column name. For example, `prefix="customer_"`
-        produces keys like `"customer_first_name"`, `"customer_email"`, etc. The prefix doesn't
-        create a separate identity: all person-related columns in a schema currently share the
-        same person in each row.
+        produces keys like `"customer_first_name"`, `"customer_email"`, etc. Each prefixed
+        profile in a schema is a separate person, with its own name, location, and employer in
+        each row. Other preset columns whose names start with the same prefix (e.g., a
+        hand-written `"customer_city"` column) belong to that profile.
 
     Returns
     -------
@@ -19640,10 +19643,20 @@ profile_fields(*, set: "Literal['minimal', 'standard', 'full']" = 'standard', sp
     pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
 
-    The prefix changes only the column names, so the emails are still derived from the names in
-    each row. All person-related columns in a schema share one identity per row, so two prefixed
-    profiles (e.g., `"sender_"` and `"recipient_"`) currently get the same names rather than two
-    independent people.
+    The emails are still derived from the names in each row. A schema can hold several prefixed
+    profiles, and each one is a different person:
+
+    ```python
+    schema = pb.Schema(
+        **pb.profile_fields(set="minimal", prefix="sender_"),
+        **pb.profile_fields(set="minimal", prefix="recipient_"),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    Each sender's email matches the sender's name and each recipient's email matches the
+    recipient's name, but the sender and the recipient in a row are two independent people.
     
 
 
