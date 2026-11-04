@@ -69,7 +69,9 @@ def _align_decimal_compare_val(nw_tbl: Any, column: str, compare_val: Any) -> An
 
     pandas compares a float column with a `Decimal` value element by element, which raises
     `decimal.InvalidOperation` as soon as the column has a `NaN`; the other backends compare the
-    two as floats anyway. A `Decimal` value against a decimal or integer column is left as is.
+    two as floats anyway. A `Decimal` value against a decimal or integer column is left as is,
+    except on an Ibis version that can't compare a decimal column with a `Decimal` literal, where
+    the value is compared as a float as well.
     """
     if not isinstance(compare_val, Decimal):
         return compare_val
@@ -78,7 +80,30 @@ def _align_decimal_compare_val(nw_tbl: Any, column: str, compare_val: Any) -> An
     if dtype is not None and dtype.is_float():
         return float(compare_val)
 
+    if (
+        dtype is not None
+        and dtype.is_decimal()
+        and nw_tbl.implementation.is_ibis()
+        and not _ibis_compares_decimal_literal(nw_tbl.to_native(), column)
+    ):
+        return float(compare_val)
+
     return compare_val
+
+
+def _ibis_compares_decimal_literal(ibis_table: Any, column: str) -> bool:
+    """
+    Check whether Ibis can compare a decimal column with a `Decimal` literal.
+
+    Ibis 11 types a `Decimal` literal as a decimal without precision and scale, which it then
+    refuses to compare with a `decimal(p, s)` column (`IbisTypeError: ... are not comparable`);
+    Ibis 12 accepts the comparison.
+    """
+    try:
+        ibis_table[column] > Decimal(0)
+    except Exception:
+        return False
+    return True
 
 
 def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val: Any) -> Any:
