@@ -347,8 +347,9 @@ def int_field(
     dtype
         Integer dtype. Default is `"Int64"`. Options: `"Int8"`, `"Int16"`, `"Int32"`,
         `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`. The dtype limits the range of
-        values (e.g., `0` to `255` for `"UInt8"`), but the column that `generate_dataset()` creates
-        is currently always `Int64`.
+        values (e.g., `0` to `255` for `"UInt8"`) and is the dtype of the column that
+        `generate_dataset()` creates. With `output="pandas"`, the column is a NumPy integer (e.g.,
+        `int32`), or a pandas nullable integer (e.g., `Int32`) when `nullable=True`.
 
     Returns
     -------
@@ -587,8 +588,8 @@ def float_field(
         the `seed=` of `generate_dataset()`, so it needs its own seeded random number generator
         for reproducible data.
     dtype
-        Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`. The column that
-        `generate_dataset()` creates is currently always `Float64`.
+        Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`. It's the dtype of
+        the column that `generate_dataset()` creates.
 
     Returns
     -------
@@ -1749,8 +1750,8 @@ def time_field(
     Time values are generated uniformly (at second-level resolution) within the specified range.
     If no range is provided, the default range is 00:00:00 to 23:59:59. Both `min_time=` and
     `max_time=` accept `datetime.time` objects or ISO format time strings (e.g., `"09:30:00"`).
-    The column that `generate_dataset()` creates currently holds the times as `"HH:MM:SS"` strings
-    rather than as a time dtype.
+    The column that `generate_dataset()` creates holds `datetime.time` values: a `Time` column in
+    Polars, and an `object` column in pandas (which has no time dtype).
 
     Parameters
     ----------
