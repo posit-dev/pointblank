@@ -4,7 +4,7 @@ Generate synthetic test data from a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1316-L1605)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1319-L1610)
 
 ``` python
 generate_dataset(
@@ -31,7 +31,7 @@ The schema object defining the structure and constraints of the data to generate
 Number of rows to generate. The default is `100`.
 
 `seed: int | None = None`  
-Random seed for reproducibility. If provided, the same seed will produce the same data. Default is `None` (non-deterministic).
+Random seed for reproducibility. If provided, the same seed will produce the same data (in any Python session). Each column draws from its own random sequence, derived from the seed and the column name, so two columns with the same field get different values and have their missing values in different rows. Default is `None` (non-deterministic).
 
 `output: Literal["polars", "pandas", "dict"] = "polars"`  
 Output format for the generated data. Options are: (1) `"polars"` (the default) returns a Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns a dictionary of lists.
@@ -160,16 +160,16 @@ pb.preview(pb.generate_dataset(schema, n=100, seed=23))
 | PolarsRows100Columns4 |  |  |  |  |
 |----|----|----|----|----|
 |  | user_id *Int64* | email *String* | age *Int64* | status *String* |
-| 1 | 7188536481533917197 | d_martin@aol.com | 55 | pending |
-| 2 | 2674009078779859984 | nancygonzalez@icloud.com | 28 | active |
-| 3 | 7652102777077138151 | jturner@aol.com | 20 | active |
-| 4 | 157503859921753049 | georgeevans@zoho.com | 93 | inactive |
-| 5 | 2829213282471975080 | pwilliams@outlook.com | 57 | pending |
-| 96 | 7027508096731143831 | isaiah.murphy@zoho.com | 68 | active |
-| 97 | 6055996548456656575 | brodriguez@yandex.com | 20 | inactive |
-| 98 | 3822709996092631588 | mstevens26@aol.com | 38 | inactive |
-| 99 | 1522653102058131295 | pjenkins29@yandex.com | 46 | active |
-| 100 | 5690877051669225499 | stephanie.santos40@gmail.com | 19 | pending |
+| 1 | 5702568738186988586 | d_martin@aol.com | 42 | pending |
+| 2 | 2878223714068359465 | nancygonzalez@icloud.com | 67 | pending |
+| 3 | 2827316211584448787 | jturner@aol.com | 26 | inactive |
+| 4 | 4882856902780995319 | georgeevans@zoho.com | 68 | pending |
+| 5 | 5672268219098327547 | pwilliams@outlook.com | 81 | active |
+| 96 | 8515820166226230863 | isaiah.murphy@zoho.com | 44 | active |
+| 97 | 1273514605515757248 | brodriguez@yandex.com | 74 | active |
+| 98 | 302880528361637242 | mstevens26@aol.com | 66 | active |
+| 99 | 7613481963472661909 | pjenkins29@yandex.com | 28 | inactive |
+| 100 | 8634311640077946044 | stephanie.santos40@gmail.com | 29 | active |
 
 It's also possible to generate data from a simple, dtype-only schema. Setting `output="pandas"` returns a Pandas DataFrame:
 
@@ -179,19 +179,19 @@ schema = pb.Schema(name="String", age="Int64", active="Boolean")
 pb.preview(pb.generate_dataset(schema, n=50, seed=23, output="pandas"))
 ```
 
-| PandasRows50Columns3 |                     |                      |               |
-|----------------------|---------------------|----------------------|---------------|
-|                      | name *str*          | age *int64*          | active *bool* |
-| 1                    | 51fbLtByHw          | -1406612057389349638 | False         |
-| 2                    | UmrCa               | -2617964757147985650 | False         |
-| 3                    | ND5bgfTF            | -5681649629593590626 | False         |
-| 4                    | bGOUBwXdnYcLxQ      | -8963716282372353309 | True          |
-| 5                    | NnVxKW              | -7269866261640175410 | False         |
-| 46                   | 8VQTQ3rUkjMe        | 6777163490966252062  | True          |
-| 47                   | ZGDIWh7eBERjPZthNbW | 4534912642422597042  | False         |
-| 48                   | MnIPm2wYtrTsBF6I8   | -7714433421897454051 | False         |
-| 49                   | sv9VboYQKY5JjeSX8i  | -4108772566563722234 | True          |
-| 50                   | S6tq                | -7629746523602015996 | True          |
+| PandasRows50Columns3 |                    |                      |               |
+|----------------------|--------------------|----------------------|---------------|
+|                      | name *str*         | age *int64*          | active *bool* |
+| 1                    | 9prTMN6oMPQfveQRq  | 8937786869484433935  | True          |
+| 2                    | hfKgnYvAIUfEP3mK3Z | 2371596857126219777  | True          |
+| 3                    | y0v8sjC            | 6016162201796263186  | True          |
+| 4                    | CgNmF32bXhFzWUbi   | -2117057455653258981 | True          |
+| 5                    | DlgkffUl5          | -4747276106502510466 | False         |
+| 46                   | r00RR0nGOfB1iOn    | -2063923962779875270 | True          |
+| 47                   | TceT8X9GJALin4CJf  | 3308897416046515148  | False         |
+| 48                   | jecavR69Dh0UUD     | 7623865611332257053  | False         |
+| 49                   | NsNy               | -5746150718301047423 | True          |
+| 50                   | Ar25M88Hyr         | -6357258717669162315 | True          |
 
 When using presets, the `country=` parameter controls the locale. Here, `country="DE"` produces German names and addresses:
 
@@ -243,15 +243,15 @@ pb.preview(pb.generate_dataset(schema, n=50, seed=23))
 | PolarsRows50Columns6 |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|
 |  | id *Int64* | name *String* | score *Float64* | is_active *Boolean* | joined *Date* | session_time *Duration* |
-| 1 | 948 | Doris Martin | 92.48652516259452 | False | 2024-05-15 | 1:20:09 |
-| 2 | 799 | Nancy Gonzalez | 94.86057779931771 | False | 2021-08-16 | 0:23:48 |
-| 3 | 972 | Jessica Turner | 89.24333440485793 | False | 2024-08-26 | None |
-| 4 | 297 | George Evans | 8.355067683068363 | True | 2020-06-20 | 2:42:39 |
-| 5 | 914 | Patricia Williams | 59.20272268857353 | True | 2020-02-04 | None |
-| 46 | 222 | Michael Hoffman | 27.556446150015233 | True | 2023-03-04 | 2:12:54 |
-| 47 | 995 | Brian Campbell | 57.282189488843784 | True | 2024-04-05 | None |
-| 48 | 753 | Teresa Roberts | 82.06631808725244 | False | 2024-10-27 | None |
-| 49 | 372 | Vincent Rodriguez | 33.08048479932988 | True | 2022-01-25 | 2:56:24 |
-| 50 | 580 | Susan Ramirez | 36.96539320060992 | True | 2023-03-17 | 0:45:40 |
+| 1 | 836 | Doris Martin | 62.32582333370822 | False | 2020-04-15 | None |
+| 2 | 654 | Nancy Gonzalez | 27.709492493249456 | False | 2024-04-19 | 1:01:57 |
+| 3 | 753 | Jessica Turner | 55.885753316684095 | True | 2020-04-19 | 2:46:39 |
+| 4 | 46 | George Evans | 48.41940867214418 | True | 2023-05-24 | 2:19:44 |
+| 5 | 206 | Patricia Williams | 45.16808623943008 | True | 2021-10-02 | 2:27:45 |
+| 46 | 24 | Michael Hoffman | 58.45345655144432 | True | 2024-07-23 | 1:36:33 |
+| 47 | 615 | Brian Campbell | 31.417030528893076 | True | 2022-04-23 | 0:56:04 |
+| 48 | 476 | Teresa Roberts | 62.36804210429992 | True | 2020-12-14 | None |
+| 49 | 686 | Vincent Rodriguez | 35.02457473962354 | True | 2022-07-10 | None |
+| 50 | 604 | Susan Ramirez | 79.03650698656563 | True | 2022-02-20 | 0:29:36 |
 
 Each column gets the dtype of its field: `Int64`, `String`, `Float64`, `Boolean`, `Date` and `Duration`. The `session_time` column has 12 missing values out of 50, close to the `null_probability=` of `0.2`, and the same `seed=` gives the same table on every run.

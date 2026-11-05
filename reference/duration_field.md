@@ -76,16 +76,16 @@ pb.preview(pb.generate_dataset(schema, n=100, seed=23))
 | PolarsRows100Columns2 |                           |                      |
 |-----------------------|---------------------------|----------------------|
 |                       | session_length *Duration* | wait_time *Duration* |
-| 1                     | 1:51:24                   | 0:13:48              |
-| 2                     | 0:44:34                   | 0:05:26              |
-| 3                     | 1:58:16                   | 0:14:39              |
-| 4                     | 0:16:24                   | 0:01:55              |
-| 5                     | 0:07:19                   | 0:00:47              |
-| 96                    | 0:34:48                   | 0:04:13              |
-| 97                    | 0:40:16                   | 0:04:54              |
-| 98                    | 0:25:24                   | 0:03:03              |
-| 99                    | 0:19:37                   | 0:02:19              |
-| 100                   | 1:29:36                   | 0:11:04              |
+| 1                     | 1:36:08                   | 0:08:55              |
+| 2                     | 1:25:07                   | 0:04:42              |
+| 3                     | 0:10:20                   | 0:11:09              |
+| 4                     | 0:08:03                   | 0:05:40              |
+| 5                     | 1:33:16                   | 0:04:30              |
+| 96                    | 0:23:10                   | 0:10:55              |
+| 97                    | 1:31:24                   | 0:03:15              |
+| 98                    | 1:11:52                   | 0:07:40              |
+| 99                    | 1:13:05                   | 0:09:55              |
+| 100                   | 1:58:22                   | 0:10:56              |
 
 Colon-separated strings can also be used for quick duration definitions:
 
@@ -101,16 +101,16 @@ pb.preview(pb.generate_dataset(schema, n=30, seed=23))
 | PolarsRows30Columns2 |                          |                       |
 |----------------------|--------------------------|-----------------------|
 |                      | call_duration *Duration* | break_time *Duration* |
-| 1                    | 0:40:34                  | 0:14:53               |
-| 2                    | 0:12:24                  | 0:07:51               |
-| 3                    | 0:03:19                  | 0:05:34               |
-| 4                    | 1:21:49                  | 0:25:12               |
-| 5                    | 0:42:52                  | 0:15:28               |
-| 26                   | 0:59:53                  | 0:22:29               |
-| 27                   | 0:50:00                  | 0:26:25               |
-| 28                   | 0:08:51                  | 0:19:43               |
-| 29                   | 0:29:04                  | 0:17:15               |
-| 30                   | 0:05:49                  | 0:06:57               |
+| 1                    | 0:42:46                  | 0:07:00               |
+| 2                    | 1:27:53                  | 0:23:55               |
+| 3                    | 0:33:12                  | 0:29:15               |
+| 4                    | 0:29:35                  | 0:05:33               |
+| 5                    | 0:30:59                  | 0:08:32               |
+| 26                   | 0:33:01                  | 0:12:12               |
+| 27                   | 1:27:59                  | 0:18:13               |
+| 28                   | 0:56:46                  | 0:19:53               |
+| 29                   | 0:37:15                  | 0:17:08               |
+| 30                   | 0:52:53                  | 0:22:33               |
 
 Optional durations can be created with `nullable=True`, and duration fields work well alongside other field types:
 
@@ -134,15 +134,15 @@ pb.preview(pb.generate_dataset(schema, n=30, seed=7))
 | PolarsRows30Columns3 |  |  |  |
 |----|----|----|----|
 |  | task_id *Int64* | time_spent *Duration* | overtime *Duration* |
-| 1 | 166 | 2:57:51 | None |
-| 2 | 486 | 1:23:23 | 0:41:11 |
-| 3 | 78 | 3:36:37 | None |
-| 4 | 203 | 5:56:29 | 2:57:44 |
-| 5 | 334 | 0:27:22 | None |
-| 26 | 31 | 5:09:48 | 2:34:24 |
-| 27 | 424 | 1:08:36 | None |
-| 28 | 290 | 2:02:55 | 1:00:57 |
-| 29 | 64 | 5:45:24 | None |
-| 30 | 115 | 5:43:39 | 2:51:19 |
+| 1 | 126 | 4:11:34 | None |
+| 2 | 314 | 5:02:27 | 2:24:24 |
+| 3 | 87 | 6:06:30 | None |
+| 4 | 40 | 1:51:03 | None |
+| 5 | 340 | 4:43:48 | 2:27:00 |
+| 26 | 352 | 7:07:54 | None |
+| 27 | 252 | 5:24:11 | None |
+| 28 | 286 | 1:56:47 | 2:44:22 |
+| 29 | 9 | 6:03:07 | 0:27:10 |
+| 30 | 30 | 2:18:33 | None |
 
 The `time_spent` values range from one minute to eight hours, while the `overtime` column is missing in most rows (20 of 30 here, in line with the `null_probability=` of `0.6`). Both columns have a duration dtype, so they can take part in arithmetic with dates and datetimes.

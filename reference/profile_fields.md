@@ -64,16 +64,16 @@ pb.preview(pb.generate_dataset(schema, n=100, seed=23))
 | PolarsRows100Columns8 |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
 |  | user_id *Int64* | first_name *String* | last_name *String* | email *String* | city *String* | state *String* | postcode *String* | phone_number *String* |
-| 1 | -1406612057389349638 | Weston | Parker | weston.parker23@gmail.com | Lubbock | Texas | 79404 | \(832\) 960-5399 |
-| 2 | -2617964757147985650 | Hazel | Torres | hazel723@hotmail.com | Anaheim | California | 92873 | \(805\) 988-7427 |
-| 3 | -5681649629593590626 | Lawrence | Mitchell | lawrence_mitchell@zoho.com | Phoenix | Arizona | 85027 | \(928\) 782-5894 |
-| 4 | -8963716282372353309 | Maria | Garcia | m_garcia@hotmail.com | Denver | Colorado | 80277 | \(303\) 846-6634 |
-| 5 | -7269866261640175410 | Michael | Hoffman | michael.hoffman@gmail.com | San Antonio | Texas | 78208 | \(214\) 901-0009 |
-| 96 | 6897155874618296668 | Daniel | Torres | daniel_torres@icloud.com | El Paso | Texas | 79944 | \(281\) 769-2210 |
-| 97 | -6112256427879931273 | Helen | Simpson | hsimpson20@yandex.com | El Paso | Texas | 79930 | \(210\) 345-8803 |
-| 98 | 8927383620913714598 | Mark | Graham | mark.graham65@mail.com | Charlotte | North Carolina | 28222 | \(336\) 732-4609 |
-| 99 | -1411303099006569581 | Brian | Moore | bmoore95@zoho.com | Los Angeles | California | 90058 | \(707\) 702-7905 |
-| 100 | 5508917247801188532 | Michael | Ward | michael_ward@yahoo.com | San Diego | California | 92147 | \(619\) 940-2614 |
+| 1 | -2652135217243684241 | Weston | Parker | weston.parker23@gmail.com | Lubbock | Texas | 79404 | \(832\) 960-5399 |
+| 2 | 542341770664691446 | Hazel | Torres | hazel723@hotmail.com | Anaheim | California | 92873 | \(805\) 988-7427 |
+| 3 | -5594418365337685388 | Lawrence | Mitchell | lawrence_mitchell@zoho.com | Phoenix | Arizona | 85027 | \(928\) 782-5894 |
+| 4 | 6541760310128689717 | Maria | Garcia | m_garcia@hotmail.com | Denver | Colorado | 80277 | \(303\) 846-6634 |
+| 5 | 8593611872195161717 | Michael | Hoffman | michael.hoffman@gmail.com | San Antonio | Texas | 78208 | \(214\) 901-0009 |
+| 96 | 7690293629874427617 | Daniel | Torres | daniel_torres@icloud.com | El Paso | Texas | 79944 | \(281\) 769-2210 |
+| 97 | -4489806309550237653 | Helen | Simpson | hsimpson20@yandex.com | El Paso | Texas | 79930 | \(210\) 345-8803 |
+| 98 | 5302888405735589602 | Mark | Graham | mark.graham65@mail.com | Charlotte | North Carolina | 28222 | \(336\) 732-4609 |
+| 99 | 6453806995400098516 | Brian | Moore | bmoore95@zoho.com | Los Angeles | California | 90058 | \(707\) 702-7905 |
+| 100 | 6004943672988944043 | Michael | Ward | michael_ward@yahoo.com | San Diego | California | 92147 | \(619\) 940-2614 |
 
 Use `set=` to control how many columns are generated. The `"minimal"` set includes only `name`, `email`, and `phone`, while `"full"` adds `address`, `company`, and `job`. Setting `split_name=False` collapses `first_name` and `last_name` into a single combined `name` column:
 
@@ -89,16 +89,16 @@ pb.preview(pb.generate_dataset(schema, n=50, seed=23))
 | PolarsRows50Columns4 |  |  |  |  |
 |----|----|----|----|----|
 |  | name *String* | email *String* | phone_number *String* | balance *Float64* |
-| 1 | Paul Woods | paulwoods@hotmail.com | \(512\) 899-4802 | 9248.652516259452 |
-| 2 | Mark Smith | mark684@icloud.com | \(310\) 986-0270 | 9486.05777993177 |
-| 3 | Willow Fowler | willowfowler@gmail.com | \(623\) 938-2304 | 8924.333440485792 |
-| 4 | Roger Graham | roger.graham@zoho.com | \(970\) 514-7904 | 835.5067683068362 |
-| 5 | Karen Horn | karen.horn70@gmail.com | \(210\) 987-2966 | 5920.272268857353 |
-| 46 | Hannah Weaver | hannahweaver@yahoo.com | \(419\) 998-5523 | 2755.6446150015236 |
-| 47 | Martin Ramos | martin_ramos@yahoo.com | \(951\) 234-6078 | 5728.218948884378 |
-| 48 | Audrey Jackson | audrey_jackson@aol.com | \(252\) 401-8878 | 8206.631808725244 |
-| 49 | Christina Cannon | ccannon13@aol.com | \(320\) 486-6471 | 3308.048479932988 |
-| 50 | Melissa Nelson | m_nelson@yandex.com | \(260\) 590-0851 | 3696.539320060992 |
+| 1 | Paul Woods | paulwoods@hotmail.com | \(512\) 899-4802 | 3072.3782714662107 |
+| 2 | Mark Smith | mark684@icloud.com | \(310\) 986-0270 | 6351.096408004626 |
+| 3 | Willow Fowler | willowfowler@gmail.com | \(623\) 938-2304 | 5373.6399360474015 |
+| 4 | Roger Graham | roger.graham@zoho.com | \(970\) 514-7904 | 7176.251549544152 |
+| 5 | Karen Horn | karen.horn70@gmail.com | \(210\) 987-2966 | 1214.1183476392537 |
+| 46 | Hannah Weaver | hannahweaver@yahoo.com | \(419\) 998-5523 | 8627.227506022216 |
+| 47 | Martin Ramos | martin_ramos@yahoo.com | \(951\) 234-6078 | 747.8363455607117 |
+| 48 | Audrey Jackson | audrey_jackson@aol.com | \(252\) 401-8878 | 4553.181484631992 |
+| 49 | Christina Cannon | ccannon13@aol.com | \(320\) 486-6471 | 2316.137417942076 |
+| 50 | Melissa Nelson | m_nelson@yandex.com | \(260\) 590-0851 | 9281.014634431509 |
 
 The `include=` and `exclude=` parameters let you customize the column set without switching to a different base set. Here we start from the `"full"` set but drop the business columns:
 
@@ -138,16 +138,16 @@ pb.preview(pb.generate_dataset(schema, n=50, seed=23))
 | PolarsRows50Columns5 |  |  |  |  |  |
 |----|----|----|----|----|----|
 |  | customer_first_name *String* | customer_last_name *String* | customer_email *String* | customer_phone_number *String* | order_total *Float64* |
-| 1 | Paul | Woods | paulwoods@hotmail.com | \(512\) 899-4802 | 462.81 |
-| 2 | Mark | Smith | mark684@icloud.com | \(310\) 986-0270 | 474.56 |
-| 3 | Willow | Fowler | willowfowler@gmail.com | \(623\) 938-2304 | 446.75 |
-| 4 | Roger | Graham | roger.graham@zoho.com | \(970\) 514-7904 | 46.36 |
-| 5 | Karen | Horn | karen.horn70@gmail.com | \(210\) 987-2966 | 298.05 |
-| 46 | Hannah | Weaver | hannahweaver@yahoo.com | \(419\) 998-5523 | 141.4 |
-| 47 | Martin | Ramos | martin_ramos@yahoo.com | \(951\) 234-6078 | 288.55 |
-| 48 | Audrey | Jackson | audrey_jackson@aol.com | \(252\) 401-8878 | 411.23 |
-| 49 | Christina | Cannon | ccannon13@aol.com | \(320\) 486-6471 | 168.75 |
-| 50 | Melissa | Nelson | m_nelson@yandex.com | \(260\) 590-0851 | 187.98 |
+| 1 | Paul | Woods | paulwoods@hotmail.com | \(512\) 899-4802 | 228.23 |
+| 2 | Mark | Smith | mark684@icloud.com | \(310\) 986-0270 | 326.16 |
+| 3 | Willow | Fowler | willowfowler@gmail.com | \(623\) 938-2304 | 360.92 |
+| 4 | Roger | Graham | roger.graham@zoho.com | \(970\) 514-7904 | 487.54 |
+| 5 | Karen | Horn | karen.horn70@gmail.com | \(210\) 987-2966 | 473.49 |
+| 46 | Hannah | Weaver | hannahweaver@yahoo.com | \(419\) 998-5523 | 130.21 |
+| 47 | Martin | Ramos | martin_ramos@yahoo.com | \(951\) 234-6078 | 230.91 |
+| 48 | Audrey | Jackson | audrey_jackson@aol.com | \(252\) 401-8878 | 15.6 |
+| 49 | Christina | Cannon | ccannon13@aol.com | \(320\) 486-6471 | 325.68 |
+| 50 | Melissa | Nelson | m_nelson@yandex.com | \(260\) 590-0851 | 453.55 |
 
 The emails are still derived from the names in each row. A schema can hold several prefixed profiles, and each one is a different person:
 

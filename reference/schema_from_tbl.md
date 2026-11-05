@@ -4,7 +4,7 @@ Create a Schema from an existing table with inferred Field constraints.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1608-L1685)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1613-L1690)
 
 ``` python
 schema_from_tbl(
@@ -75,15 +75,15 @@ pb.preview(schema.generate(n=10, seed=23))
 | PolarsRows10Columns4 |  |  |  |  |
 |----|----|----|----|----|
 |  | user_id *Int64* | email *String* | age *Int64* | status *String* |
-| 1 | 50 | doris.martin@yandex.com | 69 | inactive |
-| 2 | 19 | ngonzalez74@yahoo.com | 38 | active |
-| 3 | 6 | jessica379@protonmail.com | 25 | active |
-| 4 | 2 | george_evans@yahoo.com | 21 | pending |
-| 5 | 38 | p_williams@outlook.com | 57 | inactive |
-| 6 | 20 | andreamitchell@mail.com | 39 | inactive |
-| 7 | 28 | maria.valentine@mail.com | 47 | inactive |
-| 8 | 25 | vwalker@gmail.com | 44 | pending |
-| 9 | 34 | brenda.lopez@zoho.com | 53 | inactive |
-| 10 | 23 | laurendavis@aol.com | 42 | active |
+| 1 | 40 | doris.martin@yandex.com | 32 | inactive |
+| 2 | 20 | ngonzalez74@yahoo.com | 68 | inactive |
+| 3 | 23 | jessica379@protonmail.com | 62 | pending |
+| 4 | 35 | george_evans@yahoo.com | 44 | inactive |
+| 5 | 34 | p_williams@outlook.com | 24 | active |
+| 6 | 28 | andreamitchell@mail.com | 45 | inactive |
+| 7 | 50 | maria.valentine@mail.com | 66 | inactive |
+| 8 | 9 | vwalker@gmail.com | 51 | inactive |
+| 9 | 13 | brenda.lopez@zoho.com | 34 | inactive |
+| 10 | 24 | laurendavis@aol.com | 60 | active |
 
 The new rows follow the inferred constraints: the IDs lie between 1 and 50, the ages between 20 and 69, and every `status` is one of the three original values. The emails are new, realistic addresses from the preset rather than copies of the original `user{i}@example.com` values.

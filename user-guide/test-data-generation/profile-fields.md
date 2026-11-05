@@ -18,16 +18,16 @@ pb.preview(pb.generate_dataset(schema, n=100, seed=23))
 | PolarsRows100Columns8 |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
 |  | user_id *Int64* | first_name *String* | last_name *String* | email *String* | city *String* | state *String* | postcode *String* | phone_number *String* |
-| 1 | 7188536481533917197 | Weston | Parker | weston.parker23@gmail.com | Lubbock | Texas | 79404 | \(832\) 960-5399 |
-| 2 | 2674009078779859984 | Hazel | Torres | hazel723@hotmail.com | Anaheim | California | 92873 | \(805\) 988-7427 |
-| 3 | 7652102777077138151 | Lawrence | Mitchell | lawrence_mitchell@zoho.com | Phoenix | Arizona | 85027 | \(928\) 782-5894 |
-| 4 | 157503859921753049 | Maria | Garcia | m_garcia@hotmail.com | Denver | Colorado | 80277 | \(303\) 846-6634 |
-| 5 | 2829213282471975080 | Michael | Hoffman | michael.hoffman@gmail.com | San Antonio | Texas | 78208 | \(214\) 901-0009 |
-| 96 | 7027508096731143831 | Daniel | Torres | daniel_torres@icloud.com | El Paso | Texas | 79944 | \(281\) 769-2210 |
-| 97 | 6055996548456656575 | Helen | Simpson | hsimpson20@yandex.com | El Paso | Texas | 79930 | \(210\) 345-8803 |
-| 98 | 3822709996092631588 | Mark | Graham | mark.graham65@mail.com | Charlotte | North Carolina | 28222 | \(336\) 732-4609 |
-| 99 | 1522653102058131295 | Brian | Moore | bmoore95@zoho.com | Los Angeles | California | 90058 | \(707\) 702-7905 |
-| 100 | 5690877051669225499 | Michael | Ward | michael_ward@yahoo.com | San Diego | California | 92147 | \(619\) 940-2614 |
+| 1 | 5702568738186988586 | Weston | Parker | weston.parker23@gmail.com | Lubbock | Texas | 79404 | \(832\) 960-5399 |
+| 2 | 2878223714068359465 | Hazel | Torres | hazel723@hotmail.com | Anaheim | California | 92873 | \(805\) 988-7427 |
+| 3 | 2827316211584448787 | Lawrence | Mitchell | lawrence_mitchell@zoho.com | Phoenix | Arizona | 85027 | \(928\) 782-5894 |
+| 4 | 4882856902780995319 | Maria | Garcia | m_garcia@hotmail.com | Denver | Colorado | 80277 | \(303\) 846-6634 |
+| 5 | 5672268219098327547 | Michael | Hoffman | michael.hoffman@gmail.com | San Antonio | Texas | 78208 | \(214\) 901-0009 |
+| 96 | 8515820166226230863 | Daniel | Torres | daniel_torres@icloud.com | El Paso | Texas | 79944 | \(281\) 769-2210 |
+| 97 | 1273514605515757248 | Helen | Simpson | hsimpson20@yandex.com | El Paso | Texas | 79930 | \(210\) 345-8803 |
+| 98 | 302880528361637242 | Mark | Graham | mark.graham65@mail.com | Charlotte | North Carolina | 28222 | \(336\) 732-4609 |
+| 99 | 7613481963472661909 | Brian | Moore | bmoore95@zoho.com | Los Angeles | California | 90058 | \(707\) 702-7905 |
+| 100 | 8634311640077946044 | Michael | Ward | michael_ward@yahoo.com | San Diego | California | 92147 | \(619\) 940-2614 |
 
 The `**` operator unpacks the dictionary into keyword arguments, as if you had written each `string_field(preset=...)` call by hand.
 
@@ -133,16 +133,16 @@ pb.preview(
 | PolarsRows100Columns8 |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
 |  | first_name *String* | last_name *String* | email *String* | city *String* | state *String* | postcode *String* | phone_number *String* | company *String* |
-| 1 | Weston | Parker | weston.parker23@gmail.com | Lubbock | Texas | 79404 | \(832\) 960-5399 | Innovative Systems Solutions |
-| 2 | Hazel | Torres | hazel723@hotmail.com | Anaheim | California | 92873 | \(805\) 988-7427 | Sterling Engineering |
-| 3 | Lawrence | Mitchell | lawrence_mitchell@zoho.com | Phoenix | Arizona | 85027 | \(928\) 782-5894 | Goldman Sachs |
-| 4 | Maria | Garcia | m_garcia@hotmail.com | Denver | Colorado | 80277 | \(303\) 846-6634 | Evans Group |
-| 5 | Michael | Hoffman | michael.hoffman@gmail.com | San Antonio | Texas | 78208 | \(214\) 901-0009 | Goodwin and Garrett |
-| 96 | Daniel | Torres | daniel_torres@icloud.com | El Paso | Texas | 79944 | \(281\) 769-2210 | Henry Construction |
-| 97 | Helen | Simpson | hsimpson20@yandex.com | El Paso | Texas | 79930 | \(210\) 345-8803 | Thompson Technologies |
-| 98 | Mark | Graham | mark.graham65@mail.com | Charlotte | North Carolina | 28222 | \(336\) 732-4609 | Universal Consulting |
-| 99 | Brian | Moore | bmoore95@zoho.com | Los Angeles | California | 90058 | \(707\) 702-7905 | Long Industries |
-| 100 | Michael | Ward | michael_ward@yahoo.com | San Diego | California | 92147 | \(619\) 940-2614 | Pioneer Solutions |
+| 1 | Weston | Parker | weston.parker23@gmail.com | Lubbock | Texas | 79404 | \(832\) 960-5399 | Miller Group |
+| 2 | Hazel | Torres | hazel723@hotmail.com | Anaheim | California | 92873 | \(805\) 988-7427 | Pacific Research |
+| 3 | Lawrence | Mitchell | lawrence_mitchell@zoho.com | Phoenix | Arizona | 85027 | \(928\) 782-5894 | Diaz Marketing |
+| 4 | Maria | Garcia | m_garcia@hotmail.com | Denver | Colorado | 80277 | \(303\) 846-6634 | Allen Industries |
+| 5 | Michael | Hoffman | michael.hoffman@gmail.com | San Antonio | Texas | 78208 | \(214\) 901-0009 | Silver Systems Group |
+| 96 | Daniel | Torres | daniel_torres@icloud.com | El Paso | Texas | 79944 | \(281\) 769-2210 | Heritage Beverages Corp |
+| 97 | Helen | Simpson | hsimpson20@yandex.com | El Paso | Texas | 79930 | \(210\) 345-8803 | Zoom |
+| 98 | Mark | Graham | mark.graham65@mail.com | Charlotte | North Carolina | 28222 | \(336\) 732-4609 | EY |
+| 99 | Brian | Moore | bmoore95@zoho.com | Los Angeles | California | 90058 | \(707\) 702-7905 | National Properties Associates |
+| 100 | Michael | Ward | michael_ward@yahoo.com | San Diego | California | 92147 | \(619\) 940-2614 | Heritage Brands |
 
 ``` python
 # Standard set without city and state
@@ -220,13 +220,13 @@ pb.preview(pb.generate_dataset(schema, n=100, seed=23, country="DE"))
 | PolarsRows100Columns10 |  |  |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|----|----|
 |  | id *Int64* | first_name *String* | last_name *String* | email *String* | city *String* | state *String* | postcode *String* | phone_number *String* | active *Boolean* | signup_date *Date* |
-| 1 | 7188536481533918196 | Agathe | Kramer | akramer@gmail.com | Potsdam | Brandenburg | 14820 | \(0335\) 989-6751 | False | 2024-10-23 |
-| 2 | 2674009078779860983 | Rüdiger | Altmann | ruediger.altmann69@gmail.com | Halle (Saale) | Sachsen-Anhalt | 06210 | \(0345\) 239-7780 | False | 2024-03-26 |
-| 3 | 7652102777077139150 | Bodo | Meyer | bodo723@web.de | Frankfurt am Main | Hessen | 60473 | \(0611\) 231-3262 | False | 2024-01-18 |
-| 4 | 157503859921754048 | Stefanie | Meyer | stefanie_meyer@posteo.de | Leipzig | Sachsen | 04277 | \(0371\) 874-7863 | True | 2025-08-29 |
-| 5 | 2829213282471976079 | Fabian | Thomas | f_thomas@web.de | Cologne | Nordrhein-Westfalen | 50708 | \(0203\) 870-5463 | True | 2024-11-10 |
-| 96 | 7027508096731144830 | Maike | Fuchs | maike_fuchs@yahoo.de | Frankfurt am Main | Hessen | 60188 | \(0611\) 017-4531 | True | 2024-06-20 |
-| 97 | 6055996548456657574 | Sebastian | König | sebastian_koenig@t-online.de | Augsburg | Bayern | 86110 | \(0841\) 916-6870 | True | 2025-04-05 |
-| 98 | 3822709996092632587 | Diana | Henkel | dhenkel20@arcor.de | Frankfurt am Main | Hessen | 60198 | \(06151\) 561-5880 | False | 2024-02-04 |
-| 99 | 1522653102058132294 | Matthias | Keßler | matthias.kessler65@outlook.de | Zwickau | Sachsen | 08826 | \(0351\) 850-7507 | False | 2024-02-27 |
-| 100 | 5690877051669226498 | Dirk | Neumann | dneumann95@posteo.de | Nuremberg | Bayern | 90954 | \(0941\) 885-4226 | False | 2025-10-07 |
+| 1 | 5887552627537498771 | Agathe | Kramer | akramer@gmail.com | Potsdam | Brandenburg | 14820 | \(0335\) 989-6751 | True | 2025-11-14 |
+| 2 | 410844076336019750 | Rüdiger | Altmann | ruediger.altmann69@gmail.com | Halle (Saale) | Sachsen-Anhalt | 06210 | \(0345\) 239-7780 | True | 2024-04-02 |
+| 3 | 3891601934267715613 | Bodo | Meyer | bodo723@web.de | Frankfurt am Main | Hessen | 60473 | \(0611\) 231-3262 | True | 2025-02-01 |
+| 4 | 3397059975466238202 | Stefanie | Meyer | stefanie_meyer@posteo.de | Leipzig | Sachsen | 04277 | \(0371\) 874-7863 | True | 2025-05-21 |
+| 5 | 7125830477412885968 | Fabian | Thomas | f_thomas@web.de | Cologne | Nordrhein-Westfalen | 50708 | \(0203\) 870-5463 | False | 2024-09-26 |
+| 96 | 3639168401353182644 | Maike | Fuchs | maike_fuchs@yahoo.de | Frankfurt am Main | Hessen | 60188 | \(0611\) 017-4531 | True | 2025-07-16 |
+| 97 | 5551865056303129006 | Sebastian | König | sebastian_koenig@t-online.de | Augsburg | Bayern | 86110 | \(0841\) 916-6870 | True | 2024-12-29 |
+| 98 | 5799605629891304421 | Diana | Henkel | dhenkel20@arcor.de | Frankfurt am Main | Hessen | 60198 | \(06151\) 561-5880 | False | 2024-12-28 |
+| 99 | 2032001359082680844 | Matthias | Keßler | matthias.kessler65@outlook.de | Zwickau | Sachsen | 08826 | \(0351\) 850-7507 | True | 2024-09-16 |
+| 100 | 7040735844921169139 | Dirk | Neumann | dneumann95@posteo.de | Nuremberg | Bayern | 90954 | \(0941\) 885-4226 | True | 2024-04-04 |

@@ -115,15 +115,15 @@ pb.preview(pb.generate_dataset(schema, n=100, seed=23))
 |----|----|----|----|
 |  | name *String* | email *String* | status *String* |
 | 1 | Doris Martin | d_martin@aol.com | pending |
-| 2 | Nancy Gonzalez | nancygonzalez@icloud.com | active |
-| 3 | Jessica Turner | jturner@aol.com | active |
-| 4 | George Evans | georgeevans@zoho.com | inactive |
-| 5 | Patricia Williams | pwilliams@outlook.com | pending |
+| 2 | Nancy Gonzalez | nancygonzalez@icloud.com | pending |
+| 3 | Jessica Turner | jturner@aol.com | inactive |
+| 4 | George Evans | georgeevans@zoho.com | pending |
+| 5 | Patricia Williams | pwilliams@outlook.com | active |
 | 96 | Isaiah Murphy | isaiah.murphy@zoho.com | active |
-| 97 | Brittany Rodriguez | brodriguez@yandex.com | inactive |
-| 98 | Megan Stevens | mstevens26@aol.com | inactive |
-| 99 | Pamela Jenkins | pjenkins29@yandex.com | active |
-| 100 | Stephanie Santos | stephanie.santos40@gmail.com | pending |
+| 97 | Brittany Rodriguez | brodriguez@yandex.com | active |
+| 98 | Megan Stevens | mstevens26@aol.com | active |
+| 99 | Pamela Jenkins | pjenkins29@yandex.com | inactive |
+| 100 | Stephanie Santos | stephanie.santos40@gmail.com | active |
 
 We can also generate strings that match a regular expression with `pattern=` (e.g., product codes, identifiers):
 
@@ -140,16 +140,16 @@ pb.preview(pb.generate_dataset(schema, n=30, seed=23))
 | PolarsRows30Columns3 |                       |                   |              |
 |----------------------|-----------------------|-------------------|--------------|
 |                      | product_code *String* | batch_id *String* | sku *String* |
-| 1                    | CAS-6685              | BATCH-Y109        | CA668523     |
-| 2                    | XGI-0397              | BATCH-J685        | OA970117     |
-| 3                    | DCW-6086              | BATCH-E470        | AQ503095     |
-| 4                    | YBG-9529              | BATCH-H011        | TG959459     |
-| 5                    | XLS-9459              | BATCH-W608        | PF972228     |
-| 26                   | IEQ-1971              | BATCH-I620        | XF292474     |
-| 27                   | SYO-0413              | BATCH-O629        | BT502512     |
-| 28                   | BNZ-4359              | BATCH-W138        | GN938965     |
-| 29                   | TYC-8695              | BATCH-J648        | XR725640     |
-| 30                   | CTW-0120              | BATCH-T410        | ML823566     |
+| 1                    | TUA-7878              | BATCH-C572        | ON747986     |
+| 2                    | CIR-3746              | BATCH-E915        | RG842341     |
+| 3                    | JKS-6678              | BATCH-Y948        | MT768044     |
+| 4                    | DVC-7585              | BATCH-E014        | KN345811     |
+| 5                    | BLC-1897              | BATCH-X610        | IO470502     |
+| 26                   | GFC-4249              | BATCH-K937        | BZ789672     |
+| 27                   | BKQ-1618              | BATCH-E186        | VL008570     |
+| 28                   | ZAI-6997              | BATCH-M421        | DQ431897     |
+| 29                   | AXI-9531              | BATCH-R168        | IA831952     |
+| 30                   | LOT-0185              | BATCH-U105        | BZ850635     |
 
 For random alphanumeric strings, `min_length=` and `max_length=` control the length. Adding `nullable=True` introduces missing values:
 
@@ -168,16 +168,16 @@ pb.preview(pb.generate_dataset(schema, n=30, seed=7))
 | PolarsRows30Columns2 |  |  |
 |----|----|----|
 |  | short_code *String* | notes *String* |
-| 1 | 8jzP | None |
-| 2 | e0I | OL8dKLzdocJ2isAjIhKtJ0RlgLKOmxgJTeKdNnFRIBXuDL7Dxt |
-| 3 | xLd | None |
-| 4 | ncfBA | Ac9QeWJKY40uvSwMFLZDe1f8rESQedUStPKR0CsTy |
-| 5 | pfJ | None |
-| 26 | 8rE | tOofL9H2WjQ5TY4MyWuUFjsUNPjc0 |
-| 27 | QedUS | None |
-| 28 | PKR0 | IRpFqaDZeV7G5IfQHeVVEqZe2qpUWnoVPDF2yeE6RsXcNOPmeM |
-| 29 | sTy4 | None |
-| 30 | wb8Dw | sTHsDDDXh5Jmtf7EbsDe0G9Cryn687neLfjVHq8xi |
+| 1 | tU42 | None |
+| 2 | MEcNn | 4zs23WtLuh9sGp7VDs12SAQlXK8Ey41VEhvtMJqGrHjB8 |
+| 3 | jnO5 | None |
+| 4 | 4iq | tzSuQ08PkX1mAzXNMgFeMm |
+| 5 | 4Ev | CHCDN7OCn1VA0UGobtiFtBMHvFsvgh4tPLf2HYZy76OE0Fx4VG |
+| 26 | tRt | None |
+| 27 | 8gGNT | None |
+| 28 | Nsz | None |
+| 29 | AfwD3 | oPnSPvRPVOvRbABS9rwsnTbmQJ4xY4UhXKSkUO6Fk |
+| 30 | zbInW | kKWu7q4gmGMzIc |
 
 It's possible to combine business and internet presets to build a company directory:
 
@@ -194,15 +194,15 @@ pb.preview(pb.generate_dataset(schema, n=20, seed=55))
 | PolarsRows20Columns3 |  |  |  |
 |----|----|----|----|
 |  | company *String* | domain *String* | industry_tag *String* |
-| 1 | Morgan Stanley | was.co | tech |
-| 2 | Walmart | his.biz | finance |
-| 3 | Thompson and Zuniga | program.net | finance |
-| 4 | Adams and Ward | people.io | health |
-| 5 | White Partners | very.net | tech |
-| 16 | Silver Properties | program.us | tech |
-| 17 | Dynamic Industries Enterprises | you.app | health |
-| 18 | National Systems | who.net | tech |
-| 19 | Adobe | then.cloud | finance |
-| 20 | Apex Industries Enterprises | now.us | tech |
+| 1 | King Corp | made.me | retail |
+| 2 | Robertson LLC | company.gov | tech |
+| 3 | Premier Analytics | hand.com | health |
+| 4 | Superior Research | who.tech | finance |
+| 5 | Slack | had.com | tech |
+| 16 | Microsoft | been.biz | health |
+| 17 | Coleman Realty | number.app | tech |
+| 18 | Gonzalez and Riley | the.app | finance |
+| 19 | Prestige Technologies Partners | day.dev | tech |
+| 20 | Rodriguez Ltd | back.site | retail |
 
 Unlike the person and address presets, `"domain_name"` isn't coherent with `"company"`, so each domain is unrelated to the company in its row. The `industry_tag` values come from the `allowed=` list, also independently of the company.

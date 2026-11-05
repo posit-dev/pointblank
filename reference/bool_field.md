@@ -66,16 +66,16 @@ pb.preview(pb.generate_dataset(schema, n=100, seed=23))
 | PolarsRows100Columns3 |  |  |  |
 |----|----|----|----|
 |  | is_active *Boolean* | is_premium *Boolean* | is_verified *Boolean* |
-| 1 | False | False | False |
+| 1 | False | True | True |
 | 2 | False | False | False |
-| 3 | False | False | False |
-| 4 | True | True | True |
-| 5 | True | False | False |
+| 3 | True | False | False |
+| 4 | True | False | True |
+| 5 | True | False | True |
 | 96 | True | False | True |
-| 97 | True | False | True |
-| 98 | False | False | False |
-| 99 | False | False | False |
-| 100 | False | False | False |
+| 97 | False | False | True |
+| 98 | True | False | True |
+| 99 | True | False | True |
+| 100 | True | True | True |
 
 Optional boolean flags can be simulated by combining `nullable=True` with `null_probability=`:
 
@@ -96,13 +96,13 @@ pb.preview(pb.generate_dataset(schema, n=50, seed=23))
 |                      | opted_in *Boolean* | has_referral *Boolean* |
 | 1                    | False              | False                  |
 | 2                    | False              | False                  |
-| 3                    | False              | None                   |
-| 4                    | True               | True                   |
+| 3                    | True               | None                   |
+| 4                    | True               | False                  |
 | 5                    | True               | None                   |
-| 46                   | True               | True                   |
+| 46                   | False              | None                   |
 | 47                   | True               | None                   |
-| 48                   | False              | None                   |
-| 49                   | True               | False                  |
+| 48                   | True               | True                   |
+| 49                   | False              | False                  |
 | 50                   | True               | False                  |
 
 Boolean fields can be combined with other field types in a realistic schema:
@@ -121,15 +121,15 @@ pb.preview(pb.generate_dataset(schema, n=30, seed=10))
 | PolarsRows30Columns4 |  |  |  |  |
 |----|----|----|----|----|
 |  | user_id *Int64* | name *String* | email_verified *Boolean* | is_admin *Boolean* |
-| 1 | 9362 | Joshua Robinson | True | False |
-| 2 | 534 | Marie Young | True | False |
-| 3 | 7027 | Melissa Atkins | True | False |
-| 4 | 7907 | Paisley Jackson | True | False |
-| 5 | 9472 | Martha White | True | False |
-| 26 | 4647 | Zachary Ramirez | False | False |
-| 27 | 4298 | Sarah Gallagher | True | False |
-| 28 | 7485 | Kimberly Tran | True | True |
-| 29 | 2862 | John Marshall | True | True |
-| 30 | 4967 | Linda Garner | True | False |
+| 1 | 9201 | Joshua Robinson | True | False |
+| 2 | 5380 | Marie Young | True | False |
+| 3 | 6399 | Melissa Atkins | False | False |
+| 4 | 623 | Paisley Jackson | True | False |
+| 5 | 482 | Martha White | True | False |
+| 26 | 4395 | Zachary Ramirez | True | False |
+| 27 | 8687 | Sarah Gallagher | True | False |
+| 28 | 3867 | Kimberly Tran | True | False |
+| 29 | 9008 | John Marshall | True | False |
+| 30 | 1786 | Linda Garner | True | False |
 
-Here, `email_verified` is `True` in 26 of the 30 rows and `is_admin` in 3 of them. These counts are close to, but not exactly, the `p_true=` values of `0.9` and `0.05`, since each value is drawn independently.
+Here, `email_verified` is `True` in 24 of the 30 rows and `is_admin` in 1 of them. These counts are close to, but not exactly, the `p_true=` values of `0.9` and `0.05`, since each value is drawn independently.

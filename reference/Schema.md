@@ -4,7 +4,7 @@ Definition of a schema object.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L20-L734)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L20-L737)
 
 ``` python
 Schema(

@@ -1722,7 +1722,7 @@ The action, to use in <a href="../reference/Actions.html#pointblank.Actions" cla
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s validate a small table of orders, which has a missing customer name and two amounts that aren’t positive. The action has no webhook URL, so it prints the message instead of sending it. In <code>Actions(critical=)</code>, it runs for the steps that exceed the critical threshold:</p>
-<div id="df679deb" class="cell" data-execution_count="1">
+<div id="ba4b034e" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1755,14 +1755,14 @@ Would send to Slack:
 • Level: critical
 • Step: 2
 • Column: amount
-• Time: 2026-11-05 16:11:26.295324
+• Time: 2026-11-05 22:27:20.799458
 ==============
 </code></pre>
 </div>
 </div>
 <p>Only the second step, with 40% of its test units failing, reached the critical threshold, so there is one message. The first step (20% failing) exceeded the error threshold, which has no action here.</p>
 <p>In <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a>, the same action sends a summary of the validation instead:</p>
-<div id="59841099" class="cell" data-execution_count="2">
+<div id="10fcea36" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>orders,</span>
@@ -1782,14 +1782,14 @@ Would send to Slack:
 • Highest Severity: critical
 • Total Steps: 2
 • Failed Steps: 2
-• Time: 2026-11-05 16:11:26.303803
+• Time: 2026-11-05 22:27:20.809249
 ==============
 </code></pre>
 </div>
 </div>
 <p>The summary is sent once per interrogation, whether or not any step failed. Both steps failed here, and the highest threshold level reached was critical.</p>
 <p>Custom templates can add more detail. With <code>webhook_url=None</code> and <code>debug=True</code>, the function shows previews of the templates with sample values, without a validation:</p>
-<div id="88234113" class="cell" data-execution_count="3">
+<div id="f326a90b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pb.send_slack_notification(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    step_msg<span class="op">=</span>(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"🚨 *Step </span><span class="sc">{step}</span><span class="st"> (</span><span class="sc">{type}</span><span class="st">)* exceeded the </span><span class="sc">{level}</span><span class="st"> threshold</span><span class="ch">\n</span><span class="st">"</span></span>
