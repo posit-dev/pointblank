@@ -828,6 +828,44 @@ def test_add_steps_keeps_unserializable_arguments():
     assert [s.n_failed for s in validation.validation_info] == [1, 1, 0]
 
 
+def test_serializing_after_interrogation_keeps_brief_templates(small_table):
+    # Interrogation fills in the template elements of `brief`; serializing and `add_steps()` use
+    # the brief as given, so a copied step gets its own step number and column
+    def build(validation):
+        return (
+            validation.col_vals_gt(columns="a", value=0, brief="Step {step}: {col} > {value}")
+            .col_vals_lt(columns=["a", "c"], value=10, brief="{col} is small")
+            .col_vals_not_null(columns="b", brief=True)
+            .col_vals_not_null(columns="d")
+        )
+
+    source = build(Validate(data=small_table, tbl_name="small_table"))
+    before = (source.to_code(), source.to_yaml())
+
+    source.interrogate()
+    assert source.validation_info[0].brief == "Step 1: a > 0"
+    assert source.validation_info[2].brief == "c is small"
+    assert (source.to_code(), source.to_yaml()) == before
+
+    code, yaml_str = before
+    assert 'brief="Step {step}: {col} > {value}"' in code
+    assert 'brief="{col} is small"' in code
+    assert "brief=True" in code
+    assert code.count("brief=") == 3
+
+    validation = (
+        Validate(data=small_table).col_vals_not_null(columns="a").add_steps(source).interrogate()
+    )
+    assert [s.brief for s in validation.validation_info] == [
+        None,
+        "Step 2: a > 0",
+        "a is small",
+        "c is small",
+        "{auto}",
+        None,
+    ]
+
+
 def test_yaml_segments_pairs_and_columns(small_table):
     # In a `segments:` list, a string is a column and a two-item list is a (column, value) pair
     yaml_str = """
