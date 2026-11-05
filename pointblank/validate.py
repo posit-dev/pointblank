@@ -4258,6 +4258,10 @@ class _ValidationInfo:
         The type of assertion. This is the method name of the validation (e.g., `"col_vals_gt"`).
     column
         The column(s) to validate.
+    column_spec
+        The `columns=` selector as originally given. Interrogation expands a step with a column
+        selector into one step per resolved column (replacing `column` with that column's name), so
+        this keeps the original selector for copying the plan with `add_steps()`.
     values
         The value or values to compare against.
     na_pass
@@ -4365,6 +4369,7 @@ class _ValidationInfo:
     sha1: str | None = None
     assertion_type: str | None = None
     column: Any | None = None
+    column_spec: Any | None = None
     values: Any | list[Any] | tuple | None = None
     inclusive: tuple[bool, bool] | None = None
     na_pass: bool | None = None
@@ -4656,13 +4661,15 @@ def _validation_info_to_step(
     global_thresholds: Thresholds | None,
     global_actions: Actions | None,
     warnings_out: list[str],
+    keep_objects: bool = False,
 ) -> tuple[str, dict[str, Any]] | None:
     """Map a `_ValidationInfo` to its `(method_name, kwargs)` pair.
 
     Returns `None` for interrogation-only/internal assertion types that have no
     corresponding public validation method. Non-serializable content (callables,
     expressions) is replaced with an `_UnserializablePlaceholder` and a message is
-    appended to `warnings_out`.
+    appended to `warnings_out`. With `keep_objects=True` (used by `add_steps()`), such content is
+    kept as the original object instead, so the kwargs can be passed back to the method.
     """
     at = vi.assertion_type
     if at is None:  # pragma: no cover
@@ -4670,24 +4677,34 @@ def _validation_info_to_step(
 
     params: dict[str, Any] = {}
 
-    def _placeholder(code: str, note: str, yaml_value: Any = None) -> _UnserializablePlaceholder:
+    def _placeholder(
+        value: Any, code: str, note: str, yaml_value: Any = None
+    ) -> _UnserializablePlaceholder | Any:
+        if keep_objects:
+            return value
         warnings_out.append(note)
         return _UnserializablePlaceholder(code=code, note=note, yaml_value=yaml_value)
 
     def _columns_param() -> None:
         # Aggregate methods store `column` as a list of resolved names; column-value methods
-        # store a single string (or a Column selector, which can't be serialized simply).
-        if isinstance(vi.column, (list, tuple)):
-            names = [_column_to_name(c) for c in vi.column]
+        # store a single string (or a Column selector, which can't be serialized simply). A
+        # selector is replaced at interrogation by each column it resolves to, so the original
+        # selector is used when the step's objects are kept.
+        column = vi.column
+        if keep_objects and vi.column_spec is not None:
+            column = vi.column_spec
+        if isinstance(column, (list, tuple)):
+            names = [_column_to_name(c) for c in column]
             if names and all(n is not None for n in names):
                 params["columns"] = names[0] if len(names) == 1 else names
                 return
-        name = _column_to_name(vi.column)
+        name = _column_to_name(column)
         if name is not None:
             params["columns"] = name
         else:
-            params["columns"] = _placeholder(  # pragma: no cover
-                code=repr(str(vi.column)),
+            params["columns"] = _placeholder(
+                column,
+                code=repr(str(column)),
                 note=(
                     f"Step '{at}' uses a column selector that cannot be serialized to a "
                     "simple column name; a placeholder was emitted."
@@ -4771,6 +4788,7 @@ def _validation_info_to_step(
             params["order_by"] = order_by[0] if len(order_by) == 1 else list(order_by)
     elif at == "col_vals_expr":
         params["expr"] = _placeholder(
+            vi.values,
             code="lambda df: df",
             note=(
                 "Step 'col_vals_expr' uses a table expression that cannot be serialized to "
@@ -4838,6 +4856,7 @@ def _validation_info_to_step(
             params["tbl_compare"] = tbl_compare
         else:
             params["tbl_compare"] = _placeholder(
+                tbl_compare,
                 code="your_comparison_table",
                 note=(
                     f"Step '{at}' compares against a table object that cannot be serialized; "
@@ -4869,6 +4888,7 @@ def _validation_info_to_step(
             params["ref_table"] = str(ref_table)
         else:
             params["ref_table"] = _placeholder(
+                ref_table,
                 code="your_reference_table",
                 note=(
                     "Step 'col_vals_in_table' checks against a reference table that cannot be "
@@ -4878,6 +4898,7 @@ def _validation_info_to_step(
         params["ref_column"] = values.get("ref_column")
     elif at == "conjointly":
         params["expressions"] = _placeholder(
+            (vi.values or {}).get("expressions"),
             code="lambda df: df",
             note=(
                 "Step 'conjointly' uses callable expressions that cannot be serialized to "
@@ -4899,6 +4920,7 @@ def _validation_info_to_step(
             params["max_concurrent"] = values["max_concurrent"]
         if values.get("attachments"):
             params["attachments"] = _placeholder(
+                values["attachments"],
                 code="None",
                 note=(
                     "Step 'prompt' has `attachments=` that cannot be serialized; they were "
@@ -4908,6 +4930,7 @@ def _validation_info_to_step(
             )
     elif at == "specially":
         params["expr"] = _placeholder(
+            vi.values,
             code="lambda df: df",
             note=(
                 "Step 'specially' uses a callable that cannot be serialized to source; a "
@@ -4935,6 +4958,7 @@ def _validation_info_to_step(
 
     if vi.pre is not None:
         params["pre"] = _placeholder(
+            vi.pre,
             code="None",
             note=(
                 f"Step '{at}' has a `pre=` preprocessing callable that cannot be serialized; "
@@ -4955,6 +4979,7 @@ def _validation_info_to_step(
 
     if vi.actions is not None and vi.actions is not global_actions:
         params["actions"] = _placeholder(
+            vi.actions,
             code="None",
             note=(
                 f"Step '{at}' has step-level `actions=` that cannot be serialized; they were "
@@ -4978,6 +5003,7 @@ def _validation_info_to_step(
     if active is not None and active is not True:
         if callable(active):
             params["active"] = _placeholder(
+                active,
                 code="True",
                 note=(
                     f"Step '{at}' has a callable `active=` condition that cannot be serialized; "
@@ -5477,37 +5503,42 @@ def _extract_collect_backend() -> str | None:
 
 
 def _extract_steps_from_validate(validation: Validate) -> list:
+    """Get the steps of a validation plan as `Step` objects, for `add_steps()`.
+
+    Each step gets the same arguments that `to_code()` writes, except that values which can't be
+    serialized (callables, expressions, tables, column selectors) are kept as they are. A step
+    that interrogation expanded into several (one per resolved column or segment) is taken once,
+    as it was defined.
+    """
     from pointblank.contract import Step
 
     steps = []
+    prev_vi: _ValidationInfo | None = None
     for vi in validation.validation_info:
-        kwargs: dict[str, Any] = {}
-        if vi.column is not None:
-            kwargs["columns"] = vi.column
-        if vi.values is not None:
-            kwargs["value"] = vi.values
-        if vi.inclusive is not None:
-            kwargs["inclusive"] = vi.inclusive
-        if vi.na_pass is not None:
-            kwargs["na_pass"] = vi.na_pass
-        if vi.missing is not None:
-            kwargs["missing"] = vi.missing
-        if vi.pre is not None:
-            kwargs["pre"] = vi.pre
-        if vi.segments is not None:
-            kwargs["segments"] = vi.segments
-        if vi.thresholds is not None:
-            kwargs["thresholds"] = vi.thresholds
-        if vi.actions is not None:
-            kwargs["actions"] = vi.actions
-        if vi.brief is not None:
-            kwargs["brief"] = vi.brief
-        active = vi.active_spec if vi.active_spec is not None else vi.active
-        if active is not None and active is not True:
-            kwargs["active"] = active
-        if vi.dimension is not None:
-            kwargs["dimension"] = vi.dimension
-        steps.append(Step(vi.assertion_type, **kwargs))
+        # Steps expanded from a single step (at interrogation) share its `i_o`
+        is_expansion_copy = vi.i_o is not None and prev_vi is not None and prev_vi.i_o == vi.i_o
+        prev_vi = vi
+        if is_expansion_copy:
+            continue
+
+        step = _validation_info_to_step(
+            vi,
+            global_thresholds=validation.thresholds,
+            global_actions=validation.actions,
+            warnings_out=[],
+            keep_objects=True,
+        )
+        if step is None:  # pragma: no cover
+            raise ValueError(
+                f"The '{vi.assertion_type}' step can't be copied from a `Validate` object."
+            )
+        method, kwargs = step
+
+        # The expressions of a `conjointly()` step are recorded as `exprs=`, like in `Steps`
+        if method == "conjointly":
+            kwargs["exprs"] = kwargs.pop("expressions")
+
+        steps.append(Step(method, **kwargs))
     return steps
 
 
@@ -6470,7 +6501,9 @@ class Validate:
         steps were recorded. Several collections can be added in one call, and the result can be
         chained with other validation methods, so shared steps and steps specific to this table
         can be combined in one plan. A `Validate` object can also be given, in which case its
-        steps are copied into this validation.
+        steps are copied into this validation as they were defined, whether or not it has been
+        interrogated (a step that interrogation split into one step per column or segment is copied
+        once).
 
         Steps written for one table don't always fit another one exactly. The optional arguments
         adapt the added steps without changing the collections themselves: `columns_map=` renames
@@ -23619,6 +23652,7 @@ class Validate:
             if not columns_resolved:
                 validation.eval_error = True
                 validation.column = str(column_expr)
+                validation.column_spec = column_expr
 
                 # Add a helpful note explaining that no columns were resolved
                 note_html = _create_no_columns_resolved_note_html(
@@ -23645,6 +23679,7 @@ class Validate:
                 new_validation = copy.deepcopy(validation)
 
                 new_validation.column = column
+                new_validation.column_spec = column_expr
 
                 expanded_validation_info.append(new_validation)
 

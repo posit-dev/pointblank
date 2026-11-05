@@ -710,21 +710,122 @@ def test_add_steps_from_interrogated_validation_keeps_original_active():
 
     data = pl.DataFrame({"x": [1, 2]})
     source = _active_plan(data)
-    # Drop the `col_vals_expr()` step, which `add_steps()` can't copy from a `Validate` object
-    source.validation_info = source.validation_info[:-1]
     source.interrogate()
 
     expected = [s.active_spec for s in source.validation_info]
     assert expected[:3] == [True, True, False]
     assert all(callable(active) for active in expected[3:5])
-    assert expected[5] is True
+    assert expected[5:] == [True, True]
 
     validation = Validate(data=data).add_steps(source)
     assert [s.active for s in validation.validation_info] == expected
 
     validation.interrogate()
-    assert [s.active for s in validation.validation_info] == [True] + [False] * 5
+    assert [s.active for s in validation.validation_info] == [True] + [False] * 6
     assert validation.validation_info[0].n_passed == 2
+
+
+@pytest.mark.parametrize("method", sorted(_serialization_cases(None)))
+@pytest.mark.parametrize("interrogated", [False, True])
+def test_add_steps_copies_every_validation_method(method, interrogated, small_table, ref_path):
+    # A step copied from a `Validate` object with `add_steps()` gets the arguments it was defined
+    # with, so the copy has the same plan and the same results
+    if interrogated and method == "prompt":
+        pytest.skip("`prompt()` steps call a model at interrogation")
+
+    build = _serialization_cases(ref_path)[method]
+    source = build(Validate(data=small_table, tbl_name="small_table"))
+    plan = _serialize_quietly(source)
+    if interrogated:
+        source.interrogate()
+
+    validation = Validate(data=small_table, tbl_name="small_table").add_steps(source)
+    assert _serialize_quietly(validation) == plan
+    if method == "prompt":
+        return
+
+    expected = _results(source if interrogated else build(Validate(data=small_table)).interrogate())
+    assert _results(validation.interrogate()) == expected
+
+
+def test_add_steps_copies_expanded_steps_as_defined():
+    # Interrogation expands a step with a column selector or `segments=` into one step per column
+    # or segment; `add_steps()` copies the step as defined, so it's expanded for the new table
+    import polars as pl
+
+    source = (
+        Validate(data=pl.DataFrame({"a1": [1, 2], "a2": [3, 4], "s": ["p", "q"]}), thresholds=1)
+        .col_vals_gt(columns=pb.starts_with("a"), value=0)
+        .col_vals_gt(columns="a1", value=0, segments="s")
+        .col_vals_not_null(columns="a2")
+        .col_vals_not_null(columns=pb.starts_with("zz"))
+        .interrogate()
+    )
+    assert len(source.validation_info) == 6
+
+    data = pl.DataFrame({"a1": [1, 2, 3], "a2": [4, 5, 6], "a3": [7, 8, 9], "s": ["p", "q", "r"]})
+    validation = Validate(data=data, thresholds=(0.5, 0.8)).add_steps(source)
+    steps = validation.validation_info
+    assert [s.column for s in steps] == [
+        source.validation_info[0].column_spec,
+        "a1",
+        "a2",
+        source.validation_info[-1].column_spec,
+    ]
+    assert steps[1].segments == "s"
+
+    # Thresholds equal to the source's global thresholds give way to those of the new validation
+    assert all(s.thresholds == validation.thresholds for s in steps)
+
+    validation.interrogate()
+    assert [(s.column, s.segments) for s in validation.validation_info] == [
+        ("a1", None),
+        ("a2", None),
+        ("a3", None),
+        ("a1", ("s", "p")),
+        ("a1", ("s", "q")),
+        ("a1", ("s", "r")),
+        ("a2", None),
+        (str(pb.starts_with("zz")), None),
+    ]
+    assert validation.validation_info[-1].eval_error
+
+    # Positions in `exclude=` count the steps as defined, not as expanded
+    validation = Validate(data=data).add_steps(source, exclude=[2, 4], columns_map={"a2": "a3"})
+    assert [(s.assertion_type, s.column) for s in validation.validation_info] == [
+        ("col_vals_gt", source.validation_info[0].column_spec),
+        ("col_vals_not_null", "a3"),
+    ]
+
+
+def test_add_steps_keeps_unserializable_arguments():
+    # The arguments that `to_code()` replaces with placeholders (callables, tables, actions) are
+    # copied as they are
+    import polars as pl
+
+    data = pl.DataFrame({"a": [1, 2, 3]})
+    ref = pl.DataFrame({"x": [1, 2]})
+    actions = pb.Actions(warning="warned")
+
+    def pre(tbl):
+        return tbl.with_columns(b=pl.col("a") * 2)
+
+    source = (
+        Validate(data=data)
+        .col_vals_gt(columns="b", value=3, pre=pre, thresholds=1, actions=actions)
+        .col_vals_in_table(columns="a", ref_table=ref, ref_column="x")
+        .tbl_match(tbl_compare=data)
+    )
+
+    validation = Validate(data=data).add_steps(source)
+    first, in_table, match = validation.validation_info
+    assert first.pre is pre
+    assert first.actions is actions
+    assert in_table.values["ref_table"] is ref
+    assert match.values["tbl_compare"] is data
+
+    validation.interrogate()
+    assert [s.n_failed for s in validation.validation_info] == [1, 1, 0]
 
 
 def test_yaml_segments_pairs_and_columns(small_table):
