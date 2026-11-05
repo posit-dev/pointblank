@@ -17,6 +17,7 @@ from pathlib import Path
 from functools import partial
 import contextlib
 import datetime
+from decimal import Decimal
 from enum import Enum, IntEnum
 
 
@@ -52,6 +53,7 @@ except ImportError:
 
 import pandas as pd
 import polars as pl
+import pyarrow as pa
 from polars.testing import assert_frame_equal
 import pytz
 import ibis
@@ -2892,6 +2894,95 @@ def test_comparison_compatible_types(tbl_type, method, kwargs, n_passed) -> None
 
     assert validation.validation_info[0].eval_error is not True
     assert validation.n_passed(i=1, scalar=True) == n_passed
+
+
+def _decimal_time_table(tbl_type: str):
+    # A decimal column (e.g., a `DECIMAL(10, 2)` database column), float and integer columns, and
+    # a time column (with microsecond precision, as in a database)
+    tbl = pa.table(
+        {
+            "amt": pa.array(
+                [Decimal("1.10"), Decimal("2.25"), None, Decimal("4.00")], pa.decimal128(10, 2)
+            ),
+            "f": pa.array([1.5, 2.5, None, 4.5], pa.float64()),
+            "a": pa.array([1, 2, None, 4], pa.int64()),
+            "t": pa.array(
+                [datetime.time(9, 0), datetime.time(10, 30), None, datetime.time(12, 0)],
+                pa.time64("us"),
+            ),
+        }
+    )
+    if tbl_type == "polars":
+        return pl.from_arrow(tbl)
+    if tbl_type == "polars_lazy":
+        return pl.from_arrow(tbl).lazy()
+    if tbl_type == "pandas":
+        return tbl.to_pandas()
+    if tbl_type == "duckdb":
+        return ibis.duckdb.connect().create_table("tbl", tbl)
+    return ibis.memtable(tbl)
+
+
+@pytest.mark.parametrize("tbl_type", TYPE_MISMATCH_TBL_TYPES)
+@pytest.mark.parametrize(
+    "method, kwargs, n_passed, brief",
+    [
+        # `Decimal` values against decimal, float, and integer columns
+        (
+            "col_vals_gt",
+            {"columns": "amt", "value": Decimal("2.2")},
+            2,
+            "Expect that values in `amt` should be > `2.2`.",
+        ),
+        (
+            "col_vals_le",
+            {"columns": "f", "value": Decimal("2.5")},
+            2,
+            "Expect that values in `f` should be <= `2.5`.",
+        ),
+        (
+            "col_vals_eq",
+            {"columns": "a", "value": Decimal("2")},
+            1,
+            "Expect that values in `a` should be == `2`.",
+        ),
+        (
+            "col_vals_between",
+            {"columns": "amt", "left": Decimal("1.1"), "right": Decimal("4.0")},
+            3,
+            "Expect that values in `amt` should be between `1.1` and `4.0`.",
+        ),
+        (
+            "col_vals_outside",
+            {"columns": "f", "left": Decimal("2"), "right": Decimal("4")},
+            2,
+            "Expect that values in `f` should not be between `2` and `4`.",
+        ),
+        # `time` values against a time column
+        (
+            "col_vals_gt",
+            {"columns": "t", "value": datetime.time(10, 0)},
+            2,
+            "Expect that values in `t` should be > `10:00:00`.",
+        ),
+        (
+            "col_vals_between",
+            {"columns": "t", "left": datetime.time(9, 0), "right": datetime.time(11, 0)},
+            2,
+            "Expect that values in `t` should be between `09:00:00` and `11:00:00`.",
+        ),
+    ],
+)
+def test_comparison_decimal_and_time_values(tbl_type, method, kwargs, n_passed, brief) -> None:
+    # A `Decimal` or `time` value used to crash `interrogate()` when the autobrief was written
+    # (and, for a pandas float column with missing values, when compared with a `Decimal`)
+    validation = getattr(Validate(_decimal_time_table(tbl_type)), method)(**kwargs).interrogate()
+
+    step = validation.validation_info[0]
+    assert step.eval_error is not True
+    assert step.autobrief == brief
+    assert validation.n_passed(i=1, scalar=True) == n_passed
+    assert validation.n_failed(i=1, scalar=True) == 4 - n_passed
 
 
 # Columns `a` and `b` with nulls in `a` only, in `b` only, or in both, and the expected

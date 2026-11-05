@@ -6,6 +6,7 @@ import numbers
 import operator
 from collections.abc import Callable
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 from zoneinfo import ZoneInfo
 
@@ -60,6 +61,49 @@ def _first_line(error: BaseException) -> str:
 def _native_lib(obj: Any) -> str:
     """Get the name of the library an object comes from (e.g., `"polars"`, `"pandas"`)."""
     return type(obj).__module__.split(".")[0]
+
+
+def _align_decimal_compare_val(nw_tbl: Any, column: str, compare_val: Any) -> Any:
+    """
+    Compare a `Decimal` value with a float column as a float.
+
+    pandas compares a float column with a `Decimal` value element by element, which raises
+    `decimal.InvalidOperation` as soon as the column has a `NaN`; the other backends compare the
+    two as floats anyway. A `Decimal` value against a decimal or integer column is left as is,
+    except on an Ibis version that can't compare a decimal column with a `Decimal` literal, where
+    the value is compared as a float as well.
+    """
+    if not isinstance(compare_val, Decimal):
+        return compare_val
+
+    dtype = nw_tbl.collect_schema().get(column)
+    if dtype is not None and dtype.is_float():
+        return float(compare_val)
+
+    if (
+        dtype is not None
+        and dtype.is_decimal()
+        and nw_tbl.implementation.is_ibis()
+        and not _ibis_compares_decimal_literal(nw_tbl.to_native(), column)
+    ):
+        return float(compare_val)
+
+    return compare_val
+
+
+def _ibis_compares_decimal_literal(ibis_table: Any, column: str) -> bool:
+    """
+    Check whether Ibis can compare a decimal column with a `Decimal` literal.
+
+    Ibis 11 types a `Decimal` literal as a decimal without precision and scale, which it then
+    refuses to compare with a `decimal(p, s)` column (`IbisTypeError: ... are not comparable`);
+    Ibis 12 accepts the comparison.
+    """
+    try:
+        ibis_table[column] > Decimal(0)
+    except Exception:
+        return False
+    return True
 
 
 def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val: Any) -> Any:
@@ -1009,6 +1053,8 @@ def interrogate_between(
     _check_comparable(nw_tbl, column, high)
     low_val = _safe_modify_datetime_compare_val(nw_tbl, column, low_val)
     high_val = _safe_modify_datetime_compare_val(nw_tbl, column, high_val)
+    low_val = _align_decimal_compare_val(nw_tbl, column, low_val)
+    high_val = _align_decimal_compare_val(nw_tbl, column, high_val)
 
     result_tbl = nw_tbl.with_columns(
         pb_is_good_1=_safe_is_nan_or_null_expr(nw_tbl, nw.col(column), column),  # val is missing
@@ -1089,6 +1135,8 @@ def interrogate_outside(
     _check_comparable(nw_tbl, column, high)
     low_val = _safe_modify_datetime_compare_val(nw_tbl, column, low_val)
     high_val = _safe_modify_datetime_compare_val(nw_tbl, column, high_val)
+    low_val = _align_decimal_compare_val(nw_tbl, column, low_val)
+    high_val = _align_decimal_compare_val(nw_tbl, column, high_val)
 
     result_tbl = nw_tbl.with_columns(
         pb_is_good_1=_safe_is_nan_or_null_expr(nw_tbl, nw.col(column), column),  # val is missing
@@ -2229,6 +2277,7 @@ def _interrogate_comparison_base(
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     _check_comparable(nw_tbl, column, compare)
     compare_expr = _safe_modify_datetime_compare_val(nw_tbl, column, compare_expr)
+    compare_expr = _align_decimal_compare_val(nw_tbl, column, compare_expr)
 
     compared_columns = [column, compare.name] if isinstance(compare, Column) else [column]
     eval_tbl = _with_pandas_object_columns_converted(nw_tbl, compared_columns)
