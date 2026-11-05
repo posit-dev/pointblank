@@ -4,7 +4,7 @@ Does the column average satisfy a less than or equal to comparison?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1179-L1219)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1180-L1220)
 
 ``` python
 Validate.col_avg_le(

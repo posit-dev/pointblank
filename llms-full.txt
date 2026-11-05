@@ -2347,7 +2347,9 @@ is applied to this validation as if its method had been called directly, in the 
 steps were recorded. Several collections can be added in one call, and the result can be
 chained with other validation methods, so shared steps and steps specific to this table
 can be combined in one plan. A `Validate` object can also be given, in which case its
-steps are copied into this validation.
+steps are copied into this validation as they were defined, whether or not it has been
+interrogated (a step that interrogation split into one step per column or segment is copied
+once).
 
 Steps written for one table don't always fit another one exactly. The optional arguments
 adapt the added steps without changing the collections themselves: `columns_map=` renames

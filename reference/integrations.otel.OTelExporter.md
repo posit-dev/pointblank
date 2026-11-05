@@ -132,7 +132,7 @@ for metric in metrics:
     pb.validation.test_units.passed 7
     pb.validation.test_units.failed 3
     pb.validation.pass_rate 0.7
-    pb.validation.duration 0.009735
+    pb.validation.duration 0.009606
     pb.validation.threshold.warning 2
     pb.validation.threshold.error 2
     pb.validation.threshold.critical 1

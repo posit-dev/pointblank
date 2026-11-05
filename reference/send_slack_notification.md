@@ -121,7 +121,7 @@ validation = (
     • Level: critical
     • Step: 2
     • Column: amount
-    • Time: 2026-11-05 01:37:03.986939
+    • Time: 2026-11-05 14:32:41.370298
     ==============
 
 Only the second step, with 40% of its test units failing, reached the critical threshold, so there is one message. The first step (20% failing) exceeded the error threshold, which has no action here.
@@ -148,7 +148,7 @@ validation = (
     • Highest Severity: critical
     • Total Steps: 2
     • Failed Steps: 2
-    • Time: 2026-11-05 01:37:04.000799
+    • Time: 2026-11-05 14:32:41.385255
     ==============
 
 The summary is sent once per interrogation, whether or not any step failed. Both steps failed here, and the highest threshold level reached was critical.

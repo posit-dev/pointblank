@@ -4,7 +4,7 @@ Validate whether the column count of the table matches a specified count.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15352-L15539)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15385-L15572)
 
 ``` python
 Validate.col_count_match(

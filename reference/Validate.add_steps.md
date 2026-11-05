@@ -4,7 +4,7 @@ Add the steps from one or more [Steps](../reference/Steps.md#pointblank.Steps) c
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6455-L6663)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6486-L6696)
 
 ``` python
 Validate.add_steps(
@@ -16,7 +16,7 @@ Validate.add_steps(
 )
 ```
 
-This method appends previously recorded validation steps to the validation plan. The main source of steps is a [`Steps`](../reference/Steps.md#pointblank.Steps) collection: a reusable group of steps built with the same methods as [Validate](../reference/Validate.md#pointblank.Validate) but not attached to any table. Each recorded step is applied to this validation as if its method had been called directly, in the order the steps were recorded. Several collections can be added in one call, and the result can be chained with other validation methods, so shared steps and steps specific to this table can be combined in one plan. A [Validate](../reference/Validate.md#pointblank.Validate) object can also be given, in which case its steps are copied into this validation.
+This method appends previously recorded validation steps to the validation plan. The main source of steps is a [`Steps`](../reference/Steps.md#pointblank.Steps) collection: a reusable group of steps built with the same methods as [Validate](../reference/Validate.md#pointblank.Validate) but not attached to any table. Each recorded step is applied to this validation as if its method had been called directly, in the order the steps were recorded. Several collections can be added in one call, and the result can be chained with other validation methods, so shared steps and steps specific to this table can be combined in one plan. A [Validate](../reference/Validate.md#pointblank.Validate) object can also be given, in which case its steps are copied into this validation as they were defined, whether or not it has been interrogated (a step that interrogation split into one step per column or segment is copied once).
 
 Steps written for one table don't always fit another one exactly. The optional arguments adapt the added steps without changing the collections themselves: `columns_map=` renames columns, `thresholds=` and `active=` replace those settings on every added step, and `exclude=` leaves out steps that don't apply.
 
