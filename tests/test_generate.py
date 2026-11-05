@@ -1,3 +1,5 @@
+import os
+
 import pytest
 from datetime import date, datetime, time, timedelta
 
@@ -17,6 +19,7 @@ from pointblank.field import (
 )
 from pointblank.generate.base import GeneratorConfig
 from pointblank.generate.generators import (
+    _derive_seed,
     _get_coherence_groups,
     generate_column,
     generate_dataframe,
@@ -583,6 +586,94 @@ class TestGenerateColumnReproducibility:
         values2 = generate_column(field, config2)
 
         assert values1 != values2
+
+
+class TestSeededColumnIndependence:
+    """With a seed, each column gets its own random sequence (BUGS.md #113, #118, #128)."""
+
+    def test_same_field_twice_gives_different_columns(self):
+        field = int_field(min_val=1, max_val=100, nullable=True, null_probability=0.3)
+        config = GeneratorConfig(n=200, seed=7, output="dict")
+        data = generate_dataframe({"a": field, "b": field}, config)
+
+        assert data["a"] != data["b"]
+        assert sum(a == b for a, b in zip(data["a"], data["b"]) if a is not None) < 20
+
+        # The missing values fall in different rows
+        nulls_a = {i for i, v in enumerate(data["a"]) if v is None}
+        nulls_b = {i for i, v in enumerate(data["b"]) if v is None}
+        assert nulls_a and nulls_b and nulls_a != nulls_b
+
+    def test_different_ranges_are_not_correlated(self):
+        """Two time fields with different windows don't share their minutes and seconds."""
+        fields = {
+            "start": time_field(min_time=time(6, 0), max_time=time(9, 0)),
+            "end": time_field(min_time=time(16, 0), max_time=time(20, 0)),
+        }
+        data = generate_dataframe(fields, GeneratorConfig(n=100, seed=23, output="dict"))
+        same = sum(
+            (s.minute, s.second) == (e.minute, e.second) for s, e in zip(data["start"], data["end"])
+        )
+        assert same < 5
+
+    def test_other_columns_unchanged_by_adding_reordering_or_removing(self):
+        fields = {
+            "id": int_field(min_val=1, max_val=10_000, unique=True),
+            "score": float_field(min_val=0, max_val=1, nullable=True, null_probability=0.2),
+            "code": string_field(pattern=r"[A-Z]{3}-\d{2}"),
+        }
+        config = GeneratorConfig(n=50, seed=23, output="dict")
+        base = generate_dataframe(fields, config)
+
+        more = generate_dataframe({"flag": bool_field(), **fields}, config)
+        assert {col: more[col] for col in fields} == base
+
+        reordered = generate_dataframe(dict(reversed(fields.items())), config)
+        assert {col: reordered[col] for col in fields} == base
+
+        fewer = generate_dataframe({"id": fields["id"], "code": fields["code"]}, config)
+        assert fewer == {"id": base["id"], "code": base["code"]}
+
+    def test_seed_zero_is_reproducible(self):
+        """A seed of `0` seeds the missing values too (they were random with `seed=0`)."""
+        fields = {"x": int_field(nullable=True, null_probability=0.5)}
+        config = GeneratorConfig(n=100, seed=0, output="dict")
+        assert generate_dataframe(fields, config) == generate_dataframe(fields, config)
+        assert generate_column(fields["x"], config) == generate_column(fields["x"], config)
+
+    def test_coherent_unique_nulls_match_non_unique(self):
+        """A coherent column has its nulls in the same rows with or without `unique=True`."""
+        config = GeneratorConfig(n=50, seed=7, country="US", output="dict")
+        city = string_field(preset="city", nullable=True, null_probability=0.3)
+        non_unique = generate_dataframe({"name": string_field(preset="name"), "city": city}, config)
+        unique = generate_dataframe(
+            {"name": string_field(preset="name", unique=True), "city": city}, config
+        )
+        assert unique == non_unique
+        assert None in unique["city"]
+
+    @pytest.mark.parametrize("country", [["US", "FR"], {"DE": 2, "JP": 1}])
+    def test_multi_country_same_in_every_session(self, country):
+        """The per-country seeds don't depend on Python's per-process string hashing."""
+        import subprocess
+        import sys
+
+        code = (
+            "import pointblank as pb; "
+            "s = pb.Schema(name=pb.string_field(preset='name'), x=pb.int_field(max_val=99)); "
+            f"print(pb.generate_dataset(s, n=20, seed=7, country={country!r}, output='dict'))"
+        )
+        outputs = {
+            subprocess.run(
+                [sys.executable, "-c", code],
+                capture_output=True,
+                text=True,
+                check=True,
+                env={**os.environ, "PYTHONHASHSEED": hash_seed},
+            ).stdout
+            for hash_seed in ["1", "2", "3"]
+        }
+        assert len(outputs) == 1
 
 
 class TestGenerateDataframe:
@@ -2462,10 +2553,10 @@ class TestLocaleMixing:
         # The first 50 should all be from US data, last 50 from JP.
         # We can verify by generating the batches separately and comparing.
         config_us = GeneratorConfig(
-            n=50, seed=(23 + hash("US")) % (2**31), output="dict", country="US"
+            n=50, seed=_derive_seed(23, "country", "US"), output="dict", country="US"
         )
         config_jp = GeneratorConfig(
-            n=50, seed=(23 + hash("JP")) % (2**31), output="dict", country="JP"
+            n=50, seed=_derive_seed(23, "country", "JP"), output="dict", country="JP"
         )
         us_only = generate_dataframe(fields, config_us)
         jp_only = generate_dataframe(fields, config_jp)
