@@ -187,6 +187,7 @@ from pointblank.column import (
     last_n,
     expr_col,
 )
+from pointblank.inspect import has_columns
 
 from typing import TYPE_CHECKING
 
@@ -849,6 +850,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "actions",
         "label",
         "brief",
+        "brief_spec",
         "autobrief",
         "dimension",
         "active",
@@ -885,6 +887,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
     assert val_info.actions is None
     assert val_info.label is None
     assert val_info.brief is None
+    assert val_info.brief_spec is None
     assert val_info.autobrief is None
     assert val_info.active is True
     assert val_info.active_spec is None
@@ -939,6 +942,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "actions",
         "label",
         "brief",
+        "brief_spec",
         "autobrief",
         "dimension",
         "active",
@@ -975,6 +979,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
     assert val_info.actions is None
     assert val_info.label is None
     assert val_info.brief is None
+    assert val_info.brief_spec is None
     assert val_info.autobrief is not None
     assert val_info.active is True
     assert val_info.active_spec is True
@@ -19250,6 +19255,121 @@ def test_set_tbl_interrogation_state_management() -> None:
     assert new_result.time_start is not None
     assert new_result.time_end is not None
     assert new_result.tbl_name == "New"
+
+
+def _step_results(validation):
+    return [
+        (s.i, s.column, s.segments, s.brief, s.eval_error, s.active, s.n, s.n_passed, s.notes)
+        for s in validation.validation_info
+    ]
+
+
+def _reinterrogation_plan(data):
+    return (
+        Validate(data=data)
+        .col_vals_gt(columns=starts_with("a"), value=0, brief="Step {step}: {col} > 0")
+        .col_vals_gt(columns="a1", value=0, segments="g")
+        .col_vals_not_null(columns="b")
+        .col_vals_not_null(columns="a1", active=has_columns("b"))
+        .col_vals_increasing(columns="a1", allow_stationary=True)
+    )
+
+
+def test_reinterrogate_same_table_gives_same_results() -> None:
+    # Interrogating again starts from the steps as defined, so the results are the same as those
+    # of the first interrogation (steps aren't expanded twice, notes aren't added twice, ...)
+    tbl = pl.DataFrame({"a1": [1, 2, 2], "a2": [3, -4, 5], "g": ["x", "y", "y"]})
+    validation = _reinterrogation_plan(tbl).interrogate()
+    first = _step_results(validation)
+    assert len(first) == 7
+    assert validation.validation_info[0].brief == "Step 1: a1 > 0"
+
+    validation.interrogate()
+    assert _step_results(validation) == first
+    assert _step_results(_reinterrogation_plan(tbl).interrogate()) == first
+
+    increasing = validation.validation_info[-1]
+    assert increasing.val_info["allow_stationary"] is True
+    assert increasing.n_passed == 3
+
+
+def test_reinterrogate_after_changing_table_starts_over() -> None:
+    # Results from an earlier interrogation (an evaluation error, a step made inactive by a callable
+    # `active=`, notes, the expansion by column and segment) don't carry over to the next one
+    old = pl.DataFrame({"a1": [1, 2], "a2": [3, -4], "g": ["x", "y"]})
+    new = pl.DataFrame(
+        {"a1": [1, 2, 3], "a2": [3, 4, 5], "a3": [6, 7, 8], "g": ["x", "y", "z"], "b": [1, 2, 3]}
+    )
+
+    validation = _reinterrogation_plan(old).interrogate()
+    assert [(s.column, s.eval_error, s.active) for s in validation.validation_info[4:6]] == [
+        ("b", True, False),
+        ("a1", None, False),
+    ]
+    assert validation.validation_info[4].notes is not None
+    assert validation.validation_info[5].notes is not None
+
+    # Changing the table of the same `Validate` object and using `set_tbl()` give the same results
+    # as a validation on the new table
+    expected = _step_results(_reinterrogation_plan(new).interrogate())
+    from_set_tbl = validation.set_tbl(new).interrogate()
+    validation.data = new
+    validation.interrogate()
+    assert _step_results(validation) == _step_results(from_set_tbl) == expected
+
+    assert [(s.i, s.column, s.segments) for s in validation.validation_info] == [
+        (1, "a1", None),
+        (2, "a2", None),
+        (3, "a3", None),
+        (4, "a1", ("g", "x")),
+        (5, "a1", ("g", "y")),
+        (6, "a1", ("g", "z")),
+        (7, "b", None),
+        (8, "a1", None),
+        (9, "a1", None),
+    ]
+    assert [s.brief for s in validation.validation_info[:3]] == [
+        "Step 1: a1 > 0",
+        "Step 2: a2 > 0",
+        "Step 3: a3 > 0",
+    ]
+    assert all(s.all_passed for s in validation.validation_info)
+    assert all(s.notes is None for s in validation.validation_info)
+
+    # Going back to the old table gives its results again
+    validation.data = old
+    validation.interrogate()
+    assert _step_results(validation) == _step_results(_reinterrogation_plan(old).interrogate())
+
+
+def test_reinterrogate_with_steps_added_after_interrogation() -> None:
+    tbl = pl.DataFrame({"a1": [1, 2], "a2": [3, 4], "g": ["x", "y"]})
+    validation = _reinterrogation_plan(tbl).interrogate()
+    validation.col_vals_lt(columns=starts_with("a"), value=4, brief="{col} < 4")
+    validation.interrogate()
+
+    expected = _reinterrogation_plan(tbl).col_vals_lt(
+        columns=starts_with("a"), value=4, brief="{col} < 4"
+    )
+    assert _step_results(validation) == _step_results(expected.interrogate())
+    assert [s.brief for s in validation.validation_info[-2:]] == ["a1 < 4", "a2 < 4"]
+    assert validation.n_failed(i=9, scalar=True) == 1
+
+
+def test_reinterrogate_data_freshness_drops_earlier_age() -> None:
+    now = datetime.datetime.now()
+    validation = Validate(data=pl.DataFrame({"ts": [now]})).data_freshness(
+        column="ts", max_age="1 day"
+    )
+    validation.interrogate()
+    assert "age" in validation.validation_info[0].values
+    assert validation.validation_info[0].all_passed
+
+    validation.data = pl.DataFrame({"ts": pl.Series([None], dtype=pl.Datetime)})
+    validation.interrogate()
+    step = validation.validation_info[0]
+    assert "age" not in step.values
+    assert list(step.notes) == ["column_empty"]
 
 
 def test_process_connection_string_not_string() -> None:

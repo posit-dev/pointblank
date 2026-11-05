@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import os
 import shutil
 import sys
@@ -4757,40 +4756,13 @@ def run(
                 if hasattr(validation, "data") and hasattr(validation, "interrogate"):
                     console.print("[cyan]Updating validation with new data source...[/cyan]")
 
-                    # Store the original validation_info as our "plan"
-                    original_validation_info = validation.validation_info.copy()
-
-                    # Replace the data
-                    validation.data = cli_data
-
-                    # Re-process the data (same as what happens in __post_init__)
+                    # Replace the data (processing it as `Validate()` does)
                     from pointblank.validate import _process_data
 
-                    validation.data = _process_data(validation.data)
+                    validation.data = _process_data(cli_data)
 
-                    # Reset validation results but keep the plan
-                    validation.validation_info = []
-
-                    # Re-add each validation step from the original plan
-                    for val_info in original_validation_info:
-                        # Create a copy and reset any interrogation results
-                        new_val_info = copy.deepcopy(val_info)
-                        # Reset interrogation-specific attributes if they exist
-                        if hasattr(new_val_info, "n_passed"):
-                            new_val_info.n_passed = None
-                        if hasattr(new_val_info, "n_failed"):
-                            new_val_info.n_failed = None
-                        if hasattr(new_val_info, "all_passed"):
-                            new_val_info.all_passed = None
-                        if hasattr(new_val_info, "warning"):
-                            new_val_info.warning = None
-                        if hasattr(new_val_info, "error"):
-                            new_val_info.error = None
-                        if hasattr(new_val_info, "critical"):
-                            new_val_info.critical = None
-                        validation.validation_info.append(new_val_info)
-
-                    # Re-interrogate with the new data
+                    # Re-interrogate with the new data (interrogation starts over from the steps
+                    # as they were defined, so no results from the original data remain)
                     console.print("[cyan]Re-interrogating with new data...[/cyan]")
                     validation.interrogate()
 

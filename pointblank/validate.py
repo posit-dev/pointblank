@@ -4282,6 +4282,10 @@ class _ValidationInfo:
         A label for the validation step. Unused.
     brief
         A brief description of the validation step.
+    brief_spec
+        The brief as originally given. Interrogation fills in the template elements of `brief`
+        (e.g., `"{step}"` and `"{col}"`), so this keeps the template for serializing the plan and
+        for interrogating it again.
     autobrief
         An automatically-generated brief for the validation step.
     dimension
@@ -4292,7 +4296,7 @@ class _ValidationInfo:
     active_spec
         The `active=` value as originally given. Interrogation replaces `active` with the resolved
         value (the result of a callable, or `False` for a step that can't be evaluated), so this
-        keeps the original value for serializing the plan.
+        keeps the original value for serializing the plan and for interrogating it again.
     expr_source
         The source text of a `col_vals_expr()` expression, as written by the user (or `None` if
         it couldn't be determined with certainty).
@@ -4381,6 +4385,7 @@ class _ValidationInfo:
     actions: Actions | None = None
     label: str | None = None
     brief: str | None = None
+    brief_spec: str | None = None
     autobrief: str | None = None
     dimension: str | None = None
     active: bool | Callable | None = None
@@ -4407,6 +4412,46 @@ class _ValidationInfo:
 
     def get_val_info(self) -> dict[str, Any] | None:
         return self.val_info
+
+    def _restore_plan(self) -> None:
+        """
+        Return an interrogated step to the state it was defined in.
+
+        The column selector, `segments=`, `active=` and `brief=` values as given are put back, and
+        everything interrogation set (the results, `eval_error`, notes, ...) is cleared, so that
+        interrogating the step again starts from its definition.
+        """
+        if self.column_spec is not None:
+            self.column = self.column_spec
+        if self.segments_spec is not None:
+            self.segments = self.segments_spec
+        self.active = self.active_spec
+        self.brief = self.brief_spec
+        self.i = None
+        self.autobrief = None
+        for name in (
+            "eval_error",
+            "all_passed",
+            "n",
+            "n_passed",
+            "n_failed",
+            "f_passed",
+            "f_failed",
+            "warning",
+            "error",
+            "critical",
+            "failure_text",
+            "tbl_checked",
+            "extract",
+            "time_processed",
+            "proc_duration_s",
+            "notes",
+        ):
+            setattr(self, name, None)
+        # The settings of `col_vals_increasing()` and `col_vals_decreasing()` are held in
+        # `val_info` from definition; for the other methods it holds interrogation details
+        if self.assertion_type not in ("col_vals_increasing", "col_vals_decreasing"):
+            self.val_info = None
 
     def _add_note(self, key: str, markdown: str, text: str | None = None) -> None:
         """
@@ -4988,8 +5033,11 @@ def _validation_info_to_step(
             yaml_value="null",
         )
 
-    if vi.brief is not None and vi.brief is not False:
-        params["brief"] = True if vi.brief == "{auto}" else vi.brief
+    # After interrogation, `brief` has its template elements filled in (e.g., `"{step}"` becomes
+    # the step number); the brief as given is recorded along with `active_spec`
+    brief = vi.brief_spec if vi.active_spec is not None else vi.brief
+    if brief is not None and brief is not False:
+        params["brief"] = True if brief == "{auto}" else brief
 
     # Emit `dimension=` only when it deviates from the built-in default inference (i.e., an
     # explicit per-step override or a `dimension_map` remap), so generated plans reproduce the
@@ -6383,7 +6431,10 @@ class Validate:
 
         The `set_tbl()` method creates a copy of the validation object with the new table, so the
         original validation object remains unchanged. This allows you to reuse validation plans
-        across multiple tables without interference.
+        across multiple tables without interference. The validation object can already have been
+        interrogated: interrogating the copy starts over from the steps as they were defined, so
+        the new table is checked from scratch (e.g., a step using a column selector such as
+        `starts_with()` gets one step for each matching column of the new table).
 
         Examples
         --------
@@ -17079,6 +17130,12 @@ class Validate:
         by printing the `Validate` object; this will display the validation table in an HTML viewing
         environment.
 
+        Calling `interrogate()` again (e.g., after the table was fixed or replaced, or with
+        different extract options) replaces the results of the earlier interrogation. Each
+        interrogation starts from the validation steps as they were defined, so callable `active=`
+        values are evaluated again and steps that use column selectors or `segments=` are split by
+        column and segment for the table as it is now.
+
         Parameters
         ----------
         collect_extracts
@@ -17180,11 +17237,11 @@ class Validate:
 
         self.time_start = datetime.datetime.now(datetime.timezone.utc)
 
-        # Keep each step's `active=` value as given before interrogation replaces `active` with
-        # the resolved value (this is what `to_code()`, `to_yaml()`, etc., serialize)
-        for validation in self.validation_info:
-            if validation.active_spec is None:
-                validation.active_spec = validation.active
+        # Start from the steps as they were defined: this keeps the `active=` and `brief=` values
+        # as given (which `to_code()`, `to_yaml()`, etc., serialize) and, if the validation was
+        # interrogated before, clears its results and undoes its expansion of steps by column or
+        # segment, since the table may have changed
+        self.validation_info = _steps_as_defined(self.validation_info)
 
         # Expand `validation_info` by evaluating any column expressions in `columns=`
         # (the `_evaluate_column_exprs()` method will eval and expand as needed)
@@ -17901,8 +17958,11 @@ class Validate:
                         validation.val_info = freshness_result
 
                         # Update the values dict with actual computed values for failure text
+                        # (dropping any age left by an earlier interrogation)
                         if freshness_result.get("age") is not None:
                             value["age"] = freshness_result["age"]
+                        else:
+                            value.pop("age", None)
 
                         # Add timezone warning note if applicable
                         if freshness_result.get("tz_warning_key"):  # pragma: no cover
@@ -24192,6 +24252,31 @@ def _conditional_string_date_dttm_conversion(
         # If allow_regular_strings is True, regular strings pass through unchanged
 
     return value
+
+
+def _steps_as_defined(validation_info: list[_ValidationInfo]) -> list[_ValidationInfo]:
+    """
+    Get the validation steps as they were defined, ready to be interrogated.
+
+    A step that hasn't been interrogated has its `active=` and `brief=` values recorded, since
+    interrogation resolves `active` and fills in the template elements of `brief`. A step from an
+    earlier interrogation is returned to its definition, and the steps that interrogation expanded
+    from a single step (one per column or segment, all sharing its `i_o`) become that one step again.
+    """
+    steps = []
+    prev_vi: _ValidationInfo | None = None
+    for vi in validation_info:
+        is_expansion_copy = vi.i_o is not None and prev_vi is not None and prev_vi.i_o == vi.i_o
+        prev_vi = vi
+        if vi.active_spec is None:
+            vi.active_spec = vi.active
+            vi.brief_spec = vi.brief
+        elif is_expansion_copy:
+            continue
+        else:
+            vi._restore_plan()
+        steps.append(vi)
+    return steps
 
 
 def _process_brief(
