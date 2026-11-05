@@ -644,7 +644,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#active-parameter" id="toc-active-parameter" class="nav-link" data-scroll-target="#active-parameter">Active Parameter</a></li>
   <li><a href="#brief-parameter-options" id="toc-brief-parameter-options" class="nav-link" data-scroll-target="#brief-parameter-options">Brief Parameter Options</a></li>
   <li><a href="#python-expressions" id="toc-python-expressions" class="nav-link" data-scroll-target="#python-expressions">Python Expressions</a></li>
-  <li><a href="#restricted-python-environment" id="toc-restricted-python-environment" class="nav-link" data-scroll-target="#restricted-python-environment">Restricted Python Environment</a></li>
+  <li><a href="#running-python-code" id="toc-running-python-code" class="nav-link" data-scroll-target="#running-python-code">Running Python Code</a></li>
   </ul></li>
   <li><a href="#best-practices" id="toc-best-practices" class="nav-link" data-scroll-target="#best-practices">Best Practices</a>
   <ul class="collapse">
@@ -1531,58 +1531,59 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <span id="cb55-18"><a href="#cb55-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span></span>
 <span id="cb55-19"><a href="#cb55-19" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
 <span id="cb55-20"><a href="#cb55-20" aria-hidden="true" tabindex="-1"></a>      lambda: print("VALIDATION ERROR: Critical data quality issue detected!")</span></code></pre></div>
-<p>Note: The Python environment in YAML is restricted for security. Only built-in functions (<code>print</code>, <code>len</code>, <code>str</code>, etc.), <code>Path</code> from pathlib, and available DataFrame libraries (<code>pl</code>, <code>pd</code>) are accessible. You cannot import additional modules like <code>requests</code>, <code>logging</code>, or custom libraries.</p>
+<p>Python code only runs with <code>allow_python=True</code>, and it isn’t sandboxed (see <a href="#running-python-code">Running Python Code</a>).</p>
 <p>You can also use the shortcut syntax for lambda expressions:</p>
 <div class="sourceCode" id="cb56"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shortcut syntax (equivalent to python: block)</span></span>
 <span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pre</span><span class="kw">: </span><span class="ch">|</span></span>
 <span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  lambda df: df.filter(pl.col("status") == "active")</span></code></pre></div>
 </section>
-<section id="restricted-python-environment" class="level2">
-<h2 class="anchored" data-anchor-id="restricted-python-environment">Restricted Python Environment</h2>
-<p>For security reasons, the Python environment in YAML configurations is restricted to a safe subset of functionality. The available namespace includes:</p>
-<p>Built-in functions:</p>
+<section id="running-python-code" class="level2">
+<h2 class="anchored" data-anchor-id="running-python-code">Running Python Code</h2>
+<p>Python code in a YAML configuration (<code>python:</code> blocks and the <code>expr</code>, <code>pre</code>, and <code>active</code> shortcuts) only runs if you allow it, with <code>allow_python=True</code>:</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>pb.yaml_interrogate(<span class="st">"validation.yaml"</span>, allow_python<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+<p>From the command line, use <code>pb run validation.yaml --allow-python</code>. Without it, a configuration that contains Python code raises an error saying so.</p>
+<p>The code isn’t sandboxed. It runs with the same access as any Python script you run, so it can read and write files, import modules, make network requests, or run commands. Treat a YAML configuration that contains Python code like a Python script, and only allow it for configurations you wrote or otherwise trust.</p>
+<p>When the code runs, these names are available without importing them:</p>
 <ul>
-<li>basic types: <code>str</code>, <code>int</code>, <code>float</code>, <code>bool</code>, <code>list</code>, <code>dict</code>, <code>tuple</code>, <code>set</code></li>
-<li>math functions: <code>sum</code>, <code>min</code>, <code>max</code>, <code>abs</code>, <code>round</code>, <code>len</code></li>
-<li>iteration: <code>range</code>, <code>enumerate</code>, <code>zip</code></li>
-<li>output: <code>print</code></li>
+<li><code>pb</code> (<code>pointblank</code>)</li>
+<li><code>Path</code> from pathlib</li>
+<li><code>pl</code> (<code>polars</code>) if it’s installed</li>
+<li><code>pd</code> (<code>pandas</code>) if it’s installed</li>
+<li>any modules given to <a href="../../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a> with <code>namespaces=</code></li>
 </ul>
-<p>Available modules:</p>
+<p>A few <code>pb</code> functions don’t count as Python code when they’re called with plain values (strings, numbers, lists, and so on), so they work without <code>allow_python=True</code>:</p>
 <ul>
-<li><code>Path</code> from pathlib for file path operations</li>
-<li><code>pb</code> (<code>pointblank</code>) for dataset loading and validation functions</li>
-<li><code>pl</code> (<code>polars</code>) if available on the system</li>
-<li><code>pd</code> (<code>pandas</code>) if available on the system</li>
+<li><code>pb.load_dataset()</code></li>
+<li><code>pb.col()</code> and <code>pb.ref()</code></li>
+<li><code>pb.seg_group()</code></li>
+<li><code>pb.has_columns()</code> and <code>pb.has_rows()</code></li>
+<li>the column selectors: <code>pb.starts_with()</code>, <code>pb.ends_with()</code>, <code>pb.contains()</code>, <code>pb.matches()</code>, <code>pb.everything()</code>, <code>pb.first_n()</code>, and <code>pb.last_n()</code> (combined with <code>&amp;</code>, <code>|</code>, <code>-</code>, and <code>~</code> if you like)</li>
 </ul>
-<p>Restrictions:</p>
-<ul>
-<li>cannot import external libraries (<code>requests</code>, <code>logging</code>, <code>os</code>, <code>sys</code>, etc.)</li>
-<li>cannot use <code>__import__</code>, <code>exec</code>, <code>eval</code>, or other dynamic execution functions</li>
-<li>file operations are limited to <code>Path</code> functionality</li>
-</ul>
-<p><strong>Examples of valid callable actions:</strong></p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple output with built-in functions</span></span>
-<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
-<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span></span>
-<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>      lambda: print(f"WARNING: {sum([1, 2, 3])} validation issues detected")</span>
-<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Using available variables and string formatting</span></span>
-<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
-<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span></span>
-<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>      lambda: print("ERROR: Data validation failed at " + str(len("validation")))</span>
-<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple statements in lambda (using parentheses)</span></span>
-<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
-<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">critical</span><span class="kw">:</span></span>
-<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb57-17"><a href="#cb57-17" aria-hidden="true" tabindex="-1"></a>      lambda: (</span>
-<span id="cb57-18"><a href="#cb57-18" aria-hidden="true" tabindex="-1"></a>          print("CRITICAL ALERT:"),</span>
-<span id="cb57-19"><a href="#cb57-19" aria-hidden="true" tabindex="-1"></a>          print("Immediate attention required"),</span>
-<span id="cb57-20"><a href="#cb57-20" aria-hidden="true" tabindex="-1"></a>          print("Contact data team")</span>
-<span id="cb57-21"><a href="#cb57-21" aria-hidden="true" tabindex="-1"></a>      )[-1]  # Return the last value</span></code></pre></div>
-<p>For complex alerting, logging, or external system integration, use string template actions instead of callable actions, and handle the external communication in your application code after validation completes.</p>
+<p>These only load a bundled dataset or build an object. Anything else, such as <code>pl.col("a") &gt; 0</code> or <code>pb.col("a").str.len()</code>, is Python code.</p>
+<p><a href="../../reference/yaml_to_python.html#pointblank.yaml_to_python" class="gdls-link gdls-code">yaml_to_python()</a> never runs Python code from the configuration. It copies the code into the generated Python as written, so it doesn’t need <code>allow_python=True</code>.</p>
+<p><strong>Examples of callable actions:</strong></p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple output with built-in functions</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>      lambda: print(f"WARNING: {sum([1, 2, 3])} validation issues detected")</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Using available variables and string formatting</span></span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span></span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>      lambda: print("ERROR: Data validation failed at " + str(len("validation")))</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple statements in lambda (using parentheses)</span></span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">critical</span><span class="kw">:</span></span>
+<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a>      lambda: (</span>
+<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>          print("CRITICAL ALERT:"),</span>
+<span id="cb58-19"><a href="#cb58-19" aria-hidden="true" tabindex="-1"></a>          print("Immediate attention required"),</span>
+<span id="cb58-20"><a href="#cb58-20" aria-hidden="true" tabindex="-1"></a>          print("Contact data team")</span>
+<span id="cb58-21"><a href="#cb58-21" aria-hidden="true" tabindex="-1"></a>      )[-1]  # Return the last value</span></code></pre></div>
+<p>String template actions are plain text, so they work without <code>allow_python=True</code>. For alerting from configurations you don’t fully trust, use string template actions and handle the external communication in your application code after validation completes.</p>
 </section>
 </section>
 <section id="best-practices" class="level1">

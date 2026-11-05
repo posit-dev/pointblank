@@ -4,13 +4,14 @@ Execute a YAML-based validation workflow.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L999-L1343)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1131-L1515)
 
 ``` python
 yaml_interrogate(
     yaml,
     set_tbl=None,
     namespaces=None,
+    allow_python=False,
 )
 ```
 
@@ -27,7 +28,10 @@ YAML configuration as string or file path. Can be: (1) a YAML string containing 
 An optional table to override the table specified in the YAML configuration. This allows you to apply a YAML-defined validation workflow to a different table than what's specified in the configuration. If provided, this table is used in place of the table defined in the YAML's `tbl` field (which is then not loaded, so it can be a placeholder or a source that isn't available). This can be any supported table type including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths, GitHub URLs, or database connection strings.
 
 `namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None`  
-Optional module namespaces to make available for Python code execution in YAML configurations. Can be a dictionary mapping aliases to module names or a list of module names. See the "Using Namespaces" section below for detailed examples.
+Optional module namespaces to make available for Python code execution in YAML configurations. Can be a dictionary mapping aliases to module names or a list of module names. This only has an effect with `allow_python=True`. See the "Using Namespaces" section below for detailed examples.
+
+`allow_python: bool = False`  
+Whether to run Python code in the YAML configuration (`python:` blocks, and the `expr:`, `pre:`, and `active:` shortcuts). This is `False` by default, which makes a configuration with Python code raise a `YAMLValidationError`. Python code in YAML runs with the full access of your Python session (it can read and write files or run commands), so only set this to `True` for configurations you trust. A few `pb` functions called with literal arguments (e.g., `pb.col("b")` or `pb.has_columns("a")`) don't need it. See the "Python Code in YAML" section below.
 
 ## Returns
 
@@ -37,11 +41,19 @@ An instance of the [Validate](../reference/Validate.md#pointblank.Validate) clas
 ## Raises
 
 `YAMLValidationError`  
-If the YAML is invalid, malformed, or execution fails. This includes syntax errors, missing required fields, unknown validation methods, or data loading failures.
+If the YAML is invalid, malformed, or execution fails. This includes syntax errors, missing required fields, unknown validation methods, data loading failures, or Python code in a configuration used without `allow_python=True`.
+
+## Python Code In Yaml
+
+A YAML configuration can include Python code: a `python:` block for the data source, a parameter value, or an action, and the `expr:`, `pre:`, and `active:` shortcuts for code written as a plain string. This code isn't run unless you set `allow_python=True`.
+
+Python code in YAML is not sandboxed. It runs with the same access as the rest of your Python session, so a configuration with Python code should be treated like a Python script: only allow it for configurations you wrote or otherwise trust, never for ones supplied by other users or systems.
+
+A small set of `pb` functions can always be used, when called with literal arguments (strings, numbers, lists, and so on): [`load_dataset()`](../reference/load_dataset.md#pointblank.load_dataset), [`col()`](../reference/col.md#pointblank.col), [`ref()`](../reference/ref.md#pointblank.ref), [`seg_group()`](../reference/seg_group.md#pointblank.seg_group), [`has_columns()`](../reference/has_columns.md#pointblank.has_columns), [`has_rows()`](../reference/has_rows.md#pointblank.has_rows), and the column selectors ([starts_with()](../reference/starts_with.md#pointblank.starts_with), [ends_with()](../reference/ends_with.md#pointblank.ends_with), [contains()](../reference/contains.md#pointblank.contains), `matches()`, [everything()](../reference/everything.md#pointblank.everything), [first_n()](../reference/first_n.md#pointblank.first_n), and [last_n()](../reference/last_n.md#pointblank.last_n)). These only load a bundled dataset or build an object, so `value: pb.col("b")` or `active: pb.has_columns("a")` work without `allow_python=True`.
 
 ## Using Namespaces
 
-The `namespaces=` parameter enables custom Python modules and functions in YAML configurations. This is particularly useful for custom action functions and advanced Python expressions.
+The `namespaces=` parameter enables custom Python modules and functions in YAML configurations. This is particularly useful for custom action functions and advanced Python expressions. Since these are Python code, both options below need `allow_python=True`.
 
 **Namespace formats:**
 
@@ -67,7 +79,7 @@ steps:
     value: 1000
 '''
 
-result = pb.yaml_interrogate(yaml_config)
+result = pb.yaml_interrogate(yaml_config, allow_python=True)
 result
 ```
 
@@ -101,7 +113,9 @@ steps:
 '''
 
 # Use namespaces to make the function available
-result = pb.yaml_interrogate(yaml_config, namespaces={'actions': '__main__'})
+result = pb.yaml_interrogate(
+    yaml_config, namespaces={'actions': '__main__'}, allow_python=True
+)
 result
 ```
 
@@ -281,6 +295,10 @@ steps:
 - col_vals_not_null:
     columns: [a]
     active: true             # Always run (default)
+
+- col_vals_not_null:
+    columns: [e]
+    active: pb.has_columns("e")  # Run only if column `e` exists
 ```
 
 ### Null Percentage Check

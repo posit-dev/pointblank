@@ -195,7 +195,7 @@ Preview
 A quick look at a table showing the first and last few rows along with each column's type, made with [preview()](../../reference/preview.md#pointblank.preview). See also **column summary table**. [Learn more](../data-inspection/preview.md).
 
 `python:` block  
-A way to write Python code inside a **YAML workflow**, for settings that need it, such as `tbl`, `pre`, `expr`, and `actions`. For safety, the code runs in a limited environment: basic built-in functions, `Path`, `pb` (Pointblank), `pl` (Polars), and `pd` (Pandas) are available, but other modules can't be imported. [Learn more](../yaml/yaml-reference.md).
+A way to write Python code inside a **YAML workflow**, for settings that need it, such as `tbl`, `pre`, `expr`, and `actions`. The code isn't sandboxed, so it only runs if you allow it with `allow_python=True` (or `pb run --allow-python`). A few simple calls, such as `pb.col()` and `pb.load_dataset()`, work without it. [Learn more](../yaml/yaml-reference.md).
 
 Quality dimension  
 A category describing what kind of data quality a step measures. The categories are *completeness*, *validity*, *uniqueness*, *consistency*, *timeliness*, and *volume*. Each validation method has a default category (for example, `col_vals_not_null()` measures completeness), and you can change it with `dimension=`. Each dimension gets its own score, and together they make up the **health score**. [Learn more](../post-interrogation/quality-dimensions-and-scoring.md).

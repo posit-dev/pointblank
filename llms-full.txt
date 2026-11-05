@@ -22925,7 +22925,7 @@ Functions for using YAML to orchestrate validation workflows.
 
 
 
-yaml_interrogate(yaml: 'Union[str, Path]', set_tbl: 'Any' = None, namespaces: 'Optional[Union[Iterable[str], Mapping[str, str]]]' = None) -> 'Validate'
+yaml_interrogate(yaml: 'Union[str, Path]', set_tbl: 'Any' = None, namespaces: 'Optional[Union[Iterable[str], Mapping[str, str]]]' = None, allow_python: 'bool' = False) -> 'Validate'
 
 Execute a YAML-based validation workflow.
 
@@ -22952,7 +22952,16 @@ set_tbl
 namespaces
     Optional module namespaces to make available for Python code execution in YAML
     configurations. Can be a dictionary mapping aliases to module names or a list of module
-    names. See the "Using Namespaces" section below for detailed examples.
+    names. This only has an effect with `allow_python=True`. See the "Using Namespaces"
+    section below for detailed examples.
+allow_python
+    Whether to run Python code in the YAML configuration (`python:` blocks, and the `expr:`,
+    `pre:`, and `active:` shortcuts). This is `False` by default, which makes a configuration
+    with Python code raise a `YAMLValidationError`. Python code in YAML runs with the full
+    access of your Python session (it can read and write files or run commands), so only set
+    this to `True` for configurations you trust. A few `pb` functions called with literal
+    arguments (e.g., `pb.col("b")` or `pb.has_columns("a")`) don't need it. See the "Python
+    Code in YAML" section below.
 
 Returns
 -------
@@ -22965,12 +22974,34 @@ Raises
 ------
 YAMLValidationError
     If the YAML is invalid, malformed, or execution fails. This includes syntax errors, missing
-    required fields, unknown validation methods, or data loading failures.
+    required fields, unknown validation methods, data loading failures, or Python code in a
+    configuration used without `allow_python=True`.
+
+Python Code in YAML
+-------------------
+A YAML configuration can include Python code: a `python:` block for the data source, a
+parameter value, or an action, and the `expr:`, `pre:`, and `active:` shortcuts for code
+written as a plain string. This code isn't run unless you set `allow_python=True`.
+
+Python code in YAML is not sandboxed. It runs with the same access as the rest of your Python
+session, so a configuration with Python code should be treated like a Python script: only allow
+it for configurations you wrote or otherwise trust, never for ones supplied by other users or
+systems.
+
+A small set of `pb` functions can always be used, when called with literal arguments (strings,
+numbers, lists, and so on): [`load_dataset()`](`pointblank.load_dataset`),
+[`col()`](`pointblank.col`), [`ref()`](`pointblank.ref`),
+[`seg_group()`](`pointblank.seg_group`), [`has_columns()`](`pointblank.has_columns`),
+[`has_rows()`](`pointblank.has_rows`), and the column selectors (`starts_with()`, `ends_with()`,
+`contains()`, `matches()`, `everything()`, `first_n()`, and `last_n()`). These only load a
+bundled dataset or build an object, so `value: pb.col("b")` or `active: pb.has_columns("a")`
+work without `allow_python=True`.
 
 Using Namespaces
 ----------------
 The `namespaces=` parameter enables custom Python modules and functions in YAML configurations.
-This is particularly useful for custom action functions and advanced Python expressions.
+This is particularly useful for custom action functions and advanced Python expressions. Since
+these are Python code, both options below need `allow_python=True`.
 
 **Namespace formats:**
 
@@ -22996,7 +23027,7 @@ steps:
     value: 1000
 '''
 
-result = pb.yaml_interrogate(yaml_config)
+result = pb.yaml_interrogate(yaml_config, allow_python=True)
 result
 ```
 
@@ -23026,7 +23057,9 @@ steps:
 '''
 
 # Use namespaces to make the function available
-result = pb.yaml_interrogate(yaml_config, namespaces={'actions': '__main__'})
+result = pb.yaml_interrogate(
+    yaml_config, namespaces={'actions': '__main__'}, allow_python=True
+)
 result
 ```
 
@@ -23205,6 +23238,10 @@ steps:
 - col_vals_not_null:
     columns: [a]
     active: true             # Always run (default)
+
+- col_vals_not_null:
+    columns: [e]
+    active: pb.has_columns("e")  # Run only if column `e` exists
 ```
 
 ### Null Percentage Check
@@ -23547,6 +23584,11 @@ The `tbl` and `reference` data sources are loaded as `yaml_interrogate()` loads 
 dataset name becomes a `pb.load_dataset()` call, a CSV file is read with the `df_library`
 library (e.g., `pl.read_csv()`), and other file paths and connection strings are passed to
 `Validate` as strings.
+
+Python code in the configuration (`python:` blocks, and the `expr:`, `pre:`, and `active:`
+shortcuts) is copied into the generated code as written, without being run. So, unlike
+[`yaml_interrogate()`](`pointblank.yaml_interrogate`), this function doesn't need
+`allow_python=True`, though you should still read the generated code before running it.
 
 Governance metadata (`owner`, `consumers`, `version`) and `reference` are also rendered
 in the generated Python code:
@@ -29309,6 +29351,10 @@ Usage: pb run [OPTIONS] [VALIDATION_FILE]
   validation objects (Python scripts) or override the 'tbl' field (YAML
   configs).
 
+  Python code in a YAML config isn't run unless you use --allow-python. Only
+  do that for YAML you trust, since the code runs with full access to your
+  system (as a Python script does).
+
   To get started quickly, use 'pb make-template' to create templates.
 
   DATA can be:
@@ -29328,6 +29374,7 @@ Usage: pb run [OPTIONS] [VALIDATION_FILE]
   pb run validation_config.yaml --data small_table --output-html report.html
   pb run validation_script.py --show-extract --fail-on error
   pb run validation_config.yaml --write-extract extracts_folder --fail-on critical
+  pb run trusted_config.yaml --allow-python  # Run Python code in the YAML
 
 Options:
   --data TEXT                     Data source to replace in validation objects
@@ -29345,6 +29392,10 @@ Options:
                                   reaches this threshold level ('any' also
                                   counts failing test units and steps that
                                   couldn't be evaluated)
+  --allow-python                  Run Python code in a YAML config (python:
+                                  blocks and the expr/pre/active shortcuts).
+                                  The code has full access to your system, so
+                                  only use this with YAML you trust
   --help                          Show this message and exit.
 ```
 
@@ -40465,6 +40516,35 @@ tbl:
     )
 ```
 
+### Allowing Python Code to Run
+
+Python code in a YAML configuration only runs if you allow it, with `allow_python=True` in
+`yaml_interrogate()` (or the `--allow-python` flag of `pb run`):
+
+```python
+result = pb.yaml_interrogate("validation.yaml", allow_python=True)
+```
+
+Without it, a configuration that contains Python code raises an error saying so. Python code in YAML
+isn't sandboxed: it runs with the same access as any Python script you run, so it can read and
+write files, make network requests, or run commands. Treat a YAML configuration that contains Python
+code like a Python script, and only allow it for configurations you wrote or otherwise trust.
+
+A few `pb` functions don't need `allow_python=True` when they're called with plain values (strings,
+numbers, lists, and so on): `pb.load_dataset()`, `pb.col()`, `pb.ref()`, `pb.seg_group()`,
+`pb.has_columns()`, `pb.has_rows()`, and the column selectors (`pb.starts_with()`, `pb.ends_with()`,
+`pb.contains()`, `pb.matches()`, `pb.everything()`, `pb.first_n()`, and `pb.last_n()`). These only
+load a bundled dataset or build an object, so a configuration like this one works without it:
+
+```yaml
+tbl:
+  python: pb.load_dataset("small_table", tbl_type="polars")
+steps:
+  - col_vals_gt:
+      columns: [d]
+      value: pb.col("c")
+```
+
 ## Reusable Templates with `set_tbl=`
 
 One of the most powerful features of YAML validation workflows is the ability to create reusable
@@ -40895,10 +40975,10 @@ steps:
       columns: [transaction_id, amount]
 ```
 
-Note: The Python environment in YAML actions is restricted for security. You can use built-in
-functions like `print()`, basic operations, and available DataFrame libraries, but cannot import
-external modules like `requests` or `logging`. For external notifications, consider using string
-template actions or handling alerts in your application code after the validation completes.
+Callable actions are Python code, so they only run with `allow_python=True` (see [Allowing Python
+Code to Run](#allowing-python-code-to-run)). The code isn't sandboxed and has the same access as any
+Python script, so only allow it for configurations you trust. String template actions are plain
+text and always work.
 
 ### Step-level Actions
 
@@ -40950,7 +41030,8 @@ steps:
 ```
 
 Note that you can use either the explicit `python:` block syntax or the shortcut syntax (just
-`pre: |`) for the lambda expressions.
+`pre: |`) for the lambda expressions. Either way, `pre` functions are Python code and need
+`allow_python=True`, as do the custom expressions in the next section.
 
 ### Complex Expressions
 
@@ -41183,6 +41264,10 @@ python_code = pb.yaml_to_python(yaml_config)
 print(python_code)
 ```
 
+`yaml_to_python()` never runs Python code from the configuration: it copies the code into the
+generated Python as written, so it doesn't need `allow_python=True`. Read the generated code before
+you run it.
+
 This is useful for:
 
 - learning how YAML maps to Python API calls
@@ -41253,6 +41338,10 @@ steps:
           pl.col("event_date").str.strptime(pl.Date, "%Y-%m-%d").is_not_null()
       brief: "Event dates must be valid YYYY-MM-DD format"
 ```
+
+This configuration contains Python code (the `tbl` expression, the `error` action, and the custom
+expression), so it needs `allow_python=True` in `yaml_interrogate()` or `--allow-python` with
+`pb run`.
 
 ### Quality Monitoring Dashboard
 
@@ -42426,9 +42515,8 @@ actions:
       lambda: print("VALIDATION ERROR: Critical data quality issue detected!")
 ```
 
-Note: The Python environment in YAML is restricted for security. Only built-in functions (`print`,
-`len`, `str`, etc.), `Path` from pathlib, and available DataFrame libraries (`pl`, `pd`) are
-accessible. You cannot import additional modules like `requests`, `logging`, or custom libraries.
+Python code only runs with `allow_python=True`, and it isn't sandboxed (see [Running Python
+Code](#running-python-code)).
 
 You can also use the shortcut syntax for lambda expressions:
 
@@ -42438,32 +42526,49 @@ pre: |
   lambda df: df.filter(pl.col("status") == "active")
 ```
 
-### Restricted Python Environment
+### Running Python Code
 
-For security reasons, the Python environment in YAML configurations is restricted to a safe subset
-of functionality. The available namespace includes:
+Python code in a YAML configuration (`python:` blocks and the `expr`, `pre`, and `active`
+shortcuts) only runs if you allow it, with `allow_python=True`:
 
-Built-in functions:
+```python
+pb.yaml_interrogate("validation.yaml", allow_python=True)
+```
 
-- basic types: `str`, `int`, `float`, `bool`, `list`, `dict`, `tuple`, `set`
-- math functions: `sum`, `min`, `max`, `abs`, `round`, `len`
-- iteration: `range`, `enumerate`, `zip`
-- output: `print`
+From the command line, use `pb run validation.yaml --allow-python`. Without it, a configuration that
+contains Python code raises an error saying so.
 
-Available modules:
+The code isn't sandboxed. It runs with the same access as any Python script you run, so it can read
+and write files, import modules, make network requests, or run commands. Treat a YAML configuration
+that contains Python code like a Python script, and only allow it for configurations you wrote or
+otherwise trust.
 
-- `Path` from pathlib for file path operations
-- `pb` (`pointblank`) for dataset loading and validation functions
-- `pl` (`polars`) if available on the system
-- `pd` (`pandas`) if available on the system
+When the code runs, these names are available without importing them:
 
-Restrictions:
+- `pb` (`pointblank`)
+- `Path` from pathlib
+- `pl` (`polars`) if it's installed
+- `pd` (`pandas`) if it's installed
+- any modules given to `yaml_interrogate()` with `namespaces=`
 
-- cannot import external libraries (`requests`, `logging`, `os`, `sys`, etc.)
-- cannot use `__import__`, `exec`, `eval`, or other dynamic execution functions
-- file operations are limited to `Path` functionality
+A few `pb` functions don't count as Python code when they're called with plain values (strings,
+numbers, lists, and so on), so they work without `allow_python=True`:
 
-**Examples of valid callable actions:**
+- `pb.load_dataset()`
+- `pb.col()` and `pb.ref()`
+- `pb.seg_group()`
+- `pb.has_columns()` and `pb.has_rows()`
+- the column selectors: `pb.starts_with()`, `pb.ends_with()`, `pb.contains()`, `pb.matches()`,
+  `pb.everything()`, `pb.first_n()`, and `pb.last_n()` (combined with `&`, `|`, `-`, and `~` if you
+  like)
+
+These only load a bundled dataset or build an object. Anything else, such as `pl.col("a") > 0` or
+`pb.col("a").str.len()`, is Python code.
+
+`yaml_to_python()` never runs Python code from the configuration. It copies the code into the
+generated Python as written, so it doesn't need `allow_python=True`.
+
+**Examples of callable actions:**
 
 ```yaml
 # Simple output with built-in functions
@@ -42489,9 +42594,9 @@ actions:
       )[-1]  # Return the last value
 ```
 
-For complex alerting, logging, or external system integration, use string template actions instead
-of callable actions, and handle the external communication in your application code after validation
-completes.
+String template actions are plain text, so they work without `allow_python=True`. For alerting
+from configurations you don't fully trust, use string template actions and handle the external
+communication in your application code after validation completes.
 
 ## Best Practices
 
@@ -48796,9 +48901,9 @@ Preview
 
 `python:` block
 : A way to write Python code inside a **YAML workflow**, for settings that need it, such as `tbl`,
-  `pre`, `expr`, and `actions`. For safety, the code runs in a limited environment: basic built-in
-  functions, `Path`, `pb` (Pointblank), `pl` (Polars), and `pd` (Pandas) are available, but other
-  modules can't be imported. [Learn more](../yaml/yaml-reference.qmd).
+  `pre`, `expr`, and `actions`. The code isn't sandboxed, so it only runs if you allow it with
+  `allow_python=True` (or `pb run --allow-python`). A few simple calls, such as `pb.col()` and
+  `pb.load_dataset()`, work without it. [Learn more](../yaml/yaml-reference.qmd).
 
 Quality dimension
 : A category describing what kind of data quality a step measures. The categories are

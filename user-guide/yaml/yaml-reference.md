@@ -1053,7 +1053,7 @@ actions:
       lambda: print("VALIDATION ERROR: Critical data quality issue detected!")
 ```
 
-Note: The Python environment in YAML is restricted for security. Only built-in functions (`print`, `len`, `str`, etc.), `Path` from pathlib, and available DataFrame libraries (`pl`, `pd`) are accessible. You cannot import additional modules like `requests`, `logging`, or custom libraries.
+Python code only runs with `allow_python=True`, and it isn't sandboxed (see [Running Python Code](#running-python-code)).
 
 You can also use the shortcut syntax for lambda expressions:
 
@@ -1063,31 +1063,39 @@ pre: |
   lambda df: df.filter(pl.col("status") == "active")
 ```
 
-### Restricted Python Environment
+### Running Python Code
 
-For security reasons, the Python environment in YAML configurations is restricted to a safe subset of functionality. The available namespace includes:
+Python code in a YAML configuration (`python:` blocks and the `expr`, `pre`, and `active` shortcuts) only runs if you allow it, with `allow_python=True`:
 
-Built-in functions:
+``` python
+pb.yaml_interrogate("validation.yaml", allow_python=True)
+```
 
-- basic types: `str`, `int`, `float`, `bool`, `list`, `dict`, `tuple`, `set`
-- math functions: `sum`, `min`, `max`, `abs`, `round`, `len`
-- iteration: `range`, `enumerate`, `zip`
-- output: `print`
+From the command line, use `pb run validation.yaml --allow-python`. Without it, a configuration that contains Python code raises an error saying so.
 
-Available modules:
+The code isn't sandboxed. It runs with the same access as any Python script you run, so it can read and write files, import modules, make network requests, or run commands. Treat a YAML configuration that contains Python code like a Python script, and only allow it for configurations you wrote or otherwise trust.
 
-- `Path` from pathlib for file path operations
-- `pb` (`pointblank`) for dataset loading and validation functions
-- `pl` (`polars`) if available on the system
-- `pd` (`pandas`) if available on the system
+When the code runs, these names are available without importing them:
 
-Restrictions:
+- `pb` (`pointblank`)
+- `Path` from pathlib
+- `pl` (`polars`) if it's installed
+- `pd` (`pandas`) if it's installed
+- any modules given to [yaml_interrogate()](../../reference/yaml_interrogate.md#pointblank.yaml_interrogate) with `namespaces=`
 
-- cannot import external libraries (`requests`, `logging`, `os`, `sys`, etc.)
-- cannot use `__import__`, `exec`, `eval`, or other dynamic execution functions
-- file operations are limited to `Path` functionality
+A few `pb` functions don't count as Python code when they're called with plain values (strings, numbers, lists, and so on), so they work without `allow_python=True`:
 
-**Examples of valid callable actions:**
+- `pb.load_dataset()`
+- `pb.col()` and `pb.ref()`
+- `pb.seg_group()`
+- `pb.has_columns()` and `pb.has_rows()`
+- the column selectors: `pb.starts_with()`, `pb.ends_with()`, `pb.contains()`, `pb.matches()`, `pb.everything()`, `pb.first_n()`, and `pb.last_n()` (combined with `&`, `|`, `-`, and `~` if you like)
+
+These only load a bundled dataset or build an object. Anything else, such as `pl.col("a") > 0` or `pb.col("a").str.len()`, is Python code.
+
+[yaml_to_python()](../../reference/yaml_to_python.md#pointblank.yaml_to_python) never runs Python code from the configuration. It copies the code into the generated Python as written, so it doesn't need `allow_python=True`.
+
+**Examples of callable actions:**
 
 ``` yaml
 # Simple output with built-in functions
@@ -1113,7 +1121,7 @@ actions:
       )[-1]  # Return the last value
 ```
 
-For complex alerting, logging, or external system integration, use string template actions instead of callable actions, and handle the external communication in your application code after validation completes.
+String template actions are plain text, so they work without `allow_python=True`. For alerting from configurations you don't fully trust, use string template actions and handle the external communication in your application code after validation completes.
 
 ## Best Practices
 

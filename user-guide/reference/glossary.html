@@ -862,7 +862,7 @@ A quick look at a table showing the first and last few rows along with each colu
 </dd>
 <dt><code>python:</code> block</dt>
 <dd>
-A way to write Python code inside a <strong>YAML workflow</strong>, for settings that need it, such as <code>tbl</code>, <code>pre</code>, <code>expr</code>, and <code>actions</code>. For safety, the code runs in a limited environment: basic built-in functions, <code>Path</code>, <code>pb</code> (Pointblank), <code>pl</code> (Polars), and <code>pd</code> (Pandas) are available, but other modules can’t be imported. <a href="../../user-guide/yaml/yaml-reference.html">Learn more</a>.
+A way to write Python code inside a <strong>YAML workflow</strong>, for settings that need it, such as <code>tbl</code>, <code>pre</code>, <code>expr</code>, and <code>actions</code>. The code isn’t sandboxed, so it only runs if you allow it with <code>allow_python=True</code> (or <code>pb run --allow-python</code>). A few simple calls, such as <code>pb.col()</code> and <code>pb.load_dataset()</code>, work without it. <a href="../../user-guide/yaml/yaml-reference.html">Learn more</a>.
 </dd>
 <dt>Quality dimension</dt>
 <dd>

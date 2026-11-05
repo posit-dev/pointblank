@@ -351,6 +351,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>Python scripts should load their own data and create validation objects. YAML configurations define data sources and validation steps declaratively.</p>
 <p>If <code>--data</code> is provided, it will automatically replace the data source in your validation objects (Python scripts) or override the <code>tbl</code> field (YAML configs).</p>
+<p>Python code in a YAML config isn’t run unless you use <code>--allow-python</code>. Only do that for YAML you trust, since the code runs with full access to your system (as a Python script does).</p>
 <p>To get started quickly, use <code>pb make-template</code> to create templates.</p>
 <p>DATA can be:</p>
 <ul>
@@ -379,6 +380,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   validation objects (Python scripts) or override the 'tbl' field (YAML
   configs).
 
+  Python code in a YAML config isn't run unless you use --allow-python. Only
+  do that for YAML you trust, since the code runs with full access to your
+  system (as a Python script does).
+
   To get started quickly, use 'pb make-template' to create templates.
 
   DATA can be:
@@ -398,6 +403,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   pb run validation_config.yaml --data small_table --output-html report.html
   pb run validation_script.py --show-extract --fail-on error
   pb run validation_config.yaml --write-extract extracts_folder --fail-on critical
+  pb run trusted_config.yaml --allow-python  # Run Python code in the YAML
 
 Options:
   --data TEXT                     Data source to replace in validation objects
@@ -415,6 +421,10 @@ Options:
                                   reaches this threshold level ('any' also
                                   counts failing test units and steps that
                                   couldn't be evaluated)
+  --allow-python                  Run Python code in a YAML config (python:
+                                  blocks and the expr/pre/active shortcuts).
+                                  The code has full access to your system, so
+                                  only use this with YAML you trust
   --help                          Show this message and exit.</code></pre>
 </div>
 </div>
@@ -462,6 +472,10 @@ Maximum number of failing rows to save to CSV (default: 500)
 <dd>
 Exit with non-zero code when validation reaches this threshold level (‘any’ also counts failing test units and steps that couldn’t be evaluated)
 </dd>
+<dt><code><span class="doc-parameter-name">--allow-python</span></code></dt>
+<dd>
+Run Python code in a YAML config (python: blocks and the expr/pre/active shortcuts). The code has full access to your system, so only use this with YAML you trust
+</dd>
 </dl>
 </div>
 </section>
@@ -474,7 +488,8 @@ Exit with non-zero code when validation reaches this threshold level (‘any’ 
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run validation_script.py <span class="at">--data</span> data.csv</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run validation_config.yaml <span class="at">--data</span> small_table <span class="at">--output-html</span> report.html</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run validation_script.py <span class="at">--show-extract</span> <span class="at">--fail-on</span> error</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run validation_config.yaml <span class="at">--write-extract</span> extracts_folder <span class="at">--fail-on</span> critical</span></code></pre></div>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run validation_config.yaml <span class="at">--write-extract</span> extracts_folder <span class="at">--fail-on</span> critical</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run trusted_config.yaml <span class="at">--allow-python</span>  <span class="co"># Run Python code in the YAML</span></span></code></pre></div>
 
 
 </section>
