@@ -1675,7 +1675,7 @@ If any dimension’s score is below its specified minimum.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s validate the <code>small_table</code> dataset with a not-null check (a completeness step) and a range check (a validity step).</p>
-<div id="dc33481c" class="cell" data-execution_count="2">
+<div id="e7afe70c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
@@ -1693,11 +1693,11 @@ If any dimension’s score is below its specified minimum.
 </div>
 </div>
 <p>Requiring completeness of at least 80 and validity of at least 50 passes, so nothing happens:</p>
-<div id="b566bde3" class="cell" data-execution_count="3">
+<div id="6e0d2e4c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.assert_dimension_scores(thresholds<span class="op">=</span>{<span class="st">"completeness"</span>: <span class="dv">80</span>, <span class="st">"validity"</span>: <span class="dv">50</span>})</span></code></pre></div>
 </div>
 <p>Raising the completeness minimum to 95 makes the assertion fail. The <code>AssertionError</code> is caught here so that its message can be shown:</p>
-<div id="ed1379a2" class="cell" data-execution_count="4">
+<div id="8d8567a9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    validation.assert_dimension_scores(thresholds<span class="op">=</span>{<span class="st">"completeness"</span>: <span class="dv">95</span>, <span class="st">"validity"</span>: <span class="dv">50</span>})</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">AssertionError</span> <span class="im">as</span> e:</span>
