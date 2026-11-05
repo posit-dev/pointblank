@@ -99,10 +99,10 @@ Normalization as COLUMN=op\[,op…\] with ops strip, lower, upper, collapse_whit
 `--null-unequal`  
 Treat two nulls as different values
 
-`--schema: CHOICE = strict`  
+`--schema: [strict|common] = strict`  
 `strict`: any schema difference fails all rows; `common`: compare shared columns only
 
-`--dup-keys: CHOICE = flag`  
+`--dup-keys: [flag|compare] = flag`  
 `compare` also compares rows with duplicated keys pairwise in the report
 
 `--order-by: TEXT`  
@@ -111,7 +111,7 @@ Comma-separated columns defining row order (positional mode)
 `--partitions: INTEGER RANGE`  
 Compare in N passes by key hash to bound memory use for very large tables
 
-`--engine: CHOICE = polars`  
+`--engine: [polars|duckdb] = polars`  
 Engine for reading CSV/Parquet files: `polars` is fastest, `duckdb` uses the least memory (especially with `--partitions`)
 
 `--limit: INTEGER = 10`  
@@ -123,7 +123,7 @@ Save the HTML comparison report to file
 `--output-json: PATH`  
 Save the comparison results as JSON to file
 
-`--format: CHOICE = text`  
+`--format: [text|json] = text`  
 Terminal output: a summary ('text') or the results as JSON ('json')
 
 `--no-samples`  

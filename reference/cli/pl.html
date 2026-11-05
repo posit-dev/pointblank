@@ -441,7 +441,7 @@ Read query from file
 <dd>
 Editor to use for <code>--edit</code> mode (overrides $EDITOR and auto-detection)
 </dd>
-<dt><code><span class="doc-parameter-name">-o, --output-format</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">CHOICE</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">preview</span></code></dt>
+<dt><code><span class="doc-parameter-name">-o, --output-format</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">[preview|scan|missing|info]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">preview</span></code></dt>
 <dd>
 Output format for the result
 </dd>
@@ -461,7 +461,7 @@ Save HTML output to file
 <dd>
 Output data in a format suitable for piping to other pb commands
 </dd>
-<dt><code><span class="doc-parameter-name">--pipe-format</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">CHOICE</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">parquet</span></code></dt>
+<dt><code><span class="doc-parameter-name">--pipe-format</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">[parquet|csv]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">parquet</span></code></dt>
 <dd>
 Format for piped output (default: parquet)
 </dd>

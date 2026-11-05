@@ -127,7 +127,7 @@ Optional.
 `--list-checks`  
 List available validation checks and exit
 
-`--check: CHOICE`  
+`--check: [rows-distinct|col-vals-not-null|rows-complete|col-exists|col-vals-in-set|col-vals-gt|col-vals-ge|col-vals-lt|col-vals-le]`  
 Type of validation check to perform. Can be used multiple times for multiple checks.
 
 `--column: TEXT`  

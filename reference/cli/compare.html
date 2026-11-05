@@ -455,11 +455,11 @@ Normalization as COLUMN=op[,op…] with ops strip, lower, upper, collapse_whites
 <dd>
 Treat two nulls as different values
 </dd>
-<dt><code><span class="doc-parameter-name">--schema</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">CHOICE</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">strict</span></code></dt>
+<dt><code><span class="doc-parameter-name">--schema</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">[strict|common]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">strict</span></code></dt>
 <dd>
 <code>strict</code>: any schema difference fails all rows; <code>common</code>: compare shared columns only
 </dd>
-<dt><code><span class="doc-parameter-name">--dup-keys</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">CHOICE</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">flag</span></code></dt>
+<dt><code><span class="doc-parameter-name">--dup-keys</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">[flag|compare]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">flag</span></code></dt>
 <dd>
 <code>compare</code> also compares rows with duplicated keys pairwise in the report
 </dd>
@@ -471,7 +471,7 @@ Comma-separated columns defining row order (positional mode)
 <dd>
 Compare in N passes by key hash to bound memory use for very large tables
 </dd>
-<dt><code><span class="doc-parameter-name">--engine</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">CHOICE</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">polars</span></code></dt>
+<dt><code><span class="doc-parameter-name">--engine</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">[polars|duckdb]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">polars</span></code></dt>
 <dd>
 Engine for reading CSV/Parquet files: <code>polars</code> is fastest, <code>duckdb</code> uses the least memory (especially with <code>--partitions</code>)
 </dd>
@@ -487,7 +487,7 @@ Save the HTML comparison report to file
 <dd>
 Save the comparison results as JSON to file
 </dd>
-<dt><code><span class="doc-parameter-name">--format</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">CHOICE</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">text</span></code></dt>
+<dt><code><span class="doc-parameter-name">--format</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">[text|json]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">text</span></code></dt>
 <dd>
 Terminal output: a summary (‘text’) or the results as JSON (‘json’)
 </dd>

@@ -89,7 +89,7 @@ Read query from file
 `--editor: TEXT`  
 Editor to use for `--edit` mode (overrides \$EDITOR and auto-detection)
 
-`-o, --output-format: CHOICE = preview`  
+`-o, --output-format: [preview|scan|missing|info] = preview`  
 Output format for the result
 
 `--preview-head: INTEGER = 5`  
@@ -104,7 +104,7 @@ Save HTML output to file
 `--pipe`  
 Output data in a format suitable for piping to other pb commands
 
-`--pipe-format: CHOICE = parquet`  
+`--pipe-format: [parquet|csv] = parquet`  
 Format for piped output (default: parquet)
 
 ## Examples

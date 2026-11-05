@@ -101,7 +101,7 @@ Save failing rows to folders (one CSV per step). Provide base name for folder.
 `--limit: INTEGER = 500`  
 Maximum number of failing rows to save to CSV (default: 500)
 
-`--fail-on: CHOICE`  
+`--fail-on: [critical|error|warning|any]`  
 Exit with non-zero code when validation reaches this threshold level
 
 ## Examples

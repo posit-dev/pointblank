@@ -4,7 +4,7 @@ Get a data quality scorecard as a GT table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20872-L21072)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20887-L21087)
 
 ``` python
 Validate.get_scorecard(title=":default:")
