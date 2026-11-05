@@ -4285,6 +4285,10 @@ class _ValidationInfo:
         `"uniqueness"`, etc.). If not set explicitly, it is inferred from the `assertion_type`.
     active
         Whether the validation step is active.
+    active_spec
+        The `active=` value as originally given. Interrogation replaces `active` with the resolved
+        value (the result of a callable, or `False` for a step that can't be evaluated), so this
+        keeps the original value for serializing the plan.
     expr_source
         The source text of a `col_vals_expr()` expression, as written by the user (or `None` if
         it couldn't be determined with certainty).
@@ -4375,6 +4379,7 @@ class _ValidationInfo:
     autobrief: str | None = None
     dimension: str | None = None
     active: bool | Callable | None = None
+    active_spec: bool | Callable | None = None
     expr_source: str | None = None
     # Interrogation results
     eval_error: bool | None = None
@@ -4967,18 +4972,21 @@ def _validation_info_to_step(
     if vi.dimension is not None and vi.dimension != _base_dimension_from_assertion_type(at):
         params["dimension"] = vi.dimension
 
-    if vi.active is not None and vi.active is not True:
-        if callable(vi.active):
+    # After interrogation, `active` holds the value resolved against the table (and is `False` for
+    # a step that couldn't be evaluated); the original `active=` value is what reproduces the plan
+    active = vi.active_spec if vi.active_spec is not None else vi.active
+    if active is not None and active is not True:
+        if callable(active):
             params["active"] = _placeholder(
                 code="True",
                 note=(
                     f"Step '{at}' has a callable `active=` condition that cannot be serialized; "
                     "it was replaced with `True`."
                 ),
-                yaml_value="true",
+                yaml_value=True,
             )
         else:
-            params["active"] = vi.active
+            params["active"] = active
 
     return at, params
 
@@ -5494,8 +5502,9 @@ def _extract_steps_from_validate(validation: Validate) -> list:
             kwargs["actions"] = vi.actions
         if vi.brief is not None:
             kwargs["brief"] = vi.brief
-        if vi.active is not None and vi.active is not True:
-            kwargs["active"] = vi.active
+        active = vi.active_spec if vi.active_spec is not None else vi.active
+        if active is not None and active is not True:
+            kwargs["active"] = active
         if vi.dimension is not None:
             kwargs["dimension"] = vi.dimension
         steps.append(Step(vi.assertion_type, **kwargs))
@@ -17137,6 +17146,12 @@ class Validate:
         tbl_type = _get_tbl_type(data=data_tbl)
 
         self.time_start = datetime.datetime.now(datetime.timezone.utc)
+
+        # Keep each step's `active=` value as given before interrogation replaces `active` with
+        # the resolved value (this is what `to_code()`, `to_yaml()`, etc., serialize)
+        for validation in self.validation_info:
+            if validation.active_spec is None:
+                validation.active_spec = validation.active
 
         # Expand `validation_info` by evaluating any column expressions in `columns=`
         # (the `_evaluate_column_exprs()` method will eval and expand as needed)
