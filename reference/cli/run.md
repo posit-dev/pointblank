@@ -73,7 +73,9 @@ Full `--help` output
                                       CSV (default: 500)
       --fail-on [critical|error|warning|any]
                                       Exit with non-zero code when validation
-                                      reaches this threshold level
+                                      reaches this threshold level ('any' also
+                                      counts failing test units and steps that
+                                      couldn't be evaluated)
       --help                          Show this message and exit.
 
 ## Arguments
@@ -102,7 +104,7 @@ Save failing rows to folders (one CSV per step). Provide base name for folder.
 Maximum number of failing rows to save to CSV (default: 500)
 
 `--fail-on: [critical|error|warning|any]`  
-Exit with non-zero code when validation reaches this threshold level
+Exit with non-zero code when validation reaches this threshold level ('any' also counts failing test units and steps that couldn't be evaluated)
 
 ## Examples
 

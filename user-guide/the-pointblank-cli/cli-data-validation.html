@@ -786,6 +786,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py <span class="at">--fail-on</span> warning <span class="op">&gt;</span> /dev/null <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$?</span></span></code></pre></div>
 <p>which returns <code>1</code>.</p>
+<p>Using <code>--fail-on any</code> is stricter still: it exits with an error when any step has failing test units, or when a step couldn’t be evaluated at all (say, because its column isn’t in the table). Such steps aren’t counted as passing in the report header, which gives them their own <code>Not evaluated</code> count (inactive steps get an <code>Inactive</code> count) and lists the reason for each one below the table.</p>
 </section>
 </section>
 <section id="wrapping-up" class="level1">

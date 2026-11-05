@@ -210,6 +210,8 @@ echo $?
 
 which returns `1`.
 
+Using `--fail-on any` is stricter still: it exits with an error when any step has failing test units, or when a step couldn't be evaluated at all (say, because its column isn't in the table). Such steps aren't counted as passing in the report header, which gives them their own `Not evaluated` count (inactive steps get an `Inactive` count) and lists the reason for each one below the table.
+
 ## Wrapping Up
 
 Pointblank's CLI gives you powerful tools for validating your data, whether you need a quick check or a custom workflow. Use `pb validate` for fast, one-liner checks and `pb run` for more advanced, scriptable validation logic. With clear output and flexible options, you can catch data issues early and keep your workflows running smoothly.

@@ -412,7 +412,9 @@ Options:
                                   CSV (default: 500)
   --fail-on [critical|error|warning|any]
                                   Exit with non-zero code when validation
-                                  reaches this threshold level
+                                  reaches this threshold level ('any' also
+                                  counts failing test units and steps that
+                                  couldn't be evaluated)
   --help                          Show this message and exit.</code></pre>
 </div>
 </div>
@@ -458,7 +460,7 @@ Maximum number of failing rows to save to CSV (default: 500)
 </dd>
 <dt><code><span class="doc-parameter-name">--fail-on</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">[critical|error|warning|any]</span></code></dt>
 <dd>
-Exit with non-zero code when validation reaches this threshold level
+Exit with non-zero code when validation reaches this threshold level (‘any’ also counts failing test units and steps that couldn’t be evaluated)
 </dd>
 </dl>
 </div>

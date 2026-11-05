@@ -29340,7 +29340,9 @@ Options:
                                   CSV (default: 500)
   --fail-on [critical|error|warning|any]
                                   Exit with non-zero code when validation
-                                  reaches this threshold level
+                                  reaches this threshold level ('any' also
+                                  counts failing test units and steps that
+                                  couldn't be evaluated)
   --help                          Show this message and exit.
 ```
 
@@ -45728,6 +45730,12 @@ echo $?
 ```
 
 which returns `1`.
+
+Using `--fail-on any` is stricter still: it exits with an error when any step has failing test
+units, or when a step couldn't be evaluated at all (say, because its column isn't in the table).
+Such steps aren't counted as passing in the report header, which gives them their own `Not
+evaluated` count (inactive steps get an `Inactive` count) and lists the reason for each one below
+the table.
 
 ## Wrapping Up
 
