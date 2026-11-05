@@ -1696,6 +1696,9 @@ class LocaleGenerator:
 
     _current_location: dict[str, str] | None = None
     _row_locations: list[dict[str, str]] | None = None
+    # Postcodes drawn so far for the rows of `_row_locations` (a location holds only a postcode
+    # prefix, so the full postcode is drawn on first use and reused for the rest of the row)
+    _row_postcodes: dict[int, str] | None = None
     _current_row: int | None = None
 
     def _get_location(self) -> dict[str, str]:
@@ -1738,6 +1741,7 @@ class LocaleGenerator:
             Number of rows to pre-generate locations for.
         """
         self._row_locations = [self._get_location() for _ in range(n_rows)]
+        self._row_postcodes = {}
         self._current_row = None
 
     def set_row(self, row_index: int) -> None:
@@ -1756,6 +1760,7 @@ class LocaleGenerator:
     def clear_row_locations(self) -> None:
         """Clear all pre-generated row locations."""
         self._row_locations = None
+        self._row_postcodes = None
         self._current_row = None
 
     def new_location(self) -> dict[str, str]:
@@ -1859,7 +1864,21 @@ class LocaleGenerator:
         return self.rng.choice(codes)
 
     def postcode(self) -> str:
-        """Generate a random postal code (coherent with current location context)."""
+        """Generate a random postal code (coherent with current location context).
+
+        When row locations are active, the postcode is drawn once per row, so a postcode column
+        and the postcode within an address of the same row are the same.
+        """
+        if self._row_postcodes is not None and self._current_row is not None:
+            row_postcode = self._row_postcodes.get(self._current_row)
+            if row_postcode is None:
+                row_postcode = self._draw_postcode()
+                self._row_postcodes[self._current_row] = row_postcode
+            return row_postcode
+        return self._draw_postcode()
+
+    def _draw_postcode(self) -> str:
+        """Draw a postal code for the current location (its prefix plus random characters)."""
         location = self._get_current_location()
         prefix = location.get("postcode_prefix", "")
         postcode_format = self._data.address.get("postcode_format", "")
@@ -2523,6 +2542,8 @@ class LocaleGenerator:
         """
         if self._row_locations is not None:
             self._row_locations[row_index] = self._get_location()
+        if self._row_postcodes is not None:
+            self._row_postcodes.pop(row_index, None)
         if self._row_persons is not None:
             self._row_persons[row_index] = self._get_person()
         if self._row_employers is not None:

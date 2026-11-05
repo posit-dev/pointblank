@@ -203,6 +203,37 @@ class TestLocaleGeneratorAddress:
         gen.clear_row_locations()
         assert gen._row_locations is None
 
+    def test_row_postcode_is_drawn_once_per_row(self):
+        gen = LocaleGenerator("US", seed=1)
+        gen.init_row_locations(20)
+
+        postcodes = []
+        for i in range(20):
+            gen.set_row(i)
+            postcode = gen.postcode()
+            assert gen.postcode() == postcode
+            assert gen.address().endswith(f" {postcode}")
+            assert postcode.startswith(gen._row_locations[i]["postcode_prefix"])
+            postcodes.append(postcode)
+        assert len(set(postcodes)) > 1
+
+        # Going back to a row gives its postcode again
+        gen.set_row(0)
+        assert gen.postcode() == postcodes[0]
+
+        # Re-drawing a row's context also re-draws its postcode
+        gen.reroll_row(0)
+        assert 0 not in gen._row_postcodes
+        assert gen.postcode().startswith(gen._row_locations[0]["postcode_prefix"])
+
+        gen.clear_row_locations()
+        assert gen._row_postcodes is None
+
+    def test_postcode_without_row_context_is_drawn_each_call(self):
+        gen = LocaleGenerator("US", seed=1)
+        gen.new_location()
+        assert len({gen.postcode() for _ in range(20)}) > 1
+
     def test_latitude_longitude(self):
         gen = LocaleGenerator("US", seed=1)
         gen.new_location()

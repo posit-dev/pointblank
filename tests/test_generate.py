@@ -1976,6 +1976,69 @@ class TestCountrySupport:
 
                 assert found_city
 
+    @pytest.mark.parametrize("postcode_first", [False, True])
+    def test_address_postcode_coherence_all_countries(self, monkeypatch, postcode_first):
+        """
+        Test that the postcode column matches the postcode within the address of the same row,
+        whichever of the two columns comes first.
+        """
+        from pointblank import Schema, generate_dataset, string_field
+        from pointblank.countries import LocaleGenerator
+
+        address_col = ("address", string_field(preset="address"))
+        postcode_col = ("postcode", string_field(preset="postcode"))
+        city_col = ("city", string_field(preset="city"))
+        columns = [postcode_col, address_col] if postcode_first else [address_col, postcode_col]
+        schema = Schema(columns=[*columns, city_col])
+
+        n_checked = 0
+        for country in COUNTRIES_WITH_FULL_DATA:
+            # Keep only the address formats that include the postcode (the locale data is shared,
+            # so `monkeypatch` restores it after the test)
+            address_data = LocaleGenerator(country=country, seed=1)._data.address
+            formats = [
+                fmt for fmt in address_data.get("address_formats", []) if "{postcode}" in fmt
+            ]
+            if not formats:
+                continue
+            monkeypatch.setitem(address_data, "address_formats", formats)
+
+            data = generate_dataset(schema, n=50, seed=23, country=country, output="dict")
+            for address, postcode in zip(data["address"], data["postcode"]):
+                assert postcode in address, (country, address, postcode)
+            n_checked += 1
+
+        assert n_checked >= 80
+
+    def test_address_postcode_coherence_with_unique_postcode(self):
+        # A duplicate postcode re-draws the row's location, and the address follows the new one
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(
+            address=string_field(preset="address"),
+            postcode=string_field(preset="postcode", unique=True),
+        )
+        data = generate_dataset(schema, n=1000, seed=1, country="US", output="dict")
+
+        assert len(set(data["postcode"])) == 1000
+        for address, postcode in zip(data["address"], data["postcode"]):
+            assert address.endswith(f" {postcode}")
+
+    def test_address_postcode_coherence_per_profile(self):
+        # Each prefixed profile has its own row locations, and so its own postcodes
+        from pointblank import Schema, generate_dataset, profile_fields
+
+        schema = Schema(
+            **profile_fields(set="full", prefix="sender_"),
+            **profile_fields(set="full", prefix="recipient_"),
+        )
+        data = generate_dataset(schema, n=100, seed=23, country="US", output="dict")
+
+        for prefix in ["sender_", "recipient_"]:
+            for address, postcode in zip(data[f"{prefix}address"], data[f"{prefix}postcode"]):
+                assert address.endswith(f" {postcode}")
+        assert data["sender_postcode"] != data["recipient_postcode"]
+
 
 class TestGeneratorValidation:
     """Tests that generated data passes pointblank validation."""
