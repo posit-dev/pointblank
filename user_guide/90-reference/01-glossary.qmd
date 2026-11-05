@@ -420,9 +420,9 @@ Preview
 
 `python:` block
 : A way to write Python code inside a **YAML workflow**, for settings that need it, such as `tbl`,
-  `pre`, `expr`, and `actions`. For safety, the code runs in a limited environment: basic built-in
-  functions, `Path`, `pb` (Pointblank), `pl` (Polars), and `pd` (Pandas) are available, but other
-  modules can't be imported. [Learn more](../yaml/yaml-reference.qmd).
+  `pre`, `expr`, and `actions`. The code isn't sandboxed, so it only runs if you allow it with
+  `allow_python=True` (or `pb run --allow-python`). A few simple calls, such as `pb.col()` and
+  `pb.load_dataset()`, work without it. [Learn more](../yaml/yaml-reference.qmd).
 
 Quality dimension
 : A category describing what kind of data quality a step measures. The categories are
