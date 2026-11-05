@@ -69,7 +69,8 @@ coherence systems that activate based on which presets appear together in a sche
 
 **Address coherence** activates when *any* address-related preset is present (`address`, `city`,
 `state`, `postcode`, `latitude`, `longitude`, `phone_number`, `license_plate`). All of these
-fields will refer to the same location within each row.
+fields will refer to the same location within each row, and the postcode within an `address` is
+the same as the one in the `postcode` column.
 
 **Person coherence** activates when *any* person-related preset is present (`name`, `name_full`,
 `first_name`, `last_name`, `email`, `user_name`). The email and username are derived from the
