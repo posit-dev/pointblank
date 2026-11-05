@@ -1191,7 +1191,7 @@ def bool_field(
     pb.preview(pb.generate_dataset(schema, n=30, seed=10))
     ```
 
-    Here, `email_verified` is `True` in 26 of the 30 rows and `is_admin` in 3 of them. These
+    Here, `email_verified` is `True` in 24 of the 30 rows and `is_admin` in 1 of them. These
     counts are close to, but not exactly, the `p_true=` values of `0.9` and `0.05`, since each
     value is drawn independently.
     """
@@ -1841,7 +1841,7 @@ def time_field(
     ```
 
     Every `check_in` time falls in the morning window and every non-missing `check_out` time in the
-    late afternoon or evening one, with 6 of the 30 `check_out` values missing. The `employee_id`
+    late afternoon or evening one, with 7 of the 30 `check_out` values missing. The `employee_id`
     values are distinct three-digit numbers.
     """
     return TimeField(
