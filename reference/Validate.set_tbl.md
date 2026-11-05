@@ -4,7 +4,7 @@ Set or replace the table associated with the Validate object.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6343-L6481)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6391-L6532)
 
 ``` python
 Validate.set_tbl(
@@ -40,7 +40,7 @@ The [set_tbl()](../reference/Validate.set_tbl.md#pointblank.Validate.set_tbl) me
 - a template validation workflow that should be applied to different data sources
 - YAML-defined validations where you want to override the table specified in the YAML
 
-The [set_tbl()](../reference/Validate.set_tbl.md#pointblank.Validate.set_tbl) method creates a copy of the validation object with the new table, so the original validation object remains unchanged. This allows you to reuse validation plans across multiple tables without interference.
+The [set_tbl()](../reference/Validate.set_tbl.md#pointblank.Validate.set_tbl) method creates a copy of the validation object with the new table, so the original validation object remains unchanged. This allows you to reuse validation plans across multiple tables without interference. The validation object can already have been interrogated: interrogating the copy starts over from the steps as they were defined, so the new table is checked from scratch (e.g., a step using a column selector such as [starts_with()](../reference/starts_with.md#pointblank.starts_with) gets one step for each matching column of the new table).
 
 ## Examples
 

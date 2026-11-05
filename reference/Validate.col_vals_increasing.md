@@ -4,7 +4,7 @@ Are column data increasing by row?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9987-L10228)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10038-L10279)
 
 ``` python
 Validate.col_vals_increasing(

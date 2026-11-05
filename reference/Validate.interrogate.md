@@ -4,7 +4,7 @@ Execute each validation step against the table and store the results.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L17054-L18660)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L17105-L18720)
 
 ``` python
 Validate.interrogate(
@@ -22,6 +22,8 @@ When a validation plan has been set with a series of validation steps, the inter
 The interrogation process will collect extracts of failing rows if the `collect_extracts=` option is set to `True` (the default). We can control the number of rows collected using the `get_first_n=`, `sample_n=`, and `sample_frac=` options. The `extract_limit=` option will enforce a hard limit on the number of rows collected when `collect_extracts=True`.
 
 After interrogation is complete, the [Validate](../reference/Validate.md#pointblank.Validate) object will have gathered information, and we can use methods like [`n_passed()`](../reference/Validate.n_passed.md#pointblank.Validate.n_passed), [`f_failed()`](../reference/Validate.f_failed.md#pointblank.Validate.f_failed), etc., to understand how the table performed against the validation plan. A visual representation of the validation results can be viewed by printing the [Validate](../reference/Validate.md#pointblank.Validate) object; this will display the validation table in an HTML viewing environment.
+
+Calling [interrogate()](../reference/Validate.interrogate.md#pointblank.Validate.interrogate) again (e.g., after the table was fixed or replaced, or with different extract options) replaces the results of the earlier interrogation. Each interrogation starts from the validation steps as they were defined, so callable `active=` values are evaluated again and steps that use column selectors or `segments=` are split by column and segment for the table as it is now.
 
 ## Parameters
 

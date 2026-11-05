@@ -1625,7 +1625,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L17054-L18660" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L17105-L18720" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">interrogate</span>(</span>
@@ -1641,6 +1641,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>When a validation plan has been set with a series of validation steps, the interrogation process through <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> should then be invoked. Interrogation will evaluate each validation step against the table and store the results.</p>
 <p>The interrogation process will collect extracts of failing rows if the <code>collect_extracts=</code> option is set to <code>True</code> (the default). We can control the number of rows collected using the <code>get_first_n=</code>, <code>sample_n=</code>, and <code>sample_frac=</code> options. The <code>extract_limit=</code> option will enforce a hard limit on the number of rows collected when <code>collect_extracts=True</code>.</p>
 <p>After interrogation is complete, the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object will have gathered information, and we can use methods like <a href="../reference/Validate.n_passed.html#pointblank.Validate.n_passed" class="gdls-link"><code>n_passed()</code></a>, <a href="../reference/Validate.f_failed.html#pointblank.Validate.f_failed" class="gdls-link"><code>f_failed()</code></a>, etc., to understand how the table performed against the validation plan. A visual representation of the validation results can be viewed by printing the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object; this will display the validation table in an HTML viewing environment.</p>
+<p>Calling <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> again (e.g., after the table was fixed or replaced, or with different extract options) replaces the results of the earlier interrogation. Each interrogation starts from the validation steps as they were defined, so callable <code>active=</code> values are evaluated again and steps that use column selectors or <code>segments=</code> are split by column and segment for the table as it is now.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1687,7 +1688,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s use a built-in dataset (<code>"game_revenue"</code>) to demonstrate some of the options of the interrogation process. A series of validation steps will populate our validation plan. After setting up the plan, the next step is to interrogate the table and see how well it aligns with our expectations. We’ll use the <code>get_first_n=</code> option so that any extracts of failing rows are limited to the first <code>n</code> rows.</p>
-<div id="1ea0bf81" class="cell" data-execution_count="1">
+<div id="e01dd636" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1791,7 +1792,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
     <td colspan="14" class="gt_heading gt_title gt_font_normal" id="pb_tbl-title" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-05|14:28:38</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-05|15:10:22</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -2020,14 +2021,14 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
     <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
-<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-11-05 14:28:38 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-11-05 14:28:38 UTC</span></div></span></td></tr></tfoot>
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-11-05 15:10:22 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-11-05 15:10:22 UTC</span></div></span></td></tr></tfoot>
 </table>
 
 </div>
 </div>
 </div>
 <p>The validation table shows that step 3 (checking for <code>session_duration</code> greater than <code>5</code>) has 18 failing test units. This means that 18 rows in the table are problematic. We’d like to see the rows that failed this validation step and we can do that with the <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>get_data_extracts()</code></a> method.</p>
-<div id="5557b884" class="cell" data-execution_count="2">
+<div id="1066e1a1" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pb.preview(validation.get_data_extracts(i<span class="op">=</span><span class="dv">3</span>, frame<span class="op">=</span><span class="va">True</span>))</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

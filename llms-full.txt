@@ -17225,6 +17225,12 @@ against the validation plan. A visual representation of the validation results c
 by printing the `Validate` object; this will display the validation table in an HTML viewing
 environment.
 
+Calling `interrogate()` again (e.g., after the table was fixed or replaced, or with
+different extract options) replaces the results of the earlier interrogation. Each
+interrogation starts from the validation steps as they were defined, so callable `active=`
+values are evaluated again and steps that use column selectors or `segments=` are split by
+column and segment for the table as it is now.
+
 Parameters
 ----------
 collect_extracts
@@ -17343,7 +17349,10 @@ The `set_tbl()` method is particularly useful in scenarios where you have:
 
 The `set_tbl()` method creates a copy of the validation object with the new table, so the
 original validation object remains unchanged. This allows you to reuse validation plans
-across multiple tables without interference.
+across multiple tables without interference. The validation object can already have been
+interrogated: interrogating the copy starts over from the steps as they were defined, so
+the new table is checked from scratch (e.g., a step using a column selector such as
+`starts_with()` gets one step for each matching column of the new table).
 
 Examples
 --------
