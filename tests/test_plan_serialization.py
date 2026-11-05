@@ -565,8 +565,11 @@ def test_every_validation_method_serializes(method, interrogated, small_table, r
     if lossy:
         from pointblank.yaml import YAMLValidator
 
+        # The placeholders written for callables (e.g., `lambda df: df`) are Python code
         validator = YAMLValidator()
-        rebuilt_yaml = validator.build_validation(validator.load_config(yaml_str), tbl=small_table)
+        rebuilt_yaml = validator.build_validation(
+            validator.load_config(yaml_str), tbl=small_table, allow_python=True
+        )
         expected = [s.assertion_type for s in validation.validation_info]
         assert [s.assertion_type for s in rebuilt_code.validation_info] == expected
         assert [s.assertion_type for s in rebuilt_yaml.validation_info] == expected
