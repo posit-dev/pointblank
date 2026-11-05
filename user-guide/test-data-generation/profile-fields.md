@@ -78,16 +78,16 @@ pb.preview(
 | PolarsRows100Columns10 |  |  |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|----|----|
 |  | first_name *String* | last_name *String* | email *String* | address *String* | city *String* | state *String* | postcode *String* | phone_number *String* | company *String* | job *String* |
-| 1 | Weston | Parker | wparker89@outlook.com | 3365 Richmond Avenue, Suite 422, Lubbock, Texas 79421 | Lubbock | Texas | 79470 | \(210\) 460-3732 | Patterson Networks | System Administrator |
-| 2 | Hazel | Torres | htorres35@aol.com | 353 East South Street, Anaheim, California 92898 | Anaheim | California | 92835 | \(858\) 514-0644 | Anaheim Real Estate | Insurance Agent |
-| 3 | Lawrence | Mitchell | lawrence.mitchell1@hotmail.com | 2647 Tatum Boulevard, Phoenix, Arizona 85023 | Phoenix | Arizona | 85041 | \(520\) 301-6749 | Ford | Interior Designer |
-| 4 | Maria | Garcia | mgarcia@aol.com | 5145 Arizona Avenue, Apt 761, Denver, Colorado 80255 | Denver | Colorado | 80287 | \(970\) 458-9509 | Carter Electric | HVAC Technician |
-| 5 | Michael | Hoffman | m_hoffman@outlook.com | 5209 Grayson Street, Suite 333, San Antonio, Texas 78299 | San Antonio | Texas | 78248 | \(512\) 529-7287 | San Antonio Engineering Group | Construction Manager |
-| 96 | Daniel | Torres | daniel.torres48@icloud.com | 3678 Rim Road, Suite 33, El Paso, Texas 79943 | El Paso | Texas | 79962 | \(972\) 892-8539 | Pioneer Strategy Group | Consultant |
-| 97 | Helen | Simpson | helen.simpson1@hotmail.com | 1411 Mesa Street, El Paso, Texas 79930 | El Paso | Texas | 79955 | \(512\) 481-0603 | Powell & Gordon | Electrical Engineer |
-| 98 | Mark | Graham | mgraham26@mail.com | 2065 Craighead Road, Apt 521, Charlotte, North Carolina 28289 | Charlotte | North Carolina | 28261 | \(980\) 608-7729 | Graham & Allen | Mechanical Engineer |
-| 99 | Brian | Moore | brian263@icloud.com | 2072 2nd Street Los Angeles, Suite 893, Los Angeles, California 90034 | Los Angeles | California | 90037 | \(408\) 625-2327 | The Quality Hotels | Chef |
-| 100 | Michael | Ward | m_ward@protonmail.com | 7966 K Street, San Diego, California 92109 | San Diego | California | 92194 | \(510\) 252-2820 | Morgan Stanley | Bank Teller |
+| 1 | Weston | Parker | wparker89@outlook.com | 3365 Richmond Avenue, Suite 422, Lubbock, Texas 79421 | Lubbock | Texas | 79421 | \(972\) 235-4187 | Patterson Networks | System Administrator |
+| 2 | Hazel | Torres | htorres35@aol.com | 353 East South Street, Anaheim, California 92898 | Anaheim | California | 92898 | \(858\) 763-2933 | Anaheim Real Estate | Insurance Agent |
+| 3 | Lawrence | Mitchell | lawrence.mitchell1@hotmail.com | 2647 Tatum Boulevard, Phoenix, Arizona 85023 | Phoenix | Arizona | 85023 | \(928\) 966-6731 | Ford | Interior Designer |
+| 4 | Maria | Garcia | mgarcia@aol.com | 5145 Arizona Avenue, Apt 761, Denver, Colorado 80255 | Denver | Colorado | 80255 | \(970\) 346-9241 | Carter Electric | HVAC Technician |
+| 5 | Michael | Hoffman | m_hoffman@outlook.com | 5209 Grayson Street, Suite 333, San Antonio, Texas 78299 | San Antonio | Texas | 78299 | \(214\) 554-5611 | San Antonio Engineering Group | Construction Manager |
+| 96 | Daniel | Torres | daniel.torres48@icloud.com | 3678 Rim Road, Suite 33, El Paso, Texas 79943 | El Paso | Texas | 79943 | \(346\) 795-3511 | Pioneer Strategy Group | Consultant |
+| 97 | Helen | Simpson | helen.simpson1@hotmail.com | 1411 Mesa Street, El Paso, Texas 79930 | El Paso | Texas | 79930 | \(210\) 680-3422 | Powell & Gordon | Electrical Engineer |
+| 98 | Mark | Graham | mgraham26@mail.com | 2065 Craighead Road, Apt 521, Charlotte, North Carolina 28289 | Charlotte | North Carolina | 28289 | \(336\) 468-3530 | Graham & Allen | Mechanical Engineer |
+| 99 | Brian | Moore | brian263@icloud.com | 2072 2nd Street Los Angeles, Suite 893, Los Angeles, California 90034 | Los Angeles | California | 90034 | \(951\) 473-6876 | The Quality Hotels | Chef |
+| 100 | Michael | Ward | m_ward@protonmail.com | 7966 K Street, San Diego, California 92109 | San Diego | California | 92109 | \(650\) 287-0773 | Morgan Stanley | Bank Teller |
 
 ## Combined vs. Split Names
 

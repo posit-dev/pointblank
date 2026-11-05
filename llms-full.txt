@@ -24551,8 +24551,8 @@ Several `string_field()` presets produce locale-aware data that varies depending
 When multiple columns in the same schema use related presets, the generated data is
 automatically coherent across those columns within each row. Person-related presets will share
 the same identity (e.g., the email is derived from the name), address-related presets will
-share the same location (e.g., the city matches the address), and business-related presets
-will share the same industry context. Profiles made by `profile_fields()` with different
+share the same location (e.g., the city and postcode match the address), and business-related
+presets will share the same industry context. Profiles made by `profile_fields()` with different
 `prefix=` values (e.g., `"customer_"` and `"seller_"`) are coherent separately, so each one is a
 different person with its own location and employer.
 
@@ -39968,7 +39968,8 @@ coherence systems that activate based on which presets appear together in a sche
 
 **Address coherence** activates when *any* address-related preset is present (`address`, `city`,
 `state`, `postcode`, `latitude`, `longitude`, `phone_number`, `license_plate`). All of these
-fields will refer to the same location within each row.
+fields will refer to the same location within each row, and the postcode within an `address` is
+the same as the one in the `postcode` column.
 
 **Person coherence** activates when *any* person-related preset is present (`name`, `name_full`,
 `first_name`, `last_name`, `email`, `user_name`). The email and username are derived from the

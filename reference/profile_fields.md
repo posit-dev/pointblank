@@ -113,16 +113,16 @@ pb.preview(pb.generate_dataset(schema, n=50, seed=23, country="DE"))
 | PolarsRows50Columns8 |  |  |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|----|----|
 |  | first_name *String* | last_name *String* | email *String* | address *String* | city *String* | state *String* | postcode *String* | phone_number *String* |
-| 1 | Andrea | Kruse | andreakruse@web.de | Beethovenstraße 9261, 14699 Potsdam | Potsdam | Brandenburg | 14519 | \(0335\) 477-0031 |
-| 2 | Volker | Wunderlich | volker684@t-online.de | Mozartstraße 2669, 06078 Halle (Saale) | Halle (Saale) | Sachsen-Anhalt | 06374 | \(0391\) 594-5315 |
-| 3 | Michael | Krüger | michaelkrueger@gmail.com | Hanauer Landstraße 2068, 60057 Frankfurt am Main | Frankfurt am Main | Hessen | 60173 | \(0561\) 702-6959 |
-| 4 | Frauke | Kaiser | frauke.kaiser@posteo.de | Goethestraße 8900, 04304 Leipzig | Leipzig | Sachsen | 04677 | \(0351\) 264-2126 |
-| 5 | Lukas | Herrmann | lukas.herrmann70@gmail.com | Chlodwigplatz 1794, 50790 Köln | Cologne | Nordrhein-Westfalen | 50037 | \(0211\) 436-8490 |
-| 46 | Ingrid | Burkhardt | ingridburkhardt@yahoo.de | Friedrichsring 6253, Whg. 154, 68536 Mannheim | Mannheim | Baden-Württemberg | 68049 | \(0711\) 701-0009 |
-| 47 | Erik | Stein | erik_stein@yahoo.de | Bendemannstraße 5214, Whg. 722, 40321 Düsseldorf | Dusseldorf | Nordrhein-Westfalen | 40385 | \(02161\) 179-5275 |
-| 48 | Meike | Schwarz | meike_schwarz@freenet.de | Bischofsweg 2319, Whg. 641, 01066 Dresden | Dresden | Sachsen | 01101 | \(03741\) 147-0088 |
-| 49 | Renate | Michael | rmichael13@freenet.de | Wagenburgstraße 2634, 70074 Stuttgart | Stuttgart | Baden-Württemberg | 70339 | \(07121\) 313-1031 |
-| 50 | Katrin | Peters | k_peters@arcor.de | Wilhelmstraße 9260, 65299 Wiesbaden | Wiesbaden | Hessen | 65384 | \(069\) 470-9875 |
+| 1 | Andrea | Kruse | andreakruse@web.de | Beethovenstraße 9261, 14699 Potsdam | Potsdam | Brandenburg | 14699 | \(03381\) 193-7417 |
+| 2 | Volker | Wunderlich | volker684@t-online.de | Mozartstraße 2669, 06078 Halle (Saale) | Halle (Saale) | Sachsen-Anhalt | 06078 | \(0391\) 677-0375 |
+| 3 | Michael | Krüger | michaelkrueger@gmail.com | Hanauer Landstraße 2068, 60057 Frankfurt am Main | Frankfurt am Main | Hessen | 60057 | \(06151\) 113-6215 |
+| 4 | Frauke | Kaiser | frauke.kaiser@posteo.de | Goethestraße 8900, 04304 Leipzig | Leipzig | Sachsen | 04304 | \(03741\) 014-0819 |
+| 5 | Lukas | Herrmann | lukas.herrmann70@gmail.com | Chlodwigplatz 1794, 50790 Köln | Cologne | Nordrhein-Westfalen | 50790 | \(02161\) 395-3798 |
+| 46 | Ingrid | Burkhardt | ingridburkhardt@yahoo.de | Friedrichsring 6253, Whg. 154, 68536 Mannheim | Mannheim | Baden-Württemberg | 68536 | \(0761\) 516-0331 |
+| 47 | Erik | Stein | erik_stein@yahoo.de | Bendemannstraße 5214, Whg. 722, 40321 Düsseldorf | Dusseldorf | Nordrhein-Westfalen | 40321 | \(0231\) 799-3896 |
+| 48 | Meike | Schwarz | meike_schwarz@freenet.de | Bischofsweg 2319, Whg. 641, 01066 Dresden | Dresden | Sachsen | 01066 | \(0371\) 112-5415 |
+| 49 | Renate | Michael | rmichael13@freenet.de | Wagenburgstraße 2634, 70074 Stuttgart | Stuttgart | Baden-Württemberg | 70074 | \(0621\) 065-6802 |
+| 50 | Katrin | Peters | k_peters@arcor.de | Wilhelmstraße 9260, 65299 Wiesbaden | Wiesbaden | Hessen | 65299 | \(06151\) 082-2692 |
 
 The `prefix=` parameter prepends a string to every column name, which helps when the profile columns sit alongside other columns in a schema:
 

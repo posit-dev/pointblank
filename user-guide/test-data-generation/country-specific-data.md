@@ -25,16 +25,16 @@ pb.preview(pb.generate_dataset(schema, n=200, seed=23, country="DE"))
 | PolarsRows200Columns6 |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|
 |  | name *String* | city *String* | address *String* | postcode *String* | latitude *String* | longitude *String* |
-| 1 | Niklas Schulte | Potsdam | Jägertor 8211, Whg. 737, 14097 Potsdam | 14448 | 52.428914 | 13.064566 |
-| 2 | Erik Becker | Halle (Saale) | Hansering 9509, Whg. 636, 06678 Halle (Saale) | 06101 | 51.484572 | 11.937119 |
-| 3 | Marco Albrecht | Frankfurt am Main | Friedensstraße 9713, Whg. 474, 60597 Frankfurt am Main | 60674 | 50.212245 | 8.711472 |
-| 4 | Juliane Münz | Leipzig | Lindenauer Markt 6249, Whg. 489, 04541 Leipzig | 04992 | 51.276862 | 12.458890 |
-| 5 | Anton Baumann | Cologne | Aachener Straße 7203, 50125 Köln | 50589 | 50.967264 | 6.795838 |
-| 196 | Franziska Wendt | Ulm | Marktplatz 6251, Whg. 535, 89984 Ulm | 89226 | 48.395296 | 10.001962 |
-| 197 | Lennart Berger | Munich | Brienner Straße 1390, Whg. 389, 80255 München | 80835 | 48.206882 | 11.674262 |
-| 198 | Julia Knecht | Ludwigshafen am Rhein | Friedrichstraße 3204, 67944 Ludwigshafen am Rhein | 67305 | 49.473668 | 8.437782 |
-| 199 | Sebastian Thiel | Gelsenkirchen | Husemannstraße 453, Whg. 273, 45732 Gelsenkirchen | 45992 | 51.568689 | 7.082531 |
-| 200 | Trude Kaiser | Kassel | Königstraße 1394, 34406 Kassel | 34736 | 51.326544 | 9.494319 |
+| 1 | Niklas Schulte | Potsdam | Jägertor 8211, Whg. 737, 14097 Potsdam | 14097 | 52.448651 | 13.131661 |
+| 2 | Erik Becker | Halle (Saale) | Hansering 9509, Whg. 636, 06678 Halle (Saale) | 06678 | 51.470036 | 11.959348 |
+| 3 | Marco Albrecht | Frankfurt am Main | Friedensstraße 9713, Whg. 474, 60597 Frankfurt am Main | 60597 | 50.189473 | 8.639076 |
+| 4 | Juliane Münz | Leipzig | Lindenauer Markt 6249, Whg. 489, 04541 Leipzig | 04541 | 51.380586 | 12.461248 |
+| 5 | Anton Baumann | Cologne | Aachener Straße 7203, 50125 Köln | 50125 | 50.834534 | 7.141920 |
+| 196 | Franziska Wendt | Ulm | Marktplatz 6251, Whg. 535, 89984 Ulm | 89984 | 48.391691 | 9.972463 |
+| 197 | Lennart Berger | Munich | Brienner Straße 1390, Whg. 389, 80255 München | 80255 | 48.209692 | 11.583188 |
+| 198 | Julia Knecht | Ludwigshafen am Rhein | Friedrichstraße 3204, 67944 Ludwigshafen am Rhein | 67944 | 49.492845 | 8.475741 |
+| 199 | Sebastian Thiel | Gelsenkirchen | Husemannstraße 453, Whg. 273, 45732 Gelsenkirchen | 45732 | 51.485459 | 7.105374 |
+| 200 | Trude Kaiser | Kassel | Königstraße 1394, 34406 Kassel | 34406 | 51.320639 | 9.516872 |
 
 Japanese data includes names in romanized form and addresses from cities like Tokyo, Osaka, and Kyoto. The coordinates fall within Japan's geographic boundaries:
 
@@ -45,16 +45,16 @@ pb.preview(pb.generate_dataset(schema, n=200, seed=23, country="JP"))
 | PolarsRows200Columns6 |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|
 |  | name *String* | city *String* | address *String* | postcode *String* | latitude *String* | longitude *String* |
-| 1 | Kenji Ozawa | Kasuga | 816-3132 Fukuoka Kasuga Shirane 2869-411 | 816-5387 | 33.532717 | 130.479907 |
-| 2 | Yuki Sugimoto | Higashihiroshima | 739-7478 Hiroshima Higashihiroshima Kouchi-dori 5279-446 | 739-6297 | 34.402366 | 132.767214 |
-| 3 | Osamu Takahashi | Fukuoka | 810-8705 Fukuoka Fukuoka Jonan-dori 4932-302 | 810-3425 | 33.676810 | 130.414218 |
-| 4 | Yuki Sakai | Saitama | 330-3255 Saitama Saitama Minuma-dori 3157 | 330-4163 | 35.927124 | 139.649673 |
-| 5 | Haruka Yamazaki | Kitakyushu | 802-7756 Fukuoka Kitakyushu Yamada-dori 281 | 802-7878 | 33.908803 | 130.911548 |
-| 196 | Mayumi Takahashi | Fukuoka | 810-7017 Fukuoka Fukuoka Imajuku-dori 9700 | 810-1106 | 33.558128 | 130.415678 |
-| 197 | Katsuya Kawamura | Hiroshima | 730-1406 Hiroshima Hiroshima Ujina-dori 281 | 730-6070 | 34.398047 | 132.440192 |
-| 198 | Kazue Nakata | Sendai | 980-1935 Miyagi Sendai Kawauchi 1182 | 980-1544 | 38.255431 | 140.876065 |
-| 199 | Nozomi Shiraishi | Matsudo | 271-5711 Chiba Matsudo Akiyama-dori 6082-279 | 271-5161 | 35.818062 | 139.882260 |
-| 200 | Ayaka Asano | Kure | 737-9841 Hiroshima Kure Tsukiji-dori 3763 | 737-7152 | 34.261593 | 132.556836 |
+| 1 | Kenji Ozawa | Kasuga | 816-3132 Fukuoka Kasuga Shirane 2869-411 | 816-3132 | 33.530756 | 130.488672 |
+| 2 | Yuki Sugimoto | Higashihiroshima | 739-7478 Hiroshima Higashihiroshima Kouchi-dori 5279-446 | 739-7478 | 34.425753 | 132.722800 |
+| 3 | Osamu Takahashi | Fukuoka | 810-8705 Fukuoka Fukuoka Jonan-dori 4932-302 | 810-8705 | 33.698264 | 130.397369 |
+| 4 | Yuki Sakai | Saitama | 330-3255 Saitama Saitama Minuma-dori 3157 | 330-3255 | 35.862623 | 139.612123 |
+| 5 | Haruka Yamazaki | Kitakyushu | 802-7756 Fukuoka Kitakyushu Yamada-dori 281 | 802-7756 | 33.894352 | 130.864146 |
+| 196 | Mayumi Takahashi | Fukuoka | 810-7017 Fukuoka Fukuoka Imajuku-dori 9700 | 810-7017 | 33.605104 | 130.454464 |
+| 197 | Katsuya Kawamura | Hiroshima | 730-1406 Hiroshima Hiroshima Ujina-dori 281 | 730-1406 | 34.455607 | 132.465503 |
+| 198 | Kazue Nakata | Sendai | 980-1935 Miyagi Sendai Kawauchi 1182 | 980-1935 | 38.269432 | 140.843915 |
+| 199 | Nozomi Shiraishi | Matsudo | 271-5711 Chiba Matsudo Akiyama-dori 6082-279 | 271-5711 | 35.797384 | 139.912848 |
+| 200 | Ayaka Asano | Kure | 737-9841 Hiroshima Kure Tsukiji-dori 3763 | 737-9841 | 34.264873 | 132.592003 |
 
 Brazilian data features Portuguese names and addresses from cities like São Paulo, Rio de Janeiro, and Brasília. The postal codes follow Brazil's CEP format:
 
@@ -65,16 +65,16 @@ pb.preview(pb.generate_dataset(schema, n=200, seed=23, country="BR"))
 | PolarsRows200Columns6 |  |  |  |  |  |  |
 |----|----|----|----|----|----|----|
 |  | name *String* | city *String* | address *String* | postcode *String* | latitude *String* | longitude *String* |
-| 1 | Fábio Santos | Campinas | Avenida das Amoreiras, 1624, Apto 677, 13239-778 Campinas - SP | 13441-282 | -22.925008 | -47.075037 |
-| 2 | João Vieira | Porto Alegre | Rua Vasco da Gama, 2869, 90313-262 Porto Alegre - RS | 90439-595 | -30.006369 | -51.232939 |
-| 3 | Letícia Costa | Rio de Janeiro | Avenida Maracanã, 4893, Apto 709, 20863-487 Rio de Janeiro - RJ | 20351-144 | -22.881665 | -43.185310 |
-| 4 | Regina Ferreira | Belo Horizonte | Rua Guajajaras, 5690, 30633-255 Belo Horizonte - MG | 30803-422 | -19.962432 | -43.907671 |
-| 5 | Francisco Rodrigues | Belo Horizonte | Rua Turquesa, 281, Apto 515, 30775-668 Belo Horizonte - MG | 30822-683 | -19.958575 | -43.936621 |
-| 196 | Júlia Martins | Sao Paulo | Rua São Bento, 5410, 01605-295 São Paulo - SP | 01655-287 | -23.597987 | -46.673967 |
-| 197 | Júlia Moreira | Recife | Rua do Giriquiti, 7340, 50146-087 Recife - PE | 50893-805 | -8.025160 | -34.880996 |
-| 198 | Rodrigo Moura | Salvador | Rua Francisco Muniz Barreto, 5926, 40584-681 Salvador - BA | 40442-463 | -12.921934 | -38.521806 |
-| 199 | Iraci Lima | Sao Paulo | Rua Celso Garcia, 3181, Apto 872, 01417-237 São Paulo - SP | 01650-013 | -23.506813 | -46.649849 |
-| 200 | Bianca Medeiros | Curitiba | Rua Marechal Hermes, 3301, Apto 281, 80229-139 Curitiba - PR | 80703-569 | -25.477946 | -49.278213 |
+| 1 | Fábio Santos | Campinas | Avenida das Amoreiras, 1624, Apto 677, 13239-778 Campinas - SP | 13239-778 | -22.923787 | -47.075442 |
+| 2 | João Vieira | Porto Alegre | Rua Vasco da Gama, 2869, 90313-262 Porto Alegre - RS | 90313-262 | -30.074751 | -51.150297 |
+| 3 | Letícia Costa | Rio de Janeiro | Avenida Maracanã, 4893, Apto 709, 20863-487 Rio de Janeiro - RJ | 20863-487 | -22.864574 | -43.233337 |
+| 4 | Regina Ferreira | Belo Horizonte | Rua Guajajaras, 5690, 30633-255 Belo Horizonte - MG | 30633-255 | -19.963722 | -43.956142 |
+| 5 | Francisco Rodrigues | Belo Horizonte | Rua Turquesa, 281, Apto 515, 30775-668 Belo Horizonte - MG | 30775-668 | -19.929578 | -43.907053 |
+| 196 | Júlia Martins | Sao Paulo | Rua São Bento, 5410, 01605-295 São Paulo - SP | 01605-295 | -23.544049 | -46.637627 |
+| 197 | Júlia Moreira | Recife | Rua do Giriquiti, 7340, 50146-087 Recife - PE | 50146-087 | -8.029479 | -34.942055 |
+| 198 | Rodrigo Moura | Salvador | Rua Francisco Muniz Barreto, 5926, 40584-681 Salvador - BA | 40584-681 | -12.942919 | -38.513735 |
+| 199 | Iraci Lima | Sao Paulo | Rua Celso Garcia, 3181, Apto 872, 01417-237 São Paulo - SP | 01417-237 | -23.518868 | -46.609607 |
+| 200 | Bianca Medeiros | Curitiba | Rua Marechal Hermes, 3301, Apto 281, 80229-139 Curitiba - PR | 80229-139 | -25.428167 | -49.229220 |
 
 This location coherence is valuable when testing geospatial applications, address validation systems, or any scenario where realistic, internally-consistent location data matters.
 
@@ -82,7 +82,7 @@ This location coherence is valuable when testing geospatial applications, addres
 
 Pointblank automatically links related columns to produce realistic rows. There are three coherence systems that activate based on which presets appear together in a schema:
 
-**Address coherence** activates when *any* address-related preset is present (`address`, `city`, `state`, `postcode`, `latitude`, `longitude`, `phone_number`, `license_plate`). All of these fields will refer to the same location within each row.
+**Address coherence** activates when *any* address-related preset is present (`address`, `city`, `state`, `postcode`, `latitude`, `longitude`, `phone_number`, `license_plate`). All of these fields will refer to the same location within each row, and the postcode within an `address` is the same as the one in the `postcode` column.
 
 **Person coherence** activates when *any* person-related preset is present (`name`, `name_full`, `first_name`, `last_name`, `email`, `user_name`). The email and username are derived from the person's name.
 
@@ -166,16 +166,16 @@ pb.preview(pb.generate_dataset(schema, n=200, seed=23, country=["US", "DE", "JP"
 | PolarsRows200Columns3 |                  |               |                   |
 |-----------------------|------------------|---------------|-------------------|
 |                       | name *String*    | city *String* | postcode *String* |
-| 1                     | Tanja Krämer     | Bochum        | 44001             |
-| 2                     | Masato Uchiyama  | Takatsuki     | 569-6706          |
-| 3                     | Ashley Nguyen    | South Bend    | 46678             |
-| 4                     | Eugene Bass      | Seattle       | 98121             |
-| 5                     | Verena Schultz   | Munster       | 48746             |
-| 196                   | Kazuki Abe       | Kasuga        | 816-3146          |
-| 197                   | Steven Martinez  | Tacoma        | 98491             |
-| 198                   | Easton Gomez     | Columbus      | 43216             |
-| 199                   | Bettina Bergmann | Homburg       | 66810             |
-| 200                   | Kentaro Kuroda   | Tokyo         | 100-9983          |
+| 1                     | Jens Stark       | Stuttgart     | 70185             |
+| 2                     | Yuka Tsuji       | Saitama       | 330-8698          |
+| 3                     | Grace Adams      | Columbus      | 43297             |
+| 4                     | Teresa Simpson   | San Diego     | 92101             |
+| 5                     | Marion Weber     | Mannheim      | 68861             |
+| 196                   | Takashi Takeuchi | Kitakyushu    | 802-4966          |
+| 197                   | Karen Pruitt     | Tacoma        | 98453             |
+| 198                   | Joseph Webb      | Philadelphia  | 19109             |
+| 199                   | Anna Bischoff    | Pforzheim     | 75697             |
+| 200                   | Masahiro Ishida  | Maizuru       | 625-1032          |
 
 To control the proportion of rows per country, pass a dict mapping country codes to weights. The following generates 200 rows with 70% from the US, 20% from Germany, and 10% from France:
 
@@ -188,19 +188,19 @@ pb.preview(
 )
 ```
 
-| PolarsRows200Columns3 |                |               |                   |
-|-----------------------|----------------|---------------|-------------------|
-|                       | name *String*  | city *String* | postcode *String* |
-| 1                     | Rebecca Walker | Philadelphia  | 19197             |
-| 2                     | Christian Weiß | Leipzig       | 04474             |
-| 3                     | Hannah Ruiz    | South Bend    | 46692             |
-| 4                     | Susan Roberts  | Seattle       | 98149             |
-| 5                     | Betty Johnson  | Grand Rapids  | 49505             |
-| 196                   | Ludwig Klein   | Koblenz       | 56040             |
-| 197                   | Catherine Long | Tacoma        | 98476             |
-| 198                   | Lucy Gonzales  | Columbus      | 43285             |
-| 199                   | Jerry Jimenez  | Los Angeles   | 90019             |
-| 200                   | Charles Gérard | Grenoble      | 38081             |
+| PolarsRows200Columns3 |                     |                |                   |
+|-----------------------|---------------------|----------------|-------------------|
+|                       | name *String*       | city *String*  | postcode *String* |
+| 1                     | Paul West           | Nashville      | 37269             |
+| 2                     | Hannes Roth         | Cologne        | 50749             |
+| 3                     | Brooks Perez        | Columbus       | 43262             |
+| 4                     | Sarah Tucker        | San Diego      | 92164             |
+| 5                     | Sandra Hernandez    | Peoria         | 61600             |
+| 196                   | Alexander Schreiber | Dessau-Rosslau | 06102             |
+| 197                   | Amanda Adams        | Tacoma         | 98475             |
+| 198                   | Liam Long           | Philadelphia   | 19146             |
+| 199                   | Kevin Webb          | San Francisco  | 94156             |
+| 200                   | Dominique Mathieu   | Creteil        | 94001             |
 
 Weights are auto-normalized, so `{"US": 7, "DE": 2, "FR": 1}` is equivalent to the example above. Row counts are allocated using largest-remainder apportionment, ensuring they always sum to exactly `n`.
 
@@ -215,19 +215,19 @@ pb.preview(
 )
 ```
 
-| PolarsRows120Columns3 |                   |               |                   |
-|-----------------------|-------------------|---------------|-------------------|
-|                       | name *String*     | city *String* | postcode *String* |
-| 1                     | Betty Fuller      | Chicago       | 60639             |
-| 2                     | Ethan Vargas      | Columbus      | 31927             |
-| 3                     | Ronan Johnson     | Cary          | 27523             |
-| 4                     | Jessica Warren    | Miami         | 33110             |
-| 5                     | Jennifer Thomas   | Tacoma        | 98449             |
-| 116                   | Masami Chiba      | Hakodate      | 040-3074          |
-| 117                   | Yoshiko Kadota    | Nagoya        | 450-2994          |
-| 118                   | Hiromi Nakajima   | Nagaoka       | 940-1069          |
-| 119                   | Nobutaka Hasegawa | Sagamihara    | 252-8869          |
-| 120                   | Takuya Yamane     | Toyohashi     | 440-7355          |
+| PolarsRows120Columns3 |                 |               |                   |
+|-----------------------|-----------------|---------------|-------------------|
+|                       | name *String*   | city *String* | postcode *String* |
+| 1                     | Jeffrey Shaw    | Raleigh       | 27688             |
+| 2                     | Laura Vargas    | Austin        | 78795             |
+| 3                     | David Higgins   | El Paso       | 79947             |
+| 4                     | Victor Long     | Greensboro    | 27435             |
+| 5                     | Mark Reyes      | Tacoma        | 98436             |
+| 116                   | Yuma Kitazawa   | Hiroshima     | 730-9056          |
+| 117                   | Kanako Ishii    | Machida       | 194-7408          |
+| 118                   | Hayato Nagasawa | Osaka         | 530-6287          |
+| 119                   | Chika Hasegawa  | Yokohama      | 220-3853          |
+| 120                   | Eriko Tanaka    | Kawagoe       | 350-0103          |
 
 All coherence systems (address, person, business) work correctly within each country's batch of rows. A French row will have a French name with a matching French email; a Japanese row will have a Japanese name with a matching Japanese email. Non-preset columns (integers, floats, booleans, dates) are generated independently for each batch but still respect their field constraints.
 
@@ -285,18 +285,18 @@ pb.preview(
 )
 ```
 
-| PolarsRows200Columns2 |                  |               |
-|-----------------------|------------------|---------------|
-|                       | name *String*    | city *String* |
-| 1                     | Betty Johnson    | Philadelphia  |
-| 2                     | Miriam Brunner   | Munster       |
-| 3                     | Ashley Terry     | South Bend    |
-| 4                     | Victoria Porter  | Seattle       |
-| 5                     | Paul Cox         | Grand Rapids  |
-| 196                   | Romy Martin      | Dusseldorf    |
-| 197                   | Jeremy Carter    | Tacoma        |
-| 198                   | William Martinez | Columbus      |
-| 199                   | Mateo Stevens    | Los Angeles   |
-| 200                   | Birgit Lindemann | Koblenz       |
+| PolarsRows200Columns2 |                   |               |
+|-----------------------|-------------------|---------------|
+|                       | name *String*     | city *String* |
+| 1                     | Alexander Adams   | Nashville     |
+| 2                     | Markus Jäger      | Kassel        |
+| 3                     | Gary Miller       | Columbus      |
+| 4                     | Carter Jenkins    | San Diego     |
+| 5                     | Lucas Nguyen      | Peoria        |
+| 196                   | Sigrid Zimmermann | Stuttgart     |
+| 197                   | Michelle Ware     | Tacoma        |
+| 198                   | Autumn McDonald   | Philadelphia  |
+| 199                   | Lisa Reyes        | San Francisco |
+| 200                   | Jürgen Fröhlich   | Cologne       |
 
 All 100 supported country locales have tiered name and location data, so `weighted=True` produces realistic frequency distributions for every country.
