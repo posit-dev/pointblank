@@ -18357,8 +18357,10 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
     n
         Number of rows to generate. The default is `100`.
     seed
-        Random seed for reproducibility. If provided, the same seed will produce
-        the same data. Default is `None` (non-deterministic).
+        Random seed for reproducibility. If provided, the same seed will produce the same data (in
+        any Python session). Each column draws from its own random sequence, derived from the seed
+        and the column name, so two columns with the same field get different values and have
+        their missing values in different rows. Default is `None` (non-deterministic).
     output
         Output format for the generated data. Options are: (1) `"polars"` (the default) returns a
         Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns
@@ -19124,7 +19126,7 @@ bool_field(p_true: 'float' = 0.5, nullable: 'bool' = False, null_probability: 'f
     pb.preview(pb.generate_dataset(schema, n=30, seed=10))
     ```
 
-    Here, `email_verified` is `True` in 26 of the 30 rows and `is_admin` in 3 of them. These
+    Here, `email_verified` is `True` in 24 of the 30 rows and `is_admin` in 1 of them. These
     counts are close to, but not exactly, the `p_true=` values of `0.9` and `0.05`, since each
     value is drawn independently.
     
@@ -19443,7 +19445,7 @@ time_field(min_time: 'str | time | None' = None, max_time: 'str | time | None' =
     ```
 
     Every `check_in` time falls in the morning window and every non-missing `check_out` time in the
-    late afternoon or evening one, with 6 of the 30 `check_out` values missing. The `employee_id`
+    late afternoon or evening one, with 7 of the 30 `check_out` values missing. The `employee_id`
     values are distinct three-digit numbers.
     
 
