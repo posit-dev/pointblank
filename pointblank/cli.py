@@ -4675,6 +4675,14 @@ validation = (
         "counts failing test units and steps that couldn't be evaluated)"
     ),
 )
+@click.option(
+    "--allow-python",
+    is_flag=True,
+    help=(
+        "Run Python code in a YAML config (python: blocks and the expr/pre/active shortcuts). "
+        "The code has full access to your system, so only use this with YAML you trust"
+    ),
+)
 def run(
     validation_file: str | None,
     data: str | None,
@@ -4684,6 +4692,7 @@ def run(
     write_extract: str | None,
     limit: int,
     fail_on: str | None,
+    allow_python: bool,
 ) -> None:
     """
     Run a Pointblank validation script or YAML configuration.
@@ -4697,6 +4706,10 @@ def run(
 
     If --data is provided, it will automatically replace the data source in your
     validation objects (Python scripts) or override the 'tbl' field (YAML configs).
+
+    Python code in a YAML config isn't run unless you use --allow-python. Only do that
+    for YAML you trust, since the code runs with full access to your system (as a
+    Python script does).
 
     To get started quickly, use 'pb make-template' to create templates.
 
@@ -4719,6 +4732,7 @@ def run(
     pb run validation_config.yaml --data small_table --output-html report.html
     pb run validation_script.py --show-extract --fail-on error
     pb run validation_config.yaml --write-extract extracts_folder --fail-on critical
+    pb run trusted_config.yaml --allow-python  # Run Python code in the YAML
     """
     try:
         # Handle missing validation_file with concise help
@@ -4770,11 +4784,11 @@ def run(
                         config["tbl"] = cli_data
 
                         # Build and execute validation with modified config
-                        validation = validator.execute_workflow(config)
+                        validation = validator.execute_workflow(config, allow_python=allow_python)
 
                     else:
                         # Use YAML config as-is
-                        validation = yaml_interrogate(validation_file)
+                        validation = yaml_interrogate(validation_file, allow_python=allow_python)
 
                     validations.append(validation)
 

@@ -168,6 +168,35 @@ tbl:
     )
 ```
 
+### Allowing Python Code to Run
+
+Python code in a YAML configuration only runs if you allow it, with `allow_python=True` in
+`yaml_interrogate()` (or the `--allow-python` flag of `pb run`):
+
+```python
+result = pb.yaml_interrogate("validation.yaml", allow_python=True)
+```
+
+Without it, a configuration that contains Python code raises an error saying so. Python code in YAML
+isn't sandboxed: it runs with the same access as any Python script you run, so it can read and
+write files, make network requests, or run commands. Treat a YAML configuration that contains Python
+code like a Python script, and only allow it for configurations you wrote or otherwise trust.
+
+A few `pb` functions don't need `allow_python=True` when they're called with plain values (strings,
+numbers, lists, and so on): `pb.load_dataset()`, `pb.col()`, `pb.ref()`, `pb.seg_group()`,
+`pb.has_columns()`, `pb.has_rows()`, and the column selectors (`pb.starts_with()`, `pb.ends_with()`,
+`pb.contains()`, `pb.matches()`, `pb.everything()`, `pb.first_n()`, and `pb.last_n()`). These only
+load a bundled dataset or build an object, so a configuration like this one works without it:
+
+```yaml
+tbl:
+  python: pb.load_dataset("small_table", tbl_type="polars")
+steps:
+  - col_vals_gt:
+      columns: [d]
+      value: pb.col("c")
+```
+
 ## Reusable Templates with `set_tbl=`
 
 One of the most powerful features of YAML validation workflows is the ability to create reusable
@@ -598,10 +627,10 @@ steps:
       columns: [transaction_id, amount]
 ```
 
-Note: The Python environment in YAML actions is restricted for security. You can use built-in
-functions like `print()`, basic operations, and available DataFrame libraries, but cannot import
-external modules like `requests` or `logging`. For external notifications, consider using string
-template actions or handling alerts in your application code after the validation completes.
+Callable actions are Python code, so they only run with `allow_python=True` (see [Allowing Python
+Code to Run](#allowing-python-code-to-run)). The code isn't sandboxed and has the same access as any
+Python script, so only allow it for configurations you trust. String template actions are plain
+text and always work.
 
 ### Step-level Actions
 
@@ -653,7 +682,8 @@ steps:
 ```
 
 Note that you can use either the explicit `python:` block syntax or the shortcut syntax (just
-`pre: |`) for the lambda expressions.
+`pre: |`) for the lambda expressions. Either way, `pre` functions are Python code and need
+`allow_python=True`, as do the custom expressions in the next section.
 
 ### Complex Expressions
 
@@ -886,6 +916,10 @@ python_code = pb.yaml_to_python(yaml_config)
 print(python_code)
 ```
 
+`yaml_to_python()` never runs Python code from the configuration: it copies the code into the
+generated Python as written, so it doesn't need `allow_python=True`. Read the generated code before
+you run it.
+
 This is useful for:
 
 - learning how YAML maps to Python API calls
@@ -956,6 +990,10 @@ steps:
           pl.col("event_date").str.strptime(pl.Date, "%Y-%m-%d").is_not_null()
       brief: "Event dates must be valid YYYY-MM-DD format"
 ```
+
+This configuration contains Python code (the `tbl` expression, the `error` action, and the custom
+expression), so it needs `allow_python=True` in `yaml_interrogate()` or `--allow-python` with
+`pb run`.
 
 ### Quality Monitoring Dashboard
 

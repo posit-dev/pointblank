@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import ast
 import json
+import operator
 import re
 from importlib import import_module
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterable, Mapping, Optional, Union
+from typing import Any, Iterable, Literal, Mapping, Optional, Union
 
 import yaml
 
@@ -30,9 +32,6 @@ def _missing_spec_from_dict(spec_def: dict) -> MissingSpec:
     )
 
 
-if TYPE_CHECKING:
-    from typing import Literal
-
 # A column reference written directly as a step value (e.g., `value: pb.col("b")`)
 _COLUMN_REF_PATTERN = re.compile(r"\s*pb\.(col|ref)\(.*\)\s*", re.DOTALL)
 
@@ -43,119 +42,201 @@ class YAMLValidationError(Exception):
     pass
 
 
-def _safe_eval_python_code(
-    code: str, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
-) -> Any:
-    """Safely evaluate Python code with restricted namespace.
+# How Python code in a YAML config is handled: "deny" raises an error (the default, since the
+# code can do anything the Python session can), "allow" runs it (`allow_python=True`), and
+# "source" keeps it as source text without running it (used by `yaml_to_python()`)
+_PythonMode = Literal["deny", "allow", "source"]
 
-    This function provides a controlled environment for executing Python code embedded in YAML
-    configurations. It includes common libraries and functions while restricting access to
-    dangerous operations.
+# The `pb` functions that YAML can use without `allow_python=True`: they only build column
+# references, column selectors, segment groups, and `active=` checks from literal arguments, or
+# load one of the bundled datasets
+_DECLARATIVE_PB_FUNCTIONS = frozenset(
+    {
+        "load_dataset",
+        "col",
+        "ref",
+        "seg_group",
+        "has_columns",
+        "has_rows",
+        "starts_with",
+        "ends_with",
+        "contains",
+        "matches",
+        "everything",
+        "first_n",
+        "last_n",
+    }
+)
+
+# Operators that combine column selectors (e.g., `pb.starts_with("a") & pb.ends_with("z")`) or
+# negate a number
+_DECLARATIVE_BINARY_OPS = {
+    ast.BitAnd: operator.and_,
+    ast.BitOr: operator.or_,
+    ast.Sub: operator.sub,
+}
+_DECLARATIVE_UNARY_OPS = {
+    ast.Invert: operator.invert,
+    ast.USub: operator.neg,
+}
+
+
+class _NotDeclarative(Exception):
+    """Raised when YAML code is outside the subset that runs without `allow_python=True`."""
+
+
+class _PythonSource:
+    """Python code from a YAML config, kept as source text instead of being run."""
+
+    def __init__(self, code: str) -> None:
+        self.code = code.strip()
+
+    def __repr__(self) -> str:
+        return self.code
+
+    __str__ = __repr__
+
+
+def _eval_declarative_node(node: ast.AST) -> Any:
+    """Evaluate an expression node from the declarative subset, or raise `_NotDeclarative`."""
+    import pointblank as pb
+
+    if isinstance(node, ast.Constant):
+        return node.value
+    if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+        items = [_eval_declarative_node(item) for item in node.elts]
+        return {ast.List: list, ast.Tuple: tuple, ast.Set: set}[type(node)](items)
+    if isinstance(node, ast.Dict) and None not in node.keys:
+        return {
+            _eval_declarative_node(k): _eval_declarative_node(v)
+            for k, v in zip(node.keys, node.values)
+        }
+    if isinstance(node, ast.BinOp) and type(node.op) in _DECLARATIVE_BINARY_OPS:
+        return _DECLARATIVE_BINARY_OPS[type(node.op)](
+            _eval_declarative_node(node.left), _eval_declarative_node(node.right)
+        )
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _DECLARATIVE_UNARY_OPS:
+        return _DECLARATIVE_UNARY_OPS[type(node.op)](_eval_declarative_node(node.operand))
+    if (
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and isinstance(node.func.value, ast.Name)
+        and node.func.value.id == "pb"
+        and node.func.attr in _DECLARATIVE_PB_FUNCTIONS
+        and not any(isinstance(arg, ast.Starred) for arg in node.args)
+        and all(kw.arg is not None for kw in node.keywords)
+    ):
+        args = [_eval_declarative_node(arg) for arg in node.args]
+        kwargs = {kw.arg: _eval_declarative_node(kw.value) for kw in node.keywords}
+        return getattr(pb, node.func.attr)(*args, **kwargs)
+    raise _NotDeclarative
+
+
+def _eval_declarative_code(code: str) -> Any:
+    """Evaluate code that is in the declarative subset, or raise `_NotDeclarative`.
+
+    The subset is a single expression made of literals and calls to the `pb` functions in
+    `_DECLARATIVE_PB_FUNCTIONS` (e.g., `pb.col("b")` or `pb.has_columns("a", "b")`). It's
+    evaluated by walking the syntax tree, so nothing else can be reached.
+    """
+    try:
+        tree = ast.parse(code.strip(), mode="eval")
+    except SyntaxError:
+        raise _NotDeclarative
+    return _eval_declarative_node(tree.body)
+
+
+def _python_not_allowed_error(code: str) -> YAMLValidationError:
+    snippet = " ".join(code.split())
+    if len(snippet) > 80:
+        snippet = snippet[:77] + "..."
+    return YAMLValidationError(
+        f"This YAML config contains Python code, which isn't run unless you allow it: "
+        f"`{snippet}`. Python code in a YAML config can do anything your Python session can "
+        "(read and write files, run commands), so only allow it for configs you trust: use "
+        "`yaml_interrogate(..., allow_python=True)` or `pb run --allow-python`."
+    )
+
+
+def _eval_python_code(
+    code: str,
+    namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
+    python_mode: _PythonMode = "deny",
+) -> Any:
+    """Evaluate Python code embedded in a YAML configuration.
+
+    Code in the declarative subset (see `_eval_declarative_code()`) is always evaluated. Other
+    code raises an error with `python_mode="deny"`, is kept as `_PythonSource` text with
+    `python_mode="source"`, and is run as ordinary Python with `python_mode="allow"`. Running it
+    is not sandboxed: the code has the full access of the Python session, with `pb`, `pl`, `pd`,
+    `Path`, and any `namespaces=` modules already imported.
 
     Parameters
     ----------
     code
         The Python code to evaluate.
+    namespaces
+        Modules to make available to the code, as a mapping of aliases to module names or a list
+        of module names.
+    python_mode
+        How to handle code outside the declarative subset: `"deny"`, `"allow"`, or `"source"`.
 
     Returns
     -------
     Any
-        The result of evaluating the Python code.
+        The result of evaluating the Python code (its last expression, for multi-line code).
 
     Raises
     ------
     YAMLValidationError
-        If the code execution fails or contains unsafe operations.
+        If the code isn't allowed to run, or running it fails.
     """
-    import ast
-    import re
-    from pathlib import Path
+    if not isinstance(code, str):
+        raise YAMLValidationError(f"Python code in YAML must be a string, got: {code!r}")
 
-    from pointblank._utils import _is_lib_present
+    if python_mode == "source":
+        return _PythonSource(code)
 
-    # Create a safe namespace with commonly needed imports
-    safe_namespace = {
-        "Path": Path,  # pathlib.Path
-        "__builtins__": {
-            # Allow basic built-in functions
-            "len": len,
-            "str": str,
-            "int": int,
-            "float": float,
-            "bool": bool,
-            "list": list,
-            "dict": dict,
-            "tuple": tuple,
-            "set": set,
-            "range": range,
-            "enumerate": enumerate,
-            "zip": zip,
-            "sum": sum,
-            "min": min,
-            "max": max,
-            "abs": abs,
-            "round": round,
-            "print": print,
-            "__import__": __import__,
-        },
-    }
+    try:
+        return _eval_declarative_code(code)
+    except _NotDeclarative:
+        pass
+    except Exception as e:
+        raise YAMLValidationError(f"Error evaluating '{code.strip()}': {e}")
 
-    # Add pointblank itself to the namespace
+    if python_mode != "allow":
+        raise _python_not_allowed_error(code)
+
     import pointblank as pb
 
-    safe_namespace["pb"] = pb
+    namespace: dict[str, Any] = {"Path": Path, "pb": pb}
 
-    # Add polars if available
     if _is_lib_present("polars"):
         import polars as pl
 
-        safe_namespace["pl"] = pl
+        namespace["pl"] = pl
 
-    # Add pandas if available
     if _is_lib_present("pandas"):
         import pandas as pd
 
-        safe_namespace["pd"] = pd
+        namespace["pd"] = pd
 
     if namespaces:
         for alias, module_name in (
             namespaces.items() if isinstance(namespaces, dict) else ((m, m) for m in namespaces)
         ):
             try:
-                safe_namespace[alias] = import_module(str(module_name))
+                namespace[alias] = import_module(str(module_name))
             except ImportError as e:  # TODO: This is basically redundant, remove?
                 raise ImportError(
                     f"Could not import requested namespace '{module_name}': {e}"
                 ) from e
 
-    # Check for dangerous patterns and be more specific about __import__ to allow legitimate use
-    dangerous_patterns = [
-        r"import\s+os\b",
-        r"import\s+sys\b",
-        r"import\s+subprocess\b",
-        r"__import__\s*\(\s*['\"]os['\"]",
-        r"__import__\s*\(\s*['\"]sys['\"]",
-        r"__import__\s*\(\s*['\"]subprocess['\"]",
-        r"exec\s*\(",
-        r"eval\s*\(",
-        r"open\s*\(",
-        r"file\s*\(",
-        r"input\s*\(",
-        r"raw_input\s*\(",
-    ]
-
-    for pattern in dangerous_patterns:
-        if re.search(pattern, code, re.IGNORECASE):
-            raise YAMLValidationError(
-                f"Potentially unsafe Python code detected: '{code}'. "
-                f"Pattern '{pattern}' is not allowed."
-            )
-
     try:
         # First try to parse as expression for simple cases
         try:
             parsed = ast.parse(code, mode="eval")
-            return eval(compile(parsed, "<string>", "eval"), safe_namespace)
+            return eval(compile(parsed, "<string>", "eval"), namespace)
         except SyntaxError:
             # If that fails, try as a statement (for more complex code)
             # For multi-statement code, we need to capture the result of the last expression
@@ -170,14 +251,14 @@ def _safe_eval_python_code(
                 # Execute the statements first
                 if statements:
                     statements_module = ast.Module(body=statements, type_ignores=[])
-                    exec(compile(statements_module, "<string>", "exec"), safe_namespace)
+                    exec(compile(statements_module, "<string>", "exec"), namespace)
 
                 # Then evaluate the last expression and return its value
                 expr_module = ast.Expression(body=last_expr)
-                return eval(compile(expr_module, "<string>", "eval"), safe_namespace)
+                return eval(compile(expr_module, "<string>", "eval"), namespace)
             else:
                 # No expression at the end, just execute statements
-                exec(compile(parsed, "<string>", "exec"), safe_namespace)
+                exec(compile(parsed, "<string>", "exec"), namespace)
                 return None
 
     except Exception as e:
@@ -185,9 +266,14 @@ def _safe_eval_python_code(
 
 
 def _process_python_expressions(
-    value: Any, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
+    value: Any,
+    namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
+    python_mode: _PythonMode = "deny",
 ) -> Any:
     """Process Python code snippets embedded in YAML values.
+
+    Code is evaluated with `_eval_python_code()`, so `python_mode=` decides whether code outside
+    the declarative subset raises an error, runs, or is kept as source text.
 
     This function supports the python: block syntax for embedding Python code:
 
@@ -216,25 +302,35 @@ def _process_python_expressions(
     --------
     # Returns the result of the Python expression
     >>> import polars as pl
-    >>> expr = _process_python_expressions({"python": "pl.scan_csv('data.csv').head(10)"})
+    >>> expr = _process_python_expressions(
+    ...     {"python": "pl.scan_csv('data.csv').head(10)"}, python_mode="allow"
+    ... )
     >>> assert isinstance(expr, pl.LazyFrame)
 
     # Returns the result of multiline Python code
-    >>> expr = _process_python_expressions({"python": "import polars as pl\\npl.scan_csv('data.csv')"})
+    >>> expr = _process_python_expressions(
+    ...     {"python": "import polars as pl\\npl.scan_csv('data.csv')"}, python_mode="allow"
+    ... )
     >>> assert isinstance(expr, pl.LazyFrame)
     """
     if isinstance(value, dict):
         # Handle python: block syntax
         if "python" in value and len(value) == 1:
             code = value["python"]
-            return _safe_eval_python_code(code, namespaces=namespaces)
+            return _eval_python_code(code, namespaces=namespaces, python_mode=python_mode)
 
         # Recursively process dictionary values
-        return {k: _process_python_expressions(v, namespaces=namespaces) for k, v in value.items()}
+        return {
+            k: _process_python_expressions(v, namespaces=namespaces, python_mode=python_mode)
+            for k, v in value.items()
+        }
 
     elif isinstance(value, list):
         # Recursively process list items
-        return [_process_python_expressions(item, namespaces=namespaces) for item in value]
+        return [
+            _process_python_expressions(item, namespaces=namespaces, python_mode=python_mode)
+            for item in value
+        ]
 
     else:
         # Return primitive types unchanged
@@ -439,7 +535,10 @@ class YAMLValidator:
                         )
 
     def _load_data_source(
-        self, tbl_spec: str, df_library: Literal["polars", "pandas", "duckdb"]
+        self,
+        tbl_spec: str,
+        df_library: Literal["polars", "pandas", "duckdb"],
+        python_mode: _PythonMode = "deny",
     ) -> Any:
         """Load data source based on table specification.
 
@@ -451,6 +550,8 @@ class YAMLValidator:
             Python code snippet to be executed for dynamic data loading.
         df_library
             DataFrame library to use for loading datasets and CSV files. Options: "polars", "pandas", "duckdb".
+        python_mode
+            How to handle Python code in the specification (see `_eval_python_code()`).
 
         Returns
         -------
@@ -465,7 +566,7 @@ class YAMLValidator:
 
         try:
             # First, try to process as Python expression
-            processed_tbl_spec = _process_python_expressions(tbl_spec)
+            processed_tbl_spec = _process_python_expressions(tbl_spec, python_mode=python_mode)
 
             # If processing returned a different object (not a string), use it directly
             if processed_tbl_spec is not tbl_spec or not isinstance(processed_tbl_spec, str):
@@ -486,6 +587,8 @@ class YAMLValidator:
             else:
                 return processed_data  # pragma: no cover
 
+        except YAMLValidationError:
+            raise
         except Exception as e:  # pragma: no cover
             raise YAMLValidationError(f"Failed to load data source '{tbl_spec}': {e}")
 
@@ -700,6 +803,7 @@ class YAMLValidator:
         step_config: Union[str, dict],
         namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
         missing_specs: Optional[dict[str, MissingSpec]] = None,
+        python_mode: _PythonMode = "deny",
     ) -> tuple[str, dict]:
         """Parse a single validation step from YAML configuration.
 
@@ -707,6 +811,8 @@ class YAMLValidator:
         ----------
         step_config
             Step configuration (string for parameterless steps, dict for others).
+        python_mode
+            How to handle Python code in the step's parameters (see `_eval_python_code()`).
 
         Returns
         -------
@@ -755,15 +861,21 @@ class YAMLValidator:
             # Special case: `col_vals_expr()`'s `expr=` parameter can use shortcut syntax
             if method_name == "col_vals_expr" and key == "expr" and isinstance(value, str):
                 # Treat string directly as Python code (shortcut syntax)
-                processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
+                processed_parameters[key] = _eval_python_code(
+                    value, namespaces=namespaces, python_mode=python_mode
+                )
             # Special case: `pre=` parameter can use shortcut syntax (like `expr=`)
             elif key == "pre" and isinstance(value, str):
                 # Treat string directly as Python code (shortcut syntax)
-                processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
+                processed_parameters[key] = _eval_python_code(
+                    value, namespaces=namespaces, python_mode=python_mode
+                )
             # Special case: `active=` parameter can use shortcut syntax for callables
             # (e.g., `active: pb.has_columns("col_a")` or `active: false`)
             elif key == "active" and isinstance(value, str):
-                processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
+                processed_parameters[key] = _eval_python_code(
+                    value, namespaces=namespaces, python_mode=python_mode
+                )
             # Special case: a column reference given as a comparison value can be written directly
             # (e.g., `value: pb.col("b")`) as well as in a `python:` block
             elif (
@@ -771,7 +883,9 @@ class YAMLValidator:
                 and isinstance(value, str)
                 and _COLUMN_REF_PATTERN.fullmatch(value)
             ):
-                processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
+                processed_parameters[key] = _eval_python_code(
+                    value, namespaces=namespaces, python_mode=python_mode
+                )
             elif key == "missing":
                 # Pass the raw value through (a spec name, inline mapping, or MissingSpec); it is
                 # resolved to a MissingSpec below, after the loop
@@ -779,7 +893,7 @@ class YAMLValidator:
             else:
                 # Normal processing (requires python: block syntax)
                 processed_parameters[key] = _process_python_expressions(
-                    value, namespaces=namespaces
+                    value, namespaces=namespaces, python_mode=python_mode
                 )
         parameters = processed_parameters
 
@@ -812,7 +926,7 @@ class YAMLValidator:
                 lambda_expressions = []
                 for expr in expressions:
                     if isinstance(expr, str):
-                        lambda_expressions.append(_safe_eval_python_code(expr))
+                        lambda_expressions.append(_eval_python_code(expr, python_mode=python_mode))
                     else:
                         lambda_expressions.append(expr)  # pragma: no cover
                 # Pass expressions as positional arguments (stored as special key)
@@ -825,7 +939,7 @@ class YAMLValidator:
             expr_value = parameters["expr"]
             if isinstance(expr_value, str):
                 # Treat string directly as Python code (shortcut syntax)
-                parameters["expr"] = _safe_eval_python_code(expr_value)
+                parameters["expr"] = _eval_python_code(expr_value, python_mode=python_mode)
 
         # Convert `actions=` if present (ensure it's an Actions object)
         if "actions" in parameters:
@@ -858,6 +972,7 @@ class YAMLValidator:
         config: dict,
         namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
         tbl: Any = None,
+        allow_python: bool = False,
     ) -> Validate:
         """Convert YAML config to Validate object.
 
@@ -867,15 +982,24 @@ class YAMLValidator:
             Validated configuration dictionary.
         tbl
             A table to validate in place of the config's `tbl` (which is then not loaded).
+        allow_python
+            Whether to run Python code in the config (see `yaml_interrogate()`). Without it, a
+            config with Python code raises a `YAMLValidationError`.
 
         Returns
         -------
         Validate
             Validate object with configured validation steps.
         """
+        python_mode: _PythonMode = "allow" if allow_python else "deny"
+
         # Load data source with specified library
         df_library = config.get("df_library", "polars")
-        data = tbl if tbl is not None else self._load_data_source(config["tbl"], df_library)
+        data = (
+            tbl
+            if tbl is not None
+            else self._load_data_source(config["tbl"], df_library, python_mode=python_mode)
+        )
 
         # Create Validate object
         validate_kwargs = {}
@@ -896,7 +1020,7 @@ class YAMLValidator:
         if "actions" in config:
             # Process actions: handle `python:` block syntax for callables
             processed_actions = _process_python_expressions(
-                config["actions"], namespaces=namespaces
+                config["actions"], namespaces=namespaces, python_mode=python_mode
             )
             # Convert to Actions object
             validate_kwargs["actions"] = Actions(**processed_actions)
@@ -932,7 +1056,7 @@ class YAMLValidator:
             final_actions_spec = config["final_actions"]
             # Process Python expressions in final_actions
             processed_final_actions = _process_python_expressions(
-                final_actions_spec, namespaces=namespaces
+                final_actions_spec, namespaces=namespaces, python_mode=python_mode
             )
             if isinstance(processed_final_actions, list):
                 validate_kwargs["final_actions"] = FinalActions(*processed_final_actions)
@@ -945,7 +1069,7 @@ class YAMLValidator:
         if "reference" in config:
             ref_spec = config["reference"]
             # Process as a data source (could be a dataset name, file path, or python expression)
-            ref_data = self._load_data_source(ref_spec, df_library)
+            ref_data = self._load_data_source(ref_spec, df_library, python_mode=python_mode)
             validate_kwargs["reference"] = ref_data
 
         validation = Validate(data, **validate_kwargs)
@@ -956,7 +1080,10 @@ class YAMLValidator:
         # Add validation steps
         for step_config in config["steps"]:
             method_name, parameters = self._parse_validation_step(
-                step_config, namespaces=namespaces, missing_specs=missing_specs
+                step_config,
+                namespaces=namespaces,
+                missing_specs=missing_specs,
+                python_mode=python_mode,
             )
 
             # Get the method from the validation object
@@ -973,7 +1100,10 @@ class YAMLValidator:
         return validation
 
     def execute_workflow(
-        self, config: dict, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
+        self,
+        config: dict,
+        namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
+        allow_python: bool = False,
     ) -> Validate:
         """Execute a complete YAML validation workflow.
 
@@ -981,6 +1111,8 @@ class YAMLValidator:
         ----------
         config
             Validated configuration dictionary.
+        allow_python
+            Whether to run Python code in the config (see `yaml_interrogate()`).
 
         Returns
         -------
@@ -988,7 +1120,7 @@ class YAMLValidator:
             Interrogated Validate object with results.
         """
         # Build the validation plan
-        validation = self.build_validation(config, namespaces=namespaces)
+        validation = self.build_validation(config, namespaces=namespaces, allow_python=allow_python)
 
         # Execute interrogation to get results
         validation = validation.interrogate()
@@ -1000,6 +1132,7 @@ def yaml_interrogate(
     yaml: Union[str, Path],
     set_tbl: Any = None,
     namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
+    allow_python: bool = False,
 ) -> Validate:
     """Execute a YAML-based validation workflow.
 
@@ -1026,7 +1159,16 @@ def yaml_interrogate(
     namespaces
         Optional module namespaces to make available for Python code execution in YAML
         configurations. Can be a dictionary mapping aliases to module names or a list of module
-        names. See the "Using Namespaces" section below for detailed examples.
+        names. This only has an effect with `allow_python=True`. See the "Using Namespaces"
+        section below for detailed examples.
+    allow_python
+        Whether to run Python code in the YAML configuration (`python:` blocks, and the `expr:`,
+        `pre:`, and `active:` shortcuts). This is `False` by default, which makes a configuration
+        with Python code raise a `YAMLValidationError`. Python code in YAML runs with the full
+        access of your Python session (it can read and write files or run commands), so only set
+        this to `True` for configurations you trust. A few `pb` functions called with literal
+        arguments (e.g., `pb.col("b")` or `pb.has_columns("a")`) don't need it. See the "Python
+        Code in YAML" section below.
 
     Returns
     -------
@@ -1039,12 +1181,34 @@ def yaml_interrogate(
     ------
     YAMLValidationError
         If the YAML is invalid, malformed, or execution fails. This includes syntax errors, missing
-        required fields, unknown validation methods, or data loading failures.
+        required fields, unknown validation methods, data loading failures, or Python code in a
+        configuration used without `allow_python=True`.
+
+    Python Code in YAML
+    -------------------
+    A YAML configuration can include Python code: a `python:` block for the data source, a
+    parameter value, or an action, and the `expr:`, `pre:`, and `active:` shortcuts for code
+    written as a plain string. This code isn't run unless you set `allow_python=True`.
+
+    Python code in YAML is not sandboxed. It runs with the same access as the rest of your Python
+    session, so a configuration with Python code should be treated like a Python script: only allow
+    it for configurations you wrote or otherwise trust, never for ones supplied by other users or
+    systems.
+
+    A small set of `pb` functions can always be used, when called with literal arguments (strings,
+    numbers, lists, and so on): [`load_dataset()`](`pointblank.load_dataset`),
+    [`col()`](`pointblank.col`), [`ref()`](`pointblank.ref`),
+    [`seg_group()`](`pointblank.seg_group`), [`has_columns()`](`pointblank.has_columns`),
+    [`has_rows()`](`pointblank.has_rows`), and the column selectors (`starts_with()`, `ends_with()`,
+    `contains()`, `matches()`, `everything()`, `first_n()`, and `last_n()`). These only load a
+    bundled dataset or build an object, so `value: pb.col("b")` or `active: pb.has_columns("a")`
+    work without `allow_python=True`.
 
     Using Namespaces
     ----------------
     The `namespaces=` parameter enables custom Python modules and functions in YAML configurations.
-    This is particularly useful for custom action functions and advanced Python expressions.
+    This is particularly useful for custom action functions and advanced Python expressions. Since
+    these are Python code, both options below need `allow_python=True`.
 
     **Namespace formats:**
 
@@ -1070,7 +1234,7 @@ def yaml_interrogate(
         value: 1000
     '''
 
-    result = pb.yaml_interrogate(yaml_config)
+    result = pb.yaml_interrogate(yaml_config, allow_python=True)
     result
     ```
 
@@ -1100,7 +1264,9 @@ def yaml_interrogate(
     '''
 
     # Use namespaces to make the function available
-    result = pb.yaml_interrogate(yaml_config, namespaces={'actions': '__main__'})
+    result = pb.yaml_interrogate(
+        yaml_config, namespaces={'actions': '__main__'}, allow_python=True
+    )
     result
     ```
 
@@ -1279,6 +1445,10 @@ def yaml_interrogate(
     - col_vals_not_null:
         columns: [a]
         active: true             # Always run (default)
+
+    - col_vals_not_null:
+        columns: [e]
+        active: pb.has_columns("e")  # Run only if column `e` exists
     ```
 
     ### Null Percentage Check
@@ -1336,11 +1506,13 @@ def yaml_interrogate(
     # If `set_tbl=` is provided, build the validation on that table (without loading the config's
     # `tbl`, which may be a placeholder or unavailable) and then interrogate
     if set_tbl is not None:
-        validation = validator.build_validation(config, namespaces=namespaces, tbl=set_tbl)
+        validation = validator.build_validation(
+            config, namespaces=namespaces, tbl=set_tbl, allow_python=allow_python
+        )
         return validation.interrogate()
     else:
         # Standard execution without table override (includes interrogation)
-        return validator.execute_workflow(config, namespaces=namespaces)
+        return validator.execute_workflow(config, namespaces=namespaces, allow_python=allow_python)
 
 
 def load_yaml_config(file_path: Union[str, Path]) -> dict:
@@ -1682,6 +1854,11 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
     library (e.g., `pl.read_csv()`), and other file paths and connection strings are passed to
     `Validate` as strings.
 
+    Python code in the configuration (`python:` blocks, and the `expr:`, `pre:`, and `active:`
+    shortcuts) is copied into the generated code as written, without being run. So, unlike
+    [`yaml_interrogate()`](`pointblank.yaml_interrogate`), this function doesn't need
+    `allow_python=True`, though you should still read the generated code before running it.
+
     Governance metadata (`owner`, `consumers`, `version`) and `reference` are also rendered
     in the generated Python code:
 
@@ -1923,7 +2100,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
         # Handle string steps (parameterless methods like "rows_distinct")
         if isinstance(step_config, str):
             method_name, parameters = validator._parse_validation_step(
-                step_config, namespaces=None, missing_specs=missing_specs
+                step_config, namespaces=None, missing_specs=missing_specs, python_mode="source"
             )
             code_lines.append(f"    .{method_name}()")
             continue
@@ -1947,7 +2124,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                 original_expressions["expr"] = step_params["expr"]
 
         method_name, parameters = validator._parse_validation_step(
-            step_config, namespaces=None, missing_specs=missing_specs
+            step_config, namespaces=None, missing_specs=missing_specs, python_mode="source"
         )
 
         # Apply the original expressions to override the converted lambda functions

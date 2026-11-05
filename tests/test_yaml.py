@@ -7,13 +7,14 @@ import os
 import io
 import contextlib
 
+import pointblank as pb
 from pointblank import load_dataset, yaml_interrogate, validate_yaml, yaml_to_python, Validate
 from pointblank.yaml import (
     load_yaml_config,
     YAMLValidationError,
     YAMLValidator,
     _process_python_expressions,
-    _safe_eval_python_code,
+    _eval_python_code,
 )
 
 import polars as pl
@@ -577,7 +578,7 @@ steps:
     try:
         validator = YAMLValidator()
         config = validator.load_config(yaml_content)
-        validation_result = validator.execute_workflow(config)
+        validation_result = validator.execute_workflow(config, allow_python=True)
     except Exception as e:
         raise
 
@@ -594,11 +595,11 @@ steps:
     try:
         validator = YAMLValidator()
         config = validator.load_config(yaml_content)
-        validation_result = validator.execute_workflow(config)
+        validation_result = validator.execute_workflow(config, allow_python=True)
     except Exception as e:
         raise
 
-    # Test security restrictions
+    # Python code isn't run without `allow_python=True`
     yaml_content = """
 tbl:
   python: |
@@ -609,16 +610,10 @@ steps:
       columns: country
     """
 
-    try:
-        validator = YAMLValidator()
-        config = validator.load_config(yaml_content)
-        validation_result = validator.execute_workflow(config)
-        raise AssertionError("Security restrictions not working")
-    except Exception as e:
-        if isinstance(e, YAMLValidationError) and ("not allowed" in str(e) or "unsafe" in str(e)):
-            pass  # Expected - security restrictions work
-        else:
-            raise
+    validator = YAMLValidator()
+    config = validator.load_config(yaml_content)
+    with pytest.raises(YAMLValidationError, match="allow_python=True"):
+        validator.execute_workflow(config)
 
 
 def test_python_expressions_advanced():
@@ -661,7 +656,7 @@ steps:
     try:
         validator = YAMLValidator()
         config = validator.load_config(yaml_content)
-        validation_result = validator.execute_workflow(config)
+        validation_result = validator.execute_workflow(config, allow_python=True)
 
         # Verify the validation ran successfully
         assert validation_result is not None
@@ -702,7 +697,7 @@ steps:
     try:
         validator = YAMLValidator()
         config = validator.load_config(yaml_content)
-        validation_result = validator.execute_workflow(config)
+        validation_result = validator.execute_workflow(config, allow_python=True)
 
         # Verify the validation ran successfully
         assert validation_result is not None
@@ -747,7 +742,7 @@ steps:
         assert "interrogate()" in python_code
 
         # Test that the original YAML validation works
-        original_result = yaml_interrogate(yaml_content)
+        original_result = yaml_interrogate(yaml_content, allow_python=True)
         assert original_result is not None
         assert len(original_result.validation_info) == 1
         assert original_result.tbl_name == "Expression Test Dataset"
@@ -780,7 +775,7 @@ steps:
     try:
         validator = YAMLValidator()
         config = validator.load_config(yaml_content)
-        result = validator.execute_workflow(config)
+        result = validator.execute_workflow(config, allow_python=True)
         assert result is not None
         validation_info = result.validation_info[0]
         assert validation_info.n_passed == 4  # Values 3, 4, 5, 6 should pass
@@ -1018,7 +1013,7 @@ steps:
 
     try:
         # Test 1: YAML parsing and interrogation
-        result = yaml_interrogate(yaml_content)
+        result = yaml_interrogate(yaml_content, allow_python=True)
         assert result is not None
         assert len(result.validation_info) >= 3
         assert result.label == "NYC Flights Freshness Validation"
@@ -1087,7 +1082,7 @@ steps:
 
     try:
         # Test 1: YAML parsing and interrogation
-        result = yaml_interrogate(yaml_content)
+        result = yaml_interrogate(yaml_content, allow_python=True)
         assert result is not None
         assert len(result.validation_info) >= 3
         assert result.label == "NYC Flights Freshness Validation"
@@ -1202,7 +1197,7 @@ steps:
 
         with contextlib.redirect_stdout(captured_output):
             # Test callable actions
-            result = yaml_interrogate(yaml_content)
+            result = yaml_interrogate(yaml_content, allow_python=True)
             assert result is not None
 
         # Verify the action was executed and printed the expected message
@@ -1290,7 +1285,7 @@ steps:
 
     captured_output = io.StringIO()
     with contextlib.redirect_stdout(captured_output):
-        result = yaml_interrogate(yaml_content_templates)
+        result = yaml_interrogate(yaml_content_templates, allow_python=True)
 
     output_text = captured_output.getvalue()
     assert "Template test: Step 1 failed on column a" in output_text
@@ -1313,7 +1308,7 @@ steps:
 
     captured_output2 = io.StringIO()
     with contextlib.redirect_stdout(captured_output2):
-        result2 = yaml_interrogate(yaml_content_callable)
+        result2 = yaml_interrogate(yaml_content_callable, allow_python=True)
 
     output_text2 = captured_output2.getvalue()
     assert "ERROR: Callable action triggered!" in output_text2
@@ -1336,7 +1331,7 @@ steps:
 
     captured_output3 = io.StringIO()
     with contextlib.redirect_stdout(captured_output3):
-        result3 = yaml_interrogate(yaml_content_multi)
+        result3 = yaml_interrogate(yaml_content_multi, allow_python=True)
 
     output_text3 = captured_output3.getvalue()
     # Should see both warning and error since highest_only is false
@@ -1607,7 +1602,7 @@ def test_col_schema_match_yaml_with_actions():
           complete: false
     """
 
-    result = yaml_interrogate(yaml_content)
+    result = yaml_interrogate(yaml_content, allow_python=True)
     assert result is not None
     assert len(result.validation_info) == 1
     # The validation should fail due to wrong_column not existing
@@ -1710,7 +1705,7 @@ def test_yaml_conjointly_validation():
         brief: "All conditions must pass jointly"
     """
 
-    result = yaml_interrogate(yaml_content)
+    result = yaml_interrogate(yaml_content, allow_python=True)
     assert result is not None
     assert len(result.validation_info) == 1
     # Should pass for small_table dataset
@@ -1734,7 +1729,7 @@ def test_yaml_conjointly_with_thresholds():
         brief: "Joint validation with thresholds"
     """
 
-    result = yaml_interrogate(yaml_content)
+    result = yaml_interrogate(yaml_content, allow_python=True)
     assert result is not None
     assert len(result.validation_info) == 1
     # Since we're checking for a > 0 and d > 0, most should pass
@@ -1753,7 +1748,7 @@ def test_yaml_specially_validation():
         brief: "Custom validation function"
     """
 
-    result = yaml_interrogate(yaml_content)
+    result = yaml_interrogate(yaml_content, allow_python=True)
     assert result is not None
     assert len(result.validation_info) == 1
     # Should pass for small_table dataset
@@ -1776,7 +1771,7 @@ def test_yaml_specially_with_actions():
         brief: "Custom validation with actions"
     """
 
-    result = yaml_interrogate(yaml_content)
+    result = yaml_interrogate(yaml_content, allow_python=True)
     assert result is not None
     assert len(result.validation_info) == 1
     # Some failures are expected
@@ -1795,7 +1790,7 @@ def test_yaml_specially_pandas_syntax():
         brief: "Pandas-style custom validation"
     """
 
-    result = yaml_interrogate(yaml_content)
+    result = yaml_interrogate(yaml_content, allow_python=True)
     assert result is not None
     assert len(result.validation_info) == 1
     # Should pass for small_table dataset
@@ -1818,7 +1813,7 @@ def test_yaml_conjointly_and_specially_combined():
         brief: "Sum validation check"
     """
 
-    result = yaml_interrogate(yaml_content)
+    result = yaml_interrogate(yaml_content, allow_python=True)
     assert result is not None
     assert len(result.validation_info) == 2
     # Both validations should pass
@@ -1839,7 +1834,7 @@ def test_yaml_conjointly_expression_col_syntax():
         brief: "Using expr_col for cross-table compatibility"
     """
 
-    result = yaml_interrogate(yaml_content)
+    result = yaml_interrogate(yaml_content, allow_python=True)
     assert result is not None
     assert len(result.validation_info) == 1
     # Should pass for small_table dataset
@@ -2967,14 +2962,14 @@ def test_yaml_interrogate_template_pattern():
     assert len(q1_result.validation_info) == len(q2_result.validation_info)
 
 
-def test_safe_eval_python_code_simple_expression():
+def test_eval_python_code_simple_expression():
     """Test evaluation of simple expressions."""
 
-    result = _safe_eval_python_code("2 + 3")
+    result = _eval_python_code("2 + 3", python_mode="allow")
     assert result == 5
 
 
-def test_safe_eval_python_code_syntax_error_with_statements():
+def test_eval_python_code_syntax_error_with_statements():
     """Test SyntaxError path with statements followed by expression."""
 
     code = """
@@ -2982,64 +2977,63 @@ x = 10
 y = 20
 x + y
 """
-    result = _safe_eval_python_code(code)
+    result = _eval_python_code(code, python_mode="allow")
     assert result == 30
 
 
-def test_safe_eval_python_code_syntax_error_with_statements_no_final_expression():
+def test_eval_python_code_syntax_error_with_statements_no_final_expression():
     """Test SyntaxError path with statements but no final expression."""
 
     code = """
 x = 10
 y = 20
 """
-    result = _safe_eval_python_code(code)
+    result = _eval_python_code(code, python_mode="allow")
     assert result is None
 
 
-def test_safe_eval_python_code_exception_handling():
-    """Test exception handling in `_safe_eval_python_code()`."""
+def test_eval_python_code_exception_handling():
+    """Test exception handling in `_eval_python_code()`."""
 
     # Use undefined variable to trigger runtime error
     with pytest.raises(Exception):
-        _safe_eval_python_code("undefined_variable + 1")
+        _eval_python_code("undefined_variable + 1", python_mode="allow")
 
 
-def test_safe_eval_python_code_import_error():
-    """Test that imports in eval code raise YAMLValidationError."""
+def test_eval_python_code_denied_by_default():
+    """Test that code outside the declarative subset raises unless it's allowed."""
 
-    with pytest.raises(YAMLValidationError, match="Potentially unsafe Python code"):
-        _safe_eval_python_code("import os")
+    with pytest.raises(YAMLValidationError, match="allow_python=True"):
+        _eval_python_code("import os")
 
 
-def test_safe_eval_python_code_function_call_allowed():
-    """Test that allowed function calls work (print is in the safe namespace)."""
+def test_eval_python_code_function_call_allowed():
+    """Test that built-in function calls work."""
 
-    # print is allowed in safe namespace, so this should work
-    result = _safe_eval_python_code("print('hello')")
+    result = _eval_python_code("print('hello')", python_mode="allow")
     assert result is None  # print returns None
 
 
-def test_safe_eval_python_code_attribute_access_error():
+def test_eval_python_code_attribute_access_error():
     """Test that attribute access to undefined variables raises YAMLValidationError."""
 
     with pytest.raises(YAMLValidationError, match="Error executing Python code"):
-        _safe_eval_python_code("os.path")
+        _eval_python_code("os.path", python_mode="allow")
 
 
-def test_safe_eval_python_code_with_available_namespace():
-    """Test `_safe_eval_python_code()` with available namespace variables."""
+def test_eval_python_code_with_available_namespace():
+    """Test `_eval_python_code()` with available namespace variables."""
 
     # Test with basic arithmetic
-    result = _safe_eval_python_code("5 + 10")
+    result = _eval_python_code("5 + 10", python_mode="allow")
     assert result == 15
 
     # Test with built-in functions
-    result = _safe_eval_python_code("len([1, 2, 3])")
+    result = _eval_python_code("len([1, 2, 3])", python_mode="allow")
     assert result == 3
 
     # Test with multiple operations
-    result = _safe_eval_python_code("max([1, 5, 3]) + min([4, 2, 6])")
+    result = _eval_python_code("max([1, 5, 3]) + min([4, 2, 6])", python_mode="allow")
     assert result == 7
 
 
@@ -3047,7 +3041,7 @@ def test_process_python_expressions_python_block():
     """Test processing dictionary with `python:` block."""
 
     data = {"python": "2 + 3"}
-    result = _process_python_expressions(data)
+    result = _process_python_expressions(data, python_mode="allow")
 
     assert result == 5
 
@@ -3059,7 +3053,7 @@ def test_process_python_expressions_nested_dict():
         "level1": {"python": "10 * 2"},
         "level2": {"normal": "text", "nested": {"python": "5 + 5"}},
     }
-    result = _process_python_expressions(data)
+    result = _process_python_expressions(data, python_mode="allow")
 
     expected = {"level1": 20, "level2": {"normal": "text", "nested": 10}}
     assert result == expected
@@ -3069,7 +3063,7 @@ def test_process_python_expressions_list():
     """Test processing lists with Python expressions."""
 
     data = [{"python": "1 + 1"}, "normal", {"python": "3 * 3"}]
-    result = _process_python_expressions(data)
+    result = _process_python_expressions(data, python_mode="allow")
 
     assert result == [2, "normal", 9]
 
@@ -3082,7 +3076,7 @@ def test_process_python_expressions_mixed_structure():
         "dict": {"python": "7 - 2"},
         "simple": "regular_string",
     }
-    result = _process_python_expressions(data)
+    result = _process_python_expressions(data, python_mode="allow")
 
     expected = {"list": [4, "text"], "dict": 5, "simple": "regular_string"}
     assert result == expected
@@ -3103,7 +3097,7 @@ def test_process_python_expressions_expression_error():
     data = {"python": "undefined_var + 1"}
 
     with pytest.raises(YAMLValidationError, match="Error executing Python code"):
-        _process_python_expressions(data)
+        _process_python_expressions(data, python_mode="allow")
 
 
 def test_yaml_validator_column_parsing():
@@ -3992,7 +3986,9 @@ def test_yaml_custom_actions_namespace_import_functionality():
     # Test that we can import a test module through namespaces
     namespaces = {"test_actions": "tests.test_yaml"}
 
-    result = _safe_eval_python_code("test_actions.test_action_function", namespaces=namespaces)
+    result = _eval_python_code(
+        "test_actions.test_action_function", namespaces=namespaces, python_mode="allow"
+    )
     assert callable(result)
     assert result.__name__ == "test_action_function"
 
@@ -4017,7 +4013,7 @@ def test_yaml_custom_actions_basic_with_dict_namespaces():
 
     captured_output = io.StringIO()
     with contextlib.redirect_stdout(captured_output):
-        result = yaml_interrogate(yaml_content, namespaces=namespaces)
+        result = yaml_interrogate(yaml_content, namespaces=namespaces, allow_python=True)
         assert result is not None
         assert len(result.validation_info) == 1
 
@@ -4045,7 +4041,7 @@ def test_yaml_custom_actions_inline_import():
 
     captured_output = io.StringIO()
     with contextlib.redirect_stdout(captured_output):
-        result = yaml_interrogate(yaml_content)
+        result = yaml_interrogate(yaml_content, allow_python=True)
         assert result is not None
 
     output_text = captured_output.getvalue()
@@ -4068,7 +4064,7 @@ def test_yaml_custom_actions_invalid_namespace_error():
     namespaces = {"some_module": "non.existent.module"}
 
     with pytest.raises(ImportError) as exc_info:
-        yaml_interrogate(yaml_content, namespaces=namespaces)
+        yaml_interrogate(yaml_content, namespaces=namespaces, allow_python=True)
 
     assert "Could not import requested namespace 'non.existent.module'" in str(exc_info.value)
 
@@ -4095,7 +4091,7 @@ def test_yaml_custom_actions_multiple_namespaces():
 
     captured_output = io.StringIO()
     with contextlib.redirect_stdout(captured_output):
-        result = yaml_interrogate(yaml_content, namespaces=namespaces)
+        result = yaml_interrogate(yaml_content, namespaces=namespaces, allow_python=True)
         assert result is not None
 
     output_text = captured_output.getvalue()
@@ -4123,7 +4119,7 @@ def test_yaml_custom_actions_namespaces_list_format():
 
     captured_output = io.StringIO()
     with contextlib.redirect_stdout(captured_output):
-        result = yaml_interrogate(yaml_content, namespaces=namespaces)
+        result = yaml_interrogate(yaml_content, namespaces=namespaces, allow_python=True)
         assert result is not None
 
     output_text = captured_output.getvalue()
@@ -4152,7 +4148,9 @@ def test_yaml_custom_actions_with_set_tbl():
 
     captured_output = io.StringIO()
     with contextlib.redirect_stdout(captured_output):
-        result = yaml_interrogate(yaml_content, set_tbl=test_table, namespaces=namespaces)
+        result = yaml_interrogate(
+            yaml_content, set_tbl=test_table, namespaces=namespaces, allow_python=True
+        )
         assert result is not None
 
     output_text = captured_output.getvalue()
@@ -4178,7 +4176,7 @@ def test_yaml_custom_actions_step_level():
 
     captured_output = io.StringIO()
     with contextlib.redirect_stdout(captured_output):
-        result = yaml_interrogate(yaml_content, namespaces=namespaces)
+        result = yaml_interrogate(yaml_content, namespaces=namespaces, allow_python=True)
         assert result is not None
 
     output_text = captured_output.getvalue()
@@ -4204,7 +4202,7 @@ def test_yaml_custom_actions_empty_namespaces_fallback():
     # Test with None namespaces
     captured_output = io.StringIO()
     with contextlib.redirect_stdout(captured_output):
-        result = yaml_interrogate(yaml_content, namespaces=None)
+        result = yaml_interrogate(yaml_content, namespaces=None, allow_python=True)
         assert result is not None
 
     output_text = captured_output.getvalue()
@@ -4213,7 +4211,7 @@ def test_yaml_custom_actions_empty_namespaces_fallback():
     # Test with empty dict namespaces
     captured_output = io.StringIO()
     with contextlib.redirect_stdout(captured_output):
-        result = yaml_interrogate(yaml_content, namespaces={})
+        result = yaml_interrogate(yaml_content, namespaces={}, allow_python=True)
         assert result is not None
 
     output_text = captured_output.getvalue()
@@ -4259,7 +4257,7 @@ def test_yaml_custom_actions_original_issue_use_case():
 
     captured_output = io.StringIO()
     with contextlib.redirect_stdout(captured_output):
-        result = yaml_interrogate(yaml_content, namespaces=namespaces)
+        result = yaml_interrogate(yaml_content, namespaces=namespaces, allow_python=True)
         assert result is not None
 
     output_text = captured_output.getvalue()
@@ -5751,7 +5749,7 @@ def test_yaml_interrogate_with_final_actions_callable():
       python: |
         lambda: None
     """
-    result = yaml_interrogate(yaml_content)
+    result = yaml_interrogate(yaml_content, allow_python=True)
     assert result is not None
 
 
@@ -5765,5 +5763,219 @@ def test_yaml_interrogate_with_final_actions_list():
       - python: |
           lambda: None
     """
-    result = yaml_interrogate(yaml_content)
+    result = yaml_interrogate(yaml_content, allow_python=True)
     assert result is not None
+
+
+# Python code in YAML only runs with `allow_python=True` (GHSA-j3hh-9qq8-fcwh). Each payload tries
+# to write a marker file, so a missing marker shows that nothing ran.
+_YAML_PYTHON_PAYLOADS = [
+    "Path(r'{marker}').write_text('ran')",
+    "__import__('path' + 'lib').Path(r'{marker}').write_text('ran')",
+    "from pathlib import Path as P\nP(r'{marker}').write_text('ran')",
+    "__import__('importlib').import_module('pathlib').Path(r'{marker}').write_text('ran')",
+    "pb.yaml.Path(r'{marker}').write_text('ran')",
+    "pb.validate.__builtins__['open'](r'{marker}', 'w').write('ran')",
+]
+
+_YAML_PYTHON_LOCATIONS = {
+    "tbl": "tbl:\n  python: |\n{code}\nsteps:\n  - rows_distinct\n",
+    "reference": "tbl: small_table\nreference:\n  python: |\n{code}\nsteps:\n  - rows_distinct\n",
+    "value": (
+        "tbl: small_table\nsteps:\n  - col_vals_gt:\n      columns: [d]\n"
+        "      value:\n        python: |\n{code}\n"
+    ),
+    "pre_shortcut": "tbl: small_table\nsteps:\n  - col_vals_gt:\n      columns: [d]\n"
+    "      value: 0\n      pre: |\n{code}\n",
+    "expr_shortcut": "tbl: small_table\nsteps:\n  - col_vals_expr:\n      expr: |\n{code}\n",
+    "active_shortcut": "tbl: small_table\nsteps:\n  - col_vals_gt:\n      columns: [d]\n"
+    "      value: 0\n      active: |\n{code}\n",
+    "actions": "tbl: small_table\nthresholds:\n  warning: 1\nactions:\n  warning:\n"
+    "    python: |\n{code}\nsteps:\n  - rows_distinct\n",
+    "final_actions": "tbl: small_table\nfinal_actions:\n  python: |\n{code}\nsteps:\n"
+    "  - rows_distinct\n",
+}
+
+_YAML_PYTHON_INDENT = {
+    "tbl": 4,
+    "reference": 4,
+    "value": 10,
+    "pre_shortcut": 8,
+    "expr_shortcut": 8,
+    "active_shortcut": 8,
+    "actions": 6,
+    "final_actions": 4,
+}
+
+
+def _yaml_with_python(location, payload, marker):
+    import textwrap
+
+    code = textwrap.indent(payload.format(marker=marker), " " * _YAML_PYTHON_INDENT[location])
+    return _YAML_PYTHON_LOCATIONS[location].format(code=code)
+
+
+@pytest.mark.parametrize("payload", _YAML_PYTHON_PAYLOADS)
+def test_yaml_python_code_denied_by_default(tmp_path, payload):
+    marker = tmp_path / "marker.txt"
+    yaml_content = _yaml_with_python("tbl", payload, marker)
+
+    with pytest.raises(YAMLValidationError, match="allow_python=True"):
+        yaml_interrogate(yaml_content)
+
+    assert not marker.exists()
+
+
+@pytest.mark.parametrize("location", list(_YAML_PYTHON_LOCATIONS))
+def test_yaml_python_code_denied_in_every_location(tmp_path, location):
+    marker = tmp_path / "marker.txt"
+    yaml_content = _yaml_with_python(location, _YAML_PYTHON_PAYLOADS[0], marker)
+
+    with pytest.raises(YAMLValidationError, match="allow_python=True"):
+        yaml_interrogate(yaml_content)
+    with pytest.raises(YAMLValidationError, match="allow_python=True"):
+        YAMLValidator().build_validation(load_yaml_config(yaml_content))
+
+    assert not marker.exists()
+
+
+def test_yaml_python_code_denied_after_column_reference(tmp_path):
+    # A value that starts like `pb.col(...)` but goes on to run other code
+    marker = tmp_path / "marker.txt"
+    yaml_content = f"""
+    tbl: small_table
+    steps:
+      - col_vals_gt:
+          columns: [d]
+          value: pb.col("c") or Path(r'{marker}').write_text('ran')
+    """
+
+    with pytest.raises(YAMLValidationError, match="allow_python=True"):
+        yaml_interrogate(yaml_content)
+
+    assert not marker.exists()
+
+
+@pytest.mark.parametrize(
+    "code",
+    [
+        "pb.col(*['c'])",
+        "pb.col(**{'exprs': 'c'})",
+        "pb.col(name)",
+        "getattr(pb, 'col')('c')",
+        "pb.col('c').str",
+        "pb.Validate(None)",
+        "pb.col",
+        "[c for c in 'ab']",
+        "{**{'a': 1}}",
+    ],
+)
+def test_eval_python_code_outside_declarative_subset_denied(code):
+    with pytest.raises(YAMLValidationError, match="allow_python=True"):
+        _eval_python_code(code)
+
+
+def test_yaml_python_code_runs_with_allow_python(tmp_path):
+    marker = tmp_path / "marker.txt"
+    yaml_content = f"""
+    tbl:
+      python: |
+        (Path(r'{marker}').write_text('ran'), pb.load_dataset("small_table"))[1]
+    steps:
+      - col_exists:
+          columns: [a]
+    """
+
+    result = yaml_interrogate(yaml_content, allow_python=True)
+
+    assert marker.read_text() == "ran"
+    assert result.all_passed()
+
+
+def test_yaml_declarative_python_runs_without_allow_python():
+    yaml_content = """
+    tbl:
+      python: pb.load_dataset("small_table", tbl_type="polars")
+    reference:
+      python: pb.load_dataset(dataset="small_table", tbl_type="polars")
+    steps:
+      - col_vals_ge:
+          columns: [d]
+          value: pb.col("c")
+          na_pass: true
+          active: pb.has_columns(["c", "d"])
+      - col_vals_not_null:
+          columns:
+            python: pb.starts_with("d") | pb.matches("^a$")
+      - col_vals_not_null:
+          columns: [a]
+          segments:
+            - - f
+              - python: pb.seg_group(["low", "mid"])
+      - col_vals_lt:
+          columns: [a]
+          value: 100
+          active:
+            python: pb.has_columns("zzz")
+    """
+
+    result = yaml_interrogate(yaml_content)
+
+    steps = result.validation_info
+    assert repr(steps[0].values) == repr(pb.col("c"))
+    assert steps[0].active is True
+    assert steps[-1].active is False
+
+
+@pytest.mark.parametrize(
+    "code, expected",
+    [
+        ('pb.ref("d")', pb.ref("d")),
+        ("pb.has_rows(min=1)", None),
+        ("pb.col('a')", pb.col("a")),
+        ("~pb.ends_with('x')", None),
+        ("pb.first_n(2) - pb.last_n(1)", None),
+        ("pb.everything() & pb.contains('a')", None),
+        ("[1, -2.5, 'a', None, True]", [1, -2.5, "a", None, True]),
+        ("{'a': (1, 2)}", {"a": (1, 2)}),
+    ],
+)
+def test_eval_python_code_declarative_subset(code, expected):
+    result = _eval_python_code(code)
+
+    if expected is not None:
+        assert repr(result) == repr(expected)
+
+
+def test_yaml_to_python_does_not_run_python_code(tmp_path):
+    marker = tmp_path / "marker.txt"
+    payload = f"Path(r'{marker}').write_text('ran')"
+    yaml_content = f"""
+    tbl:
+      python: |
+        {payload}
+    steps:
+      - col_vals_gt:
+          columns: [d]
+          value: 0
+          pre: |
+            lambda df: {payload}
+    """
+
+    code = yaml_to_python(yaml_content)
+
+    assert not marker.exists()
+    assert payload in code
+
+
+def test_to_yaml_roundtrip_without_allow_python():
+    validation = (
+        Validate(data=load_dataset("small_table", tbl_type="polars"))
+        .col_vals_ge(columns="d", value=pb.col("c"), na_pass=True)
+        .col_vals_not_null(columns="a", segments=("f", pb.seg_group(["low", "mid"])))
+    )
+
+    yaml_content = validation.to_yaml()
+    result = yaml_interrogate(yaml_content, set_tbl=load_dataset("small_table", tbl_type="polars"))
+
+    assert len(result.validation_info) == len(validation.interrogate().validation_info)

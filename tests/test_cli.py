@@ -1248,6 +1248,33 @@ def test_run_command_invalid_script(runner, tmp_path):
     assert "Error executing validation script:" in result.output
 
 
+@pytest.mark.parametrize("use_data", [False, True])
+def test_run_command_yaml_python_needs_allow_python(runner, tmp_path, use_data):
+    """Python code in a YAML config only runs with `--allow-python`."""
+    marker = tmp_path / "marker.txt"
+    yaml_file = tmp_path / "config.yaml"
+    yaml_file.write_text(
+        "tbl: small_table\n"
+        "steps:\n"
+        "  - col_vals_not_null:\n"
+        "      columns: [a]\n"
+        "      pre: |\n"
+        f"        lambda df: (Path(r'{marker}').write_text('ran'), df)[1]\n"
+    )
+    args = [str(yaml_file)] + (["--data", "small_table"] if use_data else [])
+
+    result = runner.invoke(run, args)
+
+    assert result.exit_code == 1
+    assert "allow-python" in " ".join(result.output.split())
+    assert not marker.exists()
+
+    result = runner.invoke(run, args + ["--allow-python"])
+
+    assert result.exit_code == 0, result.output
+    assert marker.read_text() == "ran"
+
+
 def test_column_range_selection_edge_cases(runner):
     """Test column range selection with various edge cases."""
     # Test invalid range format
