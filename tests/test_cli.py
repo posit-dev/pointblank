@@ -1073,6 +1073,45 @@ validation = pb.Validate(data=data, thresholds=pb.Thresholds(critical=0.01)).col
     assert result.exit_code in [0, 1]
 
 
+def test_run_command_data_replaces_interrogated_results(runner, tmp_path):
+    """Test that `--data` re-interrogates a script's validation from its steps as defined."""
+    import json
+
+    script_file = tmp_path / "validation.py"
+    json_file = tmp_path / "report.json"
+
+    # `Validate` is imported from its module since `pb.Validate` is mocked in these tests; on the
+    # script's own table, the first two steps can't be evaluated and the last one is inactive
+    script_content = """
+import pointblank as pb
+import polars as pl
+from pointblank.validate import Validate
+
+validation = (
+    Validate(data=pl.DataFrame({"x": [1]}))
+    .col_vals_not_null(columns="a")
+    .col_vals_not_null(columns=pb.starts_with("d"))
+    .col_vals_gt(columns="c", value=0, active=pb.has_columns("date"))
+    .interrogate()
+)
+"""
+    script_file.write_text(script_content)
+
+    result = runner.invoke(
+        run, [str(script_file), "--data", "small_table", "--output-json", str(json_file)]
+    )
+    assert result.exit_code == 0, result.output
+    assert "Re-interrogating with new data" in result.output
+
+    steps = json.loads(json_file.read_text())
+    assert [(s["i"], s["column"], s["active"], s["n_passed"]) for s in steps] == [
+        (1, "a", True, 13),
+        (2, "date", True, 13),
+        (3, "date_time", True, 13),
+        (4, "c", True, 13),
+    ]
+
+
 def test_run_command_invalid_script(runner, tmp_path):
     """Test run command with invalid script."""
     script_file = tmp_path / "bad_script.py"
