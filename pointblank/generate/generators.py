@@ -44,6 +44,20 @@ def _get_locale_generator(
     return LocaleGenerator(country=country, seed=seed, weighted=weighted)
 
 
+def _derive_seed(seed: int | None, *parts: str) -> int | None:
+    """
+    Derive the seed for one part of the generated data (a column, its nulls, a country, ...).
+
+    Each part gets its own random sequence, so that, e.g., two columns with the same field don't
+    get the same values. `random.Random` turns a string seed into an integer with SHA-512, so the
+    derived seed is the same in every Python session (unlike `hash()` of a string). Without a seed
+    there's nothing to derive, and every part is random.
+    """
+    if seed is None:
+        return None
+    return random.Random(":".join([str(seed), *parts])).getrandbits(32)
+
+
 def _generate_integer(field: Field, rng: random.Random, generator: Any | None = None) -> int:
     """Generate a random integer value respecting field constraints."""
     dtype_min, dtype_max = INTEGER_BOUNDS.get(field.dtype, (-(2**63), 2**63 - 1))
@@ -429,7 +443,8 @@ def generate_column(
     field
         The Field specification for the column.
     config
-        Generation configuration.
+        Generation configuration. Its `seed` is the column's own seed (`generate_dataframe()`
+        derives one for each column from the dataset's seed and the column name).
 
     Returns
     -------
@@ -456,7 +471,7 @@ def generate_column(
 
     # Apply null probability
     if field.nullable and field.null_probability > 0:
-        null_rng = random.Random(config.seed + 1 if config.seed else None)
+        null_rng = random.Random(_derive_seed(config.seed, "nulls"))
         values = [None if null_rng.random() < field.null_probability else v for v in values]
 
     return values
@@ -539,7 +554,8 @@ def _generate_column_with_row_context(
     """
     Generate column values with per-row context (location and/or person).
 
-    This is used when columns need to share coherent data per row.
+    This is used when columns need to share coherent data per row. As in `generate_column()`,
+    `config.seed` is the column's own seed.
     """
     rng = random.Random(config.seed)
 
@@ -551,7 +567,7 @@ def _generate_column_with_row_context(
 
     # Apply null probability
     if field.nullable and field.null_probability > 0:
-        null_rng = random.Random(config.seed + 1 if config.seed else None)
+        null_rng = random.Random(_derive_seed(config.seed, "nulls"))
         values = [None if null_rng.random() < field.null_probability else v for v in values]
 
     return values
@@ -571,10 +587,12 @@ def _generate_unique_columns_with_row_context(
     unique column, the row's context is re-drawn and every coherent column is regenerated for
     that row, keeping the row internally consistent.
 
-    Each column uses its own RNG seeded as in `_generate_column_with_row_context()`, so rows
-    generated before any collision are identical to those produced without `unique=True`.
+    Each column uses its own RNG seeded as in `_generate_column_with_row_context()` (with the
+    column seed derived from `config.seed`, the dataset's seed), so rows generated before any
+    collision are identical to those produced without `unique=True`.
     """
-    rngs = {col_name: random.Random(config.seed) for col_name in fields}
+    col_seeds = {col_name: _derive_seed(config.seed, "column", col_name) for col_name in fields}
+    rngs = {col_name: random.Random(col_seeds[col_name]) for col_name in fields}
     unique_cols = [col_name for col_name, field in fields.items() if field.unique]
     seen: dict[str, set[Any]] = {col_name: set() for col_name in unique_cols}
     data: dict[str, list[Any]] = {col_name: [] for col_name in fields}
@@ -608,7 +626,7 @@ def _generate_unique_columns_with_row_context(
     # Apply null probability
     for col_name, field in fields.items():
         if field.nullable and field.null_probability > 0:
-            null_rng = random.Random(config.seed + 1 if config.seed else None)
+            null_rng = random.Random(_derive_seed(col_seeds[col_name], "nulls"))
             data[col_name] = [
                 None if null_rng.random() < field.null_probability else v for v in data[col_name]
             ]
@@ -744,7 +762,11 @@ def _generate_coherent_group(
         data = _generate_unique_columns_with_row_context(coherent_fields, config, shared_locale_gen)
     else:
         data = {
-            col_name: _generate_column_with_row_context(field, config, shared_locale_gen)
+            col_name: _generate_column_with_row_context(
+                field,
+                dc_replace(config, seed=_derive_seed(config.seed, "column", col_name)),
+                shared_locale_gen,
+            )
             for col_name, field in coherent_fields.items()
         }
 
@@ -793,19 +815,22 @@ def _generate_single_country(
     # same data as with one shared context; later groups get a seed derived from their prefix.
     coherent_data: dict[str, list[Any]] = {}
     for group, group_fields in groups.items():
-        if not coherent_data or config.seed is None:
+        if not coherent_data:
             group_seed = config.seed
         else:
-            group_seed = random.Random(f"{config.seed}:{group or ''}").getrandbits(32)
+            group_seed = _derive_seed(config.seed, group or "")
         coherent_data.update(_generate_coherent_group(group_fields, config, country, group_seed))
 
-    # Generate data for each column
+    # Generate data for each column; every column gets its own seed, derived from its name, so
+    # columns don't share random sequences, and adding, removing or reordering columns doesn't
+    # change the others
     data: dict[str, list[Any]] = {}
     for col_name, field in fields.items():
         if col_name in coherent_data:
             data[col_name] = coherent_data[col_name]
         else:
-            data[col_name] = generate_column(field, config)
+            column_config = dc_replace(config, seed=_derive_seed(config.seed, "column", col_name))
+            data[col_name] = generate_column(field, column_config)
 
     return data
 
@@ -853,8 +878,8 @@ def _generate_multi_country(
         return {col_name: [] for col_name in fields}
 
     # Generate per-country data batches.  Each batch gets a deterministic seed
-    # derived from the base seed + country code so results are reproducible and
-    # independent across countries.
+    # derived from the base seed and the country code so results are reproducible
+    # (in any Python session) and independent across countries.
     country_batches: dict[str, dict[str, list[Any]]] = {}
     country_order = list(allocations.keys())
 
@@ -865,10 +890,7 @@ def _generate_multi_country(
 
         # Derive a per-country seed so that adding/removing a country doesn't
         # change the data for the other countries.
-        if config.seed is not None:
-            country_seed = (config.seed + hash(country_code)) % (2**31)
-        else:
-            country_seed = None
+        country_seed = _derive_seed(config.seed, "country", country_code)
 
         from dataclasses import replace as _dc_replace
 
