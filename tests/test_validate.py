@@ -837,6 +837,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "sha1",
         "assertion_type",
         "column",
+        "column_spec",
         "values",
         "inclusive",
         "na_pass",
@@ -877,6 +878,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
     assert val_info.i_o == 1
     assert val_info.assertion_type == "col_vals_gt"
     assert val_info.column == "x"
+    assert val_info.column_spec is None
     assert val_info.values == 0
     assert val_info.na_pass is False
     assert val_info.thresholds == Thresholds()
@@ -925,6 +927,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "sha1",
         "assertion_type",
         "column",
+        "column_spec",
         "values",
         "inclusive",
         "na_pass",
