@@ -1112,6 +1112,132 @@ validation = (
     ]
 
 
+@pytest.mark.parametrize(
+    ("fail_on", "exit_code"),
+    [(None, 0), ("warning", 0), ("any", 1)],
+)
+def test_run_command_inactive_and_unevaluable_steps(runner, tmp_path, fail_on, exit_code):
+    """Test that `pb run` reports inactive and unevaluable steps instead of crashing."""
+    script_file = tmp_path / "validation.py"
+
+    # Step 1 can't be evaluated (no such column), step 2 is inactive, and step 3 passes
+    script_content = """
+import polars as pl
+from pointblank.validate import Validate
+
+validation = (
+    Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    .col_vals_gt(columns="zz", value=0)
+    .col_vals_not_null(columns="a", active=False)
+    .col_vals_not_null(columns="a")
+    .interrogate()
+)
+"""
+    script_file.write_text(script_content)
+
+    args = [str(script_file)] + (["--fail-on", fail_on] if fail_on else [])
+    result = runner.invoke(run, args)
+    assert result.exit_code == exit_code, result.output
+
+    # Rich wraps long lines, so compare against the output with whitespace collapsed
+    output = " ".join(result.output.split())
+    assert "Error displaying validation summary" not in output
+    assert (
+        "Steps: 3 / P: 1 (1 AP) / W: 0 / E: 0 / C: 0 / Not evaluated: 1 / Inactive: 1 / "
+        "incomplete" in output
+    )
+    assert "Step 1 couldn't be evaluated: The target column provided (zz)" in output
+    assert "Validation incomplete: 1 step couldn't be evaluated" in output
+    if fail_on == "any":
+        assert "Exiting with error due to steps that couldn't be evaluated" in output
+
+
+def test_run_command_unevaluable_step_with_threshold_exceedance(runner, tmp_path):
+    """Test that a threshold exceedance outranks an unevaluable step in the `pb run` status."""
+    script_file = tmp_path / "validation.py"
+
+    script_content = """
+import polars as pl
+from pointblank.validate import Validate
+
+validation = (
+    Validate(data=pl.DataFrame({"a": [1, None, 3], "b": ["x", "y", "z"]}), thresholds=(1, 2))
+    .col_vals_gt(columns="b", value=0)
+    .col_vals_not_null(columns="a")
+    .interrogate()
+)
+"""
+    script_file.write_text(script_content)
+
+    result = runner.invoke(run, [str(script_file), "--fail-on", "warning"])
+    assert result.exit_code == 1, result.output
+
+    output = " ".join(result.output.split())
+    assert "Steps: 2 / P: 0 (0 AP) / W: 1 / E: 0 / C: 0 / Not evaluated: 1 / warning" in output
+    assert "Step 1 couldn't be evaluated: Column 'b' is a string" in output
+    assert "Validation failed with warning severity" in output
+    assert "Exiting with error due to warning, error, or critical validation failures" in output
+
+
+def test_validate_command_unevaluable_check(runner, monkeypatch):
+    """Test that `pb validate` reports a check that couldn't be evaluated instead of crashing."""
+    from pointblank.validate import Validate
+
+    # Use the real `Validate` class (the autouse fixture mocks it) on the mocked `small_table`
+    monkeypatch.setattr(pb, "Validate", Validate)
+
+    # Panel borders are dropped along with Rich's line wrapping before comparing
+    result = runner.invoke(
+        validate, ["small_table", "--check", "col-vals-not-null", "--column", "zz"]
+    )
+    assert result.exit_code == 0, result.output
+    output = " ".join(result.output.replace("│", " ").split())
+    assert "Error:" not in output
+    assert "Result ✗ NOT EVALUATED" in output
+    assert "The target column provided (zz) does not match any columns" in output
+    assert "the col-vals-not-null check couldn't be performed on small_table" in output
+
+    result = runner.invoke(
+        validate,
+        ["small_table", "--check", "col-vals-not-null", "--column", "zz", "--exit-code"],
+    )
+    assert result.exit_code == 1, result.output
+
+
+def test_validate_command_unevaluable_check_among_several(runner, monkeypatch):
+    """Test `pb validate` with several checks where one of them can't be evaluated."""
+    from pointblank.validate import Validate
+
+    monkeypatch.setattr(pb, "Validate", Validate)
+
+    result = runner.invoke(
+        validate,
+        [
+            "small_table",
+            "--check",
+            "col-vals-gt",
+            "--column",
+            "b",
+            "--value",
+            "1",
+            "--check",
+            "col-vals-not-null",
+            "--column",
+            "a",
+            "--exit-code",
+        ],
+    )
+    assert result.exit_code == 1, result.output
+    output = " ".join(result.output.replace("│", " ").split())
+    assert "Error:" not in output
+    assert "Column 'b' is a string, which col_vals_gt() can't check." in output
+    assert "the col-vals-gt check couldn't be performed on small_table" in output
+    assert "No null values found in column 'a'" in output
+
+    # The tip about failing rows isn't shown, since no check had any failing rows
+    assert "--show-extract" not in output
+
+
 def test_run_command_invalid_script(runner, tmp_path):
     """Test run command with invalid script."""
     script_file = tmp_path / "bad_script.py"
@@ -2657,6 +2783,9 @@ def test_display_validation_summary_passed_severity(mock_console):
     mock_step1.column = "name"
     mock_step1.n = 1000
     mock_step1.n_passed = 1000
+    mock_step1.n_failed = 0
+    mock_step1.active = True
+    mock_step1.eval_error = None
     mock_step1.values = None
 
     mock_step2 = Mock()
@@ -2669,6 +2798,9 @@ def test_display_validation_summary_passed_severity(mock_console):
     mock_step2.column = "age"
     mock_step2.n = 1000
     mock_step2.n_passed = 950  # 95% pass rate - no threshold exceeded but not 100%
+    mock_step2.n_failed = 50
+    mock_step2.active = True
+    mock_step2.eval_error = None
     mock_step2.values = 0
 
     # Mock thresholds for the steps
