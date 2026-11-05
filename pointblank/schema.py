@@ -561,8 +561,11 @@ class Schema:
         n
             Number of rows to generate. Default is `100`.
         seed
-            Random seed for reproducibility. If provided, the same seed will produce
-            the same data. Default is `None` (non-deterministic).
+            Random seed for reproducibility. If provided, the same seed will produce the same data
+            (in any Python session). Each column draws from its own random sequence, derived from
+            the seed and the column name, so two columns with the same field get different values
+            and have their missing values in different rows. Default is `None`
+            (non-deterministic).
         output
             Output format for the generated data. Options are: (1) `"polars"` (default) returns a
             Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns
@@ -1349,8 +1352,10 @@ def generate_dataset(
     n
         Number of rows to generate. The default is `100`.
     seed
-        Random seed for reproducibility. If provided, the same seed will produce
-        the same data. Default is `None` (non-deterministic).
+        Random seed for reproducibility. If provided, the same seed will produce the same data (in
+        any Python session). Each column draws from its own random sequence, derived from the seed
+        and the column name, so two columns with the same field get different values and have
+        their missing values in different rows. Default is `None` (non-deterministic).
     output
         Output format for the generated data. Options are: (1) `"polars"` (the default) returns a
         Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns
