@@ -18262,6 +18262,9 @@ class Validate:
                         elif isinstance(raw_value, ColumnLiteral):
                             other_vec = nw.from_native(data_tbl_step).select(raw_value.exprs)
                             target = agg(other_vec)
+                        elif isinstance(raw_value, decimal.Decimal):
+                            # The aggregate is a float, so compare it with a float
+                            target = float(raw_value)
                         else:
                             target = raw_value
 
@@ -29814,6 +29817,15 @@ def _generate_agg_docstring(name: str) -> str:
         else ""
     )
 
+    missing_text = {
+        "sum": "Missing values are left out of the sum, so a column with no non-missing values "
+        "sums to `0`.",
+        "avg": "Missing values are left out of the average, so a column with no non-missing "
+        "values has no average.",
+        "sd": "Missing values are left out of the standard deviation, so a column with fewer than "
+        "two non-missing values has none.",
+    }[agg_type]
+
     docstring = f"""
     Does the column {agg_name} satisfy {comp_article} {comp_desc} comparison?
 
@@ -29915,6 +29927,15 @@ def _generate_agg_docstring(name: str) -> str:
     `target - lower`, so the tolerance lowers the bar. For `lt` and `le`, it's compared with
     `target + upper`, which raises the ceiling. In those four cases the other side of the tolerance
     isn't used. For `{name}()`, the step passes when {tol_rule}.
+
+    Missing Values and Decimal Columns
+    ----------------------------------
+    {missing_text} When the {agg_name} is missing or `NaN` (on Polars, for instance, `NaN`
+    values make it `NaN`), or the column isn't numeric, the step can't be evaluated. It's reported
+    as an evaluation error, with a note saying why, rather than as passing or failing.
+
+    The {agg_name} of a `Decimal` column is compared as a `float`, and `value=` can be given as a
+    `Decimal` too (e.g., `value=Decimal("6.60")`).
 
     Thresholds
     ----------
