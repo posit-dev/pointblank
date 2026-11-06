@@ -10985,6 +10985,32 @@ def test_convert_string_to_datetime() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    "value, offset",
+    [
+        ("2023-01-01T12:00:00+00:00", datetime.timedelta(0)),
+        ("2023-01-01T12:00:00Z", datetime.timedelta(0)),
+        ("2023-01-01 12:00:00-05:00", datetime.timedelta(hours=-5)),
+        ("2023-01-01T12:00:00+0530", datetime.timedelta(hours=5, minutes=30)),
+        ("2023-01-01T12:00:00.250+01:00", datetime.timedelta(hours=1)),
+    ],
+)
+def test_convert_string_to_datetime_with_utc_offset(value, offset) -> None:
+    # The strings written by `datetime.isoformat()` for timezone-aware datetimes
+    assert _is_string_datetime(value)
+    converted = _convert_string_to_datetime(value)
+    assert converted.utcoffset() == offset
+    assert converted.replace(tzinfo=None) == datetime.datetime(
+        2023, 1, 1, 12, 0, 0, 250000 if ".250" in value else 0
+    )
+
+
+def test_is_string_datetime_rejects_malformed_offsets() -> None:
+    assert not _is_string_datetime("2023-01-01T12:00:00+5")
+    assert not _is_string_datetime("2023-01-01T12:00:00 UTC")
+    assert not _is_string_datetime("2023-01-01T12:00:00+05:00Z")
+
+
 def test_convert_string_to_datetime_raises() -> None:
     with pytest.raises(ValueError):
         _convert_string_to_datetime("2023-01-01")
