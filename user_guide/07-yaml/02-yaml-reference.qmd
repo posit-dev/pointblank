@@ -1124,6 +1124,7 @@ When the code runs, these names are available without importing them:
 
 - `pb` (`pointblank`)
 - `Path` from pathlib
+- `datetime`, `Decimal` (from decimal), and `ZoneInfo` (from zoneinfo)
 - `pl` (`polars`) if it's installed
 - `pd` (`pandas`) if it's installed
 - any modules given to `yaml_interrogate()` with `namespaces=`
@@ -1139,8 +1140,18 @@ numbers, lists, and so on), so they work without `allow_python=True`:
   `pb.everything()`, `pb.first_n()`, and `pb.last_n()` (combined with `&`, `|`, `-`, and `~` if you
   like)
 
-These only load a bundled dataset or build an object. Anything else, such as `pl.col("a") > 0` or
-`pb.col("a").str.len()`, is Python code.
+The same goes for building the values that YAML has no way of writing: `Decimal()`,
+`datetime.date()`, `datetime.time()`, `datetime.datetime()`, `datetime.timedelta()`, and
+`ZoneInfo()`. For example, `value: {python: 'Decimal("2.2")'}` compares a column against an exact
+decimal, and `value: {python: 'datetime.time(9, 30)'}` against a time of day. This is how
+`Validate.to_yaml()` writes these values.
+
+These only load a bundled dataset or build an object. Anything else, such as `pl.col("a") > 0`,
+`pb.col("a").str.len()`, or `datetime.date.today()`, is Python code.
+
+A date or datetime can also be written as an ISO 8601 string (e.g., `"2024-01-15"` or
+`"2024-01-15T10:30:00"`), with a UTC offset for a timezone-aware datetime (e.g.,
+`"2024-01-15T10:30:00+05:00"` or `"2024-01-15T10:30:00Z"`).
 
 `yaml_to_python()` never runs Python code from the configuration. It copies the code into the
 generated Python as written, so it doesn't need `allow_python=True`.

@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import ast
+import datetime
+import decimal
 import json
 import operator
 import re
 from importlib import import_module
 from pathlib import Path
 from typing import Any, Iterable, Literal, Mapping, Optional, Union
+from zoneinfo import ZoneInfo
 
 import yaml
 
@@ -68,6 +71,18 @@ _DECLARATIVE_PB_FUNCTIONS = frozenset(
     }
 )
 
+# Other calls that YAML can use without `allow_python=True`: they build values that YAML has no
+# literal for, such as `Decimal("2.2")`, `datetime.time(9, 30)`, or a datetime with
+# `tzinfo=ZoneInfo("America/New_York")` (as written by `to_yaml()`)
+_DECLARATIVE_VALUE_CALLS = {
+    "Decimal": decimal.Decimal,
+    "ZoneInfo": ZoneInfo,
+    "datetime.date": datetime.date,
+    "datetime.time": datetime.time,
+    "datetime.datetime": datetime.datetime,
+    "datetime.timedelta": datetime.timedelta,
+}
+
 # Operators that combine column selectors (e.g., `pb.starts_with("a") & pb.ends_with("z")`) or
 # negate a number
 _DECLARATIVE_BINARY_OPS = {
@@ -99,8 +114,6 @@ class _PythonSource:
 
 def _eval_declarative_node(node: ast.AST) -> Any:
     """Evaluate an expression node from the declarative subset, or raise `_NotDeclarative`."""
-    import pointblank as pb
-
     if isinstance(node, ast.Constant):
         return node.value
     if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
@@ -119,25 +132,42 @@ def _eval_declarative_node(node: ast.AST) -> Any:
         return _DECLARATIVE_UNARY_OPS[type(node.op)](_eval_declarative_node(node.operand))
     if (
         isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Attribute)
-        and isinstance(node.func.value, ast.Name)
-        and node.func.value.id == "pb"
-        and node.func.attr in _DECLARATIVE_PB_FUNCTIONS
         and not any(isinstance(arg, ast.Starred) for arg in node.args)
         and all(kw.arg is not None for kw in node.keywords)
     ):
+        func = _declarative_function(node.func)
         args = [_eval_declarative_node(arg) for arg in node.args]
         kwargs = {kw.arg: _eval_declarative_node(kw.value) for kw in node.keywords}
-        return getattr(pb, node.func.attr)(*args, **kwargs)
+        return func(*args, **kwargs)
+    raise _NotDeclarative
+
+
+def _declarative_function(node: ast.AST) -> Any:
+    """Get the function a declarative call refers to, or raise `_NotDeclarative`."""
+    import pointblank as pb
+
+    if isinstance(node, ast.Name):
+        name = node.id
+    elif isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
+        name = f"{node.value.id}.{node.attr}"
+    else:
+        raise _NotDeclarative
+
+    prefix, _, attr = name.rpartition(".")
+    if prefix == "pb" and attr in _DECLARATIVE_PB_FUNCTIONS:
+        return getattr(pb, attr)
+    if name in _DECLARATIVE_VALUE_CALLS:
+        return _DECLARATIVE_VALUE_CALLS[name]
     raise _NotDeclarative
 
 
 def _eval_declarative_code(code: str) -> Any:
     """Evaluate code that is in the declarative subset, or raise `_NotDeclarative`.
 
-    The subset is a single expression made of literals and calls to the `pb` functions in
-    `_DECLARATIVE_PB_FUNCTIONS` (e.g., `pb.col("b")` or `pb.has_columns("a", "b")`). It's
-    evaluated by walking the syntax tree, so nothing else can be reached.
+    The subset is a single expression made of literals, calls to the `pb` functions in
+    `_DECLARATIVE_PB_FUNCTIONS` (e.g., `pb.col("b")` or `pb.has_columns("a", "b")`), and calls
+    to the constructors in `_DECLARATIVE_VALUE_CALLS` (e.g., `Decimal("2.2")`). It's evaluated by
+    walking the syntax tree, so nothing else can be reached.
     """
     try:
         tree = ast.parse(code.strip(), mode="eval")
@@ -169,7 +199,7 @@ def _eval_python_code(
     code raises an error with `python_mode="deny"`, is kept as `_PythonSource` text with
     `python_mode="source"`, and is run as ordinary Python with `python_mode="allow"`. Running it
     is not sandboxed: the code has the full access of the Python session, with `pb`, `pl`, `pd`,
-    `Path`, and any `namespaces=` modules already imported.
+    `Path`, `datetime`, `Decimal`, `ZoneInfo`, and any `namespaces=` modules already imported.
 
     Parameters
     ----------
@@ -209,7 +239,13 @@ def _eval_python_code(
 
     import pointblank as pb
 
-    namespace: dict[str, Any] = {"Path": Path, "pb": pb}
+    namespace: dict[str, Any] = {
+        "Path": Path,
+        "pb": pb,
+        "datetime": datetime,
+        "Decimal": decimal.Decimal,
+        "ZoneInfo": ZoneInfo,
+    }
 
     if _is_lib_present("polars"):
         import polars as pl
@@ -1200,9 +1236,13 @@ def yaml_interrogate(
     [`col()`](`pointblank.col`), [`ref()`](`pointblank.ref`),
     [`seg_group()`](`pointblank.seg_group`), [`has_columns()`](`pointblank.has_columns`),
     [`has_rows()`](`pointblank.has_rows`), and the column selectors (`starts_with()`, `ends_with()`,
-    `contains()`, `matches()`, `everything()`, `first_n()`, and `last_n()`). These only load a
-    bundled dataset or build an object, so `value: pb.col("b")` or `active: pb.has_columns("a")`
-    work without `allow_python=True`.
+    `contains()`, `matches()`, `everything()`, `first_n()`, and `last_n()`). So can the
+    constructors for values that YAML has no literal for: `Decimal()`, `ZoneInfo()`,
+    `datetime.date()`, `datetime.time()`, `datetime.datetime()`, and `datetime.timedelta()`. These
+    only load a bundled dataset or build an object, so `value: pb.col("b")`,
+    `value: {python: 'Decimal("2.2")'}`, or `active: pb.has_columns("a")` work without
+    `allow_python=True`. In code that is allowed to run, `datetime`, `Decimal`, and `ZoneInfo` are
+    available along with `pb`, `pl`, `pd`, and `Path`.
 
     Using Namespaces
     ----------------
@@ -2283,6 +2323,26 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
         imports.append("import polars as pl")
     if needs_pandas_import:
         imports.append("import pandas as pd")
+
+    # Python code that builds values with `datetime`, `Decimal`, or `ZoneInfo` (e.g.,
+    # `Decimal("2.2")`) needs standard-library imports, which go first
+    python_sources = [
+        *step_expressions.values(),
+        *original_actions_expressions.values(),
+        original_tbl_expression or "",
+        original_reference_expression or "",
+    ]
+    std_imports = [
+        line
+        for line, pattern in (
+            ("import datetime", r"(?<![\w.])datetime\."),
+            ("from decimal import Decimal", r"(?<![\w.])Decimal\("),
+            ("from zoneinfo import ZoneInfo", r"(?<![\w.])ZoneInfo\("),
+        )
+        if any(re.search(pattern, code) for code in python_sources)
+    ]
+    if std_imports:
+        imports = std_imports + [""] + imports
 
     # Build final code with imports
     final_code_lines = imports + [""] + code_lines

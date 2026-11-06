@@ -1531,7 +1531,9 @@ col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         can supply a date or datetime value as the `value=` argument. There is flexibility in how
         you provide the date or datetime value, as it can be:
 
-        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for a timezone-aware datetime (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
           `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -1779,7 +1781,9 @@ col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         can supply a date or datetime value as the `value=` argument. There is flexibility in how
         you provide the date or datetime value, as it can be:
 
-        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for a timezone-aware datetime (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
           `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -2027,7 +2031,9 @@ col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         can supply a date or datetime value as the `value=` argument. There is flexibility in how
         you provide the date or datetime value, as it can be:
 
-        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for a timezone-aware datetime (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
           `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -2275,7 +2281,9 @@ col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         can supply a date or datetime value as the `value=` argument. There is flexibility in how
         you provide the date or datetime value, as it can be:
 
-        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for a timezone-aware datetime (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
           `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -2523,7 +2531,9 @@ col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         can supply a date or datetime value as the `value=` argument. There is flexibility in how
         you provide the date or datetime value, as it can be:
 
-        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for a timezone-aware datetime (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
           `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -2769,7 +2779,9 @@ col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         can supply a date or datetime value as the `value=` argument. There is flexibility in how
         you provide the date or datetime value, as it can be:
 
-        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for a timezone-aware datetime (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
           `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -3024,7 +3036,9 @@ col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | Col
         can supply a date or datetime value within `left=` and `right=`. There is flexibility in how
         you provide the date or datetime values for the bounds; they can be:
 
-        - string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for timezone-aware datetimes (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - date or datetime objects using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
         `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -3292,7 +3306,9 @@ col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | Col
         can supply a date or datetime value within `left=` and `right=`. There is flexibility in how
         you provide the date or datetime values for the bounds; they can be:
 
-        - string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for timezone-aware datetimes (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - date or datetime objects using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
         `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -16968,9 +16984,13 @@ Execute a YAML-based validation workflow.
     [`col()`](`pointblank.col`), [`ref()`](`pointblank.ref`),
     [`seg_group()`](`pointblank.seg_group`), [`has_columns()`](`pointblank.has_columns`),
     [`has_rows()`](`pointblank.has_rows`), and the column selectors (`starts_with()`, `ends_with()`,
-    `contains()`, `matches()`, `everything()`, `first_n()`, and `last_n()`). These only load a
-    bundled dataset or build an object, so `value: pb.col("b")` or `active: pb.has_columns("a")`
-    work without `allow_python=True`.
+    `contains()`, `matches()`, `everything()`, `first_n()`, and `last_n()`). So can the
+    constructors for values that YAML has no literal for: `Decimal()`, `ZoneInfo()`,
+    `datetime.date()`, `datetime.time()`, `datetime.datetime()`, and `datetime.timedelta()`. These
+    only load a bundled dataset or build an object, so `value: pb.col("b")`,
+    `value: {python: 'Decimal("2.2")'}`, or `active: pb.has_columns("a")` work without
+    `allow_python=True`. In code that is allowed to run, `datetime`, `Decimal`, and `ZoneInfo` are
+    available along with `pb`, `pl`, `pd`, and `Path`.
 
     Using Namespaces
     ----------------
