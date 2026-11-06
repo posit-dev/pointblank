@@ -183,6 +183,30 @@ def test_nan_is_missing_in_range_checks(tbl_type, method, data, left, right, exp
     assert counts == expected
 
 
+# `col_vals_increasing()` and `col_vals_decreasing()` compare each value with the last non-missing
+# value before it; a NaN has to count as missing there too, or it passes or fails on its own and
+# (where it's forward-filled) makes the values after it fail
+@pytest.mark.parametrize("tbl_type", TABLE_TYPES + ["duckdb", "sqlite"])
+@pytest.mark.parametrize(
+    "method, expected",
+    [("increasing", [(2, 3), (4, 1)]), ("decreasing", [(2, 3), (4, 1)])],
+)
+def test_nan_is_missing_in_monotonic_checks(tbl_type, method, expected) -> None:
+    # The first count is with `na_pass=False`, the second with `na_pass=True`; the NaN row and the
+    # null row only pass with `na_pass=True`, the 3.0 is compared with the 1.0 and the 2.0 with
+    # the 3.0
+    data = {"t": [1.0, 2.0, 3.0, 4.0, 5.0], "x": [1.0, NAN, 3.0, None, 2.0]}
+    order_by = ["t"] if tbl_type in ("duckdb", "sqlite") else None
+
+    counts = []
+    for na_pass in [False, True]:
+        validation = pb.Validate(_table(tbl_type, data))
+        getattr(validation, f"col_vals_{method}")("x", na_pass=na_pass, order_by=order_by)
+        counts.append(_counts(validation.interrogate()))
+
+    assert counts == expected
+
+
 # The value-level helpers on `MissingSpec` follow the same rule as validation: NaN counts as a null
 @pytest.mark.parametrize("null_is_missing", [True, False])
 def test_spec_helpers_treat_nan_as_null(null_is_missing) -> None:
