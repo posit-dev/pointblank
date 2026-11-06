@@ -1,6 +1,9 @@
 import datetime
+import math
+from decimal import Decimal
 
 import ibis
+import pandas as pd
 import polars as pl
 import pytest
 
@@ -406,7 +409,8 @@ def test_internal_column_names_dont_collide():
     data = {
         "a": [1.0, 2.0, None, 5.0, 3.0],
         "pb_row_index_": [9, 9, 9, 9, 9],
-        "pb_lagged_difference_": [9, 9, 9, 9, 9],
+        "pb_values_": [9, 9, 9, 9, 9],
+        "pb_previous_": [9, 9, 9, 9, 9],
     }
 
     for tbl in [pl.DataFrame(data), pl.LazyFrame(data)]:
@@ -416,8 +420,8 @@ def test_internal_column_names_dont_collide():
         assert validation.n_failed(i=1, scalar=True) == 2
 
         extract = validation.get_data_extracts(i=1, frame=True)
-        assert extract["pb_row_index_"].to_list() == [9, 9]
-        assert extract["pb_lagged_difference_"].to_list() == [9, 9]
+        for name in ["pb_row_index_", "pb_values_", "pb_previous_"]:
+            assert extract[name].to_list() == [9, 9]
 
 
 def test_order_by_serialization():
@@ -438,3 +442,164 @@ def test_order_by_serialization():
     yaml_text = yaml_text.replace("tbl: your_data", "tbl: small_table")
     revalidated = pb.yaml_interrogate(yaml_text, set_tbl=pl.DataFrame(SHUFFLED))
     assert revalidated.n_passed(scalar=False) == {1: 3, 2: 3}
+
+
+ALL_TBL_TYPES = ["polars", "polars_lazy", "pandas", "pyarrow", "duckdb", "memtable"]
+
+
+def _typed_test_table(tbl_type: str, values: list, dtype=None):
+    """A table with an order column `t` and the values in `x`, for every backend."""
+    tbl = pl.DataFrame({"t": list(range(len(values))), "x": pl.Series(values, dtype=dtype)})
+    if tbl_type == "pyarrow":
+        return tbl.to_arrow()
+    return _ordering_test_tables(tbl.to_dict(as_series=False) if dtype is None else tbl)[tbl_type]
+
+
+def _monotonic_counts(tbl, method: str, **kwargs) -> tuple[int, int]:
+    validation = getattr(pb.Validate(data=tbl), method)(columns="x", order_by="t", **kwargs)
+    validation = validation.interrogate()
+    assert validation.validation_info[0].eval_error is not True
+    return validation.n_passed(i=1, scalar=True), validation.n_failed(i=1, scalar=True)
+
+
+def pa_table(data: dict):
+    return pl.DataFrame(data).to_arrow()
+
+
+# With `-99` and `-98` as codes, the codes pass and are skipped like nulls: the next value is
+# compared with the last real value before the code (#135)
+@pytest.mark.parametrize(
+    "values, increasing, decreasing",
+    [
+        ([1, 3, -99, 2], (3, 1), (3, 1)),  # the 2 fails against the 3, not the -99
+        ([1, -99, 3, -98, 4], (5, 0), (3, 2)),
+        ([-99, 1, 2], (3, 0), (2, 1)),  # a leading code passes; the 1 is the starting point
+        ([1.0, math.nan, 3.0, -99.0, None, 2.0], (5, 1), (5, 1)),  # NaN and null are missing too
+    ],
+)
+@pytest.mark.parametrize("tbl_type", ALL_TBL_TYPES)
+def test_missing_codes_are_skipped(tbl_type, values, increasing, decreasing):
+    data = {"t": list(range(len(values))), "x": [None if v is None else float(v) for v in values]}
+    tbl = pa_table(data) if tbl_type == "pyarrow" else _ordering_test_tables(data)[tbl_type]
+    spec = pb.MissingSpec(reasons={-99: "refused", -98: "don't know"})
+
+    assert _monotonic_counts(tbl, "col_vals_increasing", missing=spec) == increasing
+    assert _monotonic_counts(tbl, "col_vals_decreasing", missing=spec) == decreasing
+
+
+@pytest.mark.parametrize("tbl_type", ALL_TBL_TYPES)
+def test_missing_codes_without_null_is_missing(tbl_type):
+    """With `null_is_missing=False`, nulls are left to `na_pass=` but still skipped."""
+    data = {"t": [0, 1, 2, 3, 4], "x": [1.0, 3.0, -99.0, None, 2.0]}
+    tbl = pa_table(data) if tbl_type == "pyarrow" else _ordering_test_tables(data)[tbl_type]
+    spec = pb.MissingSpec(reasons={-99: "refused"}, null_is_missing=False)
+
+    # The null fails, and the 2 fails against the 3
+    assert _monotonic_counts(tbl, "col_vals_increasing", missing=spec) == (3, 2)
+    assert _monotonic_counts(tbl, "col_vals_increasing", missing=spec, na_pass=True) == (4, 1)
+
+
+DATES = [datetime.date(2024, 1, d) for d in (1, 3, 2)] + [None, datetime.date(2024, 1, 5)]
+DATETIMES = [datetime.datetime(2024, 1, d, 9, 30) for d in (1, 3, 2)] + [
+    None,
+    datetime.datetime(2024, 1, 5, 9, 30),
+]
+DURATIONS = [datetime.timedelta(hours=h) for h in (1, 3, 2)] + [None, datetime.timedelta(hours=5)]
+DECIMALS = [Decimal("1.10"), Decimal("3.10"), Decimal("2.10"), None, Decimal("5.10")]
+
+
+# Dates and datetimes are compared rather than subtracted, which pandas and PyArrow couldn't do
+# (#136). In `t` order the values go 1, 3, 2, null, 5: the 2 and the null fail when increasing;
+# the 3, the null and the 5 fail when decreasing
+@pytest.mark.parametrize(
+    "values, dtype",
+    [
+        (DATES, None),
+        (DATETIMES, None),
+        (DATETIMES, pl.Datetime("us", "UTC")),
+        (DURATIONS, None),
+        (DECIMALS, pl.Decimal(10, 2)),
+        (DECIMALS, pl.Decimal(38, 2)),  # subtracting these overflowed the precision on PyArrow
+    ],
+    ids=["date", "datetime", "datetime-tz", "duration", "decimal", "decimal-38"],
+)
+@pytest.mark.parametrize("tbl_type", ALL_TBL_TYPES)
+def test_non_float_column_types(tbl_type, values, dtype):
+    if values is DURATIONS and tbl_type in ("duckdb", "memtable"):
+        pytest.skip("Ibis gives durations the interval type, which can't be collected to Arrow")
+
+    tbl = _typed_test_table(tbl_type, values, dtype)
+
+    assert _monotonic_counts(tbl, "col_vals_increasing") == (3, 2)
+    assert _monotonic_counts(tbl, "col_vals_increasing", na_pass=True) == (4, 1)
+    assert _monotonic_counts(tbl, "col_vals_decreasing") == (2, 3)
+    assert _monotonic_counts(tbl, "col_vals_decreasing", allow_stationary=True) == (2, 3)
+
+
+@pytest.mark.parametrize("tbl_type", ALL_TBL_TYPES)
+def test_decimal_column_with_tolerance(tbl_type):
+    tbl = _typed_test_table(tbl_type, DECIMALS, pl.Decimal(38, 2))
+
+    # The drop from 3.10 to 2.10 is within the tolerance
+    assert _monotonic_counts(tbl, "col_vals_increasing", decreasing_tol=1) == (4, 1)
+    assert _monotonic_counts(tbl, "col_vals_decreasing", increasing_tol=1) == (2, 3)
+
+
+def test_pandas_object_decimal_column():
+    """Decimals in a pandas `object` column (as from `read_sql()`) are compared as they are."""
+    tbl = pd.DataFrame({"x": pd.Series(DECIMALS, dtype=object)})
+
+    for kwargs, expected in [({}, (3, 2)), ({"decreasing_tol": 1}, (4, 1))]:
+        validation = pb.Validate(data=tbl).col_vals_increasing(columns="x", **kwargs).interrogate()
+        assert (validation.n_passed(i=1, scalar=True), validation.n_failed(i=1, scalar=True)) == (
+            expected
+        )
+
+
+def _eval_error_note(tbl, method: str, **kwargs) -> str:
+    validation = getattr(pb.Validate(data=tbl), method)(columns="x", **kwargs).interrogate()
+    step = validation.validation_info[0]
+    assert step.eval_error is True
+    return step.notes["eval_error"]["text"]
+
+
+@pytest.mark.parametrize(
+    "values", [["a", "c", "b"], [True, False, True]], ids=["string", "boolean"]
+)
+@pytest.mark.parametrize("tbl_type", ALL_TBL_TYPES)
+@pytest.mark.parametrize("method", ["col_vals_increasing", "col_vals_decreasing"])
+def test_unorderable_column_is_eval_error(tbl_type, values, method):
+    """A column that isn't numeric or temporal is an evaluation error, not a crash (#136)."""
+    tbl = _typed_test_table(tbl_type, values)
+
+    note = _eval_error_note(tbl, method, order_by="t")
+    assert f"{method}() can't check" in note
+
+
+@pytest.mark.parametrize(
+    "values", [DATES, DATETIMES, DURATIONS], ids=["date", "datetime", "duration"]
+)
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "pyarrow", "duckdb"])
+def test_tolerance_on_temporal_column_is_eval_error(tbl_type, values):
+    """The tolerance is a number, so it needs a numeric column."""
+    if values is DURATIONS and tbl_type == "duckdb":
+        pytest.skip("Ibis gives durations the interval type, which can't be collected to Arrow")
+
+    tbl = _typed_test_table(tbl_type, values)
+
+    note = _eval_error_note(tbl, "col_vals_increasing", order_by="t", decreasing_tol=1)
+    assert "decreasing_tol= needs a numeric column" in note
+    note = _eval_error_note(tbl, "col_vals_decreasing", order_by="t", increasing_tol=0.5)
+    assert "increasing_tol= needs a numeric column" in note
+
+
+@pytest.mark.parametrize(
+    "values",
+    [[datetime.date(2024, 1, 1), None, datetime.date(2024, 1, 2)], [1, None, "a"]],
+    ids=["dates-with-null", "mixed"],
+)
+def test_unorderable_pandas_object_column_is_eval_error(values):
+    tbl = pd.DataFrame({"x": pd.Series(values, dtype=object)})
+
+    note = _eval_error_note(tbl, "col_vals_increasing")
+    assert "can't be put in order" in note
