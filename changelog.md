@@ -2,6 +2,102 @@
 
 This changelog is generated automatically from [GitHub Releases](https://github.com/posit-dev/pointblank/releases).
 
+## v1.2.0
+
+*2026-11-06* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v1.2.0)
+
+Pointblank `v1.2.0` focuses on correctness, consistency, and safety. Every table-level validation step now has a step report, and many step report layouts have been cleaned up. `NaN` is now treated as a missing value in every validation method on every backend. AI-powered [prompt()](./reference/Validate.prompt.md#pointblank.Validate.prompt) steps are much more reliable as they no longer report every row as failing when the model's replies can't be used. Pandas 3 is now supported, and `to_code()`/`to_yaml()` now round-trip every validation method.
+
+#### Breaking Changes
+
+- **Python code in YAML configs is opt-in** -- `python:` blocks and the `expr`/`pre`/`active` shortcuts in YAML configs now run only with `allow_python=True` (in [yaml_interrogate()](./reference/yaml_interrogate.md#pointblank.yaml_interrogate), `YAMLValidator.build_validation()`, and `execute_workflow()`) or `pb run --allow-python`. Declarative calls such as `pb.load_dataset()`, `pb.col()`, `pb.ref()`, `pb.seg_group()`, and the column selectors are checked without running any code, so they always work. [yaml_to_python()](./reference/yaml_to_python.md#pointblank.yaml_to_python) no longer runs any code. ([\#527](https://github.com/posit-dev/pointblank/issues/527))
+- `data_freshness()` now fails when the newest timestamp is later than the reference time. A new `allow_future=` parameter accepts `True` (the old behavior) or a duration such as `"5m"` to allow for clock skew. ([\#518](https://github.com/posit-dev/pointblank/issues/518))
+- [Pipeline.run()](./reference/Pipeline.md#pointblank.Pipeline.run) now raises a new [ContractViolationError](./reference/ContractViolationError.md#pointblank.ContractViolationError) for contracts with `on_violation="raise"`. Its `result` attribute holds the [PipelineResult](./reference/PipelineResult.md#pointblank.PipelineResult). Before, the error was caught and the run kept going. ([\#517](https://github.com/posit-dev/pointblank/issues/517))
+
+#### New Features
+
+- **Step reports for table-level steps** -- [get_step_report()](./reference/Validate.get_step_report.md#pointblank.Validate.get_step_report) now returns a summary report for `col_exists()`, `row_count_match()`, `col_count_match()`, `col_pct_null()`, `col_pct_missing()`, `data_freshness()`, and [specially()](./reference/Validate.specially.md#pointblank.Validate.specially). Before, it returned `None` for these steps. Each report shows the value measured during interrogation (counts, null and missing percentages, data age, the closest matching column name, and so on) next to the expected value, with a pass/fail mark. ([\#488](https://github.com/posit-dev/pointblank/issues/488))
+- **Pandas 3 support** -- The `pandas<3` pin has been removed. A new CI job runs the test suite with every direct dependency at its minimum declared version. [specially()](./reference/Validate.specially.md#pointblank.Validate.specially) also no longer renames columns in place on Pandas results. ([\#496](https://github.com/posit-dev/pointblank/issues/496))
+
+#### Enhancements
+
+- `col_vals_expr()` steps are now easier to tell apart in the validation report. The `COLUMNS` cell lists the columns the expression uses, `STEP` shows the expression's name if you set one, and on Python 3.11+ the footer shows the expression as you wrote it. ([\#492](https://github.com/posit-dev/pointblank/issues/492))
+- `col_vals_increasing()` and `col_vals_decreasing()` now support date, datetime, and Decimal columns on every backend and skip [MissingSpec](./reference/MissingSpec.md#pointblank.MissingSpec) codes the same way they skip nulls. ([\#532](https://github.com/posit-dev/pointblank/issues/532))
+- The `col_sum_*()`, `col_avg_*()`, and `col_sd_*()` methods now work on Decimal columns on every backend and accept a `Decimal` `value=`. ([\#529](https://github.com/posit-dev/pointblank/issues/529))
+- Comparison steps now accept `Decimal` and `datetime.time` values. Validation methods also accept ISO datetime strings with a UTC offset (e.g., `"2023-10-01T13:45:30+05:00"`). Thanks [\[@DG47\](https://github.com/DG47)](https://github.com/DG47)! ([\#511](https://github.com/posit-dev/pointblank/issues/511), [\#528](https://github.com/posit-dev/pointblank/issues/528))
+- `col_vals_regex()`, `col_vals_str_len()`, and `col_vals_within_spec()` now check Polars Categorical and Enum columns. Thanks [\[@pcbeingused333\](https://github.com/pcbeingused333)](https://github.com/pcbeingused333)! ([\#481](https://github.com/posit-dev/pointblank/issues/481), [\#482](https://github.com/posit-dev/pointblank/issues/482), [\#483](https://github.com/posit-dev/pointblank/issues/483))
+- [col_summary_tbl()](./reference/col_summary_tbl.md#pointblank.col_summary_tbl) and [DataScan](./reference/DataScan.md#pointblank.DataScan) now choose each column's profile from its dtype class. Decimal columns are summarized as numbers, Enum columns as strings, and Time columns get a min and max. Columns that can't be summarized are listed instead of throwing an error. ([\#501](https://github.com/posit-dev/pointblank/issues/501))
+- [emit_otel()](./reference/emit_otel.md#pointblank.emit_otel) gains a `meter_version=` parameter. [OTelExporter](./reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) now checks its arguments when it's created. ([\#514](https://github.com/posit-dev/pointblank/issues/514))
+- [generate_dataset()](./reference/generate_dataset.md#pointblank.generate_dataset) now gives numeric columns their field's dtype (e.g., `int_field(dtype="Int32")` gives an `Int32` column), and [time_field()](./reference/time_field.md#pointblank.time_field) columns now hold real `time` values. ([\#515](https://github.com/posit-dev/pointblank/issues/515))
+- `pb run` and `pb validate` now show steps that are inactive or couldn't be evaluated, along with the reason. `pb run` adds `Not evaluated:` and `Inactive:` counts and an `incomplete` status, and `--fail-on any` now also fails when a step couldn't be evaluated. ([\#525](https://github.com/posit-dev/pointblank/issues/525))
+
+#### Bug Fixes
+
+**Missing values and `NaN`**
+
+- `NaN` is now treated as a missing value on Polars, PyArrow, and DuckDB, as it already was on pandas. This covers comparison steps on DuckDB tables, `col_vals_between()`, `col_vals_outside()`, `col_vals_not_in_set()`, `col_vals_increasing()`, `col_vals_decreasing()`, and [MissingSpec](./reference/MissingSpec.md#pointblank.MissingSpec) checks. Range bounds given as `NaN` are now handled too. Thanks [\[@DG47\](https://github.com/DG47)](https://github.com/DG47) and [\[@pcbeingused333\](https://github.com/pcbeingused333)](https://github.com/pcbeingused333)! ([\#474](https://github.com/posit-dev/pointblank/issues/474), [\#484](https://github.com/posit-dev/pointblank/issues/484), [\#485](https://github.com/posit-dev/pointblank/issues/485), [\#486](https://github.com/posit-dev/pointblank/issues/486), [\#487](https://github.com/posit-dev/pointblank/issues/487), [\#500](https://github.com/posit-dev/pointblank/issues/500), [\#531](https://github.com/posit-dev/pointblank/issues/531))
+- A missing value that fails `col_vals_in_set()` now appears among the failing rows in sundered data and data extracts. Thanks [\[@pcbeingused333\](https://github.com/pcbeingused333)](https://github.com/pcbeingused333)! ([\#480](https://github.com/posit-dev/pointblank/issues/480))
+- When segments are derived from a Pandas column, missing values now form a `None` segment instead of causing an evaluation error or being skipped. Thank you [\[@DG47\](https://github.com/DG47)](https://github.com/DG47)! ([\#508](https://github.com/posit-dev/pointblank/issues/508))
+- Aggregates that can't be computed (e.g., the standard deviation of one value) are now reported as evaluation errors instead of raising errors or failing silently. ([\#529](https://github.com/posit-dev/pointblank/issues/529))
+
+**AI validation ([prompt()](./reference/Validate.prompt.md#pointblank.Validate.prompt))**
+
+- When no model reply can be used (because of a refusal, truncated JSON, an empty result, or a cut-off reply), the step is now marked as not evaluated instead of reporting every row as failing. The step note quotes the unusable reply. Thanks [\[@pcbeingused333\](https://github.com/pcbeingused333)](https://github.com/pcbeingused333)! ([\#475](https://github.com/posit-dev/pointblank/issues/475), [\#503](https://github.com/posit-dev/pointblank/issues/503))
+- Results in a reply are only accepted for that batch's own rows. ([\#503](https://github.com/posit-dev/pointblank/issues/503))
+- Each batch now starts a new conversation, so requests no longer grow with every batch and earlier verdicts can't influence later ones. Thanks [\[@pcbeingused333\](https://github.com/pcbeingused333)](https://github.com/pcbeingused333)! ([\#479](https://github.com/posit-dev/pointblank/issues/479))
+- The JSON array is now found when the reply has square brackets before it. Thanks [\[@pcbeingused333\](https://github.com/pcbeingused333)](https://github.com/pcbeingused333)! ([\#471](https://github.com/posit-dev/pointblank/issues/471))
+- Row verdicts are now matched to pandas rows by position, so frames with a non-default index get the right results. Thanks [\[@pcbeingused333\](https://github.com/pcbeingused333)](https://github.com/pcbeingused333)! ([\#477](https://github.com/posit-dev/pointblank/issues/477))
+- The batch schema is now inferred from every unique row, so sparse text columns no longer cause an error. Thanks [\[@pcbeingused333\](https://github.com/pcbeingused333)](https://github.com/pcbeingused333)! ([\#478](https://github.com/posit-dev/pointblank/issues/478))
+- The reply-token limit for Anthropic and Bedrock models has been raised to 16,000. [DraftValidation](./reference/DraftValidation.md#pointblank.DraftValidation) and [EditValidation](./reference/EditValidation.md#pointblank.EditValidation) now raise a clear error when a reply is cut off. ([\#493](https://github.com/posit-dev/pointblank/issues/493))
+- The `draft_validation_plan` MCP tool now uses `anthropic:claude-sonnet-5-5` by default, replacing a model that's being retired. Thanks [\[@pcbeingused333\](https://github.com/pcbeingused333)](https://github.com/pcbeingused333)! ([\#470](https://github.com/posit-dev/pointblank/issues/470))
+
+**Step reports**
+
+- `col_schema_match()` step reports now agree with the validation result for every combination of `complete=` and `in_order=`, and they're easier to read! ([\#491](https://github.com/posit-dev/pointblank/issues/491))
+- Step report headers, assertion boxes, pass/fail marks, and widths are now consistent across report types. ([\#489](https://github.com/posit-dev/pointblank/issues/489))
+- Awkward and ungrammatical text in step reports has been fixed. `conjointly()` and [specially()](./reference/Validate.specially.md#pointblank.Validate.specially) reports now name their expressions instead of showing `<lambda>`. ([\#490](https://github.com/posit-dev/pointblank/issues/490))
+- [get_dataframe_report()](./reference/Validate.get_dataframe_report.md#pointblank.Validate.get_dataframe_report) no longer fails on segmented steps, and checksum specs in `col_vals_within_spec()` no longer stop [interrogate()](./reference/Validate.interrogate.md#pointblank.Validate.interrogate) on Polars LazyFrames. ([\#495](https://github.com/posit-dev/pointblank/issues/495))
+
+**Column summaries ([col_summary_tbl()](./reference/col_summary_tbl.md#pointblank.col_summary_tbl) and [DataScan](./reference/DataScan.md#pointblank.DataScan))**
+
+- [col_summary_tbl()](./reference/col_summary_tbl.md#pointblank.col_summary_tbl) now explains why it fails when no column can be profiled, instead of raising a bare `AssertionError`. Thanks [\[@cristianchiriac\](https://github.com/cristianchiriac)](https://github.com/cristianchiriac)! ([\#469](https://github.com/posit-dev/pointblank/issues/469))
+- List and array columns are now skipped instead of resulting in an error. Thanks [\[@DG47\](https://github.com/DG47)](https://github.com/DG47)! ([\#499](https://github.com/posit-dev/pointblank/issues/499))
+- Empty cells now show `-` on every backend, HTML is no longer shown as text, and string-length statistics now ignore missing values. ([\#495](https://github.com/posit-dev/pointblank/issues/495), [\#502](https://github.com/posit-dev/pointblank/issues/502), [\#506](https://github.com/posit-dev/pointblank/issues/506))
+
+**Serialization (`to_code()`, `to_yaml()`, [yaml_to_python()](./reference/yaml_to_python.md#pointblank.yaml_to_python))**
+
+- `to_code()` and `to_yaml()` now write out every validation method, and the output gives the same results as the original plan. ([\#494](https://github.com/posit-dev/pointblank/issues/494))
+- `Validate(reference=...)` is now written out when the reference is a file path or connection string, so plans that use `pb.ref()` can be rebuilt. ([\#504](https://github.com/posit-dev/pointblank/issues/504))
+- Decimal, time, and timezone-aware datetime values are now written out with the imports they need. ([\#528](https://github.com/posit-dev/pointblank/issues/528))
+- The original `active=` value is now kept when a plan is serialized after interrogation. ([\#521](https://github.com/posit-dev/pointblank/issues/521))
+- [yaml_to_python()](./reference/yaml_to_python.md#pointblank.yaml_to_python) now writes working code for file paths and connection strings. ([\#505](https://github.com/posit-dev/pointblank/issues/505))
+
+**Validation workflow**
+
+- Calling [interrogate()](./reference/Validate.interrogate.md#pointblank.Validate.interrogate) again now starts over from the steps as they were defined, and `brief` templates are kept. ([\#524](https://github.com/posit-dev/pointblank/issues/524))
+- [get_sundered_data()](./reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data) now returns the right rows for segmented steps and leaves out steps that use `pre=`. ([\#495](https://github.com/posit-dev/pointblank/issues/495), [\#497](https://github.com/posit-dev/pointblank/issues/497))
+- Segmented steps are now kept when no segments are found, instead of being dropped from the validation. ([\#516](https://github.com/posit-dev/pointblank/issues/516))
+- [add_steps()](./reference/Validate.add_steps.md#pointblank.Validate.add_steps) now works when copying steps from a [Validate](./reference/Validate.md#pointblank.Validate) object for methods that don't take `value=`. ([\#523](https://github.com/posit-dev/pointblank/issues/523))
+- [emit_otel()](./reference/emit_otel.md#pointblank.emit_otel) now sends traces and log records, the same as [OTelExporter.export()](./reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter.export). ([\#514](https://github.com/posit-dev/pointblank/issues/514))
+
+**Data generation**
+
+- With `seed=`, each generated column now gets its own random sequence, so columns are no longer identical or correlated. Seeded multi-country data is now the same in every session. ([\#526](https://github.com/posit-dev/pointblank/issues/526))
+- Prefixed [profile_fields()](./reference/profile_fields.md#pointblank.profile_fields) profiles now each get their own person, location, and employer. ([\#519](https://github.com/posit-dev/pointblank/issues/519))
+- The postcode in a generated `address` now matches the row's `postcode` column. ([\#522](https://github.com/posit-dev/pointblank/issues/522))
+- [get_data_path()](./reference/get_data_path.md#pointblank.get_data_path) no longer leaves temporary files behind. ([\#520](https://github.com/posit-dev/pointblank/issues/520))
+
+#### Documentation
+
+- The User Guide sections are now ordered to follow how people might use Pointblank: the core validation workflow first, then data tools, production use, and other interfaces. ([\#509](https://github.com/posit-dev/pointblank/issues/509))
+- Retired OpenAI and Claude models have been replaced in the AI examples. Thanks [\[@pcbeingused333\](https://github.com/pcbeingused333)](https://github.com/pcbeingused333)! ([\#472](https://github.com/posit-dev/pointblank/issues/472), [\#493](https://github.com/posit-dev/pointblank/issues/493))
+- Several small documentation fixes, including clearer report terminology and customization guidance. ([\#512](https://github.com/posit-dev/pointblank/issues/512))
+
+#### Maintenance
+
+- The `duckdb` extra now requires `ibis-framework>=11.0.0` and `narwhals>=2.8.0`, which fixes queries on ibis 10.x with DuckDB 1.4+. DuckDB is temporarily capped at `<2` until ibis and Narwhals support it. ([\#476](https://github.com/posit-dev/pointblank/issues/476))
+- The minimum versions are now `narwhals>=2.8.0` and `great-tables>=1.1.0`, and the `generate` extra now requires `chatlas>=0.10.0`. ([\#496](https://github.com/posit-dev/pointblank/issues/496), [\#513](https://github.com/posit-dev/pointblank/issues/513))
+
 ## v1.1.1
 
 *2026-10-15* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v1.1.1)
@@ -851,19 +947,3 @@ Full Changelog: [v0.23.0…v0.24.0](https://github.com/posit-dev/pointblank/comp
 - Added the ability to select a subset of columns in row-based step reports, by [@rich-iannone](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/123
 
 **Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.7.2…v0.7.3](https://github.com/posit-dev/pointblank/compare/v0.7.2...v0.7.3)
-
-## v0.7.2
-
-*2025-03-24* · [GitHub](https://github.com/posit-dev/pointblank/releases/tag/v0.7.2)
-
-### New Features and Fixes
-
-- Pointblank now supports the Traditional Chinese (`zh-Hant`) locale (for localization of autobriefs), by [@jrycw](https://github.com/jrycw) in https://github.com/posit-dev/pointblank/pull/109
-- Allow validations to work with dates/datetime comparisons across columns, by [@rich-iannone](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/110
-- Revised [preview()](./reference/preview.md#pointblank.preview) for better operability with the Ibis PySpark backend, by [@rich-iannone](https://github.com/rich-iannone) in https://github.com/posit-dev/pointblank/pull/112
-
-### New Contributors
-
-- [@jrycw](https://github.com/jrycw) made their first contribution in https://github.com/posit-dev/pointblank/pull/109
-
-**Full Changelog**: [https://github.com/posit-dev/pointblank/compare/v0.7.1…v0.7.2](https://github.com/posit-dev/pointblank/compare/v0.7.1...v0.7.2)

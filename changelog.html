@@ -97,7 +97,7 @@ ul.task-list li input[type="checkbox"] {
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.1.1</code><br>Released 2026-10-15">
+<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/changelog.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/changelog.html">
@@ -172,7 +172,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Releases</h2>
    
   <ul>
-  <li><a href="#v1.1.1" id="toc-v1.1.1" class="nav-link active" data-scroll-target="#v1.1.1">v1.1.1</a></li>
+  <li><a href="#v1.2.0" id="toc-v1.2.0" class="nav-link active" data-scroll-target="#v1.2.0">v1.2.0</a></li>
+  <li><a href="#v1.1.1" id="toc-v1.1.1" class="nav-link" data-scroll-target="#v1.1.1">v1.1.1</a></li>
   <li><a href="#v1.1.0" id="toc-v1.1.0" class="nav-link" data-scroll-target="#v1.1.0">v1.1.0</a></li>
   <li><a href="#v1.0.1" id="toc-v1.0.1" class="nav-link" data-scroll-target="#v1.0.1">v1.0.1</a></li>
   <li><a href="#v1.0.0" id="toc-v1.0.0" class="nav-link" data-scroll-target="#v1.0.0">v1.0.0</a></li>
@@ -221,7 +222,6 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#v0.8.1" id="toc-v0.8.1" class="nav-link" data-scroll-target="#v0.8.1">v0.8.1</a></li>
   <li><a href="#v0.8.0" id="toc-v0.8.0" class="nav-link" data-scroll-target="#v0.8.0">v0.8.0</a></li>
   <li><a href="#v0.7.3" id="toc-v0.7.3" class="nav-link" data-scroll-target="#v0.7.3">v0.7.3</a></li>
-  <li><a href="#v0.7.2" id="toc-v0.7.2" class="nav-link" data-scroll-target="#v0.7.2">v0.7.2</a></li>
   </ul>
 </nav>
     </div>
@@ -248,6 +248,112 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>This changelog is generated automatically from <a href="https://github.com/posit-dev/pointblank/releases">GitHub Releases</a>.</p>
+<section id="v1.2.0" class="level1 changelog-version">
+<h1 class="changelog-version">v1.2.0</h1>
+<p><em>2026-11-06</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v1.2.0">GitHub</a></p>
+<p>Pointblank <code>v1.2.0</code> focuses on correctness, consistency, and safety. Every table-level validation step now has a step report, and many step report layouts have been cleaned up. <code>NaN</code> is now treated as a missing value in every validation method on every backend. AI-powered <a href="./reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt()</a> steps are much more reliable as they no longer report every row as failing when the model’s replies can’t be used. Pandas 3 is now supported, and <code>to_code()</code>/<code>to_yaml()</code> now round-trip every validation method.</p>
+<section id="breaking-changes" class="level3">
+<h3 class="anchored" data-anchor-id="breaking-changes">Breaking Changes</h3>
+<ul>
+<li><strong>Python code in YAML configs is opt-in</strong> — <code>python:</code> blocks and the <code>expr</code>/<code>pre</code>/<code>active</code> shortcuts in YAML configs now run only with <code>allow_python=True</code> (in <a href="./reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a>, <code>YAMLValidator.build_validation()</code>, and <code>execute_workflow()</code>) or <code>pb run --allow-python</code>. Declarative calls such as <code>pb.load_dataset()</code>, <code>pb.col()</code>, <code>pb.ref()</code>, <code>pb.seg_group()</code>, and the column selectors are checked without running any code, so they always work. <a href="./reference/yaml_to_python.html#pointblank.yaml_to_python" class="gdls-link gdls-code">yaml_to_python()</a> no longer runs any code. (<a href="https://github.com/posit-dev/pointblank/issues/527">#527</a>)</li>
+<li><code>data_freshness()</code> now fails when the newest timestamp is later than the reference time. A new <code>allow_future=</code> parameter accepts <code>True</code> (the old behavior) or a duration such as <code>"5m"</code> to allow for clock skew. (<a href="https://github.com/posit-dev/pointblank/issues/518">#518</a>)</li>
+<li><a href="./reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">Pipeline.run()</a> now raises a new <a href="./reference/ContractViolationError.html#pointblank.ContractViolationError" class="gdls-link gdls-code">ContractViolationError</a> for contracts with <code>on_violation="raise"</code>. Its <code>result</code> attribute holds the <a href="./reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a>. Before, the error was caught and the run kept going. (<a href="https://github.com/posit-dev/pointblank/issues/517">#517</a>)</li>
+</ul>
+</section>
+<section id="new-features" class="level3">
+<h3 class="anchored" data-anchor-id="new-features">New Features</h3>
+<ul>
+<li><strong>Step reports for table-level steps</strong> — <a href="./reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link gdls-code">get_step_report()</a> now returns a summary report for <code>col_exists()</code>, <code>row_count_match()</code>, <code>col_count_match()</code>, <code>col_pct_null()</code>, <code>col_pct_missing()</code>, <code>data_freshness()</code>, and <a href="./reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link gdls-code">specially()</a>. Before, it returned <code>None</code> for these steps. Each report shows the value measured during interrogation (counts, null and missing percentages, data age, the closest matching column name, and so on) next to the expected value, with a pass/fail mark. (<a href="https://github.com/posit-dev/pointblank/issues/488">#488</a>)</li>
+<li><strong>Pandas 3 support</strong> — The <code>pandas&lt;3</code> pin has been removed. A new CI job runs the test suite with every direct dependency at its minimum declared version. <a href="./reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link gdls-code">specially()</a> also no longer renames columns in place on Pandas results. (<a href="https://github.com/posit-dev/pointblank/issues/496">#496</a>)</li>
+</ul>
+</section>
+<section id="enhancements" class="level3">
+<h3 class="anchored" data-anchor-id="enhancements">Enhancements</h3>
+<ul>
+<li><code>col_vals_expr()</code> steps are now easier to tell apart in the validation report. The <code>COLUMNS</code> cell lists the columns the expression uses, <code>STEP</code> shows the expression’s name if you set one, and on Python 3.11+ the footer shows the expression as you wrote it. (<a href="https://github.com/posit-dev/pointblank/issues/492">#492</a>)</li>
+<li><code>col_vals_increasing()</code> and <code>col_vals_decreasing()</code> now support date, datetime, and Decimal columns on every backend and skip <a href="./reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> codes the same way they skip nulls. (<a href="https://github.com/posit-dev/pointblank/issues/532">#532</a>)</li>
+<li>The <code>col_sum_*()</code>, <code>col_avg_*()</code>, and <code>col_sd_*()</code> methods now work on Decimal columns on every backend and accept a <code>Decimal</code> <code>value=</code>. (<a href="https://github.com/posit-dev/pointblank/issues/529">#529</a>)</li>
+<li>Comparison steps now accept <code>Decimal</code> and <code>datetime.time</code> values. Validation methods also accept ISO datetime strings with a UTC offset (e.g., <code>"2023-10-01T13:45:30+05:00"</code>). Thanks <a href="https://github.com/DG47">[<span class="citation" data-cites="DG47">@DG47</span>](https://github.com/DG47)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/511">#511</a>, <a href="https://github.com/posit-dev/pointblank/issues/528">#528</a>)</li>
+<li><code>col_vals_regex()</code>, <code>col_vals_str_len()</code>, and <code>col_vals_within_spec()</code> now check Polars Categorical and Enum columns. Thanks <a href="https://github.com/pcbeingused333">[<span class="citation" data-cites="pcbeingused333">@pcbeingused333</span>](https://github.com/pcbeingused333)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/481">#481</a>, <a href="https://github.com/posit-dev/pointblank/issues/482">#482</a>, <a href="https://github.com/posit-dev/pointblank/issues/483">#483</a>)</li>
+<li><a href="./reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a> and <a href="./reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> now choose each column’s profile from its dtype class. Decimal columns are summarized as numbers, Enum columns as strings, and Time columns get a min and max. Columns that can’t be summarized are listed instead of throwing an error. (<a href="https://github.com/posit-dev/pointblank/issues/501">#501</a>)</li>
+<li><a href="./reference/emit_otel.html#pointblank.emit_otel" class="gdls-link gdls-code">emit_otel()</a> gains a <code>meter_version=</code> parameter. <a href="./reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter" class="gdls-link gdls-code">OTelExporter</a> now checks its arguments when it’s created. (<a href="https://github.com/posit-dev/pointblank/issues/514">#514</a>)</li>
+<li><a href="./reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> now gives numeric columns their field’s dtype (e.g., <code>int_field(dtype="Int32")</code> gives an <code>Int32</code> column), and <a href="./reference/time_field.html#pointblank.time_field" class="gdls-link gdls-code">time_field()</a> columns now hold real <code>time</code> values. (<a href="https://github.com/posit-dev/pointblank/issues/515">#515</a>)</li>
+<li><code>pb run</code> and <code>pb validate</code> now show steps that are inactive or couldn’t be evaluated, along with the reason. <code>pb run</code> adds <code>Not evaluated:</code> and <code>Inactive:</code> counts and an <code>incomplete</code> status, and <code>--fail-on any</code> now also fails when a step couldn’t be evaluated. (<a href="https://github.com/posit-dev/pointblank/issues/525">#525</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes">Bug Fixes</h3>
+<p><strong>Missing values and <code>NaN</code></strong></p>
+<ul>
+<li><code>NaN</code> is now treated as a missing value on Polars, PyArrow, and DuckDB, as it already was on pandas. This covers comparison steps on DuckDB tables, <code>col_vals_between()</code>, <code>col_vals_outside()</code>, <code>col_vals_not_in_set()</code>, <code>col_vals_increasing()</code>, <code>col_vals_decreasing()</code>, and <a href="./reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> checks. Range bounds given as <code>NaN</code> are now handled too. Thanks <a href="https://github.com/DG47">[<span class="citation" data-cites="DG47">@DG47</span>](https://github.com/DG47)</a> and <a href="https://github.com/pcbeingused333">[<span class="citation" data-cites="pcbeingused333">@pcbeingused333</span>](https://github.com/pcbeingused333)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/474">#474</a>, <a href="https://github.com/posit-dev/pointblank/issues/484">#484</a>, <a href="https://github.com/posit-dev/pointblank/issues/485">#485</a>, <a href="https://github.com/posit-dev/pointblank/issues/486">#486</a>, <a href="https://github.com/posit-dev/pointblank/issues/487">#487</a>, <a href="https://github.com/posit-dev/pointblank/issues/500">#500</a>, <a href="https://github.com/posit-dev/pointblank/issues/531">#531</a>)</li>
+<li>A missing value that fails <code>col_vals_in_set()</code> now appears among the failing rows in sundered data and data extracts. Thanks <a href="https://github.com/pcbeingused333">[<span class="citation" data-cites="pcbeingused333">@pcbeingused333</span>](https://github.com/pcbeingused333)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/480">#480</a>)</li>
+<li>When segments are derived from a Pandas column, missing values now form a <code>None</code> segment instead of causing an evaluation error or being skipped. Thank you <a href="https://github.com/DG47">[<span class="citation" data-cites="DG47">@DG47</span>](https://github.com/DG47)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/508">#508</a>)</li>
+<li>Aggregates that can’t be computed (e.g., the standard deviation of one value) are now reported as evaluation errors instead of raising errors or failing silently. (<a href="https://github.com/posit-dev/pointblank/issues/529">#529</a>)</li>
+</ul>
+<p><strong>AI validation (<a href="./reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt()</a>)</strong></p>
+<ul>
+<li>When no model reply can be used (because of a refusal, truncated JSON, an empty result, or a cut-off reply), the step is now marked as not evaluated instead of reporting every row as failing. The step note quotes the unusable reply. Thanks <a href="https://github.com/pcbeingused333">[<span class="citation" data-cites="pcbeingused333">@pcbeingused333</span>](https://github.com/pcbeingused333)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/475">#475</a>, <a href="https://github.com/posit-dev/pointblank/issues/503">#503</a>)</li>
+<li>Results in a reply are only accepted for that batch’s own rows. (<a href="https://github.com/posit-dev/pointblank/issues/503">#503</a>)</li>
+<li>Each batch now starts a new conversation, so requests no longer grow with every batch and earlier verdicts can’t influence later ones. Thanks <a href="https://github.com/pcbeingused333">[<span class="citation" data-cites="pcbeingused333">@pcbeingused333</span>](https://github.com/pcbeingused333)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/479">#479</a>)</li>
+<li>The JSON array is now found when the reply has square brackets before it. Thanks <a href="https://github.com/pcbeingused333">[<span class="citation" data-cites="pcbeingused333">@pcbeingused333</span>](https://github.com/pcbeingused333)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/471">#471</a>)</li>
+<li>Row verdicts are now matched to pandas rows by position, so frames with a non-default index get the right results. Thanks <a href="https://github.com/pcbeingused333">[<span class="citation" data-cites="pcbeingused333">@pcbeingused333</span>](https://github.com/pcbeingused333)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/477">#477</a>)</li>
+<li>The batch schema is now inferred from every unique row, so sparse text columns no longer cause an error. Thanks <a href="https://github.com/pcbeingused333">[<span class="citation" data-cites="pcbeingused333">@pcbeingused333</span>](https://github.com/pcbeingused333)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/478">#478</a>)</li>
+<li>The reply-token limit for Anthropic and Bedrock models has been raised to 16,000. <a href="./reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> and <a href="./reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> now raise a clear error when a reply is cut off. (<a href="https://github.com/posit-dev/pointblank/issues/493">#493</a>)</li>
+<li>The <code>draft_validation_plan</code> MCP tool now uses <code>anthropic:claude-sonnet-5-5</code> by default, replacing a model that’s being retired. Thanks <a href="https://github.com/pcbeingused333">[<span class="citation" data-cites="pcbeingused333">@pcbeingused333</span>](https://github.com/pcbeingused333)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/470">#470</a>)</li>
+</ul>
+<p><strong>Step reports</strong></p>
+<ul>
+<li><code>col_schema_match()</code> step reports now agree with the validation result for every combination of <code>complete=</code> and <code>in_order=</code>, and they’re easier to read! (<a href="https://github.com/posit-dev/pointblank/issues/491">#491</a>)</li>
+<li>Step report headers, assertion boxes, pass/fail marks, and widths are now consistent across report types. (<a href="https://github.com/posit-dev/pointblank/issues/489">#489</a>)</li>
+<li>Awkward and ungrammatical text in step reports has been fixed. <code>conjointly()</code> and <a href="./reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link gdls-code">specially()</a> reports now name their expressions instead of showing <code>&lt;lambda&gt;</code>. (<a href="https://github.com/posit-dev/pointblank/issues/490">#490</a>)</li>
+<li><a href="./reference/Validate.get_dataframe_report.html#pointblank.Validate.get_dataframe_report" class="gdls-link gdls-code">get_dataframe_report()</a> no longer fails on segmented steps, and checksum specs in <code>col_vals_within_spec()</code> no longer stop <a href="./reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> on Polars LazyFrames. (<a href="https://github.com/posit-dev/pointblank/issues/495">#495</a>)</li>
+</ul>
+<p><strong>Column summaries (<a href="./reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a> and <a href="./reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a>)</strong></p>
+<ul>
+<li><a href="./reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a> now explains why it fails when no column can be profiled, instead of raising a bare <code>AssertionError</code>. Thanks <a href="https://github.com/cristianchiriac">[<span class="citation" data-cites="cristianchiriac">@cristianchiriac</span>](https://github.com/cristianchiriac)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/469">#469</a>)</li>
+<li>List and array columns are now skipped instead of resulting in an error. Thanks <a href="https://github.com/DG47">[<span class="citation" data-cites="DG47">@DG47</span>](https://github.com/DG47)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/499">#499</a>)</li>
+<li>Empty cells now show <code>-</code> on every backend, HTML is no longer shown as text, and string-length statistics now ignore missing values. (<a href="https://github.com/posit-dev/pointblank/issues/495">#495</a>, <a href="https://github.com/posit-dev/pointblank/issues/502">#502</a>, <a href="https://github.com/posit-dev/pointblank/issues/506">#506</a>)</li>
+</ul>
+<p><strong>Serialization (<code>to_code()</code>, <code>to_yaml()</code>, <a href="./reference/yaml_to_python.html#pointblank.yaml_to_python" class="gdls-link gdls-code">yaml_to_python()</a>)</strong></p>
+<ul>
+<li><code>to_code()</code> and <code>to_yaml()</code> now write out every validation method, and the output gives the same results as the original plan. (<a href="https://github.com/posit-dev/pointblank/issues/494">#494</a>)</li>
+<li><code>Validate(reference=...)</code> is now written out when the reference is a file path or connection string, so plans that use <code>pb.ref()</code> can be rebuilt. (<a href="https://github.com/posit-dev/pointblank/issues/504">#504</a>)</li>
+<li>Decimal, time, and timezone-aware datetime values are now written out with the imports they need. (<a href="https://github.com/posit-dev/pointblank/issues/528">#528</a>)</li>
+<li>The original <code>active=</code> value is now kept when a plan is serialized after interrogation. (<a href="https://github.com/posit-dev/pointblank/issues/521">#521</a>)</li>
+<li><a href="./reference/yaml_to_python.html#pointblank.yaml_to_python" class="gdls-link gdls-code">yaml_to_python()</a> now writes working code for file paths and connection strings. (<a href="https://github.com/posit-dev/pointblank/issues/505">#505</a>)</li>
+</ul>
+<p><strong>Validation workflow</strong></p>
+<ul>
+<li>Calling <a href="./reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> again now starts over from the steps as they were defined, and <code>brief</code> templates are kept. (<a href="https://github.com/posit-dev/pointblank/issues/524">#524</a>)</li>
+<li><a href="./reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link gdls-code">get_sundered_data()</a> now returns the right rows for segmented steps and leaves out steps that use <code>pre=</code>. (<a href="https://github.com/posit-dev/pointblank/issues/495">#495</a>, <a href="https://github.com/posit-dev/pointblank/issues/497">#497</a>)</li>
+<li>Segmented steps are now kept when no segments are found, instead of being dropped from the validation. (<a href="https://github.com/posit-dev/pointblank/issues/516">#516</a>)</li>
+<li><a href="./reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a> now works when copying steps from a <a href="./reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object for methods that don’t take <code>value=</code>. (<a href="https://github.com/posit-dev/pointblank/issues/523">#523</a>)</li>
+<li><a href="./reference/emit_otel.html#pointblank.emit_otel" class="gdls-link gdls-code">emit_otel()</a> now sends traces and log records, the same as <a href="./reference/integrations.otel.OTelExporter.html#pointblank.integrations.otel.OTelExporter.export" class="gdls-link gdls-code">OTelExporter.export()</a>. (<a href="https://github.com/posit-dev/pointblank/issues/514">#514</a>)</li>
+</ul>
+<p><strong>Data generation</strong></p>
+<ul>
+<li>With <code>seed=</code>, each generated column now gets its own random sequence, so columns are no longer identical or correlated. Seeded multi-country data is now the same in every session. (<a href="https://github.com/posit-dev/pointblank/issues/526">#526</a>)</li>
+<li>Prefixed <a href="./reference/profile_fields.html#pointblank.profile_fields" class="gdls-link gdls-code">profile_fields()</a> profiles now each get their own person, location, and employer. (<a href="https://github.com/posit-dev/pointblank/issues/519">#519</a>)</li>
+<li>The postcode in a generated <code>address</code> now matches the row’s <code>postcode</code> column. (<a href="https://github.com/posit-dev/pointblank/issues/522">#522</a>)</li>
+<li><a href="./reference/get_data_path.html#pointblank.get_data_path" class="gdls-link gdls-code">get_data_path()</a> no longer leaves temporary files behind. (<a href="https://github.com/posit-dev/pointblank/issues/520">#520</a>)</li>
+</ul>
+</section>
+<section id="documentation" class="level3">
+<h3 class="anchored" data-anchor-id="documentation">Documentation</h3>
+<ul>
+<li>The User Guide sections are now ordered to follow how people might use Pointblank: the core validation workflow first, then data tools, production use, and other interfaces. (<a href="https://github.com/posit-dev/pointblank/issues/509">#509</a>)</li>
+<li>Retired OpenAI and Claude models have been replaced in the AI examples. Thanks <a href="https://github.com/pcbeingused333">[<span class="citation" data-cites="pcbeingused333">@pcbeingused333</span>](https://github.com/pcbeingused333)</a>! (<a href="https://github.com/posit-dev/pointblank/issues/472">#472</a>, <a href="https://github.com/posit-dev/pointblank/issues/493">#493</a>)</li>
+<li>Several small documentation fixes, including clearer report terminology and customization guidance. (<a href="https://github.com/posit-dev/pointblank/issues/512">#512</a>)</li>
+</ul>
+</section>
+<section id="maintenance" class="level3">
+<h3 class="anchored" data-anchor-id="maintenance">Maintenance</h3>
+<ul>
+<li>The <code>duckdb</code> extra now requires <code>ibis-framework&gt;=11.0.0</code> and <code>narwhals&gt;=2.8.0</code>, which fixes queries on ibis 10.x with DuckDB 1.4+. DuckDB is temporarily capped at <code>&lt;2</code> until ibis and Narwhals support it. (<a href="https://github.com/posit-dev/pointblank/issues/476">#476</a>)</li>
+<li>The minimum versions are now <code>narwhals&gt;=2.8.0</code> and <code>great-tables&gt;=1.1.0</code>, and the <code>generate</code> extra now requires <code>chatlas&gt;=0.10.0</code>. (<a href="https://github.com/posit-dev/pointblank/issues/496">#496</a>, <a href="https://github.com/posit-dev/pointblank/issues/513">#513</a>)</li>
+</ul>
+</section>
+</section>
 <section id="v1.1.1" class="level1 changelog-version">
 <h1 class="changelog-version">v1.1.1</h1>
 <p><em>2026-10-15</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v1.1.1">GitHub</a></p>
@@ -257,8 +363,8 @@ ul.task-list li input[type="checkbox"] {
 <h1 class="changelog-version">v1.1.0</h1>
 <p><em>2026-10-15</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v1.1.0">GitHub</a></p>
 <p>Pointblank <code>v1.1.0</code> adds table comparison and makes validation results more correct across backends. The new <code>pb.compare()</code> function, the <code>tbl_reconcile()</code> validation step, and the <code>pb compare</code> CLI command show exactly how two tables differ: row by row, column by column, and in aggregate. <code>tbl_match()</code> now runs on the same engine, with full step reports. This release also fixes how missing values, Ibis tables, and expression errors are handled in many validation methods. Steps that can’t be evaluated now report an evaluation error instead of a misleading failure.</p>
-<section id="new-features" class="level3">
-<h3 class="anchored" data-anchor-id="new-features">New Features</h3>
+<section id="new-features-1" class="level3">
+<h3 class="anchored" data-anchor-id="new-features-1">New Features</h3>
 <ul>
 <li><strong>Table comparison with <code>pb.compare()</code></strong> — Aligns two tables by key, by position, or as multisets (<code>keys="*"</code>). Each row is classified as match, changed, missing, extra, or duplicate key, and schema differences are reported too. You can set numeric and datetime tolerances, normalize strings, map renamed columns with <code>column_map=</code>, and compare a subset of columns. The result is a <a href="./reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> object with counts, row samples, a per-column summary, JSON export, and a Great Tables report in all 40 reporting languages. Inputs are scanned lazily, and <code>partitions=</code> limits memory use on very large tables. (<a href="https://github.com/posit-dev/pointblank/issues/443">#443</a>)</li>
 <li><strong><code>tbl_reconcile()</code> validation step</strong> — Reconciles aggregates (sum, count, mean, min, max) between two tables, either by key group or as grand totals. (<a href="https://github.com/posit-dev/pointblank/issues/443">#443</a>)</li>
@@ -266,8 +372,8 @@ ul.task-list li input[type="checkbox"] {
 <li><strong>A richer <code>tbl_match()</code></strong> — Now uses the comparison engine and accepts the same settings. It gains a full step report, failing-row extracts from both tables, sundering, a compact settings badge, and <code>to_code()</code>/<code>to_yaml()</code> support. <strong>Note:</strong> each aligned row now counts as one test unit (before, the whole step was one unit), so fractional thresholds now refer to the share of failing rows. Pass/fail verdicts are unchanged. To fail on any difference as before, use <code>thresholds=1</code>. (<a href="https://github.com/posit-dev/pointblank/issues/443">#443</a>)</li>
 </ul>
 </section>
-<section id="enhancements" class="level3">
-<h3 class="anchored" data-anchor-id="enhancements">Enhancements</h3>
+<section id="enhancements-1" class="level3">
+<h3 class="anchored" data-anchor-id="enhancements-1">Enhancements</h3>
 <ul>
 <li>Anthropic is no longer a required dependency. It’s now installed only with the <code>pointblank[generate]</code> extra, so core installs are lighter. Thanks <a href="https://github.com/timkpaine"><span class="citation" data-cites="timkpaine">@timkpaine</span></a>! (<a href="https://github.com/posit-dev/pointblank/issues/437">#437</a>)</li>
 <li><code>col_vals_increasing()</code> and <code>col_vals_decreasing()</code> gain an <code>order_by=</code> parameter, so they now work on database tables, Ibis, and PySpark. Each value is now compared with the last non-missing value before it. (<a href="https://github.com/posit-dev/pointblank/issues/451">#451</a>)</li>
@@ -278,8 +384,8 @@ ul.task-list li input[type="checkbox"] {
 <li>A <code>pre=</code> function with a <code>dfn</code> parameter now always receives a Narwhals DataFrame, whether it’s a lambda, a named function, or another callable. This now also works with <a href="./reference/col.html#pointblank.col" class="gdls-link gdls-code">col()</a> selectors and <code>segments=</code>. (<a href="https://github.com/posit-dev/pointblank/issues/458">#458</a>)</li>
 </ul>
 </section>
-<section id="bug-fixes" class="level3">
-<h3 class="anchored" data-anchor-id="bug-fixes">Bug Fixes</h3>
+<section id="bug-fixes-1" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-1">Bug Fixes</h3>
 <p><strong>Evaluation errors instead of misleading failures</strong></p>
 <ul>
 <li>Invalid expressions in <code>col_vals_expr()</code> and <code>conjointly()</code> are now reported as evaluation errors. (<a href="https://github.com/posit-dev/pointblank/issues/448">#448</a>)</li>
@@ -320,8 +426,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Define-XML extensions of extensible CDISC codelists are now accepted in conformance checks. (<a href="https://github.com/posit-dev/pointblank/issues/462">#462</a>)</li>
 </ul>
 </section>
-<section id="documentation" class="level3">
-<h3 class="anchored" data-anchor-id="documentation">Documentation</h3>
+<section id="documentation-1" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-1">Documentation</h3>
 <ul>
 <li>The lambda <code>pre=</code> example uses a lambda function again. Thanks <a href="https://github.com/dpprdan"><span class="citation" data-cites="dpprdan">@dpprdan</span></a>! (<a href="https://github.com/posit-dev/pointblank/issues/330">#330</a>)</li>
 </ul>
@@ -331,8 +437,8 @@ ul.task-list li input[type="checkbox"] {
 <h1 class="changelog-version">v1.0.1</h1>
 <p><em>2026-10-07</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v1.0.1">GitHub</a></p>
 <p>Pointblank <code>v1.0.1</code> is a maintenance release that makes Pointblank fully compatible with Polars 2.0. Polars 2.0 no longer silently converts between integers and floats in membership checks, and it requires equal-height frames for horizontal concatenation. Both changes caused errors in several validation methods and in schema step reports. This release fixes those errors across the board and corrects row ordering and row numbering for Polars LazyFrames. Polars <code>1.33.0</code> and later remain supported. Many thanks to <a href="https://github.com/FBruzzesi"><span class="citation" data-cites="FBruzzesi">@FBruzzesi</span></a> for spotting these issues in Narwhals CI and contributing the first set of fixes!</p>
-<section id="bug-fixes-1" class="level3">
-<h3 class="anchored" data-anchor-id="bug-fixes-1">Bug Fixes</h3>
+<section id="bug-fixes-2" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-2">Bug Fixes</h3>
 <ul>
 <li><code>col_vals_in_set()</code> and <code>col_vals_not_in_set()</code> work again on Polars 2.0 when integer columns are checked against float values or float columns against integer values, including mixed sets such as <code>[1, 2.5]</code>. (<a href="https://github.com/posit-dev/pointblank/issues/429">#429</a>, <a href="https://github.com/posit-dev/pointblank/issues/430">#430</a>)</li>
 <li>Step reports for <code>col_schema_match()</code> no longer raise a <code>ShapeError</code> on Polars 2.0 when the table and the expected schema have different numbers of columns. (<a href="https://github.com/posit-dev/pointblank/issues/429">#429</a>)</li>
@@ -341,8 +447,8 @@ ul.task-list li input[type="checkbox"] {
 <li><a href="./reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link gdls-code">get_data_extracts()</a> now reports correct row numbers for Polars LazyFrames. Previously, rows were numbered by the sort order of the first column, on every Polars version. (<a href="https://github.com/posit-dev/pointblank/issues/430">#430</a>)</li>
 </ul>
 </section>
-<section id="maintenance" class="level3">
-<h3 class="anchored" data-anchor-id="maintenance">Maintenance</h3>
+<section id="maintenance-1" class="level3">
+<h3 class="anchored" data-anchor-id="maintenance-1">Maintenance</h3>
 <ul>
 <li>CI now runs the test suite against the latest Polars and Narwhals releases as well as the minimum supported versions, so new releases of either library are tested as soon as they come out. (<a href="https://github.com/posit-dev/pointblank/issues/430">#430</a>)</li>
 </ul>
@@ -352,31 +458,31 @@ ul.task-list li input[type="checkbox"] {
 <h1 class="changelog-version">v1.0.0</h1>
 <p><em>2026-10-06</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v1.0.0">GitHub</a></p>
 <p>Pointblank reaches <code>v1.0.0</code> with new ways to reuse and compose validation logic, a new string-length validation method, and full compatibility with Great Tables <code>v1.0.0</code>. The new <a href="./reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> builder and <a href="./reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">Validate.add_steps()</a> let you define step libraries once and combine them across validation plans, with options to remap column names, override thresholds, or skip specific steps when importing. The new <code>col_vals_str_len()</code> method checks that string lengths fall within minimum and/or maximum bounds. This release also restores validation reports under Great Tables <code>v1.0.0</code>, which now escapes HTML in table cells by default.</p>
-<section id="new-features-1" class="level3">
-<h3 class="anchored" data-anchor-id="new-features-1">New Features</h3>
+<section id="new-features-2" class="level3">
+<h3 class="anchored" data-anchor-id="new-features-2">New Features</h3>
 <ul>
 <li><strong>Composable validation steps</strong>: the new <code>pb.Steps()</code> builder records validation steps without attaching them to a table, and <a href="./reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">Validate.add_steps()</a> adds them to any validation plan. When importing steps, you can remap columns with <code>columns_map=</code>, override <code>thresholds=</code> or <code>active=</code>, and drop steps by name or position with <code>exclude=</code>. Existing <a href="./reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> objects can also serve as step sources, and <a href="./reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> objects show a formatted HTML summary in notebooks. A new <em>Composable Steps</em> article in the User Guide covers the workflow. (<a href="https://github.com/posit-dev/pointblank/issues/424">#424</a>)</li>
 <li><strong><code>col_vals_str_len()</code> validation method</strong>: checks whether the character length of string values in one or more columns falls between <code>min_val=</code> and/or <code>max_val=</code>. It supports the usual <code>na_pass=</code>, <code>pre=</code>, <code>segments=</code>, <code>thresholds=</code>, and <code>actions=</code> options, has translated autobriefs, and is also available on <a href="./reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a>. (<a href="https://github.com/posit-dev/pointblank/issues/422">#422</a>)</li>
 </ul>
 </section>
-<section id="bug-fixes-2" class="level3">
-<h3 class="anchored" data-anchor-id="bug-fixes-2">Bug Fixes</h3>
+<section id="bug-fixes-3" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-3">Bug Fixes</h3>
 <ul>
 <li>Validation reports now render correctly with Great Tables <code>v1.0.0</code>. Previously, the HTML in the report’s cells (status icons, badges, and labels) appeared as escaped markup. The fix also keeps working with earlier Great Tables versions. (<a href="https://github.com/posit-dev/pointblank/issues/426">#426</a>)</li>
 <li>The MCP server’s prompts now import <code>Message</code> from FastMCP’s current module path, fixing an import error with recent FastMCP releases.</li>
 <li><code>sqlglot</code> is now restricted to versions below <code>30.18</code>, since <code>30.18</code> and later omit table names in <code>DROP</code> statements and break DuckDB and SQLite backends. (<a href="https://github.com/posit-dev/pointblank/issues/425">#425</a>)</li>
 </ul>
 </section>
-<section id="documentation-1" class="level3">
-<h3 class="anchored" data-anchor-id="documentation-1">Documentation</h3>
+<section id="documentation-2" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-2">Documentation</h3>
 <ul>
 <li>Added a glossary to the reference section of the User Guide that defines key Pointblank terms.</li>
 <li>LLM examples in the skills docs now use Anthropic model IDs that are still served. (<a href="https://github.com/posit-dev/pointblank/issues/423">#423</a>)</li>
 <li>Clarified the failing-case example in the length validation docs.</li>
 </ul>
 </section>
-<section id="maintenance-1" class="level3">
-<h3 class="anchored" data-anchor-id="maintenance-1">Maintenance</h3>
+<section id="maintenance-2" class="level3">
+<h3 class="anchored" data-anchor-id="maintenance-2">Maintenance</h3>
 <ul>
 <li>Test coverage was expanded substantially across the validation, MCP, metadata, conformance, adapter, scan profile, and data generation modules.</li>
 </ul>
@@ -386,23 +492,23 @@ ul.task-list li input[type="checkbox"] {
 <h1 class="changelog-version">v0.27.0</h1>
 <p><em>2026-08-13</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.27.0">GitHub</a></p>
 <p>Pointblank <code>v0.27.0</code> brings referential integrity validation, statistical drift detection, and expanded data profiling capabilities. The new <code>col_vals_in_table()</code> validation method enables cross-table foreign key checks, while <a href="./reference/DataScan.compare.html#pointblank.DataScan.compare" class="gdls-link gdls-code">DataScan.compare()</a> and the <a href="./reference/DataScanDiff.html#pointblank.DataScanDiff" class="gdls-link gdls-code">DataScanDiff</a> class make it possible to detect schema and statistical drift between data profiles over time. Several skills are now packaged with the library for immediate use, contract adapters received important additions and fixes, and the MCP integration has been cleaned up with a leaner dependency footprint.</p>
-<section id="new-features-2" class="level3">
-<h3 class="anchored" data-anchor-id="new-features-2">New Features</h3>
+<section id="new-features-3" class="level3">
+<h3 class="anchored" data-anchor-id="new-features-3">New Features</h3>
 <ul>
 <li><p><strong>Referential integrity validation with <code>col_vals_in_table()</code></strong> — New validation method that checks whether each value (or composite key) in a column exists in a reference table column. Supports single and multi-column keys, <code>na_pass</code>, segmentation, and all standard thresholds and actions, making foreign key–style consistency checks a first-class validation step. (<a href="https://github.com/posit-dev/pointblank/issues/419">#419</a>)</p></li>
 <li><p><strong>Statistical drift measures via <a href="./reference/DataScanDiff.html#pointblank.DataScanDiff" class="gdls-link gdls-code">DataScanDiff</a></strong> — <code>DataScan.compare(baseline)</code> now returns a <a href="./reference/DataScanDiff.html#pointblank.DataScanDiff" class="gdls-link gdls-code">DataScanDiff</a> object that provides programmatic access to schema changes (columns added, removed, or type-changed) and per-column statistical drift metrics — Population Stability Index (PSI) for numeric and categorical columns, and Kolmogorov-Smirnov statistic for numerics (with a pure-Python fallback when SciPy is unavailable). Results are surfaced via <code>get_tabular_report()</code>, which renders a styled Great Tables report with schema and drift columns. (<a href="https://github.com/posit-dev/pointblank/issues/421">#421</a>)</p></li>
 <li><p><strong>Packaged skills</strong> — A set of skills is now distributed with the package (e.g., defining contracts, drafting validations, scanning and profiling data, writing validations, and more). (<a href="https://github.com/posit-dev/pointblank/issues/417">#417</a>)</p></li>
 </ul>
 </section>
-<section id="enhancements-1" class="level3">
-<h3 class="anchored" data-anchor-id="enhancements-1">Enhancements</h3>
+<section id="enhancements-2" class="level3">
+<h3 class="anchored" data-anchor-id="enhancements-2">Enhancements</h3>
 <ul>
 <li><p><strong>Extended <a href="./reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> class</strong> — <a href="./reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> can now be serialized and restored without access to the original data. New methods include <code>to_dict()</code>, <code>to_json()</code>, <a href="./reference/DataScan.save_to_json.html#pointblank.DataScan.save_to_json" class="gdls-link gdls-code">save_to_json()</a>, <code>from_dict()</code>, <a href="./reference/DataScan.from_json.html#pointblank.DataScan.from_json" class="gdls-link gdls-code">from_json()</a>, and <a href="./reference/DataScan.load_from_json.html#pointblank.DataScan.load_from_json" class="gdls-link gdls-code">load_from_json()</a> for round-trip persistence of data profiles. Stored scans can then be compared against new scans using <code>compare()</code> to track drift over time. (<a href="https://github.com/posit-dev/pointblank/issues/420">#420</a>)</p></li>
 <li><p><strong>Contract adapter additions and fixes</strong> — The contract adapter system received expanded functionality and correctness fixes across the supported formats (dbt, Frictionless, JSON Schema, ODCS). Adapter import and export coverage was improved, and <a href="./reference/ContractImport.html#pointblank.ContractImport.to_contract" class="gdls-link gdls-code">ContractImport.to_contract()</a> and <a href="./reference/ContractImport.html#pointblank.ContractImport.to_python" class="gdls-link gdls-code">ContractImport.to_python()</a> output is now more reliable. (<a href="https://github.com/posit-dev/pointblank/issues/418">#418</a>)</p></li>
 </ul>
 </section>
-<section id="bug-fixes-3" class="level3">
-<h3 class="anchored" data-anchor-id="bug-fixes-3">Bug Fixes</h3>
+<section id="bug-fixes-4" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-4">Bug Fixes</h3>
 <ul>
 <li>Removed the direct <code>mcp[cli]</code> dependency and replaced it with an updated <code>fastmcp&gt;=2.14.2</code> pin, resolving installation conflicts in environments that use the MCP optional extra. (<a href="https://github.com/posit-dev/pointblank/issues/416">#416</a>)</li>
 </ul>
@@ -418,8 +524,8 @@ ul.task-list li input[type="checkbox"] {
 <h1 class="changelog-version">v0.26.0</h1>
 <p><em>2026-07-27</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/0.26.0">GitHub</a></p>
 <p>Pointblank <code>v0.26.0</code> is a major release focused on clinical data standards, data quality measurement, and AI-assisted validation editing. This release introduces comprehensive CDISC conformance validation with a built-in rule engine and bundled controlled terminology, a metadata import/export system supporting SDTM, ADaM, Frictionless, and CSVW formats, and structured missingness handling through a new <a href="./reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> type. Validation steps are now automatically tagged with data quality dimensions and rolled up into health scores, and the new <a href="./reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> class lets you modify existing validation plans through interaction with an LLM.</p>
-<section id="new-features-3" class="level4">
-<h4 class="anchored" data-anchor-id="new-features-3">New Features</h4>
+<section id="new-features-4" class="level4">
+<h4 class="anchored" data-anchor-id="new-features-4">New Features</h4>
 <ul>
 <li><p><strong>Data quality dimensions and health scoring</strong> — Every validation step is now tagged with a data quality dimension (Completeness, Validity, Uniqueness, Consistency, Timeliness, or Volume) inferred automatically from the assertion type. Dimensions are overridable per step via <code>dimension=</code> or remappable globally via <code>pb.config(dimension_map=...)</code>. New methods <a href="./reference/Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link gdls-code">get_dimension_scores()</a>, <a href="./reference/Validate.get_health_score.html#pointblank.Validate.get_health_score" class="gdls-link gdls-code">get_health_score()</a>, <a href="./reference/Validate.get_scorecard.html#pointblank.Validate.get_scorecard" class="gdls-link gdls-code">get_scorecard()</a>, and <a href="./reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link gdls-code">get_validation_summary()</a> expose test-unit-weighted scores, with <a href="./reference/Validate.assert_dimension_scores.html#pointblank.Validate.assert_dimension_scores" class="gdls-link gdls-code">assert_dimension_scores()</a> available to fail a run when a dimension falls below a threshold. The validation report shows color-coded dimension badges on each step number with a health-score summary in the footer. (<a href="https://github.com/posit-dev/pointblank/issues/409">#409</a>)</p></li>
 <li><p><strong>CDISC submission conformance</strong> — A new conformance validation framework provides a rule engine, bundled SDTMIG 3.4 rules with SDTM controlled terminology, and public APIs for validating study submission packages. Includes <a href="./reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a> with JSON and Excel export, <a href="./reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link gdls-code">findings_df()</a> and <a href="./reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link gdls-code">get_findings_table()</a> for detailed inspection, and integration with the CDISC CORE engine. (<a href="https://github.com/posit-dev/pointblank/issues/413">#413</a>)</p></li>
@@ -430,15 +536,15 @@ ul.task-list li input[type="checkbox"] {
 <li><p><strong><a href="./reference/float_field.html#pointblank.float_field" class="gdls-link gdls-code">float_field()</a> <code>precision=</code> parameter</strong> — Generated float values can now be rounded to a specified number of decimal places, useful for prices, scores, and other fields where full floating-point precision is not desired. (<a href="https://github.com/posit-dev/pointblank/issues/412">#412</a>)</p></li>
 </ul>
 </section>
-<section id="bug-fixes-4" class="level4">
-<h4 class="anchored" data-anchor-id="bug-fixes-4">Bug Fixes</h4>
+<section id="bug-fixes-5" class="level4">
+<h4 class="anchored" data-anchor-id="bug-fixes-5">Bug Fixes</h4>
 <ul>
 <li><p>Per-row validation checks on Polars LazyFrames are no longer 8–11× slower than v0.24.0. The result-tallying code now computes row, pass, fail, and null counts in a single aggregation instead of issuing three to four separate <code>.collect()</code> calls that re-executed the entire lazy plan. (<a href="https://github.com/posit-dev/pointblank/issues/407">#407</a>)</p></li>
 <li><p>Segmented validation on Polars LazyFrames no longer raises an <code>UnboundLocalError</code> for <code>seg_tuples()</code>. Segment expressions now work consistently for both eager and lazy DataFrames. (<a href="https://github.com/posit-dev/pointblank/issues/414">#414</a>)</p></li>
 </ul>
 </section>
-<section id="documentation-2" class="level4">
-<h4 class="anchored" data-anchor-id="documentation-2">Documentation</h4>
+<section id="documentation-3" class="level4">
+<h4 class="anchored" data-anchor-id="documentation-3">Documentation</h4>
 <ul>
 <li>CDISC validation user guide examples are now fully executable against sample metadata documents bundled with the package via the new <a href="./reference/load_metadata_example.html#pointblank.load_metadata_example" class="gdls-link gdls-code">load_metadata_example()</a> function. (<a href="https://github.com/posit-dev/pointblank/issues/406">#406</a>)</li>
 </ul>
@@ -448,16 +554,16 @@ ul.task-list li input[type="checkbox"] {
 <h1 class="changelog-version">v0.25.0</h1>
 <p><em>2026-06-12</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.25.0">GitHub</a></p>
 <p>Pointblank <code>v0.25.0</code> introduces powerful new capabilities for data pipeline governance and synthetic data generation. This release adds boundary enforcement through contracts and pipelines, letting you validate data at both the source and target of a transformation. Rich schema inference automatically detects constraints from existing tables (including ranges, categorical values, and semantic presets) enabling realistic synthetic data generation. The <a href="./reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt()</a> validation method now accepts multi-modal attachments (images and PDFs), giving the LLM visual context when evaluating data quality.</p>
-<section id="new-features-4" class="level3">
-<h3 class="anchored" data-anchor-id="new-features-4">New Features</h3>
+<section id="new-features-5" class="level3">
+<h3 class="anchored" data-anchor-id="new-features-5">New Features</h3>
 <ul>
 <li><p><strong>Rich schema inference</strong> — <code>Schema.from_table()</code> and <a href="./reference/schema_from_tbl.html#pointblank.schema_from_tbl" class="gdls-link gdls-code">schema_from_tbl()</a> automatically extract comprehensive constraints from any supported table, including numeric ranges, categorical values, nullability, date bounds, and 25+ semantic presets (email, address, UUID, etc.) to power realistic synthetic data generation. (<a href="https://github.com/posit-dev/pointblank/issues/391">#391</a>)</p></li>
 <li><p><strong>Multi-modal attachments in <a href="./reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt()</a></strong> — The <a href="./reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt()</a> validation method now accepts an <code>attachments=</code> parameter for images and PDFs (local files or URLs), providing visual context to the LLM for richer data validation against brand guides, schema diagrams, or reference documents. (<a href="https://github.com/posit-dev/pointblank/issues/393">#393</a>)</p></li>
 <li><p><strong>Boundary enforcement with contracts and pipelines</strong> — New <a href="./reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> and <a href="./reference/Pipeline.html#pointblank.Pipeline" class="gdls-link gdls-code">Pipeline</a> classes enable dual-boundary validation at the source and target of data transformations. Contracts define schema expectations and validation steps with ownership metadata, while pipelines orchestrate the full validate-transform-validate workflow with short-circuit optimization. (<a href="https://github.com/posit-dev/pointblank/issues/401">#401</a>)</p></li>
 </ul>
 </section>
-<section id="bug-fixes-5" class="level3">
-<h3 class="anchored" data-anchor-id="bug-fixes-5">Bug Fixes</h3>
+<section id="bug-fixes-6" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-6">Bug Fixes</h3>
 <ul>
 <li><p>Lazy frames are no longer prematurely collected during interrogation, preserving the performance benefits of deferred evaluation with Polars LazyFrames. (<a href="https://github.com/posit-dev/pointblank/issues/398">#398</a>)</p></li>
 <li><p><code>rows_distinct()</code> now correctly handles rows containing null values instead of dropping them from validation results. (<a href="https://github.com/posit-dev/pointblank/issues/399">#399</a>)</p></li>
@@ -468,8 +574,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.24.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.24.0</h1>
 <p><em>2026-04-22</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.24.0">GitHub</a></p>
-<section id="new-features-5" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-5">New Features</h2>
+<section id="new-features-6" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-6">New Features</h2>
 <ul>
 <li>Added the <a href="./reference/Validate.get_dataframe_report.html#pointblank.Validate.get_dataframe_report" class="gdls-link gdls-code">get_dataframe_report()</a> method to <a href="./reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> for writing validation results to a DataFrame (supports Polars, Pandas, and DuckDB output). (<a href="https://github.com/Meghansaha"><span class="citation" data-cites="Meghansaha">@Meghansaha</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/341">#341</a>)</li>
 <li>Added OpenTelemetry (OTel) integration for exporting validation results as metrics, traces, and logs. Available as an optional dependency via the <code>otel</code> extra. (<a href="https://github.com/posit-dev/pointblank/issues/383">#383</a>)</li>
@@ -515,16 +621,16 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.22.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.22.0</h1>
 <p><em>2026-02-26</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.22.0">GitHub</a></p>
-<section id="new-features-6" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-6">New Features</h2>
+<section id="new-features-7" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-7">New Features</h2>
 <ul>
 <li>Expanded <a href="./reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> country support with 29 new countries (EC, PA, SA, UA, AM, AZ, BO, CM, DO, GE, GT, HN, IL, JM, JO, KH, KZ, LB, MD, MM, MZ, NP, PY, RS, RW, SV, TZ, UY, UZ), bringing the total to 100 supported countries, along with expanded street lists and normalized industry names across existing countries. (<a href="https://github.com/posit-dev/pointblank/issues/370">#370</a>, <a href="https://github.com/posit-dev/pointblank/issues/371">#371</a>)</li>
 <li>Added <a href="./reference/profile_fields.html#pointblank.profile_fields" class="gdls-link gdls-code">profile_fields()</a> as a composite helper that creates a dictionary of person-profile <code>StringField</code> objects for direct unpacking into a <a href="./reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema()</a>. Supports three tiers (<code>"minimal"</code>, <code>"standard"</code>, <code>"full"</code>), name splitting, column include/exclude, and a <code>prefix=</code> parameter for namespacing. (<a href="https://github.com/posit-dev/pointblank/issues/367">#367</a>)</li>
 <li>Significantly expanded YAML workflow support with governance metadata (<code>owner</code>, <code>consumers</code>, <code>version</code>), <code>final_actions</code> and <code>reference</code> top-level keys, aggregate validation methods (<a href="./reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt" class="gdls-link gdls-code">col_sum_gt</a>, <a href="./reference/Validate.col_avg_le.html#pointblank.Validate.col_avg_le" class="gdls-link gdls-code">col_avg_le</a>, etc.), <code>col_pct_null</code>, <code>data_freshness</code>, shortcut syntax for the <code>active</code> parameter, unknown-key validation to catch typos, and YAML-to-Python roundtrip fidelity. (<a href="https://github.com/posit-dev/pointblank/issues/369">#369</a>)</li>
 </ul>
 </section>
-<section id="bug-fixes-6" class="level2">
-<h2 class="anchored" data-anchor-id="bug-fixes-6">Bug Fixes</h2>
+<section id="bug-fixes-7" class="level2">
+<h2 class="anchored" data-anchor-id="bug-fixes-7">Bug Fixes</h2>
 <ul>
 <li>Fixed <a href="./reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> failing on tables with duration (timedelta) columns by casting them to strings before display. (<a href="https://github.com/posit-dev/pointblank/issues/368">#368</a>)</li>
 </ul>
@@ -541,8 +647,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.21.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.21.0</h1>
 <p><em>2026-02-19</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.21.0">GitHub</a></p>
-<section id="new-features-7" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-7">New Features</h2>
+<section id="new-features-8" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-8">New Features</h2>
 <ul>
 <li>Significantly enhanced <a href="./reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> with locale mixing (<code>country=</code> now accepts lists or weighted dicts), frequency-weighted sampling via a 4-tier system, a <code>user_agent</code> preset with country-weighted browser selection, presets for hash digests (<code>md5</code>, <code>sha1</code>, <code>sha256</code>), barcodes (<code>ean8</code>, <code>ean13</code>), date strings (<code>date_between</code>, <code>date_range</code>, <code>future_date</code>, <code>past_date</code>), and ISO 3166-1 country codes (<code>country_code_2</code>, <code>country_code_3</code>), country-specific license plate formats, industry-coherent person-company pairing, a <a href="./reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset</a> pytest fixture with automatic per-test seeding, and expanded country support (bringing the total to 71). (<a href="https://github.com/posit-dev/pointblank/issues/352">#352</a>, <a href="https://github.com/posit-dev/pointblank/issues/354">#354</a>, <a href="https://github.com/posit-dev/pointblank/issues/355">#355</a>, <a href="https://github.com/posit-dev/pointblank/issues/358">#358</a>, <a href="https://github.com/posit-dev/pointblank/issues/360">#360</a>, <a href="https://github.com/posit-dev/pointblank/issues/361">#361</a>, <a href="https://github.com/posit-dev/pointblank/issues/362">#362</a>, <a href="https://github.com/posit-dev/pointblank/issues/363">#363</a>, <a href="https://github.com/posit-dev/pointblank/issues/364">#364</a>, <a href="https://github.com/posit-dev/pointblank/issues/365">#365</a>, <a href="https://github.com/posit-dev/pointblank/issues/366">#366</a>)</li>
 <li>Added expressions support for the <code>active=</code> parameter to provide for more flexible and dynamic validation workflows. (<a href="https://github.com/posit-dev/pointblank/issues/349">#349</a>)</li>
@@ -562,8 +668,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.20.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.20.0</h1>
 <p><em>2026-02-04</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.20.0">GitHub</a></p>
-<section id="new-features-8" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-8">New Features</h2>
+<section id="new-features-9" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-9">New Features</h2>
 <ul>
 <li>Added the <a href="./reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> function for creating realistic synthetic test data from <a href="./reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> definitions, with a suite of field helper functions (<a href="./reference/int_field.html#pointblank.int_field" class="gdls-link gdls-code">int_field()</a>, <a href="./reference/string_field.html#pointblank.string_field" class="gdls-link gdls-code">string_field()</a>, <a href="./reference/date_field.html#pointblank.date_field" class="gdls-link gdls-code">date_field()</a>, <code>name_field()</code>, etc.) and support for 50 country locales via the <code>country=</code> parameter. (<a href="https://github.com/posit-dev/pointblank/issues/348">#348</a>)</li>
 </ul>
@@ -573,8 +679,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.19.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.19.0</h1>
 <p><em>2026-01-21</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.19.0">GitHub</a></p>
-<section id="new-features-9" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-9">New Features</h2>
+<section id="new-features-10" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-10">New Features</h2>
 <ul>
 <li>We can now specify <code>owner</code>, <code>consumers</code>, and <code>version</code> metadata for data validations within the <a href="./reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> class. (<a href="https://github.com/posit-dev/pointblank/issues/344">#344</a>)</li>
 <li>The new <code>data_freshness()</code> validation method has been added for easily checking the freshness of data. (<a href="https://github.com/posit-dev/pointblank/issues/345">#345</a>)</li>
@@ -592,8 +698,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.18.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.18.0</h1>
 <p><em>2026-01-13</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.18.0">GitHub</a></p>
-<section id="new-features-10" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-10">New Features</h2>
+<section id="new-features-11" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-11">New Features</h2>
 <ul>
 <li>Added several validation methods that work on aggregates of column values (e.g.,<a href="./reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt" class="gdls-link gdls-code">col_sum_gt()</a>, <a href="./reference/Validate.col_sd_lt.html#pointblank.Validate.col_sd_lt" class="gdls-link gdls-code">col_sd_lt()</a>, etc.). (<a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/332">#332</a>)</li>
 </ul>
@@ -618,8 +724,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.17.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.17.0</h1>
 <p><em>2025-12-02</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.17.0">GitHub</a></p>
-<section id="new-features-11" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-11">New Features</h2>
+<section id="new-features-12" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-12">New Features</h2>
 <ul>
 <li>All <code>col_schema_match()</code> validation steps are now accompanied by notes that describe the results. (<a href="https://github.com/posit-dev/pointblank/issues/325">#325</a>)</li>
 <li>Notes appear in validation reports notes when columns are not found or none are resolved by use of column selectors. (<a href="https://github.com/posit-dev/pointblank/issues/326">#326</a>)</li>
@@ -646,8 +752,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.16.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.16.0</h1>
 <p><em>2025-11-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.16.0">GitHub</a></p>
-<section id="new-features-12" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-12">New Features</h2>
+<section id="new-features-13" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-13">New Features</h2>
 <ul>
 <li>Use of local thresholds settings will now produce notes at the bottom of the validation report table. (<a href="https://github.com/posit-dev/pointblank/issues/318">#318</a>)</li>
 <li>Added the <a href="./reference/print_database_tables.html#pointblank.print_database_tables" class="gdls-link gdls-code">print_database_tables()</a> function for printing a list of tables in a database connection. (<a href="https://github.com/posit-dev/pointblank/issues/322">#322</a>, <a href="https://github.com/Meghansaha"><span class="citation" data-cites="Meghansaha">@Meghansaha</span></a>)</li>
@@ -684,8 +790,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.15.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.15.0</h1>
 <p><em>2025-10-28</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.15.0">GitHub</a></p>
-<section id="new-features-13" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-13">New Features</h2>
+<section id="new-features-14" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-14">New Features</h2>
 <ul>
 <li>Several new validation methods were incorporated: <code>col_vals_within_spec()</code>, <code>col_vals_increasing()</code>, <code>col_vals_decreasing()</code>, and <code>tbl_match()</code>. (<a href="https://github.com/posit-dev/pointblank/issues/304">#304</a>, <a href="https://github.com/posit-dev/pointblank/issues/305">#305</a>, <a href="https://github.com/posit-dev/pointblank/issues/306">#306</a>)</li>
 <li>The option to ignore SSL verification was added to the <a href="./reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class via the new <code>verify_ssl=</code> parameter. (<a href="https://github.com/posit-dev/pointblank/issues/302">#302</a>)</li>
@@ -709,8 +815,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.14.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.14.0</h1>
 <p><em>2025-10-10</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.14.0">GitHub</a></p>
-<section id="new-features-14" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-14">New Features</h2>
+<section id="new-features-15" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-15">New Features</h2>
 <ul>
 <li>Added the <code>.prompt()</code> validation method to enable data validation using LLMs, evaluating data in rows against natural language descriptions instead of programmatic rules. (<a href="https://github.com/posit-dev/pointblank/issues/287">#287</a>)</li>
 <li>The new <a href="./reference/write_file.html#pointblank.write_file" class="gdls-link gdls-code">write_file()</a> and <a href="./reference/read_file.html#pointblank.read_file" class="gdls-link gdls-code">read_file()</a> functions allow for writing/reading validation objects to and from disk. (<a href="https://github.com/posit-dev/pointblank/issues/291">#291</a>)</li>
@@ -743,8 +849,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.13.4" class="level1 changelog-version">
 <h1 class="changelog-version">v0.13.4</h1>
 <p><em>2025-09-19</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.13.4">GitHub</a></p>
-<section id="new-features-15" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-15">New Features</h2>
+<section id="new-features-16" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-16">New Features</h2>
 <ul>
 <li>Add Enum support to <code>col_vals_in_set()</code> and <code>col_vals_not_in_set()</code>. (<a href="https://github.com/posit-dev/pointblank/issues/280">#280</a>)</li>
 <li>The <code>col_vals_regex()</code> validation method now has the <code>inverse=</code> parameter to enable negative regex matching. (<a href="https://github.com/posit-dev/pointblank/issues/282">#282</a>)</li>
@@ -761,8 +867,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.13.3" class="level1 changelog-version">
 <h1 class="changelog-version">v0.13.3</h1>
 <p><em>2025-09-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.13.3">GitHub</a></p>
-<section id="new-features-16" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-16">New Features</h2>
+<section id="new-features-17" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-17">New Features</h2>
 <ul>
 <li>Added the <code>namespaces=</code> parameter to <a href="./reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a> to facilitate authoring of custom actions. (<a href="https://github.com/mark-druffel"><span class="citation" data-cites="mark-druffel">@mark-druffel</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/277">#277</a>)</li>
 </ul>
@@ -784,8 +890,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.13.2" class="level1 changelog-version">
 <h1 class="changelog-version">v0.13.2</h1>
 <p><em>2025-09-05</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.13.2">GitHub</a></p>
-<section id="new-features-17" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-17">New Features</h2>
+<section id="new-features-18" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-18">New Features</h2>
 <ul>
 <li>String-based comparisons are now possible in the <code>col_vals_eq()</code> and <code>col_vals_ne()</code> validation methods. (<a href="https://github.com/posit-dev/pointblank/issues/272">#272</a>)</li>
 </ul>
@@ -819,8 +925,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.13.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.13.0</h1>
 <p><em>2025-08-28</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.13.0">GitHub</a></p>
-<section id="new-features-18" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-18">New Features</h2>
+<section id="new-features-19" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-19">New Features</h2>
 <ul>
 <li>Incorporated a Model Context Protocol (MCP) server implementation. (<a href="https://github.com/posit-dev/pointblank/issues/239">#239</a>, <a href="https://github.com/posit-dev/pointblank/issues/264">#264</a>, <a href="https://github.com/pipaber"><span class="citation" data-cites="pipaber">@pipaber</span></a>)</li>
 </ul>
@@ -849,8 +955,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.12.2" class="level1 changelog-version">
 <h1 class="changelog-version">v0.12.2</h1>
 <p><em>2025-08-16</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.12.2">GitHub</a></p>
-<section id="new-features-19" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-19">New Features</h2>
+<section id="new-features-20" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-20">New Features</h2>
 <ul>
 <li>Added the <a href="./reference/Validate.set_tbl.html#pointblank.Validate.set_tbl" class="gdls-link gdls-code">set_tbl()</a> method and also the <code>set_tbl=</code> parameter to <a href="./reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a>. (<a href="https://github.com/posit-dev/pointblank/issues/260">#260</a>)</li>
 </ul>
@@ -860,8 +966,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.12.1" class="level1 changelog-version">
 <h1 class="changelog-version">v0.12.1</h1>
 <p><em>2025-08-11</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.12.1">GitHub</a></p>
-<section id="new-features-20" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-20">New Features</h2>
+<section id="new-features-21" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-21">New Features</h2>
 <ul>
 <li>Pointblank now internally handles all Ibis tables using Narwhals. (<a href="https://github.com/posit-dev/pointblank/issues/257">#257</a>)</li>
 </ul>
@@ -871,8 +977,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.12.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.12.0</h1>
 <p><em>2025-08-07</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.12.0">GitHub</a></p>
-<section id="new-features-21" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-21">New Features</h2>
+<section id="new-features-22" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-22">New Features</h2>
 <ul>
 <li>The segmentation feature was expanded by way of the new <a href="./reference/seg_group.html#pointblank.seg_group" class="gdls-link gdls-code">seg_group()</a> helper function. (<a href="https://github.com/posit-dev/pointblank/issues/243">#243</a>)</li>
 <li>You can now validate Spark DataFrames without using Ibis (we now internally process those using Narwhals). (<a href="https://github.com/posit-dev/pointblank/issues/256">#256</a>)</li>
@@ -914,8 +1020,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.11.4" class="level1 changelog-version">
 <h1 class="changelog-version">v0.11.4</h1>
 <p><em>2025-07-23</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.4">GitHub</a></p>
-<section id="new-features-22" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-22">New Features</h2>
+<section id="new-features-23" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-23">New Features</h2>
 <ul>
 <li>It’s now possible to define YAML configuration files for validation workflows and run the YAML validations through <a href="./reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a> or in the Pointblank CLI via <code>pb run</code> (<a href="https://github.com/posit-dev/pointblank/issues/247">#247</a>, <a href="https://github.com/posit-dev/pointblank/issues/248">#248</a>)</li>
 </ul>
@@ -925,8 +1031,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.11.3" class="level1 changelog-version">
 <h1 class="changelog-version">v0.11.3</h1>
 <p><em>2025-07-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.3">GitHub</a></p>
-<section id="new-features-23" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-23">New Features</h2>
+<section id="new-features-24" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-24">New Features</h2>
 <ul>
 <li>The CLI has the new <code>pb pl</code> command, allowing you to run Polars at the command line. (<a href="https://github.com/posit-dev/pointblank/issues/246">#246</a>)</li>
 </ul>
@@ -943,8 +1049,8 @@ ul.task-list li input[type="checkbox"] {
 <li>For the CLI’s <code>pb validate</code> and <code>pb run</code> commands, the extract limit is now correctly applied to written CSVs (while displayed extracts will always have a limit of 10). (<a href="https://github.com/posit-dev/pointblank/issues/242">#242</a>)</li>
 </ul>
 </section>
-<section id="documentation-3" class="level2">
-<h2 class="anchored" data-anchor-id="documentation-3">Documentation</h2>
+<section id="documentation-4" class="level2">
+<h2 class="anchored" data-anchor-id="documentation-4">Documentation</h2>
 <ul>
 <li>Improved the CLI articles in the User Guide. (<a href="https://github.com/posit-dev/pointblank/issues/236">#236</a>)</li>
 <li>Updated the CLI demonstration gif for the project website. (<a href="https://github.com/posit-dev/pointblank/issues/241">#241</a>)</li>
@@ -955,8 +1061,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.11.1" class="level1 changelog-version">
 <h1 class="changelog-version">v0.11.1</h1>
 <p><em>2025-06-26</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.1">GitHub</a></p>
-<section id="new-features-24" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-24">New Features</h2>
+<section id="new-features-25" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-25">New Features</h2>
 <ul>
 <li>Have consistent input ingestion for all classes/functions with a <code>data=</code> parameter. (<a href="https://github.com/posit-dev/pointblank/issues/223">#223</a>)</li>
 <li>Enable data to be obtained via GitHub URLs. (<a href="https://github.com/posit-dev/pointblank/issues/224">#224</a>)</li>
@@ -975,8 +1081,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Improve messages with <code>pb validate &lt;data&gt;</code> default and add <code>--list-checks</code> option. (<a href="https://github.com/posit-dev/pointblank/issues/230">#230</a>)</li>
 </ul>
 </section>
-<section id="documentation-4" class="level2">
-<h2 class="anchored" data-anchor-id="documentation-4">Documentation</h2>
+<section id="documentation-5" class="level2">
+<h2 class="anchored" data-anchor-id="documentation-5">Documentation</h2>
 <ul>
 <li>Update VHS-based terminal recordings. (<a href="https://github.com/posit-dev/pointblank/issues/232">#232</a>)</li>
 <li>Create two new CLI utility articles. (<a href="https://github.com/posit-dev/pointblank/issues/235">#235</a>)</li>
@@ -987,8 +1093,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.11.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.11.0</h1>
 <p><em>2025-06-20</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.11.0">GitHub</a></p>
-<section id="new-features-25" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-25">New Features</h2>
+<section id="new-features-26" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-26">New Features</h2>
 <ul>
 <li>The <code>pb</code> CLI utility has been added to enable: (1) quick data quality checks, (2) exploration of data at the command line, and (3) easy integration with shell scripts and automation workflows. (<a href="https://github.com/posit-dev/pointblank/issues/221">#221</a>)</li>
 </ul>
@@ -998,8 +1104,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.10.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.10.0</h1>
 <p><em>2025-06-18</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.10.0">GitHub</a></p>
-<section id="new-features-26" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-26">New Features</h2>
+<section id="new-features-27" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-27">New Features</h2>
 <ul>
 <li>It’s now possible to validate Polars LazyFrames. (<a href="https://github.com/posit-dev/pointblank/issues/200">#200</a>)</li>
 <li>Paths to CSV and Parquet files can now be used as inputs for <a href="./reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> and <a href="./reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a>. (<a href="https://github.com/posit-dev/pointblank/issues/213">#213</a>, <a href="https://github.com/posit-dev/pointblank/issues/214">#214</a>, <a href="https://github.com/posit-dev/pointblank/issues/217">#217</a>)</li>
@@ -1017,8 +1123,8 @@ ul.task-list li input[type="checkbox"] {
 <li>An unwanted scrollbar in the API reference pages (obscuring text for parameters) was removed. (<a href="https://github.com/matt-humphrey"><span class="citation" data-cites="matt-humphrey">@matt-humphrey</span></a>, <a href="https://github.com/posit-dev/pointblank/issues/218">#218</a>)</li>
 </ul>
 </section>
-<section id="documentation-5" class="level2">
-<h2 class="anchored" data-anchor-id="documentation-5">Documentation</h2>
+<section id="documentation-6" class="level2">
+<h2 class="anchored" data-anchor-id="documentation-6">Documentation</h2>
 <ul>
 <li>The project website’s API reference underwent several layout and typesetting changes for the better. (<a href="https://github.com/posit-dev/pointblank/issues/204">#204</a>, <a href="https://github.com/posit-dev/pointblank/issues/205">#205</a>, <a href="https://github.com/posit-dev/pointblank/issues/208">#208</a>, <a href="https://github.com/posit-dev/pointblank/issues/209">#209</a>)</li>
 <li>Terminology throughout the documentation was improved so that users can better distinguish column- and row-based validation methods. (<a href="https://github.com/posit-dev/pointblank/issues/199">#199</a>)</li>
@@ -1088,8 +1194,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.9.1" class="level1 changelog-version">
 <h1 class="changelog-version">v0.9.1</h1>
 <p><em>2025-05-02</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.9.1">GitHub</a></p>
-<section id="new-features-27" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-27">New Features</h2>
+<section id="new-features-28" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-28">New Features</h2>
 <ul>
 <li>Added the <code>rows_complete()</code> validation method, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/171</li>
 </ul>
@@ -1099,8 +1205,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.9.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.9.0</h1>
 <p><em>2025-04-28</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.9.0">GitHub</a></p>
-<section id="new-features-28" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-28">New Features</h2>
+<section id="new-features-29" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-29">New Features</h2>
 <ul>
 <li>There’s now support for data segmentation within a wide variety of validation methods (with the new <code>segments=</code> argument), by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/170</li>
 <li>Implemented parallelization of tests to decrease the overall duration of tests, by <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a> in https://github.com/posit-dev/pointblank/pull/165</li>
@@ -1111,8 +1217,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.8.7" class="level1 changelog-version">
 <h1 class="changelog-version">v0.8.7</h1>
 <p><em>2025-04-21</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.7">GitHub</a></p>
-<section id="new-features-29" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-29">New Features</h2>
+<section id="new-features-30" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-30">New Features</h2>
 <ul>
 <li>Allow <code>None</code> in <code>col_vals_in_set()</code> by <a href="https://github.com/tylerriccio33"><span class="citation" data-cites="tylerriccio33">@tylerriccio33</span></a>, https://github.com/posit-dev/pointblank/pull/162</li>
 </ul>
@@ -1122,8 +1228,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.8.6" class="level1 changelog-version">
 <h1 class="changelog-version">v0.8.6</h1>
 <p><em>2025-04-16</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.6">GitHub</a></p>
-<section id="new-features-30" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-30">New Features</h2>
+<section id="new-features-31" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-31">New Features</h2>
 <ul>
 <li>Added the <code>conjointly()</code> validation method, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/posit-dev/pointblank/pull/159, https://github.com/posit-dev/pointblank/pull/160)</li>
 </ul>
@@ -1133,8 +1239,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.8.5" class="level1 changelog-version">
 <h1 class="changelog-version">v0.8.5</h1>
 <p><em>2025-04-15</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.5">GitHub</a></p>
-<section id="new-features-31" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-31">New Features</h2>
+<section id="new-features-32" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-32">New Features</h2>
 <ul>
 <li>Added step report functionality for <code>rows_distinct()</code> validation steps, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/157</li>
 </ul>
@@ -1144,8 +1250,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.8.4" class="level1 changelog-version">
 <h1 class="changelog-version">v0.8.4</h1>
 <p><em>2025-04-12</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.4">GitHub</a></p>
-<section id="new-features-32" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-32">New Features</h2>
+<section id="new-features-33" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-33">New Features</h2>
 <ul>
 <li>All step reports are now translated according to the <code>Validate(lang=)</code> value, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/155</li>
 </ul>
@@ -1155,8 +1261,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.8.3" class="level1 changelog-version">
 <h1 class="changelog-version">v0.8.3</h1>
 <p><em>2025-04-10</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.3">GitHub</a></p>
-<section id="new-features-33" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-33">New Features</h2>
+<section id="new-features-34" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-34">New Features</h2>
 <ul>
 <li>Added Arabic, Hindi, and Greek translations for automatically-generated briefs and for the validation report table, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/posit-dev/pointblank/pull/150, https://github.com/posit-dev/pointblank/pull/151, https://github.com/posit-dev/pointblank/pull/152)</li>
 </ul>
@@ -1190,8 +1296,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.8.0" class="level1 changelog-version">
 <h1 class="changelog-version">v0.8.0</h1>
 <p><em>2025-04-03</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.8.0">GitHub</a></p>
-<section id="new-features-34" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-34">New Features</h2>
+<section id="new-features-35" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-35">New Features</h2>
 <ul>
 <li>Added <code>highest_level=</code> and <code>default=</code> parameters to the <a href="./reference/Actions.html#pointblank.Actions" class="gdls-link gdls-code">Actions</a> class, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> (https://github.com/posit-dev/pointblank/pull/124, https://github.com/posit-dev/pointblank/pull/126)</li>
 <li>The <code>brief=</code> text now appears in the validation report table, plus we enabled more templating features for <code>brief=</code>, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/127</li>
@@ -1214,8 +1320,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="v0.7.3" class="level1 changelog-version">
 <h1 class="changelog-version">v0.7.3</h1>
 <p><em>2025-03-26</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.7.3">GitHub</a></p>
-<section id="new-features-35" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-35">New Features</h2>
+<section id="new-features-36" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-36">New Features</h2>
 <ul>
 <li>Added the <code>limit=</code> parameter to <a href="./reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link gdls-code">get_step_report()</a>, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/115</li>
 <li>The new <code>min_tbl_width=</code> arg in <a href="./reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> can improve the display of narrow preview tables by default, and, allows for customization, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/117</li>
@@ -1225,25 +1331,6 @@ ul.task-list li input[type="checkbox"] {
 <li>Added the ability to select a subset of columns in row-based step reports, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/123</li>
 </ul>
 <p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.7.2...v0.7.3">https://github.com/posit-dev/pointblank/compare/v0.7.2…v0.7.3</a></p>
-</section>
-</section>
-<section id="v0.7.2" class="level1 changelog-version">
-<h1 class="changelog-version">v0.7.2</h1>
-<p><em>2025-03-24</em> · <a href="https://github.com/posit-dev/pointblank/releases/tag/v0.7.2">GitHub</a></p>
-<section id="new-features-and-fixes-3" class="level2">
-<h2 class="anchored" data-anchor-id="new-features-and-fixes-3">New Features and Fixes</h2>
-<ul>
-<li>Pointblank now supports the Traditional Chinese (<code>zh-Hant</code>) locale (for localization of autobriefs), by <a href="https://github.com/jrycw"><span class="citation" data-cites="jrycw">@jrycw</span></a> in https://github.com/posit-dev/pointblank/pull/109</li>
-<li>Allow validations to work with dates/datetime comparisons across columns, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/110</li>
-<li>Revised <a href="./reference/preview.html#pointblank.preview" class="gdls-link gdls-code">preview()</a> for better operability with the Ibis PySpark backend, by <a href="https://github.com/rich-iannone"><span class="citation" data-cites="rich-iannone">@rich-iannone</span></a> in https://github.com/posit-dev/pointblank/pull/112</li>
-</ul>
-</section>
-<section id="new-contributors-8" class="level2">
-<h2 class="anchored" data-anchor-id="new-contributors-8">New Contributors</h2>
-<ul>
-<li><a href="https://github.com/jrycw"><span class="citation" data-cites="jrycw">@jrycw</span></a> made their first contribution in https://github.com/posit-dev/pointblank/pull/109</li>
-</ul>
-<p><strong>Full Changelog</strong>: <a href="https://github.com/posit-dev/pointblank/compare/v0.7.1...v0.7.2">https://github.com/posit-dev/pointblank/compare/v0.7.1…v0.7.2</a></p>
 
 
 </section>

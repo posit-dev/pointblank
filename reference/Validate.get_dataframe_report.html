@@ -136,7 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.1.1</code><br>Released 2026-10-15">
+<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.get_dataframe_report.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Validate.get_dataframe_report.html">
@@ -1699,7 +1699,7 @@ If the required library for the chosen <code>tbl_type=</code> is not installed.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Create a validation, interrogate, and get the results as a Polars DataFrame:</p>
-<div id="0976a956" class="cell" data-execution_count="1">
+<div id="ab9ed325" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -1725,7 +1725,7 @@ If the required library for the chosen <code>tbl_type=</code> is not installed.
 </div>
 </div>
 <p>Get the results as a Pandas DataFrame instead:</p>
-<div id="027efa61" class="cell" data-execution_count="2">
+<div id="9d88ffbe" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.get_dataframe_report(tbl_type<span class="op">=</span><span class="st">"pandas"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
