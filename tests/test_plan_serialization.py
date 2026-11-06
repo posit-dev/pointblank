@@ -949,3 +949,129 @@ def test_to_code_renders_seg_group(small_table):
     yaml_str = validation.to_yaml().replace("tbl: your_data", "tbl: small_table")
     rebuilt = yaml_interrogate(yaml_str)
     assert _results(rebuilt) == _results(validation.interrogate())
+
+
+# ─── Decimal, time, and timezone-aware values ────────────────────────────────────
+
+
+@pytest.fixture
+def typed_table():
+    import datetime
+    from decimal import Decimal
+    from zoneinfo import ZoneInfo
+
+    import polars as pl
+
+    utc, new_york = datetime.timezone.utc, ZoneInfo("America/New_York")
+    return pl.DataFrame(
+        {
+            "x": [1.5, 2.5, 3.5],
+            "d": pl.Series(
+                [Decimal("1.5"), Decimal("2.5"), Decimal("3.5")], dtype=pl.Decimal(10, 2)
+            ),
+            "t": [datetime.time(8, 0), datetime.time(9, 0), datetime.time(10, 0)],
+            "ts": [datetime.datetime(2024, 1, 1, h, tzinfo=utc) for h in (8, 9, 10)],
+            "ny": [datetime.datetime(2024, 1, 1, h, tzinfo=new_york) for h in (8, 9, 10)],
+        }
+    )
+
+
+def _typed_value_plan(data):
+    import datetime
+    from decimal import Decimal
+    from zoneinfo import ZoneInfo
+
+    utc = datetime.timezone.utc
+    plus_five = datetime.timezone(datetime.timedelta(hours=5))
+    return (
+        Validate(data=data)
+        .col_vals_gt(columns="x", value=Decimal("2.2"))
+        .col_vals_le(columns="d", value=Decimal("3.0"))
+        .col_vals_between(columns="x", left=Decimal("1"), right=Decimal("3"))
+        .col_vals_outside(columns="d", left=Decimal("5"), right=Decimal("6"))
+        .col_sum_gt(columns="x", value=Decimal("5.5"))
+        .col_vals_eq(columns="t", value=datetime.time(9, 0))
+        .col_vals_ne(columns="t", value=datetime.time(9, 0))
+        .col_vals_gt(columns="t", value=datetime.time(8, 30, 15, 250))
+        .col_vals_between(columns="t", left=datetime.time(8, 30), right=datetime.time(9, 30))
+        .col_vals_ge(columns="ts", value=datetime.datetime(2024, 1, 1, 9, tzinfo=utc))
+        .col_vals_eq(columns="ts", value=datetime.datetime(2024, 1, 1, 14, tzinfo=plus_five))
+        .col_vals_lt(
+            columns="ny",
+            value=datetime.datetime(2024, 1, 1, 9, 30, tzinfo=ZoneInfo("America/New_York")),
+        )
+    )
+
+
+def test_to_code_roundtrips_decimal_time_and_timezone_values(typed_table):
+    code = _typed_value_plan(typed_table).to_code()
+
+    # The values are written as Python expressions, with the imports they need
+    assert code.startswith(
+        "import datetime\nfrom decimal import Decimal\nfrom zoneinfo import ZoneInfo\n\n"
+        "import pointblank as pb\n"
+    )
+    assert 'value=Decimal("2.2")' in code
+    assert "value=datetime.time(8, 30, 15, 250)" in code
+    assert 'value="2024-01-01T14:00:00+05:00"' in code
+    assert 'value=datetime.datetime(2024, 1, 1, 9, 30, tzinfo=ZoneInfo("America/New_York"))' in code
+
+    namespace = {"your_data": typed_table}
+    exec(code, namespace)
+    expected = _results(_typed_value_plan(typed_table).interrogate())
+    assert _results(namespace["validation"].interrogate()) == expected
+    assert [step[2] for step in expected] == [2, 2, 2, 3, 1, 1, 2, 2, 1, 2, 1, 2]
+
+
+def test_to_yaml_roundtrips_decimal_time_and_timezone_values(typed_table):
+    yaml_str = _typed_value_plan(typed_table).to_yaml()
+
+    assert 'python: Decimal("2.2")' in yaml_str
+    assert "python: datetime.time(9, 0)" in yaml_str
+    assert "value: '2024-01-01T14:00:00+05:00'" in yaml_str
+
+    # The values load without `allow_python=True` and give the same results
+    rebuilt = yaml_interrogate(yaml_str, set_tbl=typed_table)
+    assert _results(rebuilt) == _results(_typed_value_plan(typed_table).interrogate())
+
+    # `yaml_to_python()` adds the imports that the values need
+    python_code = pb.yaml_to_python(yaml_str)
+    assert python_code.startswith(
+        "```python\nimport datetime\nfrom decimal import Decimal\nfrom zoneinfo import ZoneInfo\n\n"
+        "import pointblank as pb\n"
+    )
+    assert 'value=Decimal("2.2")' in python_code
+
+
+def test_to_code_imports_nothing_extra_for_plain_values(small_table):
+    code = Validate(data=small_table).col_vals_gt(columns="d", value=100).to_code()
+    assert code.startswith("import pointblank as pb\n\nvalidation = (")
+    assert "```python\nimport pointblank as pb\n\n(" in pb.yaml_to_python(
+        Validate(data=small_table, tbl_name="small_table")
+        .col_vals_gt(columns="d", value=100)
+        .to_yaml()
+    )
+
+
+@pytest.mark.parametrize("tolerance_in_dict", [False, True])
+def test_to_code_tbl_match_timedelta_tolerance_imports_datetime(tolerance_in_dict):
+    import datetime
+
+    import polars as pl
+
+    data = pl.DataFrame({"k": [1, 2], "ts": [datetime.datetime(2024, 1, d) for d in (1, 2)]})
+    compare = data.with_columns(pl.col("ts") + pl.duration(seconds=1))
+    tolerance = datetime.timedelta(seconds=2)
+    if tolerance_in_dict:
+        tolerance = {"ts": tolerance}
+    validation = Validate(data=data).tbl_match(compare, keys="k", tolerance=tolerance)
+
+    with pytest.warns(UserWarning, match="could not be fully serialized"):
+        code = validation.to_code()
+    assert code.startswith("import datetime\n\nimport pointblank as pb\n")
+
+    namespace = {"your_data": data, "your_comparison_table": compare}
+    exec(code, namespace)
+    rebuilt = namespace["validation"].interrogate()
+    assert _results(rebuilt) == _results(validation.interrogate())
+    assert rebuilt.all_passed() is tolerance_in_dict
