@@ -1661,7 +1661,7 @@ The <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s make a pipeline whose target contract must hold for the output to be published. It uses <code>on_violation="raise"</code>, so a failing output stops the run with an error.</p>
-<div id="d23fde5f" class="cell" data-execution_count="2">
+<div id="2843333e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1677,7 +1677,7 @@ The <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>raw_prices <span class="op">=</span> pl.DataFrame({<span class="st">"item"</span>: [<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>], <span class="st">"price"</span>: [<span class="fl">4.5</span>, <span class="fl">0.0</span>, <span class="fl">12.0</span>]})</span></code></pre></div>
 </div>
 <p>The transformation passes a zero price through, so the run raises. The error holds the result of the run, which still has the transformed data and the target validation:</p>
-<div id="fdabaef4" class="cell" data-execution_count="3">
+<div id="d7658b63" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pipeline.run(data<span class="op">=</span>raw_prices, transform<span class="op">=</span><span class="kw">lambda</span> df: df)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> pb.ContractViolationError <span class="im">as</span> e:</span>

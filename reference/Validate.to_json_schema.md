@@ -4,7 +4,7 @@ Export this validation plan as a JSON Schema document.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20496-L20603)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20498-L20605)
 
 ``` python
 Validate.to_json_schema(path=None)

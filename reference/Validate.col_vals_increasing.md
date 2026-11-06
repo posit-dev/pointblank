@@ -4,7 +4,7 @@ Are column data increasing by row?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10121-L10362)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10121-L10363)
 
 ``` python
 Validate.col_vals_increasing(
@@ -38,7 +38,7 @@ An option to allow pauses in increasing values. For example, if the values for t
 An optional threshold value that allows for movement of numerical values in the negative direction. By default this is `None` but using a numerical value will set the absolute threshold of negative travel allowed across numerical test units. Note that setting a value here also has the effect of setting `allow_stationary` to `True`.
 
 `na_pass: bool = False`  
-Should any encountered None, NA, or Null values be considered as passing test units? By default, this is `False`. Set to `True` to pass test units with missing values.
+Should any encountered None, NA, or Null values be considered as passing test units? By default, this is `False`. Set to `True` to pass test units with missing values. A `NaN` in a float column also counts as missing on every backend.
 
 `order_by: str | list[str] | None = None`  
 The column (or list of columns) that puts the rows in order before the values are compared, in ascending order. If `None` (the default), the table's own row order is used. Tables without an inherent row order (e.g., database tables, Ibis tables, or PySpark DataFrames) need `order_by=`. See the *Row Order and Missing Values* section.
