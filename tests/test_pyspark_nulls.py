@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import os
+from decimal import Decimal
 import subprocess
 import sys
 
@@ -15,6 +16,7 @@ if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() not in ("true", "1", "yes"):
         from pyspark.sql.types import (
             BooleanType,
             DateType,
+            DecimalType,
             DoubleType,
             IntegerType,
             StringType,
@@ -719,6 +721,36 @@ class TestRegexNulls:
 # ---------------------------------------------------------------------------
 # Tests: Multi-step validation pipeline with NULLs
 # ---------------------------------------------------------------------------
+
+
+class TestAggregateNulls:
+    def test_decimal_aggregates(self, spark):
+        schema = StructType([StructField("d", DecimalType(10, 2))])
+        values = [(Decimal("1.00"),), (Decimal("2.00"),), (None,), (Decimal("2.00"),)]
+        v = (
+            Validate(spark.createDataFrame(values, schema))
+            .col_sum_eq(columns="d", value=5)
+            .col_avg_eq(columns="d", value=Decimal("5") / 3)
+            .col_sd_eq(columns="d", value=3**-0.5, tol=1e-9)
+            .interrogate()
+        )
+
+        assert [step.all_passed for step in v.validation_info] == [True, True, True]
+
+    def test_missing_aggregates_are_eval_errors(self, spark):
+        schema = StructType([StructField("x", DoubleType()), StructField("s", StringType())])
+        tbl = spark.createDataFrame([(1.0, "a"), (None, "b")], schema)
+        v = (
+            Validate(tbl)
+            .col_avg_gt(columns="x", value=0)
+            .col_sd_gt(columns="x", value=0)
+            .col_sum_gt(columns="s", value=0)
+            .interrogate()
+        )
+
+        assert [step.eval_error for step in v.validation_info] == [None, True, True]
+        assert "fewer than two" in v.validation_info[1].notes["eval_error"]["text"]
+        assert "dtype String" in v.validation_info[2].notes["eval_error"]["text"]
 
 
 class TestMultiStepNulls:
