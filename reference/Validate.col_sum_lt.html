@@ -1595,6 +1595,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#understanding-tolerance" id="toc-understanding-tolerance" class="nav-link" data-scroll-target="#understanding-tolerance">Understanding Tolerance</a></li>
+  <li><a href="#missing-values-and-decimal-columns" id="toc-missing-values-and-decimal-columns" class="nav-link" data-scroll-target="#missing-values-and-decimal-columns">Missing Values And Decimal Columns</a></li>
   <li><a href="#thresholds" id="toc-thresholds" class="nav-link" data-scroll-target="#thresholds">Thresholds</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
@@ -1707,6 +1708,11 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <p>Because values below <code>1</code> are relative, an absolute allowance smaller than <code>1</code> can’t be given directly. Express it as a fraction of the target instead (for a target of <code>50</code>, <code>tol=0.01</code> allows <code>0.5</code>). A relative tolerance has no effect when the target is <code>0</code>.</p>
 <p>How the allowance is used depends on the comparison. For <code>eq</code>, the aggregate passes if it’s anywhere from <code>target - lower</code> to <code>target + upper</code>. For <code>gt</code> and <code>ge</code>, it’s compared with <code>target - lower</code>, so the tolerance lowers the bar. For <code>lt</code> and <code>le</code>, it’s compared with <code>target + upper</code>, which raises the ceiling. In those four cases the other side of the tolerance isn’t used. For <a href="../reference/Validate.col_sum_lt.html#pointblank.Validate.col_sum_lt" class="gdls-link gdls-code">col_sum_lt()</a>, the step passes when <code>sum(column) &lt; target + upper</code>.</p>
 </section>
+<section id="missing-values-and-decimal-columns" class="level2 doc-missing-values-and-decimal-columns">
+<h2 class="doc-missing-values-and-decimal-columns anchored" data-anchor-id="missing-values-and-decimal-columns">Missing Values And Decimal Columns</h2>
+<p>Missing values are left out of the sum, so a column with no non-missing values sums to <code>0</code>. When the sum is missing or <code>NaN</code> (on Polars, for instance, <code>NaN</code> values make it <code>NaN</code>), or the column isn’t numeric, the step can’t be evaluated. It’s reported as an evaluation error, with a note saying why, rather than as passing or failing.</p>
+<p>The sum of a <code>Decimal</code> column is compared as a <code>float</code>, and <code>value=</code> can be given as a <code>Decimal</code> too (e.g., <code>value=Decimal("6.60")</code>).</p>
+</section>
 <section id="thresholds" class="level2 doc-thresholds">
 <h2 class="doc-thresholds anchored" data-anchor-id="thresholds">Thresholds</h2>
 <p>The <code>thresholds=</code> parameter is used to set the failure-condition levels for the validation step. If they are set here at the step level, these thresholds will override any thresholds set at the global level in <code>Validate(thresholds=...)</code>.</p>
@@ -1722,7 +1728,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples, we’ll use a simple Polars DataFrame with two numeric columns. The table is shown below:</p>
-<div id="fea502f7" class="cell" data-execution_count="2">
+<div id="863e3b8a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1849,7 +1855,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>Let’s validate that the sum of column <code>a</code> is less than <code>20</code>:</p>
-<div id="5bcc91ef" class="cell" data-execution_count="3">
+<div id="8169a14d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_sum_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">20</span>)</span>
@@ -2016,7 +2022,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 <p>The sum of <code>a</code> is <code>15</code>, and <code>15 &lt; 20</code> holds, so the step’s one test unit passes.</p>
 <p>When validating multiple columns, each column gets its own validation step:</p>
-<div id="292338f1" class="cell" data-execution_count="4">
+<div id="45812b09" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_sum_lt(columns<span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>], value<span class="op">=</span><span class="dv">20</span>)</span>
@@ -2228,7 +2234,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>Each column gets its own step: step 1 is for <code>a</code> and step 2 is for <code>b</code>. The sum of <code>b</code> is <code>10</code>, so step 2 passes. The report doesn’t show the computed sum, but the step report does:</p>
-<div id="eec24752" class="cell" data-execution_count="5">
+<div id="2b781956" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">2</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_step_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2335,7 +2341,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 <p>The step report shows the sum computed for <code>b</code> (<em>ACTUAL</em>), the target (<em>EXPECTED</em>), the tolerance (<em>TOL</em>, none here), and <em>DIFFERENCE</em>, which is how far the computed value is from the boundary it had to meet. Here that’s <code>-10</code>, with positive values above the boundary and negative values below it.</p>
 <p>Next, a target that the sum of <code>a</code> just misses, first with an exact comparison and then with a 5% tolerance:</p>
-<div id="0e36b8e9" class="cell" data-execution_count="6">
+<div id="0d2fe669" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_sum_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="fl">14.5</span>)</span>
@@ -2549,7 +2555,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 <p>The sum of <code>a</code> is <code>15</code>, so <code>15 &lt; 14.5</code> doesn’t hold, if only just, and step 1 fails. In step 2, <code>tol=0.05</code> allows 5% of the target (<code>0.725</code>), so the sum only has to be less than <code>15.225</code>, and the step passes.</p>
 <p>The target can also be the same aggregate of another column, given with <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>:</p>
-<div id="e4e87e66" class="cell" data-execution_count="7">
+<div id="7d80fb21" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_sum_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span>pb.col(<span class="st">"b"</span>))</span>
@@ -2716,7 +2722,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 <p>Here the target is the sum of <code>b</code> (<code>10</code>) rather than a fixed number. The sum of <code>a</code> is <code>15</code>, so <code>15 &lt; 10</code> does not hold and the step fails. Both aggregates are computed from the same table when the validation is interrogated.</p>
 <p>Finally, the target can come from reference data, such as an earlier load of the same table that passed its checks:</p>
-<div id="b386d406" class="cell" data-execution_count="8">
+<div id="bd84458a" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>current <span class="op">=</span> pl.DataFrame({<span class="st">"revenue"</span>: [<span class="fl">120.0</span>, <span class="fl">95.5</span>, <span class="fl">143.2</span>, <span class="fl">88.0</span>]})</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> pl.DataFrame({<span class="st">"revenue"</span>: [<span class="fl">110.0</span>, <span class="fl">101.0</span>, <span class="fl">150.0</span>, <span class="fl">90.0</span>]})</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>

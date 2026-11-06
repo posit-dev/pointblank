@@ -68,6 +68,12 @@ Because values below `1` are relative, an absolute allowance smaller than `1` ca
 
 How the allowance is used depends on the comparison. For `eq`, the aggregate passes if it's anywhere from `target - lower` to `target + upper`. For `gt` and `ge`, it's compared with `target - lower`, so the tolerance lowers the bar. For `lt` and `le`, it's compared with `target + upper`, which raises the ceiling. In those four cases the other side of the tolerance isn't used. For [col_sd_gt()](../reference/Validate.col_sd_gt.md#pointblank.Validate.col_sd_gt), the step passes when `standard deviation(column) > target - lower`.
 
+## Missing Values And Decimal Columns
+
+Missing values are left out of the standard deviation, so a column with fewer than two non-missing values has none. When the standard deviation is missing or `NaN` (on Polars, for instance, `NaN` values make it `NaN`), or the column isn't numeric, the step can't be evaluated. It's reported as an evaluation error, with a note saying why, rather than as passing or failing.
+
+The standard deviation of a `Decimal` column is compared as a `float`, and `value=` can be given as a `Decimal` too (e.g., `value=Decimal("6.60")`).
+
 ## Thresholds
 
 The `thresholds=` parameter is used to set the failure-condition levels for the validation step. If they are set here at the step level, these thresholds will override any thresholds set at the global level in `Validate(thresholds=...)`.

@@ -68,6 +68,12 @@ Because values below `1` are relative, an absolute allowance smaller than `1` ca
 
 How the allowance is used depends on the comparison. For `eq`, the aggregate passes if it's anywhere from `target - lower` to `target + upper`. For `gt` and `ge`, it's compared with `target - lower`, so the tolerance lowers the bar. For `lt` and `le`, it's compared with `target + upper`, which raises the ceiling. In those four cases the other side of the tolerance isn't used. For [col_sum_gt()](../reference/Validate.col_sum_gt.md#pointblank.Validate.col_sum_gt), the step passes when `sum(column) > target - lower`.
 
+## Missing Values And Decimal Columns
+
+Missing values are left out of the sum, so a column with no non-missing values sums to `0`. When the sum is missing or `NaN` (on Polars, for instance, `NaN` values make it `NaN`), or the column isn't numeric, the step can't be evaluated. It's reported as an evaluation error, with a note saying why, rather than as passing or failing.
+
+The sum of a `Decimal` column is compared as a `float`, and `value=` can be given as a `Decimal` too (e.g., `value=Decimal("6.60")`).
+
 ## Thresholds
 
 The `thresholds=` parameter is used to set the failure-condition levels for the validation step. If they are set here at the step level, these thresholds will override any thresholds set at the global level in `Validate(thresholds=...)`.
