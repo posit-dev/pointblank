@@ -1,5 +1,7 @@
 # Demos
 
+## Getting Started
+
 ![](img/advanced_validation.png)
 
 Advanced Validation
@@ -11,6 +13,8 @@ A validation with a comprehensive set of rules.
 Starter Validation
 
 A validation with the basics.
+
+## Results And Reporting
 
 ![](img/data_extracts.png)
 
@@ -36,6 +40,12 @@ Sundered Data
 
 Splitting your data into 'pass' and 'fail' subsets.
 
+## Actions And Thresholds
+
+Set Failure Threshold Levels
+
+Set threshold levels to better gauge adverse data quality.
+
 ![](img/validation_with_actions.png)
 
 Step-Level Actions
@@ -48,11 +58,7 @@ Final Actions
 
 Execute actions after validation completes, such as sending alerts or generating summary reports.
 
-------------------------------------------------------------------------
-
-Set Failure Threshold Levels
-
-Set threshold levels to better gauge adverse data quality.
+## Column Value Checks
 
 Apply Validation Rules to Multiple Columns
 
@@ -93,6 +99,8 @@ Perform comparisons of values in columns to fixed values.
 Set Membership
 
 Perform validations that check whether values are part of a set (or not part of one).
+
+## Advanced Topics
 
 Validating Data Freshness
 

@@ -397,8 +397,18 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link active" data-scroll-target="#getting-started">Getting Started</a></li>
+  <li><a href="#results-and-reporting" id="toc-results-and-reporting" class="nav-link" data-scroll-target="#results-and-reporting">Results And Reporting</a></li>
+  <li><a href="#actions-and-thresholds" id="toc-actions-and-thresholds" class="nav-link" data-scroll-target="#actions-and-thresholds">Actions And Thresholds</a></li>
+  <li><a href="#column-value-checks" id="toc-column-value-checks" class="nav-link" data-scroll-target="#column-value-checks">Column Value Checks</a></li>
+  <li><a href="#advanced-topics" id="toc-advanced-topics" class="nav-link" data-scroll-target="#advanced-topics">Advanced Topics</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content" tabindex="-1">
@@ -422,6 +432,8 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="getting-started" class="level1">
+<h1>Getting Started</h1>
 <div class="section-cards section-cards-2col" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
 <a href="../examples/getting-started/advanced-validation.html" class="section-card" style="display: block; padding: 1.25rem 1.5rem; border: 1px solid #dee2e6; border-radius: 0.5rem; color: inherit; text-decoration: none;"> <img src="img/advanced_validation.png" class="section-card-img" style="width: 100%; border-radius: 0.375rem; margin-bottom: 0.75rem;">
 <div class="section-card-title" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.35rem; color: #0d6efd;">
@@ -437,7 +449,13 @@ Starter Validation
 <div class="section-card-desc" style="font-size: 0.9rem; color: #6c757d; line-height: 1.45;">
 A validation with the basics.
 </div>
-</a> <a href="../examples/results-and-reporting/data-extracts.html" class="section-card" style="display: block; padding: 1.25rem 1.5rem; border: 1px solid #dee2e6; border-radius: 0.5rem; color: inherit; text-decoration: none;"> <img src="img/data_extracts.png" class="section-card-img" style="width: 100%; border-radius: 0.375rem; margin-bottom: 0.75rem;">
+</a>
+</div>
+</section>
+<section id="results-and-reporting" class="level1">
+<h1>Results And Reporting</h1>
+<div class="section-cards section-cards-2col" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
+<a href="../examples/results-and-reporting/data-extracts.html" class="section-card" style="display: block; padding: 1.25rem 1.5rem; border: 1px solid #dee2e6; border-radius: 0.5rem; color: inherit; text-decoration: none;"> <img src="img/data_extracts.png" class="section-card-img" style="width: 100%; border-radius: 0.375rem; margin-bottom: 0.75rem;">
 <div class="section-card-title" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.35rem; color: #0d6efd;">
 Data Extracts
 </div>
@@ -465,6 +483,19 @@ Sundered Data
 <div class="section-card-desc" style="font-size: 0.9rem; color: #6c757d; line-height: 1.45;">
 Splitting your data into ‘pass’ and ‘fail’ subsets.
 </div>
+</a>
+</div>
+</section>
+<section id="actions-and-thresholds" class="level1">
+<h1>Actions And Thresholds</h1>
+<div class="section-cards section-cards-2col" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
+<a href="../examples/actions-and-thresholds/failure-thresholds.html" class="section-card" style="display: block; padding: 1.25rem 1.5rem; border: 1px solid #dee2e6; border-radius: 0.5rem; color: inherit; text-decoration: none;">
+<div class="section-card-title" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.35rem; color: #0d6efd;">
+Set Failure Threshold Levels
+</div>
+<div class="section-card-desc" style="font-size: 0.9rem; color: #6c757d; line-height: 1.45;">
+Set threshold levels to better gauge adverse data quality.
+</div>
 </a> <a href="../examples/actions-and-thresholds/validation-with-actions.html" class="section-card" style="display: block; padding: 1.25rem 1.5rem; border: 1px solid #dee2e6; border-radius: 0.5rem; color: inherit; text-decoration: none;"> <img src="img/validation_with_actions.png" class="section-card-img" style="width: 100%; border-radius: 0.375rem; margin-bottom: 0.75rem;">
 <div class="section-card-title" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.35rem; color: #0d6efd;">
 Step-Level Actions
@@ -481,16 +512,11 @@ Execute actions after validation completes, such as sending alerts or generating
 </div>
 </a>
 </div>
-<hr>
-<div class="section-cards section-cards-list" style="display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 0.5rem;">
-<a href="../examples/actions-and-thresholds/failure-thresholds.html" class="section-card" style="display: block; padding: 1.25rem 1.5rem; border: 1px solid #dee2e6; border-radius: 0.5rem; color: inherit; text-decoration: none;">
-<div class="section-card-title" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.35rem; color: #0d6efd;">
-Set Failure Threshold Levels
-</div>
-<div class="section-card-desc" style="font-size: 0.9rem; color: #6c757d; line-height: 1.45;">
-Set threshold levels to better gauge adverse data quality.
-</div>
-</a> <a href="../examples/column-value-checks/apply-checks-to-several-columns.html" class="section-card" style="display: block; padding: 1.25rem 1.5rem; border: 1px solid #dee2e6; border-radius: 0.5rem; color: inherit; text-decoration: none;">
+</section>
+<section id="column-value-checks" class="level1">
+<h1>Column Value Checks</h1>
+<div class="section-cards section-cards-2col" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
+<a href="../examples/column-value-checks/apply-checks-to-several-columns.html" class="section-card" style="display: block; padding: 1.25rem 1.5rem; border: 1px solid #dee2e6; border-radius: 0.5rem; color: inherit; text-decoration: none;">
 <div class="section-card-title" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.35rem; color: #0d6efd;">
 Apply Validation Rules to Multiple Columns
 </div>
@@ -560,7 +586,13 @@ Set Membership
 <div class="section-card-desc" style="font-size: 0.9rem; color: #6c757d; line-height: 1.45;">
 Perform validations that check whether values are part of a set (or not part of one).
 </div>
-</a> <a href="../examples/advanced-topics/check-for-freshness.html" class="section-card" style="display: block; padding: 1.25rem 1.5rem; border: 1px solid #dee2e6; border-radius: 0.5rem; color: inherit; text-decoration: none;">
+</a>
+</div>
+</section>
+<section id="advanced-topics" class="level1">
+<h1>Advanced Topics</h1>
+<div class="section-cards section-cards-2col" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
+<a href="../examples/advanced-topics/check-for-freshness.html" class="section-card" style="display: block; padding: 1.25rem 1.5rem; border: 1px solid #dee2e6; border-radius: 0.5rem; color: inherit; text-decoration: none;">
 <div class="section-card-title" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.35rem; color: #0d6efd;">
 Validating Data Freshness
 </div>
@@ -620,6 +652,7 @@ A Parquet dataset can be used for data validation, thanks to Ibis.
 </div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

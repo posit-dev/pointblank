@@ -1626,7 +1626,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10121-L10363" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10121-L10369" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">col_vals_increasing</span>(</span>
@@ -1646,7 +1646,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <code>col_vals_increasing()</code> validation method checks whether column values in a table are increasing when moving down a table. There are options for allowing missing values in the target column, allowing stationary phases (where consecutive values don’t change), and even one for allowing decreasing movements up to a certain threshold. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
+<p>The <code>col_vals_increasing()</code> validation method checks whether column values in a table are increasing when moving down a table. The column can be numeric or hold dates, datetimes, or durations; for any other column (e.g., a string column) the step is marked as having an evaluation error. There are options for allowing missing values in the target column, allowing stationary phases (where consecutive values don’t change), and even one for allowing decreasing movements up to a certain threshold. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1662,7 +1662,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">decreasing_tol</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">float | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>An optional threshold value that allows for movement of numerical values in the negative direction. By default this is <code>None</code> but using a numerical value will set the absolute threshold of negative travel allowed across numerical test units. Note that setting a value here also has the effect of setting <code>allow_stationary</code> to <code>True</code>.</p>
+<p>An optional threshold value that allows for movement of numerical values in the negative direction. By default this is <code>None</code> but using a numerical value will set the absolute threshold of negative travel allowed across numerical test units. Note that setting a value here also has the effect of setting <code>allow_stationary</code> to <code>True</code>. It needs a numeric column: with a date, datetime, or duration column, the step is marked as having an evaluation error.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">na_pass</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
@@ -1674,7 +1674,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">missing</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">MissingSpec | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>An optional <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> declaring the codes that stand in for missing values in the column (such as <code>-99</code> for a survey question that was refused). Rows holding one of these codes are excluded from the check (they count as passing test units), so only the real values are validated, and a note in the validation report lists the codes. By default a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> also treats nulls as missing, so nulls pass whatever the value of <code>na_pass=</code>. Create it with <code>null_is_missing=False</code> to leave nulls to <code>na_pass=</code>.</p>
+<p>An optional <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> declaring the codes that stand in for missing values in the column (such as <code>-99</code> for a survey question that was refused). Rows holding one of these codes are excluded from the check (they count as passing test units) and, like missing values, don’t break the sequence, so only the real values are validated, and a note in the validation report lists the codes. By default a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> also treats nulls as missing, so nulls pass whatever the value of <code>na_pass=</code>. Create it with <code>null_is_missing=False</code> to leave nulls to <code>na_pass=</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">pre</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1721,12 +1721,12 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="row-order-and-missing-values" class="level2 doc-row-order-and-missing-values">
 <h2 class="doc-row-order-and-missing-values anchored" data-anchor-id="row-order-and-missing-values">Row Order And Missing Values</h2>
 <p>Each value is compared with the value before it, so the rows need an order. Polars and pandas DataFrames (and Polars LazyFrames) have one, which is used unless <code>order_by=</code> is given. Database tables, Ibis tables, and PySpark DataFrames have no inherent row order, so <code>order_by=</code> is needed for them; without it, the step is marked as having an evaluation error. The results are reported against the table’s own rows either way. If the <code>order_by=</code> columns have ties, the order of the tied rows (and so the result) may vary.</p>
-<p>A missing value fails unless <code>na_pass=True</code>, and it doesn’t break the sequence: the next non-missing value is compared with the last non-missing value before it. For example, with <code>[1, 2, None, 5]</code> the <code>5</code> is compared with the <code>2</code>. The first non-missing value has nothing to be compared with, so it always passes.</p>
+<p>A missing value fails unless <code>na_pass=True</code>, and it doesn’t break the sequence: the next non-missing value is compared with the last non-missing value before it. For example, with <code>[1, 2, None, 5]</code> the <code>5</code> is compared with the <code>2</code>. The first non-missing value has nothing to be compared with, so it always passes. The codes of a <code>missing=</code> <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> are skipped in the same way: with <code>-99</code> as a code, <code>[1, 3, -99, 2]</code> fails the <code>2</code>, since it’s compared with the <code>3</code>.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with a numeric column (<code>a</code>). The table is shown below:</p>
-<div id="ab5d1d14" class="cell" data-execution_count="2">
+<div id="24e90855" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1867,7 +1867,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>Let’s validate that values in column <code>a</code> are increasing. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="1e29ed4d" class="cell" data-execution_count="3">
+<div id="d5f8b169" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_increasing(columns<span class="op">=</span><span class="st">"a"</span>)</span>
@@ -2030,7 +2030,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>The validation passed as all values in column <code>a</code> are increasing. Now let’s check column <code>b</code> which has a stationary value:</p>
-<div id="be552d6b" class="cell" data-execution_count="4">
+<div id="4752c5a0" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_increasing(columns<span class="op">=</span><span class="st">"b"</span>)</span>
@@ -2193,7 +2193,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>This validation fails at the third row because the value <code>2</code> is repeated. If we want to allow stationary values, we can use <code>allow_stationary=True</code>:</p>
-<div id="69c83108" class="cell" data-execution_count="5">
+<div id="c16d94bc" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_increasing(columns<span class="op">=</span><span class="st">"b"</span>, allow_stationary<span class="op">=</span><span class="va">True</span>)</span>
