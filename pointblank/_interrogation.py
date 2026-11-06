@@ -2192,14 +2192,26 @@ def _interrogate_monotonic(
     """
     Check that column values increase (or decrease) from one row to the next.
 
-    Each non-null value is compared with the last non-null value before it, so nulls don't break
-    the sequence. Null values pass only with `na_pass=True`, and the first non-null value passes.
-    A nonzero `tol=` allows movement in the wrong direction up to that size (and stationary values).
+    Each non-missing value is compared with the last non-missing value before it, so missing
+    values don't break the sequence. Missing values pass only with `na_pass=True`, and the first
+    non-missing value passes. A nonzero `tol=` allows movement in the wrong direction up to that
+    size (and stationary values).
+
+    A NaN counts as missing like a null does (on Polars, PyArrow and most Ibis backends a NaN is
+    not a null, and it compares greater than every number, so it'd otherwise pass or fail on its
+    own and break the sequence for the values after it).
     """
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
-    result_tbl, lagged, temp_columns = _with_lagged_difference(nw_tbl, column, order_by)
+    # Work from a copy of the column with NaN values turned into nulls, so NaN and null are
+    # handled the same way (in the forward fill and in the `na_pass=` check)
+    values = _unused_column_name("pb_values_", nw_tbl.collect_schema().names())
+    is_missing = _safe_is_nan_or_null_expr(tbl, nw.col(column), column)
+    nw_tbl = nw_tbl.with_columns(**{values: nw.when(~is_missing).then(nw.col(column))})
+
+    result_tbl, lagged, temp_columns = _with_lagged_difference(nw_tbl, values, order_by)
+    temp_columns.append(values)
 
     # The movement in the expected direction
     movement = nw.col(lagged) if increasing else nw.col(lagged) * -1
@@ -2209,9 +2221,9 @@ def _interrogate_monotonic(
         good_condition = movement > 0
 
     result_tbl = result_tbl.with_columns(
-        pb_is_good_=nw.when(nw.col(column).is_null())
+        pb_is_good_=nw.when(nw.col(values).is_null())
         .then(nw.lit(na_pass))
-        # The first non-null value has nothing to be compared with
+        # The first non-missing value has nothing to be compared with
         .otherwise(nw.when(nw.col(lagged).is_null()).then(nw.lit(True)).otherwise(good_condition))
     )
 

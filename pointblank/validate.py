@@ -10164,7 +10164,8 @@ class Validate:
             value here also has the effect of setting `allow_stationary` to `True`.
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
-            default, this is `False`. Set to `True` to pass test units with missing values.
+            default, this is `False`. Set to `True` to pass test units with missing values. A `NaN`
+            in a float column also counts as missing on every backend.
         order_by
             The column (or list of columns) that puts the rows in order before the values are
             compared, in ascending order. If `None` (the default), the table's own row order is
@@ -10407,7 +10408,8 @@ class Validate:
             value here also has the effect of setting `allow_stationary` to `True`.
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
-            default, this is `False`. Set to `True` to pass test units with missing values.
+            default, this is `False`. Set to `True` to pass test units with missing values. A `NaN`
+            in a float column also counts as missing on every backend.
         order_by
             The column (or list of columns) that puts the rows in order before the values are
             compared, in ascending order. If `None` (the default), the table's own row order is
