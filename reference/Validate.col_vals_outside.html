@@ -1629,7 +1629,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L8997-L9342" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9078-L9425" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">col_vals_outside</span>(</span>
@@ -1731,7 +1731,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </ul>
 <p>When supplying a number as the basis of comparison, keep in mind that all resolved columns must also be numeric. Should you have columns that are of the date or datetime types, you can supply a date or datetime value within <code>left=</code> and <code>right=</code>. There is flexibility in how you provide the date or datetime values for the bounds; they can be:</p>
 <ul>
-<li>string-based dates or datetimes (e.g., <code>"2023-10-01"</code>, <code>"2023-10-01 13:45:30"</code>, etc.)</li>
+<li>string-based dates or datetimes (e.g., <code>"2023-10-01"</code>, <code>"2023-10-01 13:45:30"</code>, etc.), optionally with a UTC offset for timezone-aware datetimes (e.g., <code>"2023-10-01T13:45:30+05:00"</code> or <code>"2023-10-01T13:45:30Z"</code>)</li>
 <li>date or datetime objects using the <code>datetime</code> module (e.g., <code>datetime.date(2023, 10, 1)</code>, <code>datetime.datetime(2023, 10, 1, 13, 45, 30)</code>, etc.)</li>
 </ul>
 <p>Finally, when supplying a column name in either <code>left=</code> or <code>right=</code> (or both), it must be specified within <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>. This facilitates column-to-column comparisons and, crucially, the columns being compared to either/both of the bounds must be of the same type as the column data (e.g., all numeric, all dates, etc.).</p>
@@ -1773,7 +1773,7 @@ segments=["region", "date"]</code></pre>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with three numeric columns (<code>a</code>, <code>b</code>, and <code>c</code>). The table is shown below:</p>
-<div id="dbcfcdaf" class="cell" data-execution_count="2">
+<div id="0d6c4b52" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1914,7 +1914,7 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 <p>Let’s validate that values in column <code>a</code> are all outside the fixed boundary values of <code>1</code> and <code>4</code>. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="f1032f4c" class="cell" data-execution_count="3">
+<div id="f8b2b877" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_outside(columns<span class="op">=</span><span class="st">"a"</span>, left<span class="op">=</span><span class="dv">1</span>, right<span class="op">=</span><span class="dv">4</span>)</span>
@@ -2086,7 +2086,7 @@ segments=["region", "date"]</code></pre>
 <li><code>left=column</code>, <code>right=literal</code></li>
 </ol>
 <p>For the next example, we’ll use <code>col_vals_outside()</code> to check whether the values in column <code>b</code> are outside of the range formed by the corresponding values in columns <code>a</code> (lower bound) and <code>c</code> (upper bound).</p>
-<div id="521ab45f" class="cell" data-execution_count="4">
+<div id="af9a4145" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_outside(columns<span class="op">=</span><span class="st">"b"</span>, left<span class="op">=</span>pb.col(<span class="st">"a"</span>), right<span class="op">=</span>pb.col(<span class="st">"c"</span>))</span>

@@ -4057,7 +4057,9 @@ must also be numeric. Should you have columns that are of the date or datetime t
 can supply a date or datetime value as the `value=` argument. There is flexibility in how
 you provide the date or datetime value, as it can be:
 
-- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+  optionally with a UTC offset for a timezone-aware datetime (e.g.,
+  `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
 - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
   `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -4310,7 +4312,9 @@ must also be numeric. Should you have columns that are of the date or datetime t
 can supply a date or datetime value as the `value=` argument. There is flexibility in how
 you provide the date or datetime value, as it can be:
 
-- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+  optionally with a UTC offset for a timezone-aware datetime (e.g.,
+  `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
 - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
   `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -4563,7 +4567,9 @@ must also be numeric. Should you have columns that are of the date or datetime t
 can supply a date or datetime value as the `value=` argument. There is flexibility in how
 you provide the date or datetime value, as it can be:
 
-- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+  optionally with a UTC offset for a timezone-aware datetime (e.g.,
+  `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
 - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
   `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -4816,7 +4822,9 @@ must also be numeric. Should you have columns that are of the date or datetime t
 can supply a date or datetime value as the `value=` argument. There is flexibility in how
 you provide the date or datetime value, as it can be:
 
-- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+  optionally with a UTC offset for a timezone-aware datetime (e.g.,
+  `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
 - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
   `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -5069,7 +5077,9 @@ must also be numeric. Should you have columns that are of the date or datetime t
 can supply a date or datetime value as the `value=` argument. There is flexibility in how
 you provide the date or datetime value, as it can be:
 
-- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+  optionally with a UTC offset for a timezone-aware datetime (e.g.,
+  `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
 - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
   `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -5320,7 +5330,9 @@ must also be numeric. Should you have columns that are of the date or datetime t
 can supply a date or datetime value as the `value=` argument. There is flexibility in how
 you provide the date or datetime value, as it can be:
 
-- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+  optionally with a UTC offset for a timezone-aware datetime (e.g.,
+  `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
 - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
   `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -5580,7 +5592,9 @@ must also be numeric. Should you have columns that are of the date or datetime t
 can supply a date or datetime value within `left=` and `right=`. There is flexibility in how
 you provide the date or datetime values for the bounds; they can be:
 
-- string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+- string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+  optionally with a UTC offset for timezone-aware datetimes (e.g.,
+  `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
 - date or datetime objects using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
 `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -5853,7 +5867,9 @@ must also be numeric. Should you have columns that are of the date or datetime t
 can supply a date or datetime value within `left=` and `right=`. There is flexibility in how
 you provide the date or datetime values for the bounds; they can be:
 
-- string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+- string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+  optionally with a UTC offset for timezone-aware datetimes (e.g.,
+  `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
 - date or datetime objects using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
 `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -17964,7 +17980,8 @@ str
     placeholder `your_data`, since the original data variable name is not known to the
     plan. Reference data given as a file path or connection string is written out as-is;
     an in-memory reference table becomes the placeholder `your_reference_data` (with a
-    warning).
+    warning). Values such as `Decimal("2.2")` or `datetime.time(9, 30)` are written as
+    Python expressions, and the code starts with the imports they need.
 
 Notes on Fidelity
 -----------------
@@ -18065,6 +18082,11 @@ As with [`to_code()`](`pointblank.Validate.to_code`), steps carrying non-seriali
 Python objects (`pre=` callables, `actions=`, callable `active=`, and the expressions of
 `col_vals_expr()`/`conjointly()`/`specially()`) cannot be represented in YAML; a
 placeholder is emitted and a warning is raised.
+
+Values that YAML has no literal for, such as `Decimal("2.2")`, `datetime.time(9, 30)`, or
+a datetime in a named time zone, are written as `python:` blocks. These are among the few
+calls that [`yaml_interrogate()`](`pointblank.yaml_interrogate`) runs without
+`allow_python=True`, so the YAML still loads as is.
 
 Examples
 --------
@@ -22993,9 +23015,13 @@ numbers, lists, and so on): [`load_dataset()`](`pointblank.load_dataset`),
 [`col()`](`pointblank.col`), [`ref()`](`pointblank.ref`),
 [`seg_group()`](`pointblank.seg_group`), [`has_columns()`](`pointblank.has_columns`),
 [`has_rows()`](`pointblank.has_rows`), and the column selectors (`starts_with()`, `ends_with()`,
-`contains()`, `matches()`, `everything()`, `first_n()`, and `last_n()`). These only load a
-bundled dataset or build an object, so `value: pb.col("b")` or `active: pb.has_columns("a")`
-work without `allow_python=True`.
+`contains()`, `matches()`, `everything()`, `first_n()`, and `last_n()`). So can the
+constructors for values that YAML has no literal for: `Decimal()`, `ZoneInfo()`,
+`datetime.date()`, `datetime.time()`, `datetime.datetime()`, and `datetime.timedelta()`. These
+only load a bundled dataset or build an object, so `value: pb.col("b")`,
+`value: {python: 'Decimal("2.2")'}`, or `active: pb.has_columns("a")` work without
+`allow_python=True`. In code that is allowed to run, `datetime`, `Decimal`, and `ZoneInfo` are
+available along with `pb`, `pl`, `pd`, and `Path`.
 
 Using Namespaces
 ----------------
@@ -40533,8 +40559,10 @@ code like a Python script, and only allow it for configurations you wrote or oth
 A few `pb` functions don't need `allow_python=True` when they're called with plain values (strings,
 numbers, lists, and so on): `pb.load_dataset()`, `pb.col()`, `pb.ref()`, `pb.seg_group()`,
 `pb.has_columns()`, `pb.has_rows()`, and the column selectors (`pb.starts_with()`, `pb.ends_with()`,
-`pb.contains()`, `pb.matches()`, `pb.everything()`, `pb.first_n()`, and `pb.last_n()`). These only
-load a bundled dataset or build an object, so a configuration like this one works without it:
+`pb.contains()`, `pb.matches()`, `pb.everything()`, `pb.first_n()`, and `pb.last_n()`). So do
+`Decimal()`, `ZoneInfo()`, and the `datetime.date()`, `datetime.time()`, `datetime.datetime()`, and
+`datetime.timedelta()` constructors, for values like `Decimal("2.2")` that YAML can't write. These
+only load a bundled dataset or build an object, so a configuration like this one works without it:
 
 ```yaml
 tbl:
@@ -42547,6 +42575,7 @@ When the code runs, these names are available without importing them:
 
 - `pb` (`pointblank`)
 - `Path` from pathlib
+- `datetime`, `Decimal` (from decimal), and `ZoneInfo` (from zoneinfo)
 - `pl` (`polars`) if it's installed
 - `pd` (`pandas`) if it's installed
 - any modules given to `yaml_interrogate()` with `namespaces=`
@@ -42562,8 +42591,18 @@ numbers, lists, and so on), so they work without `allow_python=True`:
   `pb.everything()`, `pb.first_n()`, and `pb.last_n()` (combined with `&`, `|`, `-`, and `~` if you
   like)
 
-These only load a bundled dataset or build an object. Anything else, such as `pl.col("a") > 0` or
-`pb.col("a").str.len()`, is Python code.
+The same goes for building the values that YAML has no way of writing: `Decimal()`,
+`datetime.date()`, `datetime.time()`, `datetime.datetime()`, `datetime.timedelta()`, and
+`ZoneInfo()`. For example, `value: {python: 'Decimal("2.2")'}` compares a column against an exact
+decimal, and `value: {python: 'datetime.time(9, 30)'}` against a time of day. This is how
+`Validate.to_yaml()` writes these values.
+
+These only load a bundled dataset or build an object. Anything else, such as `pl.col("a") > 0`,
+`pb.col("a").str.len()`, or `datetime.date.today()`, is Python code.
+
+A date or datetime can also be written as an ISO 8601 string (e.g., `"2024-01-15"` or
+`"2024-01-15T10:30:00"`), with a UTC offset for a timezone-aware datetime (e.g.,
+`"2024-01-15T10:30:00+05:00"` or `"2024-01-15T10:30:00Z"`).
 
 `yaml_to_python()` never runs Python code from the configuration. It copies the code into the
 generated Python as written, so it doesn't need `allow_python=True`.

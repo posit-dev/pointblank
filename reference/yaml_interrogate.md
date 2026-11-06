@@ -4,7 +4,7 @@ Execute a YAML-based validation workflow.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1131-L1515)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1167-L1555)
 
 ``` python
 yaml_interrogate(
@@ -49,7 +49,7 @@ A YAML configuration can include Python code: a `python:` block for the data sou
 
 Python code in YAML is not sandboxed. It runs with the same access as the rest of your Python session, so a configuration with Python code should be treated like a Python script: only allow it for configurations you wrote or otherwise trust, never for ones supplied by other users or systems.
 
-A small set of `pb` functions can always be used, when called with literal arguments (strings, numbers, lists, and so on): [`load_dataset()`](../reference/load_dataset.md#pointblank.load_dataset), [`col()`](../reference/col.md#pointblank.col), [`ref()`](../reference/ref.md#pointblank.ref), [`seg_group()`](../reference/seg_group.md#pointblank.seg_group), [`has_columns()`](../reference/has_columns.md#pointblank.has_columns), [`has_rows()`](../reference/has_rows.md#pointblank.has_rows), and the column selectors ([starts_with()](../reference/starts_with.md#pointblank.starts_with), [ends_with()](../reference/ends_with.md#pointblank.ends_with), [contains()](../reference/contains.md#pointblank.contains), `matches()`, [everything()](../reference/everything.md#pointblank.everything), [first_n()](../reference/first_n.md#pointblank.first_n), and [last_n()](../reference/last_n.md#pointblank.last_n)). These only load a bundled dataset or build an object, so `value: pb.col("b")` or `active: pb.has_columns("a")` work without `allow_python=True`.
+A small set of `pb` functions can always be used, when called with literal arguments (strings, numbers, lists, and so on): [`load_dataset()`](../reference/load_dataset.md#pointblank.load_dataset), [`col()`](../reference/col.md#pointblank.col), [`ref()`](../reference/ref.md#pointblank.ref), [`seg_group()`](../reference/seg_group.md#pointblank.seg_group), [`has_columns()`](../reference/has_columns.md#pointblank.has_columns), [`has_rows()`](../reference/has_rows.md#pointblank.has_rows), and the column selectors ([starts_with()](../reference/starts_with.md#pointblank.starts_with), [ends_with()](../reference/ends_with.md#pointblank.ends_with), [contains()](../reference/contains.md#pointblank.contains), `matches()`, [everything()](../reference/everything.md#pointblank.everything), [first_n()](../reference/first_n.md#pointblank.first_n), and [last_n()](../reference/last_n.md#pointblank.last_n)). So can the constructors for values that YAML has no literal for: `Decimal()`, `ZoneInfo()`, `datetime.date()`, `datetime.time()`, `datetime.datetime()`, and `datetime.timedelta()`. These only load a bundled dataset or build an object, so `value: pb.col("b")`, `value: {python: 'Decimal("2.2")'}`, or `active: pb.has_columns("a")` work without `allow_python=True`. In code that is allowed to run, `datetime`, `Decimal`, and `ZoneInfo` are available along with `pb`, `pl`, `pd`, and `Path`.
 
 ## Using Namespaces
 

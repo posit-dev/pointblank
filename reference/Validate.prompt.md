@@ -4,7 +4,7 @@ Validate rows using AI/LLM-powered analysis.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13989-L14474)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14072-L14557)
 
 ``` python
 Validate.prompt(

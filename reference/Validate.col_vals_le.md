@@ -4,7 +4,7 @@ Are column data less than or equal to a fixed value or data in another column?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L8331-L8648)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L8408-L8727)
 
 ``` python
 Validate.col_vals_le(
@@ -74,7 +74,7 @@ The `value=` argument allows for a variety of input types. The most common are:
 
 When supplying a number as the basis of comparison, keep in mind that all resolved columns must also be numeric. Should you have columns that are of the date or datetime types, you can supply a date or datetime value as the `value=` argument. There is flexibility in how you provide the date or datetime value, as it can be:
 
-- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+- a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.), optionally with a UTC offset for a timezone-aware datetime (e.g., `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
 - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`, `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
 Finally, when supplying a column name in the `value=` argument, it must be specified within [`col()`](../reference/col.md#pointblank.col). This is a column-to-column comparison and, crucially, the columns being compared must be of the same type (e.g., both numeric, both date, etc.).

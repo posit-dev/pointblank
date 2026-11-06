@@ -4,7 +4,7 @@ Provides a dictionary of the fraction of test units that failed for each validat
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19524-L19607)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19607-L19690)
 
 ``` python
 Validate.f_failed(

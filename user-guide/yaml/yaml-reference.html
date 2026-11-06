@@ -1547,6 +1547,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <ul>
 <li><code>pb</code> (<code>pointblank</code>)</li>
 <li><code>Path</code> from pathlib</li>
+<li><code>datetime</code>, <code>Decimal</code> (from decimal), and <code>ZoneInfo</code> (from zoneinfo)</li>
 <li><code>pl</code> (<code>polars</code>) if it’s installed</li>
 <li><code>pd</code> (<code>pandas</code>) if it’s installed</li>
 <li>any modules given to <a href="../../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a> with <code>namespaces=</code></li>
@@ -1559,7 +1560,9 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <li><code>pb.has_columns()</code> and <code>pb.has_rows()</code></li>
 <li>the column selectors: <code>pb.starts_with()</code>, <code>pb.ends_with()</code>, <code>pb.contains()</code>, <code>pb.matches()</code>, <code>pb.everything()</code>, <code>pb.first_n()</code>, and <code>pb.last_n()</code> (combined with <code>&amp;</code>, <code>|</code>, <code>-</code>, and <code>~</code> if you like)</li>
 </ul>
-<p>These only load a bundled dataset or build an object. Anything else, such as <code>pl.col("a") &gt; 0</code> or <code>pb.col("a").str.len()</code>, is Python code.</p>
+<p>The same goes for building the values that YAML has no way of writing: <code>Decimal()</code>, <code>datetime.date()</code>, <code>datetime.time()</code>, <code>datetime.datetime()</code>, <code>datetime.timedelta()</code>, and <code>ZoneInfo()</code>. For example, <code>value: {python: 'Decimal("2.2")'}</code> compares a column against an exact decimal, and <code>value: {python: 'datetime.time(9, 30)'}</code> against a time of day. This is how <a href="../../reference/Validate.to_yaml.html#pointblank.Validate.to_yaml" class="gdls-link gdls-code">Validate.to_yaml()</a> writes these values.</p>
+<p>These only load a bundled dataset or build an object. Anything else, such as <code>pl.col("a") &gt; 0</code>, <code>pb.col("a").str.len()</code>, or <code>datetime.date.today()</code>, is Python code.</p>
+<p>A date or datetime can also be written as an ISO 8601 string (e.g., <code>"2024-01-15"</code> or <code>"2024-01-15T10:30:00"</code>), with a UTC offset for a timezone-aware datetime (e.g., <code>"2024-01-15T10:30:00+05:00"</code> or <code>"2024-01-15T10:30:00Z"</code>).</p>
 <p><a href="../../reference/yaml_to_python.html#pointblank.yaml_to_python" class="gdls-link gdls-code">yaml_to_python()</a> never runs Python code from the configuration. It copies the code into the generated Python as written, so it doesn’t need <code>allow_python=True</code>.</p>
 <p><strong>Examples of callable actions:</strong></p>
 <div class="sourceCode" id="cb58"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple output with built-in functions</span></span>

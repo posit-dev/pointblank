@@ -4,7 +4,7 @@ Do column data lie outside of two specified values or data in other columns?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L8997-L9342)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9078-L9425)
 
 ``` python
 Validate.col_vals_outside(
@@ -82,7 +82,7 @@ The `left=` and `right=` arguments both allow for a variety of input types. The 
 
 When supplying a number as the basis of comparison, keep in mind that all resolved columns must also be numeric. Should you have columns that are of the date or datetime types, you can supply a date or datetime value within `left=` and `right=`. There is flexibility in how you provide the date or datetime values for the bounds; they can be:
 
-- string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+- string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.), optionally with a UTC offset for timezone-aware datetimes (e.g., `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
 - date or datetime objects using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`, `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
 Finally, when supplying a column name in either `left=` or `right=` (or both), it must be specified within [`col()`](../reference/col.md#pointblank.col). This facilitates column-to-column comparisons and, crucially, the columns being compared to either/both of the bounds must be of the same type as the column data (e.g., all numeric, all dates, etc.).

@@ -161,7 +161,7 @@ result = pb.yaml_interrogate("validation.yaml", allow_python=True)
 
 Without it, a configuration that contains Python code raises an error saying so. Python code in YAML isn't sandboxed: it runs with the same access as any Python script you run, so it can read and write files, make network requests, or run commands. Treat a YAML configuration that contains Python code like a Python script, and only allow it for configurations you wrote or otherwise trust.
 
-A few `pb` functions don't need `allow_python=True` when they're called with plain values (strings, numbers, lists, and so on): `pb.load_dataset()`, `pb.col()`, `pb.ref()`, `pb.seg_group()`, `pb.has_columns()`, `pb.has_rows()`, and the column selectors (`pb.starts_with()`, `pb.ends_with()`, `pb.contains()`, `pb.matches()`, `pb.everything()`, `pb.first_n()`, and `pb.last_n()`). These only load a bundled dataset or build an object, so a configuration like this one works without it:
+A few `pb` functions don't need `allow_python=True` when they're called with plain values (strings, numbers, lists, and so on): `pb.load_dataset()`, `pb.col()`, `pb.ref()`, `pb.seg_group()`, `pb.has_columns()`, `pb.has_rows()`, and the column selectors (`pb.starts_with()`, `pb.ends_with()`, `pb.contains()`, `pb.matches()`, `pb.everything()`, `pb.first_n()`, and `pb.last_n()`). So do `Decimal()`, `ZoneInfo()`, and the `datetime.date()`, `datetime.time()`, `datetime.datetime()`, and `datetime.timedelta()` constructors, for values like `Decimal("2.2")` that YAML can't write. These only load a bundled dataset or build an object, so a configuration like this one works without it:
 
 ``` yaml
 tbl:
