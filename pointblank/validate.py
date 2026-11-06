@@ -5,6 +5,7 @@ import base64
 import contextlib
 import copy
 import datetime
+import decimal
 import difflib
 import html as html_module
 import inspect
@@ -5111,8 +5112,15 @@ def _render_code_value(value: Any) -> str:
         return json.dumps(value)
     if isinstance(value, (int, float)):
         return repr(value)
+    if _is_zoned_datetime(value):
+        return _render_zoned_datetime_code(value)
     if isinstance(value, (datetime.datetime, datetime.date)):
         return json.dumps(value.isoformat())
+    if isinstance(value, decimal.Decimal):
+        return f"Decimal({json.dumps(str(value))})"
+    if isinstance(value, (datetime.time, datetime.timedelta)):
+        # e.g., `datetime.time(9, 30)` (the code then needs `import datetime`)
+        return repr(value)
     if isinstance(value, ReferenceColumn):
         return f"pb.ref({json.dumps(value.column_name)})"
     if isinstance(value, Column):
@@ -5131,9 +5139,63 @@ def _render_code_value(value: Any) -> str:
         return f"({inner},)" if len(value) == 1 else f"({inner})"
     if isinstance(value, list):
         return "[" + ", ".join(_render_code_value(v) for v in value) + "]"
+    if isinstance(value, dict):
+        # e.g., the `column_map=`, `tolerance=`, and `normalize=` settings of `tbl_match()`
+        items = (f"{_render_code_value(k)}: {_render_code_value(v)}" for k, v in value.items())
+        return "{" + ", ".join(items) + "}"
     if callable(value):  # pragma: no cover
         return "None"
     return repr(value)  # pragma: no cover
+
+
+def _is_zoned_datetime(value: Any) -> bool:
+    """Check whether a value is a datetime in a named time zone (e.g., `America/New_York`)."""
+    return (
+        isinstance(value, datetime.datetime)
+        and isinstance(value.tzinfo, ZoneInfo)
+        and bool(value.tzinfo.key)
+    )
+
+
+def _render_zoned_datetime_code(value: datetime.datetime) -> str:
+    """Render a datetime in a named time zone as a `datetime.datetime(...)` call.
+
+    An ISO string would only keep the UTC offset, and a table backend can refuse to compare a
+    column in a named time zone with a value at a fixed offset, so the zone is written out.
+    """
+    parts = [
+        value.year,
+        value.month,
+        value.day,
+        value.hour,
+        value.minute,
+        value.second,
+        value.microsecond,
+    ]
+    while len(parts) > 5 and parts[-1] == 0:
+        parts.pop()
+    args = [str(part) for part in parts]
+    if value.fold:
+        args.append("fold=1")
+    args.append(f"tzinfo=ZoneInfo({json.dumps(value.tzinfo.key)})")
+    return f"datetime.datetime({', '.join(args)})"
+
+
+def _code_value_imports(value: Any) -> set[str]:
+    """Get the imports needed by the code that `_render_code_value()` writes for a value."""
+    if _is_zoned_datetime(value):
+        return {"import datetime", "from zoneinfo import ZoneInfo"}
+    if isinstance(value, decimal.Decimal):
+        return {"from decimal import Decimal"}
+    if isinstance(value, (datetime.time, datetime.timedelta)):
+        return {"import datetime"}
+    if isinstance(value, Segment):
+        value = value.segments
+    if isinstance(value, dict):
+        value = [*value.keys(), *value.values()]
+    if isinstance(value, (list, tuple)):
+        return set().union(*(_code_value_imports(v) for v in value))
+    return set()
 
 
 def _render_thresholds_code(thresholds: Thresholds) -> str:
@@ -5198,6 +5260,11 @@ def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
         return value.yaml_value
     if isinstance(value, bool) or value is None or isinstance(value, (int, float, str)):
         return value
+    if isinstance(value, (decimal.Decimal, datetime.time)) or _is_zoned_datetime(value):
+        # Written as a Python expression (e.g., `Decimal("2.2")` or `datetime.time(9, 30)`) since a
+        # string would be read back as a string (or, for a datetime in a named time zone, lose the
+        # zone); `yaml_interrogate()` builds these values without needing `allow_python=True`
+        return {"python": _render_code_value(value)}
     if isinstance(value, (datetime.datetime, datetime.date)):
         return value.isoformat()
     if isinstance(value, ReferenceColumn):
@@ -6855,7 +6922,9 @@ class Validate:
         can supply a date or datetime value as the `value=` argument. There is flexibility in how
         you provide the date or datetime value, as it can be:
 
-        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for a timezone-aware datetime (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
           `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -7166,7 +7235,9 @@ class Validate:
         can supply a date or datetime value as the `value=` argument. There is flexibility in how
         you provide the date or datetime value, as it can be:
 
-        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for a timezone-aware datetime (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
           `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -7484,7 +7555,9 @@ class Validate:
         can supply a date or datetime value as the `value=` argument. There is flexibility in how
         you provide the date or datetime value, as it can be:
 
-        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for a timezone-aware datetime (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
           `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -7802,7 +7875,9 @@ class Validate:
         can supply a date or datetime value as the `value=` argument. There is flexibility in how
         you provide the date or datetime value, as it can be:
 
-        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for a timezone-aware datetime (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
           `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -8118,7 +8193,9 @@ class Validate:
         can supply a date or datetime value as the `value=` argument. There is flexibility in how
         you provide the date or datetime value, as it can be:
 
-        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for a timezone-aware datetime (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
           `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -8437,7 +8514,9 @@ class Validate:
         can supply a date or datetime value as the `value=` argument. There is flexibility in how
         you provide the date or datetime value, as it can be:
 
-        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - a string-based date or datetime (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for a timezone-aware datetime (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - a date or datetime object using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
           `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -8769,7 +8848,9 @@ class Validate:
         can supply a date or datetime value within `left=` and `right=`. There is flexibility in how
         you provide the date or datetime values for the bounds; they can be:
 
-        - string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for timezone-aware datetimes (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - date or datetime objects using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
         `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -9116,7 +9197,9 @@ class Validate:
         can supply a date or datetime value within `left=` and `right=`. There is flexibility in how
         you provide the date or datetime values for the bounds; they can be:
 
-        - string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.)
+        - string-based dates or datetimes (e.g., `"2023-10-01"`, `"2023-10-01 13:45:30"`, etc.),
+          optionally with a UTC offset for timezone-aware datetimes (e.g.,
+          `"2023-10-01T13:45:30+05:00"` or `"2023-10-01T13:45:30Z"`)
         - date or datetime objects using the `datetime` module (e.g., `datetime.date(2023, 10, 1)`,
         `datetime.datetime(2023, 10, 1, 13, 45, 30)`, etc.)
 
@@ -20116,7 +20199,8 @@ class Validate:
             placeholder `your_data`, since the original data variable name is not known to the
             plan. Reference data given as a file path or connection string is written out as-is;
             an in-memory reference table becomes the placeholder `your_reference_data` (with a
-            warning).
+            warning). Values such as `Decimal("2.2")` or `datetime.time(9, 30)` are written as
+            Python expressions, and the code starts with the imports they need.
 
         Notes on Fidelity
         -----------------
@@ -20230,7 +20314,15 @@ class Validate:
             )
             warnings_out.append(_REFERENCE_PLACEHOLDER_NOTE)
 
-        lines = ["import pointblank as pb", "", "validation = (", "    pb.Validate("]
+        # Values such as `Decimal("2.2")` and `datetime.time(9, 30)` need their own imports, which
+        # go first as standard-library imports (`import datetime`, then `from decimal ...`)
+        std_imports = sorted(
+            set().union(*(_code_value_imports(v) for _, params in steps for v in params.values())),
+            key=lambda line: (line.startswith("from "), line),
+        )
+
+        lines = [*std_imports, *([""] if std_imports else []), "import pointblank as pb", ""]
+        lines += ["validation = (", "    pb.Validate("]
         for arg, comment in validate_args:
             lines.append(f"        {arg}," + (comment or ""))
         lines.append("    )")
@@ -20280,6 +20372,11 @@ class Validate:
         Python objects (`pre=` callables, `actions=`, callable `active=`, and the expressions of
         `col_vals_expr()`/`conjointly()`/`specially()`) cannot be represented in YAML; a
         placeholder is emitted and a warning is raised.
+
+        Values that YAML has no literal for, such as `Decimal("2.2")`, `datetime.time(9, 30)`, or
+        a datetime in a named time zone, are written as `python:` blocks. These are among the few
+        calls that [`yaml_interrogate()`](`pointblank.yaml_interrogate`) runs without
+        `allow_python=True`, so the YAML still loads as is.
 
         Examples
         --------
@@ -24092,6 +24189,9 @@ def _is_string_datetime(value: str) -> bool:
     """
     Check if a string represents a datetime in ISO format (YYYY-MM-DD HH:MM:SS).
 
+    The time can have fractional seconds and can end with a UTC offset (`Z`, `+HH:MM`, or
+    `+HHMM`), as in the strings written by `datetime.isoformat()`.
+
     Parameters
     ----------
     value
@@ -24107,8 +24207,8 @@ def _is_string_datetime(value: str) -> bool:
 
     import re
 
-    # Match ISO datetime format YYYY-MM-DD HH:MM:SS with optional milliseconds
-    pattern = r"^\d{4}-\d{2}-\d{2}(\s|T)\d{2}:\d{2}:\d{2}(\.\d+)?$"
+    # Match ISO datetime format YYYY-MM-DD HH:MM:SS with optional fractional seconds and offset
+    pattern = r"^\d{4}-\d{2}-\d{2}(\s|T)\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})?$"
     if not re.match(pattern, value):
         return False
 
@@ -24166,16 +24266,16 @@ def _convert_string_to_datetime(value: str) -> datetime.datetime:
 
     import datetime
 
-    if "T" in value:
-        if "." in value:
-            return datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
-        else:
-            return datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%S")
-    else:
-        if "." in value:
-            return datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
-        else:
-            return datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+    import re
+
+    fmt = "%Y-%m-%dT%H:%M:%S" if "T" in value else "%Y-%m-%d %H:%M:%S"
+    if "." in value:
+        fmt += ".%f"
+    # A UTC offset (e.g., `+05:30` or `Z`) gives a timezone-aware datetime
+    if re.search(r"(Z|[+-]\d{2}:?\d{2})$", value):
+        fmt += "%z"
+
+    return datetime.datetime.strptime(value, fmt)
 
 
 def _string_date_dttm_conversion(value: Any) -> Any:
