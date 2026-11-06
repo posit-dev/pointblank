@@ -6,6 +6,9 @@ import tempfile
 import os
 import io
 import contextlib
+import datetime
+from decimal import Decimal
+from zoneinfo import ZoneInfo
 
 import pointblank as pb
 from pointblank import load_dataset, yaml_interrogate, validate_yaml, yaml_to_python, Validate
@@ -5868,6 +5871,12 @@ def test_yaml_python_code_denied_after_column_reference(tmp_path):
         "pb.col",
         "[c for c in 'ab']",
         "{**{'a': 1}}",
+        "datetime.date.today()",
+        "datetime.datetime.now(tz=ZoneInfo('UTC'))",
+        "Decimal.from_float(1.5)",
+        "decimal.Decimal('1')",
+        "ZoneInfo.clear_cache()",
+        "datetime.time",
     ],
 )
 def test_eval_python_code_outside_declarative_subset_denied(code):
@@ -5938,6 +5947,15 @@ def test_yaml_declarative_python_runs_without_allow_python():
         ("pb.everything() & pb.contains('a')", None),
         ("[1, -2.5, 'a', None, True]", [1, -2.5, "a", None, True]),
         ("{'a': (1, 2)}", {"a": (1, 2)}),
+        ('Decimal("2.2")', Decimal("2.2")),
+        ("[Decimal('-1.5'), Decimal(3)]", [Decimal("-1.5"), Decimal(3)]),
+        ("datetime.date(2024, 1, 31)", datetime.date(2024, 1, 31)),
+        ("datetime.time(9, 30, 15, 250)", datetime.time(9, 30, 15, 250)),
+        ("datetime.timedelta(days=-1, seconds=5)", datetime.timedelta(days=-1, seconds=5)),
+        (
+            'datetime.datetime(2024, 1, 1, 9, 30, tzinfo=ZoneInfo("America/New_York"))',
+            datetime.datetime(2024, 1, 1, 9, 30, tzinfo=ZoneInfo("America/New_York")),
+        ),
     ],
 )
 def test_eval_python_code_declarative_subset(code, expected):
@@ -5979,3 +5997,53 @@ def test_to_yaml_roundtrip_without_allow_python():
     result = yaml_interrogate(yaml_content, set_tbl=load_dataset("small_table", tbl_type="polars"))
 
     assert len(result.validation_info) == len(validation.interrogate().validation_info)
+
+
+def test_yaml_decimal_and_time_values_without_allow_python():
+    yaml_content = """
+    tbl: small_table
+    steps:
+      - col_vals_gt:
+          columns: [d]
+          value:
+            python: Decimal("100.5")
+      - col_vals_between:
+          columns: [c]
+          left:
+            python: Decimal("1")
+          right:
+            python: Decimal("9.5")
+          na_pass: true
+      - col_vals_lt:
+          columns: [date_time]
+          value:
+            python: datetime.datetime(2016, 1, 30, 12)
+    """
+
+    result = yaml_interrogate(yaml_content)
+
+    steps = result.validation_info
+    assert steps[0].values == Decimal("100.5")
+    assert steps[1].values == (Decimal("1"), Decimal("9.5"))
+    assert steps[2].values == datetime.datetime(2016, 1, 30, 12)
+    assert all(step.eval_error is None for step in steps)
+
+    code = yaml_to_python(yaml_content)
+    assert code.startswith("```python\nimport datetime\nfrom decimal import Decimal\n\n")
+
+
+def test_yaml_value_constructors_in_allowed_python():
+    yaml_content = """
+    tbl: small_table
+    steps:
+      - col_vals_lt:
+          columns: [date]
+          value:
+            python: datetime.date.today() + datetime.timedelta(days=Decimal("1.5").__int__())
+    """
+
+    with pytest.raises(YAMLValidationError, match="allow_python=True"):
+        yaml_interrogate(yaml_content)
+
+    result = yaml_interrogate(yaml_content, allow_python=True)
+    assert result.all_passed()
