@@ -593,13 +593,21 @@ def test_tolerance_on_temporal_column_is_eval_error(tbl_type, values):
     assert "increasing_tol= needs a numeric column" in note
 
 
-@pytest.mark.parametrize(
-    "values",
-    [[datetime.date(2024, 1, 1), None, datetime.date(2024, 1, 2)], [1, None, "a"]],
-    ids=["dates-with-null", "mixed"],
-)
-def test_unorderable_pandas_object_column_is_eval_error(values):
-    tbl = pd.DataFrame({"x": pd.Series(values, dtype=object)})
+def test_unorderable_pandas_object_column_is_eval_error():
+    tbl = pd.DataFrame({"x": pd.Series([1, None, "a"], dtype=object)})
 
     note = _eval_error_note(tbl, "col_vals_increasing")
     assert "can't be put in order" in note
+
+
+def test_pandas_object_date_column_with_nulls():
+    values = [datetime.date(2024, 1, 2), None, datetime.date(2024, 1, 1)]
+    tbl = pd.DataFrame({"t": [1, 2, 3], "x": pd.Series(values, dtype=object)})
+
+    if int(pd.__version__.split(".")[0]) >= 3:
+        # pandas 3 can order dates alongside nulls in an `object` column
+        assert _monotonic_counts(tbl, "col_vals_increasing", na_pass=True) == (2, 1)
+    else:
+        # pandas 2 can't, and the step is an evaluation error
+        note = _eval_error_note(tbl, "col_vals_increasing")
+        assert "can't be put in order" in note
