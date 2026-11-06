@@ -2004,26 +2004,39 @@ def apply_missing_exclusion(results_tbl: IntoFrame, column: str, spec: Any) -> A
     `col_vals_*` validation methods: sentinel/missing values are excluded from the check (they pass)
     so that only the "real" values are validated.
     """
-    sentinels = spec.sentinel_values()
+    mask = _missing_spec_mask(results_tbl, column, spec)
+    if mask is None:
+        return results_tbl
 
     nw_tbl = nw.from_native(results_tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    nw_tbl = nw_tbl.with_columns(pb_is_good_=(nw.col("pb_is_good_") | mask))
+    return nw_tbl.to_native()
 
-    # Build a null-free boolean mask. Note `is_in()` yields null for null inputs, and OR-ing a null
-    # into `pb_is_good_` would corrupt a failing row (False | null = null under Kleene logic), so the
-    # sentinel mask is explicitly filled with `False` for null rows.
+
+def _missing_spec_mask(tbl: IntoFrame, column: str, spec: Any) -> nw.Expr | None:
+    """
+    Get a null-free expression that's `True` where `column` holds a code of `spec` (a
+    `MissingSpec`), or a null (or NaN) when `spec.null_is_missing` is `True`.
+
+    Returns `None` when the spec declares nothing that could match.
+    """
+    sentinels = spec.sentinel_values()
+
+    nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+
+    # Note `is_in()` yields null for null inputs, and OR-ing a null into `pb_is_good_` would corrupt
+    # a failing row (False | null = null under Kleene logic), so the sentinel mask is explicitly
+    # filled with `False` for null rows.
     mask = None
     if sentinels:
         mask = _is_in(column, sentinels, nw_tbl.collect_schema()[column]).fill_null(False)
     if spec.null_is_missing:
-        null_expr = _safe_is_nan_or_null_expr(results_tbl, nw.col(column), column)
+        null_expr = _safe_is_nan_or_null_expr(tbl, nw.col(column), column)
         mask = null_expr if mask is None else (mask | null_expr)
 
-    if mask is None:
-        return results_tbl
-
-    nw_tbl = nw_tbl.with_columns(pb_is_good_=(nw.col("pb_is_good_") | mask))
-    return nw_tbl.to_native()
+    return mask
 
 
 def interrogate_missing_only_coded(
@@ -2126,17 +2139,17 @@ def _unused_column_name(name: str, existing: list[str]) -> str:
     return name
 
 
-def _with_lagged_difference(
+def _with_previous_value(
     nw_tbl: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str, order_by: list[str] | None
 ) -> tuple[nw.DataFrame[Any] | nw.LazyFrame[Any], str, list[str]]:
     """
-    Add a column with the difference from the last non-null value in an earlier row.
+    Add a column with the last non-null value of `column` in an earlier row.
 
-    The difference is null for null values and for the first non-null value. Rows are taken in
+    The previous value is null up to and including the first non-null value. Rows are taken in
     `order_by=` order if given; otherwise DataFrames and Polars LazyFrames use their row order, and
     other tables (e.g., database tables), which have no row order, raise a `StepEvaluationError`.
 
-    Returns the table, the name of the difference column, and the internal columns to drop.
+    Returns the table, the name of the previous-value column, and the internal columns to drop.
     """
     existing = nw_tbl.collect_schema().names()
     temp_columns = []
@@ -2160,11 +2173,10 @@ def _with_lagged_difference(
             'to give the column(s) that put the rows in order (e.g., order_by="date").'
         )
 
-    group, filled, lagged = (
-        _unused_column_name(name, existing)
-        for name in ("pb_group_", "pb_filled_", "pb_lagged_difference_")
+    group, filled, previous = (
+        _unused_column_name(name, existing) for name in ("pb_group_", "pb_filled_", "pb_previous_")
     )
-    temp_columns += [group, filled, lagged]
+    temp_columns += [group, filled, previous]
 
     # Forward-fill the column without `fill_null(strategy=)` (not supported by every backend): a
     # running count of non-null values puts each non-null value in its own group, together with
@@ -2173,11 +2185,9 @@ def _with_lagged_difference(
         **{group: (~nw.col(column).is_null()).cast(nw.Int64).cum_sum().over(order_by=order)}
     )
     nw_tbl = nw_tbl.with_columns(**{filled: nw.col(column).max().over(group)})
-    nw_tbl = nw_tbl.with_columns(
-        **{lagged: nw.col(column) - nw.col(filled).shift(1).over(order_by=order)}
-    )
+    nw_tbl = nw_tbl.with_columns(**{previous: nw.col(filled).shift(1).over(order_by=order)})
 
-    return nw_tbl, lagged, temp_columns
+    return nw_tbl, previous, temp_columns
 
 
 def _interrogate_monotonic(
@@ -2188,6 +2198,7 @@ def _interrogate_monotonic(
     tol: float,
     na_pass: bool,
     order_by: list[str] | None,
+    missing: Any = None,
 ) -> Any:
     """
     Check that column values increase (or decrease) from one row to the next.
@@ -2195,37 +2206,73 @@ def _interrogate_monotonic(
     Each non-missing value is compared with the last non-missing value before it, so missing
     values don't break the sequence. Missing values pass only with `na_pass=True`, and the first
     non-missing value passes. A nonzero `tol=` allows movement in the wrong direction up to that
-    size (and stationary values).
+    size (and stationary values); it needs a numeric column.
 
     A NaN counts as missing like a null does (on Polars, PyArrow and most Ibis backends a NaN is
     not a null, and it compares greater than every number, so it'd otherwise pass or fail on its
-    own and break the sequence for the values after it).
+    own and break the sequence for the values after it). So do the codes of a `missing=`
+    `MissingSpec` (the caller then marks those rows as passing with `apply_missing_exclusion()`).
     """
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
+    dtype = nw_tbl.collect_schema()[column]
 
-    # Work from a copy of the column with NaN values turned into nulls, so NaN and null are
-    # handled the same way (in the forward fill and in the `na_pass=` check)
+    if tol != 0 and dtype in (nw.Date, nw.Datetime, nw.Duration):
+        tol_arg = "decreasing_tol" if increasing else "increasing_tol"
+        raise StepEvaluationError(
+            f"{tol_arg}= needs a numeric column, and column '{column}' has dtype {dtype}."
+        )
+
+    # Work from a copy of the column with the missing values (NaN and any `MissingSpec` codes)
+    # turned into nulls, so they're all handled the same way (in the forward fill and in the
+    # `na_pass=` check)
     values = _unused_column_name("pb_values_", nw_tbl.collect_schema().names())
     is_missing = _safe_is_nan_or_null_expr(tbl, nw.col(column), column)
-    nw_tbl = nw_tbl.with_columns(**{values: nw.when(~is_missing).then(nw.col(column))})
+    codes = _missing_spec_mask(tbl, column, missing) if missing is not None else None
+    if codes is not None:
+        is_missing = is_missing | codes
+    value_expr = nw.col(column)
+    if tol != 0 and dtype in (nw.Decimal, nw.Object):
+        # The tolerance is a float, and subtracting Decimals can overflow their precision (PyArrow)
+        # or fail on Decimal objects (pandas)
+        value_expr = value_expr.cast(nw.Float64)
+    elif dtype == nw.Duration and nw_tbl.implementation.is_pyarrow():
+        # PyArrow can't take the maximum of a duration in the forward fill, but the durations of a
+        # column share a unit, so their integer counts are in the same order
+        value_expr = value_expr.cast(nw.Int64)
 
-    result_tbl, lagged, temp_columns = _with_lagged_difference(nw_tbl, values, order_by)
-    temp_columns.append(values)
+    try:
+        nw_tbl = nw_tbl.with_columns(**{values: nw.when(~is_missing).then(value_expr)})
+        result_tbl, previous, temp_columns = _with_previous_value(nw_tbl, values, order_by)
+        temp_columns.append(values)
 
-    # The movement in the expected direction
-    movement = nw.col(lagged) if increasing else nw.col(lagged) * -1
-    if allow_stationary or tol != 0:
-        good_condition = movement >= -abs(tol)
-    else:
-        good_condition = movement > 0
+        # Without a tolerance the values are compared rather than subtracted, so dates and
+        # datetimes work on every backend
+        current, before = nw.col(values), nw.col(previous)
+        if tol != 0:
+            # The movement in the expected direction
+            movement = current - before if increasing else before - current
+            good_condition = movement >= -abs(tol)
+        elif allow_stationary:
+            good_condition = current >= before if increasing else current <= before
+        else:
+            good_condition = current > before if increasing else current < before
 
-    result_tbl = result_tbl.with_columns(
-        pb_is_good_=nw.when(nw.col(values).is_null())
-        .then(nw.lit(na_pass))
-        # The first non-missing value has nothing to be compared with
-        .otherwise(nw.when(nw.col(lagged).is_null()).then(nw.lit(True)).otherwise(good_condition))
-    )
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_=nw.when(current.is_null())
+            .then(nw.lit(na_pass))
+            # The first non-missing value has nothing to be compared with
+            .otherwise(nw.when(before.is_null()).then(nw.lit(True)).otherwise(good_condition))
+        )
+    except (TypeError, ValueError) as e:
+        # A pandas `object` column can hold values that pandas can't order (e.g., mixed types, or
+        # dates alongside nulls) or convert to floats for the tolerance
+        if dtype != nw.Object:
+            raise
+        raise StepEvaluationError(
+            f"The values of column '{column}' (a pandas object column) can't be put in order "
+            f"({e}). Convert the column to a numeric, date or datetime dtype."
+        ) from e
 
     return result_tbl.drop(*temp_columns).to_native()
 
@@ -2237,10 +2284,11 @@ def interrogate_increasing(
     decreasing_tol: float,
     na_pass: bool,
     order_by: list[str] | None = None,
+    missing: Any = None,
 ) -> Any:
     """Increasing interrogation (see `_interrogate_monotonic()`)."""
     return _interrogate_monotonic(
-        tbl, column, True, allow_stationary, decreasing_tol, na_pass, order_by
+        tbl, column, True, allow_stationary, decreasing_tol, na_pass, order_by, missing
     )
 
 
@@ -2251,10 +2299,11 @@ def interrogate_decreasing(
     increasing_tol: float,
     na_pass: bool,
     order_by: list[str] | None = None,
+    missing: Any = None,
 ) -> Any:
     """Decreasing interrogation (see `_interrogate_monotonic()`)."""
     return _interrogate_monotonic(
-        tbl, column, False, allow_stationary, increasing_tol, na_pass, order_by
+        tbl, column, False, allow_stationary, increasing_tol, na_pass, order_by, missing
     )
 
 
