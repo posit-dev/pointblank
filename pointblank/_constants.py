@@ -15,6 +15,8 @@ COMPATIBLE_DTYPES = {
     "le": ["numeric", "datetime"],
     "between": ["numeric", "datetime"],
     "outside": ["numeric", "datetime"],
+    "increasing": ["numeric", "datetime", "duration"],
+    "decreasing": ["numeric", "datetime", "duration"],
     "in_set": ["numeric", "str"],
     "not_in_set": ["numeric", "str"],
     "in_table": ["numeric", "str", "bool", "datetime", "duration"],

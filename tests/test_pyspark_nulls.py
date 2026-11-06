@@ -46,6 +46,7 @@ if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() not in ("true", "1", "yes"):
 pytestmark = pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 
 
+from pointblank.missing import MissingSpec
 from pointblank.validate import Validate
 
 
@@ -323,6 +324,36 @@ class TestDirectionNulls:
             step = v.validation_info[0]
             assert step.eval_error is True
             assert "order_by=" in step.notes["eval_error"]["text"]
+
+    def test_date_column(self, spark):
+        dates = [datetime.date(2024, 1, d) for d in (1, 3, 2)] + [None, datetime.date(2024, 1, 5)]
+        tbl = spark.createDataFrame(list(enumerate(dates)), "seq int, val date")
+        v = (
+            Validate(tbl)
+            .col_vals_increasing(columns="val", order_by="seq")
+            .col_vals_decreasing(columns="val", order_by="seq", allow_stationary=True)
+            .interrogate()
+        )
+
+        assert v.n_passed(scalar=False) == {1: 3, 2: 2}
+        assert v.n_failed(scalar=False) == {1: 2, 2: 3}
+
+    def test_missing_codes_are_skipped(self, spark):
+        """The 2 is compared with the 3, not with the -99 code."""
+        tbl = spark.createDataFrame(
+            [(1, 1.0), (2, float("nan")), (3, 3.0), (4, -99.0), (5, None), (6, 2.0)],
+            "seq int, val double",
+        )
+        spec = MissingSpec(reasons={-99: "refused"})
+        v = Validate(tbl).col_vals_increasing(columns="val", order_by="seq", missing=spec)
+
+        assert v.interrogate().n_failed(i=1, scalar=True) == 1
+
+    def test_string_column_is_eval_error(self, spark):
+        tbl = spark.createDataFrame([(1, "a"), (2, "b")], "seq int, val string")
+        v = Validate(tbl).col_vals_increasing(columns="val", order_by="seq").interrogate()
+
+        assert v.validation_info[0].eval_error is True
 
 
 # ---------------------------------------------------------------------------

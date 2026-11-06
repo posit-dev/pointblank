@@ -10138,11 +10138,13 @@ class Validate:
         Are column data increasing by row?
 
         The `col_vals_increasing()` validation method checks whether column values in a table are
-        increasing when moving down a table. There are options for allowing missing values in the
-        target column, allowing stationary phases (where consecutive values don't change), and even
-        one for allowing decreasing movements up to a certain threshold. This validation will
-        operate over the number of test units that is equal to the number of rows in the table
-        (determined after any `pre=` mutation has been applied).
+        increasing when moving down a table. The column can be numeric or hold dates, datetimes, or
+        durations; for any other column (e.g., a string column) the step is marked as having an
+        evaluation error. There are options for allowing missing values in the target column,
+        allowing stationary phases (where consecutive values don't change), and even one for
+        allowing decreasing movements up to a certain threshold. This validation will operate over
+        the number of test units that is equal to the number of rows in the table (determined after
+        any `pre=` mutation has been applied).
 
         Parameters
         ----------
@@ -10161,7 +10163,9 @@ class Validate:
             An optional threshold value that allows for movement of numerical values in the negative
             direction. By default this is `None` but using a numerical value will set the absolute
             threshold of negative travel allowed across numerical test units. Note that setting a
-            value here also has the effect of setting `allow_stationary` to `True`.
+            value here also has the effect of setting `allow_stationary` to `True`. It needs a
+            numeric column: with a date, datetime, or duration column, the step is marked as having
+            an evaluation error.
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values. A `NaN`
@@ -10175,10 +10179,10 @@ class Validate:
             An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
             for missing values in the column (such as `-99` for a survey question that was refused).
             Rows holding one of these codes are excluded from the check (they count as passing test
-            units), so only the real values are validated, and a note in the validation report lists
-            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
-            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
-            to `na_pass=`.
+            units) and, like missing values, don't break the sequence, so only the real values are
+            validated, and a note in the validation report lists the codes. By default a
+            `MissingSpec` also treats nulls as missing, so nulls pass whatever the value of
+            `na_pass=`. Create it with `null_is_missing=False` to leave nulls to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -10238,7 +10242,9 @@ class Validate:
         A missing value fails unless `na_pass=True`, and it doesn't break the sequence: the next
         non-missing value is compared with the last non-missing value before it. For example, with
         `[1, 2, None, 5]` the `5` is compared with the `2`. The first non-missing value has nothing
-        to be compared with, so it always passes.
+        to be compared with, so it always passes. The codes of a `missing=` `MissingSpec` are
+        skipped in the same way: with `-99` as a code, `[1, 3, -99, 2]` fails the `2`, since it's
+        compared with the `3`.
 
         Examples
         --------
@@ -10382,11 +10388,13 @@ class Validate:
         Are column data decreasing by row?
 
         The `col_vals_decreasing()` validation method checks whether column values in a table are
-        decreasing when moving down a table. There are options for allowing missing values in the
-        target column, allowing stationary phases (where consecutive values don't change), and even
-        one for allowing increasing movements up to a certain threshold. This validation will
-        operate over the number of test units that is equal to the number of rows in the table
-        (determined after any `pre=` mutation has been applied).
+        decreasing when moving down a table. The column can be numeric or hold dates, datetimes, or
+        durations; for any other column (e.g., a string column) the step is marked as having an
+        evaluation error. There are options for allowing missing values in the target column,
+        allowing stationary phases (where consecutive values don't change), and even one for
+        allowing increasing movements up to a certain threshold. This validation will operate over
+        the number of test units that is equal to the number of rows in the table (determined after
+        any `pre=` mutation has been applied).
 
         Parameters
         ----------
@@ -10405,7 +10413,9 @@ class Validate:
             An optional threshold value that allows for movement of numerical values in the positive
             direction. By default this is `None` but using a numerical value will set the absolute
             threshold of positive travel allowed across numerical test units. Note that setting a
-            value here also has the effect of setting `allow_stationary` to `True`.
+            value here also has the effect of setting `allow_stationary` to `True`. It needs a
+            numeric column: with a date, datetime, or duration column, the step is marked as having
+            an evaluation error.
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values. A `NaN`
@@ -10419,10 +10429,10 @@ class Validate:
             An optional [`MissingSpec`](`pointblank.MissingSpec`) declaring the codes that stand in
             for missing values in the column (such as `-99` for a survey question that was refused).
             Rows holding one of these codes are excluded from the check (they count as passing test
-            units), so only the real values are validated, and a note in the validation report lists
-            the codes. By default a `MissingSpec` also treats nulls as missing, so nulls pass
-            whatever the value of `na_pass=`. Create it with `null_is_missing=False` to leave nulls
-            to `na_pass=`.
+            units) and, like missing values, don't break the sequence, so only the real values are
+            validated, and a note in the validation report lists the codes. By default a
+            `MissingSpec` also treats nulls as missing, so nulls pass whatever the value of
+            `na_pass=`. Create it with `null_is_missing=False` to leave nulls to `na_pass=`.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -10482,7 +10492,9 @@ class Validate:
         A missing value fails unless `na_pass=True`, and it doesn't break the sequence: the next
         non-missing value is compared with the last non-missing value before it. For example, with
         `[1, 2, None, 5]` the `5` is compared with the `2`. The first non-missing value has nothing
-        to be compared with, so it always passes.
+        to be compared with, so it always passes. The codes of a `missing=` `MissingSpec` are
+        skipped in the same way: with `-99` as a code, `[5, 3, -99, 4]` fails the `4`, since it's
+        compared with the `3`.
 
         Examples
         --------
@@ -17786,6 +17798,7 @@ class Validate:
                                 decreasing_tol=decreasing_tol,
                                 na_pass=na_pass,
                                 order_by=validation.val_info.get("order_by"),
+                                missing=validation.missing,
                             )
 
                         elif assertion_type == "col_vals_decreasing":
@@ -17802,6 +17815,7 @@ class Validate:
                                 increasing_tol=increasing_tol,
                                 na_pass=na_pass,
                                 order_by=validation.val_info.get("order_by"),
+                                missing=validation.missing,
                             )
 
                         elif assertion_type == "col_vals_between":
