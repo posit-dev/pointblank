@@ -148,6 +148,12 @@ from pointblank.column import (
     col,
 )
 from pointblank.missing import MissingSpec, _missing_spec_to_code, _missing_spec_to_yaml
+from pointblank.preprocessing import (
+    _ROW_INDEX,
+    _check_row_preserving_result,
+    _is_row_preserving,
+    _RowPreservingError,
+)
 from pointblank.schema import Schema, _get_schema_validation_info
 from pointblank.segments import Segment
 from pointblank.thresholds import (
@@ -4327,6 +4333,10 @@ class _ValidationInfo:
         The data table in its native format that has been checked for the validation step. It wil
         include a new column called `pb_is_good_` that is a boolean column that indicates whether
         the row passed the validation or not.
+    row_index_map
+        For a step whose `pre=` function is marked with `row_preserving()`, a table matching the
+        number of each row in `tbl_checked` (`pb_row_`, in the order `_with_row_index()` numbers
+        them) to its row number in the target table (`pb_index_`).
     extract
         The extracted rows from the table that failed the validation step.
     time_processed
@@ -4407,6 +4417,7 @@ class _ValidationInfo:
     critical: bool | None = None
     failure_text: str | None = None
     tbl_checked: Any = None
+    row_index_map: Any = None
     extract: Any = None
     val_info: dict[str, Any] | None = None
     time_processed: str | None = None
@@ -4445,6 +4456,7 @@ class _ValidationInfo:
             "critical",
             "failure_text",
             "tbl_checked",
+            "row_index_map",
             "extract",
             "time_processed",
             "proc_duration_s",
@@ -17586,13 +17598,32 @@ class Validate:
                         else list(data_tbl_step.columns)
                     )
 
+                    # A function marked with `row_preserving()` is given the table with its row
+                    # numbers, so that the rows it returns can be matched to the table's rows
+                    row_preserving = _is_row_preserving(validation.pre)
+                    if row_preserving:
+                        if _ROW_INDEX in original_column_names:
+                            raise _RowPreservingError(
+                                f"The `pre=` function of step {validation.i} is marked with "
+                                f"`pb.row_preserving()`, but the table already has a column "
+                                f"called `{_ROW_INDEX}`, which is the name of the row number "
+                                "column it adds. Rename that column first."
+                            )
+                        data_tbl_step = _with_row_index(data_tbl_step, name=_ROW_INDEX).to_native()
+
                     # Apply the preprocessing function to the table
                     data_tbl_step = _apply_pre(validation.pre, data_tbl_step)
 
+                    if row_preserving:
+                        _check_row_preserving_result(
+                            data_tbl_step, n_rows=original_rows, step=validation.i
+                        )
+
                     # After successful preprocessing, check dimensions and create notes
-                    # Use get_row_count() and get_column_count() for compatibility
+                    # Use get_row_count() and get_column_count() for compatibility (the row number
+                    # column of a row-preserving function isn't counted)
                     processed_rows = get_row_count(data_tbl_step)
-                    processed_cols = get_column_count(data_tbl_step)
+                    processed_cols = get_column_count(data_tbl_step) - row_preserving
 
                     # Always add a note when preprocessing is applied
                     if original_rows != processed_rows or original_cols != processed_cols:
@@ -17646,6 +17677,11 @@ class Validate:
                                 text=note_text,
                             )
 
+                except _RowPreservingError:
+                    # A row-preserving function that doesn't keep the rows is an error in the plan
+                    # (its results would be matched to the wrong rows), so it isn't passed over
+                    raise
+
                 except Exception:
                     # If preprocessing fails, mark the validation as having an eval_error
                     validation.eval_error = True
@@ -17665,6 +17701,18 @@ class Validate:
                 data_tbl_step = _apply_segments(
                     data_tbl=data_tbl_step, segments_expr=validation.segments
                 )
+
+            # The row numbers added for a row-preserving `pre=` function are kept as a table that
+            # matches the rows to be checked to the target table's rows (for `get_row_flags()`
+            # and `get_sundered_data()`), and taken off the table before it's checked
+            if validation.pre is not None and _is_row_preserving(validation.pre):
+                if collect_tbl_checked:
+                    validation.row_index_map = (
+                        _with_row_index(data_tbl_step, name="pb_row_", ignore=(_ROW_INDEX,))
+                        .select("pb_row_", _ROW_INDEX)
+                        .to_native()
+                    )
+                data_tbl_step = nw.from_native(data_tbl_step).drop(_ROW_INDEX).to_native()
 
             # ------------------------------------------------
             # Determine table type
@@ -21503,12 +21551,14 @@ class Validate:
         - of certain check types, where test units are rows or cells checked down a column (e.g.,
         the `col_vals_*()` methods and `rows_complete()`)
         - `active=` is not set to `False`
-        - `pre=` has not been given an expression for modifying the input table
+        - `pre=` has not been given an expression for modifying the input table, unless it's
+        marked with [`row_preserving()`](`pointblank.row_preserving`)
 
         So long as these conditions are met, the data will be split into two constituent tables: one
         with the rows that passed all validation steps and another with the rows that failed at
         least one validation step. Steps that use `segments=` are included, with each segment's
-        results counting only for the rows in that segment.
+        results counting only for the rows in that segment. Likewise, a step with a
+        `row_preserving()` `pre=` function only counts for the rows that the function returned.
 
         Steps that use [`rows_distinct()`](`pointblank.Validate.rows_distinct`) are a special case.
         That step counts every copy of a duplicated row as failing, since it can't know which of
@@ -21708,10 +21758,11 @@ class Validate:
         Details
         -------
         The steps that get flag columns are the same ones used by `get_sundered_data()`: steps that
-        check rows or cells down a column, that are active, and that don't use `pre=`. A row that a
-        step didn't check (e.g., a row outside the segment of a step that uses `segments=`) isn't
-        flagged by it, and isn't counted in its `pb_row_score_`. A row that no step checked has a
-        missing `pb_row_score_`.
+        check rows or cells down a column, that are active, and that don't use `pre=` (unless the
+        `pre=` function is marked with [`row_preserving()`](`pointblank.row_preserving`)). A row
+        that a step didn't check (e.g., a row outside the segment of a step that uses `segments=`,
+        or a row that a row-preserving `pre=` function filtered out) isn't flagged by it, and isn't
+        counted in its `pb_row_score_`. A row that no step checked has a missing `pb_row_score_`.
 
         Unlike `get_sundered_data()`, steps that use
         [`rows_distinct()`](`pointblank.Validate.rows_distinct`) are included by default: one copy
@@ -21719,9 +21770,10 @@ class Validate:
         a `rows_distinct()` flag marks the rows that removing duplicates would remove. Use
         `duplicates=` and `duplicates_order_by=` to choose which copy is kept.
 
-        A row-level step that can't be used is reported in a warning: that's a step that uses
-        `pre=` (it can change the rows, so its results may not line up with the table's rows), a
-        step that couldn't be evaluated, or a `rows_distinct()` step when `duplicates=None`.
+        A row-level step that can't be used is reported in a warning: that's a step that uses an
+        unmarked `pre=` function (it can change the rows, so its results may not line up with the
+        table's rows), a step that couldn't be evaluated, or a `rows_distinct()` step when
+        `duplicates=None`.
 
         Parameters
         ----------
@@ -24068,7 +24120,7 @@ class Validate:
                 if validation.pre is None:
                     table = self.data
                 else:
-                    table = _apply_pre(validation.pre, self.data)
+                    table = _apply_pre_to_target(validation.pre, self.data)
 
                 # Get the columns from the table as a list
                 columns = list(table.columns)
@@ -24168,7 +24220,7 @@ class Validate:
                 if validation.pre is None:
                     table = self.data
                 else:
-                    table = _apply_pre(validation.pre, self.data)
+                    table = _apply_pre_to_target(validation.pre, self.data)
 
                 # If the `segments` expression is a string, that string is taken as a column name
                 # for which segmentation should occur across unique values in the column
@@ -24478,8 +24530,9 @@ def _row_result_steps(
     These are the steps that check rows (the `ROW_BASED_VALIDATION_TYPES`, `rows_distinct()`,
     `rows_complete()`, and `tbl_match()` when it gives a row-aligned result table) and that are
     active and have no `pre=` (it can change the rows, so the results may not line up with the
-    data). A `rows_distinct()` step takes part only when `duplicates=` says which copy of a
-    duplicate row to keep, as the step itself counts every copy as failing.
+    data) unless it's marked with `row_preserving()`. A `rows_distinct()` step takes part only when
+    `duplicates=` says which copy of a duplicate row to keep, as the step itself counts every copy
+    as failing.
 
     Returns the usable steps, and the row-checking steps that were left out along with the reason
     (inactive steps aren't included, as leaving them out was the user's choice).
@@ -24502,8 +24555,8 @@ def _row_result_steps(
             continue
         if not validation.active:
             continue
-        if validation.pre is not None:
-            skipped.append((validation.i, "it uses `pre=`"))
+        if validation.pre is not None and not _is_row_preserving(validation.pre):
+            skipped.append((validation.i, "it uses `pre=` without `pb.row_preserving()`"))
             continue
         if assertion_type == "rows_distinct" and duplicates is None:
             skipped.append((validation.i, "no `duplicates=` policy was given"))
@@ -24542,15 +24595,34 @@ def _step_row_results(
     checked rows' numbers (`index_name`) and whether each row failed the step (`pb_failed_`). Rows
     outside a segmented step's segment aren't in it. A missing result doesn't count as a failure.
     """
-    # Add row numbers to the results table (put on the same backend as the data first, as some
-    # steps materialize their results, and eager and lazy tables can't be joined)
-    results_tbl = _with_row_index(
-        _results_on_data_backend(validation.tbl_checked, data_nw), name=index_name
-    )
+    if validation.row_index_map is not None:
+        # The step's `pre=` function is row-preserving, so its results are numbered in the same
+        # way as the rows it returned and matched to the target table's rows by that number (this
+        # also covers the rows of a segment); the results are then put on the data's backend, in
+        # case `pre=` changed it
+        index_map = nw.from_native(validation.row_index_map)
+        results_tbl = (
+            _with_row_index(
+                _results_on_data_backend(validation.tbl_checked, index_map), name="pb_row_"
+            )
+            .join(index_map, on="pb_row_", how="inner")
+            .drop("pb_row_")
+        )
+        results_tbl = nw.from_native(
+            _results_on_data_backend(results_tbl.to_native(), data_nw)
+        ).with_columns(nw.col(_ROW_INDEX).cast(data_nw.collect_schema()[index_name]))
+        if index_name != _ROW_INDEX:  # pragma: no cover
+            results_tbl = results_tbl.rename({_ROW_INDEX: index_name})
+    else:
+        # Add row numbers to the results table (put on the same backend as the data first, as
+        # some steps materialize their results, and eager and lazy tables can't be joined)
+        results_tbl = _with_row_index(
+            _results_on_data_backend(validation.tbl_checked, data_nw), name=index_name
+        )
 
     # A segmented step's results only hold the rows of its segment, numbered from 0, so replace
     # those numbers with the rows' numbers in the whole table
-    if validation.segments is not None:
+    if validation.segments is not None and validation.row_index_map is None:
         results_tbl = _results_with_data_row_index(
             results_tbl, data_nw, segments=validation.segments, index_name=index_name
         )
@@ -27309,6 +27381,22 @@ def _apply_pre(pre: Callable, tbl: Any) -> Any:
         return nw.to_native(pre(dfn=nw.from_native(tbl)), pass_through=True)
 
     return pre(tbl)
+
+
+def _apply_pre_to_target(pre: Callable, tbl: Any) -> Any:
+    """
+    Apply a `pre=` function to the target table to see which columns or segments it gives.
+
+    A function marked with `row_preserving()` is given the table with its row numbers, as in
+    interrogation, and they're taken off the result.
+    """
+    if not _is_row_preserving(pre):
+        return _apply_pre(pre, tbl)
+
+    result = nw.from_native(_apply_pre(pre, _with_row_index(tbl, name=_ROW_INDEX).to_native()))
+    if _ROW_INDEX in result.collect_schema().names():
+        result = result.drop(_ROW_INDEX)
+    return result.to_native()
 
 
 def _pre_processing_funcs_to_str(pre: Callable) -> str | list[str] | None:

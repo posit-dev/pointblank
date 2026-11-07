@@ -91,6 +91,8 @@ from pointblank.metadata import (
     validate_sdtmig,
 )
 from pointblank.pipeline import ContractViolationError, Pipeline, PipelineResult
+from pointblank.preprocessing import row_preserving
+from pointblank.ablation import Ablation, AblationVariant
 from pointblank.schema import Schema, generate_dataset, schema_from_tbl
 from pointblank.segments import seg_group
 from pointblank.thresholds import Actions, FinalActions, Thresholds
@@ -162,6 +164,9 @@ __all__ = [
     "get_column_count",
     "get_row_count",
     "seg_group",
+    "row_preserving",
+    "Ablation",
+    "AblationVariant",
     "send_slack_notification",
     "emit_otel",
     # Data generation - Field classes

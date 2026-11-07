@@ -292,6 +292,41 @@ DataFrame (as shown here), a Pandas DataFrame, a Narwhals DataFrame, or any othe
 This flexibility allows you to validate properties of your data that might only be apparent after
 significant reshaping or aggregation.
 
+## Preprocessing That Keeps the Rows
+
+Because a `pre=` function can reshape the table in any way, Pointblank doesn't try to match the rows
+that such a step checked to the rows of the target table. This means steps with `pre=` are left out
+when splitting the table with [`Validate.get_sundered_data()`](`Validate.get_sundered_data`) or
+flagging its rows with [`Validate.get_row_flags()`](`Validate.get_row_flags`). If your function only
+filters rows, reorders them, or changes their values, you can mark it with
+[`row_preserving()`](`row_preserving`) so that its step is used there too:
+
+```{python}
+import polars as pl
+
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_vals_gt(
+        columns="d",
+        value=1000,
+        pre=pb.row_preserving(lambda df: df.filter(pl.col("f") == "high")),
+    )
+    .interrogate()
+    .get_row_flags()
+)
+```
+
+The three `"high"` rows with a `d` value below `1000` are flagged in `pb_failed_1_`. The rows with
+other values of `f` weren't checked at all, so they aren't flagged and their `pb_row_score_` is
+missing.
+
+For a marked function, Pointblank adds a row number column called `pb_index_` to the table before
+calling the function. The function needs to keep that column and leave its values alone, and every
+row it returns must come from a different row of the table (so no aggregating, and no joins that
+repeat rows). Pointblank checks the `pb_index_` column of the result, and raises an error naming
+the step if it's missing or has repeated or unknown values. Rows the function filters out simply
+weren't checked by the step, so they aren't flagged by it.
+
 ## Conclusion
 
 The preprocessing capabilities in Pointblank provide the power and flexibility for validating

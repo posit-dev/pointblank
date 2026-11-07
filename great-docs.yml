@@ -479,6 +479,37 @@ reference:
         - has_columns
         - has_rows
 
+    - title: Preprocessing
+      desc: >
+        Helper functions for use with the `pre=` parameter of validation methods.
+      contents:
+        - row_preserving
+
+    - title: Data Ablation
+      desc: >
+        Measure how the rows that fail validation steps affect a downstream model. An `Ablation`
+        trains and evaluates a model (with a function you provide) on the full table and on
+        versions of it with the failing rows of some steps removed, repeats this over several
+        seeds, and compares each version to the full table and to a version with the same number
+        of rows removed at random.
+      contents:
+        - name: Ablation
+          members: false
+        - AblationVariant
+
+    - title: Ablation Methods
+      desc: Methods for the Ablation class
+      contents:
+        - Ablation.drop_steps
+        - Ablation.drop_each
+        - Ablation.drop_all
+        - Ablation.plan
+        - Ablation.run
+        - Ablation.get_effects
+        - Ablation.get_tabular_report
+        - Ablation.to_dict
+        - Ablation.to_json
+
     - title: YAML
       desc: >
         Functions for using YAML to orchestrate validation workflows.
