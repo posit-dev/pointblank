@@ -488,12 +488,16 @@ def _serialization_cases(ref_path):
         "prompt": lambda v: v.prompt(
             prompt="Values look plausible", model="anthropic:claude-sonnet-5", batch_size=10
         ),
+        "col_vals_scored": lambda v: v.col_vals_scored(
+            columns="b", scorer=lambda batch: [len(row["b"]) for row in batch], min_val=3
+        ),
     }
 
 
 # Methods whose plans can't be fully serialized (callables, or LLM calls at interrogation), so
-# only the rebuilt plan's structure is compared
-_LOSSY_METHODS = {"col_vals_expr", "conjointly", "specially", "prompt"}
+# only the rebuilt plan's structure is compared (a `col_vals_scored()` step with an adapter of
+# `pb.scorers` round-trips in full; that's tested in `test_scorers.py`, with a fake model)
+_LOSSY_METHODS = {"col_vals_expr", "conjointly", "specially", "prompt", "col_vals_scored"}
 
 # Public `Validate` methods that don't add validation steps
 _NON_STEP_METHODS = {
@@ -557,6 +561,12 @@ def test_every_validation_method_serializes(method, interrogated, small_table, r
     assert not any("not supported by plan serialization" in m for m in messages), messages
     if not lossy:
         assert not messages, messages
+
+    if method == "col_vals_scored":
+        # A function scorer is written as the placeholder `your_scorer`, to be replaced by hand
+        assert any("your_scorer" in m for m in messages), messages
+        code = code.replace("your_scorer", "lambda batch: [1] * len(batch)")
+        yaml_str = yaml_str.replace("your_scorer", "'lambda batch: [1] * len(batch)'")
 
     rebuilt_code = _exec_code(code, small_table)
 
