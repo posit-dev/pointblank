@@ -81,8 +81,9 @@ def _counts(train) -> tuple[int, int, int]:
     )
     if isinstance(counts, nw.LazyFrame):
         counts = counts.collect()
-    n, bad, gold = counts.row(0)
-    return int(n), int(bad), int(gold)
+    # `to_list()` gives Python values (`row()` can give pyarrow scalars, which older pyarrow
+    # versions can't pass to `int()`)
+    return tuple(int(counts[name].to_list()[0]) for name in ("n", "bad", "gold"))
 
 
 def _evaluate(train, *, seed, variant):
