@@ -7,9 +7,11 @@ import copy
 import datetime
 import decimal
 import difflib
+import functools
 import html as html_module
 import inspect
 import json
+import operator
 import os
 import pickle
 import re
@@ -21476,7 +21478,12 @@ class Validate:
 
         return json.dumps(report, indent=4, default=str)
 
-    def get_sundered_data(self, type: str = "pass") -> Any:
+    def get_sundered_data(
+        self,
+        type: str = "pass",
+        duplicates: str | None = None,
+        duplicates_order_by: str | list[str] | None = None,
+    ) -> Any:
         """
         Get the data that passed or failed the validation steps.
 
@@ -21493,8 +21500,8 @@ class Validate:
         There are some caveats to sundering. The validation steps considered for this splitting will
         only involve steps where:
 
-        - of certain check types, where test units are cells checked down a column (e.g., the
-        `col_vals_*()` methods)
+        - of certain check types, where test units are rows or cells checked down a column (e.g.,
+        the `col_vals_*()` methods and `rows_complete()`)
         - `active=` is not set to `False`
         - `pre=` has not been given an expression for modifying the input table
 
@@ -21503,6 +21510,13 @@ class Validate:
         least one validation step. Steps that use `segments=` are included, with each segment's
         results counting only for the rows in that segment.
 
+        Steps that use [`rows_distinct()`](`pointblank.Validate.rows_distinct`) are a special case.
+        That step counts every copy of a duplicated row as failing, since it can't know which of
+        them is the 'wrong' one. Such steps are only used for sundering if you say which copy to
+        keep with `duplicates=`: the kept copy goes to the 'pass' piece (if it passes the other
+        steps) and the other copies go to the 'fail' piece. With `duplicates="flag_all"`, every
+        copy goes to the 'fail' piece.
+
         Parameters
         ----------
         type
@@ -21510,6 +21524,19 @@ class Validate:
             a table only containing rows where test units always passed validation steps, and the
             latter returns a table only containing rows had test units that failed in at least one
             validation step.
+        duplicates
+            How to treat the duplicate rows found by `rows_distinct()` steps. The default `None`
+            leaves those steps out of the sundering. Use `"keep_first"` or `"keep_last"` to keep one
+            copy of each group of duplicates (the first or last one, in row order or in the order
+            given by `duplicates_order_by=`), or `"flag_all"` to treat every copy as failing.
+        duplicates_order_by
+            One or more columns that order the copies of a duplicated row, to decide which copy is
+            kept with `duplicates="keep_first"` or `duplicates="keep_last"`. For example, use
+            `duplicates="keep_last", duplicates_order_by="updated_at"` to keep the newest record.
+            Ties are broken by row order, and a copy with a missing value in one of these columns is
+            kept only if every copy is missing that value. Without this, the copies are taken in row
+            order (for a database table, which has no row order of its own, rows are ordered by
+            their values, so the choice is arbitrary but the same from run to run).
 
         Returns
         -------
@@ -21562,32 +21589,58 @@ class Validate:
         input DataFrame, the first two rows and the last two rows had test units that failed
         validation. Thus the middle two rows are the only ones that passed all validation steps and
         that's what we see in the returned DataFrame.
+
+        A [`rows_distinct()`](`pointblank.Validate.rows_distinct`) step only takes part in the
+        sundering if we say which copy of a duplicated row to keep. Here, the record with an `id` of
+        `2` appears twice, and we keep the copy with the latest `version`:
+
+        ```{python}
+        tbl_versions = pl.DataFrame(
+            {
+                "id": [1, 2, 2, 3],
+                "version": [1, 1, 2, 1],
+            }
+        )
+
+        validation_versions = (
+            pb.Validate(data=tbl_versions)
+            .rows_distinct(columns_subset="id")
+            .interrogate()
+        )
+
+        pb.preview(
+            validation_versions.get_sundered_data(
+                duplicates="keep_last", duplicates_order_by="version"
+            )
+        )
+        ```
+
+        The validation report would count both copies of `id` `2` as failing, but with
+        `duplicates="keep_last"` the copy with `version` `2` is kept in the 'pass' piece, and only
+        the older copy would be in the 'fail' piece. Without `duplicates=`, the
+        `rows_distinct()` step would be left out and all four rows would be returned.
+
+        See Also
+        --------
+        Validate.get_row_flags : Get which steps each row failed, as columns added to the table.
+        Validate.get_data_extracts : Get the rows that failed each validation step.
         """
 
-        # Keep only the validation steps that:
-        # - are row-based (included in `ROW_BASED_VALIDATION_TYPES`)
-        # - are `active`
-        # - have no `pre=` (it can change the rows, so the results may not line up with the data)
-        validation_info = [
-            validation
-            for validation in self.validation_info
-            if validation.active
-            and validation.pre is None
-            and (
-                validation.assertion_type in ROW_BASED_VALIDATION_TYPES
-                # `tbl_match()` steps take part when a row-aligned result table is available
-                or (validation.assertion_type == "tbl_match" and validation.tbl_checked is not None)
-            )
-        ]
+        order_by = _check_duplicates_policy(
+            duplicates,
+            duplicates_order_by,
+            columns=nw.from_native(self.data).collect_schema().names(),
+        )
 
-        # Obtain the validation steps that are to be used for sundering
-        validation_steps_i = [validation.assertion_type for validation in validation_info]
+        # Keep only the steps whose results can be matched to the table's rows
+        validation_info, _ = _row_result_steps(self.validation_info, duplicates=duplicates)
 
-        if len(validation_steps_i) == 0:
+        if len(validation_info) == 0:
             if type == "pass":
                 return self.data
             if type == "fail":
-                return self.data[0:0]
+                # (a PySpark DataFrame can't be sliced, so this goes through Narwhals)
+                return nw.from_native(self.data).head(0).to_native()
 
         # Get an indexed version of the data
         # TODO: add argument for user to specify the index column name
@@ -21597,24 +21650,18 @@ class Validate:
 
         # Collect the numbers of the rows that failed in each validation step (a missing result
         # doesn't count as a failure; e.g., a row outside a segmented step's segment)
-        failed_rows = []
-        for validation in validation_info:
-            # Add row numbers to the results table (put on the same backend as the data first, as
-            # some steps materialize their results, and eager and lazy tables can't be joined)
-            results_tbl = _with_row_index(
-                _results_on_data_backend(validation.tbl_checked, data_nw), name=index_name
+        failed_rows = [
+            _step_row_results(
+                validation,
+                data_nw,
+                index_name=index_name,
+                duplicates=duplicates,
+                duplicates_order_by=order_by,
             )
-
-            # A segmented step's results only hold the rows of its segment, numbered from 0, so
-            # replace those numbers with the rows' numbers in the whole table
-            if validation.segments is not None:
-                results_tbl = _results_with_data_row_index(
-                    results_tbl, data_nw, segments=validation.segments, index_name=index_name
-                )
-
-            # The results can be an `object` column in pandas, so they're made Boolean first
-            is_good = nw.col("pb_is_good_").fill_null(True).cast(nw.Boolean)
-            failed_rows.append(results_tbl.filter(~is_good).select(index_name))
+            .filter(nw.col("pb_failed_"))
+            .select(index_name)
+            for validation in validation_info
+        ]
 
         # The failing rows of all steps are combined at once (rather than joining the steps'
         # results one by one), so that the query for a database table doesn't nest more deeply with
@@ -21632,6 +21679,224 @@ class Validate:
         )
 
         return sundered_tbl
+
+    def get_row_flags(
+        self,
+        duplicates: str | None = "keep_first",
+        duplicates_order_by: str | list[str] | None = None,
+    ) -> Any:
+        """
+        Get the target table with columns flagging the validation steps each row failed.
+
+        Where [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`) splits the table into
+        the rows that passed every step and those that failed any of them, `get_row_flags()` keeps
+        every row and says *which* steps each one failed. The returned table is the target table
+        with these columns added:
+
+        - `pb_failed_<i>_`, one for each row-level step (where `<i>` is the step number): `True`
+          if the row failed step `<i>`
+        - `pb_n_failed_`: the number of steps the row failed
+        - `pb_row_score_`: the share of the row's checks that passed (from `0` to `1`), weighted
+          by the dimension weights set with [`config(dimension_weights=...)`](`pointblank.config`)
+          just as in [`get_health_score()`](`pointblank.Validate.get_health_score`)
+
+        This is useful when removing every row that failed a check is too blunt. You can use the
+        flags to see which problems occur together, filter on just the checks you care about,
+        stratify a sample on them, or use `pb_row_score_` to weight rows (e.g., as sample weights
+        when training a model) instead of dropping them.
+
+        Details
+        -------
+        The steps that get flag columns are the same ones used by `get_sundered_data()`: steps that
+        check rows or cells down a column, that are active, and that don't use `pre=`. A row that a
+        step didn't check (e.g., a row outside the segment of a step that uses `segments=`) isn't
+        flagged by it, and isn't counted in its `pb_row_score_`. A row that no step checked has a
+        missing `pb_row_score_`.
+
+        Unlike `get_sundered_data()`, steps that use
+        [`rows_distinct()`](`pointblank.Validate.rows_distinct`) are included by default: one copy
+        of each group of duplicate rows (the first one) isn't flagged, and the other copies are. So
+        a `rows_distinct()` flag marks the rows that removing duplicates would remove. Use
+        `duplicates=` and `duplicates_order_by=` to choose which copy is kept.
+
+        A row-level step that can't be used is reported in a warning: that's a step that uses
+        `pre=` (it can change the rows, so its results may not line up with the table's rows), a
+        step that couldn't be evaluated, or a `rows_distinct()` step when `duplicates=None`.
+
+        Parameters
+        ----------
+        duplicates
+            How to flag the duplicate rows found by `rows_distinct()` steps. With `"keep_first"`
+            (the default) or `"keep_last"`, one copy of each group of duplicates (the first or last
+            one, in row order or in the order given by `duplicates_order_by=`) isn't flagged.
+            `"flag_all"` flags every copy, as the step itself counts them, and `None` leaves
+            `rows_distinct()` steps out.
+        duplicates_order_by
+            One or more columns that order the copies of a duplicated row, to decide which copy
+            isn't flagged. For example, use `duplicates="keep_last",
+            duplicates_order_by="updated_at"` to keep the newest record. Ties are broken by row
+            order, and a copy with a missing value in one of these columns is kept only if every
+            copy is missing that value. Without this, the copies are taken in row order (for a
+            database table, which has no row order of its own, rows are ordered by their values, so
+            the choice is arbitrary but the same from run to run).
+
+        Returns
+        -------
+        Any
+            The target table, of the same type, with the flag and summary columns added.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(preview_incl_header=False)
+        ```
+
+        Let's validate a table of orders with a check on the amounts, a check for missing values,
+        and a check for duplicated order IDs.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        orders = pl.DataFrame(
+            {
+                "order_id": [1, 2, 2, 3, 4],
+                "amount": [25.0, -5.0, -5.0, None, 40.0],
+                "status": ["paid", "paid", "paid", "open", None],
+            }
+        )
+
+        validation = (
+            pb.Validate(data=orders)
+            .col_vals_gt(columns="amount", value=0)
+            .rows_complete()
+            .rows_distinct(columns_subset="order_id")
+            .interrogate()
+        )
+
+        pb.preview(validation.get_row_flags())
+        ```
+
+        Each step has a flag column. Both copies of order `2` have a negative amount, so both fail
+        step 1, but only the second copy is flagged by step 3, since removing duplicates would keep
+        the first one. Order `3` fails step 1 because its amount is missing (missing values fail
+        `col_vals_gt()` unless `na_pass=True`) and it also fails step 2. Order `1` passed every
+        check, so it has a `pb_row_score_` of `1`.
+
+        See Also
+        --------
+        Validate.get_sundered_data : Split the table into the rows that passed and failed the steps.
+        Validate.get_health_score : Get a single score for the whole table.
+        """
+        data_nw = nw.from_native(self.data)
+
+        order_by = _check_duplicates_policy(
+            duplicates, duplicates_order_by, columns=data_nw.collect_schema().names()
+        )
+
+        steps, skipped = _row_result_steps(self.validation_info, duplicates=duplicates)
+
+        if skipped:
+            import warnings
+
+            reasons = "; ".join(f"step {i}: {reason}" for i, reason in skipped)
+            warnings.warn(
+                f"Some row-level steps have no flag columns ({reasons}).",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        if not steps:
+            return data_nw.with_columns(
+                pb_n_failed_=nw.lit(0, dtype=nw.Int64),
+                pb_row_score_=nw.lit(None, dtype=nw.Float64),
+            ).to_native()
+
+        index_name = "pb_index_"
+
+        data_nw = _with_row_index(data_nw, name=index_name)
+
+        # Stack the steps' results (rather than joining them to the table one by one), so that the
+        # query for a database table doesn't nest more deeply with every step (SQLite versions
+        # before 3.46 can't parse deeply nested queries)
+        results = nw.concat(
+            [
+                _step_row_results(
+                    validation,
+                    data_nw,
+                    index_name=index_name,
+                    duplicates=duplicates,
+                    duplicates_order_by=order_by,
+                ).select(
+                    index_name,
+                    nw.lit(k, dtype=nw.Int64).alias("pb_step_"),
+                    nw.col("pb_failed_").cast(nw.Int64),
+                )
+                for k, validation in enumerate(steps)
+            ],
+            how="vertical",
+        )
+
+        # Spread the results out into one column per step, saying whether the row was checked by
+        # the step (`pb_checked_<k>_`) and whether it failed (`pb_fail_<k>_`), with one row per
+        # row of the table
+        is_step = [nw.col("pb_step_") == k for k in range(len(steps))]
+        results = (
+            results.with_columns(
+                *[
+                    nw.when(is_k).then(1).otherwise(0).alias(f"pb_checked_{k}_")
+                    for k, is_k in enumerate(is_step)
+                ],
+                *[
+                    nw.when(is_k).then(nw.col("pb_failed_")).otherwise(0).alias(f"pb_fail_{k}_")
+                    for k, is_k in enumerate(is_step)
+                ],
+            )
+            .group_by(index_name)
+            .agg(
+                *[nw.col(f"pb_checked_{k}_").max() for k in range(len(steps))],
+                *[nw.col(f"pb_fail_{k}_").max() for k in range(len(steps))],
+            )
+        )
+
+        # A row that no step checked has no results, and gets zeros
+        checked = [nw.col(f"pb_checked_{k}_").fill_null(0) for k in range(len(steps))]
+        failed = [nw.col(f"pb_fail_{k}_").fill_null(0) for k in range(len(steps))]
+
+        # Each step is weighted by its dimension's weight, as in `get_health_score()`
+        weights = getattr(global_config, "dimension_weights", None) or {}
+        step_weights = [
+            max(0.0, weights.get(validation.dimension or "unknown", 1.0)) for validation in steps
+        ]
+        weight_checked = functools.reduce(
+            operator.add, [w * c for w, c in zip(step_weights, checked)]
+        )
+        weight_passed = functools.reduce(
+            operator.add, [w * c * (1 - f) for w, c, f in zip(step_weights, checked, failed)]
+        )
+
+        flags_tbl = (
+            data_nw.join(results, on=index_name, how="left")
+            .with_columns(
+                *[(f == 1).alias(f"pb_failed_{v.i}_") for v, f in zip(steps, failed)],
+                pb_n_failed_=functools.reduce(operator.add, failed).cast(nw.Int64),
+                pb_row_score_=nw.when(weight_checked > 0)
+                .then(weight_passed / weight_checked)
+                .otherwise(nw.lit(None, dtype=nw.Float64)),
+            )
+            # Joins don't guarantee row order, so the original order is restored via the index
+            .sort(index_name)
+            .drop(
+                index_name,
+                *[f"pb_checked_{k}_" for k in range(len(steps))],
+                *[f"pb_fail_{k}_" for k in range(len(steps))],
+            )
+        )
+
+        return flags_tbl.to_native()
 
     def get_notes(
         self, i: int, format: str = "dict"
@@ -24162,6 +24427,192 @@ def _results_with_data_row_index(
         results_nw.rename({index_name: position_name})
         .join(segment_index, on=position_name, how="inner")
         .drop(position_name)
+    )
+
+
+# The ways of choosing which copy of a group of duplicate rows (in a `rows_distinct()` step) isn't
+# counted as failing, for `get_row_flags()` and `get_sundered_data()`
+_DUPLICATES_POLICIES = ("keep_first", "keep_last", "flag_all")
+
+
+def _check_duplicates_policy(
+    duplicates: str | None, duplicates_order_by: str | list[str] | None, columns: list[str]
+) -> list[str]:
+    """
+    Check the `duplicates=` and `duplicates_order_by=` arguments, giving the ordering columns.
+    """
+    if duplicates is not None and duplicates not in _DUPLICATES_POLICIES:
+        raise ValueError(
+            f"`duplicates=` must be one of {', '.join(repr(p) for p in _DUPLICATES_POLICIES)}, "
+            f"or `None`; got {duplicates!r}."
+        )
+
+    if duplicates_order_by is None:
+        return []
+
+    if duplicates not in ("keep_first", "keep_last"):
+        raise ValueError(
+            "`duplicates_order_by=` decides which copy of a duplicate row is kept, so it can only "
+            "be used with `duplicates='keep_first'` or `duplicates='keep_last'`."
+        )
+
+    order_by = (
+        [duplicates_order_by] if isinstance(duplicates_order_by, str) else list(duplicates_order_by)
+    )
+    missing = [column for column in order_by if column not in columns]
+    if missing:
+        raise ValueError(
+            f"The `duplicates_order_by=` column(s) {', '.join(repr(c) for c in missing)} aren't "
+            "in the target table."
+        )
+
+    return order_by
+
+
+def _row_result_steps(
+    validation_info: list[_ValidationInfo], duplicates: str | None
+) -> tuple[list[_ValidationInfo], list[tuple[int, str]]]:
+    """
+    Get the steps whose results can be matched to the rows of the target table.
+
+    These are the steps that check rows (the `ROW_BASED_VALIDATION_TYPES`, `rows_distinct()`,
+    `rows_complete()`, and `tbl_match()` when it gives a row-aligned result table) and that are
+    active and have no `pre=` (it can change the rows, so the results may not line up with the
+    data). A `rows_distinct()` step takes part only when `duplicates=` says which copy of a
+    duplicate row to keep, as the step itself counts every copy as failing.
+
+    Returns the usable steps, and the row-checking steps that were left out along with the reason
+    (inactive steps aren't included, as leaving them out was the user's choice).
+    """
+    steps = []
+    skipped = []
+
+    for validation in validation_info:
+        assertion_type = validation.assertion_type
+
+        if not (
+            assertion_type in ROW_BASED_VALIDATION_TYPES
+            or assertion_type in ("rows_distinct", "rows_complete", "tbl_match")
+        ):
+            continue
+
+        # A step that couldn't be evaluated is made inactive, so check for that first
+        if validation.eval_error:
+            skipped.append((validation.i, "it couldn't be evaluated"))
+            continue
+        if not validation.active:
+            continue
+        if validation.pre is not None:
+            skipped.append((validation.i, "it uses `pre=`"))
+            continue
+        if assertion_type == "rows_distinct" and duplicates is None:
+            skipped.append((validation.i, "no `duplicates=` policy was given"))
+            continue
+
+        if validation.tbl_checked is None:
+            # A `tbl_match()` step only has a results table if it's the same kind of table as the
+            # target table (not converted for the comparison)
+            if assertion_type == "tbl_match":
+                skipped.append((validation.i, "its results can't be matched to the table's rows"))
+                continue
+            # Steps are numbered on interrogation
+            if validation.i is None:
+                raise ValueError("There are no results yet. Call `interrogate()` first.")
+            raise ValueError(
+                f"The row-level results of step {validation.i} aren't available. Call "
+                "`interrogate()` (keeping its default of `collect_tbl_checked=True`) first."
+            )
+
+        steps.append(validation)
+
+    return steps, skipped
+
+
+def _step_row_results(
+    validation: _ValidationInfo,
+    data_nw: Any,
+    index_name: str,
+    duplicates: str | None,
+    duplicates_order_by: list[str],
+) -> Any:
+    """
+    Get a step's result for each row it checked, numbered by the rows of the target table.
+
+    `data_nw` is the target table with a row index (`index_name`). The result is a table of the
+    checked rows' numbers (`index_name`) and whether each row failed the step (`pb_failed_`). Rows
+    outside a segmented step's segment aren't in it. A missing result doesn't count as a failure.
+    """
+    # Add row numbers to the results table (put on the same backend as the data first, as some
+    # steps materialize their results, and eager and lazy tables can't be joined)
+    results_tbl = _with_row_index(
+        _results_on_data_backend(validation.tbl_checked, data_nw), name=index_name
+    )
+
+    # A segmented step's results only hold the rows of its segment, numbered from 0, so replace
+    # those numbers with the rows' numbers in the whole table
+    if validation.segments is not None:
+        results_tbl = _results_with_data_row_index(
+            results_tbl, data_nw, segments=validation.segments, index_name=index_name
+        )
+
+    # The results can be an `object` column in pandas, so they're made Boolean first
+    is_good = nw.col("pb_is_good_").fill_null(True).cast(nw.Boolean)
+    results_tbl = results_tbl.with_columns(pb_failed_=~is_good)
+
+    if validation.assertion_type == "rows_distinct" and duplicates != "flag_all":
+        keys = validation.column
+        if keys is None:
+            keys = [
+                c
+                for c in results_tbl.collect_schema().names()
+                if c not in (index_name, "pb_is_good_", "pb_failed_")
+            ]
+        elif isinstance(keys, str):
+            keys = [keys]
+
+        results_tbl = _with_kept_duplicates(
+            results_tbl,
+            keys=keys,
+            order_by=duplicates_order_by,
+            last=duplicates == "keep_last",
+            index_name=index_name,
+        )
+
+    return results_tbl.select(index_name, "pb_failed_")
+
+
+def _with_kept_duplicates(
+    results_nw: Any, keys: list[str], order_by: list[str], last: bool, index_name: str
+) -> Any:
+    """
+    Mark one copy of each group of duplicate rows in a `rows_distinct()` step's results as passing.
+
+    The rows of a group are ordered by the `order_by` columns and then by row number, and the first
+    (or, with `last=True`, the last) of them is kept. A copy with a missing value in an `order_by`
+    column comes after the others in either direction, so it's kept only if every copy is missing
+    that value. The keys are compared within the step's results, so for a segmented step a group
+    holds the copies within the segment.
+    """
+    candidates = results_nw.filter(nw.col("pb_failed_")).select(
+        list(dict.fromkeys([index_name, *keys, *order_by]))
+    )
+
+    # Narrow each group down to the copies with the best value of each column in turn; the row
+    # number is unique, so one copy per group is left at the end
+    for column in [*order_by, index_name]:
+        best = nw.col(column).max() if last else nw.col(column).min()
+        candidates = (
+            candidates.with_columns(pb_best_=best.over(*keys))
+            .filter((nw.col(column) == nw.col("pb_best_")) | nw.col("pb_best_").is_null())
+            .drop("pb_best_")
+        )
+
+    kept = candidates.select(index_name).with_columns(pb_kept_=nw.lit(True))
+
+    return (
+        results_nw.join(kept, on=index_name, how="left")
+        .with_columns(pb_failed_=nw.col("pb_failed_") & nw.col("pb_kept_").is_null())
+        .drop("pb_kept_")
     )
 
 
