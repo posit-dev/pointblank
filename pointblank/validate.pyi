@@ -770,7 +770,17 @@ class Validate:
     def get_json_report(
         self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
     ) -> str: ...
-    def get_sundered_data(self, type: str = "pass") -> Any: ...
+    def get_sundered_data(
+        self,
+        type: str = "pass",
+        duplicates: str | None = None,
+        duplicates_order_by: str | list[str] | None = None,
+    ) -> Any: ...
+    def get_row_flags(
+        self,
+        duplicates: str | None = "keep_first",
+        duplicates_order_by: str | list[str] | None = None,
+    ) -> Any: ...
     def get_notes(
         self, i: int, format: str = "dict"
     ) -> dict[str, dict[str, str]] | list[str] | None: ...
