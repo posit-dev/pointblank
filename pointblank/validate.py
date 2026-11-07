@@ -24597,15 +24597,23 @@ def _with_kept_duplicates(
         list(dict.fromkeys([index_name, *keys, *order_by]))
     )
 
-    # Narrow each group down to the copies with the best value of each column in turn; the row
-    # number is unique, so one copy per group is left at the end
-    for column in [*order_by, index_name]:
-        best = nw.col(column).max() if last else nw.col(column).min()
-        candidates = (
-            candidates.with_columns(pb_best_=best.over(*keys))
-            .filter((nw.col(column) == nw.col("pb_best_")) | nw.col("pb_best_").is_null())
-            .drop("pb_best_")
-        )
+    if isinstance(candidates, nw.DataFrame):
+        # Put the preferred copy of each group first and keep it (window functions aren't used
+        # here, as in older Narwhals versions a pandas window leaves out the rows with a missing
+        # key, while `unique()` treats missing keys as equal on every eager backend)
+        candidates = candidates.sort(
+            [*order_by, index_name], descending=last, nulls_last=True
+        ).unique(subset=keys, keep="first")
+    else:
+        # Narrow each group down to the copies with the best value of each column in turn; the row
+        # number is unique, so one copy per group is left at the end
+        for column in [*order_by, index_name]:
+            best = nw.col(column).max() if last else nw.col(column).min()
+            candidates = (
+                candidates.with_columns(pb_best_=best.over(*keys))
+                .filter((nw.col(column) == nw.col("pb_best_")) | nw.col("pb_best_").is_null())
+                .drop("pb_best_")
+            )
 
     kept = candidates.select(index_name).with_columns(pb_kept_=nw.lit(True))
 
