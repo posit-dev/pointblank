@@ -496,6 +496,8 @@ reference:
         - name: Ablation
           members: false
         - AblationVariant
+        - ablation.Stratified
+        - ablation.sklearn_evaluator
 
     - title: Ablation Methods
       desc: Methods for the Ablation class
@@ -503,10 +505,16 @@ reference:
         - Ablation.drop_steps
         - Ablation.drop_each
         - Ablation.drop_all
+        - Ablation.drop_all_but_each
+        - Ablation.drop_groups
         - Ablation.plan
         - Ablation.run
+        - Ablation.check_determinism
+        - Ablation.export
+        - Ablation.load_results
         - Ablation.get_effects
         - Ablation.get_tabular_report
+        - Ablation.annotate
         - Ablation.to_dict
         - Ablation.to_json
 
@@ -517,6 +525,7 @@ reference:
         - yaml_interrogate
         - validate_yaml
         - yaml_to_python
+        - yaml_ablation
 
     - title: Utility Functions
       desc: >
