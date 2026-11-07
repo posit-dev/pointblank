@@ -178,12 +178,18 @@ The sundering procedure relies on row-level validation types to be used. This ma
 - [`Validate.col_vals_null()`](../../reference/Validate.col_vals_null.md#pointblank.Validate.col_vals_null)
 - [`Validate.col_vals_not_null()`](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null)
 - [`Validate.col_vals_regex()`](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex)
+- [`Validate.col_vals_within_spec()`](../../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec)
+- [`Validate.col_vals_str_len()`](../../reference/Validate.col_vals_str_len.md#pointblank.Validate.col_vals_str_len)
+- [`Validate.col_vals_increasing()`](../../reference/Validate.col_vals_increasing.md#pointblank.Validate.col_vals_increasing)
+- [`Validate.col_vals_decreasing()`](../../reference/Validate.col_vals_decreasing.md#pointblank.Validate.col_vals_decreasing)
+- [`Validate.col_missing_coded()`](../../reference/Validate.col_missing_coded.md#pointblank.Validate.col_missing_coded)
+- [`Validate.col_missing_only_coded()`](../../reference/Validate.col_missing_only_coded.md#pointblank.Validate.col_missing_only_coded)
 - [`Validate.col_vals_expr()`](../../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr)
-- [`Validate.rows_distinct()`](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct)
 - [`Validate.rows_complete()`](../../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete)
 - [`Validate.conjointly()`](../../reference/Validate.conjointly.md#pointblank.Validate.conjointly)
-
-This is the same list of validation methods that are considered when creating data extracts.
+- [`Validate.prompt()`](../../reference/Validate.prompt.md#pointblank.Validate.prompt)
+- [`Validate.tbl_match()`](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) (when its results can be lined up with the rows of the table)
+- [`Validate.rows_distinct()`](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) (only when you say how to treat duplicate rows; see the next section)
 
 There are some additional caveats though. Even if using a validation method drawn from the set above, the validation step won't be used for sundering if:
 
@@ -193,6 +199,73 @@ There are some additional caveats though. Even if using a validation method draw
 The first one makes intuitive sense (you decided to skip this validation step entirely), the second one requires some explanation. Using `pre=` allows you to modify the target table, there's no easy or practical way to compare rows in a mutated table compared to the original table (e.g., a mutation may drastically reduce the number of rows).
 
 Steps that use `segments=` are used for sundering. Each segment's results apply only to the rows in that segment, so rows outside all of a step's segments aren't affected by that step.
+
+## Sundering with Duplicate Rows
+
+A [`Validate.rows_distinct()`](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step counts *every* copy of a duplicated row as a failing test unit, since there's no telling which of the copies is the 'wrong' one. That's the right count for a validation report, but it's rarely what you want when sundering: removing all copies of a duplicate would remove the record entirely. So by default, `rows_distinct()` steps are left out of sundering, and the `duplicates=` argument lets you bring them in by saying which copy to keep. The `small_table` dataset has one pair of duplicate rows, so let's check for that:
+
+``` python
+validation_3 = (
+    pb.Validate(data=pb.load_dataset(dataset="small_table"))
+    .rows_distinct()
+    .interrogate()
+)
+
+validation_3.get_sundered_data(duplicates="keep_first")
+```
+
+shape: (12, 8)
+
+| date_time           | date       | a   | b           | c    | d       | e     | f      |
+|---------------------|------------|-----|-------------|------|---------|-------|--------|
+| datetime\[μs\]      | date       | i64 | str         | i64  | f64     | bool  | str    |
+| 2016-01-04 11:00:00 | 2016-01-04 | 2   | "1-bcd-345" | 3    | 3423.29 | true  | "high" |
+| 2016-01-04 00:32:00 | 2016-01-04 | 3   | "5-egh-163" | 8    | 9999.99 | true  | "low"  |
+| 2016-01-05 13:32:00 | 2016-01-05 | 6   | "8-kdg-938" | 3    | 2343.23 | true  | "high" |
+| 2016-01-06 17:23:00 | 2016-01-06 | 2   | "5-jdo-903" | null | 3892.4  | false | "mid"  |
+| 2016-01-09 12:36:00 | 2016-01-09 | 8   | "3-ldm-038" | 7    | 283.94  | true  | "low"  |
+| …                   | …          | …   | …           | …    | …       | …     | …      |
+| 2016-01-17 11:27:00 | 2016-01-17 | 4   | "5-boe-639" | 2    | 1035.64 | false | "low"  |
+| 2016-01-20 04:30:00 | 2016-01-20 | 3   | "5-bce-642" | 9    | 837.93  | false | "high" |
+| 2016-01-26 20:07:00 | 2016-01-26 | 4   | "2-dmx-010" | 7    | 833.98  | true  | "low"  |
+| 2016-01-28 02:51:00 | 2016-01-28 | 2   | "7-dmx-010" | 8    | 108.34  | false | "low"  |
+| 2016-01-30 11:23:00 | 2016-01-30 | 1   | "3-dka-303" | null | 2230.09 | true  | "high" |
+
+That's 12 of the 13 rows: the first copy of the duplicate stays in the passing set and the second copy goes to the failing set. The options for `duplicates=` are:
+
+- `"keep_first"`: the first copy of each group of duplicates passes and the others fail
+- `"keep_last"`: the last copy passes and the others fail
+- `"flag_all"`: every copy fails (just as the validation step counts them)
+- `None` (the default): `rows_distinct()` steps aren't used for sundering
+
+The 'first' and 'last' copies are those in row order, unless you use `duplicates_order_by=` to name one or more columns to order them by. For example, a check for duplicated customer IDs combined with `duplicates="keep_last", duplicates_order_by="updated_at"` keeps the most recently updated record for each customer.
+
+## Flagging Rows Instead of Splitting Them
+
+Sundering gives a yes-or-no answer for each row: it passed every step, or it didn't. Sometimes you want to know *which* steps a row failed, so you can decide what to do with it later. The [`Validate.get_row_flags()`](../../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags) method returns the whole table with a `True`/`False` column for each row-level step (`pb_failed_1_`, `pb_failed_2_`, and so on), along with the number of steps each row failed (`pb_n_failed_`) and the share of its checks that it passed (`pb_row_score_`):
+
+``` python
+validation_2.get_row_flags()
+```
+
+shape: (13, 13)
+
+| date_time | date | a | b | c | d | e | f | pb_failed_1\_ | pb_failed_2\_ | pb_failed_3\_ | pb_n_failed\_ | pb_row_score\_ |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| datetime\[μs\] | date | i64 | str | i64 | f64 | bool | str | bool | bool | bool | i64 | f64 |
+| 2016-01-04 11:00:00 | 2016-01-04 | 2 | "1-bcd-345" | 3 | 3423.29 | true | "high" | false | false | true | 1 | 0.666667 |
+| 2016-01-04 00:32:00 | 2016-01-04 | 3 | "5-egh-163" | 8 | 9999.99 | true | "low" | false | false | false | 0 | 1.0 |
+| 2016-01-05 13:32:00 | 2016-01-05 | 6 | "8-kdg-938" | 3 | 2343.23 | true | "high" | false | false | false | 0 | 1.0 |
+| 2016-01-06 17:23:00 | 2016-01-06 | 2 | "5-jdo-903" | null | 3892.4 | false | "mid" | false | true | true | 2 | 0.333333 |
+| 2016-01-09 12:36:00 | 2016-01-09 | 8 | "3-ldm-038" | 7 | 283.94 | true | "low" | true | false | false | 1 | 0.666667 |
+| … | … | … | … | … | … | … | … | … | … | … | … | … |
+| 2016-01-20 04:30:00 | 2016-01-20 | 3 | "5-bce-642" | 9 | 837.93 | false | "high" | true | false | false | 1 | 0.666667 |
+| 2016-01-20 04:30:00 | 2016-01-20 | 3 | "5-bce-642" | 9 | 837.93 | false | "high" | true | false | false | 1 | 0.666667 |
+| 2016-01-26 20:07:00 | 2016-01-26 | 4 | "2-dmx-010" | 7 | 833.98 | true | "low" | true | false | false | 1 | 0.666667 |
+| 2016-01-28 02:51:00 | 2016-01-28 | 2 | "7-dmx-010" | 8 | 108.34 | false | "low" | true | false | true | 2 | 0.333333 |
+| 2016-01-30 11:23:00 | 2016-01-30 | 1 | "3-dka-303" | null | 2230.09 | true | "high" | false | true | true | 2 | 0.333333 |
+
+The rows with a `pb_n_failed_` of `0` are exactly the passing set from sundering. With the flags in hand, though, you can filter on just the checks that matter for a particular use, look for problems that tend to occur together, or use `pb_row_score_` to weight rows rather than drop them. The same `duplicates=` and `duplicates_order_by=` options are available here, except that [get_row_flags()](../../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags) uses `duplicates="keep_first"` by default, so that a `rows_distinct()` flag marks the copies that removing duplicates would remove.
 
 ## Practical Applications of Sundering
 

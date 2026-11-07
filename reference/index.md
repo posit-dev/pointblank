@@ -317,6 +317,9 @@ Build a validation plan for this table from a natural-language prompt.
 [Validate.get_sundered_data()](Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data)  
 Get the data that passed or failed the validation steps.
 
+[Validate.get_row_flags()](Validate.get_row_flags.md#pointblank.Validate.get_row_flags)  
+Get the target table with columns flagging the validation steps each row failed.
+
 [Validate.get_data_extracts()](Validate.get_data_extracts.md#pointblank.Validate.get_data_extracts)  
 Get the rows that failed for each validation step.
 

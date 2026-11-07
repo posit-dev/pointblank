@@ -4,7 +4,7 @@ Validate whether the length of string values falls within specified bounds.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11765-L11973)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11767-L11975)
 
 ``` python
 Validate.col_vals_str_len(

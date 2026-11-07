@@ -4,7 +4,7 @@ Provides a dictionary of the number of test units that passed for each validatio
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19374-L19456)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19376-L19458)
 
 ``` python
 Validate.n_passed(

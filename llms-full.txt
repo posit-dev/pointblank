@@ -18471,7 +18471,7 @@ plan that already has steps, use
 [`suggest_improvements()`](`pointblank.Validate.suggest_improvements`) or
 [`EditValidation`](`pointblank.EditValidation`) instead.
 
-get_sundered_data(self, type: 'str' = 'pass') -> 'Any'
+get_sundered_data(self, type: 'str' = 'pass', duplicates: 'str | None' = None, duplicates_order_by: 'str | list[str] | None' = None) -> 'Any'
 
 Get the data that passed or failed the validation steps.
 
@@ -18488,8 +18488,8 @@ Details
 There are some caveats to sundering. The validation steps considered for this splitting will
 only involve steps where:
 
-- of certain check types, where test units are cells checked down a column (e.g., the
-`col_vals_*()` methods)
+- of certain check types, where test units are rows or cells checked down a column (e.g.,
+the `col_vals_*()` methods and `rows_complete()`)
 - `active=` is not set to `False`
 - `pre=` has not been given an expression for modifying the input table
 
@@ -18498,6 +18498,13 @@ with the rows that passed all validation steps and another with the rows that fa
 least one validation step. Steps that use `segments=` are included, with each segment's
 results counting only for the rows in that segment.
 
+Steps that use [`rows_distinct()`](`pointblank.Validate.rows_distinct`) are a special case.
+That step counts every copy of a duplicated row as failing, since it can't know which of
+them is the 'wrong' one. Such steps are only used for sundering if you say which copy to
+keep with `duplicates=`: the kept copy goes to the 'pass' piece (if it passes the other
+steps) and the other copies go to the 'fail' piece. With `duplicates="flag_all"`, every
+copy goes to the 'fail' piece.
+
 Parameters
 ----------
 type
@@ -18505,6 +18512,19 @@ type
     a table only containing rows where test units always passed validation steps, and the
     latter returns a table only containing rows had test units that failed in at least one
     validation step.
+duplicates
+    How to treat the duplicate rows found by `rows_distinct()` steps. The default `None`
+    leaves those steps out of the sundering. Use `"keep_first"` or `"keep_last"` to keep one
+    copy of each group of duplicates (the first or last one, in row order or in the order
+    given by `duplicates_order_by=`), or `"flag_all"` to treat every copy as failing.
+duplicates_order_by
+    One or more columns that order the copies of a duplicated row, to decide which copy is
+    kept with `duplicates="keep_first"` or `duplicates="keep_last"`. For example, use
+    `duplicates="keep_last", duplicates_order_by="updated_at"` to keep the newest record.
+    Ties are broken by row order, and a copy with a missing value in one of these columns is
+    kept only if every copy is missing that value. Without this, the copies are taken in row
+    order (for a database table, which has no row order of its own, rows are ordered by
+    their values, so the choice is arbitrary but the same from run to run).
 
 Returns
 -------
@@ -18557,6 +18577,148 @@ object to [`preview()`](`pointblank.preview`) to show it in an HTML view). From 
 input DataFrame, the first two rows and the last two rows had test units that failed
 validation. Thus the middle two rows are the only ones that passed all validation steps and
 that's what we see in the returned DataFrame.
+
+A [`rows_distinct()`](`pointblank.Validate.rows_distinct`) step only takes part in the
+sundering if we say which copy of a duplicated row to keep. Here, the record with an `id` of
+`2` appears twice, and we keep the copy with the latest `version`:
+
+```{python}
+tbl_versions = pl.DataFrame(
+    {
+        "id": [1, 2, 2, 3],
+        "version": [1, 1, 2, 1],
+    }
+)
+
+validation_versions = (
+    pb.Validate(data=tbl_versions)
+    .rows_distinct(columns_subset="id")
+    .interrogate()
+)
+
+pb.preview(
+    validation_versions.get_sundered_data(
+        duplicates="keep_last", duplicates_order_by="version"
+    )
+)
+```
+
+The validation report would count both copies of `id` `2` as failing, but with
+`duplicates="keep_last"` the copy with `version` `2` is kept in the 'pass' piece, and only
+the older copy would be in the 'fail' piece. Without `duplicates=`, the
+`rows_distinct()` step would be left out and all four rows would be returned.
+
+See Also
+--------
+Validate.get_row_flags : Get which steps each row failed, as columns added to the table.
+Validate.get_data_extracts : Get the rows that failed each validation step.
+
+get_row_flags(self, duplicates: 'str | None' = 'keep_first', duplicates_order_by: 'str | list[str] | None' = None) -> 'Any'
+
+Get the target table with columns flagging the validation steps each row failed.
+
+Where [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`) splits the table into
+the rows that passed every step and those that failed any of them, `get_row_flags()` keeps
+every row and says *which* steps each one failed. The returned table is the target table
+with these columns added:
+
+- `pb_failed_<i>_`, one for each row-level step (where `<i>` is the step number): `True`
+  if the row failed step `<i>`
+- `pb_n_failed_`: the number of steps the row failed
+- `pb_row_score_`: the share of the row's checks that passed (from `0` to `1`), weighted
+  by the dimension weights set with [`config(dimension_weights=...)`](`pointblank.config`)
+  just as in [`get_health_score()`](`pointblank.Validate.get_health_score`)
+
+This is useful when removing every row that failed a check is too blunt. You can use the
+flags to see which problems occur together, filter on just the checks you care about,
+stratify a sample on them, or use `pb_row_score_` to weight rows (e.g., as sample weights
+when training a model) instead of dropping them.
+
+Details
+-------
+The steps that get flag columns are the same ones used by `get_sundered_data()`: steps that
+check rows or cells down a column, that are active, and that don't use `pre=`. A row that a
+step didn't check (e.g., a row outside the segment of a step that uses `segments=`) isn't
+flagged by it, and isn't counted in its `pb_row_score_`. A row that no step checked has a
+missing `pb_row_score_`.
+
+Unlike `get_sundered_data()`, steps that use
+[`rows_distinct()`](`pointblank.Validate.rows_distinct`) are included by default: one copy
+of each group of duplicate rows (the first one) isn't flagged, and the other copies are. So
+a `rows_distinct()` flag marks the rows that removing duplicates would remove. Use
+`duplicates=` and `duplicates_order_by=` to choose which copy is kept.
+
+A row-level step that can't be used is reported in a warning: that's a step that uses
+`pre=` (it can change the rows, so its results may not line up with the table's rows), a
+step that couldn't be evaluated, or a `rows_distinct()` step when `duplicates=None`.
+
+Parameters
+----------
+duplicates
+    How to flag the duplicate rows found by `rows_distinct()` steps. With `"keep_first"`
+    (the default) or `"keep_last"`, one copy of each group of duplicates (the first or last
+    one, in row order or in the order given by `duplicates_order_by=`) isn't flagged.
+    `"flag_all"` flags every copy, as the step itself counts them, and `None` leaves
+    `rows_distinct()` steps out.
+duplicates_order_by
+    One or more columns that order the copies of a duplicated row, to decide which copy
+    isn't flagged. For example, use `duplicates="keep_last",
+    duplicates_order_by="updated_at"` to keep the newest record. Ties are broken by row
+    order, and a copy with a missing value in one of these columns is kept only if every
+    copy is missing that value. Without this, the copies are taken in row order (for a
+    database table, which has no row order of its own, rows are ordered by their values, so
+    the choice is arbitrary but the same from run to run).
+
+Returns
+-------
+Any
+    The target table, of the same type, with the flag and summary columns added.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(preview_incl_header=False)
+```
+
+Let's validate a table of orders with a check on the amounts, a check for missing values,
+and a check for duplicated order IDs.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+orders = pl.DataFrame(
+    {
+        "order_id": [1, 2, 2, 3, 4],
+        "amount": [25.0, -5.0, -5.0, None, 40.0],
+        "status": ["paid", "paid", "paid", "open", None],
+    }
+)
+
+validation = (
+    pb.Validate(data=orders)
+    .col_vals_gt(columns="amount", value=0)
+    .rows_complete()
+    .rows_distinct(columns_subset="order_id")
+    .interrogate()
+)
+
+pb.preview(validation.get_row_flags())
+```
+
+Each step has a flag column. Both copies of order `2` have a negative amount, so both fail
+step 1, but only the second copy is flagged by step 3, since removing duplicates would keep
+the first one. Order `3` fails step 1 because its amount is missing (missing values fail
+`col_vals_gt()` unless `na_pass=True`) and it also fails step 2. Order `1` passed every
+check, so it has a `pb_row_score_` of `1`.
+
+See Also
+--------
+Validate.get_sundered_data : Split the table into the rows that passed and failed the steps.
+Validate.get_health_score : Get a single score for the whole table.
 
 get_data_extracts(self, i: 'int | list[int] | None' = None, frame: 'bool' = False) -> 'dict[int, Any] | Any'
 
@@ -38169,12 +38331,20 @@ validation method, for example. Luckily, we have many row-level validation metho
 - [`Validate.col_vals_null()`](`Validate.col_vals_null`)
 - [`Validate.col_vals_not_null()`](`Validate.col_vals_not_null`)
 - [`Validate.col_vals_regex()`](`Validate.col_vals_regex`)
+- [`Validate.col_vals_within_spec()`](`Validate.col_vals_within_spec`)
+- [`Validate.col_vals_str_len()`](`Validate.col_vals_str_len`)
+- [`Validate.col_vals_increasing()`](`Validate.col_vals_increasing`)
+- [`Validate.col_vals_decreasing()`](`Validate.col_vals_decreasing`)
+- [`Validate.col_missing_coded()`](`Validate.col_missing_coded`)
+- [`Validate.col_missing_only_coded()`](`Validate.col_missing_only_coded`)
 - [`Validate.col_vals_expr()`](`Validate.col_vals_expr`)
-- [`Validate.rows_distinct()`](`Validate.rows_distinct`)
 - [`Validate.rows_complete()`](`Validate.rows_complete`)
 - [`Validate.conjointly()`](`Validate.conjointly`)
-
-This is the same list of validation methods that are considered when creating data extracts.
+- [`Validate.prompt()`](`Validate.prompt`)
+- [`Validate.tbl_match()`](`Validate.tbl_match`) (when its results can be lined up with the rows of
+the table)
+- [`Validate.rows_distinct()`](`Validate.rows_distinct`) (only when you say how to treat duplicate
+rows; see the next section)
 
 There are some additional caveats though. Even if using a validation method drawn from the set
 above, the validation step won't be used for sundering if:
@@ -38189,6 +38359,58 @@ mutation may drastically reduce the number of rows).
 
 Steps that use `segments=` are used for sundering. Each segment's results apply only to the rows in
 that segment, so rows outside all of a step's segments aren't affected by that step.
+
+## Sundering with Duplicate Rows
+
+A [`Validate.rows_distinct()`](`Validate.rows_distinct`) step counts *every* copy of a duplicated
+row as a failing test unit, since there's no telling which of the copies is the 'wrong' one. That's
+the right count for a validation report, but it's rarely what you want when sundering: removing all
+copies of a duplicate would remove the record entirely. So by default, `rows_distinct()` steps are
+left out of sundering, and the `duplicates=` argument lets you bring them in by saying which copy to
+keep. The `small_table` dataset has one pair of duplicate rows, so let's check for that:
+
+```{python}
+validation_3 = (
+    pb.Validate(data=pb.load_dataset(dataset="small_table"))
+    .rows_distinct()
+    .interrogate()
+)
+
+validation_3.get_sundered_data(duplicates="keep_first")
+```
+
+That's 12 of the 13 rows: the first copy of the duplicate stays in the passing set and the second
+copy goes to the failing set. The options for `duplicates=` are:
+
+- `"keep_first"`: the first copy of each group of duplicates passes and the others fail
+- `"keep_last"`: the last copy passes and the others fail
+- `"flag_all"`: every copy fails (just as the validation step counts them)
+- `None` (the default): `rows_distinct()` steps aren't used for sundering
+
+The 'first' and 'last' copies are those in row order, unless you use `duplicates_order_by=` to name
+one or more columns to order them by. For example, a check for duplicated customer IDs combined
+with `duplicates="keep_last", duplicates_order_by="updated_at"` keeps the most recently updated
+record for each customer.
+
+## Flagging Rows Instead of Splitting Them
+
+Sundering gives a yes-or-no answer for each row: it passed every step, or it didn't. Sometimes you
+want to know *which* steps a row failed, so you can decide what to do with it later. The
+[`Validate.get_row_flags()`](`Validate.get_row_flags`) method returns the whole table with a
+`True`/`False` column for each row-level step (`pb_failed_1_`, `pb_failed_2_`, and so on), along
+with the number of steps each row failed (`pb_n_failed_`) and the share of its checks that it passed
+(`pb_row_score_`):
+
+```{python}
+validation_2.get_row_flags()
+```
+
+The rows with a `pb_n_failed_` of `0` are exactly the passing set from sundering. With the flags in
+hand, though, you can filter on just the checks that matter for a particular use, look for problems
+that tend to occur together, or use `pb_row_score_` to weight rows rather than drop them. The same
+`duplicates=` and `duplicates_order_by=` options are available here, except that
+`get_row_flags()` uses `duplicates="keep_first"` by default, so that a `rows_distinct()` flag marks
+the copies that removing duplicates would remove.
 
 ## Practical Applications of Sundering
 
