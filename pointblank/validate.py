@@ -18,6 +18,7 @@ import re
 import shutil
 import tempfile
 import threading
+import uuid
 from collections.abc import Collection
 from dataclasses import dataclass
 from enum import Enum
@@ -21701,22 +21702,28 @@ class Validate:
         # Collect the numbers of the rows that failed in each validation step (a missing result
         # doesn't count as a failure; e.g., a row outside a segmented step's segment)
         failed_rows = [
-            _step_row_results(
-                validation,
-                data_nw,
-                index_name=index_name,
-                duplicates=duplicates,
-                duplicates_order_by=order_by,
+            _as_named_query(
+                _step_row_results(
+                    validation,
+                    data_nw,
+                    index_name=index_name,
+                    duplicates=duplicates,
+                    duplicates_order_by=order_by,
+                )
+                .filter(nw.col("pb_failed_"))
+                .select(index_name),
+                name=f"pb_step_{k}_",
             )
-            .filter(nw.col("pb_failed_"))
-            .select(index_name)
-            for validation in validation_info
+            for k, validation in enumerate(validation_info)
         ]
 
         # The failing rows of all steps are combined at once (rather than joining the steps'
-        # results one by one), so that the query for a database table doesn't nest more deeply with
-        # every step (SQLite versions before 3.46 can't parse deeply nested queries)
-        failed_rows = nw.concat(failed_rows, how="vertical")
+        # results one by one), and each step's query for a database table is given a name, so that
+        # the query doesn't nest more deeply with every step (SQLite versions before 3.46 can't
+        # parse deeply nested queries)
+        failed_rows = _as_named_query(
+            nw.concat(failed_rows, how="vertical"), name="pb_failed_rows_"
+        )
 
         # The rows that passed are those that failed in no step; joins don't guarantee row order
         # (e.g., Polars >= 2.0 collects LazyFrames with the streaming engine), so the original
@@ -21871,21 +21878,24 @@ class Validate:
 
         data_nw = _with_row_index(data_nw, name=index_name)
 
-        # Stack the steps' results (rather than joining them to the table one by one), so that the
-        # query for a database table doesn't nest more deeply with every step (SQLite versions
-        # before 3.46 can't parse deeply nested queries)
+        # Stack the steps' results (rather than joining them to the table one by one), and give
+        # each step's query for a database table a name, so that the query doesn't nest more deeply
+        # with every step (SQLite versions before 3.46 can't parse deeply nested queries)
         results = nw.concat(
             [
-                _step_row_results(
-                    validation,
-                    data_nw,
-                    index_name=index_name,
-                    duplicates=duplicates,
-                    duplicates_order_by=order_by,
-                ).select(
-                    index_name,
-                    nw.lit(k, dtype=nw.Int64).alias("pb_step_"),
-                    nw.col("pb_failed_").cast(nw.Int64),
+                _as_named_query(
+                    _step_row_results(
+                        validation,
+                        data_nw,
+                        index_name=index_name,
+                        duplicates=duplicates,
+                        duplicates_order_by=order_by,
+                    ).select(
+                        index_name,
+                        nw.lit(k, dtype=nw.Int64).alias("pb_step_"),
+                        nw.col("pb_failed_").cast(nw.Int64),
+                    ),
+                    name=f"pb_step_{k}_",
                 )
                 for k, validation in enumerate(steps)
             ],
@@ -21913,6 +21923,7 @@ class Validate:
                 *[nw.col(f"pb_fail_{k}_").max() for k in range(len(steps))],
             )
         )
+        results = _as_named_query(results, name="pb_results_")
 
         # A row that no step checked has no results, and gets zeros
         checked = [nw.col(f"pb_checked_{k}_").fill_null(0) for k in range(len(steps))]
@@ -24407,6 +24418,21 @@ class Validate:
             return "some failing"
         else:
             return "all passed"
+
+
+def _as_named_query(tbl_nw: Any, name: str) -> Any:
+    """
+    Give the query of a database (Ibis) table a name, so that it's written as a CTE.
+
+    A query that uses the table then refers to it by name instead of nesting it, which keeps the
+    nesting of a query that combines many steps' results shallow (SQLite versions before 3.46 can't
+    parse deeply nested queries). The name starts with `name` and is made unique, since the table
+    can end up in a query with others named here (e.g., when the row flags of a database table are
+    validated in turn). Other tables are returned as they are.
+    """
+    if tbl_nw.implementation.is_ibis():
+        return nw.from_native(tbl_nw.to_native().alias(f"{name}{uuid.uuid4().hex}"))
+    return tbl_nw
 
 
 def _results_on_data_backend(results_tbl: Any, data_nw: Any) -> Any:
