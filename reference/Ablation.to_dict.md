@@ -4,7 +4,7 @@ Get the settings and results of the ablation as a JSON-serializable dict.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1275-L1358)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2893-L2965)
 
 ``` python
 Ablation.to_dict()
@@ -13,7 +13,7 @@ Ablation.to_dict()
 ## Returns
 
 `dict[str, Any]`  
-A dictionary with the ablation's settings (`"settings"`), the versions of the table that were evaluated (`"variants"`, including the full table and the controls), the metrics from every evaluation (`"runs"`, one entry per version and repeat, with its seed), the results (`"effects"`, with the same fields as the columns of [`get_effects()`](../reference/Ablation.get_effects.md#pointblank.Ablation.get_effects)), and the notes about variants and steps that weren't used (`"notes"`).
+A dictionary with the ablation's settings (`"settings"`), fingerprints of the data and of the plan (`"fingerprints"`, as in the manifest of [`export()`](../reference/Ablation.export.md#pointblank.Ablation.export)), the versions of the table that were evaluated (`"variants"`, including the full table and the controls), the variants that weren't evaluated because they remove the same rows as another version (`"same_as"`, from each to that version), the metrics from every evaluation (`"runs"`, one entry per version and repeat, with its seed and whether its result came from the cache), the results (`"effects"`, with the same fields as the columns of [`get_effects()`](../reference/Ablation.get_effects.md#pointblank.Ablation.get_effects)), and the notes about variants and steps that weren't used (`"notes"`).
 
 ## Examples
 
@@ -52,18 +52,22 @@ ablation.to_dict()["runs"][:4]
     [{'variant': 'full',
       'repeat': 0,
       'seed': 0,
-      'metrics': {'error': 6.587999999999997}},
+      'metrics': {'error': 6.587999999999997},
+      'cached': False},
      {'variant': 'full',
       'repeat': 1,
       'seed': 1,
-      'metrics': {'error': 9.003999999999998}},
+      'metrics': {'error': 9.003999999999998},
+      'cached': False},
      {'variant': 'full',
       'repeat': 2,
       'seed': 2,
-      'metrics': {'error': 3.913999999999998}},
+      'metrics': {'error': 3.913999999999998},
+      'cached': False},
      {'variant': 'step_1',
       'repeat': 0,
       'seed': 0,
-      'metrics': {'error': 0.06875000000000142}}]
+      'metrics': {'error': 0.06875000000000142},
+      'cached': False}]
 
-Each run records the version of the table, the repeat, the seed, and the metrics, so the runs can be stored and analyzed again later.
+Each run records the version of the table, the repeat, the seed, the metrics, and whether the result came from the cache, so the runs can be stored and analyzed again later.

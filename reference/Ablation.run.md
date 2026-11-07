@@ -4,18 +4,33 @@ Evaluate the full table, each variant, and each control.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L961-L1050)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1702-L1816)
 
 ``` python
-Ablation.run()
+Ablation.run(
+    max_workers=None,
+    executor="thread",
+)
 ```
 
-The `evaluate=` function is called `repeats=` times for each version of the table, with the seeds `seed`, `seed + 1`, and so on. The full table is evaluated first, then each variant, then each control. A control is drawn anew for each repeat, so that the comparison with it doesn't depend on one random draw of rows. Once the run is done, the results are available from [`get_tabular_report()`](../reference/Ablation.get_tabular_report.md#pointblank.Ablation.get_tabular_report), [`get_effects()`](../reference/Ablation.get_effects.md#pointblank.Ablation.get_effects), and [`to_json()`](../reference/Ablation.to_json.md#pointblank.Ablation.to_json). Running again repeats every evaluation.
+The `evaluate=` function is called `repeats=` times for each version of the table, with the seeds `seed`, `seed + 1`, and so on. The full table is evaluated first, then each variant, then each control. A control is drawn anew for each repeat, so that the comparison with it doesn't depend on one random draw of rows. Once the run is done, the results are available from [`get_tabular_report()`](../reference/Ablation.get_tabular_report.md#pointblank.Ablation.get_tabular_report), [`get_effects()`](../reference/Ablation.get_effects.md#pointblank.Ablation.get_effects), and [`to_json()`](../reference/Ablation.to_json.md#pointblank.Ablation.to_json). Running again repeats every evaluation, except those in the cache (see `cache=`).
+
+## Parameters
+
+`max_workers: int | None = None`  
+The number of evaluations to make at the same time. By default (or with `1`), they're made one after another. Models that already use several cores (e.g., with `n_jobs=-1`) usually gain little from this.
+
+`executor: str = "thread"`  
+How evaluations are made at the same time, when `max_workers=` is more than `1`. With `"thread"` (the default), they run in threads of this process, which suits models that release Python's global interpreter lock while training (as most libraries written in C, C++, or Rust do). With `"process"`, each runs in a separate process: the `evaluate=` function must then be one that can be pickled (e.g., defined at the top level of a module, rather than in a notebook or a lambda), and the training table must be a Polars, pandas, or PyArrow table.
 
 ## Returns
 
 `Ablation`  
 The [Ablation](../reference/Ablation.md#pointblank.Ablation) object, with the results of the run.
+
+## Details
+
+The results are the same whatever `max_workers=` is: the evaluations are made in a different order, but each gets the same table and seed, and the results are put back in order. If an evaluation fails, the evaluations that haven't started are cancelled and the error is raised. With a cache, the results that were already made are kept, so running again picks up where the run stopped.
 
 ## Examples
 
@@ -43,7 +58,7 @@ validation = (
 ablation = (
     pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
     .drop_each()
-    .run()
+    .run(max_workers=4)
 )
 
 ablation

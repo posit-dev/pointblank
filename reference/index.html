@@ -1204,6 +1204,18 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">AblationVariant</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.Stratified.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.Stratified</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.sklearn_evaluator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.sklearn_evaluator</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1232,6 +1244,18 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_all_but_each.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_all_but_each</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_groups.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_groups</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.plan.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.plan</span></a>
   </div>
@@ -1244,6 +1268,24 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.check_determinism.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.check_determinism</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.export.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.export</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.load_results.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.load_results</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_effects.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.get_effects</span></a>
   </div>
@@ -1252,6 +1294,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_tabular_report.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.get_tabular_report</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.annotate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.annotate</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1290,6 +1338,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../reference/yaml_to_python.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">yaml_to_python</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/yaml_ablation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">yaml_ablation</span></a>
   </div>
 </li>
       </ul>
@@ -2424,6 +2478,14 @@ ul.task-list li input[type="checkbox"] {
 <dd>
 <p>A version of the training table evaluated in an ablation.</p>
 </dd>
+<dt><a href="../reference/ablation.Stratified.html#pointblank.ablation.Stratified" class="doc-class doc-label doc-label-dataclass">ablation.Stratified</a></dt>
+<dd>
+<p>A control that removes random rows in proportion to groups of the table.</p>
+</dd>
+<dt><a href="../reference/ablation.sklearn_evaluator.html#pointblank.ablation.sklearn_evaluator" class="doc-function doc-label doc-label-function">ablation.sklearn_evaluator()</a></dt>
+<dd>
+<p>Make an <code>evaluate=</code> function that trains a scikit-learn model and scores it on held-out data.</p>
+</dd>
 </dl>
 </section>
 <section id="ablation-methods" class="level2 doc-group">
@@ -2444,6 +2506,14 @@ ul.task-list li input[type="checkbox"] {
 <dd>
 <p>Add a variant that removes the rows failing any step.</p>
 </dd>
+<dt><a href="../reference/Ablation.drop_all_but_each.html#pointblank.Ablation.drop_all_but_each" class="doc-function doc-label doc-label-method">Ablation.drop_all_but_each()</a></dt>
+<dd>
+<p>Add a variant for each step, removing the rows that failed every other step.</p>
+</dd>
+<dt><a href="../reference/Ablation.drop_groups.html#pointblank.Ablation.drop_groups" class="doc-function doc-label doc-label-method">Ablation.drop_groups()</a></dt>
+<dd>
+<p>Add a variant for each group of rows, removing the rows of that group.</p>
+</dd>
 <dt><a href="../reference/Ablation.plan.html#pointblank.Ablation.plan" class="doc-function doc-label doc-label-method">Ablation.plan()</a></dt>
 <dd>
 <p>Show the versions of the table that the ablation will evaluate.</p>
@@ -2452,6 +2522,18 @@ ul.task-list li input[type="checkbox"] {
 <dd>
 <p>Evaluate the full table, each variant, and each control.</p>
 </dd>
+<dt><a href="../reference/Ablation.check_determinism.html#pointblank.Ablation.check_determinism" class="doc-function doc-label doc-label-method">Ablation.check_determinism()</a></dt>
+<dd>
+<p>Check that <code>evaluate=</code> gives the same result twice for the same table and seed.</p>
+</dd>
+<dt><a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="doc-function doc-label doc-label-method">Ablation.export()</a></dt>
+<dd>
+<p>Write out the versions of the table to evaluate, for training them elsewhere.</p>
+</dd>
+<dt><a href="../reference/Ablation.load_results.html#pointblank.Ablation.load_results" class="doc-function doc-label doc-label-method">Ablation.load_results()</a></dt>
+<dd>
+<p>Read the results of evaluations made elsewhere, and compute the effects.</p>
+</dd>
 <dt><a href="../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="doc-function doc-label doc-label-method">Ablation.get_effects()</a></dt>
 <dd>
 <p>Get the results of the ablation as a table.</p>
@@ -2459,6 +2541,10 @@ ul.task-list li input[type="checkbox"] {
 <dt><a href="../reference/Ablation.get_tabular_report.html#pointblank.Ablation.get_tabular_report" class="doc-function doc-label doc-label-method">Ablation.get_tabular_report()</a></dt>
 <dd>
 <p>Get a tabular report of the ablation’s results.</p>
+</dd>
+<dt><a href="../reference/Ablation.annotate.html#pointblank.Ablation.annotate" class="doc-function doc-label doc-label-method">Ablation.annotate()</a></dt>
+<dd>
+<p>Add the results of the ablation to the steps of the validation, as notes.</p>
 </dd>
 <dt><a href="../reference/Ablation.to_dict.html#pointblank.Ablation.to_dict" class="doc-function doc-label doc-label-method">Ablation.to_dict()</a></dt>
 <dd>
@@ -2487,6 +2573,10 @@ ul.task-list li input[type="checkbox"] {
 <dt><a href="../reference/yaml_to_python.html#pointblank.yaml_to_python" class="doc-function doc-label doc-label-function">yaml_to_python()</a></dt>
 <dd>
 <p>Convert YAML validation configuration to equivalent Python code.</p>
+</dd>
+<dt><a href="../reference/yaml_ablation.html#pointblank.yaml_ablation" class="doc-function doc-label doc-label-function">yaml_ablation()</a></dt>
+<dd>
+<p>Set up an ablation from a YAML configuration.</p>
 </dd>
 </dl>
 </section>

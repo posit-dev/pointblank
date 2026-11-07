@@ -1242,6 +1242,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">AblationVariant</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.Stratified.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.Stratified</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.sklearn_evaluator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.sklearn_evaluator</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1270,6 +1282,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_all_but_each.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_all_but_each</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_groups.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_groups</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.plan.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.plan</span></a>
   </div>
@@ -1282,6 +1306,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.check_determinism.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.check_determinism</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.export.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.export</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.load_results.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.load_results</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_effects.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.get_effects</span></a>
   </div>
@@ -1290,6 +1332,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_tabular_report.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.get_tabular_report</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.annotate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.annotate</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1328,6 +1376,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/yaml_to_python.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">yaml_to_python</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/yaml_ablation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">yaml_ablation</span></a>
   </div>
 </li>
       </ul>
@@ -1729,12 +1783,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L134-L1600" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L321-L3251" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Ablation</span>(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">validation</span>,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">evaluate</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">evaluate</span><span class="op">=</span><span class="cn">None</span>,</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">metric</span><span class="op">=</span><span class="cn">None</span>,</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">higher_is_better</span><span class="op">=</span><span class="bn">True</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">repeats</span><span class="op">=</span><span class="dv">5</span>,</span>
@@ -1746,12 +1800,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">conf_level</span><span class="op">=</span><span class="fl">0.95</span>,</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">adjust</span><span class="op">=</span><span class="st">"holm"</span>,</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">label</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="va">evaluate_version</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">cache</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>A validation says which rows of a training table fail its checks, but not whether those rows matter to a model trained on the table. An ablation finds out: it trains and evaluates the model on the full table and on versions of the table with the rows that failed some of the steps removed, and compares the results. Pointblank never trains anything itself: you provide an <code>evaluate=</code> function that takes a training table and returns a score (e.g., the accuracy of a model trained on the table, measured on a fixed holdout set).</p>
 <p>Removing rows can change a score just because there are fewer rows to train on, so each variant is also compared to a <em>control</em> that removes the same number of rows at random. The difference between the two is the effect of the rows that failed the steps, as opposed to the effect of having less data. Training is often random too (e.g., the initial weights of a model), so every version is evaluated <code>repeats=</code> times with different seeds. The <code>r</code>-th evaluation of every version gets the same seed, so the differences between versions are compared seed by seed (paired), which cancels out much of the noise.</p>
-<p>An <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> is built in two parts, like a validation: the strategy methods add variants (<a href="../reference/Ablation.drop_each.html#pointblank.Ablation.drop_each" class="gdls-link"><code>drop_each()</code></a>, <a href="../reference/Ablation.drop_all.html#pointblank.Ablation.drop_all" class="gdls-link"><code>drop_all()</code></a>, and <a href="../reference/Ablation.drop_steps.html#pointblank.Ablation.drop_steps" class="gdls-link"><code>drop_steps()</code></a>), and nothing is evaluated until <a href="../reference/Ablation.run.html#pointblank.Ablation.run" class="gdls-link"><code>run()</code></a> is called. Use <a href="../reference/Ablation.plan.html#pointblank.Ablation.plan" class="gdls-link"><code>plan()</code></a> before that to see how many rows each variant removes and how many evaluations the run needs.</p>
+<p>An <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> is built in two parts, like a validation: the strategy methods add variants (<a href="../reference/Ablation.drop_each.html#pointblank.Ablation.drop_each" class="gdls-link"><code>drop_each()</code></a>, <a href="../reference/Ablation.drop_all.html#pointblank.Ablation.drop_all" class="gdls-link"><code>drop_all()</code></a>, <a href="../reference/Ablation.drop_steps.html#pointblank.Ablation.drop_steps" class="gdls-link"><code>drop_steps()</code></a>, <a href="../reference/Ablation.drop_all_but_each.html#pointblank.Ablation.drop_all_but_each" class="gdls-link"><code>drop_all_but_each()</code></a>, and <a href="../reference/Ablation.drop_groups.html#pointblank.Ablation.drop_groups" class="gdls-link"><code>drop_groups()</code></a>), and nothing is evaluated until <a href="../reference/Ablation.run.html#pointblank.Ablation.run" class="gdls-link"><code>run()</code></a> is called. Use <a href="../reference/Ablation.plan.html#pointblank.Ablation.plan" class="gdls-link"><code>plan()</code></a> before that to see how many rows each variant removes and how many evaluations the run needs. When training happens elsewhere (e.g., on a cluster), <a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link"><code>export()</code></a> writes out the versions of the table to train on, and <a href="../reference/Ablation.load_results.html#pointblank.Ablation.load_results" class="gdls-link"><code>load_results()</code></a> reads back the metrics.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1761,9 +1817,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dd>
 <p>An interrogated validation (a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object). Its target table is the training table, and its row-level steps (the same ones that <a href="../reference/Validate.get_row_flags.html#pointblank.Validate.get_row_flags" class="gdls-link"><code>get_row_flags()</code></a> uses) say which rows to remove.</p>
 </dd>
-<dt><code><span class="doc-parameter-name">evaluate</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable[…, Any]</span></code></dt>
+<dt><code><span class="doc-parameter-name">evaluate</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable[…, Any] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>A function that trains and evaluates a model. It’s called as <code>evaluate(train, seed=seed, variant=variant)</code>, where <code>train</code> is the training table with some rows removed (of the same type as the validation’s target table; a lazy or database table is passed as a lazy table), <code>seed</code> is an integer to seed any randomness in training with, and <code>variant</code> is an <a href="../reference/AblationVariant.html#pointblank.AblationVariant" class="gdls-link"><code>AblationVariant</code></a> describing the version of the table. The function can leave out the <code>variant=</code> parameter if it doesn’t need it. It must return a number, or a dictionary of named numbers (one per metric). The evaluation data should be a fixed holdout set that the function holds on to: it must not depend on <code>train</code>.</p>
+<p>A function that trains and evaluates a model. It’s called as <code>evaluate(train, seed=seed, variant=variant)</code>, where <code>train</code> is the training table with some rows removed (of the same type as the validation’s target table; a lazy or database table is passed as a lazy table), <code>seed</code> is an integer to seed any randomness in training with, and <code>variant</code> is an <a href="../reference/AblationVariant.html#pointblank.AblationVariant" class="gdls-link"><code>AblationVariant</code></a> describing the version of the table. The function can leave out the <code>variant=</code> parameter if it doesn’t need it. It must return a number, or a dictionary of named numbers (one per metric). The evaluation data should be a fixed holdout set that the function holds on to: it must not depend on <code>train</code>. For scikit-learn models, <a href="../reference/ablation.sklearn_evaluator.html#pointblank.ablation.sklearn_evaluator" class="gdls-link"><code>sklearn_evaluator()</code></a> makes this function for you. It can be left out (<code>None</code>) if the evaluations are done elsewhere, with <a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link"><code>export()</code></a> and <a href="../reference/Ablation.load_results.html#pointblank.Ablation.load_results" class="gdls-link"><code>load_results()</code></a>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">metric</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -1781,9 +1837,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dd>
 <p>The seed of the first repeat: repeat <code>r</code> (counting from <code>0</code>) passes <code>seed + r</code> to <code>evaluate=</code>. The random rows removed by the controls also depend on it, so a run can be reproduced exactly.</p>
 </dd>
-<dt><code><span class="doc-parameter-name">control</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"size_matched"</span></span></code></dt>
+<dt><code><span class="doc-parameter-name">control</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Stratified | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"size_matched"</span></span></code></dt>
 <dd>
-<p>The control that variants are compared to. With <code>"size_matched"</code> (the default), each variant is compared to the full table with the same number of rows removed at random (drawn anew for each repeat). Variants that remove the same number of rows share their control. Use <code>None</code> to compare variants to the full table only.</p>
+<p>The control that variants are compared to. With <code>"size_matched"</code> (the default), each variant is compared to the full table with the same number of rows removed at random (drawn anew for each repeat). Variants that remove the same number of rows share their control. A <a href="../reference/ablation.Stratified.html#pointblank.ablation.Stratified" class="gdls-link"><code>Stratified</code></a> control (e.g., <code>pb.ablation.Stratified(by="source")</code>) removes the random rows in proportion to the groups of one or more columns. Use <code>None</code> to compare variants to the full table only.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">duplicates</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"keep_first"</span></span></code></dt>
 <dd>
@@ -1807,7 +1863,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">label</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-An optional label for the ablation, shown in its reports.
+<p>An optional label for the ablation, shown in its reports.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">evaluate_version</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>An optional version of the <code>evaluate=</code> function (e.g., <code>"v2"</code>, or a commit hash). It’s recorded with the results and is part of the cache key, so changing it when the model or its training changes makes the cache evaluate everything again.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">cache</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | os.PathLike[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+A directory to keep the results of evaluations in. Each result is saved as soon as it’s made, under a key made from the data, the rows removed, the seed, and <code>evaluate_version=</code>. An evaluation with the same key is never repeated, so a run that stops partway can be started again without losing work, and adding a variant only evaluates what’s new. The <code>evaluate=</code> function itself isn’t part of the key, so change <code>evaluate_version=</code> (or use another directory) when it changes.
 </dd>
 </dl>
 </div>
@@ -1831,13 +1895,15 @@ An <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdl
 <li><code>"hurts"</code>: removing the rows makes the metric worse, with an adjusted p-value below <code>1 - conf_level</code></li>
 <li><code>"inconclusive"</code>: the difference could be due to chance</li>
 </ul>
+<p>The variants of <a href="../reference/Ablation.drop_all_but_each.html#pointblank.Ablation.drop_all_but_each" class="gdls-link"><code>drop_all_but_each()</code></a> are judged on what their left-out step adds on top of the others instead (the <code>delta_added</code> columns), and can also be <code>"redundant"</code>: the step’s rows help on their own, but make no clear difference once the other steps’ rows are removed.</p>
 <p>With fewer than 3 repeats, there are no verdicts. The intervals aren’t adjusted for multiple comparisons, so an interval can leave out zero while the verdict is <code>"inconclusive"</code>.</p>
 <p>A variant that removes no rows (e.g., a step that no row failed) is left out of the ablation, with a note in the reports. Steps that can’t be matched to the rows of the table, such as steps with a <code>pre=</code> function not marked with <a href="../reference/row_preserving.html#pointblank.row_preserving" class="gdls-link"><code>row_preserving()</code></a>, are left out too.</p>
+<p>Before a long run, <a href="../reference/Ablation.check_determinism.html#pointblank.Ablation.check_determinism" class="gdls-link"><code>check_determinism()</code></a> checks that <code>evaluate=</code> gives the same result for the same table and seed, which the paired comparisons rely on.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s take a table of temperature readings where some readings were recorded in tenths of a degree (so they’re ten times too high) and some are missing. The ‘model’ trained on it is simple: it estimates the average temperature from a bootstrap sample of the readings, and it’s evaluated by its error against the known average of <code>20</code> degrees.</p>
-<div id="3e289bbe" class="cell" data-execution_count="2">
+<div id="348e2742" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1853,7 +1919,7 @@ An <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdl
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"error"</span>: <span class="bu">abs</span>(sample[<span class="st">"temp"</span>].mean() <span class="op">-</span> <span class="dv">20</span>)}</span></code></pre></div>
 </div>
 <p>The validation has two steps: one for missing readings and one for readings out of range.</p>
-<div id="235352e3" class="cell" data-execution_count="3">
+<div id="070a1117" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>readings)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"temp"</span>)</span>
@@ -1862,7 +1928,7 @@ An <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdl
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Now we can set up the ablation, with one variant for each step (<a href="../reference/Ablation.drop_each.html#pointblank.Ablation.drop_each" class="gdls-link gdls-code">drop_each()</a>) and one for both steps (<a href="../reference/Ablation.drop_all.html#pointblank.Ablation.drop_all" class="gdls-link gdls-code">drop_all()</a>). The error is the metric, and lower errors are better.</p>
-<div id="8ebb7348" class="cell" data-execution_count="4">
+<div id="33d73da3" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ablation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(validation, evaluate<span class="op">=</span>evaluate, metric<span class="op">=</span><span class="st">"error"</span>, higher_is_better<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .drop_each()</span>
@@ -1996,6 +2062,10 @@ An <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdl
 <dt><a href="../reference/AblationVariant.html#pointblank.AblationVariant" class="gdls-link gdls-code">AblationVariant</a></dt>
 <dd>
 <p>A version of the training table evaluated in an ablation.</p>
+</dd>
+<dt><a href="../reference/yaml_ablation.html#pointblank.yaml_ablation" class="gdls-link gdls-code">yaml_ablation()</a></dt>
+<dd>
+<p>Set up an ablation from a YAML configuration.</p>
 </dd>
 </dl>
 

@@ -1239,6 +1239,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">AblationVariant</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.Stratified.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.Stratified</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.sklearn_evaluator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.sklearn_evaluator</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1267,6 +1279,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_all_but_each.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_all_but_each</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_groups.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_groups</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.plan.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.plan</span></a>
   </div>
@@ -1279,6 +1303,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.check_determinism.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.check_determinism</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.export.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.export</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.load_results.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.load_results</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_effects.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.get_effects</span></a>
   </div>
@@ -1287,6 +1329,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_tabular_report.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.get_tabular_report</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.annotate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.annotate</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1325,6 +1373,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/yaml_to_python.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">yaml_to_python</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/yaml_ablation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">yaml_ablation</span></a>
   </div>
 </li>
       </ul>
@@ -1725,7 +1779,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1800-L2352" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L2180-L2739" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">yaml_to_python</span>(<span class="va">yaml</span>)</span></code></pre></div>
@@ -1770,7 +1824,7 @@ If the YAML is invalid, malformed, or contains unknown validation methods.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Convert a basic YAML configuration to Python code:</p>
-<div id="01ab3ccd" class="cell" data-execution_count="2">
+<div id="e9eb465a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a YAML validation workflow</span></span>
@@ -1806,7 +1860,7 @@ import pointblank as pb
 </div>
 <p>The generated Python code shows exactly how to replicate the YAML workflow programmatically. This is particularly useful when transitioning from YAML-based workflows to code-based workflows, or when generating documentation that shows both YAML and Python approaches.</p>
 <p>For more complex workflows with thresholds and metadata:</p>
-<div id="f2b3a682" class="cell" data-execution_count="3">
+<div id="f6c1f773" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Advanced YAML configuration</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
@@ -1850,7 +1904,7 @@ import pointblank as pb
 <p>The <code>tbl</code> and <code>reference</code> data sources are loaded as <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a> loads them: a dataset name becomes a <code>pb.load_dataset()</code> call, a CSV file is read with the <code>df_library</code> library (e.g., <code>pl.read_csv()</code>), and other file paths and connection strings are passed to <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> as strings.</p>
 <p>Python code in the configuration (<code>python:</code> blocks, and the <code>expr:</code>, <code>pre:</code>, and <code>active:</code> shortcuts) is copied into the generated code as written, without being run. So, unlike <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a>, this function doesn’t need <code>allow_python=True</code>, though you should still read the generated code before running it.</p>
 <p>Governance metadata (<code>owner</code>, <code>consumers</code>, <code>version</code>) and <code>reference</code> are also rendered in the generated Python code:</p>
-<div id="cf4ea262" class="cell" data-execution_count="4">
+<div id="a45ddf53" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: Sales Pipeline</span></span>

@@ -4,7 +4,7 @@ Get the results of the ablation as a table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1174-L1273)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2777-L2891)
 
 ``` python
 Ablation.get_effects()
@@ -19,15 +19,18 @@ A Polars DataFrame (or a pandas DataFrame, if Polars isn't installed) with these
 
 - `variant`, `name`, `strategy`: the variant's id, name, and strategy (`"full"` for the full table)
 - `steps`: the numbers of the steps whose failing rows were removed, as a list
+- `left_out`: for a variant of [`drop_all_but_each()`](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each), the step whose rows are kept
+- `group`: for a variant of [`drop_groups()`](../reference/Ablation.drop_groups.md#pointblank.Ablation.drop_groups), the value of the group whose rows are removed, as a string
 - `n_removed`, `f_removed`: the number and share of rows removed
 - `metric`, `mean`, `sd`: the metric, and its mean and standard deviation across the repeats
 - `delta_vs_full`, `delta_vs_full_lower`, `delta_vs_full_upper`: the mean paired difference from the full table, with its interval at `conf_level=`
 - `p_vs_full`, `p_adj_vs_full`: the p-value of that difference, and the p-value adjusted across the variants (as set by `adjust=`)
 - `control_mean`: the mean of the metric for the variant's control
 - `delta_vs_control`, `delta_vs_control_lower`, `delta_vs_control_upper`, `p_vs_control`, `p_adj_vs_control`: the same, for the difference from the control
-- `verdict`: `"helps"`, `"hurts"`, or `"inconclusive"` for the metric named in `metric=` (missing for other metrics, and with fewer than 3 repeats)
+- `delta_added`, `delta_added_lower`, `delta_added_upper`, `p_added`, `p_adj_added`: for a variant of [drop_all_but_each()](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each), the difference that removing the left-out step's rows makes on top of the other steps (the variant that removes every step's rows, compared with this variant, or with its control)
+- `verdict`: `"helps"`, `"hurts"`, or `"inconclusive"` for the metric named in `metric=` (missing for other metrics, and with fewer than 3 repeats), or `"redundant"` for a variant of [drop_all_but_each()](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each) whose left-out step helps on its own but adds nothing to the other steps
 
-The comparisons are missing for the full table, and the control columns are missing when `control=None`. The intervals and p-values need at least 2 repeats.
+The comparisons are missing for the full table, and the control columns are missing when `control=None`. The intervals and p-values need at least 2 repeats. The verdict of a [drop_all_but_each()](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each) variant is based on the `delta_added` columns, and those of the other variants on the `delta_vs_control` columns (or the `delta_vs_full` columns, when `control=None`).
 
 ## Examples
 

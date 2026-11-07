@@ -4,7 +4,7 @@ Add a variant that removes the rows failing any of the given steps.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L425-L501)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L672-L748)
 
 ``` python
 Ablation.drop_steps(

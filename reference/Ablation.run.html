@@ -1242,6 +1242,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">AblationVariant</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.Stratified.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.Stratified</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.sklearn_evaluator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.sklearn_evaluator</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1270,6 +1282,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_all_but_each.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_all_but_each</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_groups.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_groups</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.plan.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.plan</span></a>
   </div>
@@ -1282,6 +1306,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.check_determinism.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.check_determinism</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.export.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.export</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.load_results.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.load_results</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_effects.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.get_effects</span></a>
   </div>
@@ -1290,6 +1332,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_tabular_report.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.get_tabular_report</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.annotate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.annotate</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1328,6 +1376,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/yaml_to_python.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">yaml_to_python</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/yaml_ablation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">yaml_ablation</span></a>
   </div>
 </li>
       </ul>
@@ -1694,7 +1748,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#returns" id="toc-returns" class="nav-link active" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
@@ -1726,14 +1782,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L961-L1050" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1702-L1816" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
-<div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Ablation</span><span class="op">.</span><span class="fu">run</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Ablation</span><span class="op">.</span><span class="fu">run</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">max_workers</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">executor</span><span class="op">=</span><span class="st">"thread"</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <code>evaluate=</code> function is called <code>repeats=</code> times for each version of the table, with the seeds <code>seed</code>, <code>seed + 1</code>, and so on. The full table is evaluated first, then each variant, then each control. A control is drawn anew for each repeat, so that the comparison with it doesn’t depend on one random draw of rows. Once the run is done, the results are available from <a href="../reference/Ablation.get_tabular_report.html#pointblank.Ablation.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>, <a href="../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link"><code>get_effects()</code></a>, and <a href="../reference/Ablation.to_json.html#pointblank.Ablation.to_json" class="gdls-link"><code>to_json()</code></a>. Running again repeats every evaluation.</p>
+<p>The <code>evaluate=</code> function is called <code>repeats=</code> times for each version of the table, with the seeds <code>seed</code>, <code>seed + 1</code>, and so on. The full table is evaluated first, then each variant, then each control. A control is drawn anew for each repeat, so that the comparison with it doesn’t depend on one random draw of rows. Once the run is done, the results are available from <a href="../reference/Ablation.get_tabular_report.html#pointblank.Ablation.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>, <a href="../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link"><code>get_effects()</code></a>, and <a href="../reference/Ablation.to_json.html#pointblank.Ablation.to_json" class="gdls-link"><code>to_json()</code></a>. Running again repeats every evaluation, except those in the cache (see <code>cache=</code>).</p>
 </div>
+<section id="parameters" class="level2 doc-parameters">
+<h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code><span class="doc-parameter-name">max_workers</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>The number of evaluations to make at the same time. By default (or with <code>1</code>), they’re made one after another. Models that already use several cores (e.g., with <code>n_jobs=-1</code>) usually gain little from this.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">executor</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"thread"</span></span></code></dt>
+<dd>
+How evaluations are made at the same time, when <code>max_workers=</code> is more than <code>1</code>. With <code>"thread"</code> (the default), they run in threads of this process, which suits models that release Python’s global interpreter lock while training (as most libraries written in C, C++, or Rust do). With <code>"process"</code>, each runs in a separate process: the <code>evaluate=</code> function must then be one that can be pickled (e.g., defined at the top level of a module, rather than in a notebook or a lambda), and the training table must be a Polars, pandas, or PyArrow table.
+</dd>
+</dl>
+</div>
+</section>
 <section id="returns" class="level2 doc-returns">
 <h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
 <div class="doc-definition-items">
@@ -1745,10 +1819,14 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 </dl>
 </div>
 </section>
+<section id="details" class="level2 doc-details">
+<h2 class="doc-details anchored" data-anchor-id="details">Details</h2>
+<p>The results are the same whatever <code>max_workers=</code> is: the evaluations are made in a different order, but each gets the same table and seed, and the results are put back in order. If an evaluation fails, the evaluations that haven’t started are cancelled and the error is raised. With a cache, the results that were already made are kept, so running again picks up where the run stopped.</p>
+</section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an ablation of a table of temperature readings with some out-of-range values. The <code>evaluate()</code> function also returns the number of rows it was given, which is a second metric in the results.</p>
-<div id="70e85914" class="cell" data-execution_count="2">
+<div id="36f4e792" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1770,7 +1848,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>ablation <span class="op">=</span> (</span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(validation, evaluate<span class="op">=</span>evaluate, metric<span class="op">=</span><span class="st">"error"</span>, higher_is_better<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    .drop_each()</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    .run()</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    .run(max_workers<span class="op">=</span><span class="dv">4</span>)</span>
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>ablation</span></code></pre></div>

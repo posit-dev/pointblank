@@ -4,7 +4,7 @@ Get a tabular report of the ablation's results.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1426-L1600)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3033-L3251)
 
 ``` python
 Ablation.get_tabular_report(
@@ -13,7 +13,7 @@ Ablation.get_tabular_report(
 )
 ```
 
-The report has a row for each variant, with the rows it removed, the metric's mean and standard deviation across the repeats, and its difference from the control (or from the full table, if `control=None`). The difference is shown with its interval, as a bar around zero (on the same scale for every variant), and with the verdict as a badge. The header gives the metric for the full table and the settings of the run, and notes at the bottom list the variants and steps that weren't used.
+The report has a row for each variant, with the rows it removed, the metric's mean and standard deviation across the repeats, and its difference from the control (or from the full table, if `control=None`). The difference is shown with its interval, as a bar around zero (on the same scale for every variant), and with the verdict as a badge. The variants of [`drop_all_but_each()`](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each) are in a group of their own, showing what the left-out step's rows add to the other steps. The header gives the metric for the full table and the settings of the run, and notes at the bottom list the variants and steps that weren't used.
 
 ## Parameters
 

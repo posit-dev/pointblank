@@ -228,6 +228,8 @@
 
 - [Ablation](https://posit-dev.github.io/pointblank/reference/Ablation.html): Measure how the rows that fail validation steps affect a model trained on the data
 - [AblationVariant](https://posit-dev.github.io/pointblank/reference/AblationVariant.html): A version of the training table evaluated in an ablation
+- [ablation.Stratified](https://posit-dev.github.io/pointblank/reference/ablation.Stratified.html)
+- [ablation.sklearn_evaluator](https://posit-dev.github.io/pointblank/reference/ablation.sklearn_evaluator.html)
 
 #### Ablation Methods
 > Methods for the Ablation class
@@ -235,10 +237,16 @@
 - [Ablation.drop_steps](https://posit-dev.github.io/pointblank/reference/Ablation.drop_steps.html)
 - [Ablation.drop_each](https://posit-dev.github.io/pointblank/reference/Ablation.drop_each.html)
 - [Ablation.drop_all](https://posit-dev.github.io/pointblank/reference/Ablation.drop_all.html)
+- [Ablation.drop_all_but_each](https://posit-dev.github.io/pointblank/reference/Ablation.drop_all_but_each.html)
+- [Ablation.drop_groups](https://posit-dev.github.io/pointblank/reference/Ablation.drop_groups.html)
 - [Ablation.plan](https://posit-dev.github.io/pointblank/reference/Ablation.plan.html)
 - [Ablation.run](https://posit-dev.github.io/pointblank/reference/Ablation.run.html)
+- [Ablation.check_determinism](https://posit-dev.github.io/pointblank/reference/Ablation.check_determinism.html)
+- [Ablation.export](https://posit-dev.github.io/pointblank/reference/Ablation.export.html)
+- [Ablation.load_results](https://posit-dev.github.io/pointblank/reference/Ablation.load_results.html)
 - [Ablation.get_effects](https://posit-dev.github.io/pointblank/reference/Ablation.get_effects.html)
 - [Ablation.get_tabular_report](https://posit-dev.github.io/pointblank/reference/Ablation.get_tabular_report.html)
+- [Ablation.annotate](https://posit-dev.github.io/pointblank/reference/Ablation.annotate.html)
 - [Ablation.to_dict](https://posit-dev.github.io/pointblank/reference/Ablation.to_dict.html)
 - [Ablation.to_json](https://posit-dev.github.io/pointblank/reference/Ablation.to_json.html)
 
@@ -249,6 +257,7 @@
 - [yaml_interrogate](https://posit-dev.github.io/pointblank/reference/yaml_interrogate.html): Execute a YAML-based validation workflow
 - [validate_yaml](https://posit-dev.github.io/pointblank/reference/validate_yaml.html): Validate YAML configuration against the expected structure
 - [yaml_to_python](https://posit-dev.github.io/pointblank/reference/yaml_to_python.html): Convert YAML validation configuration to equivalent Python code
+- [yaml_ablation](https://posit-dev.github.io/pointblank/reference/yaml_ablation.html): Set up an ablation from a YAML configuration
 
 #### Utility Functions
 > Functions for accessing metadata about the target data and managing configuration.

@@ -1239,6 +1239,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">AblationVariant</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.Stratified.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.Stratified</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.sklearn_evaluator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.sklearn_evaluator</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1267,6 +1279,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_all_but_each.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_all_but_each</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_groups.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_groups</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.plan.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.plan</span></a>
   </div>
@@ -1279,6 +1303,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.check_determinism.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.check_determinism</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.export.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.export</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.load_results.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.load_results</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_effects.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.get_effects</span></a>
   </div>
@@ -1287,6 +1329,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_tabular_report.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.get_tabular_report</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.annotate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.annotate</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1325,6 +1373,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/yaml_to_python.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">yaml_to_python</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/yaml_ablation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">yaml_ablation</span></a>
   </div>
 </li>
       </ul>
@@ -1793,7 +1847,7 @@ A JSON-formatted string representing the validation report, with each validation
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s create a validation plan with a few validation steps and generate a JSON report of the results:</p>
-<div id="5c99a5dc" class="cell" data-execution_count="1">
+<div id="ca2af3a8" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1841,8 +1895,8 @@ A JSON-formatted string representing the validation report, with each validation
         "warning": null,
         "error": null,
         "critical": null,
-        "time_processed": "2026-11-07T19:13:04.615+00:00",
-        "proc_duration_s": 0.005448
+        "time_processed": "2026-11-07T22:02:38.845+00:00",
+        "proc_duration_s": 0.005362
     },
     {
         "i": 2,
@@ -1868,15 +1922,15 @@ A JSON-formatted string representing the validation report, with each validation
         "warning": null,
         "error": null,
         "critical": null,
-        "time_processed": "2026-11-07T19:13:04.616+00:00",
-        "proc_duration_s": 0.001614
+        "time_processed": "2026-11-07T22:02:38.847+00:00",
+        "proc_duration_s": 0.001626
     }
 ]</code></pre>
 </div>
 </div>
 <p>The report is a JSON array with one object per validation step. Each object holds the step’s settings (such as the column, the comparison value and any thresholds) along with its results (the test unit counts and fractions, and whether each threshold was reached).</p>
 <p>You can also customize which fields to include:</p>
-<div id="b8f56f5b" class="cell" data-execution_count="2">
+<div id="b0b17184" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>json_report <span class="op">=</span> validation.get_json_report(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    use_fields<span class="op">=</span>[<span class="st">"i"</span>, <span class="st">"assertion_type"</span>, <span class="st">"column"</span>, <span class="st">"n_passed"</span>, <span class="st">"n_failed"</span>]</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1902,7 +1956,7 @@ A JSON-formatted string representing the validation report, with each validation
 </div>
 </div>
 <p>Now each step object has just the five requested fields. Or we can choose which fields to exclude:</p>
-<div id="5ba8076f" class="cell" data-execution_count="3">
+<div id="fdd711ab" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>json_report <span class="op">=</span> validation.get_json_report(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    exclude_fields<span class="op">=</span>[</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"i_o"</span>, <span class="st">"thresholds"</span>, <span class="st">"pre"</span>, <span class="st">"segments"</span>, <span class="st">"values"</span>,</span>
@@ -1948,7 +2002,7 @@ A JSON-formatted string representing the validation report, with each validation
 </div>
 </div>
 <p>The JSON output can be further processed or analyzed programmatically:</p>
-<div id="c03cfe59" class="cell" data-execution_count="4">
+<div id="831449b3" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse the JSON report</span></span>

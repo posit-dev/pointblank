@@ -510,6 +510,12 @@ Measure how the rows that fail validation steps affect a model trained on the da
 [AblationVariant](AblationVariant.md#pointblank.AblationVariant)  
 A version of the training table evaluated in an ablation.
 
+[ablation.Stratified](ablation.Stratified.md#pointblank.ablation.Stratified)  
+A control that removes random rows in proportion to groups of the table.
+
+[ablation.sklearn_evaluator()](ablation.sklearn_evaluator.md#pointblank.ablation.sklearn_evaluator)  
+Make an `evaluate=` function that trains a scikit-learn model and scores it on held-out data.
+
 ## Ablation Methods
 
 Methods for the Ablation class
@@ -523,17 +529,35 @@ Add a variant for each step, removing only the rows that failed that step.
 [Ablation.drop_all()](Ablation.drop_all.md#pointblank.Ablation.drop_all)  
 Add a variant that removes the rows failing any step.
 
+[Ablation.drop_all_but_each()](Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each)  
+Add a variant for each step, removing the rows that failed every other step.
+
+[Ablation.drop_groups()](Ablation.drop_groups.md#pointblank.Ablation.drop_groups)  
+Add a variant for each group of rows, removing the rows of that group.
+
 [Ablation.plan()](Ablation.plan.md#pointblank.Ablation.plan)  
 Show the versions of the table that the ablation will evaluate.
 
 [Ablation.run()](Ablation.run.md#pointblank.Ablation.run)  
 Evaluate the full table, each variant, and each control.
 
+[Ablation.check_determinism()](Ablation.check_determinism.md#pointblank.Ablation.check_determinism)  
+Check that `evaluate=` gives the same result twice for the same table and seed.
+
+[Ablation.export()](Ablation.export.md#pointblank.Ablation.export)  
+Write out the versions of the table to evaluate, for training them elsewhere.
+
+[Ablation.load_results()](Ablation.load_results.md#pointblank.Ablation.load_results)  
+Read the results of evaluations made elsewhere, and compute the effects.
+
 [Ablation.get_effects()](Ablation.get_effects.md#pointblank.Ablation.get_effects)  
 Get the results of the ablation as a table.
 
 [Ablation.get_tabular_report()](Ablation.get_tabular_report.md#pointblank.Ablation.get_tabular_report)  
 Get a tabular report of the ablation's results.
+
+[Ablation.annotate()](Ablation.annotate.md#pointblank.Ablation.annotate)  
+Add the results of the ablation to the steps of the validation, as notes.
 
 [Ablation.to_dict()](Ablation.to_dict.md#pointblank.Ablation.to_dict)  
 Get the settings and results of the ablation as a JSON-serializable dict.
@@ -553,6 +577,9 @@ Validate YAML configuration against the expected structure.
 
 [yaml_to_python()](yaml_to_python.md#pointblank.yaml_to_python)  
 Convert YAML validation configuration to equivalent Python code.
+
+[yaml_ablation()](yaml_ablation.md#pointblank.yaml_ablation)  
+Set up an ablation from a YAML configuration.
 
 ## Utility Functions
 

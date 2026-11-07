@@ -1242,6 +1242,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">AblationVariant</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.Stratified.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.Stratified</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.sklearn_evaluator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.sklearn_evaluator</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1270,6 +1282,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_all_but_each.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_all_but_each</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_groups.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_groups</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.plan.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.plan</span></a>
   </div>
@@ -1282,6 +1306,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.check_determinism.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.check_determinism</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.export.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.export</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.load_results.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.load_results</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_effects.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Ablation.get_effects</span></a>
   </div>
@@ -1290,6 +1332,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_tabular_report.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.get_tabular_report</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.annotate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.annotate</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1328,6 +1376,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/yaml_to_python.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">yaml_to_python</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/yaml_ablation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">yaml_ablation</span></a>
   </div>
 </li>
       </ul>
@@ -1726,7 +1780,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1174-L1273" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2777-L2891" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Ablation</span><span class="op">.</span><span class="fu">get_effects</span>()</span></code></pre></div>
@@ -1744,15 +1798,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li><code>variant</code>, <code>name</code>, <code>strategy</code>: the variant’s id, name, and strategy (<code>"full"</code> for the full table)</li>
 <li><code>steps</code>: the numbers of the steps whose failing rows were removed, as a list</li>
+<li><code>left_out</code>: for a variant of <a href="../reference/Ablation.drop_all_but_each.html#pointblank.Ablation.drop_all_but_each" class="gdls-link"><code>drop_all_but_each()</code></a>, the step whose rows are kept</li>
+<li><code>group</code>: for a variant of <a href="../reference/Ablation.drop_groups.html#pointblank.Ablation.drop_groups" class="gdls-link"><code>drop_groups()</code></a>, the value of the group whose rows are removed, as a string</li>
 <li><code>n_removed</code>, <code>f_removed</code>: the number and share of rows removed</li>
 <li><code>metric</code>, <code>mean</code>, <code>sd</code>: the metric, and its mean and standard deviation across the repeats</li>
 <li><code>delta_vs_full</code>, <code>delta_vs_full_lower</code>, <code>delta_vs_full_upper</code>: the mean paired difference from the full table, with its interval at <code>conf_level=</code></li>
 <li><code>p_vs_full</code>, <code>p_adj_vs_full</code>: the p-value of that difference, and the p-value adjusted across the variants (as set by <code>adjust=</code>)</li>
 <li><code>control_mean</code>: the mean of the metric for the variant’s control</li>
 <li><code>delta_vs_control</code>, <code>delta_vs_control_lower</code>, <code>delta_vs_control_upper</code>, <code>p_vs_control</code>, <code>p_adj_vs_control</code>: the same, for the difference from the control</li>
-<li><code>verdict</code>: <code>"helps"</code>, <code>"hurts"</code>, or <code>"inconclusive"</code> for the metric named in <code>metric=</code> (missing for other metrics, and with fewer than 3 repeats)</li>
+<li><code>delta_added</code>, <code>delta_added_lower</code>, <code>delta_added_upper</code>, <code>p_added</code>, <code>p_adj_added</code>: for a variant of <a href="../reference/Ablation.drop_all_but_each.html#pointblank.Ablation.drop_all_but_each" class="gdls-link gdls-code">drop_all_but_each()</a>, the difference that removing the left-out step’s rows makes on top of the other steps (the variant that removes every step’s rows, compared with this variant, or with its control)</li>
+<li><code>verdict</code>: <code>"helps"</code>, <code>"hurts"</code>, or <code>"inconclusive"</code> for the metric named in <code>metric=</code> (missing for other metrics, and with fewer than 3 repeats), or <code>"redundant"</code> for a variant of <a href="../reference/Ablation.drop_all_but_each.html#pointblank.Ablation.drop_all_but_each" class="gdls-link gdls-code">drop_all_but_each()</a> whose left-out step helps on its own but adds nothing to the other steps</li>
 </ul>
-The comparisons are missing for the full table, and the control columns are missing when <code>control=None</code>. The intervals and p-values need at least 2 repeats.
+The comparisons are missing for the full table, and the control columns are missing when <code>control=None</code>. The intervals and p-values need at least 2 repeats. The verdict of a <a href="../reference/Ablation.drop_all_but_each.html#pointblank.Ablation.drop_all_but_each" class="gdls-link gdls-code">drop_all_but_each()</a> variant is based on the <code>delta_added</code> columns, and those of the other variants on the <code>delta_vs_control</code> columns (or the <code>delta_vs_full</code> columns, when <code>control=None</code>).
 </dd>
 </dl>
 </div>
@@ -1760,7 +1817,7 @@ The comparisons are missing for the full table, and the control columns are miss
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an ablation of a table of temperature readings with some out-of-range values.</p>
-<div id="7dec267e" class="cell" data-execution_count="2">
+<div id="7e9cb782" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>

@@ -1239,6 +1239,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">AblationVariant</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.Stratified.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.Stratified</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ablation.sklearn_evaluator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ablation.sklearn_evaluator</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1267,6 +1279,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_all_but_each.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_all_but_each</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.drop_groups.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.drop_groups</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.plan.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.plan</span></a>
   </div>
@@ -1279,6 +1303,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.check_determinism.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.check_determinism</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.export.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.export</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.load_results.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.load_results</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_effects.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.get_effects</span></a>
   </div>
@@ -1287,6 +1329,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/Ablation.get_tabular_report.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Ablation.get_tabular_report</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Ablation.annotate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ablation.annotate</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1325,6 +1373,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../reference/yaml_to_python.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">yaml_to_python</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/yaml_ablation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">yaml_ablation</span></a>
   </div>
 </li>
       </ul>
@@ -1723,7 +1777,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1275-L1358" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2893-L2965" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Ablation</span><span class="op">.</span><span class="fu">to_dict</span>()</span></code></pre></div>
@@ -1734,7 +1788,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code> <span class="doc-parameter-annotation">dict[str, Any]</span></code></dt>
 <dd>
-A dictionary with the ablation’s settings (<code>"settings"</code>), the versions of the table that were evaluated (<code>"variants"</code>, including the full table and the controls), the metrics from every evaluation (<code>"runs"</code>, one entry per version and repeat, with its seed), the results (<code>"effects"</code>, with the same fields as the columns of <a href="../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link"><code>get_effects()</code></a>), and the notes about variants and steps that weren’t used (<code>"notes"</code>).
+A dictionary with the ablation’s settings (<code>"settings"</code>), fingerprints of the data and of the plan (<code>"fingerprints"</code>, as in the manifest of <a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link"><code>export()</code></a>), the versions of the table that were evaluated (<code>"variants"</code>, including the full table and the controls), the variants that weren’t evaluated because they remove the same rows as another version (<code>"same_as"</code>, from each to that version), the metrics from every evaluation (<code>"runs"</code>, one entry per version and repeat, with its seed and whether its result came from the cache), the results (<code>"effects"</code>, with the same fields as the columns of <a href="../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link"><code>get_effects()</code></a>), and the notes about variants and steps that weren’t used (<code>"notes"</code>).
 </dd>
 </dl>
 </div>
@@ -1742,7 +1796,7 @@ A dictionary with the ablation’s settings (<code>"settings"</code>), the versi
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an ablation of a table of temperature readings, with three repeats.</p>
-<div id="94a59caa" class="cell" data-execution_count="2">
+<div id="b5999933" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1774,22 +1828,26 @@ A dictionary with the ablation’s settings (<code>"settings"</code>), the versi
 <pre><code>[{'variant': 'full',
   'repeat': 0,
   'seed': 0,
-  'metrics': {'error': 6.587999999999997}},
+  'metrics': {'error': 6.587999999999997},
+  'cached': False},
  {'variant': 'full',
   'repeat': 1,
   'seed': 1,
-  'metrics': {'error': 9.003999999999998}},
+  'metrics': {'error': 9.003999999999998},
+  'cached': False},
  {'variant': 'full',
   'repeat': 2,
   'seed': 2,
-  'metrics': {'error': 3.913999999999998}},
+  'metrics': {'error': 3.913999999999998},
+  'cached': False},
  {'variant': 'step_1',
   'repeat': 0,
   'seed': 0,
-  'metrics': {'error': 0.06875000000000142}}]</code></pre>
+  'metrics': {'error': 0.06875000000000142},
+  'cached': False}]</code></pre>
 </div>
 </div>
-<p>Each run records the version of the table, the repeat, the seed, and the metrics, so the runs can be stored and analyzed again later.</p>
+<p>Each run records the version of the table, the repeat, the seed, the metrics, and whether the result came from the cache, so the runs can be stored and analyzed again later.</p>
 
 
 </section>

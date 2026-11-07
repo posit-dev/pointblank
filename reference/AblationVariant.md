@@ -4,7 +4,7 @@ A version of the training table evaluated in an ablation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L63-L121)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L96-L167)
 
 ``` python
 AblationVariant(
@@ -16,6 +16,8 @@ AblationVariant(
     f_removed=0.0,
     is_control=False,
     group=None,
+    group_column=None,
+    left_out=None,
 )
 ```
 
@@ -24,16 +26,16 @@ An [`Ablation`](../reference/Ablation.md#pointblank.Ablation) evaluates a model 
 ## Attributes
 
 `id: str`  
-A short identifier for the version, unique within the ablation: `"full"` for the full table, `"step_<i>"` for a variant of [`drop_each()`](../reference/Ablation.drop_each.md#pointblank.Ablation.drop_each), `"all"` for [`drop_all()`](../reference/Ablation.drop_all.md#pointblank.Ablation.drop_all), the `name=` (or `"steps_<i>_<j>"`) for [`drop_steps()`](../reference/Ablation.drop_steps.md#pointblank.Ablation.drop_steps), and `"control_<n>"` for the control that removes `n` random rows.
+A short identifier for the version, unique within the ablation: `"full"` for the full table, `"step_<i>"` for a variant of [`drop_each()`](../reference/Ablation.drop_each.md#pointblank.Ablation.drop_each), `"all"` for [`drop_all()`](../reference/Ablation.drop_all.md#pointblank.Ablation.drop_all), the `name=` (or `"steps_<i>_<j>"`) for [`drop_steps()`](../reference/Ablation.drop_steps.md#pointblank.Ablation.drop_steps), `"all_but_<i>"` for [`drop_all_but_each()`](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each), `"<column>=<value>"` for [`drop_groups()`](../reference/Ablation.drop_groups.md#pointblank.Ablation.drop_groups), and `"control_<n>"` for the control that removes `n` random rows (or `"control_<id>"` for the control of a [drop_all_but_each()](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each) variant).
 
 `strategy: str`  
-The kind of version: `"full"`, `"drop_steps"`, `"drop_each"`, `"drop_all"`, or `"control"`.
+The kind of version: `"full"`, `"drop_steps"`, `"drop_each"`, `"drop_all"`, `"drop_all_but_each"`, `"drop_groups"`, or `"control"`.
 
 `name: str`  
 A name for the version, as shown in reports (e.g., `"Step 2"`).
 
 `steps: tuple[int, …]`  
-The numbers of the validation steps whose failing rows were removed (empty for the full table and for controls).
+The numbers of the validation steps whose failing rows were removed (empty for the full table, for groups, and for most controls).
 
 `n_removed: int`  
 The number of rows removed from the table.
@@ -45,4 +47,10 @@ The share of the table's rows that were removed (from `0` to `1`).
 Is this a control (random rows removed) rather than a variant?
 
 `group: Any`  
-Reserved for strategies that remove groups of rows (always `None` for now).
+For a variant of [drop_groups()](../reference/Ablation.drop_groups.md#pointblank.Ablation.drop_groups), the value of `group_column` in the rows it removes (`None` for the rows where it's missing).
+
+`group_column: str | None`  
+For a variant of [drop_groups()](../reference/Ablation.drop_groups.md#pointblank.Ablation.drop_groups), the column the rows are grouped by (otherwise `None`).
+
+`left_out: int | None`  
+For a variant of [drop_all_but_each()](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each) (and its control), the step whose rows are kept (otherwise `None`).

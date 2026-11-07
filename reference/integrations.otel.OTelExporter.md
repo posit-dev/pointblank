@@ -132,7 +132,7 @@ for metric in metrics:
     pb.validation.test_units.passed 7
     pb.validation.test_units.failed 3
     pb.validation.pass_rate 0.7
-    pb.validation.duration 0.006756
+    pb.validation.duration 0.006645
     pb.validation.threshold.warning 2
     pb.validation.threshold.error 2
     pb.validation.threshold.critical 1
@@ -199,7 +199,7 @@ Usage
 export(validation)
 ```
 
-The [export()](../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter.export) method sends the signals that the exporter has enabled (metrics, traces and log records, as described in [`OTelExporter`](../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter)) for one interrogated [`Validate`](../reference/Validate.md#pointblank.Validate) object. The same exporter can export any number of validations, such as one for each table in a pipeline. The counters then add up over the validations, and the `pb.tbl_name` attribute keeps the tables apart. Exporting the same validation twice counts it twice.
+The `export()` method sends the signals that the exporter has enabled (metrics, traces and log records, as described in [`OTelExporter`](../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter)) for one interrogated [`Validate`](../reference/Validate.md#pointblank.Validate) object. The same exporter can export any number of validations, such as one for each table in a pipeline. The counters then add up over the validations, and the `pb.tbl_name` attribute keeps the tables apart. Exporting the same validation twice counts it twice.
 
 #### Parameters
 

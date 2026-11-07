@@ -4,12 +4,12 @@ Measure how the rows that fail validation steps affect a model trained on the da
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L134-L1600)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L321-L3251)
 
 ``` python
 Ablation(
     validation,
-    evaluate,
+    evaluate=None,
     metric=None,
     higher_is_better=True,
     repeats=5,
@@ -21,6 +21,8 @@ Ablation(
     conf_level=0.95,
     adjust="holm",
     label=None,
+    evaluate_version=None,
+    cache=None,
 )
 ```
 
@@ -28,15 +30,15 @@ A validation says which rows of a training table fail its checks, but not whethe
 
 Removing rows can change a score just because there are fewer rows to train on, so each variant is also compared to a *control* that removes the same number of rows at random. The difference between the two is the effect of the rows that failed the steps, as opposed to the effect of having less data. Training is often random too (e.g., the initial weights of a model), so every version is evaluated `repeats=` times with different seeds. The `r`-th evaluation of every version gets the same seed, so the differences between versions are compared seed by seed (paired), which cancels out much of the noise.
 
-An [Ablation](../reference/Ablation.md#pointblank.Ablation) is built in two parts, like a validation: the strategy methods add variants ([`drop_each()`](../reference/Ablation.drop_each.md#pointblank.Ablation.drop_each), [`drop_all()`](../reference/Ablation.drop_all.md#pointblank.Ablation.drop_all), and [`drop_steps()`](../reference/Ablation.drop_steps.md#pointblank.Ablation.drop_steps)), and nothing is evaluated until [`run()`](../reference/Ablation.run.md#pointblank.Ablation.run) is called. Use [`plan()`](../reference/Ablation.plan.md#pointblank.Ablation.plan) before that to see how many rows each variant removes and how many evaluations the run needs.
+An [Ablation](../reference/Ablation.md#pointblank.Ablation) is built in two parts, like a validation: the strategy methods add variants ([`drop_each()`](../reference/Ablation.drop_each.md#pointblank.Ablation.drop_each), [`drop_all()`](../reference/Ablation.drop_all.md#pointblank.Ablation.drop_all), [`drop_steps()`](../reference/Ablation.drop_steps.md#pointblank.Ablation.drop_steps), [`drop_all_but_each()`](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each), and [`drop_groups()`](../reference/Ablation.drop_groups.md#pointblank.Ablation.drop_groups)), and nothing is evaluated until [`run()`](../reference/Ablation.run.md#pointblank.Ablation.run) is called. Use [`plan()`](../reference/Ablation.plan.md#pointblank.Ablation.plan) before that to see how many rows each variant removes and how many evaluations the run needs. When training happens elsewhere (e.g., on a cluster), [`export()`](../reference/Ablation.export.md#pointblank.Ablation.export) writes out the versions of the table to train on, and [`load_results()`](../reference/Ablation.load_results.md#pointblank.Ablation.load_results) reads back the metrics.
 
 ## Parameters
 
 `validation: Validate`  
 An interrogated validation (a [`Validate`](../reference/Validate.md#pointblank.Validate) object). Its target table is the training table, and its row-level steps (the same ones that [`get_row_flags()`](../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags) uses) say which rows to remove.
 
-`evaluate: Callable[…, Any]`  
-A function that trains and evaluates a model. It's called as `evaluate(train, seed=seed, variant=variant)`, where `train` is the training table with some rows removed (of the same type as the validation's target table; a lazy or database table is passed as a lazy table), `seed` is an integer to seed any randomness in training with, and `variant` is an [`AblationVariant`](../reference/AblationVariant.md#pointblank.AblationVariant) describing the version of the table. The function can leave out the `variant=` parameter if it doesn't need it. It must return a number, or a dictionary of named numbers (one per metric). The evaluation data should be a fixed holdout set that the function holds on to: it must not depend on `train`.
+`evaluate: Callable[…, Any] | None = None`  
+A function that trains and evaluates a model. It's called as `evaluate(train, seed=seed, variant=variant)`, where `train` is the training table with some rows removed (of the same type as the validation's target table; a lazy or database table is passed as a lazy table), `seed` is an integer to seed any randomness in training with, and `variant` is an [`AblationVariant`](../reference/AblationVariant.md#pointblank.AblationVariant) describing the version of the table. The function can leave out the `variant=` parameter if it doesn't need it. It must return a number, or a dictionary of named numbers (one per metric). The evaluation data should be a fixed holdout set that the function holds on to: it must not depend on `train`. For scikit-learn models, [`sklearn_evaluator()`](../reference/ablation.sklearn_evaluator.md#pointblank.ablation.sklearn_evaluator) makes this function for you. It can be left out (`None`) if the evaluations are done elsewhere, with [`export()`](../reference/Ablation.export.md#pointblank.Ablation.export) and [`load_results()`](../reference/Ablation.load_results.md#pointblank.Ablation.load_results).
 
 `metric: str | None = None`  
 The name of the metric that verdicts are based on. It's needed when `evaluate=` returns a dictionary with more than one metric (the others are still reported). When `evaluate=` returns a number, this is the name it's given (`"score"` by default).
@@ -50,8 +52,8 @@ The number of times each version of the table is evaluated, each time with a dif
 `seed: int = 0`  
 The seed of the first repeat: repeat `r` (counting from `0`) passes `seed + r` to `evaluate=`. The random rows removed by the controls also depend on it, so a run can be reproduced exactly.
 
-`control: str | None = "size_matched"`  
-The control that variants are compared to. With `"size_matched"` (the default), each variant is compared to the full table with the same number of rows removed at random (drawn anew for each repeat). Variants that remove the same number of rows share their control. Use `None` to compare variants to the full table only.
+`control: str | Stratified | None = "size_matched"`  
+The control that variants are compared to. With `"size_matched"` (the default), each variant is compared to the full table with the same number of rows removed at random (drawn anew for each repeat). Variants that remove the same number of rows share their control. A [`Stratified`](../reference/ablation.Stratified.md#pointblank.ablation.Stratified) control (e.g., `pb.ablation.Stratified(by="source")`) removes the random rows in proportion to the groups of one or more columns. Use `None` to compare variants to the full table only.
 
 `duplicates: str | None = "keep_first"`  
 How the duplicate rows found by [`rows_distinct()`](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) steps are removed. With `"keep_first"` (the default) or `"keep_last"`, one copy of each group of duplicates is kept and the others are removed. `"flag_all"` removes every copy, and `None` leaves `rows_distinct()` steps out of the ablation. These are the same options as in [`get_row_flags()`](../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags).
@@ -71,6 +73,12 @@ How p-values are adjusted for comparing several variants: `"holm"` (the default)
 `label: str | None = None`  
 An optional label for the ablation, shown in its reports.
 
+`evaluate_version: str | None = None`  
+An optional version of the `evaluate=` function (e.g., `"v2"`, or a commit hash). It's recorded with the results and is part of the cache key, so changing it when the model or its training changes makes the cache evaluate everything again.
+
+`cache: str | os.PathLike[str] | None = None`  
+A directory to keep the results of evaluations in. Each result is saved as soon as it's made, under a key made from the data, the rows removed, the seed, and `evaluate_version=`. An evaluation with the same key is never repeated, so a run that stops partway can be started again without losing work, and adding a variant only evaluates what's new. The `evaluate=` function itself isn't part of the key, so change `evaluate_version=` (or use another directory) when it changes.
+
 ## Returns
 
 `Ablation`  
@@ -84,9 +92,13 @@ For each variant and metric, the results give the mean and standard deviation of
 - `"hurts"`: removing the rows makes the metric worse, with an adjusted p-value below `1 - conf_level`
 - `"inconclusive"`: the difference could be due to chance
 
+The variants of [`drop_all_but_each()`](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each) are judged on what their left-out step adds on top of the others instead (the `delta_added` columns), and can also be `"redundant"`: the step's rows help on their own, but make no clear difference once the other steps' rows are removed.
+
 With fewer than 3 repeats, there are no verdicts. The intervals aren't adjusted for multiple comparisons, so an interval can leave out zero while the verdict is `"inconclusive"`.
 
 A variant that removes no rows (e.g., a step that no row failed) is left out of the ablation, with a note in the reports. Steps that can't be matched to the rows of the table, such as steps with a `pre=` function not marked with [`row_preserving()`](../reference/row_preserving.md#pointblank.row_preserving), are left out too.
+
+Before a long run, [`check_determinism()`](../reference/Ablation.check_determinism.md#pointblank.Ablation.check_determinism) checks that `evaluate=` gives the same result for the same table and seed, which the paired comparisons rely on.
 
 ## Examples
 
@@ -149,3 +161,6 @@ Get which steps each row failed, as columns added to the table.
 
 [AblationVariant](../reference/AblationVariant.md#pointblank.AblationVariant)  
 A version of the training table evaluated in an ablation.
+
+[yaml_ablation()](../reference/yaml_ablation.md#pointblank.yaml_ablation)  
+Set up an ablation from a YAML configuration.

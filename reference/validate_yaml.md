@@ -4,7 +4,7 @@ Validate YAML configuration against the expected structure.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1580-L1776)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1958-L2156)
 
 ``` python
 validate_yaml(yaml)
@@ -173,6 +173,7 @@ The following top-level keys are recognized in the YAML configuration:
 - `consumers`: data consumers (governance metadata)
 - `version`: validation version string (governance metadata)
 - `reference`: reference table for comparison-based validations
+- `ablation`: an ablation of the validation (used by [`yaml_ablation()`](../reference/yaml_ablation.md#pointblank.yaml_ablation), and ignored otherwise)
 
 Unknown top-level keys are rejected, which catches typos like `tbl_nmae` or `step`.
 

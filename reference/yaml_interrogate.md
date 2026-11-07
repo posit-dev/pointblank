@@ -4,7 +4,7 @@ Execute a YAML-based validation workflow.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1167-L1555)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1543-L1933)
 
 ``` python
 yaml_interrogate(
@@ -17,7 +17,7 @@ yaml_interrogate(
 
 This is the main entry point for YAML-based validation workflows. It takes YAML configuration (as a string or file path) and returns a validated [Validate](../reference/Validate.md#pointblank.Validate) object with interrogation results.
 
-The YAML configuration defines the data source, validation steps, and optional settings like thresholds and labels. This function automatically loads the data, builds the validation plan, executes all validation steps, and returns the interrogated results.
+The YAML configuration defines the data source, validation steps, and optional settings like thresholds and labels. This function automatically loads the data, builds the validation plan, executes all validation steps, and returns the interrogated results. An `ablation:` block in the configuration is ignored here (it's used by [`yaml_ablation()`](../reference/yaml_ablation.md#pointblank.yaml_ablation)), so its `evaluate:` function is neither imported nor run.
 
 ## Parameters
 

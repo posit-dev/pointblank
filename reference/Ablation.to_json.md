@@ -4,7 +4,7 @@ Get the settings and results of the ablation as a JSON string.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1360-L1424)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2967-L3031)
 
 ``` python
 Ablation.to_json(indent=2)
@@ -72,6 +72,7 @@ print(json.dumps(json.loads(ablation.to_json())["settings"], indent=2))
       "max_removed": 0.5,
       "conf_level": 0.95,
       "adjust": "holm",
+      "evaluate_version": null,
       "n_rows": 300,
       "tbl_name": null
     }
