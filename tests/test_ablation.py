@@ -217,6 +217,8 @@ def test_ablation_effects_and_verdicts():
         "name",
         "strategy",
         "steps",
+        "left_out",
+        "group",
         "n_removed",
         "f_removed",
         "metric",
@@ -233,6 +235,11 @@ def test_ablation_effects_and_verdicts():
         "delta_vs_control_upper",
         "p_vs_control",
         "p_adj_vs_control",
+        "delta_added",
+        "delta_added_lower",
+        "delta_added_upper",
+        "p_added",
+        "p_adj_added",
         "verdict",
     ]
     assert effects["steps"].dtype == pl.List(pl.Int64)
@@ -319,6 +326,7 @@ def test_ablation_runs_are_paired_and_reproducible():
         "repeat": 0,
         "seed": 10,
         "metrics": {"score": pytest.approx(_evaluate(_TBL, seed=10, variant=None))},
+        "cached": False,
     }
 
 
@@ -735,7 +743,7 @@ def test_ablation_adding_variants_resets_results():
     ablation = pb.Ablation(_validation(_TBL), evaluate=_evaluate, repeats=3).drop_each(steps=1)
     ablation.run()
     ablation.drop_each(steps=2)
-    with pytest.raises(ValueError, match="Call `run\\(\\)` first"):
+    with pytest.raises(ValueError, match="Call `run\\(\\)` \\(or `load_results\\(\\)`\\) first"):
         ablation.get_effects()
     ablation.run()
     assert ablation.get_effects()["variant"].to_list() == ["full", "step_1", "step_2"]
@@ -839,7 +847,7 @@ def test_ablation_plan():
     assert "Baseline" in html and "Variants" in html and "Controls" in html
 
     # The plan doesn't evaluate anything
-    with pytest.raises(ValueError, match="Call `run\\(\\)` first"):
+    with pytest.raises(ValueError, match="Call `run\\(\\)` \\(or `load_results\\(\\)`\\) first"):
         ablation.get_tabular_report()
     assert ablation._repr_html_() == html
 
@@ -887,12 +895,22 @@ def test_ablation_to_json():
     ablation = pb.Ablation(
         _validation(_TBL), evaluate=_evaluate, repeats=3, seed=4, label="v7"
     ).drop_each()
-    with pytest.raises(ValueError, match="Call `run\\(\\)` first"):
+    with pytest.raises(ValueError, match="Call `run\\(\\)` \\(or `load_results\\(\\)`\\) first"):
         ablation.to_json()
     ablation.run()
 
     data = json.loads(ablation.to_json())
-    assert list(data) == ["settings", "variants", "runs", "effects", "notes"]
+    assert list(data) == [
+        "settings",
+        "fingerprints",
+        "variants",
+        "same_as",
+        "runs",
+        "effects",
+        "notes",
+    ]
+    assert set(data["fingerprints"]) == {"data", "plan"}
+    assert data["same_as"] == {}
     assert data["settings"] == {
         "label": "v7",
         "metric": "score",
@@ -906,6 +924,7 @@ def test_ablation_to_json():
         "max_removed": 0.5,
         "conf_level": 0.95,
         "adjust": "holm",
+        "evaluate_version": None,
         "n_rows": 100,
         "tbl_name": None,
     }
@@ -931,3 +950,1544 @@ def test_ablation_effects_with_pandas(monkeypatch):
     assert effects["delta_vs_full"].isna().tolist() == [True, False, False, False]
     assert effects["steps"].tolist() == [[], [1], [2], [3]]
     assert "helps" in ablation.get_tabular_report().as_raw_html()
+
+
+# ----------------------------------------------------------------------------------------------
+# Leaving one out and groups
+# ----------------------------------------------------------------------------------------------
+
+
+def _effects_by_variant(ablation, metric=None):
+    effects = ablation.get_effects()
+    if metric is not None:
+        effects = effects.filter(pl.col("metric") == metric)
+    return {row["variant"]: row for row in effects.iter_rows(named=True)}
+
+
+def test_ablation_drop_all_but_each():
+    ablation = (
+        pb.Ablation(_validation(_TBL), evaluate=_evaluate, repeats=5)
+        .drop_each()
+        .drop_all_but_each()
+    )
+    variants = {v["id"]: v for v in ablation.run().to_dict()["variants"]}
+
+    assert variants["all_but_1"] == {
+        "id": "all_but_1",
+        "strategy": "drop_all_but_each",
+        "name": "All steps but step 1",
+        "steps": [2, 3],
+        "n_removed": 20,
+        "f_removed": 0.2,
+        "is_control": False,
+        "group": None,
+        "group_column": None,
+        "left_out": 1,
+    }
+    # Each left-out variant has a control of its own: its rows plus as many random rows as the
+    # left-out step adds
+    control = variants["control_all_but_1"]
+    assert (control["steps"], control["n_removed"], control["left_out"]) == ([2, 3], 30, 1)
+    assert control["name"] == "All steps but step 1, plus 10 random rows"
+    assert "all" in variants
+
+    rows = _effects_by_variant(ablation)
+    # Step 1's rows hurt the model, so adding them to the other steps' rows helps
+    assert rows["all_but_1"]["delta_added"] > 5
+    assert rows["all_but_1"]["verdict"] == "helps"
+    assert rows["all_but_2"]["delta_added"] < -5
+    assert rows["all_but_2"]["verdict"] == "hurts"
+    assert rows["all_but_3"]["verdict"] == "inconclusive"
+    # The left-out variants are compared with the full table too, but not with a control of
+    # their own size
+    assert rows["all_but_1"]["delta_vs_full"] is not None
+    assert rows["all_but_1"]["delta_vs_control"] is None
+    assert rows["step_1"]["delta_added"] is None
+    assert rows["all_but_1"]["p_adj_added"] >= rows["all_but_1"]["p_added"]
+
+    # The control of a left-out variant always removes its rows
+    removed = ablation._resolve().removed["all_but_1"]
+    for r in range(5):
+        drawn = ablation._control_rows("control_all_but_1", r)
+        assert removed < drawn and len(drawn) == 30
+
+    html = ablation.get_tabular_report().as_raw_html()
+    assert "Leave one out" in html and "Variants" in html
+    assert "Δ is what the left-out step" in html
+
+
+def test_ablation_drop_all_but_each_redundant_step():
+    # Step 2's rows are a subset of step 1's
+    tbl = _TBL.with_columns(x2=pl.when(pl.col("rid") % 20 == 0).then(-1.0).otherwise(1.0))
+    validation = (
+        pb.Validate(data=tbl)
+        .col_vals_ge(columns="x", value=0)
+        .col_vals_ge(columns="x2", value=0)
+        .interrogate()
+    )
+    ablation = (
+        pb.Ablation(validation, evaluate=_evaluate, repeats=5).drop_each().drop_all_but_each()
+    )
+    ablation.run()
+    data = ablation.to_dict()
+
+    # Leaving out step 2 removes the rows of step 1, and leaving out step 1 removes the rows of
+    # step 2, so neither is evaluated again
+    assert data["same_as"] == {"all_but_2": "step_1", "all_but_1": "step_2"}
+    assert {run["variant"] for run in data["runs"]}.isdisjoint({"all_but_1", "all_but_2"})
+    # Leaving out step 2 removes as many rows as every step, so it has no control
+    assert "control_all_but_2" not in {v["id"] for v in data["variants"]}
+
+    rows = _effects_by_variant(ablation)
+    assert rows["step_1"]["verdict"] == "helps"
+    assert rows["step_2"]["verdict"] == "helps"
+    assert rows["all_but_1"]["verdict"] == "helps"
+    assert rows["all_but_2"]["delta_added"] == 0
+    assert rows["all_but_2"]["verdict"] == "redundant"
+    assert rows["all_but_2"]["mean"] == rows["step_1"]["mean"]
+
+    html = ablation.get_tabular_report().as_raw_html()
+    assert "redundant" in html
+    assert "Step 1" in html
+
+
+def test_ablation_drop_all_but_each_without_control():
+    ablation = (
+        pb.Ablation(_validation(_TBL), evaluate=_evaluate, repeats=4, control=None)
+        .drop_each()
+        .drop_all_but_each()
+        .run()
+    )
+    ids = [v["id"] for v in ablation.to_dict()["variants"]]
+    assert not any(i.startswith("control_") for i in ids)
+
+    rows = _effects_by_variant(ablation)
+    # Without a control, the added effect is every step's rows compared with the other steps'
+    assert rows["all_but_1"]["delta_added"] == pytest.approx(
+        rows["all"]["mean"] - rows["all_but_1"]["mean"]
+    )
+    assert rows["all_but_1"]["verdict"] == "helps"
+    assert "only the other steps" in ablation.get_tabular_report().as_raw_html()
+
+
+def test_ablation_drop_all_but_each_with_steps():
+    ablation = pb.Ablation(_validation(_TBL), evaluate=_evaluate, repeats=3).drop_all_but_each(
+        steps=[2, 1]
+    )
+    ids = [v["id"] for v in ablation.run().to_dict()["variants"]]
+    assert ids[:4] == ["full", "all_1_2", "all_but_1_of_1_2", "all_but_2_of_1_2"]
+    names = {v["id"]: v["name"] for v in ablation.to_dict()["variants"]}
+    assert names["all_but_2_of_1_2"] == "Steps 1, 2 but step 2"
+
+    with pytest.raises(ValueError, match="at least two steps"):
+        pb.Ablation(_validation(_TBL), evaluate=_evaluate).drop_all_but_each(steps=[1])
+    validation = pb.Validate(data=_TBL).col_vals_ge(columns="x", value=0).interrogate()
+    with pytest.raises(ValueError, match="at least two steps"):
+        pb.Ablation(validation, evaluate=_evaluate).drop_all_but_each()
+
+
+def test_ablation_drop_all_but_each_left_out_step_without_rows():
+    # Only step 1's rows fail, so leaving it out removes no rows
+    tbl = _TBL.with_columns(y=pl.col("y").fill_null(0.0), g=pl.lit("plain"))
+    validation = (
+        pb.Validate(data=tbl)
+        .col_vals_ge(columns="x", value=0)
+        .col_vals_not_null(columns="y")
+        .interrogate()
+    )
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).drop_all_but_each()
+    ablation.run()
+    data = ablation.to_dict()
+
+    # Leaving out step 1 is the same as the full table, and leaving out step 2 is the same as
+    # removing every step's rows
+    assert data["same_as"] == {"all_but_1": "full", "all_but_2": "all"}
+    rows = _effects_by_variant(ablation)
+    assert rows["all_but_1"]["n_removed"] == 0
+    assert rows["all_but_1"]["delta_added"] > 5
+    # The note about `all_but_2` names the variant it's the same as
+    html = ablation.get_tabular_report().as_raw_html()
+    assert "Same rows as Full table, so it isn't evaluated again" in html
+    assert "Same rows as All steps, so it isn't evaluated again" in html
+
+
+@pytest.mark.parametrize("tbl_type", _TBL_TYPES)
+def test_ablation_drop_groups(tbl_type):
+    tbl = _tbl(tbl_type)
+    ablation = pb.Ablation(_validation(tbl), evaluate=_evaluate, repeats=3).drop_groups("g")
+    ablation.run()
+    variants = {v["id"]: v for v in ablation.to_dict()["variants"]}
+
+    assert variants["g=gold"]["name"] == "g = gold"
+    assert variants["g=gold"]["group"] == "gold"
+    assert variants["g=gold"]["group_column"] == "g"
+    assert variants["g=gold"]["n_removed"] == 10
+    # The 'plain' group has 90 of the 100 rows, more than `max_removed=` allows without a warning
+    # (the warning is given when the ablation is first resolved, here by `run()`)
+    assert variants["g=plain"]["n_removed"] == 90
+
+    rows = _effects_by_variant(ablation)
+    assert rows["g=gold"]["verdict"] == "hurts"
+    assert rows["g=gold"]["steps"] == []
+
+
+def test_ablation_drop_groups_values():
+    tbl = _TBL.with_columns(
+        src=pl.when(pl.col("rid") < 30)
+        .then(pl.lit("web"))
+        .when(pl.col("rid") < 60)
+        .then(pl.lit("app"))
+        .otherwise(None)
+    )
+    validation = pb.Validate(data=tbl).col_vals_ge(columns="x", value=0).interrogate()
+
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).drop_groups("src")
+    variants = [(v["id"], v["name"], v["n_removed"]) for v in ablation.run().to_dict()["variants"]]
+    # The values are sorted, with the missing values last
+    assert variants[1:4] == [
+        ("src=app", "src = app", 30),
+        ("src=web", "src = web", 30),
+        ("src=null", "src is missing", 40),
+    ]
+
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).drop_groups(
+        "src", values=[None, "web"]
+    )
+    ids = [v["id"] for v in ablation.run().to_dict()["variants"]]
+    assert ids[1:3] == ["src=null", "src=web"]
+
+    # A value that isn't in the column removes no rows
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).drop_groups(
+        "src", values="mail"
+    )
+    with pytest.raises(ValueError, match="None of the variants remove any rows"):
+        ablation.run()
+    assert ablation._resolve().notes == ["src = mail isn't used: it removes no rows."]
+
+    # Integer groups
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).drop_groups(
+        "rid", values=[0, 1]
+    )
+    assert [v["group"] for v in ablation.run().to_dict()["variants"][1:3]] == [0, 1]
+
+
+def test_ablation_drop_groups_errors():
+    ablation = pb.Ablation(_validation(_TBL), evaluate=_evaluate)
+    with pytest.raises(TypeError, match="must be a column name"):
+        ablation.drop_groups(["g"])
+    with pytest.raises(ValueError, match="isn't in the table"):
+        ablation.drop_groups("nope")
+    with pytest.raises(ValueError, match="more than 50"):
+        ablation.drop_groups("rid")
+    with pytest.raises(ValueError, match="at least one value"):
+        ablation.drop_groups("g", values=[])
+    with pytest.raises(TypeError, match="must be single values"):
+        ablation.drop_groups("g", values=[["gold"]])
+
+    tbl = pl.DataFrame({"x": [1.0, -1.0, 2.0], "tags": [["a"], ["b"], ["a"]]})
+    validation = pb.Validate(data=tbl).col_vals_ge(columns="x", value=0).interrogate()
+    with pytest.raises(TypeError, match="can't be grouped by the column 'tags'"):
+        pb.Ablation(validation, evaluate=_evaluate).drop_groups("tags")
+
+
+# ----------------------------------------------------------------------------------------------
+# Stratified controls
+# ----------------------------------------------------------------------------------------------
+
+
+def test_allocate():
+    from pointblank.ablation import _allocate
+
+    assert _allocate(10, [50, 30, 20]) == [5, 3, 2]
+    assert _allocate(13, [200, 100]) == [9, 4]
+    # The largest remainders get the extra rows, then the first groups
+    assert _allocate(2, [1, 1, 1]) == [1, 1, 0]
+    assert _allocate(5, [10, 0, 10]) == [3, 0, 2]
+    assert _allocate(0, [3, 4]) == [0, 0]
+    assert _allocate(3, [0, 0]) == [0, 0]
+    assert sum(_allocate(7, [13, 29, 1, 57])) == 7
+
+
+def test_stratified():
+    from pointblank.ablation import Stratified
+
+    assert pb.ablation.Stratified is Stratified
+    assert Stratified("g").by == ("g",)
+    assert Stratified(by=["g", "y"]).by == ("g", "y")
+    assert repr(Stratified("g")) == "Stratified(by='g')"
+    assert repr(Stratified(["g", "y"])) == "Stratified(by=['g', 'y'])"
+    assert Stratified("g") == Stratified(["g"])
+
+    for by in ([], "", 1, ["g", 2], None):
+        with pytest.raises(TypeError, match="must be a column name or a list"):
+            Stratified(by)
+    with pytest.raises(ValueError, match="must be different"):
+        Stratified(["g", "g"])
+    with pytest.raises(ValueError, match="columns aren't in the table: 'nope'"):
+        pb.Ablation(_validation(_TBL), evaluate=_evaluate, control=Stratified(["g", "nope"]))
+
+
+@pytest.mark.parametrize("tbl_type", _TBL_TYPES)
+def test_ablation_stratified_control(tbl_type):
+    from pointblank.ablation import Stratified
+
+    tbl = _tbl(tbl_type)
+    ablation = pb.Ablation(
+        _validation(tbl), evaluate=_evaluate, repeats=3, control=Stratified("g")
+    ).drop_each(steps=[1, 3])
+    ablation.run()
+
+    # 10 of the 100 rows are 'gold', so a control of 10 rows always removes exactly one of them
+    gold = {k for k in range(_N) if k % 10 == 1}
+    for r in range(3):
+        drawn = ablation._control_rows("control_10", r)
+        assert len(drawn) == 10
+        assert len(drawn & gold) == 1
+    assert ablation.to_dict()["settings"]["control"] == {"stratified": ["g"]}
+    assert "stratified by g" in ablation.get_tabular_report().as_raw_html()
+    assert repr(ablation).endswith("control=Stratified(by='g'); run)")
+
+
+def test_ablation_stratified_control_draws():
+    from pointblank.ablation import Stratified
+
+    unstratified = pb.Ablation(_validation(_TBL), evaluate=_evaluate, repeats=3).drop_each(1)
+    stratified = pb.Ablation(
+        _validation(_TBL), evaluate=_evaluate, repeats=3, control=Stratified(["g", "y"])
+    ).drop_each(1)
+    two = pb.Ablation(
+        _validation(_TBL), evaluate=_evaluate, repeats=3, control=Stratified("g")
+    ).drop_each(1)
+    for ablation in (unstratified, stratified, two):
+        ablation._resolve()
+    # The draws of a stratified control differ from the unstratified ones, and depend on the
+    # columns, but each is reproducible
+    draws = [a._control_rows("control_10", 0) for a in (unstratified, stratified, two)]
+    assert len(set(draws)) == 3
+    assert stratified._control_rows("control_10", 0) == draws[1]
+
+    # Missing values are a group of their own
+    strata = stratified._strata_rows()
+    assert sum(len(s) for s in strata) == _N
+    assert sorted(k for s in strata for k in s) == list(range(_N))
+
+    # A left-out variant's control draws its random rows in proportion to the rows it keeps
+    ablation = pb.Ablation(
+        _validation(_TBL), evaluate=_evaluate, repeats=3, control=Stratified("g")
+    ).drop_all_but_each()
+    ablation._resolve()
+    removed = ablation._resolve().removed["all_but_1"]
+    drawn = ablation._control_rows("control_all_but_1", 0)
+    assert removed < drawn and len(drawn) == 30
+
+    tbl = pl.DataFrame({"x": [1.0, -1.0, 2.0, 3.0], "tags": [["a"], ["b"], ["a"], []]})
+    validation = pb.Validate(data=tbl).col_vals_ge(columns="x", value=0).interrogate()
+    ablation = pb.Ablation(
+        validation, evaluate=_evaluate, repeats=3, control=Stratified("tags")
+    ).drop_each()
+    with pytest.raises(TypeError, match="can't be grouped by the columns of the `Stratified`"):
+        ablation._control_rows("control_1", 0)
+
+
+# ----------------------------------------------------------------------------------------------
+# Running in parallel and the cache
+# ----------------------------------------------------------------------------------------------
+
+
+def test_ablation_run_in_threads():
+    def make():
+        return (
+            pb.Ablation(_validation(_TBL), evaluate=_evaluate, repeats=4)
+            .drop_each()
+            .drop_all_but_each()
+        )
+
+    sequential = make().run().to_dict()
+    threaded = make().run(max_workers=4).to_dict()
+    assert threaded == sequential
+    assert make().run(max_workers=1).to_dict() == sequential
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
+def test_ablation_run_in_processes(tbl_type):
+    tbl = _tbl(tbl_type)
+
+    def make():
+        return pb.Ablation(_validation(tbl), evaluate=_evaluate, repeats=3).drop_each()
+
+    assert make().run(max_workers=2, executor="process").to_dict() == make().run().to_dict()
+
+
+def test_ablation_run_argument_errors(tmp_path):
+    ablation = pb.Ablation(_validation(_TBL), evaluate=_evaluate, repeats=3).drop_each()
+    for max_workers in (0, -1, 1.5, "2"):
+        with pytest.raises(ValueError, match="`max_workers=` must be a positive integer"):
+            ablation.run(max_workers=max_workers)
+    with pytest.raises(ValueError, match="`executor=` must be one of 'thread', 'process'"):
+        ablation.run(executor="cluster")
+
+    # A process pool needs a function that can be pickled and a table that can be sent
+    lambda_ablation = pb.Ablation(
+        _validation(_TBL), evaluate=lambda train, *, seed: 1.0, repeats=3
+    ).drop_each()
+    with pytest.raises(TypeError, match="can be sent to another process"):
+        lambda_ablation.run(max_workers=2, executor="process")
+    # ... which isn't checked when the evaluations aren't made in parallel
+    lambda_ablation.run(executor="process")
+
+    ablation = pb.Ablation(_validation(_tbl("duckdb")), evaluate=_evaluate, repeats=3).drop_each()
+    with pytest.raises(ValueError, match="for Polars, pandas, and PyArrow tables"):
+        ablation.run(max_workers=2, executor="process")
+
+    no_evaluate = pb.Ablation(_validation(_TBL), repeats=3).drop_each()
+    with pytest.raises(ValueError, match="There's no `evaluate=` function"):
+        no_evaluate.run()
+
+
+def test_ablation_run_in_threads_errors(tmp_path):
+    calls = []
+
+    def evaluate(train, *, seed, variant):
+        calls.append(variant.id)
+        if variant.id == "step_2" and seed == 1:
+            raise RuntimeError("training failed")
+        return _evaluate(train, seed=seed, variant=variant)
+
+    ablation = pb.Ablation(
+        _validation(_TBL), evaluate=evaluate, repeats=3, cache=tmp_path / "cache"
+    ).drop_each()
+    with pytest.raises(RuntimeError, match="training failed"):
+        ablation.run(max_workers=2)
+    assert ablation._effects is None
+    n_cached = len(list((tmp_path / "cache").glob("*.json")))
+    assert 0 < n_cached < len(ablation._tasks())
+
+    # Running again only makes the evaluations that aren't in the cache
+    calls.clear()
+
+    def fixed(train, *, seed, variant):
+        calls.append(variant.id)
+        return _evaluate(train, seed=seed, variant=variant)
+
+    ablation.evaluate = fixed
+    ablation.run(max_workers=2)
+    assert len(calls) == len(ablation._tasks()) - n_cached
+    assert sum(run["cached"] for run in ablation.to_dict()["runs"]) == n_cached
+
+    # Bad results from a thread are checked as they are without threads
+    bad = pb.Ablation(
+        _validation(_TBL), evaluate=lambda train, *, seed: "high", repeats=3
+    ).drop_each()
+    with pytest.raises(TypeError, match="must return a number or a dictionary"):
+        bad.run(max_workers=2)
+
+
+def test_ablation_cache(tmp_path):
+    cache = tmp_path / "cache"
+    calls = []
+
+    def evaluate(train, *, seed, variant):
+        calls.append((variant.id, seed))
+        return {"score": _evaluate(train, seed=seed, variant=variant), "n": len(train)}
+
+    def make(**kwargs):
+        return pb.Ablation(
+            _validation(_TBL), evaluate=evaluate, metric="score", repeats=3, cache=cache, **kwargs
+        ).drop_each()
+
+    first = make().run()
+    n_tasks = len(first._tasks())
+    assert len(calls) == n_tasks
+    assert len(list(cache.glob("*.json"))) == n_tasks
+    assert not any(run["cached"] for run in first.to_dict()["runs"])
+    assert "from the cache" not in first.get_tabular_report().as_raw_html()
+
+    # A new ablation with the same data, versions, and seeds gets every result from the cache
+    calls.clear()
+    plan = make().plan().as_raw_html()
+    assert f"{n_tasks} of them are already in the cache" in plan
+    second = make().run()
+    assert calls == []
+    assert all(run["cached"] for run in second.to_dict()["runs"])
+    assert second.get_effects().equals(first.get_effects())
+    assert f"{n_tasks} of the {n_tasks} evaluations came from the cache" in (
+        second.get_tabular_report().as_raw_html()
+    )
+    # ... and so does a run in threads
+    third = make().run(max_workers=3)
+    assert calls == [] and third.get_effects().equals(first.get_effects())
+
+    # A different `evaluate_version=` doesn't use the results of another version
+    make(evaluate_version="v2").run()
+    assert len(calls) == n_tasks
+    assert len(list(cache.glob("*.json"))) == 2 * n_tasks
+
+    # A cache entry that can't be read is evaluated again and replaced
+    calls.clear()
+    entries = sorted(cache.glob("*.json"))
+    entries[0].write_text("not json")
+    entries[1].write_text(json.dumps({"result": "high"}))
+    make().run()
+    make(evaluate_version="v2").run()
+    assert len(calls) == 2
+    assert json.loads(entries[0].read_text())["result"] is not None
+
+    # A different seed or table isn't in the cache
+    calls.clear()
+    make(seed=1).run()
+    # The repeats with the seeds 1 and 2 are in the cache, except for the control: its rows are
+    # drawn for this ablation's repeats, so they're new
+    assert len(calls) == 4 + 3
+    calls.clear()
+    other = _TBL.with_columns(y=pl.col("y") * 2)
+    pb.Ablation(
+        _validation(other), evaluate=evaluate, metric="score", repeats=3, cache=cache
+    ).drop_each().run()
+    assert len(calls) == n_tasks
+
+
+def test_ablation_cache_shares_identical_versions(tmp_path):
+    calls = []
+
+    def evaluate(train, *, seed, variant):
+        calls.append(variant.id)
+        return _evaluate(train, seed=seed, variant=variant)
+
+    # Steps 1 and 4 fail the same rows, but their variants have different names
+    validation = (
+        pb.Validate(data=_TBL)
+        .col_vals_ge(columns="x", value=0)
+        .col_vals_gt(columns="x", value=-0.5)
+        .interrogate()
+    )
+    ablation = (
+        pb.Ablation(validation, evaluate=evaluate, repeats=3, cache=tmp_path, control=None)
+        .drop_steps(1, name="first")
+        .drop_steps(2, name="second")
+    )
+    ablation.run(max_workers=2)
+    # The second variant's evaluations are the same as the first's (same rows and seeds)
+    assert calls.count("first") + calls.count("second") == 3
+    runs = ablation.to_dict()["runs"]
+    assert sum(run["cached"] for run in runs) == 3
+
+
+def test_ablation_cache_errors(tmp_path):
+    with pytest.raises(TypeError, match="`cache=` must be the path of a directory"):
+        pb.Ablation(_validation(_TBL), evaluate=_evaluate, cache=1)
+    file = tmp_path / "file.txt"
+    file.write_text("x")
+    with pytest.raises(ValueError, match="`cache=` must be a directory"):
+        pb.Ablation(_validation(_TBL), evaluate=_evaluate, cache=file)
+    with pytest.raises(TypeError, match="`evaluate_version=` must be a string"):
+        pb.Ablation(_validation(_TBL), evaluate=_evaluate, evaluate_version=2)
+
+    ablation = pb.Ablation(
+        _validation(_TBL), evaluate=_evaluate, repeats=3, cache=str(tmp_path / "new" / "cache")
+    ).drop_each(1)
+    ablation.run()
+    assert len(list((tmp_path / "new" / "cache").glob("*.json"))) == 9
+    assert not list((tmp_path / "new" / "cache").glob("*.tmp"))
+
+
+def test_ablation_evaluate_version_in_report():
+    ablation = pb.Ablation(
+        _validation(_TBL), evaluate=_evaluate, repeats=3, evaluate_version="2024-06 (xgb 2.0)"
+    ).drop_each(1)
+    html = ablation.run().get_tabular_report().as_raw_html()
+    assert "Version of <code>evaluate</code>: 2024-06 (xgb 2.0)" in html
+    assert ablation.to_dict()["settings"]["evaluate_version"] == "2024-06 (xgb 2.0)"
+
+
+@pytest.mark.parametrize("tbl_type", _TBL_TYPES)
+def test_table_fingerprint(tbl_type):
+    from pointblank.ablation import _table_fingerprint
+
+    tbl = _tbl(tbl_type)
+    fingerprint = _table_fingerprint(tbl)
+    assert fingerprint == _table_fingerprint(tbl)
+    assert len(fingerprint) == 64
+    if tbl_type in ("polars", "lazy"):
+        # A lazy table has the fingerprint of the table it collects to
+        assert fingerprint == _table_fingerprint(_TBL)
+        assert fingerprint != _table_fingerprint(_TBL.with_columns(x=pl.col("x") + 1))
+        assert fingerprint != _table_fingerprint(_TBL.reverse())
+        assert fingerprint != _table_fingerprint(_TBL.rename({"y": "z"}))
+    if tbl_type == "pandas":
+        assert fingerprint != _table_fingerprint(tbl.assign(x=tbl["x"] + 1))
+        # The row labels don't matter
+        assert fingerprint == _table_fingerprint(tbl.set_axis(range(100, 200)))
+
+
+def test_table_fingerprint_unhashable_values():
+    from pointblank.ablation import _table_fingerprint
+
+    tbl = pd.DataFrame({"x": [1, 2], "tags": [["a"], ["b", "c"]]})
+    assert _table_fingerprint(tbl) == _table_fingerprint(tbl.copy())
+    assert _table_fingerprint(tbl) != _table_fingerprint(tbl.assign(tags=[["a"], ["b"]]))
+
+
+# ----------------------------------------------------------------------------------------------
+# Checking the evaluate function
+# ----------------------------------------------------------------------------------------------
+
+
+def test_ablation_check_determinism():
+    ablation = pb.Ablation(_validation(_TBL), evaluate=_evaluate)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        assert ablation.check_determinism() is True
+        assert ablation.check_determinism(seed=12) is True
+
+    state = {"calls": 0}
+
+    def noisy(train, *, seed):
+        state["calls"] += 1
+        return {"score": float(state["calls"]), "n": 1.0}
+
+    ablation = pb.Ablation(_validation(_TBL), evaluate=noisy, metric="score")
+    with pytest.warns(
+        UserWarning, match=r"isn't deterministic: .* the seed 0 twice.*\(score: 1.0 and 2.0\)"
+    ):
+        assert ablation.check_determinism() is False
+    # A difference within the tolerance counts as the same
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        assert ablation.check_determinism(tolerance=1.5) is True
+
+    # Rounding differences count as the same, even without a tolerance
+    def rounding(train, *, seed):
+        state["calls"] += 1
+        return 9.155649164204585 if state["calls"] % 2 else 9.155649164204583
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        assert pb.Ablation(_validation(_TBL), evaluate=rounding).check_determinism() is True
+
+    def changing_metrics(train, *, seed):
+        state["calls"] += 1
+        return {f"m{state['calls']}": 1.0}
+
+    state["calls"] = 0
+    ablation = pb.Ablation(_validation(_TBL), evaluate=changing_metrics, metric="m1")
+    with pytest.warns(UserWarning, match="the first time and"):
+        assert ablation.check_determinism() is False
+
+    ablation = pb.Ablation(_validation(_TBL), evaluate=_evaluate)
+    with pytest.raises(TypeError, match="`seed=` must be an integer"):
+        ablation.check_determinism(seed="1")
+    for tolerance in (-1, "0", None):
+        with pytest.raises(ValueError, match="`tolerance=` must be a number"):
+            ablation.check_determinism(tolerance=tolerance)
+    with pytest.raises(ValueError, match="There's no `evaluate=` function to check"):
+        pb.Ablation(_validation(_TBL)).check_determinism()
+    with pytest.raises(TypeError, match="must return a number"):
+        pb.Ablation(_validation(_TBL), evaluate=lambda train, *, seed: None).check_determinism()
+
+
+# ----------------------------------------------------------------------------------------------
+# Exporting and loading results
+# ----------------------------------------------------------------------------------------------
+
+
+def _score_exported(directory, metric="score", format="parquet"):
+    """Evaluate each exported version of the table, as an external process would."""
+    manifest = json.loads((directory / "manifest.json").read_text())
+    rows = []
+    for run in manifest["runs"]:
+        if format == "parquet":
+            table = pl.read_parquet(directory / run["file"])
+        else:
+            payload = json.loads((directory / run["file"]).read_text())
+            assert payload["n_rows"] == _N
+            table = _TBL.filter(~pl.col("rid").is_in(payload["removed"]))
+        rows.append(
+            {
+                "variant": run["variant"],
+                "repeat": run["repeat"],
+                "seed": run["seed"],
+                metric: _evaluate(table, seed=run["seed"], variant=None),
+            }
+        )
+    return pl.DataFrame(rows)
+
+
+@pytest.mark.parametrize("tbl_type", _TBL_TYPES)
+@pytest.mark.parametrize("format", ["parquet", "indices"])
+def test_ablation_export_and_load_results(tmp_path, tbl_type, format):
+    tbl = _tbl(tbl_type)
+
+    def make(evaluate=None):
+        return (
+            pb.Ablation(_validation(tbl), evaluate=evaluate, repeats=3, label="v1")
+            .drop_each()
+            .drop_all_but_each()
+        )
+
+    directory = make().export(tmp_path / "export", format=format)
+    assert directory == tmp_path / "export"
+    results = _score_exported(directory, format=format)
+    results.write_csv(directory / "results.csv")
+
+    loaded = make().load_results(directory)
+    expected = make(evaluate=_evaluate).run()
+    assert loaded.get_effects().equals(expected.get_effects())
+    assert "read with <code>load_results()</code>" in loaded.get_tabular_report().as_raw_html()
+    assert loaded.to_dict()["runs"] == expected.to_dict()["runs"]
+
+
+def test_ablation_export_contents(tmp_path):
+    ablation = (
+        pb.Ablation(_validation(_TBL), metric="mae", higher_is_better=False, repeats=3, seed=7)
+        .drop_each()
+        .drop_steps(1, name="Bad X/rows")
+    )
+    directory = ablation.export(str(tmp_path))
+    assert isinstance(directory, type(tmp_path))
+
+    manifest = json.loads((directory / "manifest.json").read_text())
+    assert manifest["format"] == "pointblank-ablation"
+    assert manifest["format_version"] == 1
+    assert manifest["pointblank_version"] == pb.__version__
+    assert manifest["table_format"] == "parquet"
+    assert set(manifest["fingerprints"]) == {"data", "plan"}
+    assert manifest["settings"]["metric"] == "mae"
+    assert manifest["settings"]["seed"] == 7
+    assert manifest["results"] == {
+        "file": "results.csv",
+        "template": "results_template.csv",
+        "columns": ["variant", "repeat", "seed", "mae"],
+    }
+    assert "Bad X/rows isn't used: it removes the same rows as Step 1." in manifest["notes"]
+    assert [v["id"] for v in manifest["variants"]] == [
+        "full",
+        "step_1",
+        "step_2",
+        "step_3",
+        "control_10",
+    ]
+
+    # Each variant is one file for all of its repeats, and each repeat of a control has its own
+    runs = manifest["runs"]
+    assert len(runs) == 15
+    assert runs[0] == {"variant": "full", "repeat": 0, "seed": 7, "file": "tables/full.parquet"}
+    assert {run["file"] for run in runs if run["variant"] == "step_1"} == {"tables/step_1.parquet"}
+    assert [run["file"] for run in runs if run["variant"] == "control_10"] == [
+        "tables/control_10_r0.parquet",
+        "tables/control_10_r1.parquet",
+        "tables/control_10_r2.parquet",
+    ]
+    assert sorted(p.name for p in (directory / "tables").iterdir()) == [
+        "control_10_r0.parquet",
+        "control_10_r1.parquet",
+        "control_10_r2.parquet",
+        "full.parquet",
+        "step_1.parquet",
+        "step_2.parquet",
+        "step_3.parquet",
+    ]
+    assert pl.read_parquet(directory / "tables" / "step_1.parquet").height == 90
+    assert pl.read_parquet(directory / "tables" / "full.parquet").equals(_TBL)
+
+    template = pl.read_csv(directory / "results_template.csv")
+    assert template.columns == ["variant", "repeat", "seed", "mae"]
+    assert template.height == 15
+    assert template["mae"].null_count() == 15
+    assert template.row(0) == ("full", 0, 7, None)
+
+    # An export doesn't overwrite another one unless asked to
+    with pytest.raises(FileExistsError, match="already an exported ablation"):
+        ablation.export(directory)
+    ablation.export(directory, format="indices", overwrite=True)
+    manifest = json.loads((directory / "manifest.json").read_text())
+    assert manifest["table_format"] == "indices"
+    payload = json.loads((directory / "tables" / "step_1.json").read_text())
+    assert payload == {
+        "variant": "step_1",
+        "repeats": [0, 1, 2],
+        "n_rows": 100,
+        "removed": list(range(0, 100, 10)),
+    }
+    control = json.loads((directory / "tables" / "control_10_r1.json").read_text())
+    assert control["repeats"] == [1]
+    assert sorted(control["removed"]) == sorted(ablation._control_rows("control_10", 1))
+
+
+def test_ablation_export_file_names(tmp_path):
+    from pointblank.ablation import _unique_slugs
+
+    assert _unique_slugs(["full", "a/b", "a b", "A_B", "..", "g=x"]) == {
+        "full": "full",
+        "a/b": "a_b",
+        "a b": "a_b_2",
+        "A_B": "A_B_3",
+        "..": "variant",
+        "g=x": "g_x",
+    }
+
+    tbl = _TBL.with_columns(
+        src=pl.when(pl.col("rid") < 50).then(pl.lit("Web")).otherwise(pl.lit("web"))
+    )
+    validation = pb.Validate(data=tbl).col_vals_ge(columns="x", value=0).interrogate()
+    ablation = pb.Ablation(validation, repeats=3, control=None).drop_groups("src")
+    directory = ablation.export(tmp_path)
+    files = sorted(p.name for p in (directory / "tables").iterdir())
+    assert files == ["full.parquet", "src_Web.parquet", "src_web_2.parquet"]
+
+
+def test_ablation_export_errors(tmp_path):
+    ablation = pb.Ablation(_validation(_TBL), repeats=3)
+    with pytest.raises(ValueError, match="There are no variants to evaluate"):
+        ablation.export(tmp_path)
+    ablation.drop_each()
+    with pytest.raises(ValueError, match="`format=` must be one of 'parquet', 'indices'"):
+        ablation.export(tmp_path, format="csv")
+    with pytest.raises(TypeError, match="`path=` must be the path of a directory"):
+        ablation.export(1)
+
+
+def test_ablation_load_results_sources(tmp_path):
+    def make():
+        return pb.Ablation(_validation(_TBL), metric="score", repeats=3).drop_each(steps=[1, 2])
+
+    directory = make().export(tmp_path / "export")
+    results = _score_exported(directory)
+    expected = pb.Ablation(_validation(_TBL), evaluate=_evaluate, repeats=3).drop_each(steps=[1, 2])
+    expected = expected.run().get_effects()
+
+    # A table (Polars, pandas, or lazy), with or without a `repeat` column
+    assert make().load_results(results).get_effects().equals(expected)
+    assert make().load_results(results.to_pandas()).get_effects().equals(expected)
+    assert make().load_results(results.drop("repeat").lazy()).get_effects().equals(expected)
+    # A CSV file anywhere, with the columns in any order, and the manifest given
+    results.select("score", "seed", "variant").write_csv(tmp_path / "scores.csv")
+    loaded = make().load_results(tmp_path / "scores.csv", manifest=directory)
+    assert loaded.get_effects().equals(expected)
+    loaded = make().load_results(str(tmp_path / "scores.csv"), manifest=directory / "manifest.json")
+    assert loaded.get_effects().equals(expected)
+    # Missing values written in other ways and a byte-order mark
+    text = (tmp_path / "scores.csv").read_text()
+    (tmp_path / "bom.csv").write_text("﻿" + text, encoding="utf-8")
+    assert make().load_results(tmp_path / "bom.csv").get_effects().equals(expected)
+
+    # Several metrics
+    two = results.with_columns(n=pl.lit(1.0))
+    ablation = pb.Ablation(_validation(_TBL), metric="score", repeats=3).drop_each(steps=[1, 2])
+    assert ablation.load_results(two).get_effects()["metric"].unique().sort().to_list() == [
+        "n",
+        "score",
+    ]
+    ablation = pb.Ablation(_validation(_TBL), repeats=3).drop_each(steps=[1, 2])
+    with pytest.raises(ValueError, match="The results have several metrics"):
+        ablation.load_results(two)
+    ablation = pb.Ablation(_validation(_TBL), metric="auc", repeats=3).drop_each(steps=[1, 2])
+    with pytest.raises(ValueError, match="The results don't have the metric 'auc'"):
+        ablation.load_results(results)
+
+    # Loading results replaces those of a run, and a run replaces loaded results
+    ablation = pb.Ablation(_validation(_TBL), evaluate=_evaluate, repeats=3).drop_each(steps=[1, 2])
+    ablation.load_results(results)
+    assert ablation._loaded
+    ablation.run()
+    assert not ablation._loaded
+    assert "load_results" not in ablation.get_tabular_report().as_raw_html()
+
+
+def test_ablation_load_results_checks_manifest(tmp_path):
+    directory = (
+        pb.Ablation(_validation(_TBL), metric="score", repeats=3).drop_each().export(tmp_path)
+    )
+    results = _score_exported(directory)
+    results.write_csv(directory / "results.csv")
+
+    # Different data
+    other = _validation(_TBL.with_columns(y=pl.col("y") + 1))
+    with pytest.raises(ValueError, match="The results are for different data"):
+        pb.Ablation(other, metric="score", repeats=3).drop_each().load_results(directory)
+    # A different plan
+    for kwargs in ({"repeats": 3, "seed": 1}, {"repeats": 3, "control": None}):
+        ablation = pb.Ablation(_validation(_TBL), metric="score", **kwargs).drop_each()
+        with pytest.raises(ValueError, match="The results are for a different plan"):
+            ablation.load_results(directory)
+    ablation = pb.Ablation(_validation(_TBL), metric="score", repeats=3).drop_each(steps=[1, 2])
+    with pytest.raises(ValueError, match="The results are for a different plan"):
+        ablation.load_results(directory)
+    # ... which the results themselves may not show, without the manifest
+    with pytest.raises(ValueError, match="isn't one of the evaluations"):
+        ablation.load_results(results)
+
+    # Settings that don't change the evaluations can be different
+    ablation = pb.Ablation(
+        _validation(_TBL), metric="score", repeats=3, conf_level=0.9, label="other"
+    ).drop_each()
+    ablation.load_results(directory)
+
+    bad = tmp_path / "bad"
+    bad.mkdir()
+    (bad / "manifest.json").write_text("{")
+    with pytest.raises(ValueError, match="isn't a valid manifest"):
+        ablation.load_results(results, manifest=bad)
+    (bad / "manifest.json").write_text('{"format": "other"}')
+    with pytest.raises(ValueError, match="isn't a manifest written by `Ablation.export\\(\\)`"):
+        ablation.load_results(results, manifest=bad / "manifest.json")
+    with pytest.raises(FileNotFoundError, match="There's no manifest"):
+        ablation.load_results(results, manifest=tmp_path / "nowhere")
+    with pytest.raises(TypeError, match="`manifest=` must be the path"):
+        ablation.load_results(results, manifest=1)
+
+
+def test_ablation_load_results_errors(tmp_path):
+    def make():
+        return pb.Ablation(_validation(_TBL), metric="score", repeats=3).drop_each(steps=1)
+
+    directory = make().export(tmp_path / "export")
+    results = _score_exported(directory)
+    n = results.height
+
+    def check(frame, match, error=ValueError):
+        with pytest.raises(error, match=match):
+            make().load_results(frame)
+
+    check(results.drop("variant"), "The results have no 'variant' column")
+    check(results.drop("seed"), "The results have no 'seed' column")
+    check(results.select("variant", "seed"), "The results have no metrics")
+    check(
+        results.with_columns(variant=pl.when(pl.int_range(n) == 2).then(None).otherwise("variant")),
+        "Row 3 of the results has no variant",
+    )
+    check(
+        results.with_columns(seed=pl.lit("x")),
+        "Row 1 of the results has the seed 'x', which isn't an integer",
+    )
+    check(
+        results.with_columns(seed=pl.col("seed") + 0.5),
+        "Row 1 of the results has the seed 0.5, which isn't an integer",
+    )
+    check(
+        results.with_columns(variant=pl.lit("step_9")),
+        "Row 1 of the results is for 'step_9' with the seed 0, which isn't one",
+    )
+    check(
+        pl.concat([results, results.head(1)]),
+        "more than one row for 'full' with the seed 0",
+    )
+    check(
+        results.with_columns(repeat=pl.col("repeat") + 1),
+        "Row 1 of the results has the repeat 1, but the seed 0 is for repeat 0",
+    )
+    check(
+        results.with_columns(score=pl.when(pl.int_range(n) == 4).then(None).otherwise("score")),
+        "Row 5 of the results has no value for 'score'",
+    )
+    check(
+        results.with_columns(
+            score=pl.when(pl.int_range(n) == 0).then(float("inf")).otherwise("score")
+        ),
+        "Row 1 of the results has inf for 'score'",
+    )
+    check(
+        results.with_columns(score=pl.lit("high")),
+        "The results have 'high' as a metric, which isn't a number",
+    )
+    check(results.head(2), "missing 7 of the 9 evaluations: 'full' \\(seed 2\\), 'step_1'")
+    check(
+        results.head(0),
+        "missing 9 of the 9 evaluations: .*, and 4 more\\.",
+    )
+    check(42, "`results=` must be the path of a CSV file", error=TypeError)
+    check(tmp_path / "nowhere.csv", "There's no file of results", error=FileNotFoundError)
+    check(tmp_path, "There's no file of results", error=FileNotFoundError)
+
+    # Values in a CSV file: missing values written as text, and integers written as floats
+    csv_results = results.with_columns(seed=pl.col("seed").cast(pl.Float64)).with_columns(
+        score=pl.when(pl.int_range(n) == 1)
+        .then(pl.lit("NA"))
+        .otherwise(pl.col("score").cast(pl.String))
+    )
+    csv_results.write_csv(tmp_path / "results.csv")
+    check(tmp_path, "Row 2 of the results has no value for 'score'")
+
+
+def test_parse_values():
+    from pointblank.ablation import _parse_float, _parse_int
+
+    assert _parse_int(3, "x") == 3
+    assert _parse_int("3", "x") == 3
+    assert _parse_int(" 3.0 ", "x") == 3
+    assert _parse_int(3.0, "x") == 3
+    with pytest.raises(ValueError, match="x None, which isn't an integer"):
+        _parse_int(None, "x")
+    with pytest.raises(ValueError, match="isn't an integer"):
+        _parse_int(float("nan"), "x")
+
+    assert _parse_float(None) is None
+    assert _parse_float(" 1.5 ") == 1.5
+    for missing in ("", "NA", "nan", "NULL", "None", float("nan"), pd.NA):
+        assert _parse_float(missing) is None
+    assert _parse_float(2) == 2.0
+    with pytest.raises(ValueError, match="isn't a number"):
+        _parse_float([1])
+
+
+# ----------------------------------------------------------------------------------------------
+# Notes in the validation
+# ----------------------------------------------------------------------------------------------
+
+
+def test_ablation_annotate():
+    validation = _validation(_TBL)
+    ablation = (
+        pb.Ablation(validation, evaluate=_evaluate, repeats=5).drop_each().drop_all_but_each()
+    )
+    with pytest.raises(ValueError, match="There are no results yet"):
+        ablation.annotate()
+    ablation.run()
+
+    assert ablation.annotate() is validation
+    notes = {step.i: step.notes for step in validation.validation_info}
+    assert set(notes[1]) == {"ablation"}
+    text = notes[1]["ablation"]["text"]
+    assert text.startswith("Ablation (score, higher is better): removing the 10 rows that failed")
+    assert "compared with removing as many random rows: helps" in text
+    assert "on top of steps 2, 3, this step's rows change it by" in text
+    assert notes[1]["ablation"]["markdown"].count("**helps**") == 2
+    assert "hurts" in notes[2]["ablation"]["text"]
+    assert notes[4] is None or "ablation" not in notes[4]
+
+    # The notes appear in the validation's report
+    assert (
+        "removing the 10 rows that failed this step"
+        in validation.get_tabular_report().as_raw_html()
+    )
+
+    # Annotating again replaces the notes
+    ablation.annotate()
+    assert set(validation.validation_info[0].notes) == {"ablation"}
+
+
+def test_ablation_annotate_other_validation():
+    ablation = pb.Ablation(
+        _validation(_TBL), evaluate=_evaluate, repeats=3, control=None
+    ).drop_each(steps=[1, 2])
+    ablation.drop_groups("g", values="gold").run()
+
+    newer = _validation(_TBL.head(50))
+    assert ablation.annotate(newer) is newer
+    text = newer.validation_info[0].notes["ablation"]["text"]
+    assert "compared with the full table" in text
+    # Steps without a variant of their own (and groups) have no note
+    assert newer.validation_info[2].notes is None or "ablation" not in (
+        newer.validation_info[2].notes
+    )
+
+    different = (
+        pb.Validate(data=_TBL)
+        .col_vals_ge(columns="x", value=0)
+        .col_vals_ne(columns="y", value=0)
+        .interrogate()
+    )
+    with pytest.raises(ValueError, match="its step 2 isn't a `col_vals_ne\\(\\)` step of the same"):
+        ablation.annotate(different)
+    with pytest.raises(TypeError, match="`validation=` must be a `Validate` object"):
+        ablation.annotate("validation")
+
+
+# ----------------------------------------------------------------------------------------------
+# YAML
+# ----------------------------------------------------------------------------------------------
+
+_YAML_ABLATION = """
+tbl: small_table
+tbl_name: training
+steps:
+- col_vals_ge:
+    columns: x
+    value: 0
+- col_vals_ne:
+    columns: g
+    value: gold
+- col_vals_not_null:
+    columns: y
+ablation:
+  metric: score
+  repeats: 3
+  seed: 2
+  label: YAML ablation
+  evaluate_version: v1
+  control:
+    stratified: g
+  strategies:
+    - drop_each
+    - drop_all_but_each:
+        steps: [1, 2]
+    - drop_steps:
+        steps: [1, 3]
+        name: x and y
+    - drop_groups:
+        column: g
+        values: gold
+"""
+
+
+def test_yaml_ablation():
+    ablation = pb.yaml_ablation(_YAML_ABLATION, evaluate=_evaluate, set_tbl=_TBL)
+    assert isinstance(ablation, pb.Ablation)
+    assert ablation._effects is None
+    assert ablation.validation.tbl_name == "training"
+    assert (ablation.metric, ablation.repeats, ablation.seed) == ("score", 3, 2)
+    assert ablation.label == "YAML ablation"
+    assert ablation.evaluate_version == "v1"
+    assert ablation.control == pb.ablation.Stratified("g")
+
+    expected = (
+        pb.Ablation(
+            _validation(_TBL),
+            evaluate=_evaluate,
+            metric="score",
+            repeats=3,
+            seed=2,
+            control=pb.ablation.Stratified("g"),
+        )
+        .drop_each()
+        .drop_all_but_each(steps=[1, 2])
+        .drop_steps([1, 3], name="x and y")
+        .drop_groups("g", values="gold")
+    )
+    assert ablation.run().get_effects().equals(expected.run().get_effects())
+
+    # The block is ignored when interrogating, and is valid YAML for `validate_yaml()`
+    validation = pb.yaml_interrogate(_YAML_ABLATION, set_tbl=_TBL)
+    assert validation.n_failed() == {1: 10, 2: 10, 3: 10}
+    pb.validate_yaml(_YAML_ABLATION)
+
+
+def test_yaml_ablation_settings():
+    config = """
+tbl: small_table
+steps:
+- col_vals_ge:
+    columns: x
+    value: 0
+ablation:
+  higher_is_better: false
+  control: null
+  duplicates: keep_last
+  max_removed: 0.25
+  conf_level: 0.9
+  adjust: null
+  strategies: [drop_each]
+"""
+    ablation = pb.yaml_ablation(config, evaluate=_evaluate, set_tbl=_TBL)
+    assert ablation.higher_is_better is False
+    assert ablation.control is None
+    assert ablation.duplicates == "keep_last"
+    assert (ablation.max_removed, ablation.conf_level, ablation.adjust) == (0.25, 0.9, None)
+    assert ablation.repeats == 5
+    assert [spec.id for spec in ablation._specs] == ["step_1"]
+
+    # Without strategies, the ablation has no variants yet
+    config = "tbl: small_table\nsteps:\n- rows_distinct\nablation:\n  repeats: 3\n"
+    ablation = pb.yaml_ablation(config, evaluate=_evaluate, set_tbl=_TBL)
+    assert ablation._specs == []
+    ablation.drop_each()
+    # A `size_matched` control written out
+    config = config.replace("repeats: 3", "control: size_matched")
+    assert pb.yaml_ablation(config, set_tbl=_TBL).control == "size_matched"
+
+
+def test_yaml_ablation_evaluate_from_config(tmp_path, monkeypatch):
+    (tmp_path / "ablation_models.py").write_text(
+        "from tests.test_ablation import _evaluate\n"
+        "class Models:\n"
+        "    evaluate = staticmethod(_evaluate)\n"
+        "not_a_function = 3\n"
+    )
+    monkeypatch.syspath_prepend(str(tmp_path))
+    from tests.test_ablation import _evaluate as evaluate
+
+    config = _YAML_ABLATION.replace(
+        "  metric: score", "  evaluate: ablation_models:_evaluate\n  metric: score"
+    )
+
+    # The function is Python code, so it's only imported with `allow_python=True`
+    with pytest.raises(pb.yaml.YAMLValidationError, match="is Python code, which isn't run"):
+        pb.yaml_ablation(config, set_tbl=_TBL)
+    assert pb.yaml_ablation(config, set_tbl=_TBL, allow_python=True).evaluate is evaluate
+    # ... unless `evaluate=` is given instead
+    other = pb.yaml_ablation(config, set_tbl=_TBL, evaluate=_evaluate)
+    assert other.evaluate is _evaluate
+    # `yaml_interrogate()` ignores it
+    pb.yaml_interrogate(config, set_tbl=_TBL)
+
+    nested = config.replace("ablation_models:_evaluate", "ablation_models:Models.evaluate")
+    assert pb.yaml_ablation(nested, set_tbl=_TBL, allow_python=True).evaluate is evaluate
+
+    for path, match in (
+        ("no_such_module_xyz:f", "can't be imported"),
+        ("ablation_models:nope", "has no 'nope'"),
+        ("ablation_models:not_a_function", "must be a function, got int"),
+    ):
+        bad = config.replace("ablation_models:_evaluate", path)
+        with pytest.raises(pb.yaml.YAMLValidationError, match=match):
+            pb.yaml_ablation(bad, set_tbl=_TBL, allow_python=True)
+
+    # A `python:` block
+    block = _YAML_ABLATION.replace(
+        "  metric: score",
+        "  evaluate:\n    python: |\n      lambda train, *, seed: float(len(train)) + seed\n"
+        "  metric: score",
+    )
+    with pytest.raises(pb.yaml.YAMLValidationError, match="a `python:` block"):
+        pb.yaml_ablation(block, set_tbl=_TBL)
+    ablation = pb.yaml_ablation(block, set_tbl=_TBL, allow_python=True)
+    assert ablation.evaluate(_TBL, seed=1) == 101.0
+
+
+@pytest.mark.parametrize(
+    "block, match",
+    [
+        ("  repeats: 3\n  bogus: 1\n", "Unknown key\\(s\\) in 'ablation': \\['bogus'\\]"),
+        ("  - drop_each\n", "'ablation' must be a mapping"),
+        ("  strategies: drop_each\n", "must be a list of strategies"),
+        ("  strategies: [drop_rows]\n", "Unknown ablation strategy 'drop_rows'"),
+        ("  strategies:\n  - drop_each: [1]\n", "parameters of the `drop_each` strategy must be"),
+        ("  strategies:\n  - drop_groups: {}\n", "`drop_groups` strategy needs the parameter"),
+        (
+            "  strategies:\n  - drop_steps:\n      name: a\n",
+            "needs the parameter\\(s\\) \\['steps'\\]",
+        ),
+        ("  strategies:\n  - drop_each:\n      step: 1\n", "Unknown parameter\\(s\\) \\['step'\\]"),
+        ("  strategies:\n  - {drop_each: null, drop_all: null}\n", "a mapping of one name"),
+        ("  control: random\n", "'ablation.control' must be `size_matched`"),
+        ("  control:\n    by: g\n", "'ablation.control' must be `size_matched`"),
+        ("  evaluate: models.evaluate\n", "must be the import path of a function"),
+        ("  evaluate: 3\n", "must be the import path of a function"),
+        ("  evaluate:\n    code: x\n", "must be the import path of a function"),
+    ],
+)
+def test_yaml_ablation_block_errors(block, match):
+    config = "tbl: small_table\nsteps:\n- rows_distinct\nablation:\n" + block
+    with pytest.raises(pb.yaml.YAMLValidationError, match=match):
+        pb.yaml_ablation(config, evaluate=_evaluate)
+    # The block is checked whenever the config is loaded
+    with pytest.raises(pb.yaml.YAMLValidationError, match=match):
+        pb.validate_yaml(config)
+
+
+def test_yaml_ablation_errors():
+    config = "tbl: small_table\nsteps:\n- rows_distinct\n"
+    with pytest.raises(pb.yaml.YAMLValidationError, match="has no `ablation:` block"):
+        pb.yaml_ablation(config, evaluate=_evaluate)
+    with pytest.raises(TypeError, match="`evaluate=` must be a function"):
+        pb.yaml_ablation(config + "ablation: {}\n", evaluate="f")
+    # Settings are checked by `Ablation`
+    with pytest.raises(ValueError, match="`repeats=` must be a positive integer"):
+        pb.yaml_ablation(config + "ablation:\n  repeats: 0\n", evaluate=_evaluate)
+    # Strategies are checked by the methods
+    with pytest.raises(ValueError, match="can't use step 5"):
+        pb.yaml_ablation(
+            config + "ablation:\n  strategies:\n  - drop_each:\n      steps: 5\n",
+            evaluate=_evaluate,
+        )
+    # Python code is checked before the data is loaded
+    with pytest.raises(pb.yaml.YAMLValidationError, match="is Python code"):
+        pb.yaml_ablation("tbl: nowhere.csv\nsteps:\n- rows_distinct\nablation:\n  evaluate: a:b\n")
+
+
+def test_yaml_to_python_with_ablation():
+    config = _YAML_ABLATION.replace(
+        "  metric: score", "  evaluate: my_models.training:evaluate\n  metric: score"
+    )
+    code = pb.yaml_to_python(config)
+    assert "from my_models.training import evaluate\n" in code
+    assert "validation = (\n    pb.Validate(" in code
+    assert (
+        "ablation = (\n"
+        "    pb.Ablation(\n"
+        "        validation,\n"
+        "        evaluate=evaluate,\n"
+        '        metric="score",\n'
+        "        repeats=3,\n"
+        "        seed=2,\n"
+        '        label="YAML ablation",\n'
+        '        evaluate_version="v1",\n'
+        '        control=pb.ablation.Stratified(by="g"),\n'
+        "    )\n"
+        "    .drop_each()\n"
+        "    .drop_all_but_each(steps=[1, 2])\n"
+        '    .drop_steps(steps=[1, 3], name="x and y")\n'
+        '    .drop_groups(column="g", values="gold")\n'
+        ")\n"
+    ) in code
+
+    # The generated code runs (with the function defined and the data swapped)
+    source = code.removeprefix("```python\n").removesuffix("\n```")
+    source = source.replace("from my_models.training import evaluate\n", "")
+    source = source.replace('pb.load_dataset("small_table", tbl_type="polars")', "tbl")
+    namespace = {"evaluate": _evaluate, "tbl": _TBL}
+    exec(source, namespace)
+    assert namespace["ablation"].run().get_effects().height == 9
+
+    # A nested name, and a `python:` block
+    nested = config.replace("my_models.training:evaluate", "my_models:Models.evaluate")
+    assert "from my_models import Models\n" in pb.yaml_to_python(nested)
+    assert "evaluate=Models.evaluate," in pb.yaml_to_python(nested)
+    block = _YAML_ABLATION.replace(
+        "  metric: score",
+        "  evaluate:\n    python: |\n      lambda train, *, seed: 1.0\n  metric: score",
+    )
+    assert "        evaluate=lambda train, *, seed: 1.0,\n" in pb.yaml_to_python(block)
+
+    # Without an `ablation:` block, the code is unchanged
+    plain = pb.yaml_to_python("tbl: small_table\nsteps:\n- rows_distinct\n")
+    assert "\n(\n    pb.Validate(" in plain and "Ablation" not in plain
+
+
+# ----------------------------------------------------------------------------------------------
+# scikit-learn
+# ----------------------------------------------------------------------------------------------
+
+
+def _sklearn_tables():
+    """Training and holdout tables where the target is `2 * a + b`, with some bad targets."""
+
+    def make(n, offset):
+        a = [((k + offset) * 37 % 101) / 10 for k in range(n)]
+        return pl.DataFrame(
+            {
+                "a": a,
+                "b": [float((k + offset) % 5) for k in range(n)],
+                "kind": [["x", "y", "z"][(k + offset) % 3] for k in range(n)],
+                "flag": [(k + offset) % 2 == 0 for k in range(n)],
+                "when": [None] * n,
+                "target": [2 * v + (k + offset) % 5 for k, v in enumerate(a)],
+            }
+        ).with_columns(pl.col("when").cast(pl.Date))
+
+    train = (
+        make(300, 0)
+        .with_row_index()
+        .with_columns(
+            target=pl.when(pl.col("index") % 10 == 3)
+            .then(pl.col("target") * 50)
+            .otherwise("target")
+        )
+        .drop("index")
+    )
+    return train, make(150, 1000)
+
+
+def test_sklearn_evaluator_regression():
+    pytest.importorskip("sklearn")
+
+    train, holdout = _sklearn_tables()
+    with pytest.warns(UserWarning, match="doesn't use the columns 'when'"):
+        evaluate = pb.ablation.sklearn_evaluator(holdout, target="target")
+    assert evaluate.task == "regression"
+    assert evaluate.features == ["a", "b", "kind", "flag"]
+    assert evaluate.kinds == {
+        "a": "numeric",
+        "b": "numeric",
+        "kind": "categorical",
+        "flag": "numeric",
+    }
+    assert repr(evaluate).startswith("sklearn_evaluator(target='target'")
+
+    result = evaluate(train, seed=1)
+    assert set(result) == {"r2"}
+    assert result == evaluate(train, seed=1)
+    clean = train.filter(pl.col("target") < 100)
+    assert evaluate(clean, seed=1)["r2"] > 0.95 > result["r2"]
+
+    # The same scores from a pandas or lazy table, and for a pandas holdout
+    assert evaluate(train.to_pandas(), seed=1) == pytest.approx(result)
+    assert evaluate(train.lazy(), seed=1) == pytest.approx(result)
+    pandas_evaluate = pb.ablation.sklearn_evaluator(
+        holdout.drop("when").to_pandas(), target="target"
+    )
+    assert pandas_evaluate(train.drop("when"), seed=1) == pytest.approx(result)
+
+    # It can be pickled, for `executor="process"`
+    assert pickle.loads(pickle.dumps(evaluate))(train, seed=1) == pytest.approx(result)
+
+    validation = pb.Validate(data=train).col_vals_lt(columns="target", value=100).interrogate()
+    ablation = pb.Ablation(validation, evaluate=evaluate, repeats=3).drop_each().run()
+    assert _effects_by_variant(ablation)["step_1"]["verdict"] == "helps"
+
+
+def test_sklearn_evaluator_classification():
+    pytest.importorskip("sklearn")
+
+    train, holdout = _sklearn_tables()
+    train = train.with_columns(
+        label=pl.when(pl.col("a") > 5).then(pl.lit("hi")).otherwise(pl.lit("lo"))
+    )
+    holdout = holdout.with_columns(
+        label=pl.when(pl.col("a") > 5).then(pl.lit("hi")).otherwise(pl.lit("lo"))
+    )
+
+    evaluate = pb.ablation.sklearn_evaluator(
+        holdout, target="label", features=["a", "kind"], scoring=["accuracy", "f1_macro"]
+    )
+    assert evaluate.task == "classification"
+    result = evaluate(train, seed=0)
+    assert set(result) == {"accuracy", "f1_macro"}
+    assert result["accuracy"] > 0.95
+
+    # Integer targets with few values are classes, and with many they're a regression
+    with_ints = train.with_columns(cls=(pl.col("a") > 5).cast(pl.Int64))
+    holdout_ints = holdout.with_columns(cls=(pl.col("a") > 5).cast(pl.Int64))
+    assert pb.ablation.sklearn_evaluator(holdout_ints, target="cls", features="a").task == (
+        "classification"
+    )
+    assert (
+        pb.ablation.sklearn_evaluator(holdout_ints, target="cls", features=["a"])(
+            with_ints, seed=0
+        )["accuracy"]
+        > 0.95
+    )
+    many = holdout.with_columns(n=pl.int_range(pl.len()))
+    assert pb.ablation.sklearn_evaluator(many, target="n", features=["a"]).task == "regression"
+
+    # Boolean targets are classes
+    def with_parity(tbl):
+        return tbl.with_columns(parity=pl.col("flag").cast(pl.Float64))
+
+    flag = pb.ablation.sklearn_evaluator(with_parity(holdout), target="flag", features=["parity"])
+    assert flag.task == "classification"
+    assert flag(with_parity(train), seed=0)["accuracy"] == 1.0
+
+    # A category that's only in the holdout data is treated as a missing value
+    odd = holdout.with_columns(kind=pl.lit("new"))
+    assert "accuracy" in pb.ablation.sklearn_evaluator(odd, target="label", features=["a", "kind"])(
+        train, seed=0
+    )
+
+
+def test_sklearn_evaluator_estimator_and_scoring():
+    sklearn = pytest.importorskip("sklearn")
+    from sklearn.ensemble import RandomForestRegressor
+    from sklearn.linear_model import LinearRegression
+    from sklearn.metrics import make_scorer, mean_absolute_error
+    from sklearn.pipeline import make_pipeline
+    from sklearn.preprocessing import StandardScaler
+
+    train, holdout = _sklearn_tables()
+    train, holdout = train.drop("when"), holdout.drop("when")
+
+    linear = pb.ablation.sklearn_evaluator(
+        holdout,
+        target="target",
+        features=["a", "b"],
+        estimator=make_pipeline(StandardScaler(), LinearRegression()),
+        scoring={"mae": make_scorer(mean_absolute_error, greater_is_better=False), "r2": "r2"},
+    )
+    clean = train.filter(pl.col("target") < 100)
+    result = linear(clean, seed=0)
+    assert set(result) == {"mae", "r2"}
+    assert result["mae"] == pytest.approx(0, abs=1e-9)
+    assert result["r2"] == pytest.approx(1.0)
+
+    # The estimator is cloned, with its random states set to the seed
+    forest = RandomForestRegressor(n_estimators=5, random_state=123)
+    evaluate = pb.ablation.sklearn_evaluator(
+        holdout, target="target", features=["a", "b"], estimator=forest
+    )
+    assert evaluate._model(7, {}).random_state == 7
+    assert forest.random_state == 123
+    assert not hasattr(forest, "estimators_")
+    assert evaluate(train, seed=7) == evaluate(train, seed=7)
+    assert evaluate(train, seed=7) != evaluate(train, seed=8)
+    pipeline = pb.ablation.sklearn_evaluator(
+        holdout,
+        target="target",
+        features=["a"],
+        estimator=make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=3)),
+    )
+    assert pipeline._model(5, {}).get_params()["randomforestregressor__random_state"] == 5
+
+    def score(estimator, X, y):
+        return -abs(estimator.predict(X) - y).max()
+
+    custom = pb.ablation.sklearn_evaluator(
+        holdout, target="target", features=["a", "b"], estimator=LinearRegression(), scoring=score
+    )
+    assert set(custom(clean, seed=0)) == {"score"}
+    assert sklearn.__version__
+
+
+def test_sklearn_evaluator_missing_values():
+    pytest.importorskip("sklearn")
+
+    train, holdout = _sklearn_tables()
+    train = train.drop("when").with_columns(
+        target=pl.when(pl.int_range(pl.len()) % 7 == 0).then(None).otherwise("target"),
+        kind=pl.when(pl.int_range(pl.len()) % 11 == 0).then(None).otherwise("kind"),
+        a=pl.when(pl.int_range(pl.len()) % 13 == 0).then(None).otherwise("a"),
+    )
+    holdout = holdout.drop("when").with_columns(
+        target=pl.when(pl.int_range(pl.len()) % 9 == 0).then(None).otherwise("target")
+    )
+    evaluate = pb.ablation.sklearn_evaluator(holdout, target="target")
+    assert len(evaluate.holdout) == 150 - 17
+    assert "r2" in evaluate(train, seed=0)
+    # Categorical and enum features
+    categorical = train.with_columns(kind=pl.col("kind").cast(pl.Categorical))
+    evaluate = pb.ablation.sklearn_evaluator(
+        holdout.with_columns(kind=pl.col("kind").cast(pl.Categorical)), target="target"
+    )
+    assert evaluate.kinds["kind"] == "categorical"
+    assert "r2" in evaluate(categorical, seed=0)
+
+
+def test_sklearn_evaluator_errors():
+    pytest.importorskip("sklearn")
+
+    train, holdout = _sklearn_tables()
+    make = pb.ablation.sklearn_evaluator
+    with pytest.raises(TypeError, match="`target=` must be a column name"):
+        make(holdout, target=["target"])
+    with pytest.raises(ValueError, match="no column 'nope' \\(`target=`\\)"):
+        make(holdout, target="nope")
+    with pytest.raises(ValueError, match="`task=` must be one of"):
+        make(holdout, target="target", task="clustering")
+    with pytest.raises(ValueError, match="no column 'nope' \\(`features=`\\)"):
+        make(holdout, target="target", features=["a", "nope"])
+    with pytest.raises(ValueError, match="can't also be a feature"):
+        make(holdout, target="target", features=["a", "target"])
+    with pytest.raises(TypeError, match="The features 'when' have types that can't be used"):
+        make(holdout, target="target", features=["a", "when"])
+    with pytest.raises(ValueError, match="There are no features"):
+        make(holdout.select("target"), target="target")
+    with pytest.raises(ValueError, match="no rows with a value of 'when'"):
+        make(holdout, target="when", features=["a"], task="classification")
+    with pytest.raises(TypeError, match="isn't a class or a number"):
+        make(holdout.with_columns(when=pl.date(2024, 1, 1)), target="when", features=["a"])
+    with pytest.raises(TypeError, match="A regression needs a numeric target"):
+        make(holdout, target="kind", features=["a"], task="regression")
+    with pytest.raises(ValueError, match="'nope' isn't the name of a scikit-learn scorer"):
+        make(holdout, target="target", features=["a"], scoring="nope")
+    for scoring in ([], {}, 3, ["r2", 3]):
+        with pytest.raises(TypeError, match="`scoring=`|list of scorer names"):
+            make(holdout, target="target", features=["a"], scoring=scoring)
+    with pytest.raises(TypeError, match="The scorer 'x' must be"):
+        make(holdout, target="target", features=["a"], scoring={"x": 3})
+
+    evaluate = make(holdout, target="target", features=["a", "b"])
+    with pytest.raises(ValueError, match="The training table has no column 'b'"):
+        evaluate(train.drop("b"), seed=0)
+
+
+def test_sklearn_evaluator_without_sklearn(monkeypatch):
+    import builtins
+
+    real_import = builtins.__import__
+
+    def fake_import(name, *args, **kwargs):
+        if name == "sklearn" or name.startswith("sklearn."):
+            raise ImportError("No module named 'sklearn'")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+    with pytest.raises(ImportError, match='pip install "pointblank\\[ml\\]"'):
+        pb.ablation.sklearn_evaluator(_TBL, target="x")

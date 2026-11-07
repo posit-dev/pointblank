@@ -68,6 +68,8 @@ otel = [
 
 excel = ["openpyxl>=3.0.0"]
 cdisc = ["lxml>=4.9.0"]
+# For `pb.ablation.sklearn_evaluator()`: 1.4.2 is the first scikit-learn that works with NumPy 2
+ml = ["scikit-learn>=1.4.2"]
 # For the CDISC CORE conformance engine wrapper (`validate_cdisc_submission`,
 # `SubmissionPackage.validate_conformance(engine="core")`): pyreadstat materializes in-memory
 # datasets to XPT for CORE. The CORE engine itself is an externally-installed executable / Docker
@@ -102,7 +104,7 @@ docs = [
     "pyreadstat>=1.2.0",                         # SAS Transport (XPT) metadata example
     "opentelemetry-api>=1.23.0",                 # OTelExporter and emit_otel() examples
     "opentelemetry-sdk>=1.23.0",
-    "scikit-learn>=1.3",                         # Data ablation worked example
+    "scikit-learn>=1.4.2",                       # Data ablation worked example (1.4.2+ works with NumPy 2)
 ]
 
 [dependency-groups]
@@ -135,6 +137,7 @@ dev = [
     "pyreadstat>=1.2.0",
     "pytz>=2025.2",
     "lxml>=4.9.0",
+    "scikit-learn>=1.4.2",  # So the `sklearn_evaluator()` tests run (1.4.2+ works with NumPy 2)
     "ruff==0.14.10",  # NOTE: must match rev in .pre-commit-config.yaml
     "shiny>=1.4.0",
     "openpyxl>=3.0.0",

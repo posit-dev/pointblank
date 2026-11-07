@@ -8,7 +8,7 @@ import operator
 import re
 from importlib import import_module
 from pathlib import Path
-from typing import Any, Iterable, Literal, Mapping, Optional, Union
+from typing import TYPE_CHECKING, Any, Iterable, Literal, Mapping, Optional, Union
 from zoneinfo import ZoneInfo
 
 import yaml
@@ -18,6 +18,9 @@ from pointblank._utils import _is_lib_present
 from pointblank.missing import MissingSpec, _missing_spec_to_code
 from pointblank.thresholds import Actions
 from pointblank.validate import Validate, load_dataset
+
+if TYPE_CHECKING:
+    from pointblank.ablation import Ablation
 
 
 def _missing_spec_from_dict(spec_def: dict) -> MissingSpec:
@@ -505,6 +508,7 @@ class YAMLValidator:
             "consumers",
             "version",
             "reference",
+            "ablation",
         }
 
         # Warn about unknown top-level keys (likely typos)
@@ -514,6 +518,9 @@ class YAMLValidator:
                 f"Unknown top-level key(s): {sorted(unknown_keys)}. "
                 f"Valid keys are: {sorted(known_keys)}"
             )
+
+        if "ablation" in config:
+            _check_ablation_block(config["ablation"])
 
         # Check required fields
         if "tbl" not in config:
@@ -1164,6 +1171,375 @@ class YAMLValidator:
         return validation
 
 
+# The keys of an `ablation:` block, and the strategies it can use with their parameters (those
+# in the second set are required)
+_ABLATION_KEYS = (
+    "evaluate",
+    "evaluate_version",
+    "metric",
+    "higher_is_better",
+    "repeats",
+    "seed",
+    "control",
+    "duplicates",
+    "duplicates_order_by",
+    "max_removed",
+    "conf_level",
+    "adjust",
+    "label",
+    "cache",
+    "strategies",
+)
+_ABLATION_STRATEGIES = {
+    "drop_each": ({"steps"}, set()),
+    "drop_all": ({"steps"}, set()),
+    "drop_steps": ({"steps", "name"}, {"steps"}),
+    "drop_all_but_each": ({"steps"}, set()),
+    "drop_groups": ({"column", "values"}, {"column"}),
+}
+
+# An `evaluate:` function given by its import path (e.g., `my_models.training:evaluate`)
+_IMPORT_PATH_PATTERN = re.compile(r"[A-Za-z_][\w.]*:[A-Za-z_][\w.]*")
+
+
+def _ablation_strategies(block: dict) -> list[tuple[str, dict]]:
+    """The strategies of an `ablation:` block, as `(method, parameters)` pairs."""
+    strategies = block.get("strategies") or []
+    if not isinstance(strategies, list):
+        raise YAMLValidationError("'ablation.strategies' must be a list of strategies.")
+    parsed = []
+    for strategy in strategies:
+        if isinstance(strategy, str):
+            method, params = strategy, {}
+        elif isinstance(strategy, dict) and len(strategy) == 1:
+            method, params = next(iter(strategy.items()))
+            params = {} if params is None else params
+        else:
+            raise YAMLValidationError(
+                "Each strategy in 'ablation.strategies' must be a strategy name (e.g., "
+                f"`drop_each`) or a mapping of one name to its parameters, got {strategy!r}."
+            )
+        if method not in _ABLATION_STRATEGIES:
+            raise YAMLValidationError(
+                f"Unknown ablation strategy {method!r}. The strategies are: "
+                f"{', '.join(_ABLATION_STRATEGIES)}."
+            )
+        if not isinstance(params, dict):
+            raise YAMLValidationError(
+                f"The parameters of the `{method}` strategy must be a mapping, got {params!r}."
+            )
+        allowed, required = _ABLATION_STRATEGIES[method]
+        unknown = sorted(set(params) - allowed)
+        if unknown:
+            raise YAMLValidationError(
+                f"Unknown parameter(s) {unknown} for the `{method}` strategy. Valid parameters "
+                f"are: {sorted(allowed)}."
+            )
+        missing = sorted(required - set(params))
+        if missing:
+            raise YAMLValidationError(f"The `{method}` strategy needs the parameter(s) {missing}.")
+        parsed.append((method, dict(params)))
+    return parsed
+
+
+def _check_ablation_block(block: Any) -> None:
+    """Check the structure of an `ablation:` block."""
+    if not isinstance(block, dict):
+        raise YAMLValidationError("'ablation' must be a mapping of ablation settings.")
+    unknown = sorted(set(block) - set(_ABLATION_KEYS))
+    if unknown:
+        raise YAMLValidationError(
+            f"Unknown key(s) in 'ablation': {unknown}. Valid keys are: {sorted(_ABLATION_KEYS)}"
+        )
+    evaluate = block.get("evaluate")
+    if evaluate is not None and not (
+        (isinstance(evaluate, str) and _IMPORT_PATH_PATTERN.fullmatch(evaluate.strip()))
+        or (isinstance(evaluate, dict) and set(evaluate) == {"python"})
+    ):
+        raise YAMLValidationError(
+            "'ablation.evaluate' must be the import path of a function (e.g., "
+            "`my_models.training:evaluate`) or a `python:` block, got "
+            f"{evaluate!r}."
+        )
+    control = block.get("control", "size_matched")
+    if not (
+        control is None
+        or control == "size_matched"
+        or (isinstance(control, dict) and set(control) == {"stratified"})
+    ):
+        raise YAMLValidationError(
+            "'ablation.control' must be `size_matched`, `null`, or a mapping like "
+            f"`{{stratified: column}}`, got {control!r}."
+        )
+    _ablation_strategies(block)
+
+
+def _import_evaluate(path: str) -> Any:
+    """Import a function from its import path (e.g., `my_models.training:evaluate`)."""
+    module_name, _, attrs = path.strip().partition(":")
+    try:
+        obj: Any = import_module(module_name)
+    except ImportError as e:
+        raise YAMLValidationError(
+            f"The module {module_name!r} of 'ablation.evaluate' can't be imported: {e}"
+        ) from e
+    for attr in attrs.split("."):
+        try:
+            obj = getattr(obj, attr)
+        except AttributeError:
+            raise YAMLValidationError(
+                f"The module {module_name!r} has no {attrs!r} (in 'ablation.evaluate')."
+            ) from None
+    return obj
+
+
+def _ablation_kwargs(
+    block: dict,
+    namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
+    python_mode: _PythonMode = "deny",
+    resolve_evaluate: bool = True,
+) -> dict[str, Any]:
+    """The arguments of `Ablation()` from an `ablation:` block."""
+    from pointblank.ablation import Stratified
+
+    kwargs = {k: v for k, v in block.items() if k not in ("evaluate", "strategies", "control")}
+    if "control" in block:
+        control = block["control"]
+        if isinstance(control, dict):
+            by = control["stratified"]
+            kwargs["control"] = (
+                _PythonSource(f"pb.ablation.Stratified(by={_literal_code(by)})")
+                if python_mode == "source"
+                else Stratified(by=by)
+            )
+        else:
+            kwargs["control"] = control
+
+    evaluate = block.get("evaluate")
+    if evaluate is not None and resolve_evaluate:
+        if python_mode == "source":
+            kwargs["evaluate"] = (
+                _PythonSource(evaluate["python"])
+                if isinstance(evaluate, dict)
+                else _PythonSource(evaluate.strip().partition(":")[2])
+            )
+        elif python_mode != "allow":
+            shown = evaluate.strip() if isinstance(evaluate, str) else "a `python:` block"
+            raise YAMLValidationError(
+                f"The `ablation:` block's `evaluate:` ({shown}) is Python code, which isn't run "
+                "unless you allow it. Use `yaml_ablation(..., allow_python=True)` for a config "
+                "you trust, or pass the function with `yaml_ablation(..., evaluate=...)`."
+            )
+        elif isinstance(evaluate, dict):
+            kwargs["evaluate"] = _eval_python_code(
+                evaluate["python"], namespaces=namespaces, python_mode=python_mode
+            )
+        else:
+            kwargs["evaluate"] = _import_evaluate(evaluate)
+        if python_mode == "allow" and not callable(kwargs["evaluate"]):
+            raise YAMLValidationError(
+                f"'ablation.evaluate' must be a function, got {type(kwargs['evaluate']).__name__}."
+            )
+    return kwargs
+
+
+def yaml_ablation(
+    yaml: Union[str, Path],
+    evaluate: Any = None,
+    set_tbl: Any = None,
+    namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
+    allow_python: bool = False,
+) -> "Ablation":
+    """Set up an ablation from a YAML configuration.
+
+    A YAML configuration for [`yaml_interrogate()`](`pointblank.yaml_interrogate`) can have an
+    `ablation:` block, which describes an [`Ablation`](`pointblank.Ablation`) of its validation:
+    the `evaluate=` function, the settings, and the strategies that add variants. This function
+    interrogates the validation and sets up the ablation, ready to
+    [`run()`](`pointblank.Ablation.run`) or to [`export()`](`pointblank.Ablation.export`). The
+    validation and its ablation can then be kept together in one file, alongside a model's
+    training code.
+
+    Parameters
+    ----------
+    yaml
+        YAML configuration as a string or a file path, with an `ablation:` block.
+    evaluate
+        The `evaluate=` function of the ablation. If given, it's used in place of the block's
+        `evaluate:` (which is then not imported), so that the configuration can be used without
+        `allow_python=True`.
+    set_tbl
+        A table to use in place of the configuration's `tbl` (as in `yaml_interrogate()`).
+    namespaces
+        Modules to make available to Python code in the configuration (as in
+        `yaml_interrogate()`). This only has an effect with `allow_python=True`.
+    allow_python
+        Whether to run Python code in the configuration. The `evaluate:` of the `ablation:` block
+        is Python code (it imports a function and runs it on the training data), so it's only
+        used with `allow_python=True`. Without it, either pass `evaluate=` or leave `evaluate:`
+        out (e.g., to `export()` the versions of the table for evaluation elsewhere).
+
+    Returns
+    -------
+    Ablation
+        The ablation, with its variants added but not yet run.
+
+    Raises
+    ------
+    YAMLValidationError
+        If the configuration is invalid, has no `ablation:` block, or has Python code without
+        `allow_python=True`.
+
+    The `ablation:` Block
+    ---------------------
+    The block has the parameters of `Ablation` (other than `validation=`), along with a list of
+    `strategies:`:
+
+    ```yaml
+    ablation:
+      evaluate: my_models.training:evaluate
+      evaluate_version: "2024-06"
+      metric: mae
+      higher_is_better: false
+      repeats: 5
+      control:
+        stratified: sensor
+      cache: .ablation_cache
+      strategies:
+        - drop_each
+        - drop_all_but_each
+        - drop_steps:
+            steps: [1, 2]
+            name: Without step 3
+        - drop_groups:
+            column: sensor
+    ```
+
+    The `evaluate:` is the import path of a function (the module, a colon, and the name of the
+    function), or a `python:` block whose result is the function. The `control:` is
+    `size_matched` (the default), `null` (for no control), or `stratified:` with one or more
+    columns (for a [`Stratified`](`pointblank.ablation.Stratified`) control). Each strategy is
+    the name of an `Ablation` method that adds variants, with its parameters as a mapping. The
+    strategies are added in order.
+
+    The block is ignored by `yaml_interrogate()`, so the same configuration can be used both to
+    validate the data and to measure what its steps do for a model.
+
+    Examples
+    --------
+    ```{python}
+    #| echo: false
+    #| output: false
+    import pointblank as pb
+    pb.config(report_incl_header=False, report_incl_footer_timings=False)
+    ```
+
+    Here's a table of temperature readings with some out-of-range values, and a YAML
+    configuration with a validation step and an `ablation:` block. The `evaluate()` function is
+    passed from Python, so the configuration doesn't need `allow_python=True`.
+
+    ```{python}
+    import pointblank as pb
+    import polars as pl
+
+    temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+    for k in range(0, 300, 25):
+        temps[k] *= 10
+    readings = pl.DataFrame({"temp": temps})
+
+    def evaluate(train, *, seed):
+        sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+        return abs(sample["temp"].mean() - 20)
+
+    yaml_config = '''
+    tbl: readings.csv
+    tbl_name: readings
+    steps:
+    - col_vals_between:
+        columns: temp
+        left: -10
+        right: 45
+    ablation:
+      metric: error
+      higher_is_better: false
+      label: Temperature model
+      strategies:
+        - drop_each
+    '''
+
+    ablation = pb.yaml_ablation(yaml_config, evaluate=evaluate, set_tbl=readings)
+
+    ablation.run()
+    ```
+
+    The `tbl:` of the configuration is replaced with the table in `set_tbl=`, and the ablation
+    was set up from the block, ready to run.
+    """
+    from pointblank.ablation import Ablation
+
+    if evaluate is not None and not callable(evaluate):
+        raise TypeError(f"`evaluate=` must be a function, got {type(evaluate).__name__}.")
+
+    validator = YAMLValidator()
+    config = validator.load_config(yaml)
+    if "ablation" not in config:
+        raise YAMLValidationError("The YAML configuration has no `ablation:` block.")
+    block = config["ablation"]
+    python_mode: _PythonMode = "allow" if allow_python else "deny"
+
+    # Check the block (and any Python code in it) before the data is loaded and interrogated
+    kwargs = _ablation_kwargs(
+        block, namespaces=namespaces, python_mode=python_mode, resolve_evaluate=evaluate is None
+    )
+    if evaluate is not None:
+        kwargs["evaluate"] = evaluate
+
+    validation = validator.build_validation(
+        config, namespaces=namespaces, tbl=set_tbl, allow_python=allow_python
+    ).interrogate()
+
+    ablation = Ablation(validation, **kwargs)
+    for method, params in _ablation_strategies(block):
+        getattr(ablation, method)(**params)
+    return ablation
+
+
+def _ablation_code(block: dict) -> tuple[list[str], list[str]]:
+    """The imports and the code of the `pb.Ablation()` from an `ablation:` block."""
+    imports = []
+    evaluate = block.get("evaluate")
+    if isinstance(evaluate, str):
+        module_name, _, attrs = evaluate.strip().partition(":")
+        imports.append(f"from {module_name} import {attrs.split('.')[0]}")
+
+    kwargs = _ablation_kwargs(block, python_mode="source")
+    args = ["validation"]
+    if "evaluate" in kwargs:
+        args.append(f"evaluate={kwargs.pop('evaluate')}")
+    args += [f"{key}={_literal_code(value)}" for key, value in kwargs.items()]
+
+    lines = ["ablation = (", "    pb.Ablation("]
+    lines += [f"        {arg}," for arg in args]
+    lines.append("    )")
+    for method, params in _ablation_strategies(block):
+        params_str = ", ".join(f"{k}={_literal_code(v)}" for k, v in params.items())
+        lines.append(f"    .{method}({params_str})")
+    lines.append(")")
+    return imports, lines
+
+
+def _literal_code(value: Any) -> str:
+    """Python code for a value from a YAML config, with strings in double quotes."""
+    if isinstance(value, str):
+        return json.dumps(value, ensure_ascii=False)
+    if isinstance(value, list):
+        return "[" + ", ".join(_literal_code(item) for item in value) + "]"
+    if isinstance(value, dict):
+        items = (f"{_literal_code(k)}: {_literal_code(v)}" for k, v in value.items())
+        return "{" + ", ".join(items) + "}"
+    return repr(value)
+
+
 def yaml_interrogate(
     yaml: Union[str, Path],
     set_tbl: Any = None,
@@ -1177,7 +1553,9 @@ def yaml_interrogate(
 
     The YAML configuration defines the data source, validation steps, and optional settings like
     thresholds and labels. This function automatically loads the data, builds the validation plan,
-    executes all validation steps, and returns the interrogated results.
+    executes all validation steps, and returns the interrogated results. An `ablation:` block in
+    the configuration is ignored here (it's used by [`yaml_ablation()`](`pointblank.yaml_ablation`)),
+    so its `evaluate:` function is neither imported nor run.
 
     Parameters
     ----------
@@ -1752,6 +2130,8 @@ def validate_yaml(yaml: Union[str, Path]) -> None:
     - `consumers`: data consumers (governance metadata)
     - `version`: validation version string (governance metadata)
     - `reference`: reference table for comparison-based validations
+    - `ablation`: an ablation of the validation (used by
+      [`yaml_ablation()`](`pointblank.yaml_ablation`), and ignored otherwise)
 
     Unknown top-level keys are rejected, which catches typos like `tbl_nmae` or `step`.
 
@@ -2317,6 +2697,13 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
     # Add interrogation method call
     code_lines.append("    .interrogate()")
     code_lines.append(")")
+
+    # An `ablation:` block becomes a `pb.Ablation()` of the validation, with its strategies
+    if "ablation" in config:
+        code_lines[0] = "validation = ("
+        ablation_imports, ablation_lines = _ablation_code(config["ablation"])
+        imports += ablation_imports
+        code_lines += ["", *ablation_lines]
 
     # Add imports at the beginning
     if needs_polars_import:

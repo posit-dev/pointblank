@@ -200,6 +200,7 @@ def _get_api_text() -> str:
         "yaml_interrogate",
         "validate_yaml",
         "yaml_to_python",
+        "yaml_ablation",
     ]
 
     utility_exported = [

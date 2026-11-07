@@ -114,6 +114,7 @@ from pointblank.validate import (
 )
 from pointblank.yaml import (
     validate_yaml,
+    yaml_ablation,
     yaml_interrogate,
     yaml_to_python,
 )
@@ -201,6 +202,7 @@ __all__ = [
     "yaml_interrogate",
     "validate_yaml",
     "yaml_to_python",
+    "yaml_ablation",
     # Contract import/export
     "ContractAdapter",
     "ContractImport",
