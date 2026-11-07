@@ -11,6 +11,7 @@ import functools
 import html as html_module
 import inspect
 import json
+import numbers
 import operator
 import os
 import pickle
@@ -4989,6 +4990,35 @@ def _validation_info_to_step(
                 ),
                 yaml_value="null",
             )
+    elif at == "col_vals_scored":
+        from pointblank.scorers import _Adapter
+
+        values = vi.values or {}
+        columns = vi.column if isinstance(vi.column, (list, tuple)) else [vi.column]
+        params["columns"] = columns[0] if len(columns) == 1 else list(columns)
+        scorer = values.get("scorer")
+        if isinstance(scorer, _Adapter) and scorer._is_literal():
+            # A `pb.scorers` adapter whose settings are all literals is written as the call
+            # that makes it (and in YAML as `{<kind>: {...}}`)
+            params["scorer"] = scorer
+        else:
+            params["scorer"] = _placeholder(
+                scorer,
+                code="your_scorer",
+                note=(
+                    "Step 'col_vals_scored' uses a scorer that cannot be serialized to source; "
+                    "the placeholder `your_scorer` was emitted and must be replaced with it."
+                ),
+                yaml_value={"python": "your_scorer"},
+            )
+        for key in ("min_val", "max_val"):
+            if values.get(key) is not None:
+                params[key] = values[key]
+        cache = values.get("cache", True)
+        if cache is not True:
+            params["cache"] = cache if isinstance(cache, bool) else str(cache)
+        if not values.get("keep_scores", True):
+            params["keep_scores"] = False
     elif at == "specially":
         params["expr"] = _placeholder(
             vi.values,
@@ -5158,6 +5188,8 @@ def _render_code_value(value: Any) -> str:
         # e.g., the `column_map=`, `tolerance=`, and `normalize=` settings of `tbl_match()`
         items = (f"{_render_code_value(k)}: {_render_code_value(v)}" for k, v in value.items())
         return "{" + ", ".join(items) + "}"
+    if _is_scorer_adapter(value):
+        return value._to_code()
     if callable(value):  # pragma: no cover
         return "None"
     return repr(value)  # pragma: no cover
@@ -5307,7 +5339,17 @@ def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
     if isinstance(value, datetime.timedelta):
         # Written as a duration string (e.g., "1.5s") that `tbl_match(tolerance=)` accepts
         return f"{value.total_seconds():g}s"
+    if _is_scorer_adapter(value):
+        # e.g., `{classifier: {hf_model: ..., label: ...}}`, read back by `yaml_interrogate()`
+        return value._to_yaml()
     return str(value)  # pragma: no cover
+
+
+def _is_scorer_adapter(value: Any) -> bool:
+    """Check whether a value is a `pb.scorers` adapter that can be written out."""
+    from pointblank.scorers import _Adapter
+
+    return isinstance(value, _Adapter) and value._is_literal()
 
 
 def _segments_to_yaml(segments: Any, warnings_out: list[str]) -> Any:
@@ -14585,6 +14627,309 @@ class Validate:
 
         return self
 
+    def col_vals_scored(
+        self,
+        columns: str | list[str],
+        scorer: Callable[..., Any],
+        min_val: float | None = None,
+        max_val: float | None = None,
+        na_pass: bool = False,
+        cache: bool | str | Path = True,
+        keep_scores: bool = True,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate whether rows have a score from a model within bounds.
+
+        The `col_vals_scored()` validation method gives each row a score with a model (a
+        *scorer*) and checks that the score is at least `min_val=`, at most `max_val=`, or both.
+        It's for the checks that are about meaning rather than form: whether a passage answers
+        its query (a reranker), whether a document is of good quality or toxic (a classifier),
+        whether text is in the expected language, or whether it's fluent (perplexity). Each row
+        is a test unit, and the scorer gets the values of `columns=` for the row.
+
+        The scorer can be any function of a batch of rows (see the
+        [`Scorer`](`pointblank.scorers.Scorer`) protocol), or one of the adapters of
+        `pb.scorers`, which use models from common packages:
+        [`embedding_similarity()`](`pointblank.scorers.embedding_similarity`),
+        [`reranker()`](`pointblank.scorers.reranker`),
+        [`classifier()`](`pointblank.scorers.classifier`),
+        [`langid()`](`pointblank.scorers.langid`), and
+        [`perplexity()`](`pointblank.scorers.perplexity`). Pointblank never trains a model: the
+        scorers use models that are given to them.
+
+        Parameters
+        ----------
+        columns
+            The column (or a list of columns) whose values the scorer gets for each row. A
+            reranker, for example, needs two columns: the query and the document.
+        scorer
+            The scorer: a function that takes a list of rows (dictionaries of the values of
+            `columns=`) and returns a score for each, or an adapter of `pb.scorers`. A score is a
+            number, or `None` for a row that can't be scored.
+        min_val
+            The lowest score that passes (inclusive).
+        max_val
+            The highest score that passes (inclusive). At least one of `min_val=` and `max_val=`
+            is needed.
+        na_pass
+            Should a row with a missing value in any of `columns=` (which isn't scored), or a row
+            that the scorer gives no score, pass? The default is `False`, so such rows fail.
+        cache
+            Where to keep the scores, so that rows aren't scored again: `True` (the default) keeps
+            them in memory for the session, a path is the directory of a cache on disk (an SQLite
+            file, `scores.sqlite`) that's kept between sessions, and `False` doesn't keep them.
+            Scores are kept by the scorer's name and version, and by the values of the row. A
+            cache on disk needs a scorer with a stable name (see the *Score Cache* section).
+        keep_scores
+            Should the results of the step keep the scores, in a column called `pb_score_`? With
+            `True` (the default), the scores are in the extracts of failing rows, in the step
+            report, and in [`get_row_flags()`](`pointblank.Validate.get_row_flags`) (as
+            `pb_score_<step>_`), and they can be used by
+            [`Ablation.sweep_score()`](`pointblank.Ablation.sweep_score`).
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing.
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is `"validity"`. This label appears in the validation report and feeds the
+            overall and per-dimension health scores.
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Raises
+        ------
+        TypeError
+            If `columns=` isn't a column name or a list of them, if `scorer=` isn't callable, or if
+            `min_val=` or `max_val=` isn't a number.
+        ValueError
+            If neither `min_val=` nor `max_val=` is given, if `min_val=` is greater than
+            `max_val=`, or if `cache=` is a directory and the scorer has no stable name.
+
+        Preprocessing
+        -------------
+        The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
+        table during interrogation. This function should take a table as input and return a
+        modified table. This is useful for performing any necessary transformations or filtering on
+        the data before the validation step is applied, such as taking a sample of the rows to keep
+        the cost of scoring down.
+
+        The preprocessing function can be any callable that takes a table as input and returns a
+        modified table. Regardless of which is used, the function should return a table with the
+        columns of `columns=`.
+
+        How Rows Are Scored
+        -------------------
+        The scorer gets the rows in batches (of the scorer's `batch_size`, or 256 rows), as
+        dictionaries of the values of `columns=`. Rows with the same values are scored once, and a
+        row with a missing value in any of `columns=` isn't scored at all (it passes or fails by
+        `na_pass=`). A scorer that fails, or that returns something other than a number (or
+        `None`) for each row, stops the step with an evaluation error and a note that says why,
+        as does a scorer whose package isn't installed (the note says how to install it).
+
+        Scoring runs in Python, on the rows' values. A Polars or pandas table is scored as it is
+        (a Polars LazyFrame is collected first). For a database table (through Ibis) or a PySpark
+        DataFrame, the distinct rows of `columns=` are collected and scored, and the scores are
+        joined back to the table on its own backend; other kinds of table give an evaluation
+        error. The step's note says which scorer was used, how many rows it scored, how many
+        scores came from the cache, and the range of the scores.
+
+        Score Cache
+        -----------
+        Scores are kept in a cache by the scorer's name and version (its `name` and `version`
+        attributes) and by the values of the row, so that interrogating the same data again (as an
+        [`Ablation`](`pointblank.Ablation`) does, or after a change to another step) doesn't run
+        the model again. The scores are written after each batch, so a run that's interrupted
+        picks up where it left off.
+
+        With `cache=True`, the scores are kept in memory until the end of the session (or until
+        [`pb.scorers.clear_cache()`](`pointblank.scorers.clear_cache`)). With a directory as
+        `cache=`, they're kept on disk and can be shared between sessions and projects; this needs
+        a scorer with a stable name, which the adapters of `pb.scorers` have (unless they're given
+        a model object), as does a function defined at the top level of a module. A lambda can be
+        given a name with [`pb.scorers.from_function()`](`pointblank.scorers.from_function`).
+        Change the version of a scorer when its model changes, so that older scores aren't used.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        For the examples here, we'll use a table of product reviews and a scorer that stands in
+        for a model: it scores a review by the share of its words that are on a list of positive
+        words. A real scorer would be a classifier, such as
+        `pb.scorers.classifier(hf_model=..., label="POSITIVE")`.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "product": ["kettle", "kettle", "toaster", "toaster", "lamp", "lamp"],
+                "review": [
+                    "great kettle and fast",
+                    "broke after a week",
+                    "good toast every time",
+                    "great value",
+                    "too dim",
+                    None,
+                ],
+            }
+        )
+
+        POSITIVE = {"great", "good", "fast", "value", "every"}
+
+        def positivity(batch):
+            return [
+                sum(w in POSITIVE for w in row["review"].split()) / len(row["review"].split())
+                for row in batch
+            ]
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that each review scores at least `0.25`.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_scored(columns="review", scorer=positivity, min_val=0.25)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The step has six test units, one for each row, and three fail: two reviews have no
+        positive words, and the missing review isn't scored (use `na_pass=True` to let such rows
+        pass). The step's note gives the range of the scores. The failing rows can be seen with
+        their scores, in the `pb_score_` column, with
+        [`get_step_report()`](`pointblank.Validate.get_step_report`).
+
+        ```{python}
+        validation.get_step_report(i=1)
+        ```
+
+        The scores of a scored step can be used to see how the threshold affects a model trained on
+        the data, by removing more or fewer rows; see
+        [`Ablation.sweep_score()`](`pointblank.Ablation.sweep_score`).
+        """
+
+        assertion_type = _get_fn_name()
+
+        from pointblank import scorers as _scorers
+
+        if isinstance(columns, str):
+            columns = [columns]
+        if (
+            not isinstance(columns, (list, tuple))
+            or not columns
+            or not all(isinstance(c, str) and c for c in columns)
+        ):
+            raise TypeError("`columns=` must be the name of a column or a list of column names.")
+        if len(set(columns)) != len(columns):
+            raise ValueError("`columns=` has the same column more than once.")
+        if not callable(scorer):
+            raise TypeError(
+                "`scorer=` must be a function of a list of rows or an adapter of `pb.scorers`, "
+                f"got {type(scorer).__name__}."
+            )
+        for bound, param in ((min_val, "min_val"), (max_val, "max_val")):
+            if bound is not None and (
+                isinstance(bound, bool) or not isinstance(bound, numbers.Real)
+            ):
+                raise TypeError(f"`{param}=` must be a number, got {type(bound).__name__}.")
+        if min_val is None and max_val is None:
+            raise ValueError("col_vals_scored() needs a bound: `min_val=`, `max_val=`, or both.")
+        if min_val is not None and max_val is not None and min_val > max_val:
+            raise ValueError(
+                f"`min_val=` ({min_val}) must not be greater than `max_val=` ({max_val})."
+            )
+        _check_boolean_input(param=na_pass, param_name="na_pass")
+        _check_boolean_input(param=keep_scores, param_name="keep_scores")
+        _scorers.check_cache(scorer, cache)
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        values = {
+            "scorer": scorer,
+            "min_val": min_val,
+            "max_val": max_val,
+            "cache": cache,
+            "keep_scores": keep_scores,
+        }
+
+        val_info = _ValidationInfo(
+            assertion_type=assertion_type,
+            column=list(columns),
+            values=values,
+            na_pass=na_pass,
+            pre=pre,
+            segments=segments,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
+        )
+
+        self._add_validation(validation_info=val_info)
+
+        return self
+
     def col_schema_match(
         self,
         schema: Schema,
@@ -17987,6 +18332,19 @@ class Validate:
 
                         results_tbl = interrogate_prompt(
                             tbl=data_tbl_step, columns_subset=column, ai_config=value
+                        )
+
+                    elif assertion_type == "col_vals_scored":
+                        from pointblank._interrogation import interrogate_scored
+
+                        results_tbl, validation.val_info = interrogate_scored(
+                            tbl=data_tbl_step, columns=column, config=value, na_pass=na_pass
+                        )
+                        scored_note_html, scored_note_text = _create_scored_note(
+                            validation.val_info, na_pass=na_pass
+                        )
+                        validation._add_note(
+                            key="scores", markdown=scored_note_html, text=scored_note_text
                         )
 
                     elif assertion_type == "col_exists":
@@ -21752,6 +22110,9 @@ class Validate:
 
         - `pb_failed_<i>_`, one for each row-level step (where `<i>` is the step number): `True`
           if the row failed step `<i>`
+        - `pb_score_<i>_`, one for each [`col_vals_scored()`](`pointblank.Validate.col_vals_scored`)
+          step that keeps its scores (the default, `keep_scores=True`): the row's score in step
+          `<i>`, missing if the row wasn't scored
         - `pb_n_failed_`: the number of steps the row failed
         - `pb_row_score_`: the share of the row's checks that passed (from `0` to `1`), weighted
           by the dimension weights set with [`config(dimension_weights=...)`](`pointblank.config`)
@@ -21878,25 +22239,36 @@ class Validate:
 
         data_nw = _with_row_index(data_nw, name=index_name)
 
+        # The `col_vals_scored()` steps that kept their scores also give a column of scores
+        scored = [k for k, validation in enumerate(steps) if _has_kept_scores(validation)]
+
+        def _step_results(k: int, validation: _ValidationInfo) -> Any:
+            results_tbl = _step_row_results(
+                validation,
+                data_nw,
+                index_name=index_name,
+                duplicates=duplicates,
+                duplicates_order_by=order_by,
+                extra=("pb_score_",) if k in scored else (),
+            )
+            score = (
+                nw.col("pb_score_").cast(nw.Float64)
+                if k in scored
+                else nw.lit(None, dtype=nw.Float64).alias("pb_score_")
+            )
+            return results_tbl.select(
+                index_name,
+                nw.lit(k, dtype=nw.Int64).alias("pb_step_"),
+                nw.col("pb_failed_").cast(nw.Int64),
+                *([score] if scored else []),
+            )
+
         # Stack the steps' results (rather than joining them to the table one by one), and give
         # each step's query for a database table a name, so that the query doesn't nest more deeply
         # with every step (SQLite versions before 3.46 can't parse deeply nested queries)
         results = nw.concat(
             [
-                _as_named_query(
-                    _step_row_results(
-                        validation,
-                        data_nw,
-                        index_name=index_name,
-                        duplicates=duplicates,
-                        duplicates_order_by=order_by,
-                    ).select(
-                        index_name,
-                        nw.lit(k, dtype=nw.Int64).alias("pb_step_"),
-                        nw.col("pb_failed_").cast(nw.Int64),
-                    ),
-                    name=f"pb_step_{k}_",
-                )
+                _as_named_query(_step_results(k, validation), name=f"pb_step_{k}_")
                 for k, validation in enumerate(steps)
             ],
             how="vertical",
@@ -21916,11 +22288,19 @@ class Validate:
                     nw.when(is_k).then(nw.col("pb_failed_")).otherwise(0).alias(f"pb_fail_{k}_")
                     for k, is_k in enumerate(is_step)
                 ],
+                *[
+                    nw.when(is_step[k])
+                    .then(nw.col("pb_score_"))
+                    .otherwise(nw.lit(None, dtype=nw.Float64))
+                    .alias(f"pb_score_{steps[k].i}_")
+                    for k in scored
+                ],
             )
             .group_by(index_name)
             .agg(
                 *[nw.col(f"pb_checked_{k}_").max() for k in range(len(steps))],
                 *[nw.col(f"pb_fail_{k}_").max() for k in range(len(steps))],
+                *[nw.col(f"pb_score_{steps[k].i}_").max() for k in scored],
             )
         )
         results = _as_named_query(results, name="pb_results_")
@@ -21958,6 +22338,13 @@ class Validate:
                 *[f"pb_fail_{k}_" for k in range(len(steps))],
             )
         )
+
+        if scored:
+            # The scores come after the flags
+            score_columns = [f"pb_score_{steps[k].i}_" for k in scored]
+            columns = [c for c in flags_tbl.collect_schema().names() if c not in score_columns]
+            at = columns.index("pb_n_failed_")
+            flags_tbl = flags_tbl.select(*columns[:at], *score_columns, *columns[at:])
 
         return flags_tbl.to_native()
 
@@ -22501,7 +22888,12 @@ class Validate:
                 "col_count_match",
             ]:
                 column_text = "&mdash;"
-            elif assertion_type[i] in ["rows_distinct", "rows_complete", "prompt"]:
+            elif assertion_type[i] in [
+                "rows_distinct",
+                "rows_complete",
+                "prompt",
+                "col_vals_scored",
+            ]:
                 if not column:
                     # If there is no column subset, then all columns are used
                     column_text = "ALL COLUMNS"
@@ -22738,6 +23130,10 @@ class Validate:
                     values_upd.append(f"≥{min_v}")  # pragma: no cover
                 else:  # pragma: no cover
                     values_upd.append(f"≤{max_v}")  # pragma: no cover
+
+            elif assertion_type[i] in ["col_vals_scored"]:
+                # The bounds, and a compact badge for the scorer (its full name is in the note)
+                values_upd.append(_scored_values_text(value))
 
             elif assertion_type[i] in ["prompt"]:  # pragma: no cover
                 # For AI validation, show only the prompt, not the full config
@@ -24607,19 +25003,33 @@ def _row_result_steps(
     return steps, skipped
 
 
+def _has_kept_scores(validation: _ValidationInfo) -> bool:
+    """
+    Whether a step is a `col_vals_scored()` step whose results hold the rows' scores.
+    """
+    if validation.assertion_type != "col_vals_scored":
+        return False
+    if not (validation.values or {}).get("keep_scores", True):
+        return False
+    return "pb_score_" in nw.from_native(validation.tbl_checked).collect_schema().names()
+
+
 def _step_row_results(
     validation: _ValidationInfo,
     data_nw: Any,
     index_name: str,
     duplicates: str | None,
     duplicates_order_by: list[str],
+    extra: tuple[str, ...] = (),
 ) -> Any:
     """
     Get a step's result for each row it checked, numbered by the rows of the target table.
 
     `data_nw` is the target table with a row index (`index_name`). The result is a table of the
-    checked rows' numbers (`index_name`) and whether each row failed the step (`pb_failed_`). Rows
-    outside a segmented step's segment aren't in it. A missing result doesn't count as a failure.
+    checked rows' numbers (`index_name`) and whether each row failed the step (`pb_failed_`), along
+    with any `extra` columns of the step's results (e.g., the `pb_score_` column of a
+    `col_vals_scored()` step). Rows outside a segmented step's segment aren't in it. A missing
+    result doesn't count as a failure.
     """
     if validation.row_index_map is not None:
         # The step's `pre=` function is row-preserving, so its results are numbered in the same
@@ -24676,7 +25086,7 @@ def _step_row_results(
             index_name=index_name,
         )
 
-    return results_tbl.select(index_name, "pb_failed_")
+    return results_tbl.select(index_name, "pb_failed_", *extra)
 
 
 def _with_kept_duplicates(
@@ -25614,6 +26024,9 @@ def _create_autobrief_or_failure_text(
     if assertion_type == "specially":
         return _create_text_specially(lang=lang, for_failure=for_failure)
 
+    if assertion_type == "col_vals_scored":
+        return _create_text_scored(lang=lang, column=column, values=values, for_failure=for_failure)
+
     if assertion_type == "prompt":
         return _create_text_prompt(
             lang=lang,
@@ -26122,6 +26535,32 @@ def _create_text_specially(lang: str, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     return EXPECT_FAIL_TEXT[f"specially_{type_}_text"][lang]
+
+
+def _create_text_scored(
+    lang: str, column: str | list[str], values: dict, for_failure: bool = False
+) -> str:
+    from pointblank.scorers import scorer_label
+
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    columns = [column] if isinstance(column, str) else list(column)
+    column_text = ", ".join(f"`{c}`" for c in columns)
+
+    min_val = values.get("min_val")
+    max_val = values.get("max_val")
+    if min_val is not None and max_val is not None:
+        values_text = f"[{min_val}, {max_val}]"
+    elif min_val is not None:
+        values_text = f"≥ {min_val}"
+    else:
+        values_text = f"≤ {max_val}"
+
+    return EXPECT_FAIL_TEXT[f"col_vals_scored_{type_}_text"][lang].format(
+        scorer_text=f"`{scorer_label(values.get('scorer'))}`",
+        column_text=column_text,
+        values_text=values_text,
+    )
 
 
 def _create_text_prompt(lang: str, prompt: str, for_failure: bool = False) -> str:
@@ -28043,6 +28482,82 @@ def _create_threshold_reset_note_text() -> str:
     return "Global thresholds explicitly not used for this step."
 
 
+def _scored_values_text(value: dict[str, Any]) -> str:
+    """Get the VALUES cell of a `col_vals_scored()` step: its bounds and a badge of its scorer."""
+    from pointblank.scorers import scorer_label
+
+    min_v = value.get("min_val")
+    max_v = value.get("max_val")
+    if min_v is not None and max_v is not None:
+        bounds = f"{min_v}–{max_v}"
+    elif min_v is not None:
+        bounds = f"≥{min_v}"
+    else:
+        bounds = f"≤{max_v}"
+    label = scorer_label(value.get("scorer"))
+    if len(label) > 24:
+        label = label[:23] + "…"
+    badge = (
+        "<br/><span style='font-size: 8px; font-weight: 600; letter-spacing: 0.5px; "
+        f"color: #7B68A6;'>{html_module.escape(label)}</span>"
+    )
+    return f"{bounds}{badge}"
+
+
+def _create_scored_note(info: dict[str, Any], na_pass: bool = False) -> tuple[str, str]:
+    """
+    Create the note of a `col_vals_scored()` step (HTML and plain text): the scorer, how many rows
+    were scored or found in the cache, the range of the scores, and the rows without a score.
+    """
+
+    def num(value: float) -> str:
+        return f"{value:.4g}"
+
+    def plural(n: int, word: str) -> str:
+        return f"{n:,} {word}{'' if n == 1 else 's'}"
+
+    scorer = info.get("scorer") or info.get("label") or "the scorer"
+    version = info.get("version")
+    version_text = f" (version {version})" if version is not None else ""
+
+    sentences = []
+    n_distinct = info.get("n_distinct", 0)
+    n_cached = info.get("n_cached", 0)
+    if not n_cached:
+        counts = f"{plural(n_distinct, 'distinct row')} scored"
+    elif n_cached == n_distinct:
+        counts = f"{plural(n_distinct, 'distinct row')}, with every score from the cache"
+    else:
+        counts = (
+            f"{plural(n_distinct, 'distinct row')}: {n_distinct - n_cached:,} scored and "
+            f"{n_cached:,} from the cache"
+        )
+    sentences.append(counts + ".")
+    if info.get("min") is not None:
+        range_text = f"Scores from {num(info['min'])} to {num(info['max'])}"
+        if info.get("median") is not None:
+            range_text += f" (median {num(info['median'])})"
+        sentences.append(range_text + ".")
+    n_unscored = info.get("n_unscored", 0)
+    if n_unscored:
+        if na_pass:
+            outcome = "passed with `na_pass=True`"
+        else:
+            outcome = f"failed (`na_pass=True` lets {'it' if n_unscored == 1 else 'them'} pass)"
+        sentences.append(
+            f"{plural(n_unscored, 'row')} had no score (a missing value, or none from the "
+            f"scorer) and {outcome}."
+        )
+    rest = " ".join(sentences)
+
+    text = f"Scored by {scorer}{version_text}: {rest}"
+    rest_html = html_module.escape(rest).replace("`na_pass=True`", "<code>na_pass=True</code>")
+    # Underscores are written as entities, so that a name like `__main__.fn` isn't read as bold
+    name_html = html_module.escape(str(scorer)).replace("_", "&#95;")
+    markdown = f"Scored by <code>{name_html}</code>{version_text}: {rest_html}"
+    return markdown, text
+
+
 def _create_no_columns_resolved_note_html(
     column_expr: str, available_columns: list[str], locale: str = "en"
 ) -> str:
@@ -28775,6 +29290,19 @@ def _step_report_row_based(
             name = getattr(expr, "__name__", None)
             names.append(name if name and name != "<lambda>" else f"expr_{k}")
         text = f"CONJOINTLY({html_module.escape(', '.join(names))})"
+    elif assertion_type == "col_vals_scored":
+        from pointblank.scorers import scorer_label
+
+        cols = ", ".join(column) if isinstance(column, (list, tuple)) else str(column)
+        scored = html_module.escape(f"{scorer_label(values.get('scorer'))}({cols})")
+        min_v = values.get("min_val")
+        max_v = values.get("max_val")
+        if min_v is not None and max_v is not None:
+            text = f"{min_v} &le; {scored} &le; {max_v}"
+        elif min_v is not None:
+            text = f"{scored} &ge; {min_v}"
+        else:
+            text = f"{scored} &le; {max_v}"
     else:
         # Fallback for any other assertion type: show the assertion type name
         text = str(assertion_type)  # pragma: no cover
@@ -28789,6 +29317,10 @@ def _step_report_row_based(
         # in the `tbl_preview` (i.e., it may not be present if `columns_subset=` didn't include it)
         preview_tbl_columns = tbl_preview._boxhead._get_columns()
         preview_tbl_has_target_column = column in preview_tbl_columns
+        if assertion_type == "col_vals_scored":
+            # The columns that were scored
+            column = [c for c in column if c in preview_tbl_columns]
+            preview_tbl_has_target_column = bool(column)
 
         if preview_tbl_has_target_column:
             step_report = tbl_preview.tab_style(
@@ -28885,6 +29417,10 @@ def _step_report_row_based(
         # in the `extract_tbl` (i.e., it may not be present if `columns_subset=` didn't include it)
         extract_tbl_columns = extract_tbl._boxhead._get_columns()
         extract_tbl_has_target_column = column in extract_tbl_columns
+        if assertion_type == "col_vals_scored":
+            # The columns that were scored, and their scores
+            column = [c for c in [*column, "pb_score_"] if c in extract_tbl_columns]
+            extract_tbl_has_target_column = bool(column)
 
         if extract_tbl_has_target_column:
             step_report = extract_tbl.tab_style(
