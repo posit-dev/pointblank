@@ -331,6 +331,7 @@ reference:
         - Validate.conjointly
         - Validate.specially
         - Validate.prompt
+        - Validate.col_vals_scored
 
     - title: Aggregation Steps
       desc: >
@@ -352,6 +353,23 @@ reference:
         - Validate.col_sd_ge
         - Validate.col_sd_le
         - Validate.col_sd_eq
+
+    - title: Scorers
+      desc: >
+        Scorers give each row a score with a model, for `Validate.col_vals_scored()`. Any function
+        of a batch of rows is a scorer; `from_function()` gives one a name, a version, and a batch
+        size, and the adapters use models from common packages (embeddings, rerankers, text
+        classifiers, language identification, and perplexity). Scores are cached by the scorer's
+        name and version, in memory or on disk.
+      contents:
+        - scorers.Scorer
+        - scorers.from_function
+        - scorers.embedding_similarity
+        - scorers.reranker
+        - scorers.classifier
+        - scorers.langid
+        - scorers.perplexity
+        - scorers.clear_cache
 
     - title: Column Selection
       desc: >
@@ -507,6 +525,8 @@ reference:
         - Ablation.drop_all
         - Ablation.drop_all_but_each
         - Ablation.drop_groups
+        - Ablation.sweep_score
+        - Ablation.sweep_step
         - Ablation.plan
         - Ablation.run
         - Ablation.check_determinism
