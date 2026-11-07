@@ -10531,6 +10531,66 @@ def test_get_row_flags_many_steps_sqlite() -> None:
     assert flags["pb_n_failed_"].to_list() == [8, 4] + [0] * 8
 
 
+def _many_steps_validation(data) -> Validate:
+    validation = Validate(data)
+    for k in range(12):
+        # (the steps all differ, since a query that repeats a step can reuse its subquery)
+        validation = (
+            validation.col_vals_gt(columns="rid", value=k)
+            .col_vals_gt(
+                columns="amount",
+                value=k / 4,
+                pre=pb.row_preserving(lambda dfn, k=k: dfn.filter(nw.col("rid") > k // 2)),
+            )
+            .rows_distinct(columns_subset="key", segments=("g", ["a", "b"][k % 2]))
+            .rows_distinct(
+                columns_subset="key",
+                pre=pb.row_preserving(lambda dfn, k=k: dfn.filter(nw.col("rid") != k)),
+            )
+        )
+    return validation.interrogate()
+
+
+def test_row_results_many_different_steps_sqlite() -> None:
+    # Different steps (including those with `pre=` and those keeping one copy of each duplicate)
+    # mustn't make the query nest more deeply either
+    validation = _many_steps_validation(_dup_tbl("sqlite"))
+    expected = _many_steps_validation(_DUP_TBL)
+
+    def flags(v):
+        return _as_polars(
+            v.get_row_flags(duplicates="keep_last", duplicates_order_by="version")
+        ).sort("rid")
+
+    assert flags(validation).equals(flags(expected))
+    for type in ("pass", "fail"):
+        assert _rids(validation.get_sundered_data(type=type, duplicates="keep_first")) == _rids(
+            expected.get_sundered_data(type=type, duplicates="keep_first")
+        )
+
+
+def test_row_results_of_row_flags_sqlite() -> None:
+    # The steps' queries are named in the query for the flags, so validating the flags again (with
+    # steps of the same number) mustn't name two queries the same
+    flags = (
+        Validate(_dup_tbl("sqlite"))
+        .col_vals_gt(columns="amount", value=0)
+        .rows_distinct(columns_subset="key")
+        .interrogate()
+        .get_row_flags()
+    )
+    validation = (
+        Validate(flags)
+        .col_vals_gt(columns="amount", value=2)
+        .col_vals_eq(columns="pb_n_failed_", value=0)
+        .interrogate()
+    )
+
+    assert _flagged_rids(validation.get_row_flags(), 1) == [1, 2, 3, 5]
+    assert _flagged_rids(validation.get_row_flags(), 2) == [2, 3, 5, 7, 8, 10]
+    assert _rids(validation.get_sundered_data(type="pass")) == [4, 6, 9]
+
+
 def _rp_paid_rows(df):
     return df.filter(pl.col("g") == "a")
 
@@ -10784,7 +10844,9 @@ def test_row_preserving_pre_unmarked_and_marked_reports() -> None:
     assert report[0]["pre"] == report[1]["pre"]
     validation.get_tabular_report()
 
-    with pytest.warns(UserWarning, match="step 1: it uses `pre=` without `pb.row_preserving\\(\\)`"):
+    with pytest.warns(
+        UserWarning, match="step 1: it uses `pre=` without `pb.row_preserving\\(\\)`"
+    ):
         flags = validation.get_row_flags()
     assert [c for c in flags.columns if c.startswith("pb_failed")] == ["pb_failed_2_"]
 
