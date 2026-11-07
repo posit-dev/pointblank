@@ -6,6 +6,7 @@ import warnings
 import pprint
 import sys
 import re
+import json
 import os
 from unittest.mock import patch, Mock
 import pytest
@@ -123,6 +124,8 @@ from great_tables import vals
 import great_tables as GT
 import narwhals as nw
 import narwhals.selectors as ncs
+
+import pointblank as pb
 
 from pointblank._constants import REPORTING_LANGUAGES
 from pointblank.missing import MissingSpec
@@ -870,6 +873,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "critical",
         "failure_text",
         "tbl_checked",
+        "row_index_map",
         "extract",
         "val_info",
         "time_processed",
@@ -905,6 +909,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
     assert val_info.critical is None
     assert val_info.failure_text is None
     assert val_info.tbl_checked is None
+    assert val_info.row_index_map is None
     assert val_info.extract is None
     assert val_info.val_info is None
     assert val_info.time_processed is None
@@ -962,6 +967,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture) -> None:
         "critical",
         "failure_text",
         "tbl_checked",
+        "row_index_map",
         "extract",
         "val_info",
         "time_processed",
@@ -10475,7 +10481,7 @@ def test_get_row_flags_warns_about_skipped_steps() -> None:
 
     # Inactive steps (step 4) are left out without a warning
     [message] = [str(w.message) for w in record if "flag columns" in str(w.message)]
-    assert "step 1: it uses `pre=`" in message
+    assert "step 1: it uses `pre=` without `pb.row_preserving()`" in message
     assert "step 2: it couldn't be evaluated" in message
     assert "step 3: no `duplicates=` policy was given" in message
     assert "step 4" not in message
@@ -10523,6 +10529,348 @@ def test_get_row_flags_many_steps_sqlite() -> None:
     flags = _as_polars(validation.get_row_flags()).sort("rid")
 
     assert flags["pb_n_failed_"].to_list() == [8, 4] + [0] * 8
+
+
+def _many_steps_validation(data) -> Validate:
+    validation = Validate(data)
+    for k in range(12):
+        # (the steps all differ, since a query that repeats a step can reuse its subquery)
+        validation = (
+            validation.col_vals_gt(columns="rid", value=k)
+            .col_vals_gt(
+                columns="amount",
+                value=k / 4,
+                pre=pb.row_preserving(lambda dfn, k=k: dfn.filter(nw.col("rid") > k // 2)),
+            )
+            .rows_distinct(columns_subset="key", segments=("g", ["a", "b"][k % 2]))
+            .rows_distinct(
+                columns_subset="key",
+                pre=pb.row_preserving(lambda dfn, k=k: dfn.filter(nw.col("rid") != k)),
+            )
+        )
+    return validation.interrogate()
+
+
+def test_row_results_many_different_steps_sqlite() -> None:
+    # Different steps (including those with `pre=` and those keeping one copy of each duplicate)
+    # mustn't make the query nest more deeply either
+    validation = _many_steps_validation(_dup_tbl("sqlite"))
+    expected = _many_steps_validation(_DUP_TBL)
+
+    def flags(v):
+        return _as_polars(
+            v.get_row_flags(duplicates="keep_last", duplicates_order_by="version")
+        ).sort("rid")
+
+    assert flags(validation).equals(flags(expected))
+    for type in ("pass", "fail"):
+        assert _rids(validation.get_sundered_data(type=type, duplicates="keep_first")) == _rids(
+            expected.get_sundered_data(type=type, duplicates="keep_first")
+        )
+
+
+def test_row_results_of_row_flags_sqlite() -> None:
+    # The steps' queries are named in the query for the flags, so validating the flags again (with
+    # steps of the same number) mustn't name two queries the same
+    flags = (
+        Validate(_dup_tbl("sqlite"))
+        .col_vals_gt(columns="amount", value=0)
+        .rows_distinct(columns_subset="key")
+        .interrogate()
+        .get_row_flags()
+    )
+    validation = (
+        Validate(flags)
+        .col_vals_gt(columns="amount", value=2)
+        .col_vals_eq(columns="pb_n_failed_", value=0)
+        .interrogate()
+    )
+
+    assert _flagged_rids(validation.get_row_flags(), 1) == [1, 2, 3, 5]
+    assert _flagged_rids(validation.get_row_flags(), 2) == [2, 3, 5, 7, 8, 10]
+    assert _rids(validation.get_sundered_data(type="pass")) == [4, 6, 9]
+
+
+def _rp_paid_rows(df):
+    return df.filter(pl.col("g") == "a")
+
+
+def _flagged_rids(flags, step: int) -> list[int]:
+    flags = _as_polars(flags)
+    return sorted(flags.filter(pl.col(f"pb_failed_{step}_"))["rid"].to_list())
+
+
+@pytest.mark.parametrize("tbl_type", _ROW_TBL_TYPES)
+def test_row_preserving_pre_in_flags_and_sundering(tbl_type) -> None:
+    validation = (
+        Validate(_dup_tbl(tbl_type))
+        # Filters the rows: rows 2 and 5 of group "a" fail (row 5's amount is missing)
+        .col_vals_gt(
+            columns="amount",
+            value=0,
+            pre=pb.row_preserving(lambda dfn: dfn.filter(nw.col("g") == "a")),
+        )
+        # Changes values: rows 6 and 10 fail (and row 5, with its missing amount)
+        .col_vals_lt(
+            columns="amount",
+            value=9,
+            pre=pb.row_preserving(lambda dfn: dfn.with_columns(nw.col("amount") + 1)),
+        )
+        # Reorders the rows, in two segments: in "a" rows 1, 2, and 5 fail; in "b" row 3 fails
+        .col_vals_gt(
+            columns="amount",
+            value=2,
+            pre=pb.row_preserving(lambda dfn: dfn.sort("amount", descending=True)),
+            segments="g",
+        )
+        # Duplicated keys in group "b" (rows 6, 7, and 8): the first copy is kept
+        .rows_distinct(
+            columns_subset="key",
+            pre=pb.row_preserving(lambda dfn: dfn.filter(nw.col("g") == "b")),
+        )
+        .interrogate()
+    )
+
+    assert [v.i for v in validation.validation_info] == [1, 2, 3, 4, 5]
+    assert all(not v.eval_error for v in validation.validation_info)
+    assert validation.n_failed() == {1: 2, 2: 3, 3: 3, 4: 1, 5: 3}
+
+    flags = validation.get_row_flags()
+
+    # The table's own columns come back without the row numbers given to `pre=`
+    assert [c for c in _as_polars(flags).columns if not c.startswith("pb_")] == [
+        "rid",
+        "key",
+        "version",
+        "amount",
+        "g",
+    ]
+    assert _flagged_rids(flags, 1) == [2, 5]
+    assert _flagged_rids(flags, 2) == [5, 6, 10]
+    assert _flagged_rids(flags, 3) == [1, 2, 5]
+    assert _flagged_rids(flags, 4) == [3]
+    assert _flagged_rids(flags, 5) == [7, 8]
+
+    # Rows that `pre=` filtered out weren't checked, so they don't lower the row score
+    scores = dict(_as_polars(flags).select("rid", "pb_row_score_").rows())
+    assert scores[4] == 1.0
+    assert scores[1] == pytest.approx(2 / 3)
+
+    assert _rids(validation.get_sundered_data(type="pass", duplicates="keep_first")) == [4, 9]
+    # Without a `duplicates=` policy, the `rows_distinct()` step isn't used
+    assert _rids(validation.get_sundered_data(type="pass")) == [4, 7, 8, 9]
+    assert _rids(validation.get_sundered_data(type="fail")) == [1, 2, 3, 5, 6, 10]
+
+
+def test_row_preserving_pre_with_native_and_named_functions() -> None:
+    for data, pre in [
+        (_DUP_TBL, _rp_paid_rows),
+        (_DUP_TBL.lazy(), _rp_paid_rows),
+        (_DUP_TBL.to_pandas(), lambda df: df[df["g"] == "a"]),
+    ]:
+        validation = (
+            Validate(data)
+            .col_vals_gt(columns="amount", value=0, pre=pb.row_preserving(pre))
+            .interrogate()
+        )
+
+        assert _flagged_rids(validation.get_row_flags(), 1) == [2, 5]
+
+
+def test_row_preserving_pre_notes_and_columns() -> None:
+    validation = (
+        Validate(_DUP_TBL)
+        .col_vals_not_null(
+            columns=pb.everything(),
+            pre=pb.row_preserving(lambda dfn: dfn.filter(nw.col("g") == "a")),
+        )
+        .col_vals_gt(
+            columns="amount",
+            value=0,
+            pre=pb.row_preserving(lambda dfn: dfn.filter(nw.col("g") == "a")),
+            segments="g",
+        )
+        .col_count_match(count=5, pre=pb.row_preserving(lambda df: df))
+        .interrogate()
+    )
+
+    # The row number column isn't one of the columns that a column selector or segment sees, nor
+    # one of the columns counted
+    assert [v.column for v in validation.validation_info[:5]] == [
+        "rid",
+        "key",
+        "version",
+        "amount",
+        "g",
+    ]
+    assert validation.validation_info[5].segments == ("g", "a")
+    assert len(validation.validation_info) == 7
+    assert validation.validation_info[6].all_passed
+    assert (
+        validation.validation_info[0].notes["pre_applied"]["text"]
+        == "Precondition applied: table dimensions [10 rows, 5 columns] → [5 rows, 5 columns]."
+    )
+    assert validation.validation_info[6].notes["pre_applied"]["text"] == (
+        "Precondition applied: no table dimension change."
+    )
+
+
+@pytest.mark.parametrize(
+    "pre, problem",
+    [
+        (lambda df: df.select("rid", "amount"), "has no `pb_index_` column"),
+        (lambda df: pl.concat([df, df]), "has repeated values"),
+        (
+            lambda df: df.join(pl.DataFrame({"g": ["a", "a"]}), on="g"),
+            "has repeated values",
+        ),
+        (lambda df: df.with_columns(pl.col("pb_index_") + 100), "values that aren't row numbers"),
+        (lambda df: df.with_columns(pl.col("pb_index_") - 1), "values that aren't row numbers"),
+        (
+            lambda df: df.with_columns(pl.col("pb_index_").cast(pl.String)),
+            "changed the `pb_index_` column to String",
+        ),
+        (
+            lambda df: df.with_columns(pl.lit(None, dtype=pl.UInt32).alias("pb_index_")),
+            "has missing values",
+        ),
+        (
+            lambda df: df.group_by("g").agg(pl.col("amount").sum()),
+            "has no `pb_index_` column",
+        ),
+    ],
+)
+def test_row_preserving_pre_violations_raise(pre, problem) -> None:
+    validation = (
+        Validate(_DUP_TBL)
+        .col_vals_gt(columns="rid", value=0)
+        .col_vals_gt(columns="amount", value=0, pre=pb.row_preserving(pre))
+    )
+
+    with pytest.raises(ValueError, match=re.escape(problem)) as excinfo:
+        validation.interrogate()
+
+    assert "The `pre=` function of step 2 is marked with `pb.row_preserving()`" in str(
+        excinfo.value
+    )
+
+
+@pytest.mark.parametrize("tbl_type", ["duckdb", "pandas"])
+def test_row_preserving_pre_violations_raise_on_other_backends(tbl_type) -> None:
+    validation = Validate(_dup_tbl(tbl_type)).col_vals_gt(
+        columns="amount", value=0, pre=pb.row_preserving(lambda dfn: dfn.select("amount"))
+    )
+
+    with pytest.raises(ValueError, match="has no `pb_index_` column"):
+        validation.interrogate()
+
+
+def test_row_preserving_pre_reserved_column_and_failing_function() -> None:
+    tbl = _DUP_TBL.with_columns(pb_index_=pl.col("rid"))
+
+    with pytest.raises(ValueError, match="already has a column called `pb_index_`"):
+        Validate(tbl).col_vals_gt(
+            columns="amount", value=0, pre=pb.row_preserving(lambda df: df)
+        ).interrogate()
+
+    # A function that fails is an evaluation error, as for any `pre=` function
+    def fails(df):
+        raise RuntimeError("boom")
+
+    validation = (
+        Validate(_DUP_TBL)
+        .col_vals_gt(columns="amount", value=0, pre=pb.row_preserving(fails))
+        .interrogate()
+    )
+    assert validation.validation_info[0].eval_error
+
+    with pytest.warns(UserWarning, match="step 1: it couldn't be evaluated"):
+        validation.get_row_flags()
+
+
+def test_row_preserving_pre_without_collected_results() -> None:
+    validation = Validate(_DUP_TBL).col_vals_gt(
+        columns="amount", value=0, pre=pb.row_preserving(_rp_paid_rows)
+    )
+
+    validation.interrogate()
+    assert validation.validation_info[0].row_index_map is not None
+
+    # Interrogating again starts afresh, and without the results there's no row index map
+    validation.interrogate(collect_tbl_checked=False)
+    assert validation.validation_info[0].row_index_map is None
+    with pytest.raises(ValueError, match="collect_tbl_checked=True"):
+        validation.get_row_flags()
+
+
+def test_row_preserving_marker() -> None:
+    import inspect
+    import pickle
+
+    marked = pb.row_preserving(_rp_paid_rows)
+
+    # It behaves like the function and looks like it to `inspect`
+    assert_frame_equal(marked(_DUP_TBL), _rp_paid_rows(_DUP_TBL))
+    assert marked.__name__ == "_rp_paid_rows"
+    assert list(inspect.signature(marked).parameters) == ["df"]
+    assert "def _rp_paid_rows(df):" in inspect.getsource(marked)
+    assert list(inspect.signature(pb.row_preserving(lambda dfn: dfn)).parameters) == ["dfn"]
+    assert pb.row_preserving(lambda df: df).__name__ == "<lambda>"
+    assert repr(marked).startswith("row_preserving(<function _rp_paid_rows")
+
+    # Marking twice changes nothing
+    assert pb.row_preserving(marked) is marked
+
+    # It can be pickled when the function can
+    restored = pickle.loads(pickle.dumps(marked))
+    assert restored.__wrapped__ is _rp_paid_rows
+
+    with pytest.raises(TypeError, match="needs a function"):
+        pb.row_preserving("not a function")
+
+
+def test_row_preserving_pre_unmarked_and_marked_reports() -> None:
+    validation = (
+        Validate(_DUP_TBL)
+        .col_vals_gt(columns="amount", value=0, pre=_rp_paid_rows)
+        .col_vals_gt(columns="amount", value=0, pre=pb.row_preserving(_rp_paid_rows))
+        .interrogate()
+    )
+
+    # Both steps check the same rows
+    assert validation.n_failed() == {1: 2, 2: 2}
+
+    report = json.loads(validation.get_json_report())
+    assert report[0]["pre"] == report[1]["pre"]
+    validation.get_tabular_report()
+
+    with pytest.warns(
+        UserWarning, match="step 1: it uses `pre=` without `pb.row_preserving\\(\\)`"
+    ):
+        flags = validation.get_row_flags()
+    assert [c for c in flags.columns if c.startswith("pb_failed")] == ["pb_failed_2_"]
+
+
+def test_row_preserving_pre_in_yaml() -> None:
+    from pointblank.yaml import YAMLValidationError, yaml_interrogate
+
+    config = """
+    tbl: small_table
+    steps:
+      - col_vals_gt:
+          columns: d
+          value: 1000
+          pre: |
+            pb.row_preserving(lambda df: df.filter(pl.col("f") == "high"))
+    """
+
+    validation = yaml_interrogate(config, allow_python=True)
+    flags = validation.get_row_flags()
+    assert flags.filter(pl.col("pb_failed_1_"))["f"].to_list() == ["high"] * 3
+
+    # The function is Python code, so it needs `allow_python=True` as before
+    with pytest.raises(YAMLValidationError, match="allow_python=True"):
+        yaml_interrogate(config)
 
 
 def test_col_vals_within_spec_checksum_on_lazyframe() -> None:
