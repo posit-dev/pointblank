@@ -500,8 +500,8 @@ _NON_STEP_METHODS = {
     "above_threshold", "add_steps", "all_passed", "assert_below_threshold",
     "assert_dimension_scores", "assert_passing", "critical", "error", "f_failed", "f_passed",
     "from_prompt", "get_data_extracts", "get_dataframe_report", "get_dimension_scores",
-    "get_health_score", "get_json_report", "get_note", "get_notes", "get_scorecard",
-    "get_step_report", "get_sundered_data", "get_tabular_report", "interrogate", "n",
+    "get_health_score", "get_json_report", "get_note", "get_notes", "get_row_flags",
+    "get_scorecard", "get_step_report", "get_sundered_data", "get_tabular_report", "interrogate", "n",
     "n_failed", "n_passed", "set_tbl", "suggest_improvements", "to_code", "to_json_schema",
     "to_yaml", "warning",
 }  # fmt: skip
