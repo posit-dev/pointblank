@@ -4,6 +4,7 @@ import datetime
 import functools
 import numbers
 import operator
+import statistics
 from collections.abc import Callable
 from dataclasses import dataclass
 from decimal import Decimal
@@ -2624,6 +2625,206 @@ def interrogate_prompt(  # pragma: no cover
     except Exception as e:
         # Anything else that stops the step as a whole (e.g., an invalid model configuration)
         raise StepEvaluationError(f"The prompt() step couldn't be run ({_first_line(e)}).") from e
+
+
+# The column of the scores of a `col_vals_scored()` step, next to `pb_is_good_`
+SCORE_COLUMN = "pb_score_"
+
+
+def _score_plain_rows(
+    scorer: Any, rows: list[dict[str, Any]], columns: list[str], cache: Any
+) -> tuple[list[float | None], dict[str, Any]]:
+    """
+    Score rows of values, leaving out (with a score of `None`) those with a missing value.
+
+    Errors of the scorer (or of a missing package it needs) stop the step, with a note.
+    """
+    from pointblank import scorers
+
+    records = []
+    positions = []
+    for i, row in enumerate(rows):
+        record = {c: scorers.python_value(row[c]) for c in columns}
+        if any(v is None for v in record.values()):
+            continue
+        records.append(record)
+        positions.append(i)
+
+    label = scorers.scorer_label(scorer)
+    try:
+        scored, counts = scorers.score_records(scorer, records, cache)
+    except ImportError as e:
+        raise StepEvaluationError(f"The col_vals_scored() step couldn't be run: {e}") from e
+    except scorers.ScorerOutputError as e:
+        raise StepEvaluationError(
+            f"The scorer {label} of the col_vals_scored() step can't be used: {e}."
+        ) from e
+    except Exception as e:
+        raise StepEvaluationError(
+            f"The scorer {label} of the col_vals_scored() step failed ({_first_line(e)})."
+        ) from e
+
+    scores: list[float | None] = [None] * len(rows)
+    for position, score in zip(positions, scored):
+        scores[position] = score
+    return scores, counts
+
+
+def _scored_lookup(nw_tbl: Any, columns: list[str], rows: list[dict], scores: list) -> Any:
+    """Make a table of the distinct rows that have a score, on the backend of a lazy table."""
+    keep = [(row, score) for row, score in zip(rows, scores) if score is not None]
+    native = nw_tbl.to_native()
+
+    if nw_tbl.implementation == nw.Implementation.IBIS:
+        import ibis
+
+        data_schema = native.schema()
+        schema = {c: data_schema[c] for c in columns}
+        schema[SCORE_COLUMN] = "float64"
+        data = {c: [row[c] for row, _ in keep] for c in columns}
+        data[SCORE_COLUMN] = [score for _, score in keep]
+        return nw.from_native(ibis.memtable(data, schema=ibis.schema(schema)))
+
+    if nw_tbl.implementation.is_pyspark() or nw_tbl.implementation.is_pyspark_connect():
+        from pyspark.sql.types import DoubleType, StructField, StructType
+
+        fields = {field.name: field for field in native.schema.fields}
+        schema = StructType(
+            [fields[c] for c in columns] + [StructField(SCORE_COLUMN, DoubleType(), True)]
+        )
+        data = [tuple(row[c] for c in columns) + (score,) for row, score in keep]
+        return nw.from_native(native.sparkSession.createDataFrame(data, schema=schema))
+
+    raise StepEvaluationError(
+        "col_vals_scored() can score Polars and pandas tables, Ibis tables, and PySpark "
+        f"DataFrames, not a {nw_tbl.implementation} table."
+    )
+
+
+def interrogate_scored(
+    tbl: IntoFrame, columns: list[str], config: dict[str, Any], na_pass: bool
+) -> tuple[Any, dict[str, Any]]:
+    """
+    Score each row with a model and check the scores against bounds.
+
+    The scorer gets the values of `columns` for each distinct row that has no missing value (a
+    row with a missing value, or that the scorer gives no score, passes if `na_pass=True`). The
+    results table has the scores in `pb_score_` (unless `keep_scores=False`) and the test results
+    in `pb_is_good_`. An eager table is scored in Python, in order. A database (Ibis) table or a
+    PySpark DataFrame has its distinct rows collected and scored, and the scores are joined back
+    to it on its own backend.
+
+    Returns the results table and the information on the scores for the step (`val_info`).
+    """
+    from pointblank import scorers
+
+    scorer = config["scorer"]
+    min_val = config.get("min_val")
+    max_val = config.get("max_val")
+    cache = config.get("cache", True)
+
+    nw_tbl = nw.from_native(tbl)
+    names = list(nw_tbl.collect_schema().names())
+    missing = [c for c in columns if c not in names]
+    if missing:
+        listed = ", ".join(repr(c) for c in missing)
+        raise StepEvaluationError(
+            f"The column{'s' if len(missing) > 1 else ''} {listed} of the col_vals_scored() step "
+            f"{'aren' if len(missing) > 1 else 'isn'}'t in the table."
+        )
+    if SCORE_COLUMN in names:
+        raise StepEvaluationError(
+            f"The table has a column {SCORE_COLUMN!r}, which is the name of the scores of a "
+            "col_vals_scored() step: rename it first (e.g., with `pre=`)."
+        )
+
+    name, version = scorers.scorer_identity(scorer)
+    info: dict[str, Any] = {
+        "scorer": name,
+        "version": version,
+        "label": scorers.scorer_label(scorer),
+    }
+
+    was_polars_lazy = is_polars_lazyframe(nw_tbl.to_native())
+    if was_polars_lazy:
+        nw_tbl = nw_tbl.collect()
+
+    if isinstance(nw_tbl, nw.DataFrame):
+        rows = nw_tbl.select(columns).rows(named=True)
+        scores, counts = _score_plain_rows(scorer, rows, columns, cache)
+        native = nw_tbl.to_native()
+        if is_polars_dataframe(native):
+            import polars as pl
+
+            native = native.with_columns(pl.Series(SCORE_COLUMN, scores, dtype=pl.Float64))
+        elif is_pandas_dataframe(native):
+            import pandas as pd
+
+            # Align by position: the frame's index need not be 0..n-1
+            native = native.assign(
+                **{SCORE_COLUMN: pd.Series(scores, dtype="float64", index=native.index)}
+            )
+        else:  # pragma: no cover
+            native = nw_tbl.with_columns(
+                nw.new_series(SCORE_COLUMN, scores, nw.Float64(), backend=nw_tbl.implementation)
+            ).to_native()
+        scored_tbl = nw.from_native(native)
+
+        present = [s for s in scores if s is not None]
+        info.update(counts)
+        info["n_rows"] = len(scores)
+        info["n_unscored"] = len(scores) - len(present)
+        info["min"] = min(present) if present else None
+        info["max"] = max(present) if present else None
+        info["median"] = statistics.median(present) if present else None
+    else:
+        distinct = nw_tbl.select(columns).unique().collect()
+        rows = distinct.rows(named=True)
+        scores, counts = _score_plain_rows(scorer, rows, columns, cache)
+        lookup = _scored_lookup(nw_tbl, columns, rows, scores)
+        scored_tbl = nw_tbl.join(lookup, on=columns, how="left")
+        info.update(counts)
+        info.update(_lazy_score_stats(scored_tbl))
+
+    score = nw.col(SCORE_COLUMN)
+    in_bounds = None
+    if min_val is not None:
+        in_bounds = score >= min_val
+    if max_val is not None:
+        below_max = score <= max_val
+        in_bounds = below_max if in_bounds is None else in_bounds & below_max
+    results = scored_tbl.with_columns(
+        pb_is_good_=nw.when(score.is_null()).then(nw.lit(bool(na_pass))).otherwise(in_bounds)
+    )
+    if not config.get("keep_scores", True):
+        results = results.drop(SCORE_COLUMN)
+    if was_polars_lazy:
+        results = results.lazy()
+
+    return results.to_native(), info
+
+
+def _lazy_score_stats(scored_tbl: Any) -> dict[str, Any]:
+    """Get the number of rows, those without a score, and the range of the scores, on a backend."""
+    score = nw.col(SCORE_COLUMN)
+    exprs = [
+        nw.len().alias("n_rows"),
+        score.is_null().cast(nw.Int64).sum().alias("n_unscored"),
+        score.min().alias("min"),
+        score.max().alias("max"),
+    ]
+    try:
+        stats = scored_tbl.select(*exprs, score.median().alias("median")).collect()
+    except Exception:
+        # A backend without a median (e.g., SQLite)
+        stats = scored_tbl.select(*exprs).collect()
+    row = stats.rows(named=True)[0]
+    out = {k: row.get(k) for k in ("n_rows", "n_unscored", "min", "max", "median")}
+    for key in ("n_rows", "n_unscored"):
+        out[key] = int(out[key] or 0)
+    for key in ("min", "max", "median"):
+        out[key] = None if out[key] is None else float(out[key])
+    return out
 
 
 def data_freshness(
