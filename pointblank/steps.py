@@ -7,6 +7,7 @@ from pointblank.contract import Step
 
 if TYPE_CHECKING:
     from collections.abc import Collection
+    from pathlib import Path
 
     from pointblank._typing import SegmentSpec, Tolerance
     from pointblank.actions import Actions
@@ -57,9 +58,9 @@ class Steps:
     ---------------
     Each validation method records one step and returns the same `Steps` object, so calls can be
     chained. All of the row-based and table-level validation methods are available, from
-    `col_vals_gt()` to `tbl_reconcile()`. The aggregation methods (`col_sum_*()`, `col_avg_*()`,
-    and `col_sd_*()`), `specially()`, and `prompt()` aren't, so add those directly to the
-    validation.
+    `col_vals_gt()` to `tbl_reconcile()`, including `col_vals_scored()`. The aggregation methods
+    (`col_sum_*()`, `col_avg_*()`, and `col_sd_*()`), `specially()`, and `prompt()` aren't, so add
+    those directly to the validation.
 
     Because each method adds to the object it's called on, a collection isn't copied when you add
     to it. Calling a method on a shared collection (e.g., `extended = id_checks.col_exists(...)`)
@@ -214,6 +215,9 @@ class Steps:
             "null_equal": True,
             "dup_keys": "flag",
             "agg": "sum",
+            # `col_vals_scored()` settings
+            "cache": True,
+            "keep_scores": True,
         }
         if value is None:
             return True
@@ -1005,6 +1009,57 @@ class Steps:
             max_val=max_val,
             na_pass=na_pass,
             missing=missing,
+            pre=pre,
+            segments=segments,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
+        )
+
+    def col_vals_scored(
+        self,
+        columns: str | list[str],
+        scorer: Callable[..., Any],
+        min_val: float | None = None,
+        max_val: float | None = None,
+        na_pass: bool = False,
+        cache: bool | str | Path = True,
+        keep_scores: bool = True,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Steps:
+        """Add a `col_vals_scored()` step to the collection.
+
+        The step records a call to
+        [`Validate.col_vals_scored()`](`pointblank.Validate.col_vals_scored`), which checks whether
+        each row's score from a model falls within given bounds. It takes the same arguments as
+        that method, so see its reference page for what each one does. Nothing is checked when the
+        step is recorded: it runs when the collection is added to a validation with
+        [`Validate.add_steps()`](`pointblank.Validate.add_steps`) and the validation is
+        interrogated.
+
+        Returns
+        -------
+        Steps
+            This same `Steps` object, with the new step added at the end, so that calls
+            can be chained.
+        """
+        return self._add(
+            "col_vals_scored",
+            columns=columns,
+            scorer=scorer,
+            min_val=min_val,
+            max_val=max_val,
+            na_pass=na_pass,
+            cache=cache,
+            keep_scores=keep_scores,
             pre=pre,
             segments=segments,
             thresholds=thresholds,
