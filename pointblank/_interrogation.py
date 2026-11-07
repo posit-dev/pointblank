@@ -458,6 +458,16 @@ class SpeciallyValidation:
             else:  # pragma: no cover
                 raise NotImplementedError(f"Support for {tbl_type} is not yet implemented")
 
+            # A null result (e.g., from `pl.col("a") > 1` where `a` is null) is neither `True` nor
+            # `False`, so it would be left out of both the passing and the failing counts; it is a
+            # failing test unit, as in `col_vals_expr()` and `conjointly()`
+            if "pb_is_good_" in result.columns:
+                result = (
+                    nw.from_native(result)
+                    .with_columns(pb_is_good_=nw.col("pb_is_good_").fill_null(False))
+                    .to_native()
+                )
+
         elif isinstance(result, bool):
             # If it's a single boolean, return that as a list
             return [result]

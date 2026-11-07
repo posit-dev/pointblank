@@ -11455,6 +11455,11 @@ specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'in
         boolean value, the validation will operate over a single test unit. For a return of a list
         of boolean values, the length of the list constitutes the number of test units.
 
+        When a table is returned, a row where the final column has a missing value (e.g.,
+        `pl.col("a") > 1` when `a` is null) counts as a failing test unit, as in
+        [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`). To let such rows pass, allow for
+        them in the function itself, as in `(pl.col("a") > 1) | pl.col("a").is_null()`.
+
         Parameters
         ----------
         expr
