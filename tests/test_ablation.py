@@ -219,6 +219,8 @@ def test_ablation_effects_and_verdicts():
         "steps",
         "left_out",
         "group",
+        "sweep",
+        "value",
         "n_removed",
         "f_removed",
         "metric",
@@ -983,6 +985,8 @@ def test_ablation_drop_all_but_each():
         "group": None,
         "group_column": None,
         "left_out": 1,
+        "sweep": None,
+        "value": None,
     }
     # Each left-out variant has a control of its own: its rows plus as many random rows as the
     # left-out step adds
@@ -1188,6 +1192,403 @@ def test_ablation_drop_groups_errors():
     validation = pb.Validate(data=tbl).col_vals_ge(columns="x", value=0).interrogate()
     with pytest.raises(TypeError, match="can't be grouped by the column 'tags'"):
         pb.Ablation(validation, evaluate=_evaluate).drop_groups("tags")
+
+
+# ----------------------------------------------------------------------------------------------
+# Sweeps
+# ----------------------------------------------------------------------------------------------
+
+_SCORER_CALLS = []
+
+
+def _x_score(batch):
+    """A scorer of the rows' `x` (a hundredth of it), counting the rows it's given."""
+    _SCORER_CALLS.append(len(batch))
+    return [row["x"] / 100 for row in batch]
+
+
+def _scored_validation(tbl, **kwargs):
+    kwargs = {"min_val": 0, **kwargs}
+    return (
+        pb.Validate(data=tbl)
+        .col_vals_ge(columns="x", value=0)
+        .col_vals_scored(columns="x", scorer=_x_score, cache=False, **kwargs)
+        .interrogate()
+    )
+
+
+def _sweep_points(ablation):
+    return [
+        (v["id"], v["strategy"], v["sweep"], v["value"], v["n_removed"])
+        for v in ablation.to_dict()["variants"]
+        if v["sweep"] is not None
+    ]
+
+
+@pytest.mark.parametrize("tbl_type", _TBL_TYPES)
+def test_ablation_sweep_score(tbl_type):
+    tbl = _tbl(tbl_type)
+    validation = _scored_validation(tbl)
+    repeats = 3
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=repeats).sweep_score(
+        2, quantiles=[0.1, 0.25]
+    )
+    ablation.run()
+    assert _sweep_points(ablation) == [
+        ("step_2:lowest_0.1", "sweep_score", "step_2:lowest", 0.1, 10),
+        ("step_2:lowest_0.25", "sweep_score", "step_2:lowest", 0.25, 25),
+    ]
+    rows = _effects_by_variant(ablation)
+    # The 10 lowest scores are the rows with a negative `x`, which hurt the model
+    assert rows["step_2:lowest_0.1"]["verdict"] == "helps"
+    assert rows["step_2:lowest_0.1"]["sweep"] == "step_2:lowest"
+    assert rows["step_2:lowest_0.1"]["value"] == 0.1
+    assert rows["step_2:lowest_0.1"]["steps"] == []
+    assert rows["step_2:lowest_0.1"]["name"] == "Step 2: lowest 10% of scores"
+
+    # The removed rows are those with the lowest scores (here, of `x`)
+    removed = ablation._resolve().removed
+    xs = _TBL["x"].to_list()
+    assert sorted(xs[k] for k in removed["step_2:lowest_0.1"]) == [-1.0] * 10
+    assert max(xs[k] for k in removed["step_2:lowest_0.25"]) == 16.0
+
+
+def test_ablation_sweep_score_values_and_direction():
+    validation = _scored_validation(_TBL)
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3)
+    ablation.sweep_score(2, values=[0, 0.05])
+    ablation.sweep_score(2, values=[0.95], remove="highest")
+    ablation.sweep_score(2, quantiles=[0.05], remove="highest")
+    assert _sweep_points(ablation.run()) == [
+        ("step_2:below_0", "sweep_score", "step_2:below", 0.0, 10),
+        ("step_2:below_0.05", "sweep_score", "step_2:below", 0.05, 14),
+        ("step_2:above_0.95", "sweep_score", "step_2:above", 0.95, 4),
+        ("step_2:highest_0.05", "sweep_score", "step_2:highest", 0.05, 5),
+    ]
+    names = {v.id: v.name for v in ablation._variants}
+    assert names["step_2:below_0.05"] == "Step 2: scores below 0.05"
+    assert names["step_2:highest_0.05"] == "Step 2: highest 5% of scores"
+    # Removing the highest scores of 95 to 99 is the same as removing the top 5%, minus row 95
+    assert ablation._resolve().same_as == {}
+
+    # With only `max_val=`, a high score is bad, so the highest scores are removed by default
+    validation = _scored_validation(_TBL, min_val=None, max_val=0.9)
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).sweep_score(
+        2, quantiles=[0.1]
+    )
+    assert [spec.id for spec in ablation._specs] == ["step_2:highest_0.1"]
+    xs = _TBL["x"].to_list()
+    assert sorted(xs[k] for k in ablation._resolve().removed["step_2:highest_0.1"]) == [
+        float(k) for k in range(89, 100) if k % 10
+    ]
+
+
+def test_ablation_sweep_score_ties_and_rounding():
+    tbl = pl.DataFrame({"s": [0.5, 0.1, 0.5, 0.1, 0.9, None, 0.3, 0.7], "x": [1.0] * 8})
+    validation = pb.Validate(data=tbl).col_vals_ge(columns="x", value=0).interrogate()
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).sweep_score(
+        "s", quantiles=[0.2, 0.5, 1]
+    )
+    removed = {spec.id: sorted(ablation._sweep_rows[spec.id]) for spec in ablation._specs}
+    # Of the 7 scored rows, 20% is 1.4 rows (1 row), and ties are broken by row order
+    assert removed == {
+        "s:lowest_0.2": [1],
+        "s:lowest_0.5": [0, 1, 3, 6],
+        "s:lowest_1": [0, 1, 2, 3, 4, 6, 7],
+    }
+    assert ablation._notes == [
+        "1 row has no score in the column `s`, so the sweep never removes it."
+    ]
+    details = ablation._sweep_details
+    assert details["s:lowest_0.5"] == "The 4 rows with the lowest scores (of 7 scored rows)"
+
+
+def test_ablation_sweep_score_column_with_missing_values(tmp_path):
+    validation = _validation(_TBL)
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).sweep_score("y", values=[10])
+    ablation.run()
+    # The rows with a missing `y` are never removed
+    removed = ablation._resolve().removed["y:below_10"]
+    assert len(removed) == 18
+    assert all(_TBL["y"][k] is not None for k in removed)
+    assert ablation._notes == [
+        "10 rows have no score in the column `y`, so the sweep never removes them."
+    ]
+
+    # A pandas table with NaN for the missing values
+    tbl = _TBL.to_pandas()
+    validation = _validation(tbl)
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).sweep_score("y", values=[10])
+    assert len(ablation._resolve().removed["y:below_10"]) == 18
+
+
+def test_ablation_sweep_score_with_a_segmented_step():
+    validation = (
+        pb.Validate(data=_TBL)
+        .col_vals_scored(columns="x", scorer=_x_score, min_val=0, segments="g", cache=False)
+        .interrogate()
+    )
+    # Step 1 is the 'gold' segment, step 2 the 'plain' one
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).sweep_score(
+        2, quantiles=[0.5]
+    )
+    removed = ablation._resolve().removed["step_2:lowest_0.5"]
+    assert len(removed) == 45
+    assert all(_TBL["g"][k] == "plain" for k in removed)
+    assert ablation._notes == ["10 rows have no score in step 2, so the sweep never removes them."]
+
+
+def test_ablation_sweep_score_same_rows_and_no_rows():
+    validation = _scored_validation(_TBL)
+    ablation = (
+        pb.Ablation(validation, evaluate=_evaluate, repeats=3)
+        .drop_each()
+        .sweep_score(2, values=[-0.5, 0, 0.001])
+    )
+    ablation.run()
+    resolved = ablation._resolve()
+    # Removing the scores below 0 removes the rows that fail step 1 (and step 2), and so does
+    # removing those below 0.001, so they aren't evaluated again
+    assert resolved.same_as == {"step_2:below_0": "step_1", "step_2:below_0.001": "step_1"}
+    assert "Step 2: scores below -0.5 isn't used: it removes no rows." in resolved.notes
+    rows = _effects_by_variant(ablation)
+    assert rows["step_2:below_0"]["mean"] == rows["step_1"]["mean"]
+
+    # A point that removes every row isn't used
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).sweep_score(
+        2, quantiles=[0.5, 1]
+    )
+    assert "Step 2: lowest 100% of scores isn't used: it removes every row." in (
+        ablation._resolve().notes
+    )
+
+
+def test_ablation_sweep_score_errors():
+    validation = _scored_validation(_TBL)
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3)
+    with pytest.raises(TypeError, match=r"must be the number of a `col_vals_scored\(\)` step"):
+        ablation.sweep_score(True)
+    with pytest.raises(TypeError, match=r"must be the number of a `col_vals_scored\(\)` step"):
+        ablation.sweep_score(2.0)
+    with pytest.raises(ValueError, match="either `quantiles=` or `values=`"):
+        ablation.sweep_score(2, quantiles=[0.1], values=[0])
+    with pytest.raises(ValueError, match="must be 'lowest' or 'highest'"):
+        ablation.sweep_score(2, remove="low")
+    with pytest.raises(ValueError, match=r"isn't a `col_vals_scored\(\)` step"):
+        ablation.sweep_score(1)
+    with pytest.raises(ValueError, match="the validation has no step 7"):
+        ablation.sweep_score(7)
+    with pytest.raises(ValueError, match="The column 'nope' isn't in the table"):
+        ablation.sweep_score("nope")
+    with pytest.raises(TypeError, match="must be numeric to be used as a score"):
+        ablation.sweep_score("g")
+    with pytest.raises(ValueError, match="greater than 0 and at most 1"):
+        ablation.sweep_score(2, quantiles=[0])
+    with pytest.raises(ValueError, match="greater than 0 and at most 1"):
+        ablation.sweep_score(2, quantiles=[1.5])
+    with pytest.raises(TypeError, match="must be a list of numbers"):
+        ablation.sweep_score(2, values=0.5)
+    with pytest.raises(ValueError, match="at least one value"):
+        ablation.sweep_score(2, values=[])
+    with pytest.raises(TypeError, match="must be finite numbers"):
+        ablation.sweep_score(2, values=[True])
+    with pytest.raises(TypeError, match="must be finite numbers"):
+        ablation.sweep_score(2, values=[float("nan")])
+    with pytest.raises(ValueError, match="different from each other"):
+        ablation.sweep_score(2, values=[0.1, 0.1])
+    assert ablation._specs == []
+
+    # A step that didn't keep its scores
+    validation = _scored_validation(_TBL, keep_scores=False)
+    with pytest.raises(ValueError, match="kept its scores"):
+        pb.Ablation(validation, evaluate=_evaluate).sweep_score(2)
+
+
+@pytest.mark.parametrize("tbl_type", _TBL_TYPES)
+def test_ablation_sweep_step(tbl_type):
+    tbl = _tbl(tbl_type)
+    ablation = pb.Ablation(_validation(tbl), evaluate=_evaluate, repeats=3).sweep_step(
+        1, param="value", values=[0, 5, 30]
+    )
+    ablation.run()
+    assert _sweep_points(ablation) == [
+        ("step_1:value=0", "sweep_step", "step_1:value", 0.0, 10),
+        ("step_1:value=5", "sweep_step", "step_1:value", 5.0, 14),
+        ("step_1:value=30", "sweep_step", "step_1:value", 30.0, 37),
+    ]
+    rows = _effects_by_variant(ablation)
+    assert rows["step_1:value=0"]["verdict"] == "helps"
+    assert rows["step_1:value=0"]["name"] == "Step 1 with value=0"
+    assert ablation._sweep_details["step_1:value=5"] == ("The rows that fail step 1 with `value=5`")
+
+
+def test_ablation_sweep_step_of_a_scored_step_uses_the_cache():
+    pb.scorers.clear_cache()
+    validation = (
+        pb.Validate(data=_TBL)
+        .col_vals_scored(columns="x", scorer=_x_score, min_val=0, thresholds=0.1, brief="Scored")
+        .interrogate()
+    )
+    _SCORER_CALLS.clear()
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).sweep_step(
+        1, param="min_val", values=[0, 0.1, 0.5]
+    )
+    assert [len(ablation._sweep_rows[spec.id]) for spec in ablation._specs] == [10, 19, 55]
+    # The scores came from the score cache
+    assert _SCORER_CALLS == []
+    # Running the step again with `min_val=` above `max_val=` fails
+    validation = (
+        pb.Validate(data=_TBL)
+        .col_vals_scored(columns="x", scorer=_x_score, min_val=0, max_val=0.5)
+        .interrogate()
+    )
+    with pytest.raises(ValueError, match="Step 1 can't be run with `min_val=0.9`: `min_val=`"):
+        pb.Ablation(validation, evaluate=_evaluate).sweep_step(1, "min_val", [0.9])
+
+
+def test_ablation_sweep_step_with_segments_and_pre():
+    validation = (
+        pb.Validate(data=_TBL)
+        .col_vals_ge(columns="x", value=0, segments="g")
+        .col_vals_ge(columns="x", value=0, pre=pb.row_preserving(lambda df: df))
+        .interrogate()
+    )
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).sweep_step(
+        2, param="value", values=[20]
+    )
+    # Only the rows of the step's segment ('plain') are checked
+    removed = ablation._sweep_rows["step_2:value=20"]
+    assert len(removed) == 10 + 8 + 8
+    assert all(_TBL["g"][k] == "plain" for k in removed)
+
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).sweep_step(
+        3, param="value", values=[1.5]
+    )
+    assert len(ablation._sweep_rows["step_3:value=1.5"]) == 11
+
+
+def test_ablation_sweep_step_errors():
+    validation = _validation(_TBL)
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3)
+    with pytest.raises(TypeError, match="must be a step number"):
+        ablation.sweep_step("1", "value", [1])
+    with pytest.raises(ValueError, match="can't use step 4: it doesn't check rows"):
+        ablation.sweep_step(4, "value", [1])
+    with pytest.raises(TypeError, match="must be the name of a parameter"):
+        ablation.sweep_step(1, None, [1])
+    for param in ("thresholds", "pre", "segments", "self", "nope"):
+        with pytest.raises(ValueError, match=f"can't vary '{param}'"):
+            ablation.sweep_step(1, param, [1])
+    with pytest.raises(TypeError, match="must be finite numbers"):
+        ablation.sweep_step(1, "value", ["a"])
+    with pytest.raises(ValueError, match="Step 1 can't be run with `columns=1`"):
+        ablation.sweep_step(1, "columns", [1])
+    assert ablation._specs == []
+
+
+def test_ablation_sweep_reports():
+    validation = _scored_validation(_TBL)
+    ablation = (
+        pb.Ablation(validation, evaluate=_evaluate, repeats=3)
+        .drop_each(steps=[1])
+        .sweep_score(2, quantiles=[0.1, 0.2, 0.3])
+        .sweep_step(1, param="value", values=[5])
+    )
+    plan = ablation.plan().as_raw_html()
+    assert "Sweep: Step 2, removing the lowest-scoring rows" in plan
+    assert "Sweep: Step 1, varying value" in plan
+    assert "The 20 rows with the lowest scores (of 100 scored rows)" in plan
+    assert "The rows that fail step 1 with <code>value=5</code>" in plan
+    # The groups are in order: the variants, then each sweep
+    assert plan.index(">Variants<") < plan.index("Sweep: Step 2") < plan.index("Sweep: Step 1")
+
+    ablation.run()
+    report = ablation.get_tabular_report().as_raw_html()
+    assert report.count("<svg width='460'") == 2
+    assert "Removing as many random rows" in report
+    assert "Share of the scored rows removed" in report
+    assert ">10%<" in report and ">30%<" in report
+    assert "value (step 1)" in report
+    # The sweeps aren't used to annotate the validation
+    annotated = ablation.annotate()
+    assert "ablation" in annotated.validation_info[0].notes
+    assert "ablation" not in (annotated.validation_info[1].notes or {})
+
+    # Without a control, there's no dashed line
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3, control=None).sweep_score(
+        2, quantiles=[0.1]
+    )
+    report = ablation.run().get_tabular_report().as_raw_html()
+    assert report.count("<svg width='460'") == 1
+    assert "Removing as many random rows" not in report
+
+    # The effects, and the JSON of the results
+    effects = ablation.get_effects()
+    assert effects["sweep"].to_list() == [None, "step_2:lowest"]
+    assert effects["value"].to_list() == [None, 0.1]
+    variants = json.loads(ablation.to_json())["variants"]
+    assert variants[1]["sweep"] == "step_2:lowest" and variants[1]["value"] == 0.1
+
+
+def test_sweep_svg_with_one_point_and_no_intervals():
+    from pointblank.ablation import _sweep_svg
+
+    sweep = {"label": "S", "axis": "A", "percent": False}
+    row = {
+        "value": 1.0,
+        "name": "P",
+        "delta_vs_full": 0.0,
+        "delta_vs_full_lower": None,
+        "delta_vs_full_upper": None,
+        "control_mean": 1.0,
+        "verdict": None,
+    }
+    svg = _sweep_svg(sweep, [row], baseline=1.0, fmt=_NumberFormat([1.0]), metric="m", direction="")
+    assert svg.startswith("<svg") and svg.endswith("</svg>")
+    assert "stroke-dasharray='4,3'" in svg
+
+
+def test_nice_ticks():
+    from pointblank.ablation import _nice_ticks
+
+    assert _nice_ticks(-10.0, 1.2) == [-10.0, -5.0, 0.0, 5.0]
+    assert _nice_ticks(0.0, 1.0) == [0.0, 0.25, 0.5, 0.75, 1.0]
+    assert 0.0 in _nice_ticks(-0.013, 0.004)
+
+
+def test_yaml_ablation_sweeps():
+    config = """
+tbl: small_table
+steps:
+- col_vals_ge:
+    columns: x
+    value: 0
+ablation:
+  repeats: 3
+  strategies:
+  - sweep_step:
+      step: 1
+      param: value
+      values: [0, 5]
+  - sweep_score:
+      score: x
+      quantiles: [0.1]
+"""
+    ablation = pb.yaml_ablation(config, evaluate=_evaluate, set_tbl=_TBL)
+    assert [spec.id for spec in ablation._specs] == [
+        "step_1:value=0",
+        "step_1:value=5",
+        "x:lowest_0.1",
+    ]
+    code = pb.yaml_to_python(config)
+    assert '    .sweep_step(step=1, param="value", values=[0, 5])' in code
+    assert '    .sweep_score(score="x", quantiles=[0.1])' in code
+
+    bad = config.replace("      param: value\n", "")
+    with pytest.raises(
+        pb.yaml.YAMLValidationError, match="needs the parameter\\(s\\) \\['param'\\]"
+    ):
+        pb.yaml_ablation(bad, evaluate=_evaluate, set_tbl=_TBL)
 
 
 # ----------------------------------------------------------------------------------------------
