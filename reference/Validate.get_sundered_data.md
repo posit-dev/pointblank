@@ -4,7 +4,7 @@ Get the data that passed or failed the validation steps.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21481-L21681)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21530-L21738)
 
 ``` python
 Validate.get_sundered_data(
@@ -22,9 +22,9 @@ There are some caveats to sundering. The validation steps considered for this sp
 
 - of certain check types, where test units are rows or cells checked down a column (e.g., the `col_vals_*()` methods and `rows_complete()`)
 - `active=` is not set to `False`
-- `pre=` has not been given an expression for modifying the input table
+- `pre=` has not been given an expression for modifying the input table, unless it's marked with [`row_preserving()`](../reference/row_preserving.md#pointblank.row_preserving)
 
-So long as these conditions are met, the data will be split into two constituent tables: one with the rows that passed all validation steps and another with the rows that failed at least one validation step. Steps that use `segments=` are included, with each segment's results counting only for the rows in that segment.
+So long as these conditions are met, the data will be split into two constituent tables: one with the rows that passed all validation steps and another with the rows that failed at least one validation step. Steps that use `segments=` are included, with each segment's results counting only for the rows in that segment. Likewise, a step with a [row_preserving()](../reference/row_preserving.md#pointblank.row_preserving) `pre=` function only counts for the rows that the function returned.
 
 Steps that use [`rows_distinct()`](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) are a special case. That step counts every copy of a duplicated row as failing, since it can't know which of them is the 'wrong' one. Such steps are only used for sundering if you say which copy to keep with `duplicates=`: the kept copy goes to the 'pass' piece (if it passes the other steps) and the other copies go to the 'fail' piece. With `duplicates="flag_all"`, every copy goes to the 'fail' piece.
 

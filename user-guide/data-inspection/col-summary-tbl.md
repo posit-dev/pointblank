@@ -168,7 +168,7 @@ for col_name, scores in drift.items():
     print(f"{col_name}: {scores}")
 ```
 
-    amount: {'psi': 2.941363, 'ks_statistic': 0.55, 'ks_p_value': 0.002571}
+    amount: {'psi': 2.941363, 'ks_statistic': np.float64(0.55), 'ks_p_value': np.float64(0.003967)}
     category: {'psi': 0.250553}
 
 When a [DataScan](../../reference/DataScan.md#pointblank.DataScan) is loaded from a saved JSON file (with no original data attached), drift scores cannot be computed. The comparison still reports schema changes and raw stat differences, but the `drift_scores` field will be empty. If you need drift scores in a persist-and-compare workflow, keep the original data available when calling `compare()`.

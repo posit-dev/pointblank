@@ -119,7 +119,7 @@ Full `--help` output
 
 ## Arguments
 
-`DATA_SOURCE: TEXT`  
+`DATA_SOURCE`  
 Optional.
 
 ## Options

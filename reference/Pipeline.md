@@ -77,7 +77,7 @@ When a boundary fails, the pipeline applies that contract's `on_violation=` sett
 
 ## Serialization
 
-A pipeline can be stored as YAML with [`to_yaml()`](../reference/Pipeline.md#pointblank.Pipeline.to_yaml) and read back with [`from_yaml()`](../reference/Pipeline.md#pointblank.Pipeline.from_yaml), or converted to and from a dictionary with [`to_dict()`](../reference/Pipeline.md#pointblank.Pipeline.to_dict) and [`from_dict()`](../reference/Pipeline.md#pointblank.Pipeline.from_dict). The stored form holds the label, thresholds, and `short_circuit=` setting under a `pipeline` key, plus the two contracts under `source` and `target`. Actions and final actions are functions or messages tied to your environment, so they aren't stored. Pass them again when you recreate the pipeline. The transformation isn't part of the pipeline either: it's given to [run()](../reference/Pipeline.md#pointblank.Pipeline.run) each time.
+A pipeline can be stored as YAML with [`to_yaml()`](../reference/Pipeline.md#pointblank.Pipeline.to_yaml) and read back with [`from_yaml()`](../reference/Pipeline.md#pointblank.Pipeline.from_yaml), or converted to and from a dictionary with [`to_dict()`](../reference/Pipeline.md#pointblank.Pipeline.to_dict) and [`from_dict()`](../reference/Pipeline.md#pointblank.Pipeline.from_dict). The stored form holds the label, thresholds, and `short_circuit=` setting under a `pipeline` key, plus the two contracts under `source` and `target`. Actions and final actions are functions or messages tied to your environment, so they aren't stored. Pass them again when you recreate the pipeline. The transformation isn't part of the pipeline either: it's given to `run()` each time.
 
 ## Examples
 
@@ -214,7 +214,7 @@ The batch was caught at the source boundary, so nothing reached the target table
 ## See Also
 
 [PipelineResult](../reference/PipelineResult.md#pointblank.PipelineResult)  
-The result of [run()](../reference/Pipeline.md#pointblank.Pipeline.run), holding both boundary validations.
+The result of `run()`, holding both boundary validations.
 
 [Contract](../reference/Contract.md#pointblank.Contract)  
 Define the source and target contracts.
@@ -253,7 +253,7 @@ This is the main way to use a pipeline. It checks `data` against the source cont
 
 If the source validation has any failing test units and the pipeline has `short_circuit=True` (the default), the run stops there. The transformation isn't called, and the result has no transformed data and no target validation. With `short_circuit=False`, the transformation is called and the target is validated whatever the outcome of the source validation. If the pipeline has only one contract, the other boundary is skipped.
 
-When a boundary fails, its contract's `on_violation=` setting is applied: `"warn"` issues a `UserWarning` and `"log"` writes to the `"pointblank.contract"` logger. With `"raise"`, [run()](../reference/Pipeline.md#pointblank.Pipeline.run) raises a [`ContractViolationError`](../reference/ContractViolationError.md#pointblank.ContractViolationError) instead of returning. A failing source raises right away with `short_circuit=True`, and after the target has been validated with `short_circuit=False`. The error's `result` attribute holds the [`PipelineResult`](../reference/PipelineResult.md#pointblank.PipelineResult) of the run, with the validations and any transformed data. With `"warn"` or `"log"`, check the result's [`passed`](../reference/PipelineResult.md#pointblank.PipelineResult.passed) property to stop a job when the pipeline fails.
+When a boundary fails, its contract's `on_violation=` setting is applied: `"warn"` issues a `UserWarning` and `"log"` writes to the `"pointblank.contract"` logger. With `"raise"`, `run()` raises a [`ContractViolationError`](../reference/ContractViolationError.md#pointblank.ContractViolationError) instead of returning. A failing source raises right away with `short_circuit=True`, and after the target has been validated with `short_circuit=False`. The error's `result` attribute holds the [`PipelineResult`](../reference/PipelineResult.md#pointblank.PipelineResult) of the run, with the validations and any transformed data. With `"warn"` or `"log"`, check the result's [`passed`](../reference/PipelineResult.md#pointblank.PipelineResult.passed) property to stop a job when the pipeline fails.
 
 #### Parameters
 
@@ -261,7 +261,7 @@ When a boundary fails, its contract's `on_violation=` setting is applied: `"warn
 The input table. Any table type that [Validate](../reference/Validate.md#pointblank.Validate) accepts can be used (e.g., a Polars or Pandas DataFrame, or an Ibis table).
 
 `transform: Callable[[Any], Any]`  
-A function that takes the input table and returns the transformed table. It's called with `data` itself, and its return value is validated against the target contract, so it must also be a table that [Validate](../reference/Validate.md#pointblank.Validate) accepts. The function is called at most once per run. An exception raised by it isn't caught, so it propagates from [run()](../reference/Pipeline.md#pointblank.Pipeline.run).
+A function that takes the input table and returns the transformed table. It's called with `data` itself, and its return value is validated against the target contract, so it must also be a table that [Validate](../reference/Validate.md#pointblank.Validate) accepts. The function is called at most once per run. An exception raised by it isn't caught, so it propagates from `run()`.
 
 #### Returns
 

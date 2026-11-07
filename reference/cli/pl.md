@@ -75,7 +75,7 @@ Full `--help` output
 
 ## Arguments
 
-`POLARS_EXPRESSION: TEXT`  
+`POLARS_EXPRESSION`  
 Optional.
 
 ## Options

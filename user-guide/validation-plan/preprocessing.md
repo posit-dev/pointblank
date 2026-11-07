@@ -210,9 +210,9 @@ shape: (3, 2)
 | f      | n   |
 |--------|-----|
 | str    | u32 |
+| "mid"  | 2   |
 | "low"  | 5   |
 | "high" | 6   |
-| "mid"  | 2   |
 
 Then, we'll plug in the `data_transformed` DataFrame with a preprocessing function:
 
@@ -241,6 +241,46 @@ def use_transformed_data(df):
 We can see from the validation report table that there are three test units. This corresponds to a row for each of the categorical value counts. From the report, we find that two of the three test units are passing test units (turns out there are only two instances of `"mid"` in column `f`).
 
 Note that the swapped-in table can be any table type that Pointblank supports, like a Polars DataFrame (as shown here), a Pandas DataFrame, a Narwhals DataFrame, or any other compatible format. This flexibility allows you to validate properties of your data that might only be apparent after significant reshaping or aggregation.
+
+## Preprocessing That Keeps the Rows
+
+Because a `pre=` function can reshape the table in any way, Pointblank doesn't try to match the rows that such a step checked to the rows of the target table. This means steps with `pre=` are left out when splitting the table with [`Validate.get_sundered_data()`](../../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data) or flagging its rows with [`Validate.get_row_flags()`](../../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags). If your function only filters rows, reorders them, or changes their values, you can mark it with [`row_preserving()`](../../reference/row_preserving.md#pointblank.row_preserving) so that its step is used there too:
+
+``` python
+import polars as pl
+
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_vals_gt(
+        columns="d",
+        value=1000,
+        pre=pb.row_preserving(lambda df: df.filter(pl.col("f") == "high")),
+    )
+    .interrogate()
+    .get_row_flags()
+)
+```
+
+shape: (13, 11)
+
+| date_time | date | a | b | c | d | e | f | pb_failed_1\_ | pb_n_failed\_ | pb_row_score\_ |
+|----|----|----|----|----|----|----|----|----|----|----|
+| datetime\[μs\] | date | i64 | str | i64 | f64 | bool | str | bool | i64 | f64 |
+| 2016-01-04 11:00:00 | 2016-01-04 | 2 | "1-bcd-345" | 3 | 3423.29 | true | "high" | false | 0 | 1.0 |
+| 2016-01-04 00:32:00 | 2016-01-04 | 3 | "5-egh-163" | 8 | 9999.99 | true | "low" | false | 0 | null |
+| 2016-01-05 13:32:00 | 2016-01-05 | 6 | "8-kdg-938" | 3 | 2343.23 | true | "high" | false | 0 | 1.0 |
+| 2016-01-06 17:23:00 | 2016-01-06 | 2 | "5-jdo-903" | null | 3892.4 | false | "mid" | false | 0 | null |
+| 2016-01-09 12:36:00 | 2016-01-09 | 8 | "3-ldm-038" | 7 | 283.94 | true | "low" | false | 0 | null |
+| … | … | … | … | … | … | … | … | … | … | … |
+| 2016-01-20 04:30:00 | 2016-01-20 | 3 | "5-bce-642" | 9 | 837.93 | false | "high" | true | 1 | 0.0 |
+| 2016-01-20 04:30:00 | 2016-01-20 | 3 | "5-bce-642" | 9 | 837.93 | false | "high" | true | 1 | 0.0 |
+| 2016-01-26 20:07:00 | 2016-01-26 | 4 | "2-dmx-010" | 7 | 833.98 | true | "low" | false | 0 | null |
+| 2016-01-28 02:51:00 | 2016-01-28 | 2 | "7-dmx-010" | 8 | 108.34 | false | "low" | false | 0 | null |
+| 2016-01-30 11:23:00 | 2016-01-30 | 1 | "3-dka-303" | null | 2230.09 | true | "high" | false | 0 | 1.0 |
+
+The three `"high"` rows with a `d` value below `1000` are flagged in `pb_failed_1_`. The rows with other values of `f` weren't checked at all, so they aren't flagged and their `pb_row_score_` is missing.
+
+For a marked function, Pointblank adds a row number column called `pb_index_` to the table before calling the function. The function needs to keep that column and leave its values alone, and every row it returns must come from a different row of the table (so no aggregating, and no joins that repeat rows). Pointblank checks the `pb_index_` column of the result, and raises an error naming the step if it's missing or has repeated or unknown values. Rows the function filters out simply weren't checked by the step, so they aren't flagged by it.
 
 ## Conclusion
 

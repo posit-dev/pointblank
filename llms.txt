@@ -216,6 +216,32 @@
 - [has_columns](https://posit-dev.github.io/pointblank/reference/has_columns.html): Check whether one or more columns exist in a table
 - [has_rows](https://posit-dev.github.io/pointblank/reference/has_rows.html): Check whether a table has a certain number of rows
 
+#### Preprocessing
+> Helper functions for use with the `pre=` parameter of validation methods.
+
+
+- [row_preserving](https://posit-dev.github.io/pointblank/reference/row_preserving.html): Mark a `pre=` function as one that keeps the rows of the table
+
+#### Data Ablation
+> Measure how the rows that fail validation steps affect a downstream model. An `Ablation` trains and evaluates a model (with a function you provide) on the full table and on versions of it with the failing rows of some steps removed, repeats this over several seeds, and compares each version to the full table and to a version with the same number of rows removed at random.
+
+
+- [Ablation](https://posit-dev.github.io/pointblank/reference/Ablation.html): Measure how the rows that fail validation steps affect a model trained on the data
+- [AblationVariant](https://posit-dev.github.io/pointblank/reference/AblationVariant.html): A version of the training table evaluated in an ablation
+
+#### Ablation Methods
+> Methods for the Ablation class
+
+- [Ablation.drop_steps](https://posit-dev.github.io/pointblank/reference/Ablation.drop_steps.html)
+- [Ablation.drop_each](https://posit-dev.github.io/pointblank/reference/Ablation.drop_each.html)
+- [Ablation.drop_all](https://posit-dev.github.io/pointblank/reference/Ablation.drop_all.html)
+- [Ablation.plan](https://posit-dev.github.io/pointblank/reference/Ablation.plan.html)
+- [Ablation.run](https://posit-dev.github.io/pointblank/reference/Ablation.run.html)
+- [Ablation.get_effects](https://posit-dev.github.io/pointblank/reference/Ablation.get_effects.html)
+- [Ablation.get_tabular_report](https://posit-dev.github.io/pointblank/reference/Ablation.get_tabular_report.html)
+- [Ablation.to_dict](https://posit-dev.github.io/pointblank/reference/Ablation.to_dict.html)
+- [Ablation.to_json](https://posit-dev.github.io/pointblank/reference/Ablation.to_json.html)
+
 #### YAML
 > Functions for using YAML to orchestrate validation workflows.
 

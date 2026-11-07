@@ -4,7 +4,7 @@ Do column data lie outside of two specified values or data in other columns?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9080-L9427)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9093-L9440)
 
 ``` python
 Validate.col_vals_outside(

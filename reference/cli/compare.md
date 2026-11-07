@@ -73,10 +73,10 @@ Full `--help` output
 
 ## Arguments
 
-`SOURCE: TEXT`  
+`SOURCE`  
 Required.
 
-`TARGET: TEXT`  
+`TARGET`  
 Required.
 
 ## Options

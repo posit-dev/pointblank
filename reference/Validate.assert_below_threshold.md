@@ -4,7 +4,7 @@ Raise an `AssertionError` if validation steps exceed a specified threshold level
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18954-L19117)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19003-L19166)
 
 ``` python
 Validate.assert_below_threshold(

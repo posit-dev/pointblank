@@ -194,9 +194,38 @@ The sundering procedure relies on row-level validation types to be used. This ma
 There are some additional caveats though. Even if using a validation method drawn from the set above, the validation step won't be used for sundering if:
 
 - the `active=` parameter for that step has been set to `False`
-- the `pre=` parameter has been used
+- the `pre=` parameter has been used (unless the function is marked with [`row_preserving()`](../../reference/row_preserving.md#pointblank.row_preserving), as described below)
 
-The first one makes intuitive sense (you decided to skip this validation step entirely), the second one requires some explanation. Using `pre=` allows you to modify the target table, there's no easy or practical way to compare rows in a mutated table compared to the original table (e.g., a mutation may drastically reduce the number of rows).
+The first one makes intuitive sense (you decided to skip this validation step entirely), the second one requires some explanation. Using `pre=` allows you to modify the target table, there's no easy or practical way to compare rows in a mutated table compared to the original table (e.g., a mutation may drastically reduce the number of rows, or aggregate them into entirely new ones).
+
+Many `pre=` functions only filter rows or change their values though, and for these you can say so by wrapping the function in [`row_preserving()`](../../reference/row_preserving.md#pointblank.row_preserving). Pointblank then adds a row number column (`pb_index_`) to the table before calling the function, checks that the rows it returns all come from different rows of the table, and uses the row numbers to match the step's results to the table's rows:
+
+``` python
+import polars as pl
+
+validation_high = (
+    pb.Validate(data=pb.load_dataset(dataset="small_table"))
+    .col_vals_gt(
+        columns="d",
+        value=1000,
+        pre=pb.row_preserving(lambda df: df.filter(pl.col("f") == "high")),
+    )
+    .interrogate()
+)
+
+validation_high.get_sundered_data(type="fail")
+```
+
+shape: (3, 8)
+
+| date_time           | date       | a   | b           | c   | d      | e     | f      |
+|---------------------|------------|-----|-------------|-----|--------|-------|--------|
+| datetime\[μs\]      | date       | i64 | str         | i64 | f64    | bool  | str    |
+| 2016-01-15 18:46:00 | 2016-01-15 | 7   | "1-knw-093" | 3   | 843.34 | true  | "high" |
+| 2016-01-20 04:30:00 | 2016-01-20 | 3   | "5-bce-642" | 9   | 837.93 | false | "high" |
+| 2016-01-20 04:30:00 | 2016-01-20 | 3   | "5-bce-642" | 9   | 837.93 | false | "high" |
+
+Only the six rows with `f` equal to `"high"` were checked, and the three of them with a `d` value below `1000` make up the failing set. The rows that the function filtered out weren't checked by the step, and they count as passing it (just as rows outside a step's segments do). A function marked this way must keep the `pb_index_` column (include it if the function selects columns), and it can't aggregate rows or repeat them (e.g., through a join). If the column is missing, or has repeated or unknown values, interrogation raises an error that names the step. An aggregation that keeps one of each group's rows (with its `pb_index_` value) looks just like a filter, though, so it's up to you to only mark functions that keep the rows.
 
 Steps that use `segments=` are used for sundering. Each segment's results apply only to the rows in that segment, so rows outside all of a step's segments aren't affected by that step.
 

@@ -18491,12 +18491,14 @@ only involve steps where:
 - of certain check types, where test units are rows or cells checked down a column (e.g.,
 the `col_vals_*()` methods and `rows_complete()`)
 - `active=` is not set to `False`
-- `pre=` has not been given an expression for modifying the input table
+- `pre=` has not been given an expression for modifying the input table, unless it's
+marked with [`row_preserving()`](`pointblank.row_preserving`)
 
 So long as these conditions are met, the data will be split into two constituent tables: one
 with the rows that passed all validation steps and another with the rows that failed at
 least one validation step. Steps that use `segments=` are included, with each segment's
-results counting only for the rows in that segment.
+results counting only for the rows in that segment. Likewise, a step with a
+`row_preserving()` `pre=` function only counts for the rows that the function returned.
 
 Steps that use [`rows_distinct()`](`pointblank.Validate.rows_distinct`) are a special case.
 That step counts every copy of a duplicated row as failing, since it can't know which of
@@ -18637,10 +18639,11 @@ when training a model) instead of dropping them.
 Details
 -------
 The steps that get flag columns are the same ones used by `get_sundered_data()`: steps that
-check rows or cells down a column, that are active, and that don't use `pre=`. A row that a
-step didn't check (e.g., a row outside the segment of a step that uses `segments=`) isn't
-flagged by it, and isn't counted in its `pb_row_score_`. A row that no step checked has a
-missing `pb_row_score_`.
+check rows or cells down a column, that are active, and that don't use `pre=` (unless the
+`pre=` function is marked with [`row_preserving()`](`pointblank.row_preserving`)). A row
+that a step didn't check (e.g., a row outside the segment of a step that uses `segments=`,
+or a row that a row-preserving `pre=` function filtered out) isn't flagged by it, and isn't
+counted in its `pb_row_score_`. A row that no step checked has a missing `pb_row_score_`.
 
 Unlike `get_sundered_data()`, steps that use
 [`rows_distinct()`](`pointblank.Validate.rows_distinct`) are included by default: one copy
@@ -18648,9 +18651,10 @@ of each group of duplicate rows (the first one) isn't flagged, and the other cop
 a `rows_distinct()` flag marks the rows that removing duplicates would remove. Use
 `duplicates=` and `duplicates_order_by=` to choose which copy is kept.
 
-A row-level step that can't be used is reported in a warning: that's a step that uses
-`pre=` (it can change the rows, so its results may not line up with the table's rows), a
-step that couldn't be evaluated, or a `rows_distinct()` step when `duplicates=None`.
+A row-level step that can't be used is reported in a warning: that's a step that uses an
+unmarked `pre=` function (it can change the rows, so its results may not line up with the
+table's rows), a step that couldn't be evaluated, or a `rows_distinct()` step when
+`duplicates=None`.
 
 Parameters
 ----------
@@ -23250,6 +23254,904 @@ validation
 
 The first two steps ran because the table has exactly 3 rows (matching `count=3`) and falls
 within the range `[2, 10]`. The third step was skipped because `3` does not equal `100`.
+
+
+## Preprocessing
+
+Helper functions for use with the `pre=` parameter of validation methods.
+
+
+
+row_preserving(fn: 'Callable') -> 'Callable'
+
+Mark a `pre=` function as one that keeps the rows of the table.
+
+Validation methods have a `pre=` argument for a function that changes the table before a
+step checks it. Such a function can do anything to the table (e.g., aggregate it, or join
+another table to it), so Pointblank can't match the rows that a step with `pre=` checked to the
+rows of the target table. Because of this, steps with `pre=` are left out of
+[`get_row_flags()`](`pointblank.Validate.get_row_flags`) and
+[`get_sundered_data()`](`pointblank.Validate.get_sundered_data`). Wrapping the function in
+`row_preserving()` says that it only filters, reorders, or changes the values of rows, so that
+its step can be used there too.
+
+For a marked function, Pointblank adds a column called `pb_index_` (the row number) to the
+table before calling the function, and uses it to match the rows the function returns to the
+rows of the target table. The function must keep this column (if it selects columns, include
+`pb_index_` among them) and must not change its values. Each row of its result must come from
+a different row of the table, so the function can't aggregate rows, join a table that repeats
+rows, or combine the table with itself. If its result is missing the `pb_index_` column, or has
+repeated or unknown values in it, interrogation raises an error naming the step. These checks
+can't tell a filter from an aggregation that keeps one of each group's rows, along with its
+`pb_index_` value (e.g., taking the first row of each group), so only mark functions that keep
+the rows. Rows that the function filters out weren't checked by the step, so they don't count
+as failing it.
+
+Parameters
+----------
+fn
+    The function to mark: a function or lambda taking a table and returning a table, as for
+    `pre=`. A function with a parameter named `dfn` is given a Narwhals DataFrame, as with any
+    `pre=` function.
+
+Returns
+-------
+Callable
+    The function, marked as keeping the rows of the table. It behaves just like `fn`.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's validate the order amounts in a table, checking only the orders that were paid. The
+`pre=` function filters the table to those rows, and `row_preserving()` marks it as one that
+keeps the table's rows (it only removes some of them).
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+orders = pl.DataFrame(
+    {
+        "order_id": [1, 2, 3, 4],
+        "amount": [25.0, -5.0, -10.0, 40.0],
+        "status": ["paid", "paid", "open", "paid"],
+    }
+)
+
+validation = (
+    pb.Validate(data=orders)
+    .col_vals_gt(
+        columns="amount",
+        value=0,
+        pre=pb.row_preserving(lambda df: df.filter(pl.col("status") == "paid")),
+    )
+    .interrogate()
+)
+
+pb.preview(validation.get_row_flags())
+```
+
+The step checked the three paid orders and order `2` failed it. Order `3` also has a negative
+amount, but it wasn't checked (the `pre=` function filtered it out), so it isn't flagged. Without
+`row_preserving()`, the step would have no flag column at all.
+
+See Also
+--------
+Validate.get_row_flags : Get which steps each row failed, as columns added to the table.
+Validate.get_sundered_data : Split the table into the rows that passed and failed the steps.
+
+
+## Data Ablation
+
+Measure how the rows that fail validation steps affect a downstream model. An `Ablation` trains and evaluates a model (with a function you provide) on the full table and on versions of it with the failing rows of some steps removed, repeats this over several seeds, and compares each version to the full table and to a version with the same number of rows removed at random.
+
+
+
+Ablation(validation: 'Validate', evaluate: 'Callable[..., Any]', metric: 'str | None' = None, higher_is_better: 'bool' = True, repeats: 'int' = 5, seed: 'int' = 0, control: 'str | None' = 'size_matched', duplicates: 'str | None' = 'keep_first', duplicates_order_by: 'str | list[str] | None' = None, max_removed: 'float' = 0.5, conf_level: 'float' = 0.95, adjust: 'str | None' = 'holm', label: 'str | None' = None) -> 'None'
+
+Measure how the rows that fail validation steps affect a model trained on the data.
+
+A validation says which rows of a training table fail its checks, but not whether those rows
+matter to a model trained on the table. An ablation finds out: it trains and evaluates the
+model on the full table and on versions of the table with the rows that failed some of the
+steps removed, and compares the results. Pointblank never trains anything itself: you provide
+an `evaluate=` function that takes a training table and returns a score (e.g., the accuracy of
+a model trained on the table, measured on a fixed holdout set).
+
+Removing rows can change a score just because there are fewer rows to train on, so each
+variant is also compared to a *control* that removes the same number of rows at random. The
+difference between the two is the effect of the rows that failed the steps, as opposed to the
+effect of having less data. Training is often random too (e.g., the initial weights of a
+model), so every version is evaluated `repeats=` times with different seeds. The `r`-th
+evaluation of every version gets the same seed, so the differences between versions are
+compared seed by seed (paired), which cancels out much of the noise.
+
+An `Ablation` is built in two parts, like a validation: the strategy methods add variants
+([`drop_each()`](`pointblank.Ablation.drop_each`),
+[`drop_all()`](`pointblank.Ablation.drop_all`), and
+[`drop_steps()`](`pointblank.Ablation.drop_steps`)), and nothing is evaluated until
+[`run()`](`pointblank.Ablation.run`) is called. Use [`plan()`](`pointblank.Ablation.plan`)
+before that to see how many rows each variant removes and how many evaluations the run needs.
+
+Parameters
+----------
+validation
+    An interrogated validation (a [`Validate`](`pointblank.Validate`) object). Its target table
+    is the training table, and its row-level steps (the same ones that
+    [`get_row_flags()`](`pointblank.Validate.get_row_flags`) uses) say which rows to remove.
+evaluate
+    A function that trains and evaluates a model. It's called as `evaluate(train, seed=seed,
+    variant=variant)`, where `train` is the training table with some rows removed (of the same
+    type as the validation's target table; a lazy or database table is passed as a lazy
+    table), `seed` is an integer to seed any randomness in training with, and `variant` is an
+    [`AblationVariant`](`pointblank.AblationVariant`) describing the version of the table. The
+    function can leave out the `variant=` parameter if it doesn't need it. It must return a
+    number, or a dictionary of named numbers (one per metric). The evaluation data should be a
+    fixed holdout set that the function holds on to: it must not depend on `train`.
+metric
+    The name of the metric that verdicts are based on. It's needed when `evaluate=` returns a
+    dictionary with more than one metric (the others are still reported). When `evaluate=`
+    returns a number, this is the name it's given (`"score"` by default).
+higher_is_better
+    Is a higher value of `metric=` better (e.g., accuracy) or worse (e.g., an error)? This
+    decides whether a variant that raises the metric helps or hurts.
+repeats
+    The number of times each version of the table is evaluated, each time with a different
+    seed. At least `3` are needed for verdicts. More repeats give narrower intervals but take
+    longer to run.
+seed
+    The seed of the first repeat: repeat `r` (counting from `0`) passes `seed + r` to
+    `evaluate=`. The random rows removed by the controls also depend on it, so a run can be
+    reproduced exactly.
+control
+    The control that variants are compared to. With `"size_matched"` (the default), each
+    variant is compared to the full table with the same number of rows removed at random
+    (drawn anew for each repeat). Variants that remove the same number of rows share their
+    control. Use `None` to compare variants to the full table only.
+duplicates
+    How the duplicate rows found by [`rows_distinct()`](`pointblank.Validate.rows_distinct`)
+    steps are removed. With `"keep_first"` (the default) or `"keep_last"`, one copy of each
+    group of duplicates is kept and the others are removed. `"flag_all"` removes every copy,
+    and `None` leaves `rows_distinct()` steps out of the ablation. These are the same options as
+    in [`get_row_flags()`](`pointblank.Validate.get_row_flags`).
+duplicates_order_by
+    One or more columns that order the copies of a duplicated row, to decide which copy is
+    kept (e.g., `"updated_at"` with `duplicates="keep_last"` keeps the newest record).
+max_removed
+    A variant that removes more than this share of the rows (from `0` to `1`) gives a warning,
+    as a comparison of such different tables says more about the size of the training table
+    than about the quality of the removed rows.
+conf_level
+    The confidence level of the intervals, and of the verdicts (a variant helps or hurts if
+    its adjusted p-value is below `1 - conf_level`).
+adjust
+    How p-values are adjusted for comparing several variants: `"holm"` (the default) uses the
+    Holm method, which keeps the chance of any false verdict among the variants below
+    `1 - conf_level`. Use `None` to use the unadjusted p-values.
+label
+    An optional label for the ablation, shown in its reports.
+
+Returns
+-------
+Ablation
+    An `Ablation` object, with no variants yet.
+
+Details
+-------
+For each variant and metric, the results give the mean and standard deviation of the metric
+across the repeats, and two paired comparisons: with the full table (`delta_vs_full`) and with
+the control (`delta_vs_control`). Each comparison has a t-interval at `conf_level=` and a
+p-value from a paired t-test, along with the p-value adjusted across the variants. The
+verdict on a variant is based on the metric named in `metric=` and the comparison with the
+control (or with the full table, if `control=None`):
+
+- `"helps"`: removing the variant's rows makes the metric better, with an adjusted p-value
+  below `1 - conf_level`
+- `"hurts"`: removing the rows makes the metric worse, with an adjusted p-value below
+  `1 - conf_level`
+- `"inconclusive"`: the difference could be due to chance
+
+With fewer than 3 repeats, there are no verdicts. The intervals aren't adjusted for multiple
+comparisons, so an interval can leave out zero while the verdict is `"inconclusive"`.
+
+A variant that removes no rows (e.g., a step that no row failed) is left out of the ablation,
+with a note in the reports. Steps that can't be matched to the rows of the table, such as
+steps with a `pre=` function not marked with [`row_preserving()`](`pointblank.row_preserving`),
+are left out too.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's take a table of temperature readings where some readings were recorded in tenths of a
+degree (so they're ten times too high) and some are missing. The 'model' trained on it is
+simple: it estimates the average temperature from a bootstrap sample of the readings, and it's
+evaluated by its error against the known average of `20` degrees.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+for k in range(7, 300, 40):
+    temps[k] = None
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed, variant):
+    sample = train.drop_nulls().sample(fraction=1.0, with_replacement=True, seed=seed)
+    return {"error": abs(sample["temp"].mean() - 20)}
+```
+
+The validation has two steps: one for missing readings and one for readings out of range.
+
+```{python}
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_not_null(columns="temp")
+    .col_vals_between(columns="temp", left=-10, right=45, na_pass=True)
+    .interrogate()
+)
+```
+
+Now we can set up the ablation, with one variant for each step (`drop_each()`) and one for
+both steps (`drop_all()`). The error is the metric, and lower errors are better.
+
+```{python}
+ablation = (
+    pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+    .drop_each()
+    .drop_all()
+)
+
+ablation.run()
+```
+
+Removing the rows that failed step 2 (the readings out of range) cuts the error by much more
+than removing the same number of random rows, so the verdict is that it helps. The missing
+readings were dropped by the model anyway, so removing them makes no real difference and the
+verdict on step 1 is inconclusive. The numbers behind the report are available as a table from
+[`get_effects()`](`pointblank.Ablation.get_effects`).
+
+See Also
+--------
+Validate.get_row_flags : Get which steps each row failed, as columns added to the table.
+AblationVariant : A version of the training table evaluated in an ablation.
+
+AblationVariant(id: 'str', strategy: 'str', name: 'str', steps: 'tuple[int, ...]' = (), n_removed: 'int' = 0, f_removed: 'float' = 0.0, is_control: 'bool' = False, group: 'Any' = None) -> None
+
+A version of the training table evaluated in an ablation.
+
+An [`Ablation`](`pointblank.Ablation`) evaluates a model on several versions of the target
+table of a validation: the full table, the table with the rows that failed some of the steps
+removed (a variant), and the table with the same number of rows removed at random (a control).
+Each time it calls the `evaluate=` function, it passes the version being evaluated as the
+`variant=` argument, so the function can tell them apart (e.g., to log the runs, or to name the
+files that a model is saved to). The variants of an ablation are also listed in its
+[`plan()`](`pointblank.Ablation.plan`) and its results.
+
+Attributes
+----------
+id
+    A short identifier for the version, unique within the ablation: `"full"` for the full
+    table, `"step_<i>"` for a variant of [`drop_each()`](`pointblank.Ablation.drop_each`),
+    `"all"` for [`drop_all()`](`pointblank.Ablation.drop_all`), the `name=` (or
+    `"steps_<i>_<j>"`) for [`drop_steps()`](`pointblank.Ablation.drop_steps`), and
+    `"control_<n>"` for the control that removes `n` random rows.
+strategy
+    The kind of version: `"full"`, `"drop_steps"`, `"drop_each"`, `"drop_all"`, or
+    `"control"`.
+name
+    A name for the version, as shown in reports (e.g., `"Step 2"`).
+steps
+    The numbers of the validation steps whose failing rows were removed (empty for the full
+    table and for controls).
+n_removed
+    The number of rows removed from the table.
+f_removed
+    The share of the table's rows that were removed (from `0` to `1`).
+is_control
+    Is this a control (random rows removed) rather than a variant?
+group
+    Reserved for strategies that remove groups of rows (always `None` for now).
+
+
+## Ablation Methods
+
+Methods for the Ablation class
+
+
+drop_steps(self, steps: 'int | list[int]', name: 'str | None' = None) -> 'Ablation'
+
+Add a variant that removes the rows failing any of the given steps.
+
+This is the most flexible strategy: it adds one variant, with the rows that failed any of
+`steps=` removed. Use it to test a particular combination of checks (e.g., all the checks
+on one column), or to give a variant a name of its own.
+
+Parameters
+----------
+steps
+    One or more step numbers. Each must be a row-level step that the ablation can use
+    (active, and without a `pre=` function unless that function is marked with
+    [`row_preserving()`](`pointblank.row_preserving`)).
+name
+    A name for the variant, shown in reports and used as its `id`. By default, it's named
+    after the steps (e.g., `"Steps 1, 3"`, with the id `"steps_1_3"`).
+
+Returns
+-------
+Ablation
+    The `Ablation` object, with the variant added.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's a table of temperature readings with some out-of-range values, checked against two
+different ranges. The 'model' estimates the average temperature and is evaluated by its
+error against the true average of `20`.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed, variant):
+    sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_between(columns="temp", left=-10, right=45)
+    .col_vals_lt(columns="temp", value=100)
+    .interrogate()
+)
+
+ablation = pb.Ablation(
+    validation, evaluate=evaluate, metric="error", higher_is_better=False
+).drop_steps([1, 2], name="Range checks")
+
+ablation.plan()
+```
+
+The plan has the full table, the one variant (removing the rows that failed either
+step), and its control, which removes the same number of rows at random.
+
+drop_each(self, steps: 'int | list[int] | None' = None) -> 'Ablation'
+
+Add a variant for each step, removing only the rows that failed that step.
+
+Each variant answers the question 'does removing the rows that fail this check help, on
+its own?' Comparing the variants shows which checks matter to the model and which don't.
+
+Parameters
+----------
+steps
+    The step numbers to add variants for. By default, every row-level step that the
+    ablation can use gets one (the steps that can't be used are listed in the notes of the
+    reports).
+
+Returns
+-------
+Ablation
+    The `Ablation` object, with the variants added.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's a table of temperature readings with out-of-range and missing values. The 'model'
+estimates the average temperature, ignoring missing readings, and is evaluated by its error
+against the true average of `20`.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+for k in range(7, 300, 40):
+    temps[k] = None
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed, variant):
+    sample = train.drop_nulls().sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_not_null(columns="temp")
+    .col_vals_between(columns="temp", left=-10, right=45, na_pass=True)
+    .interrogate()
+)
+
+ablation = pb.Ablation(
+    validation, evaluate=evaluate, metric="error", higher_is_better=False
+).drop_each()
+
+ablation.plan()
+```
+
+There's a variant for each step. The two variants remove different numbers of rows, so
+each has its own control.
+
+drop_all(self, steps: 'list[int] | None' = None) -> 'Ablation'
+
+Add a variant that removes the rows failing any step.
+
+This variant answers the question 'does the validation as a whole help?' Without
+`rows_distinct()` steps, its training table is the one that
+[`get_sundered_data()`](`pointblank.Validate.get_sundered_data`) gives: the rows that
+passed every step.
+
+Parameters
+----------
+steps
+    The step numbers to combine. By default, every row-level step that the ablation can
+    use is combined.
+
+Returns
+-------
+Ablation
+    The `Ablation` object, with the variant added.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's a table of temperature readings with out-of-range and missing values, validated
+with a step for each problem.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+for k in range(7, 300, 40):
+    temps[k] = None
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed, variant):
+    sample = train.drop_nulls().sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_not_null(columns="temp")
+    .col_vals_between(columns="temp", left=-10, right=45, na_pass=True)
+    .interrogate()
+)
+
+ablation = pb.Ablation(
+    validation, evaluate=evaluate, metric="error", higher_is_better=False
+).drop_all()
+
+ablation.plan()
+```
+
+The one variant removes the 20 rows that failed either step.
+
+plan(self) -> 'GT'
+
+Show the versions of the table that the ablation will evaluate.
+
+The plan is a dry run: it finds the rows that each variant removes, without evaluating
+anything. It lists the full table, each variant, and each control, with the number and
+share of rows they remove, and gives the number of evaluations that
+[`run()`](`pointblank.Ablation.run`) will make in its header. Variants that won't be used
+(e.g., because they remove no rows) are listed in the notes at the bottom.
+
+Returns
+-------
+GT
+    A Great Tables object.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's an ablation of a table of temperature readings, checked for missing values and for
+values out of range, and also for duplicate readings (there are none).
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+for k in range(7, 300, 40):
+    temps[k] = None
+readings = pl.DataFrame({"id": range(300), "temp": temps})
+
+def evaluate(train, *, seed, variant):
+    sample = train.drop_nulls().sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_not_null(columns="temp")
+    .col_vals_between(columns="temp", left=-10, right=45, na_pass=True)
+    .rows_distinct(columns_subset="id")
+    .interrogate()
+)
+
+ablation = pb.Ablation(
+    validation, evaluate=evaluate, metric="error", higher_is_better=False, repeats=10
+).drop_each()
+
+ablation.plan()
+```
+
+No row failed step 3, so it has no variant, as the note says. With 10 repeats of the full
+table, two variants, and two controls, the run will make 50 evaluations.
+
+run(self) -> 'Ablation'
+
+Evaluate the full table, each variant, and each control.
+
+The `evaluate=` function is called `repeats=` times for each version of the table, with
+the seeds `seed`, `seed + 1`, and so on. The full table is evaluated first, then each
+variant, then each control. A control is drawn anew for each repeat, so that the
+comparison with it doesn't depend on one random draw of rows. Once the run is done, the
+results are available from [`get_tabular_report()`](`pointblank.Ablation.get_tabular_report`),
+[`get_effects()`](`pointblank.Ablation.get_effects`), and
+[`to_json()`](`pointblank.Ablation.to_json`). Running again repeats every evaluation.
+
+Returns
+-------
+Ablation
+    The `Ablation` object, with the results of the run.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's an ablation of a table of temperature readings with some out-of-range values. The
+`evaluate()` function also returns the number of rows it was given, which is a second
+metric in the results.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed, variant):
+    sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+    return {"error": abs(sample["temp"].mean() - 20), "n_train": train.height}
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_between(columns="temp", left=-10, right=45)
+    .interrogate()
+)
+
+ablation = (
+    pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+    .drop_each()
+    .run()
+)
+
+ablation
+```
+
+After the run, the `Ablation` object shows its report. The report shows the metric named
+in `metric=`; the other metrics are in the results of `get_effects()`.
+
+get_effects(self) -> 'Any'
+
+Get the results of the ablation as a table.
+
+The table has one row for each version of the training table and each metric: the full
+table first (as the baseline), then the variants. Use it to make plots, to compare
+ablations of different data, or to look at the metrics that the report doesn't show.
+
+Returns
+-------
+DataFrame
+    A Polars DataFrame (or a pandas DataFrame, if Polars isn't installed) with these
+    columns:
+
+    - `variant`, `name`, `strategy`: the variant's id, name, and strategy (`"full"` for the
+    full table)
+    - `steps`: the numbers of the steps whose failing rows were removed, as a list
+    - `n_removed`, `f_removed`: the number and share of rows removed
+    - `metric`, `mean`, `sd`: the metric, and its mean and standard deviation across the
+    repeats
+    - `delta_vs_full`, `delta_vs_full_lower`, `delta_vs_full_upper`: the mean paired
+    difference from the full table, with its interval at `conf_level=`
+    - `p_vs_full`, `p_adj_vs_full`: the p-value of that difference, and the p-value
+    adjusted across the variants (as set by `adjust=`)
+    - `control_mean`: the mean of the metric for the variant's control
+    - `delta_vs_control`, `delta_vs_control_lower`, `delta_vs_control_upper`,
+    `p_vs_control`, `p_adj_vs_control`: the same, for the difference from the control
+    - `verdict`: `"helps"`, `"hurts"`, or `"inconclusive"` for the metric named in
+    `metric=` (missing for other metrics, and with fewer than 3 repeats)
+
+    The comparisons are missing for the full table, and the control columns are missing
+    when `control=None`. The intervals and p-values need at least 2 repeats.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Here's an ablation of a table of temperature readings with some out-of-range values.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed, variant):
+    sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_between(columns="temp", left=-10, right=45)
+    .interrogate()
+)
+
+ablation = (
+    pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+    .drop_each()
+    .run()
+)
+
+ablation.get_effects().select("variant", "mean", "delta_vs_control", "verdict")
+```
+
+Removing the 12 rows that failed step 1 lowers the error by about 7 degrees compared
+with removing 12 random rows, so the verdict is that the step helps.
+
+get_tabular_report(self, metric: 'str | None' = None, title: 'str | None' = None) -> 'GT'
+
+Get a tabular report of the ablation's results.
+
+The report has a row for each variant, with the rows it removed, the metric's mean and
+standard deviation across the repeats, and its difference from the control (or from the
+full table, if `control=None`). The difference is shown with its interval, as a bar
+around zero (on the same scale for every variant), and with the verdict as a badge. The
+header gives the metric for the full table and the settings of the run, and notes at the
+bottom list the variants and steps that weren't used.
+
+Parameters
+----------
+metric
+    The metric to show. By default, it's the one that verdicts are based on (named in
+    `metric=` when the ablation was created). Verdicts are only shown for that metric.
+title
+    An optional title replacing the default.
+
+Returns
+-------
+GT
+    A Great Tables object.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's an ablation of a table of temperature readings with out-of-range and missing values.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+for k in range(7, 300, 40):
+    temps[k] = None
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed, variant):
+    sample = train.drop_nulls().sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_not_null(columns="temp")
+    .col_vals_between(columns="temp", left=-10, right=45, na_pass=True)
+    .interrogate()
+)
+
+ablation = (
+    pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+    .drop_each()
+    .run()
+)
+
+ablation.get_tabular_report(title="Which checks matter for the temperature model?")
+```
+
+Removing the readings that are out of range (step 2) helps, while removing the missing
+readings (step 1) makes no clear difference.
+
+to_dict(self) -> 'dict[str, Any]'
+
+Get the settings and results of the ablation as a JSON-serializable dict.
+
+Returns
+-------
+dict[str, Any]
+    A dictionary with the ablation's settings (`"settings"`), the versions of the table
+    that were evaluated (`"variants"`, including the full table and the controls), the
+    metrics from every evaluation (`"runs"`, one entry per version and repeat, with its
+    seed), the results (`"effects"`, with the same fields as the columns of
+    [`get_effects()`](`pointblank.Ablation.get_effects`)), and the notes about variants
+    and steps that weren't used (`"notes"`).
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's an ablation of a table of temperature readings, with three repeats.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed, variant):
+    sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_between(columns="temp", left=-10, right=45)
+    .interrogate()
+)
+
+ablation = (
+    pb.Ablation(
+        validation, evaluate=evaluate, metric="error", higher_is_better=False, repeats=3
+    )
+    .drop_each()
+    .run()
+)
+
+ablation.to_dict()["runs"][:4]
+```
+
+Each run records the version of the table, the repeat, the seed, and the metrics, so the
+runs can be stored and analyzed again later.
+
+to_json(self, indent: 'int | None' = 2) -> 'str'
+
+Get the settings and results of the ablation as a JSON string.
+
+The structure is the same as that of [`to_dict()`](`pointblank.Ablation.to_dict`). Saving
+it alongside a model's training data makes a record of which checks mattered to the model,
+and of how that was measured.
+
+Parameters
+----------
+indent
+    The number of spaces to indent nested levels by. Use `None` for the most compact
+    output, on a single line.
+
+Returns
+-------
+str
+    The settings and results of the ablation as a JSON string.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's an ablation of a table of temperature readings, with three repeats.
+
+```{python}
+import json
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed, variant):
+    sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_between(columns="temp", left=-10, right=45)
+    .interrogate()
+)
+
+ablation = (
+    pb.Ablation(
+        validation, evaluate=evaluate, metric="error", higher_is_better=False, repeats=3
+    )
+    .drop_each()
+    .run()
+)
+
+print(json.dumps(json.loads(ablation.to_json())["settings"], indent=2))
+```
+
+The settings record everything needed to repeat the ablation with the same `evaluate()`
+function, including the seed.
 
 
 ## YAML
@@ -32635,6 +33537,41 @@ DataFrame (as shown here), a Pandas DataFrame, a Narwhals DataFrame, or any othe
 This flexibility allows you to validate properties of your data that might only be apparent after
 significant reshaping or aggregation.
 
+## Preprocessing That Keeps the Rows
+
+Because a `pre=` function can reshape the table in any way, Pointblank doesn't try to match the rows
+that such a step checked to the rows of the target table. This means steps with `pre=` are left out
+when splitting the table with [`Validate.get_sundered_data()`](`Validate.get_sundered_data`) or
+flagging its rows with [`Validate.get_row_flags()`](`Validate.get_row_flags`). If your function only
+filters rows, reorders them, or changes their values, you can mark it with
+[`row_preserving()`](`row_preserving`) so that its step is used there too:
+
+```{python}
+import polars as pl
+
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_vals_gt(
+        columns="d",
+        value=1000,
+        pre=pb.row_preserving(lambda df: df.filter(pl.col("f") == "high")),
+    )
+    .interrogate()
+    .get_row_flags()
+)
+```
+
+The three `"high"` rows with a `d` value below `1000` are flagged in `pb_failed_1_`. The rows with
+other values of `f` weren't checked at all, so they aren't flagged and their `pb_row_score_` is
+missing.
+
+For a marked function, Pointblank adds a row number column called `pb_index_` to the table before
+calling the function. The function needs to keep that column and leave its values alone, and every
+row it returns must come from a different row of the table (so no aggregating, and no joins that
+repeat rows). Pointblank checks the `pb_index_` column of the result, and raises an error naming
+the step if it's missing or has repeated or unknown values. Rows the function filters out simply
+weren't checked by the step, so they aren't flagged by it.
+
 ## Conclusion
 
 The preprocessing capabilities in Pointblank provide the power and flexibility for validating
@@ -38350,12 +39287,44 @@ There are some additional caveats though. Even if using a validation method draw
 above, the validation step won't be used for sundering if:
 
 - the `active=` parameter for that step has been set to `False`
-- the `pre=` parameter has been used
+- the `pre=` parameter has been used (unless the function is marked with
+[`row_preserving()`](`row_preserving`), as described below)
 
 The first one makes intuitive sense (you decided to skip this validation step entirely), the second
 one requires some explanation. Using `pre=` allows you to modify the target table, there's no easy
 or practical way to compare rows in a mutated table compared to the original table (e.g., a
-mutation may drastically reduce the number of rows).
+mutation may drastically reduce the number of rows, or aggregate them into entirely new ones).
+
+Many `pre=` functions only filter rows or change their values though, and for these you can say so
+by wrapping the function in [`row_preserving()`](`row_preserving`). Pointblank then adds a row
+number column (`pb_index_`) to the table before calling the function, checks that the rows it
+returns all come from different rows of the table, and uses the row numbers to match the step's
+results to the table's rows:
+
+```{python}
+import polars as pl
+
+validation_high = (
+    pb.Validate(data=pb.load_dataset(dataset="small_table"))
+    .col_vals_gt(
+        columns="d",
+        value=1000,
+        pre=pb.row_preserving(lambda df: df.filter(pl.col("f") == "high")),
+    )
+    .interrogate()
+)
+
+validation_high.get_sundered_data(type="fail")
+```
+
+Only the six rows with `f` equal to `"high"` were checked, and the three of them with a `d` value
+below `1000` make up the failing set. The rows that the function filtered out weren't checked by the
+step, and they count as passing it (just as rows outside a step's segments do). A function marked
+this way must keep the `pb_index_` column (include it if the function selects columns), and it
+can't aggregate rows or repeat them (e.g., through a join). If the column is missing, or has
+repeated or unknown values, interrogation raises an error that names the step. An aggregation that
+keeps one of each group's rows (with its `pb_index_` value) looks just like a filter, though, so
+it's up to you to only mark functions that keep the rows.
 
 Steps that use `segments=` are used for sundering. Each segment's results apply only to the rows in
 that segment, so rows outside all of a step's segments aren't affected by that step.
@@ -38764,6 +39733,289 @@ localized. When you set a reporting language (e.g., `Validate(..., lang="fr")`),
 names in badge tooltips, the footer summary, and the scorecard are translated automatically. The
 two-letter badge codes stay language-neutral (matching the report's other short codes such as
 `TBL`, `EVAL`, and `W`/`E`/`C`), with the full localized name available on hover.
+
+
+### Data Ablation
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+A validation tells you which rows of a table fail its checks. If the table is training data for a
+model, the next question is whether those rows actually matter: does removing them make the model
+better, worse, or no different? Data ablation answers that by experiment. The model is trained on
+the full table and on versions of it with the failing rows removed, and each version is scored on
+the same held-out data. Pointblank's [`Ablation`](`Ablation`) class runs that experiment from an
+interrogated validation and reports the effect of each step's rows.
+
+Removing rows changes the model even when the rows were perfectly good, since there's less data to
+learn from. So each version is also compared to a *control*, which removes the same number of rows
+at random. A step whose rows are really a problem does better than its control, and a step whose
+rows are good data does worse.
+
+This article uses [scikit-learn](https://scikit-learn.org/) for the model, so you'll need it
+installed (`pip install scikit-learn`) to run the examples. Pointblank itself doesn't depend on it:
+the model is just a function that you write.
+
+## The Data and the Model
+
+The `nycflights` dataset has a row for each flight that left New York City airports in 2013. We'll
+train a model to predict a flight's `air_time` (in minutes) from its `distance` (in miles) and the
+`month` and `hour` it left. Here we take 6,000 flights, keeping 2,000 of them aside as the held-out
+data for scoring the model.
+
+```{python}
+import polars as pl
+
+flights = (
+    pb.load_dataset(dataset="nycflights")
+    .drop_nulls("air_time")
+    .select("month", "hour", "distance", "air_time")
+    .sample(n=6000, seed=23)
+)
+
+holdout = flights.tail(2000)
+```
+
+To know what the right answers are, we'll add two problems to the other 4,000 flights. One flight
+in every 50 has its air time recorded in hours rather than minutes, and one in every 33 has a
+missing distance recorded as `0`:
+
+```{python}
+train = (
+    flights.head(4000)
+    .with_row_index("row")
+    .with_columns(
+        air_time=pl.when(pl.col("row") % 50 == 7)
+        .then(pl.col("air_time") / 60)
+        .otherwise(pl.col("air_time")),
+        distance=pl.when(pl.col("row") % 33 == 4)
+        .then(0)
+        .otherwise(pl.col("distance")),
+    )
+    .drop("row")
+)
+
+pb.preview(train)
+```
+
+The validation of the training data has a check for each problem, plus a third one that looks
+reasonable but isn't: it treats any flight longer than 2,500 miles as an error, though flights from
+New York to San Francisco and Honolulu are longer than that.
+
+```{python}
+validation = (
+    pb.Validate(data=train, tbl_name="flights_train")
+    .col_vals_between(
+        columns="air_time",
+        left=20,
+        right=700,
+        brief="Air time is between 20 and 700 minutes",
+    )
+    .col_vals_gt(
+        columns="distance",
+        value=0,
+        brief="Distance is greater than zero",
+    )
+    .col_vals_le(
+        columns="distance",
+        value=2500,
+        brief="Distance is at most 2,500 miles",
+    )
+    .interrogate()
+)
+
+validation
+```
+
+Each of the three steps has failing rows. The report says how many, but not whether removing them
+would help the model.
+
+## Writing the `evaluate` Function
+
+An ablation needs a function that trains the model on a version of the training table and scores
+it. Pointblank calls the function with the table as its first argument (the same type of table as
+the validation's data, a Polars DataFrame here) and a `seed=` keyword. It returns the score, or a
+dictionary of scores if there's more than one:
+
+```{python}
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, r2_score
+
+features = ["month", "hour", "distance"]
+
+
+def evaluate(train, *, seed):
+    model = RandomForestRegressor(
+        n_estimators=50, min_samples_leaf=5, random_state=seed, n_jobs=-1
+    )
+    model.fit(train.select(features).to_numpy(), train["air_time"].to_numpy())
+
+    predicted = model.predict(holdout.select(features).to_numpy())
+    actual = holdout["air_time"].to_numpy()
+
+    return {
+        "mae": mean_absolute_error(actual, predicted),
+        "r2": r2_score(actual, predicted),
+    }
+```
+
+There are a few things to keep in mind when writing this function:
+
+- the held-out data is fixed: it's the yardstick for every version of the training table, so it's
+never ablated
+- the function should give the same result each time it's called with the same table and seed, so
+use the seed for any randomness in training (here, the forest's `random_state=`)
+- the function can also take a `variant=` keyword, which gets an
+[`AblationVariant`](`AblationVariant`) describing the version of the table being evaluated (its
+id, the steps whose rows were removed, and the number of rows removed)
+
+## Planning the Ablation
+
+An `Ablation` is built in the same way as a validation: you add variants with its methods, and
+nothing is evaluated until you call [`Ablation.run()`](`Ablation.run`). The
+[`Ablation.drop_each()`](`Ablation.drop_each`) method adds a variant for each step, removing the
+rows that failed it, and [`Ablation.drop_all()`](`Ablation.drop_all`) adds one that removes the
+rows that failed any step (the failing set from
+[`Validate.get_sundered_data()`](`Validate.get_sundered_data`)).
+
+The model is scored on the mean absolute error (`"mae"`), so lower is better. The
+[`Ablation.plan()`](`Ablation.plan`) method shows what the run will do, without evaluating
+anything:
+
+```{python}
+ablation = (
+    pb.Ablation(
+        validation,
+        evaluate=evaluate,
+        metric="mae",
+        higher_is_better=False,
+        label="Air time model",
+    )
+    .drop_each()
+    .drop_all()
+)
+
+ablation.plan()
+```
+
+Each version of the table, and each control, is evaluated `repeats=5` times by default, with the
+seeds `0` to `4`. Variants that remove the same number of rows share a control, and a variant that
+removes no rows isn't evaluated at all (the plan has a note saying so).
+
+## Running the Ablation
+
+The [`Ablation.run()`](`Ablation.run`) method does the evaluations and returns the `Ablation`, which
+then shows its report:
+
+```{python}
+ablation.run()
+```
+
+The report has a row for each variant. The **mae** column has the mean and standard deviation of
+the metric over the repeats, and the change from the full table. The **Δ vs random** column is the
+main result: the mean difference between the variant and its control, with its interval and a
+verdict. A variant *helps* if it does better than its control, *hurts* if it does worse, and is
+*inconclusive* if the difference could be down to chance.
+
+Here, the results match what we know about the data:
+
+- removing the flights with air times in hours (step 1) helps a lot, more than removing the same
+number of random flights
+- removing the flights with a zero distance (step 2) makes no clear difference: the problem is real,
+but it doesn't measurably affect this model
+- removing the flights longer than 2,500 miles (step 3) hurts: they're good data, and without them
+the model can't predict the long flights in the held-out data
+- removing every failing row helps, but less than step 1 alone, because it includes the rows from
+step 3
+
+Each version and its control are evaluated with the same seeds, and the differences are taken
+between runs with the same seed. This pairing means that the variation from the seed itself (here,
+the randomness in growing the forest) mostly cancels out.
+
+## Comparing Other Combinations of Steps
+
+The [`Ablation.drop_steps()`](`Ablation.drop_steps`) method adds a variant that removes the rows
+failing any of the steps you give it. Let's try the validation without its third step. Adding a
+variant clears the results, so the ablation needs to be run again:
+
+```{python}
+ablation.drop_steps([1, 2], name="Without step 3").run()
+
+ablation.get_tabular_report()
+```
+
+The two checks that find real problems do about as well together as step 1 alone, and better than
+all three steps. So the third step should be dropped from the cleaning process (or its limit
+raised), even though it might still be a useful check to report on.
+
+## Getting the Results
+
+The [`Ablation.get_effects()`](`Ablation.get_effects`) method returns the results as a table, with
+a row for each variant and metric. Along with the differences from the controls, it has the
+differences from the full table, the interval bounds, and the p-values:
+
+```{python}
+effects = ablation.get_effects()
+mae = effects.filter(pl.col("metric") == "mae")
+
+mae.select("name", "mean", "delta_vs_control", "p_adj_vs_control", "verdict")
+```
+
+The verdicts are only given for the metric named in `metric=`, but the other metrics are evaluated
+too. The report can show any of them:
+
+```{python}
+ablation.get_tabular_report(metric="r2")
+```
+
+The R² tells the same story for steps 1 and 3, but it rates removing all the failing rows as worse
+than removing random ones. That's because it's based on squared errors, so the large errors on the
+long flights count for more. Metrics can disagree like this, so it's worth deciding on the metric
+for the verdicts before running the ablation, rather than picking the one with the most favorable
+result.
+
+The [`Ablation.to_json()`](`Ablation.to_json`) method (or [`Ablation.to_dict()`](`Ablation.to_dict`))
+gives everything about the ablation: its settings, the variants, every evaluation's results, and
+the effects. This is useful for keeping a record of the experiment alongside the model.
+
+## How the Comparisons Are Made
+
+For each variant, the difference from its control is computed for each repeat, and the report shows
+the mean of these differences with a paired *t*-interval (95% by default, set with
+`conf_level=`). The p-values are adjusted for the number of variants with the Holm method, and the
+verdicts use the adjusted p-values: a variant helps or hurts only if its adjusted p-value is below
+`1 - conf_level`. You can turn off the adjustment with `adjust=None`.
+
+With fewer than three repeats, there's too little data for a useful interval, so the report gives
+no verdicts (and `Ablation` warns about this). More repeats give narrower intervals, at the cost of
+more evaluations. A few other options are worth knowing about:
+
+- `control=None` compares variants only to the full table, which saves evaluations but leaves the
+effect of removing *any* rows mixed in with the effect of removing these rows
+- `max_removed=` (by default `0.5`) sets the share of rows above which a variant gives a warning,
+since a version of the table missing most of its rows is a different dataset rather than an
+ablation of this one
+- `duplicates=` and `duplicates_order_by=` say which copy of a duplicate row a
+[`Validate.rows_distinct()`](`Validate.rows_distinct`) step should keep (by default the first one,
+as with [`Validate.get_row_flags()`](`Validate.get_row_flags`)); see
+[Sundering Validated Data](04-sundering.qmd) for more on these
+
+Only steps that check rows can be used in an ablation. Steps that check the table as a whole (like
+[`Validate.col_exists()`](`Validate.col_exists`)), inactive steps, and steps using a `pre=` function
+that isn't marked with [`row_preserving()`](`row_preserving`) are left out, and the plan and report
+have a note for each step that couldn't be used.
+
+## Conclusion
+
+A validation can say which rows break its rules, but only an experiment can say whether those rows
+hurt the model trained on them. An `Ablation` runs that experiment with controls, repeats, and
+intervals, so you can find the checks that are worth enforcing, the ones that don't matter, and the
+ones that remove good data. It works with any model that you can wrap in an `evaluate` function,
+and with any validation whose steps check rows.
 
 
 ### Previewing Data

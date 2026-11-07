@@ -4,7 +4,7 @@ Get the target table with columns flagging the validation steps each row failed.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21683-L21899)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21740-L21962)
 
 ``` python
 Validate.get_row_flags(
@@ -23,11 +23,11 @@ This is useful when removing every row that failed a check is too blunt. You can
 
 ## Details
 
-The steps that get flag columns are the same ones used by [get_sundered_data()](../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data): steps that check rows or cells down a column, that are active, and that don't use `pre=`. A row that a step didn't check (e.g., a row outside the segment of a step that uses `segments=`) isn't flagged by it, and isn't counted in its `pb_row_score_`. A row that no step checked has a missing `pb_row_score_`.
+The steps that get flag columns are the same ones used by [get_sundered_data()](../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data): steps that check rows or cells down a column, that are active, and that don't use `pre=` (unless the `pre=` function is marked with [`row_preserving()`](../reference/row_preserving.md#pointblank.row_preserving)). A row that a step didn't check (e.g., a row outside the segment of a step that uses `segments=`, or a row that a row-preserving `pre=` function filtered out) isn't flagged by it, and isn't counted in its `pb_row_score_`. A row that no step checked has a missing `pb_row_score_`.
 
 Unlike [get_sundered_data()](../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data), steps that use [`rows_distinct()`](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) are included by default: one copy of each group of duplicate rows (the first one) isn't flagged, and the other copies are. So a `rows_distinct()` flag marks the rows that removing duplicates would remove. Use `duplicates=` and `duplicates_order_by=` to choose which copy is kept.
 
-A row-level step that can't be used is reported in a warning: that's a step that uses `pre=` (it can change the rows, so its results may not line up with the table's rows), a step that couldn't be evaluated, or a `rows_distinct()` step when `duplicates=None`.
+A row-level step that can't be used is reported in a warning: that's a step that uses an unmarked `pre=` function (it can change the rows, so its results may not line up with the table's rows), a step that couldn't be evaluated, or a `rows_distinct()` step when `duplicates=None`.
 
 ## Parameters
 

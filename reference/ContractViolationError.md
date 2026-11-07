@@ -66,7 +66,7 @@ failed_run.target_validation
 
 [TABLE]
 
-The report shows the one failing test unit in the `col_vals_gt` step, the row for item `"b"`. Nothing after the [run()](../reference/Pipeline.md#pointblank.Pipeline.run) call was reached, so the prices weren't published.
+The report shows the one failing test unit in the `col_vals_gt` step, the row for item `"b"`. Nothing after the `run()` call was reached, so the prices weren't published.
 
 ## See Also
 

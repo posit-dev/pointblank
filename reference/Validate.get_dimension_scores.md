@@ -4,7 +4,7 @@ Get per-dimension health scores from the validation results.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20848-L20907)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20897-L20956)
 
 ``` python
 Validate.get_dimension_scores()

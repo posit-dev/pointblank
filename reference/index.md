@@ -493,6 +493,54 @@ Check whether one or more columns exist in a table.
 [has_rows()](has_rows.md#pointblank.has_rows)  
 Check whether a table has a certain number of rows.
 
+## Preprocessing
+
+Helper functions for use with the `pre=` parameter of validation methods.
+
+[row_preserving()](row_preserving.md#pointblank.row_preserving)  
+Mark a `pre=` function as one that keeps the rows of the table.
+
+## Data Ablation
+
+Measure how the rows that fail validation steps affect a downstream model. An [Ablation](../reference/Ablation.md#pointblank.Ablation) trains and evaluates a model (with a function you provide) on the full table and on versions of it with the failing rows of some steps removed, repeats this over several seeds, and compares each version to the full table and to a version with the same number of rows removed at random.
+
+[Ablation](Ablation.md#pointblank.Ablation)  
+Measure how the rows that fail validation steps affect a model trained on the data.
+
+[AblationVariant](AblationVariant.md#pointblank.AblationVariant)  
+A version of the training table evaluated in an ablation.
+
+## Ablation Methods
+
+Methods for the Ablation class
+
+[Ablation.drop_steps()](Ablation.drop_steps.md#pointblank.Ablation.drop_steps)  
+Add a variant that removes the rows failing any of the given steps.
+
+[Ablation.drop_each()](Ablation.drop_each.md#pointblank.Ablation.drop_each)  
+Add a variant for each step, removing only the rows that failed that step.
+
+[Ablation.drop_all()](Ablation.drop_all.md#pointblank.Ablation.drop_all)  
+Add a variant that removes the rows failing any step.
+
+[Ablation.plan()](Ablation.plan.md#pointblank.Ablation.plan)  
+Show the versions of the table that the ablation will evaluate.
+
+[Ablation.run()](Ablation.run.md#pointblank.Ablation.run)  
+Evaluate the full table, each variant, and each control.
+
+[Ablation.get_effects()](Ablation.get_effects.md#pointblank.Ablation.get_effects)  
+Get the results of the ablation as a table.
+
+[Ablation.get_tabular_report()](Ablation.get_tabular_report.md#pointblank.Ablation.get_tabular_report)  
+Get a tabular report of the ablation's results.
+
+[Ablation.to_dict()](Ablation.to_dict.md#pointblank.Ablation.to_dict)  
+Get the settings and results of the ablation as a JSON-serializable dict.
+
+[Ablation.to_json()](Ablation.to_json.md#pointblank.Ablation.to_json)  
+Get the settings and results of the ablation as a JSON string.
+
 ## YAML
 
 Functions for using YAML to orchestrate validation workflows.
