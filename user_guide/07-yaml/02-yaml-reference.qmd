@@ -931,6 +931,66 @@ Examples:
 - Performance-critical validations with large datasets
 - When deterministic results are required
 
+### Model-Scored Validation
+
+`col_vals_scored`: are the scores that a model gives each row within bounds?
+
+```yaml
+- col_vals_scored:
+    columns: [query, passage]                          # REQUIRED: Column(s) given to the scorer
+    scorer:                                            # REQUIRED: An adapter and its settings
+      reranker:
+        provider: sentence-transformers
+        query: query
+        document: passage
+    min_val: 0.5                                       # OPTIONAL: Lowest passing score
+    max_val: 1.0                                       # OPTIONAL: Highest passing score
+    na_pass: false                                     # OPTIONAL: Pass rows without a score
+    cache: .scores                                     # OPTIONAL: Directory of a score cache
+    keep_scores: true                                  # OPTIONAL: Keep the scores (`pb_score_`)
+    pre: |                                             # OPTIONAL: Data preprocessing
+      lambda df: df.head(1000)
+    thresholds:                                        # OPTIONAL: Step-level thresholds
+      warning: 0.1
+    brief: "Passages answer their queries"             # OPTIONAL: Step description
+```
+
+At least one of `min_val` and `max_val` is needed. The scorer is written as one of the adapters of
+`pb.scorers` with its settings, as `{<adapter>: {<settings>}}`, where the adapter is one of
+`embedding_similarity`, `reranker`, `classifier`, `langid`, or `perplexity`. A scorer that's a
+function of your own is written as a `python:` block, which is only run with `allow_python=True`:
+
+```yaml
+# Text in English, with a cache of the scores on disk
+- col_vals_scored:
+    columns: text
+    scorer:
+      langid:
+        expected: en
+    min_val: 0.5
+    cache: .scores
+
+# Documents of educational quality (a regression model, scored from 0 to 5)
+- col_vals_scored:
+    columns: text
+    scorer:
+      classifier:
+        hf_model: HuggingFaceFW/fineweb-edu-classifier
+        function_to_apply: none
+    min_val: 2.5
+
+# A scorer of your own (needs `allow_python=True`)
+- col_vals_scored:
+    columns: text
+    scorer:
+      python: |
+        pb.scorers.from_function(lambda row: len(row["text"].split()), name="words", per_row=True)
+    min_val: 5
+```
+
+See the [Scored Validation](../advanced-validation/scored-validation.qmd) article for more on
+scorers and the score cache.
+
 ### Data Quality Methods
 
 `col_pct_null`: is the percentage of null values in a column within bounds?
