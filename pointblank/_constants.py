@@ -58,6 +58,7 @@ ASSERTION_TYPE_METHOD_MAP: dict[str, str] = {
     "rows_distinct": "rows_distinct",
     "rows_complete": "rows_complete",
     "prompt": "prompt",
+    "col_vals_scored": "scored",
     "col_schema_match": "col_schema_match",
     "row_count_match": "row_count_match",
     "col_count_match": "col_count_match",
@@ -121,6 +122,7 @@ ASSERTION_TYPE_TO_DIMENSION: dict[str, str] = {
     "col_schema_match": "validity",
     "col_sum_eq": "validity",
     "prompt": "validity",
+    "col_vals_scored": "validity",
     "specially": "validity",
     # Uniqueness: absence of duplicate rows
     "rows_distinct": "uniqueness",
@@ -197,6 +199,7 @@ ROW_BASED_VALIDATION_TYPES = [
     "col_vals_expr",
     "conjointly",
     "prompt",
+    "col_vals_scored",
 ]
 
 # Validation steps that don't check values row by row; their step reports show a summary of the
@@ -945,6 +948,24 @@ SVG_ICONS_FOR_ASSERTION_TYPES: dict[str, str] = {
                 <path d="M59,54 L59,58 L55,58"/>
                 <path d="M12,58 L8,58 L8,54"/>
             </g>
+        </g>
+    </g>
+</svg>""",
+    "col_vals_scored": """<?xml version="1.0" encoding="UTF-8"?>
+<svg width="67px" height="67px" viewBox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>col_vals_scored</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_vals_scored" transform="translate(0.000000, 0.965517)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="gauge" stroke="#000000" stroke-linecap="round">
+                <path d="M12.5,43 A21,21 0 0,1 54.5,43" id="dial" stroke-width="3"></path>
+                <path d="M33.5,22 L33.5,26.5" id="tick_top" stroke-width="2"></path>
+                <path d="M18.65,28.15 L21.83,31.33" id="tick_left" stroke-width="2"></path>
+                <path d="M48.35,28.15 L45.17,31.33" id="tick_right" stroke-width="2"></path>
+                <path d="M33.5,43 L44.5,30" id="needle" stroke-width="3"></path>
+            </g>
+            <circle id="hub" fill="#000000" cx="33.5" cy="43" r="3.5"></circle>
+            <path d="M14,52 L53,52" id="baseline" stroke="#000000" stroke-width="2" stroke-linecap="round"></path>
         </g>
     </g>
 </svg>""",
