@@ -10174,6 +10174,357 @@ def test_get_sundered_data_many_steps_sqlite() -> None:
     assert _sorted_ids(validation.get_sundered_data(type="fail")) == [1, 2]
 
 
+@pytest.mark.parametrize("tbl_type", ["polars", "lazy", "pandas", "duckdb", "sqlite"])
+def test_get_sundered_data_includes_rows_complete(tbl_type) -> None:
+    # The row with `id` 5 has a missing `isbn`
+    validation = Validate(_sunder_tbl(tbl_type)).rows_complete().interrogate()
+
+    assert _sorted_ids(validation.get_sundered_data(type="pass")) == [1, 2, 3, 4, 6]
+    assert _sorted_ids(validation.get_sundered_data(type="fail")) == [5]
+
+
+# A table with groups of rows that share a `key`: rows 2 and 3 (one of them with a missing
+# `version`), rows 4 and 5 (a missing `key`), rows 6, 7 and 8 (rows 6 and 8 tie on `version`), and
+# rows 9 and 10 (both missing `version`). `rid` is the first column, so that a database table's
+# row order (by its values) is the same as the row order
+_DUP_TBL = pl.DataFrame(
+    {
+        "rid": list(range(1, 11)),
+        "key": [1, 2, 2, None, None, 3, 3, 3, 4, 4],
+        "version": [1, None, 5, 1, 2, 7, None, 7, None, None],
+        "amount": [1.0, -1.0, 2.0, 3.0, None, 9.0, 5.0, 6.0, 7.0, 8.0],
+        "g": ["a", "a", "b", "a", "a", "b", "b", "b", "a", "b"],
+    }
+)
+
+_ROW_TBL_TYPES = ["polars", "lazy", "pandas", "duckdb", "sqlite", "pyspark"]
+
+
+def _dup_tbl(tbl_type: str, tbl: pl.DataFrame = _DUP_TBL):
+    if tbl_type == "polars":
+        return tbl
+    if tbl_type == "lazy":
+        return tbl.lazy()
+    if tbl_type == "pandas":
+        return tbl.to_pandas()
+    if tbl_type == "duckdb":
+        return ibis.memtable(tbl)
+    if tbl_type == "sqlite":
+        return ibis.sqlite.connect().create_table("dup_tbl", tbl.to_pandas())
+    if not PYSPARK_AVAILABLE:
+        pytest.skip("PySpark not available")
+    spark_types = {pl.Int64: "long", pl.Float64: "double", pl.String: "string"}
+    schema = ", ".join(f"{name} {spark_types[dtype]}" for name, dtype in tbl.schema.items())
+    return get_spark_session().createDataFrame(tbl.rows(), schema=schema)
+
+
+def _as_polars(tbl) -> pl.DataFrame:
+    if isinstance(tbl, pl.DataFrame):
+        return tbl
+    if isinstance(tbl, pl.LazyFrame):
+        return tbl.collect()
+    if isinstance(tbl, pd.DataFrame):
+        return pl.from_pandas(tbl)
+    if hasattr(tbl, "toPandas"):
+        return pl.from_pandas(tbl.toPandas())
+    return tbl.to_polars()
+
+
+def _rids(tbl) -> list[int]:
+    return sorted(_as_polars(tbl)["rid"].to_list())
+
+
+@pytest.mark.parametrize("tbl_type", _ROW_TBL_TYPES)
+@pytest.mark.parametrize(
+    "duplicates, order_by, expected_pass",
+    [
+        # One copy of each group passes: the first or last in row order, or by `version`
+        ("keep_first", None, [1, 2, 4, 6, 9]),
+        ("keep_last", None, [1, 3, 5, 8, 10]),
+        # A missing `version` is never preferred (row 3 is kept over row 2 either way), unless
+        # every copy is missing it (rows 9 and 10); ties are broken by row order (rows 6 and 8)
+        ("keep_first", "version", [1, 3, 4, 6, 9]),
+        ("keep_last", "version", [1, 3, 5, 8, 10]),
+        # Rows 6 and 8 tie on `version`, so `amount` decides
+        ("keep_first", ["version", "amount"], [1, 3, 4, 8, 9]),
+        # Every copy fails, as in the step itself
+        ("flag_all", None, [1]),
+        # The step isn't used
+        (None, None, list(range(1, 11))),
+    ],
+)
+def test_get_sundered_data_rows_distinct(tbl_type, duplicates, order_by, expected_pass) -> None:
+    validation = Validate(_dup_tbl(tbl_type)).rows_distinct(columns_subset="key").interrogate()
+
+    sundered_pass = validation.get_sundered_data(
+        type="pass", duplicates=duplicates, duplicates_order_by=order_by
+    )
+    sundered_fail = validation.get_sundered_data(
+        type="fail", duplicates=duplicates, duplicates_order_by=order_by
+    )
+
+    assert type(sundered_pass) is type(_dup_tbl(tbl_type))
+    assert _rids(sundered_pass) == expected_pass
+    assert _rids(sundered_fail) == sorted(set(range(1, 11)) - set(expected_pass))
+
+
+def test_get_sundered_data_rows_distinct_default() -> None:
+    # By default, `rows_distinct()` steps aren't used for sundering (as before)
+    validation = Validate(_DUP_TBL).rows_distinct(columns_subset="key").interrogate()
+
+    assert _rids(validation.get_sundered_data(type="pass")) == list(range(1, 11))
+
+
+@pytest.mark.parametrize("tbl_type", _ROW_TBL_TYPES)
+def test_get_sundered_data_rows_distinct_with_segments(tbl_type) -> None:
+    # Copies are only duplicates within a segment: keys 2 and 4 occur once in each of `a` and `b`
+    validation = (
+        Validate(_dup_tbl(tbl_type)).rows_distinct(columns_subset="key", segments="g").interrogate()
+    )
+
+    sundered_pass = validation.get_sundered_data(type="pass", duplicates="keep_last")
+
+    assert _rids(sundered_pass) == [1, 2, 3, 5, 8, 9, 10]
+
+
+@pytest.mark.parametrize("tbl_type", _ROW_TBL_TYPES)
+def test_get_sundered_data_rows_distinct_all_columns(tbl_type) -> None:
+    # Without `columns_subset=`, rows are duplicates if all of their values are the same
+    tbl = pl.DataFrame({"rid": [1, 1, 2, 3, 3, 3], "x": [1.0, 1.0, 2.0, 3.0, 3.0, None]})
+    validation = Validate(_dup_tbl(tbl_type, tbl)).rows_distinct().interrogate()
+
+    assert _rids(validation.get_sundered_data(type="pass", duplicates="keep_first")) == [1, 2, 3, 3]
+    assert _rids(validation.get_sundered_data(type="fail", duplicates="keep_first")) == [1, 3]
+
+
+@pytest.mark.parametrize(
+    "duplicates, order_by, message",
+    [
+        ("keep_all", None, "must be one of"),
+        ("flag_all", "version", "can only be used with"),
+        (None, "version", "can only be used with"),
+        ("keep_last", ["version", "updated_at"], "'updated_at' aren't in the target table"),
+    ],
+)
+def test_row_results_bad_duplicates_args(duplicates, order_by, message) -> None:
+    validation = Validate(_DUP_TBL).rows_distinct(columns_subset="key").interrogate()
+
+    with pytest.raises(ValueError, match=message):
+        validation.get_sundered_data(duplicates=duplicates, duplicates_order_by=order_by)
+    with pytest.raises(ValueError, match=message):
+        validation.get_row_flags(duplicates=duplicates, duplicates_order_by=order_by)
+
+
+@pytest.mark.parametrize("method", ["get_sundered_data", "get_row_flags"])
+def test_row_results_need_tbl_checked(method) -> None:
+    not_interrogated = Validate(_DUP_TBL).col_vals_gt(columns="amount", value=0)
+    not_collected = (
+        Validate(_DUP_TBL)
+        .col_vals_gt(columns="amount", value=0)
+        .interrogate(collect_tbl_checked=False)
+    )
+
+    with pytest.raises(ValueError, match="no results yet"):
+        getattr(not_interrogated, method)()
+    with pytest.raises(ValueError, match="row-level results of step 1 aren't available"):
+        getattr(not_collected, method)()
+
+
+@pytest.mark.parametrize("tbl_type", _ROW_TBL_TYPES)
+def test_get_row_flags(tbl_type) -> None:
+    validation = (
+        Validate(_dup_tbl(tbl_type))
+        .col_vals_gt(columns="amount", value=0)
+        .col_exists(columns="key")
+        .rows_complete()
+        .rows_distinct(columns_subset="key")
+        .interrogate()
+    )
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", UserWarning)
+        flags = validation.get_row_flags()
+
+    assert type(flags) is type(_dup_tbl(tbl_type))
+
+    flags = _as_polars(flags).sort("rid")
+
+    # The table's columns come first, then a flag for each row-level step (step 2 isn't one)
+    assert flags.columns == [
+        *_DUP_TBL.columns,
+        "pb_failed_1_",
+        "pb_failed_3_",
+        "pb_failed_4_",
+        "pb_n_failed_",
+        "pb_row_score_",
+    ]
+    assert_frame_equal(flags.select(_DUP_TBL.columns), _DUP_TBL, check_dtypes=False)
+
+    # Missing values fail `col_vals_gt()`, and the first copy of each duplicate isn't flagged
+    failed_1 = [False, True, False, False, True, False, False, False, False, False]
+    failed_3 = [False, True, False, True, True, False, True, False, True, True]
+    failed_4 = [False, False, True, False, True, False, True, True, False, True]
+    assert flags["pb_failed_1_"].to_list() == failed_1
+    assert flags["pb_failed_3_"].to_list() == failed_3
+    assert flags["pb_failed_4_"].to_list() == failed_4
+
+    n_failed = [a + b + c for a, b, c in zip(failed_1, failed_3, failed_4)]
+    assert flags["pb_n_failed_"].to_list() == n_failed
+    assert flags["pb_row_score_"].to_list() == pytest.approx([1 - n / 3 for n in n_failed])
+
+    # The rows with no flags are the rows that sundering with the same policy says passed
+    sundered_pass = validation.get_sundered_data(type="pass", duplicates="keep_first")
+    assert _rids(sundered_pass) == flags.filter(pl.col("pb_n_failed_") == 0)["rid"].to_list()
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+@pytest.mark.parametrize(
+    "duplicates, order_by, expected",
+    [
+        ("keep_first", None, [3, 5, 7, 8, 10]),
+        ("keep_last", "version", [2, 4, 6, 7, 9]),
+        ("flag_all", None, [2, 3, 4, 5, 6, 7, 8, 9, 10]),
+    ],
+)
+def test_get_row_flags_duplicates(tbl_type, duplicates, order_by, expected) -> None:
+    validation = Validate(_dup_tbl(tbl_type)).rows_distinct(columns_subset="key").interrogate()
+
+    flags = _as_polars(
+        validation.get_row_flags(duplicates=duplicates, duplicates_order_by=order_by)
+    )
+
+    assert sorted(flags.filter(pl.col("pb_failed_1_"))["rid"].to_list()) == expected
+
+
+@pytest.mark.parametrize("tbl_type", _ROW_TBL_TYPES)
+def test_get_row_flags_with_segments(tbl_type) -> None:
+    # Each segment is a step of its own; rows outside the segments (`g` is `b`) aren't checked by
+    # them, so they aren't flagged, and those that no step checked have no score
+    validation = (
+        Validate(_dup_tbl(tbl_type))
+        .col_vals_gt(columns="amount", value=2, segments=("g", ["a"]))
+        .col_vals_lt(columns="amount", value=8, segments=("g", ["b"]))
+        .interrogate()
+    )
+
+    flags = _as_polars(validation.get_row_flags()).sort("rid")
+
+    assert flags.columns[-4:] == ["pb_failed_1_", "pb_failed_2_", "pb_n_failed_", "pb_row_score_"]
+
+    in_a = [g == "a" for g in _DUP_TBL["g"]]
+    failed_a = [a and not (x is not None and x > 2) for a, x in zip(in_a, _DUP_TBL["amount"])]
+    failed_b = [not a and not (x is not None and x < 8) for a, x in zip(in_a, _DUP_TBL["amount"])]
+
+    assert flags["pb_failed_1_"].to_list() == failed_a
+    assert flags["pb_failed_2_"].to_list() == failed_b
+    assert flags["pb_row_score_"].to_list() == [
+        0.0 if fa or fb else 1.0 for fa, fb in zip(failed_a, failed_b)
+    ]
+
+
+def test_get_row_flags_unchecked_rows_have_no_score() -> None:
+    validation = (
+        Validate(_DUP_TBL)
+        .col_vals_gt(columns="amount", value=2, segments=("g", ["a"]))
+        .interrogate()
+    )
+
+    flags = validation.get_row_flags().sort("rid")
+
+    in_a = [g == "a" for g in _DUP_TBL["g"]]
+    assert [s is None for s in flags["pb_row_score_"]] == [not a for a in in_a]
+    assert flags.filter(~pl.Series(in_a))["pb_n_failed_"].to_list() == [0, 0, 0, 0, 0]
+
+
+def test_get_row_flags_dimension_weights(monkeypatch) -> None:
+    validation = (
+        Validate(_DUP_TBL)
+        .col_vals_gt(columns="amount", value=0, dimension="validity")
+        .rows_complete(dimension="completeness")
+        .interrogate()
+    )
+
+    def scores(weights):
+        monkeypatch.setattr(global_config, "dimension_weights", weights)
+        return validation.get_row_flags().sort("rid")["pb_row_score_"].to_list()
+
+    # Rows 2 and 5 fail both steps, row 3 passes both, and row 4 fails only step 2
+    assert scores(None)[1:5] == [0.0, 1.0, 0.5, 0.0]
+    assert scores({"validity": 3.0})[1:5] == pytest.approx([0.0, 1.0, 0.75, 0.0])
+
+    # A weight of zero leaves a dimension out, and a negative weight counts as zero
+    assert scores({"completeness": -1.0})[1:5] == [0.0, 1.0, 1.0, 0.0]
+
+    # With every check weighted zero, no row has a score
+    assert scores({"validity": 0.0, "completeness": 0.0}) == [None] * 10
+
+
+def test_get_row_flags_warns_about_skipped_steps() -> None:
+    validation = (
+        Validate(_DUP_TBL)
+        .col_vals_gt(columns="amount", value=0, pre=lambda df: df.head(5))
+        .col_vals_gt(columns="not_a_column", value=0)
+        .rows_distinct(columns_subset="key")
+        .col_vals_lt(columns="amount", value=100, active=False)
+        .col_vals_lt(columns="amount", value=8)
+        .interrogate()
+    )
+
+    with pytest.warns(UserWarning) as record:
+        flags = validation.get_row_flags(duplicates=None)
+
+    # Inactive steps (step 4) are left out without a warning
+    [message] = [str(w.message) for w in record if "flag columns" in str(w.message)]
+    assert "step 1: it uses `pre=`" in message
+    assert "step 2: it couldn't be evaluated" in message
+    assert "step 3: no `duplicates=` policy was given" in message
+    assert "step 4" not in message
+
+    assert [c for c in flags.columns if c.startswith("pb_")] == [
+        "pb_failed_5_",
+        "pb_n_failed_",
+        "pb_row_score_",
+    ]
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "lazy", "pandas", "duckdb", "sqlite"])
+@pytest.mark.parametrize("with_steps", [False, True])
+def test_get_row_flags_no_row_level_steps(tbl_type, with_steps) -> None:
+    validation = Validate(_dup_tbl(tbl_type))
+    if with_steps:
+        validation = validation.col_exists(columns="key").row_count_match(count=10)
+    validation = validation.interrogate()
+
+    flags = _as_polars(validation.get_row_flags())
+
+    assert flags.columns == [*_DUP_TBL.columns, "pb_n_failed_", "pb_row_score_"]
+    assert flags["pb_n_failed_"].to_list() == [0] * 10
+    assert flags["pb_row_score_"].null_count() == 10
+
+
+def test_get_row_flags_keeps_row_order() -> None:
+    tbl = pl.DataFrame({"x": [5, 1, 4, 1, 3], "y": [10, 20, 30, 40, 50]})
+
+    for data in [tbl, tbl.lazy(), tbl.to_pandas()]:
+        validation = Validate(data).col_vals_gt(columns="y", value=25).interrogate()
+        flags = _as_polars(validation.get_row_flags())
+
+        assert flags["y"].to_list() == [10, 20, 30, 40, 50]
+        assert flags["pb_failed_1_"].to_list() == [True, True, False, False, False]
+
+
+def test_get_row_flags_many_steps_sqlite() -> None:
+    # The query mustn't nest more deeply with every step: SQLite before 3.46 can't parse it
+    validation = Validate(_dup_tbl("sqlite"))
+    for value in range(2, 14):
+        validation = validation.col_vals_gt(columns="rid", value=value % 3)
+    validation = validation.interrogate()
+
+    flags = _as_polars(validation.get_row_flags()).sort("rid")
+
+    assert flags["pb_n_failed_"].to_list() == [8, 4] + [0] * 8
+
+
 def test_col_vals_within_spec_checksum_on_lazyframe() -> None:
     # The checksum specs collect a LazyFrame to check its values, and give a LazyFrame back
     results = {}
