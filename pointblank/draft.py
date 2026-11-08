@@ -30,9 +30,9 @@ class DraftValidation:
     starting point for validating a table. This can be useful when you have a new table and you
     want to get a sense of how to validate it (and adjustments could always be made later). The
     `DraftValidation` class uses the `chatlas` package to draft a validation plan for a given table
-    using an LLM from the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, or `"azure-openai"`
-    provider. You can install all requirements for the class through an optional 'generate' install
-    of Pointblank via `pip install pointblank[generate]`.
+    using an LLM from the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, `"azure-openai"`, or
+    `"cohere"` provider. You can install all requirements for the class through an optional
+    'generate' install of Pointblank via `pip install pointblank[generate]`.
 
     :::{.callout-warning}
     The `DraftValidation` class is still experimental. Please report any issues you encounter in
@@ -46,8 +46,8 @@ class DraftValidation:
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
         `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
-        `"ollama"`, `"bedrock"`, and `"azure-openai"`. For `"azure-openai"`, the value after the
-        colon is the Azure *deployment id*, not an OpenAI model id.
+        `"ollama"`, `"bedrock"`, `"azure-openai"`, and `"cohere"`. For `"azure-openai"`, the value
+        after the colon is the Azure *deployment id*, not an OpenAI model id.
     api_key
         The API key to be used for the model.
     verify_ssl
@@ -79,6 +79,7 @@ class DraftValidation:
     - `"ollama"` (Ollama)
     - `"bedrock"` (Amazon Bedrock)
     - `"azure-openai"` (Azure OpenAI)
+    - `"cohere"` (Cohere)
 
     The model name should be the specific model to be used from the provider. Model names are
     subject to change so consult the provider's documentation for the most up-to-date model names.
@@ -86,7 +87,8 @@ class DraftValidation:
     assigned when deploying the model in your Azure OpenAI resource). It also requires the
     environment variables `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g.,
     `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) to
-    be set.
+    be set. For `"cohere"`, the API key is read from `CO_API_KEY` (or `COHERE_API_KEY`) if
+    `api_key=` isn't given, and the requests go to Cohere's OpenAI-compatible API.
 
     Notes on Authentication
     -----------------------
