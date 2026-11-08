@@ -114,7 +114,9 @@ class Scorer(Protocol):
     Three of the four rows have a score below `0.5`, so they fail.
     """
 
-    def __call__(self, batch: list[dict[str, Any]]) -> Sequence[float | None]: ...  # pragma: no cover
+    def __call__(
+        self, batch: list[dict[str, Any]]
+    ) -> Sequence[float | None]: ...  # pragma: no cover
 
 
 # ---------------------------------------------------------------------------------------------
@@ -160,7 +162,11 @@ def _literal_code(value: Any) -> str:
     if isinstance(value, (list, tuple)):
         return "[" + ", ".join(_literal_code(v) for v in value) + "]"
     if isinstance(value, dict):
-        return "{" + ", ".join(f"{_literal_code(k)}: {_literal_code(v)}" for k, v in value.items()) + "}"
+        return (
+            "{"
+            + ", ".join(f"{_literal_code(k)}: {_literal_code(v)}" for k, v in value.items())
+            + "}"
+        )
     return repr(value)
 
 
@@ -746,7 +752,9 @@ class _Classifier(_Adapter):
     _label = "CLASSIFIER"
     _default_batch_size = 32
 
-    def __init__(self, hf_model, label, column, function_to_apply, device, name, version, batch_size):
+    def __init__(
+        self, hf_model, label, column, function_to_apply, device, name, version, batch_size
+    ):
         if not isinstance(hf_model, str) and not callable(hf_model):
             raise TypeError(
                 "`hf_model=` must be the name of a Hugging Face model or a text-classification "
@@ -754,7 +762,11 @@ class _Classifier(_Adapter):
             )
         if label is not None and not isinstance(label, str):
             raise TypeError("`label=` must be the name of a label of the model.")
-        if function_to_apply is not None and function_to_apply not in ("sigmoid", "softmax", "none"):
+        if function_to_apply is not None and function_to_apply not in (
+            "sigmoid",
+            "softmax",
+            "none",
+        ):
             raise ValueError('`function_to_apply=` must be "sigmoid", "softmax", or "none".')
         _check_column(column)
         self._hf_model = hf_model
@@ -814,8 +826,7 @@ class _Classifier(_Adapter):
                 if len(items) != 1:
                     labels = ", ".join(repr(item["label"]) for item in items)
                     raise ValueError(
-                        f"The model has the labels {labels}: choose the one to score with "
-                        "`label=`."
+                        f"The model has the labels {labels}: choose the one to score with `label=`."
                     )
                 scores.append(items[0]["score"])
                 continue
@@ -980,7 +991,10 @@ class _LangId(_Adapter):
 
                 def rank(text):
                     labels, probs = ft_model.predict(text.replace("\n", " "), k=-1)
-                    return [(l.removeprefix("__label__"), float(p)) for l, p in zip(labels, probs)]
+                    return [
+                        (label.removeprefix("__label__"), float(p))
+                        for label, p in zip(labels, probs)
+                    ]
 
                 self._rank = rank
             else:
