@@ -95,9 +95,11 @@ from pointblank.preprocessing import row_preserving
 from pointblank.ablation import Ablation, AblationVariant
 from pointblank import scorers
 from pointblank import text
+from pointblank import rag
 from pointblank.schema import Schema, generate_dataset, schema_from_tbl
 from pointblank.segments import seg_group
 from pointblank.splits import SplitCheck, check_splits
+from pointblank.synthetic import SyntheticCheck, check_synthetic
 from pointblank.thresholds import Actions, FinalActions, Thresholds
 from pointblank.validate import (
     Validate,
@@ -173,8 +175,11 @@ __all__ = [
     "AblationVariant",
     "scorers",
     "text",
+    "rag",
     "check_splits",
     "SplitCheck",
+    "check_synthetic",
+    "SyntheticCheck",
     "send_slack_notification",
     "emit_otel",
     # Data generation - Field classes
