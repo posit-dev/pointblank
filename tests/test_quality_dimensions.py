@@ -648,3 +648,135 @@ def test_dimension_override_preserved_on_segment_expansion():
         .interrogate()
     )
     assert [s.dimension for s in v.validation_info] == ["consistency", "consistency"]
+
+
+# ---------------------------------------------------------------------------
+# Scores by segment
+# ---------------------------------------------------------------------------
+
+_SEGMENTED = {
+    "lang": ["en", "en", "en", "fr", "fr", "de"],
+    "text": ["a", "b", None, "c", None, "d"],
+    "n": [5, 1, 7, 2, 9, 0],
+}
+
+
+def _segmented_validation(data):
+    return (
+        Validate(data=data, tbl_name="corpus")
+        .col_vals_not_null(columns="text", segments="lang")
+        .col_vals_gt(columns="n", value=1, segments="lang")
+        .rows_distinct()
+        .interrogate()
+    )
+
+
+def _pl_frame():
+    import polars as pl
+
+    return pl.DataFrame(_SEGMENTED)
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb", "pyspark"])
+def test_dimension_scores_by_segment(tbl_type):
+    from tests.test_text_checks import _tbl
+
+    validation = _segmented_validation(_tbl(tbl_type, _pl_frame()))
+
+    # The unsegmented step (uniqueness) is in no segment's scores, and the segments are in the
+    # order of the steps
+    scores = validation.get_dimension_scores(by="lang")
+    assert scores == {
+        "de": {"completeness": 100.0, "validity": 0.0},
+        "en": {"completeness": 66.67, "validity": 66.67},
+        "fr": {"completeness": 50.0, "validity": 100.0},
+    }
+    assert list(scores) == ["de", "en", "fr"]
+    assert validation.get_health_score(by="lang") == {"de": 50.0, "en": 66.67, "fr": 75.0}
+    # Without `by=`, the scores are those of every step
+    assert validation.get_health_score() == 77.78
+
+
+def test_health_score_by_segment_with_weights():
+    validation = _segmented_validation(_pl_frame())
+
+    global_config.dimension_weights = {"validity": 3}
+    # (1 of 1 complete, and 0 of 1 valid with three times the weight)
+    assert validation.get_health_score(by="lang")["de"] == 25.0
+
+
+def test_dimension_scores_by_segment_errors_and_empty():
+    validation = _segmented_validation(_pl_frame())
+
+    with pytest.raises(ValueError, match=r"No step is segmented by the column 'n' \(the steps"):
+        validation.get_dimension_scores(by="n")
+    with pytest.raises(TypeError, match="`by=` must be the name"):
+        validation.get_health_score(by=1)
+
+    unsegmented = Validate(data=_pl_frame()).col_vals_not_null(columns="text").interrogate()
+    with pytest.raises(ValueError, match="no step has `segments=`"):
+        unsegmented.get_scorecard(by="lang")
+
+    # Before interrogation, there are no scores
+    plan = Validate(data=_pl_frame()).col_vals_not_null(columns="text", segments="lang")
+    assert plan.get_dimension_scores(by="lang") == {}
+    assert plan.get_health_score(by="lang") == {}
+    assert "pb_scorecard" in plan.get_scorecard(by="lang").as_raw_html()
+
+    # A segment whose steps have no results is left out
+    inactive = (
+        Validate(data=_pl_frame())
+        .col_vals_not_null(columns="text", segments=("lang", ["en", "fr"]))
+        .col_vals_not_null(columns="text", segments=("lang", "de"), active=False)
+        .interrogate()
+    )
+    assert list(inactive.get_dimension_scores(by="lang")) == ["en", "fr"]
+
+
+def test_dimension_scores_by_segment_group():
+    validation = (
+        Validate(data=_pl_frame())
+        .col_vals_not_null(columns="text", segments=("lang", pb.seg_group([["en", "de"], ["fr"]])))
+        .interrogate()
+    )
+
+    assert validation.get_dimension_scores(by="lang") == {
+        ("en", "de"): {"completeness": 75.0},
+        ("fr",): {"completeness": 50.0},
+    }
+    assert "en, de" in validation.get_scorecard(by="lang").as_raw_html()
+
+
+def test_assert_dimension_scores_by_segment():
+    validation = _segmented_validation(_pl_frame())
+
+    validation.assert_dimension_scores(thresholds={"completeness": 50}, by="lang")
+    with pytest.raises(AssertionError) as error:
+        validation.assert_dimension_scores(
+            thresholds={"completeness": 60, "validity": 40}, by="lang"
+        )
+    assert str(error.value) == (
+        "Dimension health score(s) below the required minimum: validity in lang='de' (0% < 40%), "
+        "completeness in lang='fr' (50% < 60%)"
+    )
+    # The scores of the whole validation pass the same minimums
+    validation.assert_dimension_scores(thresholds={"completeness": 60, "validity": 40})
+
+
+def test_scorecard_by_segment():
+    validation = _segmented_validation(_pl_frame())
+
+    html = validation.get_scorecard(by="lang").as_raw_html()
+
+    assert "HEALTH SCORE" in html and "lang" in html
+    # A badge per dimension with its score, and the test units of each segment
+    assert "Completeness 67%" in html.replace("</span>", "").replace(
+        ' <span style="font-weight: 400;">', " "
+    )
+    assert "1 / 2" in html and "4 / 6" in html and "3 / 4" in html
+    # Without `by=`, the scorecard has a row per dimension
+    assert "HEALTH SCORE" not in validation.get_scorecard().as_raw_html()
+
+    french = Validate(data=_pl_frame(), lang="fr")
+    french = french.col_vals_not_null(columns="text", segments="lang").interrogate()
+    assert "SCORE DE SANTÉ" in french.get_scorecard(by="lang").as_raw_html()
