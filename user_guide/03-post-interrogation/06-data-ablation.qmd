@@ -495,6 +495,14 @@ validation
 The validation can also be a newer one with the same steps (e.g., an interrogation of next month's
 training data), passed as `annotate(validation=...)`.
 
+The plan, the report, and the notes are written in the language of the validation (its `lang=`),
+with the numbers formatted for its `locale=`. The plan and the report take `lang=` and `locale=`
+arguments of their own, for another language (the briefs of the steps stay as they are):
+
+```{python}
+ablation.get_tabular_report(lang="de", locale="de-CH")
+```
+
 ## A Ready-Made `evaluate` Function
 
 Many `evaluate` functions for tabular models are much the same: pick the features, encode them, fit

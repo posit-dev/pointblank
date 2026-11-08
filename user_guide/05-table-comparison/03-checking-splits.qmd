@@ -128,6 +128,13 @@ check.get_overlap("train", "test")
 The other attributes have the numbers behind the report (`overlap`, `labels`, and `drift`), and
 `to_dict()` gives all of them as a dictionary that can be written as JSON.
 
+The report is in English by default, and `get_tabular_report()` takes `lang=` and `locale=` for
+another language (the messages of `issues` stay in English):
+
+```{python}
+check.get_tabular_report(lang="es")
+```
+
 ## Contamination by Other Data
 
 `check_splits()` checks a dataset's own splits. To check that training data doesn't contain the
