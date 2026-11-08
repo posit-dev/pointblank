@@ -2478,10 +2478,149 @@ def interrogate_rows_complete(tbl: IntoFrame, columns_subset: list[str] | None) 
     return result_tbl.to_native()
 
 
+# The column of the number of judges that passed each row of a `prompt()` step with several models
+VOTES_COLUMN = "pb_votes_"
+
+# How the verdicts of several judges are combined into the result of a row
+PROMPT_AGGREGATES = ("majority", "all", "any")
+
+
+def _aggregate_votes(votes: int, n_judges: int, aggregate: str) -> bool:
+    """Whether a row passes, given the number of judges that passed it."""
+    if aggregate == "all":
+        return votes == n_judges
+    if aggregate == "any":
+        return votes > 0
+    # A majority (more than half; a tie fails)
+    return 2 * votes > n_judges
+
+
+def _prompt_verdicts(  # pragma: no cover
+    tbl: Any,
+    columns_subset: list[str] | None,
+    ai_config: dict[str, Any],
+    provider: str,
+    model: str,
+    total_rows: int,
+) -> list[bool]:
+    """The verdict of one model on each row of the table (a row it didn't judge fails)."""
+    import logging
+
+    from pointblank._utils_ai import (
+        _AIValidationEngine,
+        _BatchConfig,
+        _DataBatcher,
+        _LLMConfig,
+        _PromptBuilder,
+        _ValidationResponseParser,
+    )
+
+    logger = logging.getLogger(__name__)
+
+    batch_size = ai_config.get("batch_size", 1000)
+    max_concurrent = ai_config.get("max_concurrent", 3)
+    attachments = ai_config.get("attachments", [])
+
+    # Set up LLM configuration (api_key will be loaded from environment)
+    llm_config = _LLMConfig(
+        provider=provider,
+        model=model,
+        api_key=None,  # Will be loaded from environment variables
+        verify_ssl=True,  # Default to verifying SSL certificates
+    )
+
+    # Set up batch configuration
+    batch_config = _BatchConfig(size=batch_size, max_concurrent=max_concurrent)
+
+    # Create optimized data batcher
+    batcher = _DataBatcher(data=tbl, columns=columns_subset, config=batch_config)
+
+    # Create batches with signature mapping for optimization
+    batches, signature_mapping = batcher.create_batches()
+    logger.info(f"Created {len(batches)} batches for AI validation")
+
+    # Log optimization stats
+    if hasattr(batcher, "get_reduction_stats"):
+        stats = batcher.get_reduction_stats()
+        if stats.get("reduction_percentage", 0) > 0:
+            logger.info(
+                f"Optimization: {stats['original_rows']} → {stats['unique_rows']} rows ({stats['reduction_percentage']:.1f}% reduction)"
+            )
+
+    # Create prompt builder
+    prompt_builder = _PromptBuilder(ai_config["prompt"])
+
+    # Create AI validation engine
+    engine = _AIValidationEngine(llm_config, attachments=attachments)
+
+    # Run AI validation synchronously (chatlas is synchronous)
+    batch_results = engine.validate_batches(
+        batches=batches, prompt_builder=prompt_builder, max_concurrent=max_concurrent
+    )
+
+    # Parse and combine results with signature mapping optimization
+    parser = _ValidationResponseParser(total_rows=total_rows)
+    combined_results = parser.combine_batch_results(batch_results, signature_mapping)
+
+    # Debug: Log table info and combined results
+    logger.debug("🏁 Final result conversion:")
+    logger.debug(f"   - Table length: {total_rows}")
+    logger.debug(
+        f"   - Combined results keys: {sorted(combined_results.keys()) if combined_results else 'None'}"
+    )
+
+    # Default to False if row wasn't processed
+    validation_results = [bool(combined_results.get(i, False)) for i in range(total_rows)]
+
+    logger.debug(f"   - Final passed count: {sum(validation_results)}")
+    logger.debug(f"   - Final failed count: {len(validation_results) - sum(validation_results)}")
+
+    return validation_results
+
+
+def _with_prompt_columns(native_tbl: Any, columns: dict[str, list]) -> Any:  # pragma: no cover
+    """Add the result columns of a `prompt()` step to a Polars or pandas table."""
+    if hasattr(native_tbl, "with_columns"):  # Polars
+        import polars as pl
+
+        return native_tbl.with_columns(
+            **{name: pl.Series(name, values) for name, values in columns.items()}
+        )
+
+    if hasattr(native_tbl, "assign"):  # Pandas
+        import pandas as pd
+
+        # Align by position: the frame's index need not be 0..n-1
+        return native_tbl.assign(
+            **{
+                name: pd.Series(
+                    values, dtype=bool if name == "pb_is_good_" else "int64", index=native_tbl.index
+                )
+                for name, values in columns.items()
+            }
+        )
+
+    # Generic fallback
+    result_tbl = native_tbl.copy() if hasattr(native_tbl, "copy") else native_tbl
+    for name, values in columns.items():
+        result_tbl[name] = values
+    return result_tbl
+
+
 def interrogate_prompt(  # pragma: no cover
-    tbl: IntoFrame, columns_subset: list[str] | None, ai_config: dict[str, Any]
+    tbl: IntoFrame,
+    columns_subset: list[str] | None,
+    ai_config: dict[str, Any],
+    info: dict[str, Any] | None = None,
 ) -> Any:
-    """AI-powered interrogation of rows."""
+    """
+    AI-powered interrogation of rows.
+
+    With several models (the `judges` of `ai_config`), each judges every row, and their verdicts
+    are combined with its `aggregate` rule; the number of judges that passed each row is in a
+    `pb_votes_` column. The verdicts of each model are put in `info` (if given), for the note of
+    the step and for `Validate.calibrate_prompt()`.
+    """
     import logging
 
     logger = logging.getLogger(__name__)
@@ -2502,115 +2641,37 @@ def interrogate_prompt(  # pragma: no cover
         assert is_narwhals_dataframe(nw_tbl)
         total_rows = len(nw_tbl)
 
+    judges = ai_config.get("judges") or [f"{ai_config['llm_provider']}:{ai_config['llm_model']}"]
+    aggregate = ai_config.get("aggregate", "majority")
+
     try:
-        # Import AI validation modules
-        from pointblank._utils_ai import (
-            _AIValidationEngine,
-            _BatchConfig,
-            _DataBatcher,
-            _LLMConfig,
-            _PromptBuilder,
-            _ValidationResponseParser,
-        )
-
-        # Extract AI configuration
-        prompt = ai_config["prompt"]
-        llm_provider = ai_config["llm_provider"]
-        llm_model = ai_config["llm_model"]
-        batch_size = ai_config.get("batch_size", 1000)
-        max_concurrent = ai_config.get("max_concurrent", 3)
-        attachments = ai_config.get("attachments", [])
-
-        # Set up LLM configuration (api_key will be loaded from environment)
-        llm_config = _LLMConfig(
-            provider=llm_provider,
-            model=llm_model,
-            api_key=None,  # Will be loaded from environment variables
-            verify_ssl=True,  # Default to verifying SSL certificates
-        )
-
-        # Set up batch configuration
-        batch_config = _BatchConfig(size=batch_size, max_concurrent=max_concurrent)
-
-        # Create optimized data batcher
-        batcher = _DataBatcher(data=tbl, columns=columns_subset, config=batch_config)
-
-        # Create batches with signature mapping for optimization
-        batches, signature_mapping = batcher.create_batches()
-        logger.info(f"Created {len(batches)} batches for AI validation")
-
-        # Log optimization stats
-        if hasattr(batcher, "get_reduction_stats"):
-            stats = batcher.get_reduction_stats()
-            if stats.get("reduction_percentage", 0) > 0:
-                logger.info(
-                    f"Optimization: {stats['original_rows']} → {stats['unique_rows']} rows ({stats['reduction_percentage']:.1f}% reduction)"
-                )
-
-        # Create prompt builder
-        prompt_builder = _PromptBuilder(prompt)
-
-        # Create AI validation engine
-        engine = _AIValidationEngine(llm_config, attachments=attachments)
-
-        # Run AI validation synchronously (chatlas is synchronous)
-        batch_results = engine.validate_batches(
-            batches=batches, prompt_builder=prompt_builder, max_concurrent=max_concurrent
-        )
-
-        # Parse and combine results with signature mapping optimization
-        parser = _ValidationResponseParser(total_rows=total_rows)
-        combined_results = parser.combine_batch_results(batch_results, signature_mapping)
-
-        # Debug: Log table info and combined results
-        logger.debug("🏁 Final result conversion:")
-        logger.debug(f"   - Table length: {total_rows}")
-        logger.debug(
-            f"   - Combined results keys: {sorted(combined_results.keys()) if combined_results else 'None'}"
-        )
-
-        # Create a boolean column for validation results
-        validation_results = []
-        for i in range(total_rows):
-            # Default to False if row wasn't processed
-            result = combined_results.get(i, False)
-            validation_results.append(result)
-
-            # Debug: Log first few conversions
-            if i < 5 or total_rows - i <= 2:
-                logger.debug(f"   Row {i}: {result} (from combined_results.get({i}, False))")
-
-        logger.debug(f"   - Final validation_results length: {len(validation_results)}")
-        logger.debug(f"   - Final passed count: {sum(validation_results)}")
-        logger.debug(
-            f"   - Final failed count: {len(validation_results) - sum(validation_results)}"
-        )
-
-        # Add the pb_is_good_ column by creating a proper boolean Series
-        # First convert to native to work with the underlying data frame
-        native_tbl = nw_tbl.to_native()
-
-        # Create the result table with the boolean column
-        if hasattr(native_tbl, "with_columns"):  # Polars
-            import polars as pl
-
-            result_tbl = native_tbl.with_columns(pb_is_good_=pl.Series(validation_results))
-
-        elif hasattr(native_tbl, "assign"):  # Pandas
-            import pandas as pd
-
-            # Align by position: the frame's index need not be 0..n-1
-            result_tbl = native_tbl.assign(
-                pb_is_good_=pd.Series(validation_results, dtype=bool, index=native_tbl.index)
+        verdicts = {}
+        for judge in judges:
+            provider, model = judge.split(":", 1)
+            verdicts[judge] = _prompt_verdicts(
+                tbl, columns_subset, ai_config, provider, model, total_rows
             )
 
+        columns: dict[str, list] = {}
+        if len(judges) == 1:
+            columns["pb_is_good_"] = verdicts[judges[0]]
         else:
-            # Generic fallback
-            result_tbl = native_tbl.copy() if hasattr(native_tbl, "copy") else native_tbl
-            result_tbl["pb_is_good_"] = validation_results
+            votes = [sum(row) for row in zip(*verdicts.values())]
+            columns["pb_is_good_"] = [
+                _aggregate_votes(vote, len(judges), aggregate) for vote in votes
+            ]
+            columns[VOTES_COLUMN] = votes
+
+        if info is not None:
+            info["judges"] = verdicts
+            info["aggregate"] = aggregate
+
+        # Add the result columns to the table (as a Polars or pandas table)
+        result_tbl = _with_prompt_columns(nw_tbl.to_native(), columns)
 
         logger.info(
-            f"AI validation completed. {sum(validation_results)} rows passed out of {len(validation_results)}"
+            f"AI validation completed. {sum(columns['pb_is_good_'])} rows passed out of "
+            f"{total_rows}"
         )
 
         return result_tbl
