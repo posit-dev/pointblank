@@ -137,7 +137,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-splits.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-splits.html">
@@ -185,15 +184,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../changelog.html"> 
-<span class="menu-text">Changelog</span></a>
-  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -698,7 +693,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-splits" class="level1">
 <h1>The Splits</h1>
 <p>Let’s make three splits of a dataset of support tickets, labelled with their topic, for a model that sorts new tickets by topic. Each ticket also records how many days the customer waited. The test split was collected later than the others, and it shows: there are no tickets about returns, the waits are longer, and two tickets were copied from the training split (one as it is, and one in capital letters with different punctuation).</p>
-<div id="c00b212b" class="cell" data-execution_count="2">
+<div id="aea62387" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -897,7 +892,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-the-splits" class="level1">
 <h1>Checking the Splits</h1>
 <p>The splits are given in order, as <code>train=</code>, <code>valid=</code>, and <code>test=</code> (or as a dictionary of splits by name, with <code>splits=</code>). We’ll say which column identifies a ticket (its text) and which has the labels, and ask for rows that are nearly the same as well as rows that are the same.</p>
-<div id="f1e02e35" class="cell" data-execution_count="3">
+<div id="87bef886" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>check <span class="op">=</span> pb.check_splits(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    train<span class="op">=</span>train, valid<span class="op">=</span>valid, test<span class="op">=</span>test, columns<span class="op">=</span><span class="st">"text"</span>, label<span class="op">=</span><span class="st">"topic"</span>, near<span class="op">=</span><span class="va">True</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1047,7 +1042,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-results" class="level1">
 <h1>The Results</h1>
 <p>The problems found are also in the <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> attribute, as messages, and <code>ok</code> is <code>True</code> when there are none, which makes a check of the splits easy to put in a test or a pipeline.</p>
-<div id="363a5fb4" class="cell" data-execution_count="4">
+<div id="30779fff" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>check.issues</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>["2 rows of 'test' (0.7%) are also in 'train' (1 the same and 1 nearly the same).",
@@ -1057,7 +1052,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The <a href="../../reference/SplitCheck.get_overlap.html#pointblank.SplitCheck.get_overlap" class="gdls-link gdls-code">get_overlap()</a> method gives the overlapping rows of a pair of splits, with the row number of each in its own split.</p>
-<div id="3c238209" class="cell" data-execution_count="5">
+<div id="2f09813b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>check.get_overlap(<span class="st">"train"</span>, <span class="st">"test"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div><style>

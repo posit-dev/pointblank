@@ -548,6 +548,47 @@ boosting
 
 The scorers of scikit-learn are such that higher is better (which is why the mean absolute error is negated), so the default `higher_is_better=True` is the right one here. With this model, removing the flights with a zero distance helps too. Whether a problem in the data matters depends on the model, which is why an ablation is worth running with the model that will be trained on the data. Pass `estimator=` to use another model or pipeline: it's cloned for each evaluation, with its `random_state` set to the seed.
 
+## Checking the Held-Out Data
+
+The held-out data is the yardstick of every comparison, so a problem in it is a problem in all of them: a model that's scored on bad data can be rewarded for learning the same mistakes. With `holdout=`, the [Ablation](../../reference/Ablation.md#pointblank.Ablation) checks the held-out data with the same steps as the training table (it's never ablated, only checked), and the plan and the report give the health score of each:
+
+``` python
+checked = pb.Ablation(
+    validation,
+    evaluate=evaluate,
+    metric="mae",
+    higher_is_better=False,
+    holdout=holdout,
+).drop_each()
+
+checked.plan()
+```
+
+| Ablation plan |  |
+|----|----|
+| 4,000 rows in the training table. Each version is evaluated 5 times, so the run will make **35** evaluations. Health score of the training table: **96.80**; of the holdout set (2,000 rows): **98.33**. |  |
+| Version | Removed |
+| Baseline |  |
+| **Full table** Nothing removed | 0 0% |
+| Variants |  |
+| **Step 1** Air time is between 20 and 700 minutes | 80 2.0% |
+| **Step 2** Distance is greater than zero | 122 3.0% |
+| **Step 3** Distance is at most 2,500 miles | 182 4.5% |
+| Controls |  |
+| **80 random rows** Rows removed at random, drawn anew for each repeat | 80 2.0% |
+| **122 random rows** Rows removed at random, drawn anew for each repeat | 122 3.0% |
+| **182 random rows** Rows removed at random, drawn anew for each repeat | 182 4.5% |
+
+The full results are in the `holdout_validation` attribute, an interrogated validation of the held-out data:
+
+``` python
+checked.holdout_validation
+```
+
+[TABLE]
+
+The held-out flights have no air times in hours and no zero distances, but they do have flights longer than 2,500 miles. That's another sign that step 3 is a problem with the check rather than with the data: the flights it fails are the ones the model is asked to predict. The health scores are also in [`Ablation.to_dict()`](../../reference/Ablation.to_dict.md#pointblank.Ablation.to_dict) (with the results of each step) and in a [data card](data-cards.md) made with the ablation. Any table that a validation takes can be the holdout, including the path of a file.
+
 ## Running Larger Ablations
 
 The ablations here make a few dozen evaluations, but with a model that takes minutes to train, a run can take hours. A few things help with that.
@@ -578,6 +619,24 @@ ablation.run(max_workers=4)
 ```
 
 The report says how many of the evaluations came from the cache.
+
+When the training pipeline loads the data itself (from a database, say, or a file that's too large to copy for each version), `pass_as="row_index"` gives the `evaluate` function the list of the numbers of the rows to keep (counting from `0`, in the order of the table) instead of the table. A list can be sent to another process, so this also makes `executor="process"` work for any kind of table:
+
+``` python
+def evaluate_rows(rows, *, seed):
+    return evaluate(train[rows], seed=seed)
+
+
+pb.Ablation(
+    validation,
+    evaluate=evaluate_rows,
+    metric="mae",
+    higher_is_better=False,
+    pass_as="row_index",
+).drop_each().run()
+```
+
+With a list of rows, the defects of [`Ablation.inject()`](../../reference/Ablation.inject.md#pointblank.Ablation.inject) can't be passed on, so they need the default `pass_as="table"`.
 
 ## Evaluating Somewhere Else
 
@@ -716,7 +775,7 @@ pb.yaml_ablation(config, set_tbl=train, evaluate=evaluate).plan()
 | **All steps but step 2, plus 120 random rows** The rows of steps 1, 3, plus random rows drawn anew for each repeat | 380 9.5% |
 | **All steps but step 3, plus 180 random rows** The rows of steps 1, 2, plus random rows drawn anew for each repeat | 380 9.5% |
 
-The sweeps, [inject](../../reference/Ablation.inject.md#pointblank.Ablation.inject), and [shapley](../../reference/Ablation.shapley.md#pointblank.Ablation.shapley) are strategies too, with their arguments by name (e.g., `- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}` or `- inject: {corruption: "null", step: 2}`). In YAML, a defect must be one of the four kinds by name, not a function.
+The sweeps, [inject](../../reference/Ablation.inject.md#pointblank.Ablation.inject), and [shapley](../../reference/Ablation.shapley.md#pointblank.Ablation.shapley) are strategies too, with their arguments by name (e.g., `- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}` or `- inject: {corruption: "null", step: 2}`). In YAML, a defect must be one of the four kinds by name, not a function. The `holdout:` is a data source like `tbl:` (e.g., `holdout: flights_holdout.parquet`), which `yaml_ablation(..., holdout=...)` can replace with a table, as `set_tbl=` does for `tbl:`.
 
 The block is ignored by [`yaml_interrogate()`](../../reference/yaml_interrogate.md#pointblank.yaml_interrogate), so the same file can be used for validating the data, and [`yaml_to_python()`](../../reference/yaml_to_python.md#pointblank.yaml_to_python) writes out the equivalent Python code, ablation included.
 
@@ -724,7 +783,11 @@ The block is ignored by [`yaml_interrogate()`](../../reference/yaml_interrogate.
 
 For each variant, the difference from its control is computed for each repeat, and the report shows the mean of these differences with a paired *t*-interval (95% by default, set with `conf_level=`). The p-values are adjusted for the number of variants with the Holm method, and the verdicts use the adjusted p-values: a variant helps or hurts only if its adjusted p-value is below `1 - conf_level`. You can turn off the adjustment with `adjust=None`. Injected defects remove no rows, so they're always compared with the full table, and the Shapley values have intervals and p-values of their own (from the values of each repeat), adjusted for the number of steps.
 
-With fewer than three repeats, there's too little data for a useful interval, so the report gives no verdicts (and [Ablation](../../reference/Ablation.md#pointblank.Ablation) warns about this). More repeats give narrower intervals, at the cost of more evaluations. A few other options are worth knowing about:
+With fewer than three repeats, there's too little data for a useful interval, so the report gives no verdicts (and [Ablation](../../reference/Ablation.md#pointblank.Ablation) warns about this). More repeats give narrower intervals, at the cost of more evaluations.
+
+The *t*-interval assumes that the differences are roughly normal, which a few outlying repeats (a model that sometimes fails to converge, say) can make untrue. With `ci="bootstrap"`, the intervals and p-values come from 4,000 resamples of the repeats instead: the interval has the middle 95% of the resampled mean differences, and the p-value is the share of them on the other side of zero. The bootstrap assumes nothing about the distribution of the differences, but it needs more repeats (with fewer than 10, its intervals are too narrow, and [Ablation](../../reference/Ablation.md#pointblank.Ablation) warns about this). The resamples are made from the `seed=`, so the results are the same each time.
+
+A few other options are worth knowing about:
 
 - `control=None` compares variants only to the full table, which saves evaluations but leaves the effect of removing *any* rows mixed in with the effect of removing these rows
 - `control=pb.ablation.Stratified("origin")` (see [`ablation.Stratified`](../../reference/ablation.Stratified.md#pointblank.ablation.Stratified)) draws the random rows of each control from each group in proportion to its size, so that a control doesn't take more rows from one group than another by chance (worth using when the groups matter to the model, like the classes of a classification target)

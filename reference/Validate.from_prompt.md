@@ -4,7 +4,7 @@ Build a validation plan for this table from a natural-language prompt.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22464-L22543)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22471-L22550)
 
 ``` python
 Validate.from_prompt(

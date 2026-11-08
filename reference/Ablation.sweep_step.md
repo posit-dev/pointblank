@@ -4,7 +4,7 @@ Add a variant for each value of a step's parameter, removing the rows that fail 
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1442-L1578)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1510-L1646)
 
 ``` python
 Ablation.sweep_step(

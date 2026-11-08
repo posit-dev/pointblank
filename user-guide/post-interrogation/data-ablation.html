@@ -137,7 +137,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/post-interrogation/data-ablation.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/post-interrogation/data-ablation.html">
@@ -185,15 +184,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../changelog.html"> 
-<span class="menu-text">Changelog</span></a>
-  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -676,6 +671,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#sharing-the-effect-among-the-steps" id="toc-sharing-the-effect-among-the-steps" class="nav-link" data-scroll-target="#sharing-the-effect-among-the-steps">Sharing the Effect Among the Steps</a></li>
   <li><a href="#getting-the-results" id="toc-getting-the-results" class="nav-link" data-scroll-target="#getting-the-results">Getting the Results</a></li>
   <li><a href="#a-ready-made-evaluate-function" id="toc-a-ready-made-evaluate-function" class="nav-link" data-scroll-target="#a-ready-made-evaluate-function">A Ready-Made <code>evaluate</code> Function</a></li>
+  <li><a href="#checking-the-held-out-data" id="toc-checking-the-held-out-data" class="nav-link" data-scroll-target="#checking-the-held-out-data">Checking the Held-Out Data</a></li>
   <li><a href="#running-larger-ablations" id="toc-running-larger-ablations" class="nav-link" data-scroll-target="#running-larger-ablations">Running Larger Ablations</a></li>
   <li><a href="#evaluating-somewhere-else" id="toc-evaluating-somewhere-else" class="nav-link" data-scroll-target="#evaluating-somewhere-else">Evaluating Somewhere Else</a></li>
   <li><a href="#ablations-in-yaml" id="toc-ablations-in-yaml" class="nav-link" data-scroll-target="#ablations-in-yaml">Ablations in YAML</a></li>
@@ -712,7 +708,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-data-and-the-model" class="level1">
 <h1>The Data and the Model</h1>
 <p>The <code>nycflights</code> dataset has a row for each flight that left New York City airports in 2013. We’ll train a model to predict a flight’s <code>air_time</code> (in minutes) from its <code>distance</code> (in miles) and the <code>month</code> and <code>hour</code> it left. Here we take 6,000 flights, keeping 2,000 of them aside as the held-out data for scoring the model. The <code>origin</code> airport isn’t used by the model, but we’ll use it later to look at groups of flights.</p>
-<div id="aba4b71e" class="cell" data-execution_count="2">
+<div id="746ac555" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -727,7 +723,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>holdout <span class="op">=</span> flights.tail(<span class="dv">2000</span>)</span></code></pre></div>
 </div>
 <p>To know what the right answers are, we’ll add two problems to the other 4,000 flights. One flight in every 50 has its air time recorded in hours rather than minutes, and one in every 33 has a missing distance recorded as <code>0</code>:</p>
-<div id="c92694f3" class="cell" data-execution_count="3">
+<div id="fa0290ee" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> (</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    flights.head(<span class="dv">4000</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .with_row_index(<span class="st">"row"</span>)</span>
@@ -922,7 +918,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The validation of the training data has a check for each problem, plus a third one that looks reasonable but isn’t: it treats any flight longer than 2,500 miles as an error, though flights from New York to San Francisco and Honolulu are longer than that.</p>
-<div id="ff95548d" class="cell" data-execution_count="4">
+<div id="6a2ff1d4" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>train, tbl_name<span class="op">=</span><span class="st">"flights_train"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(</span>
@@ -1187,7 +1183,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="writing-the-evaluate-function" class="level1">
 <h1>Writing the <code>evaluate</code> Function</h1>
 <p>An ablation needs a function that trains the model on a version of the training table and scores it. Pointblank calls the function with the table as its first argument (the same type of table as the validation’s data, a Polars DataFrame here) and a <code>seed=</code> keyword. It returns the score, or a dictionary of scores if there’s more than one:</p>
-<div id="08689934" class="cell" data-execution_count="5">
+<div id="3e0429f1" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestRegressor</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_absolute_error, r2_score</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1219,7 +1215,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Planning the Ablation</h1>
 <p>An <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> is built in the same way as a validation: you add variants with its methods, and nothing is evaluated until you call <a href="../../reference/Ablation.run.html#pointblank.Ablation.run" class="gdls-link"><code>Ablation.run()</code></a>. The <a href="../../reference/Ablation.drop_each.html#pointblank.Ablation.drop_each" class="gdls-link"><code>Ablation.drop_each()</code></a> method adds a variant for each step, removing the rows that failed it, and <a href="../../reference/Ablation.drop_all.html#pointblank.Ablation.drop_all" class="gdls-link"><code>Ablation.drop_all()</code></a> adds one that removes the rows that failed any step (the failing set from <a href="../../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>Validate.get_sundered_data()</code></a>).</p>
 <p>The model is scored on the mean absolute error (<code>"mae"</code>), so lower is better. The <a href="../../reference/Ablation.plan.html#pointblank.Ablation.plan" class="gdls-link"><code>Ablation.plan()</code></a> method shows what the run will do, without evaluating anything:</p>
-<div id="223b74df" class="cell" data-execution_count="6">
+<div id="00d7f337" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ablation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        validation,</span>
@@ -1375,7 +1371,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="running-the-ablation" class="level1">
 <h1>Running the Ablation</h1>
 <p>The <a href="../../reference/Ablation.run.html#pointblank.Ablation.run" class="gdls-link"><code>Ablation.run()</code></a> method does the evaluations and returns the <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a>, which then shows its report:</p>
-<div id="89ae85e5" class="cell" data-execution_count="7">
+<div id="06c2e34d" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ablation.run()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div id="pb_ablation_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1510,7 +1506,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="comparing-other-combinations-of-steps" class="level1">
 <h1>Comparing Other Combinations of Steps</h1>
 <p>The <a href="../../reference/Ablation.drop_steps.html#pointblank.Ablation.drop_steps" class="gdls-link"><code>Ablation.drop_steps()</code></a> method adds a variant that removes the rows failing any of the steps you give it. Let’s try the validation without its third step. Adding a variant clears the results, so the ablation needs to be run again:</p>
-<div id="3b1209d1" class="cell" data-execution_count="8">
+<div id="569ce1f3" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ablation.drop_steps([<span class="dv">1</span>, <span class="dv">2</span>], name<span class="op">=</span><span class="st">"Without step 3"</span>).run()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>ablation.get_tabular_report()</span></code></pre></div>
@@ -1645,7 +1641,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="leaving-one-step-out" class="level1">
 <h1>Leaving One Step Out</h1>
 <p>A step’s variant shows the effect of its rows on their own, but the steps of a validation are used together, and their rows overlap. The <a href="../../reference/Ablation.drop_all_but_each.html#pointblank.Ablation.drop_all_but_each" class="gdls-link"><code>Ablation.drop_all_but_each()</code></a> method asks what each step adds to the others: for each step, it adds a variant that removes the rows failing every <em>other</em> step. The difference between that variant and the one removing every step’s rows is what the left-out step’s rows add on top of the rest:</p>
-<div id="2eb82716" class="cell" data-execution_count="9">
+<div id="8c36b7e6" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ablation.drop_all_but_each().run()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div id="pb_ablation_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1803,7 +1799,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="removing-groups-of-rows" class="level1">
 <h1>Removing Groups of Rows</h1>
 <p>The variants don’t have to come from the steps. The <a href="../../reference/Ablation.drop_groups.html#pointblank.Ablation.drop_groups" class="gdls-link"><code>Ablation.drop_groups()</code></a> method adds a variant for each value of a column, removing the rows with that value. This shows whether some part of the data (a source, a region, a period) is worse than the rest, which a validation can’t always say. Here’s an ablation that removes the flights from each of the three airports:</p>
-<div id="6719828b" class="cell" data-execution_count="10">
+<div id="4152e36b" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>by_origin <span class="op">=</span> (</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        validation,</span>
@@ -1936,7 +1932,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="sweeping-a-threshold" class="level1">
 <h1>Sweeping a Threshold</h1>
 <p>A step’s variant tests one setting of its check, but the setting itself is often the question: is 2,500 miles the right limit, or would a higher one do better? The <a href="../../reference/Ablation.sweep_step.html#pointblank.Ablation.sweep_step" class="gdls-link"><code>Ablation.sweep_step()</code></a> method adds a variant for each of a list of values of one of a step’s parameters, each removing the rows that fail the step with that value. Here’s the limit of step 3 at four values:</p>
-<div id="14361205" class="cell" data-execution_count="11">
+<div id="fd322a75" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>by_limit <span class="op">=</span> (</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        validation,</span>
@@ -2075,7 +2071,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The variants of a sweep are a group of their own in the report, and below the table, a curve shows the change from the full table at each value, with a dashed line for the controls (removing as many random rows). The lower the limit, the more long flights are removed and the worse the model gets. Even a limit of 3,000 miles, which only removes the seven flights to Honolulu, hurts. No limit helps, so this check shouldn’t be used to clean the data at all.</p>
 <p>A check whose limit is a model’s score is the same question: a score is a matter of degree, and where to draw the line is a choice. A <a href="../../reference/Validate.col_vals_scored.html#pointblank.Validate.col_vals_scored" class="gdls-link"><code>Validate.col_vals_scored()</code></a> step (see <a href="../../user-guide/advanced-validation/scored-validation.html">Scored Validation</a>) gives each row a score and keeps the scores. The <a href="../../reference/Ablation.sweep_score.html#pointblank.Ablation.sweep_score" class="gdls-link"><code>Ablation.sweep_score()</code></a> method then removes more and more of the rows with the highest (or lowest) scores, whatever the step’s own bound. Here, the score of a flight is the average speed implied by its distance and air time, which is far too high for the flights with their air times in hours:</p>
-<div id="77aa07a3" class="cell" data-execution_count="12">
+<div id="8da2351f" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> speed(batch):</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [row[<span class="st">"distance"</span>] <span class="op">/</span> (row[<span class="st">"air_time"</span>] <span class="op">/</span> <span class="dv">60</span>) <span class="cf">for</span> row <span class="kw">in</span> batch]</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2251,7 +2247,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>"duplicate"</code>: rows are copied</li>
 </ul>
 <p>or a function, which is applied to the values of a column. Here, the defect is the problem that step 1 catches, air times in hours, made by a function that divides the air time by 60:</p>
-<div id="89038bef" class="cell" data-execution_count="13">
+<div id="0a52aec5" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>injected <span class="op">=</span> (</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>        validation,</span>
@@ -2394,7 +2390,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="suggesting-thresholds" class="level1">
 <h1>Suggesting Thresholds</h1>
 <p>A step’s thresholds say how many failing rows are too many, but the right number depends on how much the failures cost. With a curve like the one above, that can be worked out: the <a href="../../reference/Ablation.suggest_thresholds.html#pointblank.Ablation.suggest_thresholds" class="gdls-link"><code>Ablation.suggest_thresholds()</code></a> method fits a line through the harm of each injected defect against the share of rows that fail its step, and gives the share at which the harm reaches a <code>tolerance=</code> (in the units of the metric):</p>
-<div id="2e01ba68" class="cell" data-execution_count="14">
+<div id="8b4f9d36" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>injected.suggest_thresholds(tolerance<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
 <pre><code>{1: Thresholds(warning=0.005, error=0.01, critical=None)}</code></pre>
@@ -2405,7 +2401,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="sharing-the-effect-among-the-steps" class="level1">
 <h1>Sharing the Effect Among the Steps</h1>
 <p>Removing every step’s rows has an effect, but the steps’ rows overlap and work together, so their effects on their own don’t add up to it. The <em>Shapley value</em> of a step is its fair share of the whole effect: its average effect when it’s added to every combination of the other steps. The <a href="../../reference/Ablation.shapley.html#pointblank.Ablation.shapley" class="gdls-link"><code>Ablation.shapley()</code></a> method adds a variant for each combination that’s needed (reusing those already in the ablation), and the report shows a Shapley value for each step:</p>
-<div id="0e3d6755" class="cell" data-execution_count="15">
+<div id="1dd37edf" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>shares <span class="op">=</span> (</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        validation,</span>
@@ -2542,7 +2538,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="getting-the-results" class="level1">
 <h1>Getting the Results</h1>
 <p>The <a href="../../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link"><code>Ablation.get_effects()</code></a> method returns the results as a table, with a row for each variant and metric. Along with the differences from the controls, it has the differences from the full table, the interval bounds, and the p-values:</p>
-<div id="9d512d32" class="cell" data-execution_count="16">
+<div id="d9cd0735" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>effects <span class="op">=</span> ablation.get_effects()</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>mae <span class="op">=</span> effects.<span class="bu">filter</span>(pl.col(<span class="st">"metric"</span>) <span class="op">==</span> <span class="st">"mae"</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2559,7 +2555,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The verdicts are only given for the metric named in <code>metric=</code>, but the other metrics are evaluated too. The report can show any of them:</p>
-<div id="a64a9a4c" class="cell" data-execution_count="17">
+<div id="db5eb232" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>ablation.get_tabular_report(metric<span class="op">=</span><span class="st">"r2"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
 <div id="pb_ablation_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2714,7 +2710,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The R² tells the same story for steps 1 and 3, but it rates removing all the failing rows as worse than removing random ones. That’s because it’s based on squared errors, so the large errors on the long flights count for more. Metrics can disagree like this, so it’s worth deciding on the metric for the verdicts before running the ablation, rather than picking the one with the most favorable result.</p>
 <p>The <a href="../../reference/Ablation.to_json.html#pointblank.Ablation.to_json" class="gdls-link"><code>Ablation.to_json()</code></a> method (or <a href="../../reference/Ablation.to_dict.html#pointblank.Ablation.to_dict" class="gdls-link"><code>Ablation.to_dict()</code></a>) gives everything about the ablation: its settings, the variants, every evaluation’s results, and the effects. This is useful for keeping a record of the experiment alongside the model.</p>
 <p>The <a href="../../reference/Ablation.annotate.html#pointblank.Ablation.annotate" class="gdls-link"><code>Ablation.annotate()</code></a> method puts the results where the checks are: it adds a note to each step of the validation that has a variant, with its effect and verdict (and what its rows add on top of the other steps, with <a href="../../reference/Ablation.drop_all_but_each.html#pointblank.Ablation.drop_all_but_each" class="gdls-link"><code>Ablation.drop_all_but_each()</code></a>). The notes appear in the validation’s report:</p>
-<div id="215a8d43" class="cell" data-execution_count="18">
+<div id="3149e1c3" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>ablation.annotate()</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
@@ -2964,7 +2960,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="a-ready-made-evaluate-function" class="level1">
 <h1>A Ready-Made <code>evaluate</code> Function</h1>
 <p>Many <code>evaluate</code> functions for tabular models are much the same: pick the features, encode them, fit a model, and score it on the held-out data. The <a href="../../reference/ablation.sklearn_evaluator.html#pointblank.ablation.sklearn_evaluator" class="gdls-link"><code>ablation.sklearn_evaluator()</code></a> function makes one from the held-out data and the target. By default it fits a histogram-based gradient boosting model, which handles missing values and string features, and scores it with <code>"r2"</code> for a regression (or <code>"accuracy"</code> for classification). Any scikit-learn scorers can be used instead:</p>
-<div id="994e289b" class="cell" data-execution_count="19">
+<div id="bdf764d8" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>evaluate_boosting <span class="op">=</span> pb.ablation.sklearn_evaluator(</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    holdout,</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    target<span class="op">=</span><span class="st">"air_time"</span>,</span>
@@ -3100,64 +3096,463 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The scorers of scikit-learn are such that higher is better (which is why the mean absolute error is negated), so the default <code>higher_is_better=True</code> is the right one here. With this model, removing the flights with a zero distance helps too. Whether a problem in the data matters depends on the model, which is why an ablation is worth running with the model that will be trained on the data. Pass <code>estimator=</code> to use another model or pipeline: it’s cloned for each evaluation, with its <code>random_state</code> set to the seed.</p>
 </section>
+<section id="checking-the-held-out-data" class="level1">
+<h1>Checking the Held-Out Data</h1>
+<p>The held-out data is the yardstick of every comparison, so a problem in it is a problem in all of them: a model that’s scored on bad data can be rewarded for learning the same mistakes. With <code>holdout=</code>, the <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> checks the held-out data with the same steps as the training table (it’s never ablated, only checked), and the plan and the report give the health score of each:</p>
+<div id="bcfa2dd0" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>checked <span class="op">=</span> pb.Ablation(</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    validation,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    evaluate<span class="op">=</span>evaluate,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    metric<span class="op">=</span><span class="st">"mae"</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    higher_is_better<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    holdout<span class="op">=</span>holdout,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>).drop_each()</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>checked.plan()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<div id="pb_ablation_plan" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_ablation_plan table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_ablation_plan thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_ablation_plan p { margin: 0; padding: 0; }
+ #pb_ablation_plan .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_ablation_plan .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_ablation_plan .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_ablation_plan .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_ablation_plan .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_ablation_plan .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_ablation_plan .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_ablation_plan .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_ablation_plan .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_ablation_plan .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_ablation_plan .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_ablation_plan .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_ablation_plan .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_ablation_plan .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_ablation_plan .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_ablation_plan .gt_from_md> :first-child { margin-top: 0; }
+ #pb_ablation_plan .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_ablation_plan .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_ablation_plan .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_ablation_plan .gt_indent_1 { text-indent: 5px; }
+ #pb_ablation_plan .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_ablation_plan .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_ablation_plan .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_ablation_plan .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_ablation_plan .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_ablation_plan .gt_row_group_first td { border-top-width: 2px; }
+ #pb_ablation_plan .gt_row_group_first th { border-top-width: 2px; }
+ #pb_ablation_plan .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_ablation_plan .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_ablation_plan .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_ablation_plan .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_ablation_plan .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_ablation_plan .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_ablation_plan .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_ablation_plan .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_ablation_plan .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_ablation_plan .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_ablation_plan .gt_left { text-align: left; }
+ #pb_ablation_plan .gt_center { text-align: center; }
+ #pb_ablation_plan .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_ablation_plan .gt_font_normal { font-weight: normal; }
+ #pb_ablation_plan .gt_font_bold { font-weight: bold; }
+ #pb_ablation_plan .gt_font_italic { font-style: italic; }
+ #pb_ablation_plan .gt_super { font-size: 65%; }
+ #pb_ablation_plan .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_ablation_plan .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_ablation_plan .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_ablation_plan .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_ablation_plan .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_ablation_plan .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_ablation_plan-title" aria-describedby="pb_ablation_plan-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:75%;">
+  <col style="width:25%;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_title gt_font_normal" id="pb_ablation_plan-title">Ablation plan</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_ablation_plan-subtitle"><div>4,000 rows in the training table. Each version is evaluated 5 times, so the run will make <strong>35</strong> evaluations.</div><div>Health score of the training table: <strong>96.80</strong>; of the holdout set (2,000 rows): <strong>98.33</strong>.</div></td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="font-size: 12px;font-weight: bold;" scope="col" id="pb_ablation_plan-variant">Version</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="font-size: 12px;font-weight: bold;" scope="col" id="pb_ablation_plan-removed">Removed</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_ablation_plan-Baseline" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Baseline</th>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Baseline pb_ablation_plan-variant" class="gt_row gt_left"><div><strong>Full table</strong></div><div style="font-size: 10px; color: #777777;">Nothing removed</div></td>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Baseline pb_ablation_plan-removed" class="gt_row gt_right"><div><span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">0</span></div><div style="font-size: 10px; color: #777777;">0%</div></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_ablation_plan-Variants" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Variants</th>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Variants pb_ablation_plan-variant" class="gt_row gt_left"><div><strong>Step 1</strong></div><div style="font-size: 10px; color: #777777;">Air time is between 20 and 700 minutes</div></td>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Variants pb_ablation_plan-removed" class="gt_row gt_right"><div><span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">80</span></div><div style="font-size: 10px; color: #777777;">2.0%</div></td>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Variants pb_ablation_plan-variant" class="gt_row gt_left"><div><strong>Step 2</strong></div><div style="font-size: 10px; color: #777777;">Distance is greater than zero</div></td>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Variants pb_ablation_plan-removed" class="gt_row gt_right"><div><span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">122</span></div><div style="font-size: 10px; color: #777777;">3.0%</div></td>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Variants pb_ablation_plan-variant" class="gt_row gt_left"><div><strong>Step 3</strong></div><div style="font-size: 10px; color: #777777;">Distance is at most 2,500 miles</div></td>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Variants pb_ablation_plan-removed" class="gt_row gt_right"><div><span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">182</span></div><div style="font-size: 10px; color: #777777;">4.5%</div></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_ablation_plan-Controls" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Controls</th>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Controls pb_ablation_plan-variant" class="gt_row gt_left"><div><strong>80 random rows</strong></div><div style="font-size: 10px; color: #777777;">Rows removed at random, drawn anew for each repeat</div></td>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Controls pb_ablation_plan-removed" class="gt_row gt_right"><div><span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">80</span></div><div style="font-size: 10px; color: #777777;">2.0%</div></td>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Controls pb_ablation_plan-variant" class="gt_row gt_left"><div><strong>122 random rows</strong></div><div style="font-size: 10px; color: #777777;">Rows removed at random, drawn anew for each repeat</div></td>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Controls pb_ablation_plan-removed" class="gt_row gt_right"><div><span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">122</span></div><div style="font-size: 10px; color: #777777;">3.0%</div></td>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Controls pb_ablation_plan-variant" class="gt_row gt_left"><div><strong>182 random rows</strong></div><div style="font-size: 10px; color: #777777;">Rows removed at random, drawn anew for each repeat</div></td>
+    <td style="font-size: 12px;" headers="pb_ablation_plan-Controls pb_ablation_plan-removed" class="gt_row gt_right"><div><span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">182</span></div><div style="font-size: 10px; color: #777777;">4.5%</div></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>The full results are in the <code>holdout_validation</code> attribute, an interrogated validation of the held-out data:</p>
+<div id="b686ee88" class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>checked.holdout_validation</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_tbl p { margin: 0; padding: 0; }
+ #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_indent_1 { text-indent: 5px; }
+ #pb_tbl .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_tbl .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_tbl .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_tbl .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_left { text-align: left; }
+ #pb_tbl .gt_center { text-align: center; }
+ #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_tbl .gt_font_normal { font-weight: normal; }
+ #pb_tbl .gt_font_bold { font-weight: bold; }
+ #pb_tbl .gt_font_italic { font-style: italic; }
+ #pb_tbl .gt_super { font-size: 65%; }
+ #pb_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:4px;">
+  <col style="width:35px;">
+  <col style="width:190px;">
+  <col style="width:120px;">
+  <col style="width:120px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:65px;">
+</colgroup>
+
+<thead>
+
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>col_vals_between</title>
+    <g id="pb_tbl-type_upd-0-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-0-col_vals_between" transform="translate(0.000000, 0.206897)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="pb_tbl-type_upd-0-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M11.993484,21.96875 C10.962234,22.082031 10.188797,22.964844 10.212234,24 L10.212234,42 C10.200515,42.722656 10.579422,43.390625 11.204422,43.753906 C11.825515,44.121094 12.598953,44.121094 13.220047,43.753906 C13.845047,43.390625 14.223953,42.722656 14.212234,42 L14.212234,24 C14.220047,23.457031 14.009109,22.9375 13.626297,22.554688 C13.243484,22.171875 12.723953,21.960938 12.180984,21.96875 C12.118484,21.964844 12.055984,21.964844 11.993484,21.96875 Z M55.993484,21.96875 C54.962234,22.082031 54.188797,22.964844 54.212234,24 L54.212234,42 C54.200515,42.722656 54.579422,43.390625 55.204422,43.753906 C55.825515,44.121094 56.598953,44.121094 57.220047,43.753906 C57.845047,43.390625 58.223953,42.722656 58.212234,42 L58.212234,24 C58.220047,23.457031 58.009109,22.9375 57.626297,22.554688 C57.243484,22.171875 56.723953,21.960938 56.180984,21.96875 C56.118484,21.964844 56.055984,21.964844 55.993484,21.96875 Z M16.212234,22 C15.661453,22 15.212234,22.449219 15.212234,23 C15.212234,23.550781 15.661453,24 16.212234,24 C16.763015,24 17.212234,23.550781 17.212234,23 C17.212234,22.449219 16.763015,22 16.212234,22 Z M20.212234,22 C19.661453,22 19.212234,22.449219 19.212234,23 C19.212234,23.550781 19.661453,24 20.212234,24 C20.763015,24 21.212234,23.550781 21.212234,23 C21.212234,22.449219 20.763015,22 20.212234,22 Z M24.212234,22 C23.661453,22 23.212234,22.449219 23.212234,23 C23.212234,23.550781 23.661453,24 24.212234,24 C24.763015,24 25.212234,23.550781 25.212234,23 C25.212234,22.449219 24.763015,22 24.212234,22 Z M28.212234,22 C27.661453,22 27.212234,22.449219 27.212234,23 C27.212234,23.550781 27.661453,24 28.212234,24 C28.763015,24 29.212234,23.550781 29.212234,23 C29.212234,22.449219 28.763015,22 28.212234,22 Z M32.212234,22 C31.661453,22 31.212234,22.449219 31.212234,23 C31.212234,23.550781 31.661453,24 32.212234,24 C32.763015,24 33.212234,23.550781 33.212234,23 C33.212234,22.449219 32.763015,22 32.212234,22 Z M36.212234,22 C35.661453,22 35.212234,22.449219 35.212234,23 C35.212234,23.550781 35.661453,24 36.212234,24 C36.763015,24 37.212234,23.550781 37.212234,23 C37.212234,22.449219 36.763015,22 36.212234,22 Z M40.212234,22 C39.661453,22 39.212234,22.449219 39.212234,23 C39.212234,23.550781 39.661453,24 40.212234,24 C40.763015,24 41.212234,23.550781 41.212234,23 C41.212234,22.449219 40.763015,22 40.212234,22 Z M44.212234,22 C43.661453,22 43.212234,22.449219 43.212234,23 C43.212234,23.550781 43.661453,24 44.212234,24 C44.763015,24 45.212234,23.550781 45.212234,23 C45.212234,22.449219 44.763015,22 44.212234,22 Z M48.212234,22 C47.661453,22 47.212234,22.449219 47.212234,23 C47.212234,23.550781 47.661453,24 48.212234,24 C48.763015,24 49.212234,23.550781 49.212234,23 C49.212234,22.449219 48.763015,22 48.212234,22 Z M52.212234,22 C51.661453,22 51.212234,22.449219 51.212234,23 C51.212234,23.550781 51.661453,24 52.212234,24 C52.763015,24 53.212234,23.550781 53.212234,23 C53.212234,22.449219 52.763015,22 52.212234,22 Z M21.462234,27.96875 C21.419265,27.976563 21.376297,27.988281 21.337234,28 C21.177078,28.027344 21.02864,28.089844 20.899734,28.1875 L15.618484,32.1875 C15.356765,32.375 15.200515,32.679688 15.200515,33 C15.200515,33.320313 15.356765,33.625 15.618484,33.8125 L20.899734,37.8125 C21.348953,38.148438 21.985672,38.058594 22.321609,37.609375 C22.657547,37.160156 22.567703,36.523438 22.118484,36.1875 L19.212234,34 L49.212234,34 L46.305984,36.1875 C45.856765,36.523438 45.766922,37.160156 46.102859,37.609375 C46.438797,38.058594 47.075515,38.148438 47.524734,37.8125 L52.805984,33.8125 C53.067703,33.625 53.223953,33.320313 53.223953,33 C53.223953,32.679688 53.067703,32.375 52.805984,32.1875 L47.524734,28.1875 C47.30989,28.027344 47.040359,27.960938 46.774734,28 C46.743484,28 46.712234,28 46.680984,28 C46.282547,28.074219 45.96614,28.382813 45.884109,28.78125 C45.802078,29.179688 45.970047,29.585938 46.305984,29.8125 L49.212234,32 L19.212234,32 L22.118484,29.8125 C22.520828,29.566406 22.696609,29.070313 22.536453,28.625 C22.380203,28.179688 21.930984,27.90625 21.462234,27.96875 Z M16.212234,42 C15.661453,42 15.212234,42.449219 15.212234,43 C15.212234,43.550781 15.661453,44 16.212234,44 C16.763015,44 17.212234,43.550781 17.212234,43 C17.212234,42.449219 16.763015,42 16.212234,42 Z M20.212234,42 C19.661453,42 19.212234,42.449219 19.212234,43 C19.212234,43.550781 19.661453,44 20.212234,44 C20.763015,44 21.212234,43.550781 21.212234,43 C21.212234,42.449219 20.763015,42 20.212234,42 Z M24.212234,42 C23.661453,42 23.212234,42.449219 23.212234,43 C23.212234,43.550781 23.661453,44 24.212234,44 C24.763015,44 25.212234,43.550781 25.212234,43 C25.212234,42.449219 24.763015,42 24.212234,42 Z M28.212234,42 C27.661453,42 27.212234,42.449219 27.212234,43 C27.212234,43.550781 27.661453,44 28.212234,44 C28.763015,44 29.212234,43.550781 29.212234,43 C29.212234,42.449219 28.763015,42 28.212234,42 Z M32.212234,42 C31.661453,42 31.212234,42.449219 31.212234,43 C31.212234,43.550781 31.661453,44 32.212234,44 C32.763015,44 33.212234,43.550781 33.212234,43 C33.212234,42.449219 32.763015,42 32.212234,42 Z M36.212234,42 C35.661453,42 35.212234,42.449219 35.212234,43 C35.212234,43.550781 35.661453,44 36.212234,44 C36.763015,44 37.212234,43.550781 37.212234,43 C37.212234,42.449219 36.763015,42 36.212234,42 Z M40.212234,42 C39.661453,42 39.212234,42.449219 39.212234,43 C39.212234,43.550781 39.661453,44 40.212234,44 C40.763015,44 41.212234,43.550781 41.212234,43 C41.212234,42.449219 40.763015,42 40.212234,42 Z M44.212234,42 C43.661453,42 43.212234,42.449219 43.212234,43 C43.212234,43.550781 43.661453,44 44.212234,44 C44.763015,44 45.212234,43.550781 45.212234,43 C45.212234,42.449219 44.763015,42 44.212234,42 Z M48.212234,42 C47.661453,42 47.212234,42.449219 47.212234,43 C47.212234,43.550781 47.661453,44 48.212234,44 C48.763015,44 49.212234,43.550781 49.212234,43 C49.212234,42.449219 48.763015,42 48.212234,42 Z M52.212234,42 C51.661453,42 51.212234,42.449219 51.212234,43 C51.212234,43.550781 51.661453,44 52.212234,44 C52.763015,44 53.212234,43.550781 53.212234,43 C53.212234,42.449219 52.763015,42 52.212234,42 Z" id="pb_tbl-type_upd-0-inside_range" fill="#000000" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_between()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"><p style="font-size: inherit; margin: 0;">Air time is between 20 and 700 minutes</p>
+</div>
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">air_time</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">[20, 700]</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-0-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-0-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-0-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-0-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-0-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">2000</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">2000<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">2</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_vals_gt</title>
+    <g id="pb_tbl-type_upd-1-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-1-col_vals_gt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="pb_tbl-type_upd-1-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M48.7619048,10 L15.2380953,10 C12.3466667,10 10,12.3466667 10,15.2380952 L10,48.7619048 C10,51.6533333 12.3466667,54 15.2380953,54 L48.7619048,54 C51.6533333,54 54,51.6533333 54,48.7619048 L54,15.2380952 C54,12.3466667 51.6533333,10 48.7619048,10 Z M25.2638095,44.3828571 L24.0695238,42.6647619 L39.5847619,32 L24.0695238,21.3352381 L25.2638095,19.6171429 L43.2828572,32 L25.2638095,44.3828571 Z" id="pb_tbl-type_upd-1-greater_than" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"><p style="font-size: inherit; margin: 0;">Distance is greater than zero</p>
+</div>
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">distance</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">0</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-1-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-1-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-1-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-1-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-1-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">2000</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">2000<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" headers="pb_tbl-status_color" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" headers="pb_tbl-i" class="gt_row gt_right">3</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-type_upd" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_vals_le</title>
+    <g id="pb_tbl-type_upd-2-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-type_upd-2-col_vals_le" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="pb_tbl-type_upd-2-rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M51,10 L13,10 C11.347656,10 10,11.347656 10,13 L10,51 C10,52.652344 11.347656,54 13,54 L51,54 C52.652344,54 54,52.652344 54,51 L54,13 C54,11.347656 52.652344,10 51,10 Z M40.515625,18.125 L41.484375,19.875 L25.058594,29 L41.484375,38.125 L40.515625,39.875 L20.941406,29 L40.515625,18.125 Z M43,46 L21,46 L21,44 L43,44 L43,46 Z" id="pb_tbl-type_upd-2-less_than_equal" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_le()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"><p style="font-size: inherit; margin: 0;">Distance is at most 2,500 miles</p>
+</div>
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">distance</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">2500</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-tbl" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="pb_tbl-tbl-2-unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pb_tbl-tbl-2-unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="pb_tbl-tbl-2-Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="pb_tbl-tbl-2-Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="pb_tbl-tbl-2-arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-eval" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" headers="pb_tbl-test_units" class="gt_row gt_right">2000</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-pass" class="gt_row gt_right">1900<br>0.95</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" headers="pb_tbl-fail" class="gt_row gt_right">100<br>0.05</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" headers="pb_tbl-w_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" headers="pb_tbl-e_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" headers="pb_tbl-c_upd" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLG1vbnRoLGhvdXIsb3JpZ2luLGRpc3RhbmNlLGFpcl90aW1lCjE1LDEsMTQsSkZLLDI1ODYsMzM3CjI4LDksMTcsRVdSLDI1NjUsMzM2CjY5LDcsMTgsSkZLLDI1ODYsMzQ1CjEwMSwxLDE5LEpGSywyNTg2LDM2NAoxMDYsMTIsMjAsRVdSLDI1NjUsMzMyCjExMCwzLDcsSkZLLDI1ODYsMzk1CjEyMSw1LDE4LEpGSywyNTY5LDMzOQoxMjgsOCw3LEpGSywyNTg2LDM1NQoxMjksMiwxOCxKRkssMjU2OSwzMzAKMTMzLDIsMTAsSkZLLDI1ODYsMzYyCjE3NCw2LDE3LEVXUiwyNTY1LDMzNAoxNzgsOCwxOCxKRkssMjU2OSwzNTQKMTkxLDQsMTAsSkZLLDI1ODYsMzQwCjE5OSw1LDE3LEpGSywyNTg2LDMyNAoyMDUsNiwxNixFV1IsMjU2NSwzNDgKMjE3LDIsNyxKRkssMjU4NiwzNTIKMjU5LDgsOCxKRkssMjU4NiwzMjgKMjc2LDgsMTMsRVdSLDI1NjUsMzI5CjMyMywxMiwxNSxFV1IsMjU2NSwzNDAKMzQ1LDUsMTgsRVdSLDI1NjUsMzMyCjM1NywzLDgsSkZLLDI1ODYsMzU1CjQ1MywyLDgsRVdSLDI1NjUsMzUzCjQ5NCw3LDcsSkZLLDI1ODYsMzQxCjUwMiwzLDE4LEpGSywyNTg2LDMzNwo1MjEsNSwyMCxKRkssMjU4NiwzMjYKNTIyLDUsNyxFV1IsMjU2NSwzNTMKNTUxLDEwLDgsSkZLLDI1ODYsMzM3CjU3OCwxMiw2LEVXUiwyNTY1LDM3OQo1ODIsMTAsMTQsRVdSLDI1NjUsMzYwCjYwNyw1LDcsRVdSLDI1NjUsMzY3CjYyNyw5LDcsSkZLLDI1ODYsMzM0CjY1NCwxMSw5LEVXUiw0OTYzLDY0MQo3MjgsOSw3LEpGSywyNTg2LDM0NQo3NDAsOSw2LEVXUiwyNTY1LDMyMQo3NjQsMiw3LEpGSywyNTg2LDMyNwo4MDMsMTEsMTgsSkZLLDI1ODYsMzQzCjgyMSw0LDEwLEVXUiwyNTY1LDM1Nwo4MjcsNSwxNixFV1IsMjU2NSwzMzMKODUxLDEyLDE1LEpGSywyNTg2LDM4Ngo5MDAsOSw5LEpGSywyNTg2LDM0Mwo5MTQsNSwxNyxKRkssMjU3NiwzNDAKOTIzLDEwLDcsSkZLLDI1ODYsMzQzCjkzNiw0LDE4LEpGSywyNTg2LDM0MAo5NDksNSwxMCxFV1IsMjU2NSwzMzIKOTc0LDExLDEyLEVXUiwyNTY1LDM0Nwo5ODEsMTEsMTcsSkZLLDI1ODYsMzUyCjEwMjAsMTIsNyxKRkssMjU4NiwzMzkKMTA2NCwxMiw4LEpGSywyNTg2LDM3MQoxMTEyLDEyLDgsSkZLLDI1ODYsMzY3CjExMjYsNiwxMCxKRkssMjU4NiwzMTUKMTE1OSw0LDE5LEVXUiwyNTY1LDM0MwoxMTc0LDEsMTUsSkZLLDI1ODYsMzYxCjExOTUsMTIsMTUsRVdSLDI1NjUsMzUyCjEyMDAsMiw3LEpGSywyNTg2LDM0MwoxMjE4LDUsNyxKRkssMjU4NiwzNDMKMTI1MiwzLDE3LEpGSywyNTg2LDM2MQoxMjU0LDgsMTgsSkZLLDI1NjksMzIxCjEyNTUsMTEsNyxFV1IsMjU2NSwzNTMKMTI3NiwxMCw4LEpGSywyNTg2LDM4NQoxMjc5LDEsMTQsSkZLLDI1ODYsMzQ1CjEyODQsOSwxOCxKRkssMjU2OSwzMzcKMTMxNSw5LDE2LEpGSywyNTg2LDMzOAoxMzcwLDEsNyxKRkssMjU4NiwzNDcKMTM3MiwyLDksSkZLLDQ5ODMsNjIwCjE0MTQsNCw5LEpGSywyNTg2LDM1MgoxNDIyLDEwLDExLEVXUiwyNTY1LDM0MAoxNDI0LDExLDEwLEpGSywyNTg2LDM1MAoxNDMwLDUsMTUsRVdSLDI1NjUsMzU0CjE0NDAsMiwxOCxKRkssMjU4NiwzNjcKMTQ0NiwxMiwxOCxFV1IsMjU2NSwzMzgKMTQ1MCw1LDcsSkZLLDI1ODYsMzMyCjE0NjAsMTEsOSxFV1IsMjU2NSwzNTkKMTUwMSwxLDgsSkZLLDI1ODYsMzU3CjE1MDIsMSw3LEpGSywyNTg2LDM1MAoxNTQ0LDcsMTgsSkZLLDI1NjksMzE2CjE1NjAsNiwxMyxKRkssMjU4NiwzMzAKMTU3Miw4LDE1LEVXUiwyNTY1LDM1NgoxNTkwLDIsMTEsSkZLLDI1ODYsMzUyCjE2MDAsMyw2LEpGSywyNTg2LDM1NAoxNjA1LDQsNixFV1IsMjU2NSwzNTAKMTYxNSw4LDcsSkZLLDI1ODYsMzI5CjE2MTYsNiw4LEVXUiwyNTY1LDM0MAoxNjM4LDcsMTcsSkZLLDI1ODYsMzI5CjE2NTksMTAsMTksSkZLLDI1ODYsMzQxCjE2ODUsMTIsMTcsSkZLLDI1ODYsMzc2CjE3MzMsNiwxOCxKRkssMjU4NiwzNDAKMTc3MSwyLDgsSkZLLDI1ODYsMzM5CjE3ODAsNSwxNyxFV1IsMjU2NSwzMjEKMTc4MywxMiw3LEVXUiwyNTY1LDMzNAoxNzg0LDgsMTUsSkZLLDI1ODYsMzI0CjE4MDUsOCwxNyxFV1IsMjU2NSwzMTQKMTgzOSw1LDEwLEpGSyw0OTgzLDYwNwoxODcwLDYsMTQsRVdSLDI1NjUsMzkyCjE4NzEsNywxMyxFV1IsNDk2Myw2MTEKMTg4MCw5LDcsSkZLLDI1ODYsMzQxCjE4ODUsNiwxMixKRkssMjU4NiwzMzcKMTg4OSw4LDksRVdSLDI1NjUsMzYwCjE5MDcsMTEsMTAsSkZLLDQ5ODMsNjQ4CjE5MjksNSwxOSxFV1IsMjU2NSwzNDAKMTkzMCwxMSwxMixFV1IsMjU2NSwzNTcK" download="extract_0003.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+  </tr>
+</tbody>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>The held-out flights have no air times in hours and no zero distances, but they do have flights longer than 2,500 miles. That’s another sign that step 3 is a problem with the check rather than with the data: the flights it fails are the ones the model is asked to predict. The health scores are also in <a href="../../reference/Ablation.to_dict.html#pointblank.Ablation.to_dict" class="gdls-link"><code>Ablation.to_dict()</code></a> (with the results of each step) and in a <a href="../../user-guide/post-interrogation/data-cards.html">data card</a> made with the ablation. Any table that a validation takes can be the holdout, including the path of a file.</p>
+</section>
 <section id="running-larger-ablations" class="level1">
 <h1>Running Larger Ablations</h1>
 <p>The ablations here make a few dozen evaluations, but with a model that takes minutes to train, a run can take hours. A few things help with that.</p>
 <p>Before a long run, it’s worth checking that the <code>evaluate</code> function uses its seed for all of its randomness, since the paired comparisons rely on it. The <a href="../../reference/Ablation.check_determinism.html#pointblank.Ablation.check_determinism" class="gdls-link"><code>Ablation.check_determinism()</code></a> method evaluates the full table twice with the same seed, and warns if the results differ:</p>
-<div id="86ba1d9a" class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>ablation.check_determinism()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="20">
+<div id="7d7eb245" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>ablation.check_determinism()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
 <pre><code>True</code></pre>
 </div>
 </div>
 <p>The <code>max_workers=</code> parameter of <a href="../../reference/Ablation.run.html#pointblank.Ablation.run" class="gdls-link"><code>Ablation.run()</code></a> makes the evaluations in parallel. They run in threads by default, which suits models that release Python’s lock while they train (most of those in compiled libraries do), and <code>executor="process"</code> runs them in separate processes instead (this needs an <code>evaluate</code> function defined at the top level of a module). The random forest here already uses every core with <code>n_jobs=-1</code>, so it wouldn’t gain much.</p>
 <p>The <code>cache=</code> parameter of <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> keeps each evaluation’s result in a directory, so that a run that stops partway through (or a run with an added variant) only makes the evaluations it doesn’t already have. A result is found again only for the same data, the same rows removed, and the same seed, so a change to the table gives new evaluations. A change to the model doesn’t, since Pointblank can’t see inside the <code>evaluate</code> function, so give it an <code>evaluate_version=</code> that you change along with the model:</p>
-<div id="cc91ee07" class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>ablation <span class="op">=</span> pb.Ablation(</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    validation,</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    evaluate<span class="op">=</span>evaluate,</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    metric<span class="op">=</span><span class="st">"mae"</span>,</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    higher_is_better<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    cache<span class="op">=</span><span class="st">".ablation-cache"</span>,</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    evaluate_version<span class="op">=</span><span class="st">"random forest, 50 trees"</span>,</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>).drop_each()</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>ablation.run(max_workers<span class="op">=</span><span class="dv">4</span>)</span></code></pre></div>
+<div id="ab43c4b2" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>ablation <span class="op">=</span> pb.Ablation(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    validation,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    evaluate<span class="op">=</span>evaluate,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    metric<span class="op">=</span><span class="st">"mae"</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    higher_is_better<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    cache<span class="op">=</span><span class="st">".ablation-cache"</span>,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    evaluate_version<span class="op">=</span><span class="st">"random forest, 50 trees"</span>,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>).drop_each()</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>ablation.run(max_workers<span class="op">=</span><span class="dv">4</span>)</span></code></pre></div>
 </div>
 <p>The report says how many of the evaluations came from the cache.</p>
+<p>When the training pipeline loads the data itself (from a database, say, or a file that’s too large to copy for each version), <code>pass_as="row_index"</code> gives the <code>evaluate</code> function the list of the numbers of the rows to keep (counting from <code>0</code>, in the order of the table) instead of the table. A list can be sent to another process, so this also makes <code>executor="process"</code> work for any kind of table:</p>
+<div id="621929f9" class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> evaluate_rows(rows, <span class="op">*</span>, seed):</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> evaluate(train[rows], seed<span class="op">=</span>seed)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>pb.Ablation(</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    validation,</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    evaluate<span class="op">=</span>evaluate_rows,</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    metric<span class="op">=</span><span class="st">"mae"</span>,</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    higher_is_better<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    pass_as<span class="op">=</span><span class="st">"row_index"</span>,</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>).drop_each().run()</span></code></pre></div>
+</div>
+<p>With a list of rows, the defects of <a href="../../reference/Ablation.inject.html#pointblank.Ablation.inject" class="gdls-link"><code>Ablation.inject()</code></a> can’t be passed on, so they need the default <code>pass_as="table"</code>.</p>
 </section>
 <section id="evaluating-somewhere-else" class="level1">
 <h1>Evaluating Somewhere Else</h1>
 <p>Sometimes the model can’t be trained in the Python session that has the validation: it’s trained on a cluster, by another team, or in another language. The <a href="../../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link"><code>Ablation.export()</code></a> method writes every version of the training table that a run would evaluate to a directory, as Parquet files, along with a <code>manifest.json</code> that lists each evaluation (its version of the table, its file, and its seed) and a <code>results_template.csv</code> to fill in. With <code>format="indices"</code>, it writes the row numbers that each version removes instead, for a table that’s too large to copy.</p>
 <p>Here, the evaluations are made by reading the files back and calling the same <code>evaluate</code> function, but any process that writes a row of metrics for each evaluation would do:</p>
-<div id="13273f56" class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>plan <span class="op">=</span> pb.Ablation(</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    validation, metric<span class="op">=</span><span class="st">"mae"</span>, higher_is_better<span class="op">=</span><span class="va">False</span>, repeats<span class="op">=</span><span class="dv">3</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>).drop_each(steps<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>directory <span class="op">=</span> plan.export(Path(tempfile.mkdtemp()) <span class="op">/</span> <span class="st">"air-time-ablation"</span>)</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>manifest <span class="op">=</span> json.loads((directory <span class="op">/</span> <span class="st">"manifest.json"</span>).read_text())</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    [</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>        {</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"variant"</span>: run[<span class="st">"variant"</span>],</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">"repeat"</span>: run[<span class="st">"repeat"</span>],</span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>            <span class="st">"seed"</span>: run[<span class="st">"seed"</span>],</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>            <span class="op">**</span>evaluate(pl.read_parquet(directory <span class="op">/</span> run[<span class="st">"file"</span>]), seed<span class="op">=</span>run[<span class="st">"seed"</span>]),</span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> run <span class="kw">in</span> manifest[<span class="st">"runs"</span>]</span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>results.write_csv(directory <span class="op">/</span> <span class="st">"results.csv"</span>)</span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>plan.load_results(directory)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="21">
+<div id="0fc9256a" class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>plan <span class="op">=</span> pb.Ablation(</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    validation, metric<span class="op">=</span><span class="st">"mae"</span>, higher_is_better<span class="op">=</span><span class="va">False</span>, repeats<span class="op">=</span><span class="dv">3</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>).drop_each(steps<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>directory <span class="op">=</span> plan.export(Path(tempfile.mkdtemp()) <span class="op">/</span> <span class="st">"air-time-ablation"</span>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>manifest <span class="op">=</span> json.loads((directory <span class="op">/</span> <span class="st">"manifest.json"</span>).read_text())</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"variant"</span>: run[<span class="st">"variant"</span>],</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">"repeat"</span>: run[<span class="st">"repeat"</span>],</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>            <span class="st">"seed"</span>: run[<span class="st">"seed"</span>],</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>            <span class="op">**</span>evaluate(pl.read_parquet(directory <span class="op">/</span> run[<span class="st">"file"</span>]), seed<span class="op">=</span>run[<span class="st">"seed"</span>]),</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> run <span class="kw">in</span> manifest[<span class="st">"runs"</span>]</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>results.write_csv(directory <span class="op">/</span> <span class="st">"results.csv"</span>)</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>plan.load_results(directory)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
 <div id="pb_ablation_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
@@ -3264,59 +3659,59 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="ablations-in-yaml" class="level1">
 <h1>Ablations in YAML</h1>
 <p>A validation written in YAML can have an <code>ablation:</code> block, with the settings of the <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> and its strategies (the methods that add variants). The <code>evaluate</code> function is given as the import path of a function in a module:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span><span class="at"> flights_train.parquet</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_name</span><span class="kw">:</span><span class="at"> flights_train</span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_between</span><span class="kw">:</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> air_time</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">left</span><span class="kw">:</span><span class="at"> </span><span class="dv">20</span></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">right</span><span class="kw">:</span><span class="at"> </span><span class="dv">700</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_gt</span><span class="kw">:</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> distance</span></span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_le</span><span class="kw">:</span></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> distance</span></span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">2500</span></span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ablation</span><span class="kw">:</span></span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">evaluate</span><span class="kw">:</span><span class="at"> air_time_model:evaluate</span></span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">metric</span><span class="kw">:</span><span class="at"> mae</span></span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">higher_is_better</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">label</span><span class="kw">:</span><span class="at"> Air time model</span></span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">strategies</span><span class="kw">:</span></span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> drop_each</span></span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> drop_all_but_each</span></span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">drop_groups</span><span class="kw">:</span></span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">column</span><span class="kw">:</span><span class="at"> origin</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span><span class="at"> flights_train.parquet</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_name</span><span class="kw">:</span><span class="at"> flights_train</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_between</span><span class="kw">:</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> air_time</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">left</span><span class="kw">:</span><span class="at"> </span><span class="dv">20</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">right</span><span class="kw">:</span><span class="at"> </span><span class="dv">700</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_gt</span><span class="kw">:</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> distance</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_le</span><span class="kw">:</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> distance</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">2500</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ablation</span><span class="kw">:</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">evaluate</span><span class="kw">:</span><span class="at"> air_time_model:evaluate</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">metric</span><span class="kw">:</span><span class="at"> mae</span></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">higher_is_better</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">label</span><span class="kw">:</span><span class="at"> Air time model</span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">strategies</span><span class="kw">:</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> drop_each</span></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> drop_all_but_each</span></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">drop_groups</span><span class="kw">:</span></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">column</span><span class="kw">:</span><span class="at"> origin</span></span></code></pre></div>
 <p>The <a href="../../reference/yaml_ablation.html#pointblank.yaml_ablation" class="gdls-link"><code>yaml_ablation()</code></a> function interrogates the validation and returns the <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a>, ready to run. Importing the function runs Python code, so it’s only done for a configuration that you trust, with <code>allow_python=True</code>. Otherwise, the function can be passed in directly with <code>evaluate=</code>, as it is here (along with the training table, in place of the file):</p>
-<div id="e5bef0ba" class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> <span class="st">"""</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: flights_train.parquet</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: flights_train</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_between:</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: air_time</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="st">    left: 20</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="st">    right: 700</span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_gt:</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: distance</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="st">    value: 0</span></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_le:</span></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: distance</span></span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="st">    value: 2500</span></span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="st">ablation:</span></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="st">  evaluate: air_time_model:evaluate</span></span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="st">  metric: mae</span></span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="st">  higher_is_better: false</span></span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a><span class="st">  label: Air time model</span></span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a><span class="st">  strategies:</span></span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="st">  - drop_each</span></span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a><span class="st">  - drop_all_but_each</span></span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a><span class="st">  - drop_groups:</span></span>
-<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a><span class="st">      column: origin</span></span>
-<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
-<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>pb.yaml_ablation(config, set_tbl<span class="op">=</span>train, evaluate<span class="op">=</span>evaluate).plan()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="22">
+<div id="d47f4944" class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: flights_train.parquet</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: flights_train</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_between:</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: air_time</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="st">    left: 20</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="st">    right: 700</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_gt:</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: distance</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="st">    value: 0</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_le:</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: distance</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="st">    value: 2500</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="st">ablation:</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="st">  evaluate: air_time_model:evaluate</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="st">  metric: mae</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="st">  higher_is_better: false</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="st">  label: Air time model</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="st">  strategies:</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="st">  - drop_each</span></span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="st">  - drop_all_but_each</span></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a><span class="st">  - drop_groups:</span></span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a><span class="st">      column: origin</span></span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>pb.yaml_ablation(config, set_tbl<span class="op">=</span>train, evaluate<span class="op">=</span>evaluate).plan()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="24">
 <div id="pb_ablation_plan" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
@@ -3504,13 +3899,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>The sweeps, <a href="../../reference/Ablation.inject.html#pointblank.Ablation.inject" class="gdls-link gdls-code">inject</a>, and <a href="../../reference/Ablation.shapley.html#pointblank.Ablation.shapley" class="gdls-link gdls-code">shapley</a> are strategies too, with their arguments by name (e.g., <code>- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}</code> or <code>- inject: {corruption: "null", step: 2}</code>). In YAML, a defect must be one of the four kinds by name, not a function.</p>
+<p>The sweeps, <a href="../../reference/Ablation.inject.html#pointblank.Ablation.inject" class="gdls-link gdls-code">inject</a>, and <a href="../../reference/Ablation.shapley.html#pointblank.Ablation.shapley" class="gdls-link gdls-code">shapley</a> are strategies too, with their arguments by name (e.g., <code>- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}</code> or <code>- inject: {corruption: "null", step: 2}</code>). In YAML, a defect must be one of the four kinds by name, not a function. The <code>holdout:</code> is a data source like <code>tbl:</code> (e.g., <code>holdout: flights_holdout.parquet</code>), which <code>yaml_ablation(..., holdout=...)</code> can replace with a table, as <code>set_tbl=</code> does for <code>tbl:</code>.</p>
 <p>The block is ignored by <a href="../../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a>, so the same file can be used for validating the data, and <a href="../../reference/yaml_to_python.html#pointblank.yaml_to_python" class="gdls-link"><code>yaml_to_python()</code></a> writes out the equivalent Python code, ablation included.</p>
 </section>
 <section id="how-the-comparisons-are-made" class="level1">
 <h1>How the Comparisons Are Made</h1>
 <p>For each variant, the difference from its control is computed for each repeat, and the report shows the mean of these differences with a paired <em>t</em>-interval (95% by default, set with <code>conf_level=</code>). The p-values are adjusted for the number of variants with the Holm method, and the verdicts use the adjusted p-values: a variant helps or hurts only if its adjusted p-value is below <code>1 - conf_level</code>. You can turn off the adjustment with <code>adjust=None</code>. Injected defects remove no rows, so they’re always compared with the full table, and the Shapley values have intervals and p-values of their own (from the values of each repeat), adjusted for the number of steps.</p>
-<p>With fewer than three repeats, there’s too little data for a useful interval, so the report gives no verdicts (and <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> warns about this). More repeats give narrower intervals, at the cost of more evaluations. A few other options are worth knowing about:</p>
+<p>With fewer than three repeats, there’s too little data for a useful interval, so the report gives no verdicts (and <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> warns about this). More repeats give narrower intervals, at the cost of more evaluations.</p>
+<p>The <em>t</em>-interval assumes that the differences are roughly normal, which a few outlying repeats (a model that sometimes fails to converge, say) can make untrue. With <code>ci="bootstrap"</code>, the intervals and p-values come from 4,000 resamples of the repeats instead: the interval has the middle 95% of the resampled mean differences, and the p-value is the share of them on the other side of zero. The bootstrap assumes nothing about the distribution of the differences, but it needs more repeats (with fewer than 10, its intervals are too narrow, and <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> warns about this). The resamples are made from the <code>seed=</code>, so the results are the same each time.</p>
+<p>A few other options are worth knowing about:</p>
 <ul>
 <li><code>control=None</code> compares variants only to the full table, which saves evaluations but leaves the effect of removing <em>any</em> rows mixed in with the effect of removing these rows</li>
 <li><code>control=pb.ablation.Stratified("origin")</code> (see <a href="../../reference/ablation.Stratified.html#pointblank.ablation.Stratified" class="gdls-link"><code>ablation.Stratified</code></a>) draws the random rows of each control from each group in proportion to its size, so that a control doesn’t take more rows from one group than another by chance (worth using when the groups matter to the model, like the classes of a classification target)</li>

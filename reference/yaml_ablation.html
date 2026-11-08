@@ -136,7 +136,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/yaml_ablation.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/yaml_ablation.html">
@@ -184,15 +183,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../changelog.html"> 
-<span class="menu-text">Changelog</span></a>
-  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2051,16 +2046,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1380-L1541" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1394-L1568" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">yaml_ablation</span>(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">yaml</span>,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">evaluate</span><span class="op">=</span><span class="cn">None</span>,</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">set_tbl</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">namespaces</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">allow_python</span><span class="op">=</span><span class="bn">False</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">holdout</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">namespaces</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">allow_python</span><span class="op">=</span><span class="bn">False</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>A YAML configuration for <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a> can have an <code>ablation:</code> block, which describes an <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link"><code>Ablation</code></a> of its validation: the <code>evaluate=</code> function, the settings, and the strategies that add variants. This function interrogates the validation and sets up the ablation, ready to <a href="../reference/Ablation.run.html#pointblank.Ablation.run" class="gdls-link"><code>run()</code></a> or to <a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link"><code>export()</code></a>. The validation and its ablation can then be kept together in one file, alongside a model’s training code.</p>
@@ -2080,6 +2076,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dt><code><span class="doc-parameter-name">set_tbl</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
 <p>A table to use in place of the configuration’s <code>tbl</code> (as in <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a>).</p>
+</dd>
+<dt><code><span class="doc-parameter-name">holdout</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>A table to use in place of the block’s <code>holdout:</code> (the holdout set that the validation’s steps are also applied to, as in the <code>holdout=</code> of <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a>).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">namespaces</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Optional[Union[Iterable[str], Mapping[str, str]]]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -2126,21 +2126,22 @@ If the configuration is invalid, has no <code>ablation:</code> block, or has Pyt
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">control</span><span class="kw">:</span></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">stratified</span><span class="kw">:</span><span class="at"> sensor</span></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">cache</span><span class="kw">:</span><span class="at"> .ablation_cache</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">strategies</span><span class="kw">:</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> drop_each</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> drop_all_but_each</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">drop_steps</span><span class="kw">:</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">steps</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="dv">1</span><span class="kw">,</span><span class="at"> </span><span class="dv">2</span><span class="kw">]</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Without step 3</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">drop_groups</span><span class="kw">:</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">column</span><span class="kw">:</span><span class="at"> sensor</span></span></code></pre></div>
-<p>The <code>evaluate:</code> is the import path of a function (the module, a colon, and the name of the function), or a <code>python:</code> block whose result is the function. The <code>control:</code> is <code>size_matched</code> (the default), <code>null</code> (for no control), or <code>stratified:</code> with one or more columns (for a <a href="../reference/ablation.Stratified.html#pointblank.ablation.Stratified" class="gdls-link"><code>Stratified</code></a> control). Each strategy is the name of an <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> method that adds variants (including the sweeps <a href="../reference/Ablation.sweep_score.html#pointblank.Ablation.sweep_score" class="gdls-link gdls-code">sweep_score</a> and <a href="../reference/Ablation.sweep_step.html#pointblank.Ablation.sweep_step" class="gdls-link gdls-code">sweep_step</a>, the injected defects of <a href="../reference/Ablation.inject.html#pointblank.Ablation.inject" class="gdls-link gdls-code">inject</a>, and the Shapley values of <a href="../reference/Ablation.shapley.html#pointblank.Ablation.shapley" class="gdls-link gdls-code">shapley</a>), with its parameters as a mapping. The strategies are added in order. In YAML, the <code>corruption:</code> of <a href="../reference/Ablation.inject.html#pointblank.Ablation.inject" class="gdls-link gdls-code">inject</a> is the name of a defect (<code>null</code>, <code>shuffle</code>, <code>truncate</code>, or <code>duplicate</code>), not a function.</p>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">holdout</span><span class="kw">:</span><span class="at"> data/holdout.parquet</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">strategies</span><span class="kw">:</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> drop_each</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> drop_all_but_each</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">drop_steps</span><span class="kw">:</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">steps</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="dv">1</span><span class="kw">,</span><span class="at"> </span><span class="dv">2</span><span class="kw">]</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Without step 3</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">drop_groups</span><span class="kw">:</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">column</span><span class="kw">:</span><span class="at"> sensor</span></span></code></pre></div>
+<p>The <code>evaluate:</code> is the import path of a function (the module, a colon, and the name of the function), or a <code>python:</code> block whose result is the function. The <code>control:</code> is <code>size_matched</code> (the default), <code>null</code> (for no control), or <code>stratified:</code> with one or more columns (for a <a href="../reference/ablation.Stratified.html#pointblank.ablation.Stratified" class="gdls-link"><code>Stratified</code></a> control). The <code>holdout:</code> is a data source like the <code>tbl:</code> of the configuration (a dataset name, a file path, or a <code>python:</code> block), loaded with its <code>df_library:</code>. Each strategy is the name of an <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> method that adds variants (including the sweeps <a href="../reference/Ablation.sweep_score.html#pointblank.Ablation.sweep_score" class="gdls-link gdls-code">sweep_score</a> and <a href="../reference/Ablation.sweep_step.html#pointblank.Ablation.sweep_step" class="gdls-link gdls-code">sweep_step</a>, the injected defects of <a href="../reference/Ablation.inject.html#pointblank.Ablation.inject" class="gdls-link gdls-code">inject</a>, and the Shapley values of <a href="../reference/Ablation.shapley.html#pointblank.Ablation.shapley" class="gdls-link gdls-code">shapley</a>), with its parameters as a mapping. The strategies are added in order. In YAML, the <code>corruption:</code> of <a href="../reference/Ablation.inject.html#pointblank.Ablation.inject" class="gdls-link gdls-code">inject</a> is the name of a defect (<code>null</code>, <code>shuffle</code>, <code>truncate</code>, or <code>duplicate</code>), not a function.</p>
 <p>The block is ignored by <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a>, so the same configuration can be used both to validate the data and to measure what its steps do for a model.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s a table of temperature readings with some out-of-range values, and a YAML configuration with a validation step and an <code>ablation:</code> block. The <code>evaluate()</code> function is passed from Python, so the configuration doesn’t need <code>allow_python=True</code>.</p>
-<div id="7c7ca439" class="cell" data-execution_count="2">
+<div id="d938af9d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>

@@ -4,7 +4,7 @@ Measure how the rows that fail validation steps affect a model trained on the da
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L404-L4849)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L410-L4980)
 
 ``` python
 Ablation(
@@ -23,6 +23,9 @@ Ablation(
     label=None,
     evaluate_version=None,
     cache=None,
+    holdout=None,
+    ci="t",
+    pass_as="table",
 )
 ```
 
@@ -38,7 +41,7 @@ An [Ablation](../reference/Ablation.md#pointblank.Ablation) is built in two part
 An interrogated validation (a [`Validate`](../reference/Validate.md#pointblank.Validate) object). Its target table is the training table, and its row-level steps (the same ones that [`get_row_flags()`](../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags) uses) say which rows to remove.
 
 `evaluate: Callable[…, Any] | None = None`  
-A function that trains and evaluates a model. It's called as `evaluate(train, seed=seed, variant=variant)`, where `train` is the training table with some rows removed (of the same type as the validation's target table; a lazy or database table is passed as a lazy table), `seed` is an integer to seed any randomness in training with, and `variant` is an [`AblationVariant`](../reference/AblationVariant.md#pointblank.AblationVariant) describing the version of the table. The function can leave out the `variant=` parameter if it doesn't need it. It must return a number, or a dictionary of named numbers (one per metric). The evaluation data should be a fixed holdout set that the function holds on to: it must not depend on `train`. For scikit-learn models, [`sklearn_evaluator()`](../reference/ablation.sklearn_evaluator.md#pointblank.ablation.sklearn_evaluator) makes this function for you. It can be left out (`None`) if the evaluations are done elsewhere, with [`export()`](../reference/Ablation.export.md#pointblank.Ablation.export) and [`load_results()`](../reference/Ablation.load_results.md#pointblank.Ablation.load_results).
+A function that trains and evaluates a model. It's called as `evaluate(train, seed=seed, variant=variant)`, where `train` is the training table with some rows removed (of the same type as the validation's target table; a lazy or database table is passed as a lazy table), `seed` is an integer to seed any randomness in training with, and `variant` is an [`AblationVariant`](../reference/AblationVariant.md#pointblank.AblationVariant) describing the version of the table. The function can leave out the `variant=` parameter if it doesn't need it. With `pass_as="row_index"`, `train` is the list of the numbers of the rows that are kept instead. It must return a number, or a dictionary of named numbers (one per metric). The evaluation data should be a fixed holdout set that the function holds on to: it must not depend on `train`. For scikit-learn models, [`sklearn_evaluator()`](../reference/ablation.sklearn_evaluator.md#pointblank.ablation.sklearn_evaluator) makes this function for you. It can be left out (`None`) if the evaluations are done elsewhere, with [`export()`](../reference/Ablation.export.md#pointblank.Ablation.export) and [`load_results()`](../reference/Ablation.load_results.md#pointblank.Ablation.load_results).
 
 `metric: str | None = None`  
 The name of the metric that verdicts are based on. It's needed when `evaluate=` returns a dictionary with more than one metric (the others are still reported). When `evaluate=` returns a number, this is the name it's given (`"score"` by default).
@@ -79,6 +82,15 @@ An optional version of the `evaluate=` function (e.g., `"v2"`, or a commit hash)
 `cache: str | os.PathLike[str] | None = None`  
 A directory to keep the results of evaluations in. Each result is saved as soon as it's made, under a key made from the data, the rows removed, the seed, and `evaluate_version=`. An evaluation with the same key is never repeated, so a run that stops partway can be started again without losing work, and adding a variant only evaluates what's new. The `evaluate=` function itself isn't part of the key, so change `evaluate_version=` (or use another directory) when it changes.
 
+`holdout: Any = None`  
+The holdout set that `evaluate=` scores the model on (a table of any kind that [`Validate`](../reference/Validate.md#pointblank.Validate) takes, or the path of a file), to be checked with the same validation steps. The holdout isn't used in the ablation (rows are never removed from it), but a model can only be scored as well as its holdout allows, so the reports give its health score next to that of the training table. The holdout is interrogated when the [Ablation](../reference/Ablation.md#pointblank.Ablation) is created, and the results are in the `holdout_validation` attribute (steps that call a model, such as those of [`prompt()`](../reference/Validate.prompt.md#pointblank.Validate.prompt), call it again for the holdout). With [`sklearn_evaluator()`](../reference/ablation.sklearn_evaluator.md#pointblank.ablation.sklearn_evaluator), it's the same table as the evaluator's `holdout=`.
+
+`ci: str = "t"`  
+How the intervals and p-values are computed from the paired differences of the repeats. With `"t"` (the default), they come from a paired t-test, which assumes the differences are roughly normal. With `"bootstrap"`, they come from 4,000 resamples of the repeats (a percentile interval, and a p-value from the share of resampled means on either side of zero), which assumes nothing about their distribution but needs more repeats: with fewer than 10, it gives intervals that are too narrow (there's a warning).
+
+`pass_as: str = "table"`  
+What `evaluate=` gets as its first argument. With `"table"` (the default), it's the training table with the rows removed. With `"row_index"`, it's a sorted list of the numbers of the rows that are kept (counting from `0`, in the order of the table, as in the `format="indices"` of [`export()`](../reference/Ablation.export.md#pointblank.Ablation.export)), for a pipeline that loads the training data itself. This can't be used with [`inject()`](../reference/Ablation.inject.md#pointblank.Ablation.inject), which changes the values of the table, or with [`sklearn_evaluator()`](../reference/ablation.sklearn_evaluator.md#pointblank.ablation.sklearn_evaluator).
+
 ## Returns
 
 `Ablation`  
@@ -86,7 +98,7 @@ An [Ablation](../reference/Ablation.md#pointblank.Ablation) object, with no vari
 
 ## Details
 
-For each variant and metric, the results give the mean and standard deviation of the metric across the repeats, and two paired comparisons: with the full table (`delta_vs_full`) and with the control (`delta_vs_control`). Each comparison has a t-interval at `conf_level=` and a p-value from a paired t-test, along with the p-value adjusted across the variants. The verdict on a variant is based on the metric named in `metric=` and the comparison with the control (or with the full table, if `control=None`):
+For each variant and metric, the results give the mean and standard deviation of the metric across the repeats, and two paired comparisons: with the full table (`delta_vs_full`) and with the control (`delta_vs_control`). Each comparison has an interval at `conf_level=` and a p-value (from a paired t-test, or from the bootstrap with `ci="bootstrap"`), along with the p-value adjusted across the variants. The verdict on a variant is based on the metric named in `metric=` and the comparison with the control (or with the full table, if `control=None`):
 
 - `"helps"`: removing the variant's rows makes the metric better, with an adjusted p-value below `1 - conf_level`
 - `"hurts"`: removing the rows makes the metric worse, with an adjusted p-value below `1 - conf_level`

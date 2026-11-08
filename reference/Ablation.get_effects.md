@@ -4,7 +4,7 @@ Get the results of the ablation as a table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3936-L4064)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4062-L4190)
 
 ``` python
 Ablation.get_effects()

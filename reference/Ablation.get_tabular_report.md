@@ -4,7 +4,7 @@ Get a tabular report of the ablation's results.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4505-L4816)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4634-L4947)
 
 ``` python
 Ablation.get_tabular_report(

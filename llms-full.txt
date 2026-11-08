@@ -26212,7 +26212,7 @@ Measure how the rows that fail validation steps affect a downstream model. An `A
 
 
 
-Ablation(validation: 'Validate', evaluate: 'Callable[..., Any] | None' = None, metric: 'str | None' = None, higher_is_better: 'bool' = True, repeats: 'int' = 5, seed: 'int' = 0, control: 'str | Stratified | None' = 'size_matched', duplicates: 'str | None' = 'keep_first', duplicates_order_by: 'str | list[str] | None' = None, max_removed: 'float' = 0.5, conf_level: 'float' = 0.95, adjust: 'str | None' = 'holm', label: 'str | None' = None, evaluate_version: 'str | None' = None, cache: 'str | os.PathLike[str] | None' = None) -> 'None'
+Ablation(validation: 'Validate', evaluate: 'Callable[..., Any] | None' = None, metric: 'str | None' = None, higher_is_better: 'bool' = True, repeats: 'int' = 5, seed: 'int' = 0, control: 'str | Stratified | None' = 'size_matched', duplicates: 'str | None' = 'keep_first', duplicates_order_by: 'str | list[str] | None' = None, max_removed: 'float' = 0.5, conf_level: 'float' = 0.95, adjust: 'str | None' = 'holm', label: 'str | None' = None, evaluate_version: 'str | None' = None, cache: 'str | os.PathLike[str] | None' = None, holdout: 'Any' = None, ci: 'str' = 't', pass_as: 'str' = 'table') -> 'None'
 
 Measure how the rows that fail validation steps affect a model trained on the data.
 
@@ -26260,12 +26260,14 @@ evaluate
     type as the validation's target table; a lazy or database table is passed as a lazy
     table), `seed` is an integer to seed any randomness in training with, and `variant` is an
     [`AblationVariant`](`pointblank.AblationVariant`) describing the version of the table. The
-    function can leave out the `variant=` parameter if it doesn't need it. It must return a
-    number, or a dictionary of named numbers (one per metric). The evaluation data should be a
-    fixed holdout set that the function holds on to: it must not depend on `train`. For
-    scikit-learn models, [`sklearn_evaluator()`](`pointblank.ablation.sklearn_evaluator`)
-    makes this function for you. It can be left out (`None`) if the evaluations are done
-    elsewhere, with [`export()`](`pointblank.Ablation.export`) and
+    function can leave out the `variant=` parameter if it doesn't need it. With
+    `pass_as="row_index"`, `train` is the list of the numbers of the rows that are kept
+    instead. It must return a number, or a dictionary of named numbers (one per metric). The
+    evaluation data should be a fixed holdout set that the function holds on to: it must not
+    depend on `train`. For scikit-learn models,
+    [`sklearn_evaluator()`](`pointblank.ablation.sklearn_evaluator`) makes this function for
+    you. It can be left out (`None`) if the evaluations are done elsewhere, with
+    [`export()`](`pointblank.Ablation.export`) and
     [`load_results()`](`pointblank.Ablation.load_results`).
 metric
     The name of the metric that verdicts are based on. It's needed when `evaluate=` returns a
@@ -26322,6 +26324,32 @@ cache
     started again without losing work, and adding a variant only evaluates what's new. The
     `evaluate=` function itself isn't part of the key, so change `evaluate_version=` (or use
     another directory) when it changes.
+holdout
+    The holdout set that `evaluate=` scores the model on (a table of any kind that
+    [`Validate`](`pointblank.Validate`) takes, or the path of a file), to be checked with the
+    same validation steps. The holdout isn't used in the ablation (rows are never removed from
+    it), but a model can only be scored as well as its holdout allows, so the reports give its
+    health score next to that of the training table. The holdout is interrogated when the
+    `Ablation` is created, and the results are in the `holdout_validation` attribute (steps
+    that call a model, such as those of [`prompt()`](`pointblank.Validate.prompt`), call it
+    again for the holdout). With
+    [`sklearn_evaluator()`](`pointblank.ablation.sklearn_evaluator`), it's the same table as
+    the evaluator's `holdout=`.
+ci
+    How the intervals and p-values are computed from the paired differences of the repeats.
+    With `"t"` (the default), they come from a paired t-test, which assumes the differences
+    are roughly normal. With `"bootstrap"`, they come from 4,000 resamples of the repeats (a
+    percentile interval, and a p-value from the share of resampled means on either side of
+    zero), which assumes nothing about their distribution but needs more repeats: with fewer
+    than 10, it gives intervals that are too narrow (there's a warning).
+pass_as
+    What `evaluate=` gets as its first argument. With `"table"` (the default), it's the
+    training table with the rows removed. With `"row_index"`, it's a sorted list of the
+    numbers of the rows that are kept (counting from `0`, in the order of the table, as in
+    the `format="indices"` of [`export()`](`pointblank.Ablation.export`)), for a pipeline that
+    loads the training data itself. This can't be used with
+    [`inject()`](`pointblank.Ablation.inject`), which changes the values of the table, or
+    with [`sklearn_evaluator()`](`pointblank.ablation.sklearn_evaluator`).
 
 Returns
 -------
@@ -26332,10 +26360,10 @@ Details
 -------
 For each variant and metric, the results give the mean and standard deviation of the metric
 across the repeats, and two paired comparisons: with the full table (`delta_vs_full`) and with
-the control (`delta_vs_control`). Each comparison has a t-interval at `conf_level=` and a
-p-value from a paired t-test, along with the p-value adjusted across the variants. The
-verdict on a variant is based on the metric named in `metric=` and the comparison with the
-control (or with the full table, if `control=None`):
+the control (`delta_vs_control`). Each comparison has an interval at `conf_level=` and a
+p-value (from a paired t-test, or from the bootstrap with `ci="bootstrap"`), along with the
+p-value adjusted across the variants. The verdict on a variant is based on the metric named in
+`metric=` and the comparison with the control (or with the full table, if `control=None`):
 
 - `"helps"`: removing the variant's rows makes the metric better, with an adjusted p-value
   below `1 - conf_level`
@@ -28256,8 +28284,10 @@ dict[str, Any]
     [`get_effects()`](`pointblank.Ablation.get_effects`)), the Shapley values
     (`"shapley"`, with the same fields as the columns of
     [`get_shapley()`](`pointblank.Ablation.get_shapley`), or `None` without
-    [`shapley()`](`pointblank.Ablation.shapley`)), and the notes about variants and steps
-    that weren't used (`"notes"`).
+    [`shapley()`](`pointblank.Ablation.shapley`)), the notes about variants and steps
+    that weren't used (`"notes"`), and the results of the steps on the holdout set
+    (`"holdout"`, with its number of rows, its health score, and the number and share of
+    failing test units of each step, or `None` without `holdout=`).
 
 Examples
 --------
@@ -29072,7 +29102,7 @@ print(python_code)
 This function is also useful for educational purposes, helping users understand how YAML
 configurations map to the underlying Python API calls.
 
-yaml_ablation(yaml: 'Union[str, Path]', evaluate: 'Any' = None, set_tbl: 'Any' = None, namespaces: 'Optional[Union[Iterable[str], Mapping[str, str]]]' = None, allow_python: 'bool' = False) -> "'Ablation'"
+yaml_ablation(yaml: 'Union[str, Path]', evaluate: 'Any' = None, set_tbl: 'Any' = None, holdout: 'Any' = None, namespaces: 'Optional[Union[Iterable[str], Mapping[str, str]]]' = None, allow_python: 'bool' = False) -> "'Ablation'"
 
 Set up an ablation from a YAML configuration.
 
@@ -29094,6 +29124,9 @@ evaluate
     `allow_python=True`.
 set_tbl
     A table to use in place of the configuration's `tbl` (as in `yaml_interrogate()`).
+holdout
+    A table to use in place of the block's `holdout:` (the holdout set that the validation's
+    steps are also applied to, as in the `holdout=` of `Ablation`).
 namespaces
     Modules to make available to Python code in the configuration (as in
     `yaml_interrogate()`). This only has an effect with `allow_python=True`.
@@ -29129,6 +29162,7 @@ ablation:
   control:
     stratified: sensor
   cache: .ablation_cache
+  holdout: data/holdout.parquet
   strategies:
     - drop_each
     - drop_all_but_each
@@ -29142,7 +29176,9 @@ ablation:
 The `evaluate:` is the import path of a function (the module, a colon, and the name of the
 function), or a `python:` block whose result is the function. The `control:` is
 `size_matched` (the default), `null` (for no control), or `stratified:` with one or more
-columns (for a [`Stratified`](`pointblank.ablation.Stratified`) control). Each strategy is
+columns (for a [`Stratified`](`pointblank.ablation.Stratified`) control). The `holdout:` is a
+data source like the `tbl:` of the configuration (a dataset name, a file path, or a `python:`
+block), loaded with its `df_library:`. Each strategy is
 the name of an `Ablation` method that adds variants (including the sweeps `sweep_score` and
 `sweep_step`, the injected defects of `inject`, and the Shapley values of `shapley`), with its
 parameters as a mapping. The strategies are added in order. In YAML, the `corruption:` of
@@ -45478,6 +45514,39 @@ on the model, which is why an ablation is worth running with the model that will
 data. Pass `estimator=` to use another model or pipeline: it's cloned for each evaluation, with its
 `random_state` set to the seed.
 
+## Checking the Held-Out Data
+
+The held-out data is the yardstick of every comparison, so a problem in it is a problem in all of
+them: a model that's scored on bad data can be rewarded for learning the same mistakes. With
+`holdout=`, the `Ablation` checks the held-out data with the same steps as the training table (it's
+never ablated, only checked), and the plan and the report give the health score of each:
+
+```{python}
+checked = pb.Ablation(
+    validation,
+    evaluate=evaluate,
+    metric="mae",
+    higher_is_better=False,
+    holdout=holdout,
+).drop_each()
+
+checked.plan()
+```
+
+The full results are in the `holdout_validation` attribute, an interrogated validation of the
+held-out data:
+
+```{python}
+checked.holdout_validation
+```
+
+The held-out flights have no air times in hours and no zero distances, but they do have flights
+longer than 2,500 miles. That's another sign that step 3 is a problem with the check rather than
+with the data: the flights it fails are the ones the model is asked to predict. The health scores
+are also in [`Ablation.to_dict()`](`Ablation.to_dict`) (with the results of each step) and in a
+[data card](data-cards.qmd) made with the ablation. Any table that a validation takes can be the
+holdout, including the path of a file.
+
 ## Running Larger Ablations
 
 The ablations here make a few dozen evaluations, but with a model that takes minutes to train, a
@@ -45520,6 +45589,30 @@ ablation.run(max_workers=4)
 ```
 
 The report says how many of the evaluations came from the cache.
+
+When the training pipeline loads the data itself (from a database, say, or a file that's too large
+to copy for each version), `pass_as="row_index"` gives the `evaluate` function the list of the
+numbers of the rows to keep (counting from `0`, in the order of the table) instead of the table.
+A list can be sent to another process, so this also makes `executor="process"` work for any kind of
+table:
+
+```{python}
+#| eval: false
+def evaluate_rows(rows, *, seed):
+    return evaluate(train[rows], seed=seed)
+
+
+pb.Ablation(
+    validation,
+    evaluate=evaluate_rows,
+    metric="mae",
+    higher_is_better=False,
+    pass_as="row_index",
+).drop_each().run()
+```
+
+With a list of rows, the defects of [`Ablation.inject()`](`Ablation.inject`) can't be passed on,
+so they need the default `pass_as="table"`.
 
 ## Evaluating Somewhere Else
 
@@ -45638,7 +45731,9 @@ pb.yaml_ablation(config, set_tbl=train, evaluate=evaluate).plan()
 The sweeps, `inject`, and `shapley` are strategies too, with their arguments by name (e.g.,
 `- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}` or
 `- inject: {corruption: "null", step: 2}`). In YAML, a defect must be one of the four kinds by
-name, not a function.
+name, not a function. The `holdout:` is a data source like `tbl:` (e.g.,
+`holdout: flights_holdout.parquet`), which `yaml_ablation(..., holdout=...)` can replace with a
+table, as `set_tbl=` does for `tbl:`.
 
 The block is ignored by [`yaml_interrogate()`](`yaml_interrogate`), so the same file can be used
 for validating the data, and [`yaml_to_python()`](`yaml_to_python`) writes out the equivalent
@@ -45656,7 +45751,17 @@ p-values of their own (from the values of each repeat), adjusted for the number 
 
 With fewer than three repeats, there's too little data for a useful interval, so the report gives
 no verdicts (and `Ablation` warns about this). More repeats give narrower intervals, at the cost of
-more evaluations. A few other options are worth knowing about:
+more evaluations.
+
+The *t*-interval assumes that the differences are roughly normal, which a few outlying repeats (a
+model that sometimes fails to converge, say) can make untrue. With `ci="bootstrap"`, the intervals
+and p-values come from 4,000 resamples of the repeats instead: the interval has the middle 95% of
+the resampled mean differences, and the p-value is the share of them on the other side of zero. The
+bootstrap assumes nothing about the distribution of the differences, but it needs more repeats
+(with fewer than 10, its intervals are too narrow, and `Ablation` warns about this). The resamples
+are made from the `seed=`, so the results are the same each time.
+
+A few other options are worth knowing about:
 
 - `control=None` compares variants only to the full table, which saves evaluations but leaves the
 effect of removing *any* rows mixed in with the effect of removing these rows

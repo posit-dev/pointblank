@@ -136,7 +136,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/float_field.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/float_field.html">
@@ -184,15 +183,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../changelog.html"> 
-<span class="menu-text">Changelog</span></a>
-  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2137,7 +2132,7 @@ If <code>min_val</code> is greater than <code>max_val</code>, if <code>allowed</
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>The <code>min_val=</code> and <code>max_val=</code> parameters define the generated value ranges:</p>
-<div id="a53c5854" class="cell" data-execution_count="1">
+<div id="27656e39" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -2302,7 +2297,7 @@ If <code>min_val</code> is greater than <code>max_val</code>, if <code>allowed</
 </div>
 </div>
 <p>It’s also possible to restrict values to a discrete set with <code>allowed=</code>, which is useful for fixed pricing tiers or measurement levels:</p>
-<div id="c440519e" class="cell" data-execution_count="2">
+<div id="db34e427" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    discount<span class="op">=</span>pb.float_field(allowed<span class="op">=</span>[<span class="fl">0.05</span>, <span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.20</span>, <span class="fl">0.25</span>]),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    weight_kg<span class="op">=</span>pb.float_field(min_val<span class="op">=</span><span class="fl">0.5</span>, max_val<span class="op">=</span><span class="fl">100.0</span>),</span>
@@ -2452,7 +2447,7 @@ If <code>min_val</code> is greater than <code>max_val</code>, if <code>allowed</
 </div>
 </div>
 <p>We can simulate missing measurements by introducing null values:</p>
-<div id="2ba54ad2" class="cell" data-execution_count="3">
+<div id="e59d9a81" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    reading<span class="op">=</span>pb.float_field(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        min_val<span class="op">=</span><span class="fl">0.0</span>, max_val<span class="op">=</span><span class="fl">500.0</span>,</span>
@@ -2605,7 +2600,7 @@ If <code>min_val</code> is greater than <code>max_val</code>, if <code>allowed</
 </div>
 </div>
 <p>Use <code>precision=</code> to round generated values to a fixed number of decimal places. This is useful for prices, scores, or any measurement where full floating-point precision is unwanted:</p>
-<div id="c1d65e7f" class="cell" data-execution_count="4">
+<div id="e16f77f8" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    price<span class="op">=</span>pb.float_field(min_val<span class="op">=</span><span class="fl">1.0</span>, max_val<span class="op">=</span><span class="fl">200.0</span>, precision<span class="op">=</span><span class="dv">2</span>),</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    score<span class="op">=</span>pb.float_field(min_val<span class="op">=</span><span class="fl">0.0</span>, max_val<span class="op">=</span><span class="fl">100.0</span>, precision<span class="op">=</span><span class="dv">1</span>),</span>
@@ -2768,7 +2763,7 @@ If <code>min_val</code> is greater than <code>max_val</code>, if <code>allowed</
 </div>
 </div>
 <p>A custom <code>generator=</code> provides full control over value generation, such as values from a distribution other than the uniform one:</p>
-<div id="0d0d8923" class="cell" data-execution_count="5">
+<div id="da0bf563" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random, math</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> random.Random(<span class="dv">0</span>)</span>

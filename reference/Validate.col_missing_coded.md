@@ -4,7 +4,7 @@ Validate that all missing values in a column are *coded* (no uncoded nulls).
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13095-L13281)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13102-L13288)
 
 ``` python
 Validate.col_missing_coded(

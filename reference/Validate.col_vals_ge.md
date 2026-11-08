@@ -4,7 +4,7 @@ Are column data greater than or equal to a fixed value or data in another column
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L8224-L8543)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L8231-L8550)
 
 ``` python
 Validate.col_vals_ge(

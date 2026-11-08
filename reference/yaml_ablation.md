@@ -4,13 +4,14 @@ Set up an ablation from a YAML configuration.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1380-L1541)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1394-L1568)
 
 ``` python
 yaml_ablation(
     yaml,
     evaluate=None,
     set_tbl=None,
+    holdout=None,
     namespaces=None,
     allow_python=False,
 )
@@ -28,6 +29,9 @@ The `evaluate=` function of the ablation. If given, it's used in place of the bl
 
 `set_tbl: Any = None`  
 A table to use in place of the configuration's `tbl` (as in [yaml_interrogate()](../reference/yaml_interrogate.md#pointblank.yaml_interrogate)).
+
+`holdout: Any = None`  
+A table to use in place of the block's `holdout:` (the holdout set that the validation's steps are also applied to, as in the `holdout=` of [Ablation](../reference/Ablation.md#pointblank.Ablation)).
 
 `namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None`  
 Modules to make available to Python code in the configuration (as in [yaml_interrogate()](../reference/yaml_interrogate.md#pointblank.yaml_interrogate)). This only has an effect with `allow_python=True`.
@@ -59,6 +63,7 @@ ablation:
   control:
     stratified: sensor
   cache: .ablation_cache
+  holdout: data/holdout.parquet
   strategies:
     - drop_each
     - drop_all_but_each
@@ -69,7 +74,7 @@ ablation:
         column: sensor
 ```
 
-The `evaluate:` is the import path of a function (the module, a colon, and the name of the function), or a `python:` block whose result is the function. The `control:` is `size_matched` (the default), `null` (for no control), or `stratified:` with one or more columns (for a [`Stratified`](../reference/ablation.Stratified.md#pointblank.ablation.Stratified) control). Each strategy is the name of an [Ablation](../reference/Ablation.md#pointblank.Ablation) method that adds variants (including the sweeps [sweep_score](../reference/Ablation.sweep_score.md#pointblank.Ablation.sweep_score) and [sweep_step](../reference/Ablation.sweep_step.md#pointblank.Ablation.sweep_step), the injected defects of [inject](../reference/Ablation.inject.md#pointblank.Ablation.inject), and the Shapley values of [shapley](../reference/Ablation.shapley.md#pointblank.Ablation.shapley)), with its parameters as a mapping. The strategies are added in order. In YAML, the `corruption:` of [inject](../reference/Ablation.inject.md#pointblank.Ablation.inject) is the name of a defect (`null`, `shuffle`, `truncate`, or `duplicate`), not a function.
+The `evaluate:` is the import path of a function (the module, a colon, and the name of the function), or a `python:` block whose result is the function. The `control:` is `size_matched` (the default), `null` (for no control), or `stratified:` with one or more columns (for a [`Stratified`](../reference/ablation.Stratified.md#pointblank.ablation.Stratified) control). The `holdout:` is a data source like the `tbl:` of the configuration (a dataset name, a file path, or a `python:` block), loaded with its `df_library:`. Each strategy is the name of an [Ablation](../reference/Ablation.md#pointblank.Ablation) method that adds variants (including the sweeps [sweep_score](../reference/Ablation.sweep_score.md#pointblank.Ablation.sweep_score) and [sweep_step](../reference/Ablation.sweep_step.md#pointblank.Ablation.sweep_step), the injected defects of [inject](../reference/Ablation.inject.md#pointblank.Ablation.inject), and the Shapley values of [shapley](../reference/Ablation.shapley.md#pointblank.Ablation.shapley)), with its parameters as a mapping. The strategies are added in order. In YAML, the `corruption:` of [inject](../reference/Ablation.inject.md#pointblank.Ablation.inject) is the name of a defect (`null`, `shuffle`, `truncate`, or `duplicate`), not a function.
 
 The block is ignored by [yaml_interrogate()](../reference/yaml_interrogate.md#pointblank.yaml_interrogate), so the same configuration can be used both to validate the data and to measure what its steps do for a model.
 

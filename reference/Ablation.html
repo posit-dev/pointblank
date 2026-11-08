@@ -136,7 +136,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Ablation.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Ablation.html">
@@ -184,15 +183,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../changelog.html"> 
-<span class="menu-text">Changelog</span></a>
-  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2051,7 +2046,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L404-L4849" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L410-L4980" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Ablation</span>(</span>
@@ -2070,7 +2065,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">label</span><span class="op">=</span><span class="cn">None</span>,</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="va">evaluate_version</span><span class="op">=</span><span class="cn">None</span>,</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">cache</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="va">holdout</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="va">ci</span><span class="op">=</span><span class="st">"t"</span>,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="va">pass_as</span><span class="op">=</span><span class="st">"table"</span>,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>A validation says which rows of a training table fail its checks, but not whether those rows matter to a model trained on the table. An ablation finds out: it trains and evaluates the model on the full table and on versions of the table with the rows that failed some of the steps removed, and compares the results. Pointblank never trains anything itself: you provide an <code>evaluate=</code> function that takes a training table and returns a score (e.g., the accuracy of a model trained on the table, measured on a fixed holdout set).</p>
@@ -2087,7 +2085,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">evaluate</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable[…, Any] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>A function that trains and evaluates a model. It’s called as <code>evaluate(train, seed=seed, variant=variant)</code>, where <code>train</code> is the training table with some rows removed (of the same type as the validation’s target table; a lazy or database table is passed as a lazy table), <code>seed</code> is an integer to seed any randomness in training with, and <code>variant</code> is an <a href="../reference/AblationVariant.html#pointblank.AblationVariant" class="gdls-link"><code>AblationVariant</code></a> describing the version of the table. The function can leave out the <code>variant=</code> parameter if it doesn’t need it. It must return a number, or a dictionary of named numbers (one per metric). The evaluation data should be a fixed holdout set that the function holds on to: it must not depend on <code>train</code>. For scikit-learn models, <a href="../reference/ablation.sklearn_evaluator.html#pointblank.ablation.sklearn_evaluator" class="gdls-link"><code>sklearn_evaluator()</code></a> makes this function for you. It can be left out (<code>None</code>) if the evaluations are done elsewhere, with <a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link"><code>export()</code></a> and <a href="../reference/Ablation.load_results.html#pointblank.Ablation.load_results" class="gdls-link"><code>load_results()</code></a>.</p>
+<p>A function that trains and evaluates a model. It’s called as <code>evaluate(train, seed=seed, variant=variant)</code>, where <code>train</code> is the training table with some rows removed (of the same type as the validation’s target table; a lazy or database table is passed as a lazy table), <code>seed</code> is an integer to seed any randomness in training with, and <code>variant</code> is an <a href="../reference/AblationVariant.html#pointblank.AblationVariant" class="gdls-link"><code>AblationVariant</code></a> describing the version of the table. The function can leave out the <code>variant=</code> parameter if it doesn’t need it. With <code>pass_as="row_index"</code>, <code>train</code> is the list of the numbers of the rows that are kept instead. It must return a number, or a dictionary of named numbers (one per metric). The evaluation data should be a fixed holdout set that the function holds on to: it must not depend on <code>train</code>. For scikit-learn models, <a href="../reference/ablation.sklearn_evaluator.html#pointblank.ablation.sklearn_evaluator" class="gdls-link"><code>sklearn_evaluator()</code></a> makes this function for you. It can be left out (<code>None</code>) if the evaluations are done elsewhere, with <a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link"><code>export()</code></a> and <a href="../reference/Ablation.load_results.html#pointblank.Ablation.load_results" class="gdls-link"><code>load_results()</code></a>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">metric</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -2139,7 +2137,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">cache</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | os.PathLike[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-A directory to keep the results of evaluations in. Each result is saved as soon as it’s made, under a key made from the data, the rows removed, the seed, and <code>evaluate_version=</code>. An evaluation with the same key is never repeated, so a run that stops partway can be started again without losing work, and adding a variant only evaluates what’s new. The <code>evaluate=</code> function itself isn’t part of the key, so change <code>evaluate_version=</code> (or use another directory) when it changes.
+<p>A directory to keep the results of evaluations in. Each result is saved as soon as it’s made, under a key made from the data, the rows removed, the seed, and <code>evaluate_version=</code>. An evaluation with the same key is never repeated, so a run that stops partway can be started again without losing work, and adding a variant only evaluates what’s new. The <code>evaluate=</code> function itself isn’t part of the key, so change <code>evaluate_version=</code> (or use another directory) when it changes.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">holdout</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>The holdout set that <code>evaluate=</code> scores the model on (a table of any kind that <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> takes, or the path of a file), to be checked with the same validation steps. The holdout isn’t used in the ablation (rows are never removed from it), but a model can only be scored as well as its holdout allows, so the reports give its health score next to that of the training table. The holdout is interrogated when the <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> is created, and the results are in the <code>holdout_validation</code> attribute (steps that call a model, such as those of <a href="../reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link"><code>prompt()</code></a>, call it again for the holdout). With <a href="../reference/ablation.sklearn_evaluator.html#pointblank.ablation.sklearn_evaluator" class="gdls-link"><code>sklearn_evaluator()</code></a>, it’s the same table as the evaluator’s <code>holdout=</code>.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">ci</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"t"</span></span></code></dt>
+<dd>
+<p>How the intervals and p-values are computed from the paired differences of the repeats. With <code>"t"</code> (the default), they come from a paired t-test, which assumes the differences are roughly normal. With <code>"bootstrap"</code>, they come from 4,000 resamples of the repeats (a percentile interval, and a p-value from the share of resampled means on either side of zero), which assumes nothing about their distribution but needs more repeats: with fewer than 10, it gives intervals that are too narrow (there’s a warning).</p>
+</dd>
+<dt><code><span class="doc-parameter-name">pass_as</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"table"</span></span></code></dt>
+<dd>
+What <code>evaluate=</code> gets as its first argument. With <code>"table"</code> (the default), it’s the training table with the rows removed. With <code>"row_index"</code>, it’s a sorted list of the numbers of the rows that are kept (counting from <code>0</code>, in the order of the table, as in the <code>format="indices"</code> of <a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link"><code>export()</code></a>), for a pipeline that loads the training data itself. This can’t be used with <a href="../reference/Ablation.inject.html#pointblank.Ablation.inject" class="gdls-link"><code>inject()</code></a>, which changes the values of the table, or with <a href="../reference/ablation.sklearn_evaluator.html#pointblank.ablation.sklearn_evaluator" class="gdls-link"><code>sklearn_evaluator()</code></a>.
 </dd>
 </dl>
 </div>
@@ -2157,7 +2167,7 @@ An <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdl
 </section>
 <section id="details" class="level2 doc-details">
 <h2 class="doc-details anchored" data-anchor-id="details">Details</h2>
-<p>For each variant and metric, the results give the mean and standard deviation of the metric across the repeats, and two paired comparisons: with the full table (<code>delta_vs_full</code>) and with the control (<code>delta_vs_control</code>). Each comparison has a t-interval at <code>conf_level=</code> and a p-value from a paired t-test, along with the p-value adjusted across the variants. The verdict on a variant is based on the metric named in <code>metric=</code> and the comparison with the control (or with the full table, if <code>control=None</code>):</p>
+<p>For each variant and metric, the results give the mean and standard deviation of the metric across the repeats, and two paired comparisons: with the full table (<code>delta_vs_full</code>) and with the control (<code>delta_vs_control</code>). Each comparison has an interval at <code>conf_level=</code> and a p-value (from a paired t-test, or from the bootstrap with <code>ci="bootstrap"</code>), along with the p-value adjusted across the variants. The verdict on a variant is based on the metric named in <code>metric=</code> and the comparison with the control (or with the full table, if <code>control=None</code>):</p>
 <ul>
 <li><code>"helps"</code>: removing the variant’s rows makes the metric better, with an adjusted p-value below <code>1 - conf_level</code></li>
 <li><code>"hurts"</code>: removing the rows makes the metric worse, with an adjusted p-value below <code>1 - conf_level</code></li>
@@ -2171,7 +2181,7 @@ An <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdl
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s take a table of temperature readings where some readings were recorded in tenths of a degree (so they’re ten times too high) and some are missing. The ‘model’ trained on it is simple: it estimates the average temperature from a bootstrap sample of the readings, and it’s evaluated by its error against the known average of <code>20</code> degrees.</p>
-<div id="a21836e7" class="cell" data-execution_count="2">
+<div id="358c05f3" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2187,7 +2197,7 @@ An <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdl
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"error"</span>: <span class="bu">abs</span>(sample[<span class="st">"temp"</span>].mean() <span class="op">-</span> <span class="dv">20</span>)}</span></code></pre></div>
 </div>
 <p>The validation has two steps: one for missing readings and one for readings out of range.</p>
-<div id="ab0c2596" class="cell" data-execution_count="3">
+<div id="169e01ea" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>readings)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"temp"</span>)</span>
@@ -2196,7 +2206,7 @@ An <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdl
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Now we can set up the ablation, with one variant for each step (<a href="../reference/Ablation.drop_each.html#pointblank.Ablation.drop_each" class="gdls-link gdls-code">drop_each()</a>) and one for both steps (<a href="../reference/Ablation.drop_all.html#pointblank.Ablation.drop_all" class="gdls-link gdls-code">drop_all()</a>). The error is the metric, and lower errors are better.</p>
-<div id="cb711279" class="cell" data-execution_count="4">
+<div id="31124de0" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ablation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(validation, evaluate<span class="op">=</span>evaluate, metric<span class="op">=</span><span class="st">"error"</span>, higher_is_better<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .drop_each()</span>

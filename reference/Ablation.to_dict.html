@@ -133,7 +133,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Ablation.to_dict.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Ablation.to_dict.html">
@@ -181,15 +180,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../changelog.html"> 
-<span class="menu-text">Changelog</span></a>
-  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2045,7 +2040,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4357-L4437" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4483-L4566" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Ablation</span><span class="op">.</span><span class="fu">to_dict</span>()</span></code></pre></div>
@@ -2056,7 +2051,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code> <span class="doc-parameter-annotation">dict[str, Any]</span></code></dt>
 <dd>
-A dictionary with the ablation’s settings (<code>"settings"</code>), fingerprints of the data and of the plan (<code>"fingerprints"</code>, as in the manifest of <a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link"><code>export()</code></a>), the versions of the table that were evaluated (<code>"variants"</code>, including the full table and the controls), the variants that weren’t evaluated because they remove the same rows as another version (<code>"same_as"</code>, from each to that version), the metrics from every evaluation (<code>"runs"</code>, one entry per version and repeat, with its seed and whether its result came from the cache), the results (<code>"effects"</code>, with the same fields as the columns of <a href="../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link"><code>get_effects()</code></a>), the Shapley values (<code>"shapley"</code>, with the same fields as the columns of <a href="../reference/Ablation.get_shapley.html#pointblank.Ablation.get_shapley" class="gdls-link"><code>get_shapley()</code></a>, or <code>None</code> without <a href="../reference/Ablation.shapley.html#pointblank.Ablation.shapley" class="gdls-link"><code>shapley()</code></a>), and the notes about variants and steps that weren’t used (<code>"notes"</code>).
+A dictionary with the ablation’s settings (<code>"settings"</code>), fingerprints of the data and of the plan (<code>"fingerprints"</code>, as in the manifest of <a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link"><code>export()</code></a>), the versions of the table that were evaluated (<code>"variants"</code>, including the full table and the controls), the variants that weren’t evaluated because they remove the same rows as another version (<code>"same_as"</code>, from each to that version), the metrics from every evaluation (<code>"runs"</code>, one entry per version and repeat, with its seed and whether its result came from the cache), the results (<code>"effects"</code>, with the same fields as the columns of <a href="../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link"><code>get_effects()</code></a>), the Shapley values (<code>"shapley"</code>, with the same fields as the columns of <a href="../reference/Ablation.get_shapley.html#pointblank.Ablation.get_shapley" class="gdls-link"><code>get_shapley()</code></a>, or <code>None</code> without <a href="../reference/Ablation.shapley.html#pointblank.Ablation.shapley" class="gdls-link"><code>shapley()</code></a>), the notes about variants and steps that weren’t used (<code>"notes"</code>), and the results of the steps on the holdout set (<code>"holdout"</code>, with its number of rows, its health score, and the number and share of failing test units of each step, or <code>None</code> without <code>holdout=</code>).
 </dd>
 </dl>
 </div>
@@ -2064,7 +2059,7 @@ A dictionary with the ablation’s settings (<code>"settings"</code>), fingerpri
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an ablation of a table of temperature readings, with three repeats.</p>
-<div id="3b91ebea" class="cell" data-execution_count="2">
+<div id="91693bf5" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
