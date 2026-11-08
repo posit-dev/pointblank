@@ -89,8 +89,8 @@ action_str = "[{LEVEL}: {TYPE}]: Step {step} has failed validation. ({time})"
 )
 ```
 
-    [CRITICAL: COL_VALS_GT]: Step 2 has failed validation. (2026-11-08 03:12:18.466049+00:00)
-    [CRITICAL: COL_VALS_GE]: Step 3 has failed validation. (2026-11-08 03:12:18.511083+00:00)
+    [CRITICAL: COL_VALS_GT]: Step 2 has failed validation. (2026-11-08 04:53:17.925531+00:00)
+    [CRITICAL: COL_VALS_GE]: Step 3 has failed validation. (2026-11-08 04:53:17.968320+00:00)
 
 [TABLE]
 
@@ -122,7 +122,7 @@ def duration_issue():
 )
 ```
 
-    Data quality issue found (2026-11-08 03:12:18.899827).
+    Data quality issue found (2026-11-08 04:53:18.334590).
 
 [TABLE]
 

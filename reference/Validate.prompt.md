@@ -4,7 +4,7 @@ Validate rows using AI/LLM-powered analysis.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14217-L14702)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14223-L14789)
 
 ``` python
 Validate.prompt(
@@ -21,6 +21,7 @@ Validate.prompt(
     brief=None,
     active=True,
     dimension=None,
+    aggregate="majority",
 )
 ```
 
@@ -43,8 +44,8 @@ A single column or list of columns to include in the validation. If `None`, all 
 `attachments: list | None = None`  
 An optional list of reference files (images or PDFs) to attach as global context for every batch. Each item can be a local file path, a URL (`http://` / `https://`), a `pathlib.Path`, or a pre-built chatlas `Content` object. Supported extensions are `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, and `.pdf`. The attachments apply to the whole validation step, not per-row, so they are well-suited for things like brand guides, schema diagrams, or sample documents the LLM should consult when scoring each row. **Cost note**: attachments are re-sent on every batch -- see the *Multi-modal attachments* section below for cost-management tips.
 
-`model: str`  
-The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, and `"azure-openai"`. The model name should be the specific model to be used from the provider (for `"azure-openai"`, the value after the colon is the Azure *deployment id*). Model names are subject to change so consult the provider's documentation for the most up-to-date model names.
+`model: str | list[str]`  
+The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, `"azure-openai"`, and `"cohere"`. The model name should be the specific model to be used from the provider (for `"azure-openai"`, the value after the colon is the Azure *deployment id*). Model names are subject to change so consult the provider's documentation for the most up-to-date model names. A list of models makes each of them a judge of every row, with their verdicts combined by `aggregate=` (see the *Several Judges* section).
 
 `batch_size: int = 1000`  
 Number of rows to process in each batch. Larger batches are more efficient but may hit API limits. Default is `1000`.
@@ -73,6 +74,9 @@ A boolean value or callable that determines whether the validation step should b
 `dimension: str | None = None`  
 An optional data quality dimension to categorize this validation step for health scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`, `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the dimension is inferred automatically from the assertion type. This label appears in the validation report and feeds the overall and per-dimension health scores.
 
+`aggregate: str = "majority"`  
+How the verdicts of several models (a list of them in `model=`) are combined into the result of a row: `"majority"` (the default: more than half of the models pass it, so a tie fails), `"all"` (every model passes it), or `"any"` (at least one does). It has no effect with a single model.
+
 ## Returns
 
 `Validate`  
@@ -87,6 +91,7 @@ The `model=` argument should be constructed using the provider and model name se
 - `"ollama"` (Ollama)
 - `"bedrock"` (Amazon Bedrock)
 - `"azure-openai"` (Azure OpenAI)
+- `"cohere"` (Cohere)
 
 The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider's documentation for the most up-to-date model names. For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the name you assigned when deploying the model in your Azure OpenAI resource), not an OpenAI model id.
 
@@ -112,6 +117,15 @@ There's no need to have the `python-dotenv` package installed when using `.env` 
 - **Ollama**: no API key required, just ensure Ollama is running locally
 - **Bedrock**: configure AWS credentials through standard AWS methods
 - **Azure OpenAI**: set `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g., `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`)
+- **Cohere**: set the `CO_API_KEY` (or `COHERE_API_KEY`) environment variable (the requests go to Cohere's OpenAI-compatible API, so the `openai` package is needed)
+
+## Several Judges
+
+A model can be wrong about a row, and different models are wrong about different rows. With a list of models in `model=`, each model judges every row (as a *judge*), and the verdicts are combined into the result of the row with `aggregate=`. With three models and the default `aggregate="majority"`, a row passes if at least two of them pass it. The rows are sent to each model in turn, so the cost and the time of the step grow with the number of models.
+
+The results of the step have a `pb_votes_` column (in the step report and the data extracts) with the number of models that passed each row, and the step's note gives the number of rows that each model passed and how often the models agreed. A row on which the models disagree is worth a look by a person, and a model that disagrees with the others often may not be suited to the prompt.
+
+To measure how well the models agree with the judgments of a person, label some of the rows and use [`calibrate_prompt()`](../reference/Validate.calibrate_prompt.md#pointblank.Validate.calibrate_prompt) after interrogation.
 
 ## Ai Validation Process
 
@@ -311,3 +325,26 @@ validation = (
 ```
 
 The brand guide is sent alongside the row JSON on every batch, so the LLM evaluates each description with the same reference document in view.
+
+**Several judges:**
+
+Here, three models from different providers judge each review, and a review passes if at least two of them find that it's about the product.
+
+``` python
+validation = (
+    pb.Validate(data=reviews)
+    .prompt(
+        prompt="The review is about the product, not about the delivery or the seller.",
+        columns_subset="review",
+        model=[
+            "anthropic:claude-sonnet-4-5",
+            "openai:gpt-6-luna",
+            "cohere:command-a-03-2025",
+        ],
+        aggregate="majority",
+    )
+    .interrogate()
+)
+```
+
+The step report has the number of models that passed each review (in `pb_votes_`), and the step's note says how often the models agreed.

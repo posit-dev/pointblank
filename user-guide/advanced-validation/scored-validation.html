@@ -361,6 +361,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Checking Text Data</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/rag-checks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Checking RAG Data</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -403,6 +409,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/post-interrogation/data-ablation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Data Ablation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/data-cards.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Cards</span></a>
   </div>
 </li>
       </ul>
@@ -455,6 +467,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/table-comparison/checking-splits.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Checking Dataset Splits</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/table-comparison/checking-synthetic-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Checking Synthetic Data</span></a>
   </div>
 </li>
       </ul>
@@ -684,7 +702,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="a-first-scored-step" class="level1">
 <h1>A First Scored Step</h1>
 <p>Let’s make a small corpus of short documents, of the kind that might be collected to train a language model. Some of them aren’t what we’d want: one is spam, one is in French, one is keyboard-mashing, and one is missing.</p>
-<div id="34ad0ab5" class="cell" data-execution_count="2">
+<div id="c1e18694" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>corpus <span class="op">=</span> pl.DataFrame(</span>
@@ -837,7 +855,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>A scorer is a function that takes a batch of rows and returns a score for each. Here’s one that scores a document by the share of its words that are distinct, which is low for text that repeats itself.</p>
-<div id="3fdd8014" class="cell" data-execution_count="3">
+<div id="ff8fefeb" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> distinct_share(batch):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    scores <span class="op">=</span> []</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> row <span class="kw">in</span> batch:</span>
@@ -846,7 +864,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> scores</span></code></pre></div>
 </div>
 <p>We’ll validate that at least 60% of the words of each document are distinct.</p>
-<div id="a7efacda" class="cell" data-execution_count="4">
+<div id="451f7f65" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>corpus, tbl_name<span class="op">=</span><span class="st">"corpus"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_scored(columns<span class="op">=</span><span class="st">"text"</span>, scorer<span class="op">=</span>distinct_share, min_val<span class="op">=</span><span class="fl">0.6</span>)</span>
@@ -1023,7 +1041,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>A scorer gets the rows as a list of dictionaries, one for each row, with the values of the columns of the step. With <code>columns="text"</code>, each row is a dictionary like <code>{"text": "..."}</code>; with <code>columns=["query", "passage"]</code>, it has both values. The scorer returns a list of scores, in the order of the rows. A score is a number, or <code>None</code> for a row that can’t be scored.</p>
 <p>Rows come in batches, which is what most models want: a model scores a batch of texts much faster than it scores them one at a time. Rows with the same values are scored only once, and a row with a missing value in any of the columns isn’t given to the scorer at all.</p>
 <p>A scorer can also have a <code>name</code>, a <code>version</code>, and a <code>batch_size</code>. The name identifies the scorer in the report and in the score cache (a function defined at the top level of a module is named after the function), and the version is part of the key of the cache. The <code>pb.scorers.from_function()</code> function gives these to any function, and it can also wrap a function that scores one row at a time, with <code>per_row=True</code>:</p>
-<div id="64e1a5a8" class="cell" data-execution_count="5">
+<div id="a643bc96" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>word_count <span class="op">=</span> pb.scorers.from_function(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">lambda</span> row: <span class="bu">len</span>(row[<span class="st">"text"</span>].split()), name<span class="op">=</span><span class="st">"word_count"</span>, version<span class="op">=</span><span class="st">"1"</span>, per_row<span class="op">=</span><span class="va">True</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1249,7 +1267,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <p>The last two need no model to score with (other than a tokenizer), and they’re the scorers of the bundles of steps in <code>pb.text</code>, for the heuristic quality filters and the length of text in tokens (see the <a href="../../user-guide/advanced-validation/text-checks.html">Checking Text Data</a> article).</p>
 <p>With real models, the adapters look like this:</p>
-<div id="7c050c03" class="cell" data-execution_count="6">
+<div id="d001761c" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Is each document of educational quality (on a scale from 0 to 5)?</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>quality <span class="op">=</span> pb.scorers.classifier(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    hf_model<span class="op">=</span><span class="st">"HuggingFaceFW/fineweb-edu-classifier"</span>, function_to_apply<span class="op">=</span><span class="st">"none"</span></span>
@@ -1275,7 +1293,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>tokens <span class="op">=</span> pb.scorers.token_count(tokenizer<span class="op">=</span><span class="st">"tiktoken:cl100k_base"</span>)</span></code></pre></div>
 </div>
 <p>The adapters that take a model can also take a function in its place, which is how we’ll keep the examples on this page self-contained. Here, <code>guess_language()</code> stands in for a language identification model (it counts common English and French words), and <code>vowel_ratio()</code> stands in for a language model’s perplexity (garbled text has few vowels for its letters).</p>
-<div id="1a52d5d4" class="cell" data-execution_count="7">
+<div id="290b7ba5" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> guess_language(text):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    words <span class="op">=</span> <span class="bu">set</span>(text.lower().split())</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    english <span class="op">=</span> <span class="bu">len</span>(words <span class="op">&amp;</span> {<span class="st">"the"</span>, <span class="st">"and"</span>, <span class="st">"at"</span>, <span class="st">"is"</span>, <span class="st">"for"</span>, <span class="st">"are"</span>, <span class="st">"so"</span>, <span class="st">"our"</span>, <span class="st">"on"</span>})</span>
@@ -1291,7 +1309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">len</span>(letters) <span class="op">/</span> <span class="bu">max</span>(vowels, <span class="dv">1</span>)</span></code></pre></div>
 </div>
 <p>Now we can check the corpus in three ways at once: that it doesn’t repeat itself, that it’s in English, and that it’s fluent (with <code>max_val=</code> as the highest perplexity allowed).</p>
-<div id="379c00e7" class="cell" data-execution_count="8">
+<div id="85ef9b0e" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>corpus, tbl_name<span class="op">=</span><span class="st">"corpus"</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_scored(columns<span class="op">=</span><span class="st">"text"</span>, scorer<span class="op">=</span>distinct_share, min_val<span class="op">=</span><span class="fl">0.6</span>)</span>
@@ -1576,14 +1594,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-score-cache" class="level1">
 <h1>The Score Cache</h1>
 <p>Models are slow and can be costly, so scores are kept in a cache: by the scorer’s name and version, and by the values of the row. Interrogating the same data again (after a change to another step, say, or in an <a href="../../user-guide/post-interrogation/data-ablation.html"><code>Ablation</code></a>, which interrogates many variants of a table) doesn’t run the model again for rows that it has already scored. In fact, the note of step 1 in the last report says that every score came from the cache, since the first validation on this page had already scored those rows with <code>distinct_share</code>.</p>
-<div id="4cb335b4" class="cell" data-execution_count="9">
+<div id="802f6496" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>validation.get_note(<span class="dv">1</span>, <span class="st">"scores"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">"text"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>'Scored by __main__.distinct_share: 7 distinct rows, with every score from the cache. Scores from 0.4 to 1 (median 1). 1 row had no score (a missing value, or none from the scorer) and failed (`na_pass=True` lets it pass).'</code></pre>
 </div>
 </div>
 <p>With <code>cache=True</code> (the default), the scores are kept in memory for the rest of the session. With a directory as <code>cache=</code>, they’re kept on disk, in an SQLite file, and can be shared between sessions and projects:</p>
-<div id="622ab944" class="cell" data-execution_count="10">
+<div id="35960cb3" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>pb.Validate(data<span class="op">=</span>corpus).col_vals_scored(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span><span class="st">"text"</span>,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    scorer<span class="op">=</span>pb.scorers.langid(expected<span class="op">=</span><span class="st">"en"</span>),</span>
@@ -1597,7 +1615,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="using-the-scores" class="level1">
 <h1>Using the Scores</h1>
 <p>The scores of a step are kept with its results, in a column called <code>pb_score_</code>. They’re in the extracts of the failing rows and in the step report, which makes it easy to see how far a failing row is from the bounds:</p>
-<div id="bb3e22ae" class="cell" data-execution_count="11">
+<div id="94687f0e" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">2</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1706,7 +1724,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>They’re also in the table of <a href="../../reference/Validate.get_row_flags.html#pointblank.Validate.get_row_flags" class="gdls-link gdls-code">get_row_flags()</a>, as a column for each scored step (<code>pb_score_&lt;step&gt;_</code>), next to the flags of the steps:</p>
-<div id="d477e8d6" class="cell" data-execution_count="12">
+<div id="8735e8cc" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>validation.get_row_flags()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div><style>
@@ -1729,7 +1747,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="scored-steps-in-yaml" class="level1">
 <h1>Scored Steps in YAML</h1>
 <p>In a YAML workflow, a scorer is written as one of the adapters with its settings, as <code>{&lt;adapter&gt;: {&lt;settings&gt;}}</code>:</p>
-<div id="ec2296d5" class="cell" data-execution_count="13">
+<div id="9aa9e459" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> <span class="st">"""</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: corpus.parquet</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>

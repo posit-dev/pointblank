@@ -190,6 +190,57 @@ pb.config()  # reset back to defaults
 
     PointblankConfig(report_incl_header=True, report_incl_footer=True, report_incl_footer_timings=True, report_incl_footer_notes=True, report_incl_dimensions=False, preview_incl_header=True, dimension_map=None, dimension_weights=None, dimension_thresholds=None)
 
+## Scores by Segment
+
+A single score for a table can hide a part of it that's much worse than the rest: one region, one source, or one language of a corpus. When steps are [segmented](../validation-plan/segmentation.md) by a column, `by=` gives the scores of each of its values. Here, the checks are segmented by the status of the order:
+
+``` python
+by_status = (
+    pb.Validate(data=sales, tbl_name="sales")
+    .col_vals_not_null(columns="amount", segments="status")
+    .col_vals_gt(columns="amount", value=0, segments="status")
+    .col_vals_regex(columns="email", pattern=r"^[^@]+@[^@]+\.[^@]+$", segments="status")
+    .interrogate()
+)
+
+by_status.get_dimension_scores(by="status")
+```
+
+    {'paid': {'completeness': 85.71, 'validity': 71.43},
+     'pending': {'completeness': 100.0, 'validity': 50.0},
+     'refund': {'completeness': 100.0, 'validity': 100.0}}
+
+``` python
+by_status.get_health_score(by="status")
+```
+
+    {'paid': 76.19, 'pending': 66.67, 'refund': 100.0}
+
+The scores of each segment come from the steps segmented by that column only, since a step that isn't segmented checks the whole table. The scorecard has a row for each segment, with its health score and a pill for the score of each dimension:
+
+``` python
+by_status.get_scorecard(by="status")
+```
+
+| Dimension Scores -- `sales` |  |  |  |
+|----|----|----|----|
+| Health Score: 80% |  |  |  |
+| status | HEALTH SCORE | DIMENSION | UNITS |
+| paid | 76% | Completeness 86%Validity 71% | 16 / 21 |
+| pending | 67% | Completeness 100%Validity 50% | 2 / 3 |
+| refund | 100% | Completeness 100%Validity 100% | 6 / 6 |
+
+And [assert_dimension_scores()](../../reference/Validate.assert_dimension_scores.md#pointblank.Validate.assert_dimension_scores) checks the minimums in every segment, so that a pipeline fails when any segment falls short (here, the paid and the pending orders):
+
+``` python
+try:
+    by_status.assert_dimension_scores(thresholds={"validity": 75}, by="status")
+except AssertionError as e:
+    print(e)
+```
+
+    Dimension health score(s) below the required minimum: validity in status='paid' (71.43% < 75%), validity in status='pending' (50% < 75%)
+
 ## Accessing Scores Programmatically
 
 The scores are also included in the summary available to [`FinalActions`](../../reference/FinalActions.md#pointblank.FinalActions) via [`get_validation_summary()`](../../reference/get_validation_summary.md#pointblank.get_validation_summary), under the `dimension_scores` and `overall_health_score` keys. This makes it easy to log or trend the health score over time:

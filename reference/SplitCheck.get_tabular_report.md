@@ -4,7 +4,7 @@ Get a tabular report of the checks of the splits.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L577-L737)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L531-L691)
 
 ``` python
 SplitCheck.get_tabular_report(title=None)

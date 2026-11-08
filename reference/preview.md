@@ -4,7 +4,7 @@ Display a table preview that shows some rows from the top, some from the bottom.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L2226-L2489)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L2227-L2490)
 
 ``` python
 preview(

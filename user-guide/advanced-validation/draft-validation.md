@@ -39,6 +39,7 @@ The [DraftValidation](../../reference/DraftValidation.md#pointblank.DraftValidat
 - **Ollama** (local LLMs)
 - **Amazon Bedrock** (AWS-hosted models)
 - **Azure OpenAI** (OpenAI models deployed on Azure)
+- **Cohere** (Command models, through Cohere's OpenAI-compatible API)
 
 Each provider has different capabilities and performance characteristics, but all can be used to generate validation plans through a consistent interface.
 
@@ -164,6 +165,9 @@ You can also store API keys in a `.env` file in your project's root directory:
     AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
     OPENAI_API_VERSION=2025-03-01-preview
 
+    # For Cohere:
+    CO_API_KEY=your_cohere_api_key_here
+
 If your API keys have standard names (like `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`), [DraftValidation](../../reference/DraftValidation.md#pointblank.DraftValidation) will automatically find and use them:
 
 ``` python
@@ -273,6 +277,9 @@ pb.DraftValidation(data=data, model="bedrock:anthropic.claude-sonnet-5-5")
 # Using Azure OpenAI (the value after the colon is the Azure deployment id, not an OpenAI model id;
 # requires AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and OPENAI_API_VERSION env vars)
 pb.DraftValidation(data=data, model="azure-openai:my-gpt4-deployment")
+
+# Using Cohere (requires the CO_API_KEY env var)
+pb.DraftValidation(data=data, model="cohere:command-a-03-2025")
 ```
 
 ### Model Performance and Privacy

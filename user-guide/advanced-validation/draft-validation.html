@@ -358,6 +358,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Checking Text Data</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/rag-checks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Checking RAG Data</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -400,6 +406,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/post-interrogation/data-ablation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Data Ablation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/post-interrogation/data-cards.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Cards</span></a>
   </div>
 </li>
       </ul>
@@ -452,6 +464,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../user-guide/table-comparison/checking-splits.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Checking Dataset Splits</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/table-comparison/checking-synthetic-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Checking Synthetic Data</span></a>
   </div>
 </li>
       </ul>
@@ -726,6 +744,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Ollama</strong> (local LLMs)</li>
 <li><strong>Amazon Bedrock</strong> (AWS-hosted models)</li>
 <li><strong>Azure OpenAI</strong> (OpenAI models deployed on Azure)</li>
+<li><strong>Cohere</strong> (Command models, through Cohere’s OpenAI-compatible API)</li>
 </ul>
 <p>Each provider has different capabilities and performance characteristics, but all can be used to generate validation plans through a consistent interface.</p>
 </section>
@@ -838,7 +857,10 @@ OPENAI_API_KEY=your_openai_api_key_here
 # For Azure OpenAI, three variables are required:
 AZURE_OPENAI_API_KEY=your_azure_openai_api_key_here
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
-OPENAI_API_VERSION=2025-03-01-preview</code></pre>
+OPENAI_API_VERSION=2025-03-01-preview
+
+# For Cohere:
+CO_API_KEY=your_cohere_api_key_here</code></pre>
 <p>If your API keys have standard names (like <code>ANTHROPIC_API_KEY</code> or <code>OPENAI_API_KEY</code>), <a href="../../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> will automatically find and use them:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># No API key needed if stored in .env with standard names</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>draft_validation <span class="op">=</span> pb.DraftValidation(</span>
@@ -937,7 +959,10 @@ validation
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Using Azure OpenAI (the value after the colon is the Azure deployment id, not an OpenAI model id;</span></span>
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># requires AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and OPENAI_API_VERSION env vars)</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>pb.DraftValidation(data<span class="op">=</span>data, model<span class="op">=</span><span class="st">"azure-openai:my-gpt4-deployment"</span>)</span></code></pre></div>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>pb.DraftValidation(data<span class="op">=</span>data, model<span class="op">=</span><span class="st">"azure-openai:my-gpt4-deployment"</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Using Cohere (requires the CO_API_KEY env var)</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>pb.DraftValidation(data<span class="op">=</span>data, model<span class="op">=</span><span class="st">"cohere:command-a-03-2025"</span>)</span></code></pre></div>
 </section>
 <section id="model-performance-and-privacy" class="level2">
 <h2 class="anchored" data-anchor-id="model-performance-and-privacy">Model Performance and Privacy</h2>

@@ -4,12 +4,13 @@ Raise an `AssertionError` if any dimension's health score falls below a minimum.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22254-L22368)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22778-L22903)
 
 ``` python
 Validate.assert_dimension_scores(
     thresholds=None,
     message=None,
+    by=None,
 )
 ```
 
@@ -22,6 +23,9 @@ A mapping of dimension name to a minimum acceptable score (`0`-`100`). If `None`
 
 `message: str | None = None`  
 Custom error message to use if the assertion fails. If `None`, a default message that lists the offending dimensions (with actual vs. required scores) is generated.
+
+`by: str | None = None`  
+The name of a column that steps are segmented by (with `segments=`), to require the minimums of every segment rather than of the whole validation. The scores of each segment are those of [`get_dimension_scores(by=)`](../reference/Validate.get_dimension_scores.md#pointblank.Validate.get_dimension_scores).
 
 ## Returns
 

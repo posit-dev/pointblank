@@ -710,9 +710,26 @@ products = pl.DataFrame({
 
 The `columns_subset=` parameter lets you specify which columns to include in the validation, improving performance and reducing API costs by only sending relevant data to the LLM.
 
-**Note:** To use [`Validate.prompt()`](../../reference/Validate.prompt.md#pointblank.Validate.prompt), you need to have the appropriate API credentials configured for your chosen LLM provider (Anthropic, OpenAI, Ollama, AWS Bedrock, or Azure OpenAI).
+**Note:** To use [`Validate.prompt()`](../../reference/Validate.prompt.md#pointblank.Validate.prompt), you need to have the appropriate API credentials configured for your chosen LLM provider (Anthropic, OpenAI, Ollama, AWS Bedrock, Azure OpenAI, or Cohere).
 
-For **Azure OpenAI**, use `model="azure-openai:<deployment_id>"` where `<deployment_id>` is the name you assigned when deploying the model in your Azure OpenAI resource. In addition to `AZURE_OPENAI_API_KEY`, you must set `AZURE_OPENAI_ENDPOINT` (e.g., `https://<resource>.openai.azure.com`) and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) in your environment.
+For **Azure OpenAI**, use `model="azure-openai:<deployment_id>"` where `<deployment_id>` is the name you assigned when deploying the model in your Azure OpenAI resource. In addition to `AZURE_OPENAI_API_KEY`, you must set `AZURE_OPENAI_ENDPOINT` (e.g., `https://<resource>.openai.azure.com`) and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) in your environment. For **Cohere**, use `model="cohere:<model>"` (e.g., `"cohere:command-a-03-2025"`) with the `CO_API_KEY` environment variable set.
+
+A single model can be wrong about a row. With a list of models in `model=`, each model judges every row and the verdicts are combined with `aggregate=` (`"majority"`, `"all"`, or `"any"`):
+
+``` python
+(
+    pb.Validate(data=products)
+    .prompt(
+        prompt="Each description should mention either quality, features, or warranty",
+        columns_subset=["description"],
+        model=["anthropic:claude-opus-4-6", "openai:gpt-5.6-sol", "cohere:command-a-03-2025"],
+        aggregate="majority",
+    )
+    .interrogate()
+)
+```
+
+The step's results have a `pb_votes_` column with the number of models that passed each row, and its note says how often the models agreed. To measure how well the step agrees with a person's judgment, label some rows by hand (in a column that isn't sent to the models) and call [calibrate_prompt()](../../reference/Validate.calibrate_prompt.md#pointblank.Validate.calibrate_prompt) after interrogation, which gives the agreement and Cohen's kappa of the step (and of each model) with the labels.
 
 ## 5. Aggregate Validations
 

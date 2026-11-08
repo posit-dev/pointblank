@@ -20,7 +20,7 @@ EditValidation(
 
 While [`DraftValidation`](../reference/DraftValidation.md#pointblank.DraftValidation) generates a validation plan from scratch by profiling a table, [EditValidation](../reference/EditValidation.md#pointblank.EditValidation) takes an *existing* plan plus a natural-language instruction (e.g., "add a freshness check on `updated_at`, tighten the email regex, and drop the `price > 0` check") and produces a revised plan. You review the change as a diff and explicitly [`accept()`](../reference/EditValidation.md#pointblank.EditValidation.accept) it before anything runs, keeping a human in control.
 
-[EditValidation](../reference/EditValidation.md#pointblank.EditValidation) reuses the same provider abstraction as [DraftValidation](../reference/DraftValidation.md#pointblank.DraftValidation) (via the `chatlas` package), supporting the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, and `"azure-openai"` providers. Install the optional requirements with `pip install pointblank[generate]`.
+[EditValidation](../reference/EditValidation.md#pointblank.EditValidation) reuses the same provider abstraction as [DraftValidation](../reference/DraftValidation.md#pointblank.DraftValidation) (via the `chatlas` package), supporting the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, `"azure-openai"`, and `"cohere"` providers. Install the optional requirements with `pip install pointblank[generate]`.
 
 > **Warning**
 >
@@ -35,7 +35,7 @@ The existing validation plan to edit. This can be a [`Validate`](../reference/Va
 A plain-English description of the changes to make to the plan.
 
 `model: str`  
-The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-8"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, and `"azure-openai"`.
+The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-8"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, `"azure-openai"`, and `"cohere"`.
 
 `data: Any = None`  
 Optional data table. When provided, a [`DataScan`](../reference/DataScan.md#pointblank.DataScan) summary of the table is included in the prompt so the model can make *informed* edits (e.g., tightening a range using observed min/max values). It is also used as the default data source when building a [`Validate`](../reference/Validate.md#pointblank.Validate) via [`accept()`](../reference/EditValidation.md#pointblank.EditValidation.accept).

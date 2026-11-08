@@ -301,6 +301,16 @@ Make a validation step that checks the length of text in tokens.
 [text.no_pii()](text.no_pii.md#pointblank.text.no_pii)  
 Make validation steps that check that text has no personal information.
 
+## RAG Checks
+
+Checks of the data of a retrieval-augmented generation (RAG) system. Each function makes a [Steps](../reference/Steps.md#pointblank.Steps) collection of ordinary validation steps: [rag.corpus_checks()](../reference/rag.corpus_checks.md#pointblank.rag.corpus_checks) checks the chunks of the corpus (text, unique ids, metadata, length, near duplicates, and freshness), and [rag.eval_checks()](../reference/rag.eval_checks.md#pointblank.rag.eval_checks) checks the evaluation set (queries, near-duplicate queries, gold documents in the corpus, and the relevance of the gold passages).
+
+[rag.corpus_checks()](rag.corpus_checks.md#pointblank.rag.corpus_checks)  
+Make validation steps that check the corpus of a RAG system.
+
+[rag.eval_checks()](rag.eval_checks.md#pointblank.rag.eval_checks)  
+Make validation steps that check the evaluation set of a RAG system.
+
 ## Column Selection
 
 Use the [col()](../reference/col.md#pointblank.col) function along with column selection helpers to flexibly select columns for validation. Combine [col()](../reference/col.md#pointblank.col) with [starts_with()](../reference/starts_with.md#pointblank.starts_with), `matches()`, etc. for selecting multiple target columns.
@@ -370,6 +380,9 @@ Serialize this validation plan to a [yaml_interrogate()](../reference/yaml_inter
 [Validate.to_json_schema()](Validate.to_json_schema.md#pointblank.Validate.to_json_schema)  
 Export this validation plan as a JSON Schema document.
 
+[Validate.to_data_card()](Validate.to_data_card.md#pointblank.Validate.to_data_card)  
+Write a data card for the table, with the evidence of the validation.
+
 [Validate.suggest_improvements()](Validate.suggest_improvements.md#pointblank.Validate.suggest_improvements)  
 Propose AI-generated improvements to this validation plan.
 
@@ -384,6 +397,9 @@ Get the target table with columns flagging the validation steps each row failed.
 
 [Validate.get_data_extracts()](Validate.get_data_extracts.md#pointblank.Validate.get_data_extracts)  
 Get the rows that failed for each validation step.
+
+[Validate.calibrate_prompt()](Validate.calibrate_prompt.md#pointblank.Validate.calibrate_prompt)  
+Measure how well a [prompt()](../reference/Validate.prompt.md#pointblank.Validate.prompt) step agrees with labels given by a person.
 
 [Validate.all_passed()](Validate.all_passed.md#pointblank.Validate.all_passed)  
 Determine if every validation step passed perfectly, with no failing test units.
@@ -562,6 +578,25 @@ Get the rows of a split that are also in an earlier split.
 Get a tabular report of the checks of the splits.
 
 [SplitCheck.to_dict()](SplitCheck.to_dict.md#pointblank.SplitCheck.to_dict)  
+Get the results as a dictionary (that can be written as JSON).
+
+## Synthetic Data Checks
+
+Check synthetic data against the real data it was made from (its seed): [check_synthetic()](../reference/check_synthetic.md#pointblank.check_synthetic) compares the distribution and the share of missing values of each column, measures the diversity of the rows and of the text, and finds synthetic rows that copy a seed row (exactly or nearly). The result is a [SyntheticCheck](../reference/SyntheticCheck.md#pointblank.SyntheticCheck) object with the issues found, the copied rows, and a tabular report.
+
+[check_synthetic()](check_synthetic.md#pointblank.check_synthetic)  
+Check synthetic data against its seed for fidelity, diversity, and copies.
+
+[SyntheticCheck](SyntheticCheck.md#pointblank.SyntheticCheck)  
+The results of [`check_synthetic()`](../reference/check_synthetic.md#pointblank.check_synthetic).
+
+[SyntheticCheck.get_copies()](SyntheticCheck.get_copies.md#pointblank.SyntheticCheck.get_copies)  
+Get the synthetic rows that copy a seed row.
+
+[SyntheticCheck.get_tabular_report()](SyntheticCheck.get_tabular_report.md#pointblank.SyntheticCheck.get_tabular_report)  
+Get a tabular report of the checks of the synthetic data.
+
+[SyntheticCheck.to_dict()](SyntheticCheck.to_dict.md#pointblank.SyntheticCheck.to_dict)  
 Get the results as a dictionary (that can be written as JSON).
 
 ## Table Pre-checks

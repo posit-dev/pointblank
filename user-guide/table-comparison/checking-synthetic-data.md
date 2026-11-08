@@ -1,0 +1,167 @@
+# Checking Synthetic Data
+
+Synthetic data is made to stand in for real data: to train a model when there's too little real data, to share a dataset whose real rows are private, or to test a pipeline. It's made by a generator (a generative model, an LLM, or a program that perturbs real rows) from real data, its *seed*. It's only useful if it's like the seed, and only safe to share if it doesn't copy it. Generators fail in ways that are easy to miss by looking at a few rows: they favour the most common values, drop values they find hard, repeat a few kinds of rows (*mode collapse*), and memorize rows of the seed.
+
+The [`check_synthetic()`](../../reference/check_synthetic.md#pointblank.check_synthetic) function compares synthetic data with its seed for all of these at once: the fidelity of each column's distribution, the diversity of the rows and of the text, and the rows that copy a seed row.
+
+## The Data
+
+Let's make a seed of 500 customers of a bank, each with an age, a plan, a monthly spend, and a message to the bank's support team. Then we'll make 500 synthetic customers, with a generator that has some of the usual faults: it rarely gives the less common plans, it often leaves the spend out, its messages are about fewer things, and it memorized three customers of the seed (and gives one of them as it is, one in capital letters, and one with different punctuation).
+
+``` python
+import random
+
+import polars as pl
+
+rng = random.Random(11)
+plans = ["basic", "plus", "family", "business"]
+products = ["card", "app", "statement", "transfer", "loan", "savings account", "overdraft", "PIN"]
+problems = [
+    "isn't working",
+    "shows the wrong amount",
+    "was blocked",
+    "is taking too long",
+    "has a fee I didn't expect",
+    "needs to be changed",
+]
+whens = ["since Monday", "since last week", "since this morning", "for a month", "again"]
+asks = ["Can you help?", "Please call me back.", "What should I do?", "I'd like a refund."]
+
+
+def customer(k):
+    return {
+        "customer_id": f"C{k:04d}",
+        "age": rng.randint(18, 80),
+        "plan": rng.choices(plans, [5, 3, 2, 1])[0],
+        "monthly_spend": round(rng.lognormvariate(3.2, 0.5), 2),
+        "message": (
+            f"My {rng.choice(products)} {rng.choice(problems)} {rng.choice(whens)}. "
+            f"{rng.choice(asks)}"
+        ),
+    }
+
+
+def synthetic_customer(k):
+    return {
+        "customer_id": f"S{k:04d}",
+        "age": rng.randint(23, 80),
+        "plan": rng.choices(plans, [8, 2, 1, 0])[0],
+        "monthly_spend": round(rng.lognormvariate(3.2, 0.5), 2) if rng.random() > 0.15 else None,
+        "message": (
+            f"Hi, my {rng.choice(products[:3])} {rng.choice(problems[:2])}. {rng.choice(asks)}"
+        ),
+    }
+
+
+seed = pl.DataFrame([customer(k) for k in range(500)])
+
+memorized = seed[[3, 41, 97]]
+synthetic = pl.concat(
+    [
+        pl.DataFrame([synthetic_customer(k) for k in range(497)]),
+        memorized.with_columns(
+            pl.Series("customer_id", ["S0497", "S0498", "S0499"]),
+            pl.Series(
+                "message",
+                [
+                    memorized["message"][0],
+                    memorized["message"][1].upper(),
+                    memorized["message"][2].replace(".", "!"),
+                ],
+            ),
+        ),
+    ]
+)
+
+pb.preview(synthetic)
+```
+
+| PolarsRows500Columns5 |  |  |  |  |  |
+|----|----|----|----|----|----|
+|  | customer_id *String* | age *Int64* | plan *String* | monthly_spend *Float64* | message *String* |
+| 1 | S0000 | 35 | plus | None | Hi, my app shows the wrong amount. Please call me back. |
+| 2 | S0001 | 46 | plus | None | Hi, my statement isn't working. Please call me back. |
+| 3 | S0002 | 62 | basic | 10.32 | Hi, my app isn't working. I'd like a refund. |
+| 4 | S0003 | 78 | basic | 29.58 | Hi, my card shows the wrong amount. Please call me back. |
+| 5 | S0004 | 77 | plus | 45.09 | Hi, my app isn't working. I'd like a refund. |
+| 496 | S0495 | 34 | basic | 48.26 | Hi, my card isn't working. Can you help? |
+| 497 | S0496 | 55 | plus | 58.11 | Hi, my statement shows the wrong amount. Please call me back. |
+| 498 | S0497 | 20 | basic | 23.21 | My transfer has a fee I didn't expect since last week. What should I do? |
+| 499 | S0498 | 27 | business | 50.06 | MY PIN IS TAKING TOO LONG AGAIN. CAN YOU HELP? |
+| 500 | S0499 | 44 | business | 39.35 | My statement needs to be changed for a month! Please call me back! |
+
+## Checking the Synthetic Data
+
+The synthetic data comes first, then the seed. We'll say which columns identify a customer, for finding copies: every column but the id, since the generator gives each synthetic customer an id of its own (and a copy with a new id is still a copy). We'll also say which column has free text, so that its diversity is measured and copies of its text are found even if they're not exactly the same.
+
+``` python
+check = pb.check_synthetic(
+    synthetic, seed, columns=["age", "plan", "monthly_spend", "message"], text="message"
+)
+
+check
+```
+
+| Synthetic data check |  |
+|----|----|
+| synthetic: 500 rows · seed: 500 rows **4 issues found.** |  |
+| Check | Result |
+| Fidelity |  |
+| `age` compared with the seed | MODERATE PSI 0.122 numeric; KS 0.124 (p = 0.000906); missing 0.0% (the seed: 0.0%) |
+| `plan` compared with the seed | MAJOR PSI 0.512 categorical; missing 0.0% (the seed: 0.0%) |
+| `monthly_spend` compared with the seed | MISSING PSI 0.0548 numeric; KS 0.0624 (p = 0.31); missing 13.4% (the seed: 0.0%) |
+| Diversity |  |
+| Rows that repeat an earlier row compared on `age`, `plan`, `monthly_spend`, `message` | OK 0 of 500 rows (0.0%) the seed: 0 of 500 rows (0.0%) |
+| Distinct-1 of `message` the share of the words that are distinct | OK 0.00896 the seed: 0.00874 (102% of it); on 500 rows of each |
+| Distinct-2 of `message` the share of the pairs of words that are distinct | LOW 0.0131 the seed: 0.0228 (57% of it); on 500 rows of each |
+| Copies |  |
+| Synthetic rows that copy a seed row compared on `age`, `plan`, `monthly_spend`, `message`, and on the text of `message` | COPIES 3 of 500 rows (0.6%) 1 the same, 2 with nearly the same text |
+| PSI is the population stability index of the shares of the values (binned by the deciles of the seed, for a numeric column): a change is moderate from 0.1 and major from 0.2. KS is the Kolmogorov-Smirnov statistic. A change of 10 percentage points or more in the share of missing values is an issue. |  |
+| A share of repeated rows 5 percentage points or more above the seed's is an issue, as is a distinct-n below 90% of the seed's (measured on as many rows of each table, sampled from the larger one). |  |
+| Texts are nearly the same if the Jaccard similarity of their 5-word n-grams is at least 0.8 (found with MinHash, with 128 permutations). |  |
+
+The report has a row for each check, in three groups:
+
+- **Fidelity.** For each column, its distribution in the synthetic data compared with the seed, with the population stability index (PSI) and, for a numeric column, the Kolmogorov-Smirnov statistic. A PSI from 0.1 is a moderate change, and from 0.2 a major one. The synthetic customers are a little older (the generator gives no one under 23), and the plans are very different: most are basic, and the only business customers are the memorized ones. The spend is distributed like the seed's, but 13% of it is missing, and a change of 10 percentage points or more in the share of missing values is an issue. By default, the columns compared are the numeric columns and those with few distinct values (which leaves out free text and identifiers); `fidelity_columns=` chooses others.
+- **Diversity.** The share of the synthetic rows that repeat an earlier row shouldn't be more than 5 percentage points above the seed's, which catches a generator that gives the same few rows over and over. For each column of `text=`, distinct-1 and distinct-2 are the shares of the words, and of the pairs of words, that are distinct; the synthetic data's should be at least 90% of the seed's. Here, the messages are about three things that can go wrong in two ways. Their share of distinct words is about the seed's (they're shorter, so they have fewer words to repeat), but they put their words together in far fewer ways, so their distinct-2 is only 57% of the seed's.
+- **Copies.** The synthetic rows that are the same as a seed row (on `columns=`), and, with `near=True` (the default), those whose text is the same or nearly the same as a seed row's. Texts are nearly the same if the Jaccard similarity of their sequences of words (once in lower case and without punctuation) is at least `threshold=` (0.8 by default), found with MinHash. All three memorized customers are found: one is the same, and the other two have nearly the same text.
+
+Distinct-n is lower for more text (a word can only be new once), so it's measured on as many rows of each table, with a sample (made with a fixed seed) of the larger one. Like PSI, it's noisy for small tables, and it's most useful with at least a few hundred rows in each.
+
+## The Results
+
+The problems found are also in the [issues](../../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) attribute, as messages, and `ok` is `True` when there are none, which makes a check of synthetic data easy to put in a test or a pipeline that makes it.
+
+``` python
+check.issues
+```
+
+    ["The distribution of 'plan' in the synthetic data differs from that in the seed (PSI 0.512).",
+     "The share of missing values of 'monthly_spend' is 13.4% in the synthetic data and 0.0% in the seed.",
+     "The text of 'message' is less diverse in the synthetic data: its distinct-2 is 0.0131, and the seed's is 0.0228 (57% of it).",
+     '3 rows of the synthetic data (0.6%) copy a seed row (1 the same and 2 with nearly the same text).']
+
+The [get_copies()](../../reference/SyntheticCheck.get_copies.md#pointblank.SyntheticCheck.get_copies) method gives the synthetic rows that copy a seed row, with the row number of each in its own table and the kind of copy.
+
+``` python
+check.get_copies()
+```
+
+shape: (3, 7)
+
+| seed_row | synthetic_row | copy | age | plan | monthly_spend | message |
+|----|----|----|----|----|----|----|
+| i64 | i64 | str | i64 | str | f64 | str |
+| 4 | 498 | "exact" | 20 | "basic" | 23.21 | "My transfer has a fee I didn't… |
+| 42 | 499 | "near" | 27 | "business" | 50.06 | "MY PIN IS TAKING TOO LONG AGAI… |
+| 98 | 500 | "near" | 44 | "business" | 39.35 | "My statement needs to be chang… |
+
+The other attributes have the numbers behind the report (`fidelity`, `duplicates`, `diversity`, and `copies`), and `to_dict()` gives all of them as a dictionary that can be written as JSON.
+
+## What It Doesn't Check
+
+A synthetic dataset can pass these checks and still be a poor stand-in for its seed. The checks compare each column on its own, so a generator that gets every column right but the relationships between them wrong (customers of 18 with the largest spends, say) isn't caught. And a synthetic row that isn't a copy can still give a seed row away, by being very close to it in every numeric value, or by being so rare that it could only come from one customer; the check of copies finds rows that are the same (or whose text is nearly the same), not rows that are merely close. The best test of synthetic data for training a model is to train one on it, and to compare it with a model trained on the seed.
+
+## Conclusion
+
+The [check_synthetic()](../../reference/check_synthetic.md#pointblank.check_synthetic) function compares synthetic data with the real data it was made from. It finds the columns whose distribution or share of missing values changed, the rows and the text that are less diverse than the seed's, and the synthetic rows that copy a seed row (exactly or nearly), with a report of each check and the issues found as messages.

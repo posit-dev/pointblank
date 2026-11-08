@@ -132,6 +132,13 @@
 - [text.token_length](https://posit-dev.github.io/pointblank/reference/text.token_length.html)
 - [text.no_pii](https://posit-dev.github.io/pointblank/reference/text.no_pii.html)
 
+#### RAG Checks
+> Checks of the data of a retrieval-augmented generation (RAG) system. Each function makes a `Steps` collection of ordinary validation steps: `rag.corpus_checks()` checks the chunks of the corpus (text, unique ids, metadata, length, near duplicates, and freshness), and `rag.eval_checks()` checks the evaluation set (queries, near-duplicate queries, gold documents in the corpus, and the relevance of the gold passages).
+
+
+- [rag.corpus_checks](https://posit-dev.github.io/pointblank/reference/rag.corpus_checks.html)
+- [rag.eval_checks](https://posit-dev.github.io/pointblank/reference/rag.eval_checks.html)
+
 #### Column Selection
 > Use the `col()` function along with column selection helpers to flexibly select columns for validation. Combine `col()` with `starts_with()`, `matches()`, etc. for selecting multiple target columns.
 
@@ -165,11 +172,13 @@
 - [Validate.to_code](https://posit-dev.github.io/pointblank/reference/Validate.to_code.html)
 - [Validate.to_yaml](https://posit-dev.github.io/pointblank/reference/Validate.to_yaml.html)
 - [Validate.to_json_schema](https://posit-dev.github.io/pointblank/reference/Validate.to_json_schema.html)
+- [Validate.to_data_card](https://posit-dev.github.io/pointblank/reference/Validate.to_data_card.html)
 - [Validate.suggest_improvements](https://posit-dev.github.io/pointblank/reference/Validate.suggest_improvements.html)
 - [Validate.from_prompt](https://posit-dev.github.io/pointblank/reference/Validate.from_prompt.html)
 - [Validate.get_sundered_data](https://posit-dev.github.io/pointblank/reference/Validate.get_sundered_data.html)
 - [Validate.get_row_flags](https://posit-dev.github.io/pointblank/reference/Validate.get_row_flags.html)
 - [Validate.get_data_extracts](https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html)
+- [Validate.calibrate_prompt](https://posit-dev.github.io/pointblank/reference/Validate.calibrate_prompt.html)
 - [Validate.all_passed](https://posit-dev.github.io/pointblank/reference/Validate.all_passed.html)
 - [Validate.assert_passing](https://posit-dev.github.io/pointblank/reference/Validate.assert_passing.html)
 - [Validate.assert_below_threshold](https://posit-dev.github.io/pointblank/reference/Validate.assert_below_threshold.html)
@@ -246,6 +255,16 @@
 - [SplitCheck.get_overlap](https://posit-dev.github.io/pointblank/reference/SplitCheck.get_overlap.html)
 - [SplitCheck.get_tabular_report](https://posit-dev.github.io/pointblank/reference/SplitCheck.get_tabular_report.html)
 - [SplitCheck.to_dict](https://posit-dev.github.io/pointblank/reference/SplitCheck.to_dict.html)
+
+#### Synthetic Data Checks
+> Check synthetic data against the real data it was made from (its seed): `check_synthetic()` compares the distribution and the share of missing values of each column, measures the diversity of the rows and of the text, and finds synthetic rows that copy a seed row (exactly or nearly). The result is a `SyntheticCheck` object with the issues found, the copied rows, and a tabular report.
+
+
+- [check_synthetic](https://posit-dev.github.io/pointblank/reference/check_synthetic.html): Check synthetic data against its seed for fidelity, diversity, and copies
+- [SyntheticCheck](https://posit-dev.github.io/pointblank/reference/SyntheticCheck.html): The results of [`check_synthetic()`](`pointblank.check_synthetic`)
+- [SyntheticCheck.get_copies](https://posit-dev.github.io/pointblank/reference/SyntheticCheck.get_copies.html)
+- [SyntheticCheck.get_tabular_report](https://posit-dev.github.io/pointblank/reference/SyntheticCheck.get_tabular_report.html)
+- [SyntheticCheck.to_dict](https://posit-dev.github.io/pointblank/reference/SyntheticCheck.to_dict.html)
 
 #### Table Pre-checks
 > Helper functions for use with the `active=` parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.
