@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, Literal
 
 from pointblank.contract import Step
 
 if TYPE_CHECKING:
-    from collections.abc import Collection
+    from collections.abc import Collection, Sequence
     from pathlib import Path
 
     from pointblank._typing import SegmentSpec, Tolerance
@@ -189,7 +189,7 @@ class Steps:
     def __init__(self, steps: list[Step] | None = None) -> None:
         self._steps: list[Step] = list(steps) if steps is not None else []
 
-    def _add(self, method: str, **kwargs: Any) -> Steps:
+    def _add(self, method: str, /, **kwargs: Any) -> Steps:
         self._steps.append(Step(method, **kwargs))
         return self
 
@@ -218,6 +218,14 @@ class Steps:
             # `col_vals_scored()` settings
             "cache": True,
             "keep_scores": True,
+            # `rows_near_distinct()`, `rows_not_contaminated()`, and `col_vals_chat_format()`
+            # settings
+            "num_perm": 128,
+            "roles": ("system", "user", "assistant"),
+            "alternate": True,
+            "allow_empty": False,
+            "role_key": "role",
+            "content_key": "content",
         }
         if value is None:
             return True
@@ -1069,6 +1077,61 @@ class Steps:
             dimension=dimension,
         )
 
+    def col_vals_chat_format(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        roles: Sequence[str] = ("system", "user", "assistant"),
+        alternate: bool = True,
+        first_role: str | None = None,
+        last_role: str | None = None,
+        allow_empty: bool = False,
+        role_key: str = "role",
+        content_key: str = "content",
+        na_pass: bool = False,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Steps:
+        """Add a `col_vals_chat_format()` step to the collection.
+
+        The step records a call to
+        [`Validate.col_vals_chat_format()`](`pointblank.Validate.col_vals_chat_format`), which checks whether each value is a
+        well-formed conversation (a list of messages with roles). It takes the same arguments as
+        that method, so see its reference page for what each one does. Nothing is checked when the
+        step is recorded: it runs when the collection is added to a validation with
+        [`Validate.add_steps()`](`pointblank.Validate.add_steps`) and the validation is
+        interrogated.
+
+        Returns
+        -------
+        Steps
+            This same `Steps` object, with the new step added at the end, so that calls
+            can be chained.
+        """
+        return self._add(
+            "col_vals_chat_format",
+            columns=columns,
+            roles=roles,
+            alternate=alternate,
+            first_role=first_role,
+            last_role=last_role,
+            allow_empty=allow_empty,
+            role_key=role_key,
+            content_key=content_key,
+            na_pass=na_pass,
+            pre=pre,
+            segments=segments,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
+        )
+
     def col_vals_expr(
         self,
         expr: Any,
@@ -1341,6 +1404,104 @@ class Steps:
         return self._add(
             "rows_distinct",
             columns_subset=columns_subset,
+            pre=pre,
+            segments=segments,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
+        )
+
+    def rows_near_distinct(
+        self,
+        columns: str | list[str],
+        method: Literal["minhash", "exact"] = "minhash",
+        threshold: float = 0.85,
+        ngram: int = 5,
+        num_perm: int = 128,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Steps:
+        """Add a `rows_near_distinct()` step to the collection.
+
+        The step records a call to
+        [`Validate.rows_near_distinct()`](`pointblank.Validate.rows_near_distinct`), which checks that no row's text is a near
+        duplicate of another's. It takes the same arguments as
+        that method, so see its reference page for what each one does. Nothing is checked when the
+        step is recorded: it runs when the collection is added to a validation with
+        [`Validate.add_steps()`](`pointblank.Validate.add_steps`) and the validation is
+        interrogated.
+
+        Returns
+        -------
+        Steps
+            This same `Steps` object, with the new step added at the end, so that calls
+            can be chained.
+        """
+        return self._add(
+            "rows_near_distinct",
+            columns=columns,
+            method=method,
+            threshold=threshold,
+            ngram=ngram,
+            num_perm=num_perm,
+            pre=pre,
+            segments=segments,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
+        )
+
+    def rows_not_contaminated(
+        self,
+        columns: str | list[str],
+        reference: Any,
+        reference_columns: str | list[str] | None = None,
+        method: Literal["ngram", "exact", "minhash"] = "ngram",
+        ngram: int | None = None,
+        threshold: float = 0.8,
+        num_perm: int = 128,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Steps:
+        """Add a `rows_not_contaminated()` step to the collection.
+
+        The step records a call to
+        [`Validate.rows_not_contaminated()`](`pointblank.Validate.rows_not_contaminated`), which checks that no row's text overlaps
+        with a reference set of texts (such as a benchmark). It takes the same arguments as
+        that method, so see its reference page for what each one does. Nothing is checked when the
+        step is recorded: it runs when the collection is added to a validation with
+        [`Validate.add_steps()`](`pointblank.Validate.add_steps`) and the validation is
+        interrogated.
+
+        Returns
+        -------
+        Steps
+            This same `Steps` object, with the new step added at the end, so that calls
+            can be chained.
+        """
+        return self._add(
+            "rows_not_contaminated",
+            columns=columns,
+            reference=reference,
+            reference_columns=reference_columns,
+            method=method,
+            ngram=ngram,
+            threshold=threshold,
+            num_perm=num_perm,
             pre=pre,
             segments=segments,
             thresholds=thresholds,
