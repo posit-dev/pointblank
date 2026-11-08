@@ -223,6 +223,10 @@ def test_ablation_effects_and_verdicts():
         "value",
         "n_removed",
         "f_removed",
+        "corruption",
+        "column",
+        "n_corrupted",
+        "checked_by",
         "metric",
         "mean",
         "sd",
@@ -909,6 +913,7 @@ def test_ablation_to_json():
         "same_as",
         "runs",
         "effects",
+        "shapley",
         "notes",
     ]
     assert set(data["fingerprints"]) == {"data", "plan"}
@@ -987,6 +992,10 @@ def test_ablation_drop_all_but_each():
         "left_out": 1,
         "sweep": None,
         "value": None,
+        "corruption": None,
+        "column": None,
+        "n_corrupted": 0,
+        "checked_by": None,
     }
     # Each left-out variant has a control of its own: its rows plus as many random rows as the
     # left-out step adds
