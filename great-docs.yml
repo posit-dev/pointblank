@@ -392,6 +392,17 @@ reference:
         - text.token_length
         - text.no_pii
 
+    - title: RAG Checks
+      desc: >
+        Checks of the data of a retrieval-augmented generation (RAG) system. Each function makes a
+        `Steps` collection of ordinary validation steps: `rag.corpus_checks()` checks the chunks of
+        the corpus (text, unique ids, metadata, length, near duplicates, and freshness), and
+        `rag.eval_checks()` checks the evaluation set (queries, near-duplicate queries, gold
+        documents in the corpus, and the relevance of the gold passages).
+      contents:
+        - rag.corpus_checks
+        - rag.eval_checks
+
     - title: Column Selection
       desc: >
         Use the `col()` function along with column selection helpers to flexibly select columns for
@@ -428,11 +439,13 @@ reference:
         - Validate.to_code
         - Validate.to_yaml
         - Validate.to_json_schema
+        - Validate.to_data_card
         - Validate.suggest_improvements
         - Validate.from_prompt
         - Validate.get_sundered_data
         - Validate.get_row_flags
         - Validate.get_data_extracts
+        - Validate.calibrate_prompt
         - Validate.all_passed
         - Validate.assert_passing
         - Validate.assert_below_threshold
@@ -523,6 +536,21 @@ reference:
         - SplitCheck.get_overlap
         - SplitCheck.get_tabular_report
         - SplitCheck.to_dict
+
+    - title: Synthetic Data Checks
+      desc: >
+        Check synthetic data against the real data it was made from (its seed): `check_synthetic()`
+        compares the distribution and the share of missing values of each column, measures the
+        diversity of the rows and of the text, and finds synthetic rows that copy a seed row
+        (exactly or nearly). The result is a `SyntheticCheck` object with the issues found, the
+        copied rows, and a tabular report.
+      contents:
+        - check_synthetic
+        - name: SyntheticCheck
+          members: false
+        - SyntheticCheck.get_copies
+        - SyntheticCheck.get_tabular_report
+        - SyntheticCheck.to_dict
 
     - title: Table Pre-checks
       desc: >
