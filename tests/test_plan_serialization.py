@@ -467,6 +467,15 @@ def _serialization_cases(ref_path):
         ),
         "rows_distinct": lambda v: v.rows_distinct(columns_subset=["f"]),
         "rows_complete": lambda v: v.rows_complete(),
+        "rows_near_distinct": lambda v: v.rows_near_distinct(
+            columns=["b", "f"], threshold=0.5, ngram=2
+        ),
+        "rows_not_contaminated": lambda v: v.rows_not_contaminated(
+            columns="b", reference=str(ref_path), method="exact"
+        ),
+        "col_vals_chat_format": lambda v: v.col_vals_chat_format(
+            columns="b", roles=["user", "assistant"], last_role="assistant", na_pass=True
+        ),
         "col_count_match": lambda v: v.col_count_match(count=7, inverse=True),
         "row_count_match": lambda v: v.row_count_match(count=10, tol=3),
         "col_schema_match": lambda v: v.col_schema_match(
