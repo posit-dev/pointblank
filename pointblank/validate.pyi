@@ -7,6 +7,7 @@ from narwhals.typing import IntoDataFrame, IntoFrame
 from pathlib import Path
 from pointblank._typing import SegmentSpec, Tolerance
 from pointblank._utils import _PBUnresolvedColumn
+from pointblank.ablation import Ablation
 from pointblank.column import Column, ColumnSelector, ColumnSelectorNarwhals, ReferenceColumn
 from pointblank.missing import MissingSpec
 from pointblank.schema import Schema
@@ -565,7 +566,7 @@ class Validate:
     def prompt(
         self,
         prompt: str,
-        model: str,
+        model: str | list[str],
         columns_subset: str | list[str] | None = None,
         attachments: list | None = None,
         batch_size: int = 1000,
@@ -577,6 +578,7 @@ class Validate:
         brief: str | bool | None = None,
         active: bool | Callable = True,
         dimension: str | None = None,
+        aggregate: str = "majority",
     ) -> Validate: ...
     def col_vals_scored(
         self,
@@ -805,6 +807,8 @@ class Validate:
     def critical(
         self, i: int | list[int] | None = None, scalar: bool = False
     ) -> dict[int, bool] | bool: ...
+    def calibrate_prompt(self, i: int, labels: str | Any) -> dict[str, Any]: ...
+    def _prompt_step(self, i: int) -> _ValidationInfo: ...
     def get_data_extracts(
         self, i: int | list[int] | None = None, frame: bool = False
     ) -> dict[int, Any] | Any: ...
@@ -812,6 +816,20 @@ class Validate:
     def to_code(self) -> str: ...
     def to_yaml(self, path: str | Path | None = None) -> str: ...
     def to_json_schema(self, path: str | Path | None = None) -> dict[str, Any]: ...
+    def to_data_card(
+        self,
+        format: str = "huggingface",
+        path: str | Path | None = None,
+        ablation: Ablation | None = None,
+        title: str | None = None,
+        description: str | None = None,
+        license: str | None = None,
+        language: str | list[str] | None = None,
+        source: str | None = None,
+        citation: str | None = None,
+        column_descriptions: dict[str, str] | None = None,
+        by: str | None = None,
+    ) -> str: ...
     def _enrich_schema_types(self, schema_doc: dict[str, Any]) -> None: ...
     def _covered_columns(self) -> set[str]: ...
     def _auto_improvement_instruction(self) -> str: ...
@@ -830,12 +848,19 @@ class Validate:
         verify_ssl: bool = True,
         max_reprompts: int = 1,
     ) -> Any: ...
-    def get_dimension_scores(self) -> dict[str, float]: ...
-    def get_health_score(self) -> float: ...
+    def get_dimension_scores(self, by: str | None = None) -> dict[Any, Any]: ...
+    def _steps_by_segment(self, by: str) -> dict[Any, list[_ValidationInfo]]: ...
+    def get_health_score(self, by: str | None = None) -> float | dict[Any, float]: ...
     def assert_dimension_scores(
-        self, thresholds: dict[str, float] | None = None, message: str | None = None
+        self,
+        thresholds: dict[str, float] | None = None,
+        message: str | None = None,
+        by: str | None = None,
     ) -> None: ...
-    def get_scorecard(self, title: str | None = ":default:") -> GT: ...
+    def get_scorecard(self, title: str | None = ":default:", by: str | None = None) -> GT: ...
+    def _dimension_scorecard(
+        self, dimension_scores: dict[str, float], lang: str, df_lib: Any
+    ) -> GT: ...
     def get_json_report(
         self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
     ) -> str: ...
