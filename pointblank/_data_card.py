@@ -7,14 +7,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from pointblank._report_text import ENGLISH, Localizer, msg
+
 if TYPE_CHECKING:
     from pointblank.ablation import Ablation
     from pointblank.validate import Validate
 
 DATA_CARD_FORMATS = ("huggingface", "datasheet")
-
-# As in the Hugging Face template, for what the card can't say
-_MORE_INFO = "[More Information Needed]"
 
 # The `size_categories` of the Hugging Face Hub, by their upper bound
 _SIZE_CATEGORIES = [
@@ -49,17 +48,18 @@ def _table(header: list[str], rows: list[list[Any]]) -> str:
     return "\n".join(lines)
 
 
-def _pct(x: float) -> str:
-    """A share as a percentage, without rounding to 100% or 0% unless it's exact."""
-    if 0 < x < 0.001:
-        return "<0.1%"
-    if 0.999 < x < 1:
-        return ">99.9%"
-    return f"{x * 100:.1f}%"
+def _score(x: float, ctx: Localizer) -> str:
+    return ctx.marks(f"{x:.1f}")
 
 
-def _score(x: float) -> str:
-    return f"{x:.1f}"
+def _dimension(name: str, ctx: Localizer) -> str:
+    """The name of a data quality dimension, in the language of the card."""
+    from pointblank._constants_translations import VALIDATION_REPORT_TEXT
+
+    entry = VALIDATION_REPORT_TEXT.get(f"dimension_{name}")
+    if entry is None:
+        return name.capitalize()
+    return entry.get(ctx.lang) or entry["en"]
 
 
 def _null_counts(tbl: Any) -> dict[str, int] | None:
@@ -77,18 +77,19 @@ def _null_counts(tbl: Any) -> dict[str, int] | None:
         return None
 
 
-def _step_columns(step: Any) -> str:
+def _step_columns(step: Any, ctx: Localizer) -> str:
     column = step.column
     if column is None:
         return ""
     if isinstance(column, (list, tuple)):
-        return ", ".join(str(name) for name in column)
+        return ctx.list_sep.join(str(name) for name in column)
     return str(column)
 
 
 def _step_status(step: Any) -> str:
+    """The key of the status of a step (e.g., `"below_thresholds"`)."""
     if step.eval_error:
-        return "not evaluated"
+        return "not_evaluated"
     if not step.active:
         return "inactive"
     for level in ("critical", "error", "warning"):
@@ -100,17 +101,19 @@ def _step_status(step: Any) -> str:
     if thresholds is not None and any(
         getattr(thresholds, level, None) is not None for level in ("warning", "error", "critical")
     ):
-        return "below thresholds"
+        return "below_thresholds"
     return "failed"
 
 
-def _step_check(step: Any) -> str:
+def _step_check(step: Any, ctx: Localizer) -> str:
     text = step.brief or step.autobrief or step.assertion_type
     if isinstance(step.segments, tuple) and len(step.segments) == 2:
         column, value = step.segments
         if isinstance(value, list):
-            value = ", ".join(map(str, value))
-        text = f"{text.rstrip('.')}, for the rows where `{column}` is `{value}`."
+            value = ctx.list_sep.join(map(str, value))
+        text = ctx.t(
+            "card_step_segment", text=text.rstrip(".。"), column=str(column), value=str(value)
+        )
     return text
 
 
@@ -135,6 +138,7 @@ class _Card:
         citation: str | None,
         column_descriptions: dict[str, str] | None,
         by: str | None,
+        ctx: Localizer = ENGLISH,
     ) -> None:
         from pointblank import __version__
         from pointblank.schema import Schema
@@ -151,6 +155,9 @@ class _Card:
         self.column_descriptions = column_descriptions or {}
         self.by = by
         self.version = __version__
+        self.ctx = ctx
+        # As in the Hugging Face template, for what the card can't say
+        self.more_info = ctx.t("card_more_info")
 
         self.columns = Schema(tbl=validation.data).columns
         self.n_rows = get_row_count(validation.data)
@@ -160,45 +167,53 @@ class _Card:
     # Facts -------------------------------------------------------------------------------------
 
     def contact(self) -> str:
-        return self.validation.owner or _MORE_INFO
+        return self.validation.owner or self.more_info
 
     def uses(self) -> str:
         consumers = self.validation.consumers
         if not consumers:
-            return _MORE_INFO
+            return self.more_info
         if isinstance(consumers, str):
             consumers = [consumers]
-        return "The data is used by: " + ", ".join(consumers) + "."
+        return self.ctx.t("card_used_by", consumers=self.ctx.list_sep.join(consumers))
 
     def details(self) -> list[str]:
-        languages = ", ".join(self.languages) or _MORE_INFO
+        t = self.ctx.t
         lines = [
-            f"- **Curated by:** {self.validation.owner or _MORE_INFO}",
-            f"- **Language(s):** {languages}",
-            f"- **License:** {self.license or _MORE_INFO}",
+            t("card_curated_by", value=self.validation.owner or self.more_info),
+            t("card_languages", value=self.language_list()),
+            t("card_license", value=self.license or self.more_info),
         ]
         if self.validation.version is not None:
-            lines.append(f"- **Version:** {self.validation.version}")
-        return lines
+            lines.append(t("card_version", value=str(self.validation.version)))
+        return ["- " + line for line in lines]
+
+    def language_list(self) -> str:
+        return self.ctx.list_sep.join(self.languages) or self.more_info
 
     # Sections ----------------------------------------------------------------------------------
 
     def structure(self) -> str:
-        n_columns = len(self.columns)
-        intro = (
-            f"The data has {self.n_rows:,} {'row' if self.n_rows == 1 else 'rows'} and "
-            f"{n_columns:,} {'column' if n_columns == 1 else 'columns'}."
+        ctx = self.ctx
+        intro = ctx.t(
+            "card_structure_intro",
+            rows=msg("n_rows", n=self.n_rows),
+            columns=msg("n_columns", n=len(self.columns)),
         )
-        header = ["Column", "Type", "Missing"]
+        header = [ctx.t("card_col_column"), ctx.t("card_col_type"), ctx.t("card_col_missing")]
         if self.column_descriptions:
-            header.append("Description")
+            header.append(ctx.t("card_col_description"))
         rows = []
         for name, dtype in self.columns:
             if self.null_counts is None or name not in self.null_counts:
                 missing = "—"
             elif self.n_rows:
                 n_null = self.null_counts[name]
-                missing = f"{n_null:,} ({_pct(n_null / self.n_rows)})" if n_null else "0"
+                missing = (
+                    f"{ctx.int(n_null)} ({ctx.pct_bounded(n_null / self.n_rows)})"
+                    if n_null
+                    else "0"
+                )
             else:
                 missing = "0"
             row = [f"`{name}`", dtype, missing]
@@ -208,37 +223,35 @@ class _Card:
         return intro + "\n\n" + _table(header, rows)
 
     def quality(self, level: int) -> str:
+        ctx = self.ctx
         validation = self.validation
         when = validation.time_end or validation.time_start
         date = when.strftime("%Y-%m-%d")
         steps = self.steps
         if not steps:
-            return (
-                f"The data was validated with Pointblank {self.version} on {date}, with no steps."
-            )
+            return ctx.t("card_validated_no_steps", version=self.version, date=date)
 
         evaluated = [step for step in steps if step.active and not step.eval_error]
         n_clean = sum(1 for step in evaluated if step.all_passed)
-        parts = [
-            f"The data was validated with Pointblank {self.version} on {date}: "
-            f"{n_clean} of {len(steps)} {'check' if len(steps) == 1 else 'checks'} passed for "
-            f"every row (or other test unit)."
+        validated = [
+            ctx.t("card_validated", version=self.version, date=date, clean=n_clean, n=len(steps))
         ]
         skipped = len(steps) - len(evaluated)
         if skipped:
-            parts[0] += f" {skipped} weren't evaluated (being inactive, or failing to run)."
+            validated.append(ctx.t("card_not_evaluated", n=skipped))
+        parts = [ctx.sentences(validated)]
         if evaluated:
             health = validation.get_health_score()
             scores = validation.get_dimension_scores()
-            parts.append(
-                f"The health score (the share of the test units that passed, from 0 to 100) is "
-                f"**{_score(health)}**."
-            )
+            parts.append(ctx.t("card_health", score=_score(health, ctx)))
             if scores:
                 parts.append(
                     _table(
-                        ["Dimension", "Score"],
-                        [[name.capitalize(), _score(value)] for name, value in scores.items()],
+                        [ctx.t("card_col_dimension"), ctx.t("card_col_score")],
+                        [
+                            [_dimension(name, ctx), _score(value, ctx)]
+                            for name, value in scores.items()
+                        ],
                     )
                 )
 
@@ -248,19 +261,32 @@ class _Card:
         rows = []
         for step in steps:
             if step.n and step.n_passed is not None and step.active and not step.eval_error:
-                passed = f"{step.n_passed:,} of {step.n:,} ({_pct(step.n_passed / step.n)})"
+                passed = ctx.t(
+                    "card_n_of",
+                    passed=step.n_passed,
+                    n=step.n,
+                    pct=ctx.pct_bounded(step.n_passed / step.n),
+                )
             else:
                 passed = "—"
             rows.append(
-                [step.i, _step_check(step), _step_columns(step), passed, _step_status(step)]
+                [
+                    step.i,
+                    _step_check(step, ctx),
+                    _step_columns(step, ctx),
+                    passed,
+                    ctx.t(f"card_status_{_step_status(step)}"),
+                ]
             )
+        header = ["step", "check", "columns", "passed", "status"]
         parts.append(
-            f"{'#' * (level + 1)} Validation Steps\n\n"
-            + _table(["Step", "Check", "Columns", "Passed", "Status"], rows)
+            f"{'#' * (level + 1)} {ctx.t('card_steps_heading')}\n\n"
+            + _table([ctx.t(f"card_col_{name}") for name in header], rows)
         )
         return "\n\n".join(parts)
 
     def segment_scores(self, level: int) -> str:
+        ctx = self.ctx
         validation = self.validation
         health = validation.get_health_score(by=self.by)
         scores = validation.get_dimension_scores(by=self.by)
@@ -269,18 +295,18 @@ class _Card:
             dimensions += [name for name in values if name not in dimensions]
         rows = []
         for segment, value in health.items():
-            label = ", ".join(map(str, segment)) if isinstance(segment, tuple) else segment
-            row = [label, _score(value)]
+            label = ctx.list_sep.join(map(str, segment)) if isinstance(segment, tuple) else segment
+            row = [label, _score(value, ctx)]
             row += [
-                _score(scores[segment][name]) if name in scores.get(segment, {}) else "—"
+                _score(scores[segment][name], ctx) if name in scores.get(segment, {}) else "—"
                 for name in dimensions
             ]
             rows.append(row)
-        header = [f"`{self.by}`", "Health"] + [name.capitalize() for name in dimensions]
+        header = [f"`{self.by}`", ctx.t("card_col_health")]
+        header += [_dimension(name, ctx) for name in dimensions]
         return (
-            f"{'#' * level} Scores by `{self.by}`\n\n"
-            f"The scores of the checks of each value of `{self.by}` (the steps segmented by it).\n\n"
-            + _table(header, rows)
+            f"{'#' * level} {ctx.t('card_scores_by', by=self.by)}\n\n"
+            f"{ctx.t('card_scores_by_intro', by=self.by)}\n\n" + _table(header, rows)
         )
 
     def ablation_evidence(self) -> str | None:
@@ -289,46 +315,42 @@ class _Card:
         ablation = self.ablation
         if ablation is None:
             return None
+        ctx = self.ctx
         effects = [
             row
             for row in ablation._effects
             if row["metric"] == ablation._primary and row["strategy"] != "shapley"
         ]
         full, variants = effects[0], effects[1:]
-        fmt = _NumberFormat([row["mean"] for row in effects])
+        fmt = _NumberFormat([row["mean"] for row in effects], ctx)
         comparison = "vs_control" if ablation.control is not None else "vs_full"
-        direction = "higher" if ablation.higher_is_better else "lower"
+        direction = msg("abl_higher" if ablation.higher_is_better else "abl_lower")
         injected = any(row["strategy"] == "inject" for row in variants)
         if ablation.control is not None:
-            compared = "with the data with as many random rows removed"
-            if injected:
-                compared += " (or, for a defect, with the full data)"
+            trained = "card_abl_trained_random_injected" if injected else "card_abl_trained_random"
         else:
-            compared = "with the full data"
+            trained = "card_abl_trained_full"
         repeats = ablation.repeats
-        intro = (
-            "The checks were tested by data ablation. Each variant below is a version of the data "
-            "with the rows that failed some of the checks removed"
-            + (", or with a defect put in" if injected else "")
-            + f". A model was trained on each, {repeats} {'time' if repeats == 1 else 'times'}, "
-            f"and its {ablation._primary} ({direction} is better) was compared {compared}. With "
-            f"the full data, it's {fmt.value(full['mean'], full['sd'])}"
-            + (
-                " (the mean ± the standard deviation of the repeats)"
-                if full["sd"] is not None
-                else ""
-            )
-            + f". The change has its interval at {ablation.conf_level * 100:g}% in brackets."
-        )
+        value = fmt.value(full["mean"], full["sd"])
+        intro = [
+            ctx.t("card_abl_intro_injected" if injected else "card_abl_intro"),
+            ctx.t(trained, n=repeats, metric=ablation._primary, direction=direction),
+            ctx.t("card_abl_full_sd" if full["sd"] is not None else "card_abl_full", value=value),
+            ctx.t("card_abl_interval", conf=ctx.marks(f"{ablation.conf_level * 100:g}%")),
+        ]
         if repeats < 3:
-            intro += " There are no verdicts, as they need at least 3 repeats."
+            intro.append(ctx.t("card_abl_no_verdicts"))
         holdout = ablation._holdout_summary()
         if holdout is not None:
-            intro += (
-                f" The model was scored on a holdout set of {holdout['n_rows']:,} rows, which was "
-                f"checked by the same steps: its health score is {holdout['health_score']:.2f} "
-                f"(the training data's is {ablation.validation.get_health_score():.2f})."
+            intro.append(
+                ctx.t(
+                    "card_abl_holdout",
+                    rows=msg("n_rows", n=holdout["n_rows"]),
+                    holdout=ctx.marks(f"{holdout['health_score']:.2f}"),
+                    train=ctx.marks(f"{ablation.validation.get_health_score():.2f}"),
+                )
             )
+        text = ctx.sentences(intro)
 
         rows = []
         for row in variants:
@@ -339,15 +361,24 @@ class _Card:
             else:
                 prefix = comparison
             if row["strategy"] == "inject":
-                changed = f"{row['n_corrupted']:,} corrupted"
+                changed = ctx.t("card_n_corrupted", n=row["n_corrupted"])
             else:
-                changed = f"{row['n_removed']:,} removed ({_pct(row['f_removed'])})"
+                changed = ctx.t(
+                    "card_n_removed", n=row["n_removed"], pct=ctx.pct_bounded(row["f_removed"])
+                )
             change = _change_text(fmt, row, prefix) if row[f"delta_{prefix}"] is not None else "—"
-            rows.append([row["name"], changed, change, row["verdict"] or "—"])
+            name = ctx.r(ablation._texts.get(row["variant"], row["name"]))
+            verdict = ctx.t(f"abl_verdict_{row['verdict']}") if row["verdict"] else "—"
+            rows.append([name, changed, change, verdict])
         if not rows:
-            return intro  # pragma: no cover
-        table = _table(["Variant", "Rows", f"Change in {ablation._primary}", "Verdict"], rows)
-        return intro + "\n\n" + table
+            return text  # pragma: no cover
+        header = [
+            ctx.t("abl_col_variant"),
+            ctx.t("card_col_rows"),
+            ctx.t("card_col_change", metric=ablation._primary),
+            ctx.t("card_col_verdict"),
+        ]
+        return text + "\n\n" + _table(header, rows)
 
     def problems(self) -> str:
         failing = [
@@ -356,22 +387,25 @@ class _Card:
             if step.active and not step.eval_error and step.all_passed is False
         ]
         if not failing:
-            return _MORE_INFO
-        listed = [f"{step.n_failed:,} failed step {step.i}" for step in failing]
-        listed[0] = listed[0].replace(
-            " failed", f" test {'unit' if failing[0].n_failed == 1 else 'units'} failed", 1
-        )
-        if len(listed) > 1:
-            listed[-1] = "and " + listed[-1]
-        return (
-            f"The validation found problems in {len(failing)} of {len(self.steps)} checks (see "
-            f"*Data Quality*): {(', ' if len(listed) > 2 else ' ').join(listed)}."
+            return self.more_info
+        ctx = self.ctx
+        listed = [
+            ctx.t("card_problem_first" if k == 0 else "card_problem", n=step.n_failed, i=step.i)
+            for k, step in enumerate(failing)
+        ]
+        return ctx.t(
+            "card_problems",
+            failing=len(failing),
+            n=len(self.steps),
+            section=ctx.t("card_quality"),
+            list=ctx.and_list(listed),
         )
 
     def footer(self) -> str:
-        return (
-            f"*This card was made with [Pointblank](https://posit-dev.github.io/pointblank/) "
-            f"{self.version}.*"
+        return self.ctx.t(
+            "card_footer",
+            pointblank="[Pointblank](https://posit-dev.github.io/pointblank/)",
+            version=self.version,
         )
 
     # Formats -----------------------------------------------------------------------------------
@@ -389,32 +423,34 @@ class _Card:
         front["size_categories"] = [_size_category(self.n_rows)]
         header = "---\n" + yaml.safe_dump(front, sort_keys=False, allow_unicode=True) + "---"
 
-        title = f"# Dataset Card for {self.title}" if self.title else "# Dataset Card"
+        t = self.ctx.t
+        more_info = self.more_info
+        title = t("card_hf_title", title=self.title) if self.title else t("card_hf_title_plain")
         sections = [
             header,
-            title,
-            self.description or _MORE_INFO,
-            "## Dataset Details",
+            f"# {title}",
+            self.description or more_info,
+            f"## {t('card_details')}",
             "\n".join(self.details()),
-            "## Uses",
+            f"## {t('card_uses')}",
             self.uses(),
-            "## Dataset Structure",
+            f"## {t('card_structure')}",
             self.structure(),
-            "## Data Quality",
+            f"## {t('card_quality')}",
             self.quality(level=2),
         ]
         evidence = self.ablation_evidence()
         if evidence is not None:
-            sections += ["## Ablation Evidence", evidence]
+            sections += [f"## {t('card_ablation')}", evidence]
         sections += [
-            "## Dataset Creation",
-            "### Source Data",
-            self.source or _MORE_INFO,
-            "## Bias, Risks, and Limitations",
+            f"## {t('card_creation')}",
+            f"### {t('card_source')}",
+            self.source or more_info,
+            f"## {t('card_bias')}",
             self.problems(),
-            "## Citation",
-            f"```\n{self.citation.strip()}\n```" if self.citation else _MORE_INFO,
-            "## Dataset Card Contact",
+            f"## {t('card_citation')}",
+            f"```\n{self.citation.strip()}\n```" if self.citation else more_info,
+            f"## {t('card_contact')}",
             self.contact(),
             self.footer(),
         ]
@@ -422,46 +458,39 @@ class _Card:
 
     def datasheet(self) -> str:
         """A datasheet with the sections of Gebru et al. (2021), 'Datasheets for Datasets'."""
+        t = self.ctx.t
+        more_info = self.more_info
 
         def answer(question: str, text: str) -> str:
-            return f"**{question}**\n\n{text}"
+            return f"**{t(f'card_q_{question}')}**\n\n{text}"
 
-        languages = ", ".join(self.languages) or _MORE_INFO
-        title = f"# Datasheet for {self.title}" if self.title else "# Datasheet"
+        title = t("card_ds_title", title=self.title) if self.title else t("card_ds_title_plain")
         evidence = self.ablation_evidence()
         sections = [
-            title,
-            "## Motivation",
-            answer("For what purpose was the dataset created?", self.description or _MORE_INFO),
-            answer("Who created the dataset?", self.validation.owner or _MORE_INFO),
-            "## Composition",
-            answer("What does the dataset consist of?", self.structure()),
-            answer("What language(s) is the data in?", languages),
-            answer(
-                "Are there any errors, sources of noise, or redundancies in the dataset?",
-                self.quality(level=3),
-            ),
-            "## Collection Process",
-            answer("How was the data collected, and from what sources?", self.source or _MORE_INFO),
-            "## Preprocessing, Cleaning, and Labeling",
-            answer(
-                "Was any preprocessing or cleaning of the data done, and was its effect measured?",
-                evidence if evidence is not None else _MORE_INFO,
-            ),
-            "## Uses",
-            answer("What tasks has the dataset been used for?", self.uses()),
-            answer("Are there tasks for which the dataset should not be used?", _MORE_INFO),
-            "## Distribution",
-            answer("Under what license is the dataset distributed?", self.license or _MORE_INFO),
+            f"# {title}",
+            f"## {t('card_motivation')}",
+            answer("purpose", self.description or more_info),
+            answer("creator", self.validation.owner or more_info),
+            f"## {t('card_composition')}",
+            answer("consist", self.structure()),
+            answer("language", self.language_list()),
+            answer("errors", self.quality(level=3)),
+            f"## {t('card_collection')}",
+            answer("collected", self.source or more_info),
+            f"## {t('card_preprocessing')}",
+            answer("preprocessing", evidence if evidence is not None else more_info),
+            f"## {t('card_uses')}",
+            answer("tasks", self.uses()),
+            answer("not_tasks", more_info),
+            f"## {t('card_distribution')}",
+            answer("license", self.license or more_info),
         ]
         if self.citation:
-            sections.append(
-                answer("How should the dataset be cited?", f"```\n{self.citation.strip()}\n```")
-            )
+            sections.append(answer("cite", f"```\n{self.citation.strip()}\n```"))
         sections += [
-            "## Maintenance",
-            answer("Who maintains the dataset, and how can they be contacted?", self.contact()),
-            answer("What version of the dataset is this?", self.validation.version or _MORE_INFO),
+            f"## {t('card_maintenance')}",
+            answer("maintainer", self.contact()),
+            answer("version", str(self.validation.version or more_info)),
             self.footer(),
         ]
         return "\n\n".join(sections) + "\n"
@@ -480,7 +509,10 @@ def make_data_card(
     citation: str | None,
     column_descriptions: dict[str, str] | None,
     by: str | None,
+    lang: str | None = None,
+    locale: str | None = None,
 ) -> str:
+    from pointblank._report_text import report_localizer
     from pointblank.ablation import Ablation
 
     if format not in DATA_CARD_FORMATS:
@@ -521,6 +553,7 @@ def make_data_card(
         citation=citation,
         column_descriptions=column_descriptions,
         by=by,
+        ctx=report_localizer(lang, locale, default=validation),
     )
     if column_descriptions is not None:
         if not isinstance(column_descriptions, dict):
