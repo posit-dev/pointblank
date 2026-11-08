@@ -243,6 +243,75 @@ def test_check_synthetic_report():
     assert "PSI is" not in bare_html and "MinHash" not in bare_html
 
 
+def _report_text(check, **kwargs):
+    import html
+
+    return html.unescape(check.get_tabular_report(**kwargs).as_raw_html())
+
+
+def test_check_synthetic_report_in_another_language():
+    check = pb.check_synthetic(_SYNTHETIC, _SEED, text="review", ngram=3)
+
+    fr = _report_text(check, lang="fr")
+    for text in (
+        "Vérification des données synthétiques",
+        "synthétiques : 40 lignes · données sources : 40 lignes",
+        "7 problèmes trouvés.",
+        "Fidélité",
+        "comparée aux données sources",
+        "catégorielle ; manquantes : 32,5% (données sources : 0,0%)",
+        "PLUS",
+        "34 sur 40 lignes (85,0%)",
+        "données sources : 0 sur 40 lignes (0,0%)",
+        "Distinct-1 de ",
+        "la part des paires de mots qui sont distinctes",
+        "FAIBLE",
+        "données sources : 0,168 (62% de cette valeur) ; sur 40 lignes de chacune",
+        "et sur le texte de ",
+        "1 identique, 1 avec presque le même texte",
+        "Un changement de 10 points de pourcentage",
+        "un distinct-n inférieur à 90% de celui des données sources",
+        "n-grammes de 3 mots est d'au moins 0,8",
+    ):
+        assert text in fr, text
+    assert "direction: rtl" not in fr
+    # The issues stay in English
+    assert check.issues[0].startswith("The distribution of 'stars'")
+
+    de = _report_text(check, lang="de")
+    assert "KS 0,55 (p = " in de
+    assert "KS 0.55 (p = " in _report_text(check, lang="de", locale="de-CH")
+
+    ja = _report_text(check, lang="ja")
+    assert "合成データのチェック" in ja and "シードデータ：40 行中 0 行（0.0%）" in ja
+
+    # Right to left
+    ar = _report_text(check, lang="ar")
+    assert "فحص البيانات الاصطناعية" in ar and "direction: rtl" in ar
+    assert "البيانات الأصلية: 0 من 40 (0.0%)" in ar
+
+    # The default is English
+    assert "Synthetic data check" in _report_text(check)
+    with pytest.raises(ValueError):
+        check.get_tabular_report(lang="xx")
+
+    # Without text, the note on the repeated rows is shorter
+    bare = pb.check_synthetic(_LIKE_SEED, _SEED, fidelity_columns=False)
+    assert _report_text(bare, lang="fr").count("points de pourcentage") == 1
+
+
+def test_check_synthetic_report_singular_forms():
+    check = pb.check_synthetic(
+        pl.DataFrame({"t": ["", None]}),
+        pl.DataFrame({"t": [f"word{k} other{k}" for k in range(20)]}),
+        text="t",
+    )
+
+    text = _report_text(check)
+    assert "on 1 row of each" in text and "no text" in text
+    assert "sur 1 ligne de chacune" in _report_text(check, lang="fr")
+
+
 def test_check_synthetic_mixed_tables_and_files(tmp_path):
     path = tmp_path / "seed.csv"
     _SEED.write_csv(path)

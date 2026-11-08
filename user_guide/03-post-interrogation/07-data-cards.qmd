@@ -145,6 +145,19 @@ them helps. The rows without a humidity don't matter to a model of the temperatu
 verdicts of those steps are inconclusive: removing their rows isn't clearly better or worse than
 removing as many random rows.
 
+## Cards in Other Languages
+
+A card is written in the language of the validation (its `lang=`), with the numbers formatted for
+its `locale=`. The `lang=` and `locale=` arguments of `to_data_card()` give another language. The
+front matter stays as it is, since the Hub reads it, and so do the arguments with text of their
+own (like `description=`):
+
+```{python}
+card = validation.to_data_card(lang="fr", by="station")
+
+print(card[card.index("## Qualité des données") : card.index("### Étapes de validation")])
+```
+
 ## Conclusion
 
 The `to_data_card()` method writes a data card from a validation: a Hugging Face dataset card or a

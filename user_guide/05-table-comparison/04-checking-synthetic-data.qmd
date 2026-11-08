@@ -164,6 +164,13 @@ check.get_copies()
 The other attributes have the numbers behind the report (`fidelity`, `duplicates`, `diversity`, and
 `copies`), and `to_dict()` gives all of them as a dictionary that can be written as JSON.
 
+The report is in English by default, and `get_tabular_report()` takes `lang=` and `locale=` for
+another language (the messages of `issues` stay in English):
+
+```{python}
+check.get_tabular_report(lang="es")
+```
+
 ## What It Doesn't Check
 
 A synthetic dataset can pass these checks and still be a poor stand-in for its seed. The checks

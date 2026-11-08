@@ -14,12 +14,21 @@ import random
 import re
 import statistics
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable
 
 import narwhals as nw
 
+from pointblank._report_text import (
+    ENGLISH,
+    Localizer,
+    Num,
+    Text,
+    capitalized,
+    msg,
+    report_localizer,
+)
 from pointblank._utils import _select_df_lib, _with_row_index
 
 if TYPE_CHECKING:
@@ -262,6 +271,8 @@ class _Spec:
     group: Any = None
     sweep: str | None = None
     value: float | None = None
+    # The name as a text to translate (when it isn't given by the user)
+    text: Text | None = field(default=None, compare=False)
 
     @property
     def key(self) -> tuple[Any, ...]:
@@ -281,6 +292,22 @@ class _Spec:
         return tuple(sorted((*self.steps, self.left_out)))
 
 
+def _named(text: Text | str, **kwargs: Any) -> _Spec:
+    """A spec named by a text to translate (its `name` is the text in English)."""
+    if isinstance(text, str):
+        return _Spec(name=text, **kwargs)
+    return _Spec(name=ENGLISH.r(text), text=text, **kwargs)
+
+
+# The notes for the reasons that a step isn't used (from `_row_result_steps()`)
+_SKIP_REASON_KEYS = {
+    "it couldn't be evaluated": "abl_note_step_eval_error",
+    "it uses `pre=` without `pb.row_preserving()`": "abl_note_step_pre",
+    "no `duplicates=` policy was given": "abl_note_step_duplicates",
+    "its results can't be matched to the table's rows": "abl_note_step_tbl_match",
+}
+
+
 @dataclass
 class _Resolved:
     """The variants of an ablation with the rows they remove, and the controls they need."""
@@ -289,7 +316,7 @@ class _Resolved:
     variants: list[tuple[AblationVariant, frozenset[int]]]
     removed: dict[str, frozenset[int]]
     # Notes about the variants that aren't used
-    notes: list[str]
+    notes: list[Text]
     # The variants that remove the same rows as an earlier version, which aren't evaluated again
     same_as: dict[str, str]
     controls: list[AblationVariant]
@@ -798,7 +825,9 @@ class Ablation:
         self._pass_variant = evaluate is not None and _accepts_keyword(evaluate, "variant")
 
         self._specs: list[_Spec] = []
-        self._notes: list[str] = []
+        self._notes: list[Text | str] = []
+        # The names of the versions of the table as texts to translate, by id
+        self._texts: dict[str, Text] = {"full": msg("abl_name_full")}
         self._resolved: _Resolved | None = None
         # The rows of each group, by column (for `drop_groups()`), and of each stratum (for a
         # `Stratified` control)
@@ -808,7 +837,7 @@ class Ablation:
         # points, the rows it removes and a line describing them
         self._sweeps: dict[str, dict[str, Any]] = {}
         self._sweep_rows: dict[str, frozenset[int]] = {}
-        self._sweep_details: dict[str, str] = {}
+        self._sweep_details: dict[str, Text] = {}
         # The rows that each variant of `inject()` corrupts, and for each of them, the share of
         # failing test units that the corruption adds to its step (found when needed)
         self._injections: dict[str, _Injection] = {}
@@ -907,15 +936,20 @@ class Ablation:
         step), and its control, which removes the same number of rows at random.
         """
         steps = self._check_steps(steps, method="drop_steps")
+        text = None
         if name is None:
-            label = "Step" if len(steps) == 1 else "Steps"
-            name = f"{label} {', '.join(str(i) for i in steps)}"
+            text = (
+                msg("abl_name_step", i=str(steps[0]))
+                if len(steps) == 1
+                else msg("abl_name_steps", steps=steps)
+            )
+            name = ENGLISH.r(text)
             spec_id = "steps_" + "_".join(str(i) for i in steps)
         else:
             if not isinstance(name, str) or not name:
                 raise TypeError("`name=` must be a non-empty string.")
             spec_id = name
-        self._add_spec(_Spec(id=spec_id, name=name, strategy="drop_steps", steps=steps))
+        self._add_spec(_Spec(id=spec_id, name=name, strategy="drop_steps", steps=steps, text=text))
         return self
 
     def drop_each(self, steps: int | list[int] | None = None) -> Ablation:
@@ -988,7 +1022,9 @@ class Ablation:
             steps = self._check_steps(steps, method="drop_each")
         for i in steps:
             self._add_spec(
-                _Spec(id=f"step_{i}", name=f"Step {i}", strategy="drop_each", steps=(i,))
+                _named(
+                    msg("abl_name_step", i=str(i)), id=f"step_{i}", strategy="drop_each", steps=(i,)
+                )
             )
         return self
 
@@ -1057,13 +1093,12 @@ class Ablation:
         """
         if steps is None:
             steps = self._all_steps(method="drop_all")
-            spec = _Spec(id="all", name="All steps", strategy="drop_all", steps=steps)
+            spec = _named(msg("abl_name_all_steps"), id="all", strategy="drop_all", steps=steps)
         else:
             steps = self._check_steps(steps, method="drop_all")
-            numbers_text = ", ".join(str(i) for i in steps)
-            spec = _Spec(
+            spec = _named(
+                msg("abl_name_all_of_steps", steps=steps),
                 id="all_" + "_".join(str(i) for i in steps),
-                name=f"All of steps {numbers_text}",
                 strategy="drop_all",
                 steps=steps,
             )
@@ -1169,16 +1204,15 @@ class Ablation:
             )
 
         self.drop_all(None if steps is None else list(base))
-        numbers = ", ".join(str(i) for i in base)
         for k in base:
             rest = tuple(i for i in base if i != k)
             if steps is None:
-                spec_id, name = f"all_but_{k}", f"All steps but step {k}"
+                spec_id, text = f"all_but_{k}", msg("abl_name_all_but_step", k=str(k))
             else:
                 spec_id = f"all_but_{k}_of_" + "_".join(str(i) for i in base)
-                name = f"Steps {numbers} but step {k}"
+                text = msg("abl_name_steps_but_step", steps=base, k=str(k))
             self._add_spec(
-                _Spec(id=spec_id, name=name, strategy="drop_all_but_each", steps=rest, left_out=k)
+                _named(text, id=spec_id, strategy="drop_all_but_each", steps=rest, left_out=k)
             )
         return self
 
@@ -1283,13 +1317,13 @@ class Ablation:
             except TypeError:
                 raise TypeError(f"The values in `values=` must be single values, got {value!r}.")
             if value is None:
-                spec_id, name = f"{column}=null", f"{column} is missing"
+                spec_id, text = f"{column}=null", msg("abl_name_group_missing", column=column)
             else:
-                spec_id, name = f"{column}={value}", f"{column} = {value}"
+                spec_id, text = f"{column}={value}", f"{column} = {value}"
             self._add_spec(
-                _Spec(
+                _named(
+                    text,
                     id=spec_id,
-                    name=name,
                     strategy="drop_groups",
                     group_column=column,
                     group=value,
@@ -1412,6 +1446,7 @@ class Ablation:
                 raise ValueError(f"The column {score!r} isn't in the table.")
             scores = self._column_scores(score)
             base_id, base_name = score, score
+            missing_label = msg("abl_note_no_score_column", column=score)
             remove = remove or "lowest"
         else:
             if score not in self._steps:
@@ -1425,7 +1460,8 @@ class Ablation:
                     "that kept its scores (with `keep_scores=True`)."
                 )
             scores = self._step_scores(score)
-            base_id, base_name = f"step_{score}", f"Step {score}"
+            base_id, base_name = f"step_{score}", msg("abl_name_step", i=str(score))
+            missing_label = msg("abl_note_no_score_step", step=str(score))
             if remove is None:
                 bounds = step.values or {}
                 only_max = bounds.get("min_val") is None and bounds.get("max_val") is not None
@@ -1447,35 +1483,26 @@ class Ablation:
         n_scored = len(scores)
         n_missing = self._n_rows - n_scored
         if n_missing:
-            label = f"step {score}" if isinstance(score, int) else f"the column `{score}`"
-            self._add_note(
-                f"1 row has no score in {label}, so the sweep never removes it."
-                if n_missing == 1
-                else f"{n_missing:,} rows have no score in {label}, so the sweep never removes "
-                "them."
-            )
+            self._add_note(Text(missing_label.key, (*missing_label.fields, ("n", n_missing))))
 
         highest = remove == "highest"
         if values is None:
             sweep_id = f"{base_id}:{remove}"
             self._sweeps[sweep_id] = {
-                "label": f"{base_name}, removing the {remove}-scoring rows",
-                "axis": "Share of the scored rows removed",
+                "label": msg(f"abl_sweep_{remove}", base=base_name),
+                "axis": msg("abl_axis_scored_removed"),
                 "percent": True,
             }
             ranked = sorted(scores.items(), key=lambda kv: (-kv[1] if highest else kv[1], kv[0]))
             for q in quantiles:
                 n = math.floor(q * n_scored + 0.5)
-                pct = f"{q * 100:g}%"
                 spec_id = f"{sweep_id}_{_number_text(q)}"
                 self._sweep_rows[spec_id] = frozenset(k for k, _ in ranked[:n])
-                self._sweep_details[spec_id] = (
-                    f"The {n:,} rows with the {remove} scores (of {n_scored:,} scored rows)"
-                )
+                self._sweep_details[spec_id] = msg(f"abl_detail_{remove}", n=n, total=n_scored)
                 self._add_spec(
-                    _Spec(
+                    _named(
+                        msg(f"abl_name_{remove}", base=base_name, pct=Num(q * 100, "g", "%")),
                         id=spec_id,
-                        name=f"{base_name}: {remove} {pct} of scores",
                         strategy="sweep_score",
                         sweep=sweep_id,
                         value=float(q),
@@ -1485,8 +1512,8 @@ class Ablation:
             side = "above" if highest else "below"
             sweep_id = f"{base_id}:{side}"
             self._sweeps[sweep_id] = {
-                "label": f"{base_name}, removing the rows scoring {side} each cutoff",
-                "axis": "Score cutoff",
+                "label": msg(f"abl_sweep_{side}", base=base_name),
+                "axis": msg("abl_axis_cutoff"),
                 "percent": False,
             }
             for v in values:
@@ -1495,11 +1522,11 @@ class Ablation:
                 self._sweep_rows[spec_id] = frozenset(
                     k for k, x in scores.items() if (x > v if highest else x < v)
                 )
-                self._sweep_details[spec_id] = f"The rows with a score {side} {text}"
+                self._sweep_details[spec_id] = msg(f"abl_detail_{side}", value=Num(v))
                 self._add_spec(
-                    _Spec(
+                    _named(
+                        msg(f"abl_name_{side}", base=base_name, value=Num(v)),
                         id=spec_id,
-                        name=f"{base_name}: scores {side} {text}",
                         strategy="sweep_score",
                         sweep=sweep_id,
                         value=float(v),
@@ -1623,8 +1650,8 @@ class Ablation:
 
         sweep_id = f"step_{step}:{param}"
         self._sweeps[sweep_id] = {
-            "label": f"Step {step}, varying {param}",
-            "axis": f"{param} (step {step})",
+            "label": msg("abl_sweep_step", step=str(step), param=param),
+            "axis": msg("abl_axis_param", param=param, step=str(step)),
             "percent": False,
         }
         for v in values:
@@ -1633,11 +1660,14 @@ class Ablation:
             self._sweep_rows[spec_id] = self._rerun_failed_rows(
                 method, {**kwargs, param: v}, step=step, setting=f"{param}={text}"
             )
-            self._sweep_details[spec_id] = f"The rows that fail step {step} with `{param}={text}`"
+            setting = f"{param}={text}"
+            self._sweep_details[spec_id] = msg(
+                "abl_detail_step_setting", step=str(step), setting=setting
+            )
             self._add_spec(
-                _Spec(
+                _named(
+                    msg("abl_name_step_setting", step=str(step), setting=setting),
                     id=spec_id,
-                    name=f"Step {step} with {param}={text}",
                     strategy="sweep_step",
                     sweep=sweep_id,
                     value=float(v),
@@ -1852,37 +1882,31 @@ class Ablation:
         random.Random(f"pointblank-ablation-inject:{self.seed}:{label}:{column}").shuffle(pool)
 
         sweep_id = f"inject:{label}" if kind == "duplicate" else f"inject:{label}:{column}"
-        description = {
-            "null": f"missing values in {column}",
-            "shuffle": f"shuffled values of {column}",
-            "truncate": f"truncated values of {column}",
-            "duplicate": "duplicated rows" if label == "duplicate" else label,
-            "function": f"{label} on {column}",
+        description: Text | str = {
+            "null": msg("abl_defect_null", column=column),
+            "shuffle": msg("abl_defect_shuffle", column=column),
+            "truncate": msg("abl_defect_truncate", column=column),
+            "duplicate": msg("abl_defect_duplicate") if label == "duplicate" else label,
+            "function": msg("abl_defect_function", name=label, column=column),
         }[kind]
         self._sweeps[sweep_id] = {
             "label": description,
-            "axis": "Share of the rows copied"
-            if kind == "duplicate"
-            else ("Share of the rows corrupted"),
+            "axis": msg("abl_axis_copied" if kind == "duplicate" else "abl_axis_corrupted"),
             "percent": True,
             "inject": True,
         }
-        title = description[0].upper() + description[1:]
+        title = capitalized(description)
         for rate in rates:
             n = math.floor(rate * self._n_rows + 0.5)
-            pct = f"{rate * 100:g}%"
+            pct = Num(rate * 100, "g", "%")
             spec_id = f"{sweep_id}_{_number_text(rate)}"
-            spec_name = f"{title}: {pct}"
+            spec_text = msg("abl_name_rate", name=title, pct=pct)
             if n < (2 if kind == "shuffle" else 1):
-                self._add_note(
-                    f"{spec_name} isn't used: {pct} of the {self._n_rows:,} rows is too few rows "
-                    "to corrupt."
-                )
+                self._add_note(msg("abl_note_too_few", name=spec_text, pct=pct, total=self._n_rows))
                 continue
             if n > len(pool):
                 self._add_note(
-                    f"{spec_name} isn't used: it needs {n:,} clean rows, but there are only "
-                    f"{len(pool):,}."
+                    msg("abl_note_needs_clean", name=spec_text, n=n, available=len(pool))
                 )
                 continue
             chosen = pool[:n]
@@ -1911,17 +1935,20 @@ class Ablation:
             )
             self._injections[spec_id] = injection
             self._caught.pop(spec_id, None)
-            self._sweep_details[spec_id] = {
-                "null": f"{n:,} clean rows get a missing value in `{column}`",
-                "shuffle": f"The values of `{column}` are shuffled among {n:,} clean rows",
-                "truncate": f"{n:,} clean rows have their value of `{column}` cut in half",
-                "duplicate": f"{n:,} clean rows are copied",
-                "function": f"{n:,} clean rows have `{label}()` applied to `{column}`",
-            }[kind] + (f" (checked by step {step})" if step is not None else "")
+            detail = {
+                "null": msg("abl_detail_null", n=n, column=column),
+                "shuffle": msg("abl_detail_shuffle", n=n, column=column),
+                "truncate": msg("abl_detail_truncate", n=n, column=column),
+                "duplicate": msg("abl_detail_duplicate", n=n),
+                "function": msg("abl_detail_function", n=n, name=label, column=column),
+            }[kind]
+            if step is not None:
+                detail = msg("abl_detail_checked_by", detail=detail, step=str(step))
+            self._sweep_details[spec_id] = detail
             self._add_spec(
-                _Spec(
+                _named(
+                    spec_text,
                     id=spec_id,
-                    name=spec_name,
                     strategy="inject",
                     sweep=sweep_id,
                     value=float(rate),
@@ -2053,7 +2080,7 @@ class Ablation:
         failed = self._failed_rows(list(players))
         for i in players:
             if not failed[i]:
-                self._add_note(f"Step {i} has no Shapley value: no rows failed it.")
+                self._add_note(msg("abl_note_no_shapley", i=str(i)))
         players = tuple(i for i in players if failed[i])
         if len(players) < 2:
             raise ValueError(
@@ -2184,7 +2211,10 @@ class Ablation:
 
     def _all_steps(self, method: str) -> tuple[int, ...]:
         for i, reason in self._skipped.items():
-            self._add_note(f"Step {i} isn't used: {reason}.")
+            key = _SKIP_REASON_KEYS.get(reason)
+            self._add_note(
+                msg(key, i=str(i)) if key is not None else f"Step {i} isn't used: {reason}."
+            )
         if not self._steps:
             raise ValueError(
                 f"`{method}()` has no steps to use: the validation has no row-level steps that "
@@ -2202,6 +2232,12 @@ class Ablation:
             return "it's inactive"
         return "it doesn't check rows"
 
+    def _text(self, version: Any) -> Text | str:
+        """The name of a version of the table (or of its id), as a text to translate."""
+        if isinstance(version, str):
+            return self._texts.get(version, version)
+        return self._texts.get(version.id, version.name)
+
     def _add_spec(self, spec: _Spec) -> None:
         if spec.id == "full" or spec.id.startswith(("control_", "shapley_")):
             raise ValueError(f"The variant name {spec.id!r} is reserved; choose another one.")
@@ -2214,14 +2250,20 @@ class Ablation:
             if existing.key == spec.key:
                 if existing.name != spec.name:
                     self._add_note(
-                        f"{spec.name} isn't used: it removes the same rows as {existing.name}."
+                        msg(
+                            "abl_note_same_rows",
+                            name=spec.text or spec.name,
+                            other=existing.text or existing.name,
+                        )
                     )
                 return
         self._specs.append(spec)
+        if spec.text is not None:
+            self._texts[spec.id] = spec.text
         self._resolved = None
         self._reset_results()
 
-    def _add_note(self, note: str) -> None:
+    def _add_note(self, note: Text | str) -> None:
         if note not in self._notes:
             self._notes.append(note)
 
@@ -2242,7 +2284,7 @@ class Ablation:
             sorted({i for spec in self._specs for i in spec.steps} | set(players))
         )
         n_rows = self._n_rows
-        notes: list[str] = []
+        notes: list[Text] = []
 
         usable = []
         for spec in self._specs:
@@ -2257,12 +2299,12 @@ class Ablation:
             else:
                 removed = frozenset().union(*(failed[i] for i in spec.steps))
             if len(removed) >= n_rows:
-                notes.append(f"{spec.name} isn't used: it removes every row.")
+                notes.append(msg("abl_note_removes_all", name=self._text(spec)))
                 continue
             # A `drop_all_but_each()` variant can remove no rows (when the left-out step is the
             # only one that rows failed): it's then the same as the full table
             if not removed and spec.left_out is None:
-                notes.append(f"{spec.name} isn't used: it removes no rows.")
+                notes.append(msg("abl_note_removes_none", name=self._text(spec)))
                 continue
             usable.append((spec, removed))
 
@@ -2275,8 +2317,11 @@ class Ablation:
                 if reference is None:
                     reference = next(s for s in self._specs if s.key == ("steps", spec.base))
                     notes.append(
-                        f"{spec.name} isn't used: it's compared with {reference.name}, which isn't "
-                        "used."
+                        msg(
+                            "abl_note_reference_unused",
+                            name=self._text(spec),
+                            reference=self._text(reference),
+                        )
                     )
                     continue
                 references[spec.id] = reference.id
@@ -2327,16 +2372,21 @@ class Ablation:
                     shapley_ids[coalition] = by_steps[coalition]
                     continue
                 removed = frozenset().union(*(failed[i] for i in coalition))
+                text = (
+                    msg("abl_name_steps", steps=coalition)
+                    if len(coalition) > 1
+                    else msg("abl_name_step", i=str(coalition[0]))
+                )
                 variant = AblationVariant(
                     id="shapley_" + "_".join(map(str, coalition)),
                     strategy="shapley",
-                    name=f"Step{'s' if len(coalition) > 1 else ''} "
-                    + ", ".join(map(str, coalition)),
+                    name=ENGLISH.r(text),
                     steps=coalition,
                     n_removed=len(removed),
                     f_removed=len(removed) / n_rows,
                 )
                 variants.append((variant, removed))
+                self._texts[variant.id] = text
                 shapley_ids[coalition] = variant.id
 
         # A `drop_all_but_each()` variant, a sweep's point, or a group of steps of `shapley()` that
@@ -2370,10 +2420,12 @@ class Ablation:
             for n in sorted(
                 {v.n_removed for v, _ in variants if v.left_out is None and v.strategy != "inject"}
             ):
+                text = msg("abl_name_random_rows", n=n)
+                self._texts[f"control_{n}"] = text
                 control = AblationVariant(
                     id=f"control_{n}",
                     strategy="control",
-                    name=f"{n:,} random rows",
+                    name=ENGLISH.r(text),
                     n_removed=n,
                     f_removed=n / n_rows,
                     is_control=True,
@@ -2395,10 +2447,12 @@ class Ablation:
                 if not removed:
                     variant_control[variant.id] = f"control_{n_random}"
                     continue
+                text = msg("abl_name_plus_random", name=self._text(variant), n=n_random)
+                self._texts[f"control_{variant.id}"] = text
                 control = AblationVariant(
                     id=f"control_{variant.id}",
                     strategy="control",
-                    name=f"{variant.name}, plus {n_random:,} random rows",
+                    name=ENGLISH.r(text),
                     steps=variant.steps,
                     n_removed=len(reference),
                     f_removed=len(reference) / n_rows,
@@ -2681,7 +2735,7 @@ class Ablation:
         }
 
     def _full_variant(self) -> AblationVariant:
-        return AblationVariant(id="full", strategy="full", name="Full table")
+        return AblationVariant(id="full", strategy="full", name=ENGLISH.r(self._texts["full"]))
 
     def _holdout_summary(self) -> dict[str, Any] | None:
         """The results of the validation's steps on the holdout set (`None` without one)."""
@@ -2704,18 +2758,20 @@ class Ablation:
             "steps": steps,
         }
 
-    def _holdout_html(self) -> str:
+    def _holdout_html(self, ctx: Localizer = ENGLISH) -> str:
         """A line for the subtitle of a report, with the health score of the holdout set."""
         summary = self._holdout_summary()
         if summary is None:
             return ""
-        return (
-            f"<div>Health score of the training table: "
-            f"<strong>{self.validation.get_health_score():.2f}</strong>; of the holdout set "
-            f"({summary['n_rows']:,} rows): <strong>{summary['health_score']:.2f}</strong>.</div>"
+        text = ctx.t(
+            "abl_holdout",
+            train=ctx.marks(f"{self.validation.get_health_score():.2f}"),
+            rows=ctx.t("n_rows", n=summary["n_rows"]),
+            holdout=ctx.marks(f"{summary['health_score']:.2f}"),
         )
+        return f"<div>{text}</div>"
 
-    def plan(self) -> GT:
+    def plan(self, lang: str | None = None, locale: str | None = None) -> GT:
         """
         Show the versions of the table that the ablation will evaluate.
 
@@ -2724,6 +2780,17 @@ class Ablation:
         share of rows they remove, and gives the number of evaluations that
         [`run()`](`pointblank.Ablation.run`) will make in its header. Variants that won't be used
         (e.g., because they remove no rows) are listed in the notes at the bottom.
+
+        Parameters
+        ----------
+        lang
+            The language of the plan's text, as a two-letter language code (e.g., `"fr"` or
+            `"de"`; see the `lang=` argument of [`Validate`](`pointblank.Validate`) for the
+            languages). By default, the plan is in the language of the validation.
+        locale
+            The locale for the numbers in the plan (e.g., `"de-CH"`), which sets the decimal mark
+            and the thousands separator. By default, it's the locale of the validation (when the
+            plan is in the validation's language), or `lang=`.
 
         Returns
         -------
@@ -2779,15 +2846,20 @@ class Ablation:
 
         from pointblank._utils_html import _fmt_raw_html
 
+        ctx = report_localizer(lang, locale, default=self.validation)
         resolved = self._resolve()
         tasks = self._tasks()
-        names = {"full": self._full_variant().name, **{v.id: v.name for v, _ in resolved.variants}}
 
+        def name(version: AblationVariant | str) -> str:
+            return ctx.r(self._text(version))
+
+        full = self._full_variant()
+        by_id = {"full": full, **{v.id: v for v, _ in resolved.variants}}
         rows = [
             {
-                "group": "Baseline",
-                "variant": _variant_html(self._full_variant(), self._steps),
-                "removed": _removed_html(0, 0.0),
+                "group": ctx.t("abl_group_baseline"),
+                "variant": _variant_html(full, self._steps, name=name(full), ctx=ctx),
+                "removed": _removed_html(0, 0.0, ctx),
             }
         ]
         variants = [v for v, _ in resolved.variants]
@@ -2795,40 +2867,44 @@ class Ablation:
             same_as = resolved.same_as.get(v.id)
             rows.append(
                 {
-                    "group": self._group_label(v),
+                    "group": self._group_label(v, ctx),
                     "variant": _variant_html(
                         v,
                         self._steps,
-                        same_as=names[same_as] if same_as else None,
+                        same_as=name(by_id[same_as]) if same_as else None,
                         detail=self._sweep_details.get(v.id) if v.sweep else None,
+                        name=name(v),
+                        ctx=ctx,
                     ),
                     "removed": (
-                        _corrupted_html(v, self._n_rows)
+                        _corrupted_html(v, self._n_rows, ctx)
                         if v.strategy == "inject"
-                        else _removed_html(v.n_removed, v.f_removed)
+                        else _removed_html(v.n_removed, v.f_removed, ctx)
                     ),
                 }
             )
         rows += [
             {
-                "group": "Controls",
-                "variant": _variant_html(v, self._steps, control=self.control),
-                "removed": _removed_html(v.n_removed, v.f_removed),
+                "group": ctx.t("abl_group_controls"),
+                "variant": _variant_html(
+                    v, self._steps, control=self.control, name=name(v), ctx=ctx
+                ),
+                "removed": _removed_html(v.n_removed, v.f_removed, ctx),
             }
             for v in resolved.controls
         ]
 
-        subtitle = (
-            f"{self._n_rows:,} rows in the training table. Each version is evaluated "
-            f"{self.repeats} time{'s' if self.repeats != 1 else ''}, so the run will make "
-            f"<strong>{len(tasks):,}</strong> evaluations."
-        )
+        lines = [
+            ctx.t("abl_plan_rows", n=self._n_rows),
+            ctx.t("abl_plan_repeats", n=self.repeats, evaluations=len(tasks)),
+        ]
         if self.cache is not None:
             n_cached = sum(self._cache_get(self._task_key(v, r)) is not None for v, r in tasks)
             if n_cached:
-                subtitle += f" {n_cached:,} of them are already in the cache."
+                lines.append(ctx.t("abl_plan_cached", n=n_cached))
+        subtitle = ctx.sentences(lines)
         if self.holdout_validation is not None:
-            subtitle = f"<div>{subtitle}</div>{self._holdout_html()}"
+            subtitle = f"<div>{subtitle}</div>{self._holdout_html(ctx)}"
         notes = resolved.notes
         gt_tbl = (
             _fmt_raw_html(
@@ -2840,12 +2916,13 @@ class Ablation:
                 columns=["variant", "removed"],
             )
             .tab_header(
-                title=html(_title_html("Ablation plan", self.label)), subtitle=html(subtitle)
+                title=html(_title_html(ctx.t("abl_plan_title"), self.label)),
+                subtitle=html(subtitle),
             )
-            .cols_label(variant="Version", removed="Removed")
+            .cols_label(variant=ctx.t("abl_col_version"), removed=ctx.t("abl_col_removed"))
             .cols_align(align="right", columns="removed")
             .opt_table_font(font=google_font("IBM Plex Sans"))
-            .opt_align_table_header(align="left")
+            .opt_align_table_header(align="right" if ctx.rtl else "left")
             .tab_style(style=style.text(size="12px"), locations=loc.body())
             .tab_style(style=style.text(size="12px", weight="bold"), locations=loc.column_labels())
             .tab_style(
@@ -2856,8 +2933,8 @@ class Ablation:
             .tab_options(table_width="100%")
         )
         for note in [*self._notes, *notes]:
-            gt_tbl = gt_tbl.tab_source_note(source_note=html(_note_html(note)))
-        return gt_tbl
+            gt_tbl = gt_tbl.tab_source_note(source_note=html(_note_html(ctx.r(note))))
+        return _rtl_styles(gt_tbl, ctx)
 
     def run(self, max_workers: int | None = None, executor: str = "thread") -> Ablation:
         """
@@ -3234,7 +3311,7 @@ class Ablation:
                 "template": "results_template.csv",
                 "columns": columns,
             },
-            "notes": [*self._notes, *resolved.notes],
+            "notes": [ENGLISH.r(note) for note in [*self._notes, *resolved.notes]],
         }
         with open(root / "manifest.json", "w", encoding="utf-8") as f:
             json.dump(manifest, f, indent=2)
@@ -3911,7 +3988,8 @@ class Ablation:
         the effect of its rows on top of the other steps, and a step with a Shapley value (from
         [`shapley()`](`pointblank.Ablation.shapley`)) gets that value. The notes appear in the
         validation's report, so that the report shows which checks matter to the model, next to
-        the checks themselves.
+        the checks themselves. They're written in the language of that validation (its `lang=`),
+        with the numbers formatted for its `locale=`.
 
         Parameters
         ----------
@@ -3995,8 +4073,9 @@ class Ablation:
                         f"`{step.assertion_type}()` step of the same column."
                     )
 
+        ctx = report_localizer(None, None, default=target)
         effects = [row for row in self._effects if row["metric"] == self._primary]
-        fmt = _NumberFormat([row["mean"] for row in effects])
+        fmt = _NumberFormat([row["mean"] for row in effects], ctx)
         alone = {}
         on_top: dict[int, list[dict[str, Any]]] = {}
         for row in effects:
@@ -4008,8 +4087,10 @@ class Ablation:
                 alone[row["steps"][0]] = row
 
         comparison = "vs_control" if self.control is not None else "vs_full"
-        vs_text = "removing as many random rows" if self.control is not None else "the full table"
-        direction = "higher" if self.higher_is_better else "lower"
+        alone_key = (
+            "abl_annotate_alone_random" if self.control is not None else "abl_annotate_alone_full"
+        )
+        direction = ctx.t("abl_higher" if self.higher_is_better else "abl_lower")
         shapley = {
             row["step"]: row for row in self._shapley_values or [] if row["metric"] == self._primary
         }
@@ -4020,43 +4101,38 @@ class Ablation:
             if i in alone:
                 row = alone[i]
                 change = _change_text(fmt, row, comparison)
-                parts.append(
-                    (
-                        f"removing the {row['n_removed']:,} rows that failed this step changes "
-                        f"it by {change}, compared with {vs_text}",
-                        row["verdict"],
-                    )
-                )
+                parts.append((ctx.t(alone_key, n=row["n_removed"], change=change), row["verdict"]))
             for row in on_top.get(i, []):
-                others = ", ".join(str(k) for k in row["steps"])
-                label = "step" if len(row["steps"]) == 1 else "steps"
-                parts.append(
-                    (
-                        f"on top of {label} {others}, this step's rows change it by "
-                        f"{_change_text(fmt, row, 'added')}",
-                        row["verdict"],
-                    )
+                text = ctx.t(
+                    "abl_annotate_on_top",
+                    steps=tuple(row["steps"]),
+                    change=_change_text(fmt, row, "added"),
+                    n=len(row["steps"]),
                 )
+                parts.append((text, row["verdict"]))
             if i in shapley:
                 row = shapley[i]
                 value = fmt.delta(row["shapley"])
                 if row["lower"] is not None and row["upper"] is not None:
-                    value += f" [{fmt.delta(row['lower'])}, {fmt.delta(row['upper'])}]"
-                parts.append(
-                    (
-                        f"its Shapley value (its share of the effect of removing every step's "
-                        f"rows) is {value}",
-                        row["verdict"],
-                    )
+                    value += " " + ctx.interval(fmt.delta(row["lower"]), fmt.delta(row["upper"]))
+                parts.append((ctx.t("abl_annotate_shapley", value=value), row["verdict"]))
+
+            def note(bold: bool) -> str:
+                texts = []
+                for text, verdict in parts:
+                    if verdict is not None:
+                        verdict = ctx.t(f"abl_verdict_{verdict}")
+                        verdict = f"**{verdict}**" if bold else verdict
+                        text = ctx.t("abl_annotate_verdict", text=text, verdict=verdict)
+                    texts.append(text)
+                return ctx.t(
+                    "abl_annotate_note",
+                    metric=self._primary,
+                    direction=direction,
+                    parts=ctx.clause_sep.join(texts),
                 )
-            intro = f"Ablation ({self._primary}, {direction} is better): "
-            markdown = intro + "; ".join(
-                text + (f": **{verdict}**" if verdict else "") for text, verdict in parts
-            )
-            text = intro + "; ".join(
-                text + (f": {verdict}" if verdict else "") for text, verdict in parts
-            )
-            info[i]._add_note(key="ablation", markdown=markdown + ".", text=text + ".")
+
+            info[i]._add_note(key="ablation", markdown=note(bold=True), text=note(bold=False))
         return target
 
     def get_effects(self) -> Any:
@@ -4405,7 +4481,7 @@ class Ablation:
         skipped: dict[int, list[str]] = {}
         for sweep_id, points in by_sweep.items():
             step = self._injections[points[0]["variant"]].step
-            label = self._sweeps[sweep_id]["label"]
+            label = ENGLISH.r(self._sweeps[sweep_id]["label"])
             shares = [self._caught_share(row["variant"]) for row in points]
             harms = [
                 -row["delta_vs_full"] if self.higher_is_better else row["delta_vs_full"]
@@ -4561,7 +4637,7 @@ class Ablation:
                 if self._shapley_values is not None
                 else None
             ),
-            "notes": [*self._notes, *resolved.notes],
+            "notes": [ENGLISH.r(note) for note in [*self._notes, *resolved.notes]],
             "holdout": self._holdout_summary(),
         }
 
@@ -4631,7 +4707,13 @@ class Ablation:
         """
         return json.dumps(self.to_dict(), indent=indent)
 
-    def get_tabular_report(self, metric: str | None = None, title: str | None = None) -> GT:
+    def get_tabular_report(
+        self,
+        metric: str | None = None,
+        title: str | None = None,
+        lang: str | None = None,
+        locale: str | None = None,
+    ) -> GT:
         """
         Get a tabular report of the ablation's results.
 
@@ -4658,6 +4740,16 @@ class Ablation:
             `metric=` when the ablation was created). Verdicts are only shown for that metric.
         title
             An optional title replacing the default.
+        lang
+            The language of the report's text, as a two-letter language code (e.g., `"fr"` or
+            `"de"`; see the `lang=` argument of [`Validate`](`pointblank.Validate`) for the
+            languages). By default, the report is in the language of the validation. The names
+            of the variants given in [`drop_steps()`](`pointblank.Ablation.drop_steps`), the
+            metrics, and the briefs of the steps are shown as they are.
+        locale
+            The locale for the numbers in the report (e.g., `"de-CH"`), which sets the decimal
+            mark and the thousands separator. By default, it's the locale of the validation (when
+            the report is in the validation's language), or `lang=`.
 
         Returns
         -------
@@ -4739,14 +4831,18 @@ class Ablation:
             or any(row["sweep"] is not None for row in variant_rows)
         )
         resolved = self._resolve()
-        names = {"full": baseline["name"], **{row["variant"]: row["name"] for row in variant_rows}}
+        ctx = report_localizer(lang, locale, default=self.validation)
+        variants = {v.id: v for v in self._variants}
+
+        def name(version_id: str) -> str:
+            return ctx.r(self._text(variants.get(version_id, version_id)))
 
         def prefix(row: dict[str, Any]) -> str:
             if row["left_out"] is not None:
                 return "added"
             return "vs_full" if row["strategy"] == "inject" else comparison
 
-        fmt = _NumberFormat([row["mean"] for row in effects])
+        fmt = _NumberFormat([row["mean"] for row in effects], ctx)
         bounds = [
             abs(row[key])
             for row in variant_rows
@@ -4765,7 +4861,6 @@ class Ablation:
         scale = max(bounds, default=0.0) or 1.0
 
         rows = []
-        variants = {v.id: v for v in self._variants}
         for row in sorted(
             variant_rows, key=lambda row: self._group_order(variants[row["variant"]])
         ):
@@ -4773,19 +4868,22 @@ class Ablation:
             same_as = resolved.same_as.get(variant.id)
             metric_html = _mono(fmt.value(row["mean"], row["sd"]))
             if prefix(row) != "vs_full":
-                metric_html += _small(f"Δ vs full {fmt.delta(row['delta_vs_full'])}")
+                delta = fmt.delta(row["delta_vs_full"])
+                metric_html += _small(_esc(ctx.t("abl_delta_vs_full", delta=delta)))
             if variant.strategy == "inject":
-                removed_html = _corrupted_html(variant, self._n_rows)
+                removed_html = _corrupted_html(variant, self._n_rows, ctx)
             else:
-                removed_html = _removed_html(row["n_removed"], row["f_removed"])
+                removed_html = _removed_html(row["n_removed"], row["f_removed"], ctx)
             rows.append(
                 {
-                    "group": self._group_label(variant),
+                    "group": self._group_label(variant, ctx),
                     "variant": _variant_html(
                         variant,
                         self._steps,
-                        same_as=names.get(same_as) if same_as else None,
+                        same_as=name(same_as) if same_as else None,
                         detail=self._sweep_details.get(variant.id) if variant.sweep else None,
+                        name=name(variant.id),
+                        ctx=ctx,
                     ),
                     "removed": removed_html,
                     "metric": metric_html,
@@ -4801,11 +4899,13 @@ class Ablation:
             share = row["shapley"] / total if total and abs(total) > _ROUNDING else None
             rows.append(
                 {
-                    "group": "Shapley values",
-                    "variant": _variant_html(step, self._steps),
-                    "removed": _removed_html(row["n_failed"], row["n_failed"] / self._n_rows),
+                    "group": ctx.t("abl_group_shapley"),
+                    "variant": _variant_html(
+                        step, self._steps, name=ctx.t("abl_name_step", i=i), ctx=ctx
+                    ),
+                    "removed": _removed_html(row["n_failed"], row["n_failed"] / self._n_rows, ctx),
                     "metric": (
-                        _mono(f"{share:.0%}") + _small("of the total Δ")
+                        _mono(ctx.pct(share, 0)) + _small(_esc(ctx.t("abl_of_total")))
                         if share is not None
                         else _mono("—")
                     ),
@@ -4823,56 +4923,44 @@ class Ablation:
                 }
             )
 
-        if comparison == "vs_control":
-            vs_text = "removing the same number of random rows"
-            if isinstance(self.control, Stratified):
-                vs_text += f" (stratified by {', '.join(self.control.by)})"
-        else:
-            vs_text = "the full table"
         # `higher_is_better=` is only known to apply to the metric the verdicts are based on
         direction = ""
+        full_metric = {
+            "metric": _esc(metric),
+            "rows": ctx.t("n_rows", n=self._n_rows),
+            "value": fmt.value(baseline["mean"], baseline["sd"]),
+        }
         if metric == self._primary:
-            direction = f" ({'higher' if self.higher_is_better else 'lower'} is better)"
-        subtitle = (
-            f"<div>{_esc(metric)} on the full table ({self._n_rows:,} rows): "
-            f"<strong>{fmt.value(baseline['mean'], baseline['sd'])}</strong>"
-            f"{direction}.</div>"
-            f"<div>Each version was evaluated {self.repeats} time"
-            f"{'s' if self.repeats != 1 else ''}; Δ is the mean paired difference from "
-            f"{_esc(vs_text)}.</div>"
-        )
+            direction = ctx.t("abl_higher" if self.higher_is_better else "abl_lower")
+            lines = [ctx.t("abl_full_metric_direction", direction=direction, **full_metric)]
+            direction = f" ({direction})"
+        else:
+            lines = [ctx.t("abl_full_metric", **full_metric)]
+        if comparison != "vs_control":
+            lines.append(ctx.t("abl_evaluated_full", n=self.repeats))
+        elif isinstance(self.control, Stratified):
+            columns = _esc(ctx.list_sep.join(self.control.by))
+            lines.append(ctx.t("abl_evaluated_stratified", n=self.repeats, columns=columns))
+        else:
+            lines.append(ctx.t("abl_evaluated_random", n=self.repeats))
         if has_left_out:
-            others = (
-                "the other steps' rows, plus as many random rows"
-                if self.control is not None
-                else "only the other steps' rows"
-            )
-            subtitle += (
-                "<div>For leaving one out, Δ is what the left-out step's rows add to the other "
-                f"steps: removing every step's rows, compared with removing {others}.</div>"
-            )
+            control = self.control is not None
+            lines.append(ctx.t("abl_left_out_control" if control else "abl_left_out"))
         if has_injected and comparison != "vs_full":
-            subtitle += (
-                "<div>For injected defects, Δ is the difference from the full table, since no "
-                "rows are removed.</div>"
-            )
+            lines.append(ctx.t("abl_injected_vs_full"))
         if shapley_rows:
-            subtitle += (
-                "<div>For the Shapley values, Δ is each step's share of the effect of removing "
-                "the rows of every step.</div>"
-            )
+            lines.append(ctx.t("abl_shapley_share"))
         if self.evaluate_version is not None:
-            subtitle += (
-                f"<div>Version of <code>evaluate</code>: {_esc(self.evaluate_version)}.</div>"
-            )
-        subtitle += self._holdout_html()
+            lines.append(ctx.t("abl_evaluate_version", version=_esc(self.evaluate_version)))
+        subtitle = "".join(f"<div>{line}</div>" for line in lines) + self._holdout_html(ctx)
         if metric != self._primary:
-            subtitle += (
-                f"<div>Verdicts are based on {_esc(self._primary)}, so none are shown here.</div>"
-            )
+            text = ctx.t("abl_verdicts_based_on", metric=_esc(self._primary))
+            subtitle += f"<div>{text}</div>"
 
-        effect_label = "Δ vs random" if comparison == "vs_control" else "Δ vs full"
-        default_title = _title_html("Ablation report", self.label)
+        effect_label = ctx.t(
+            "abl_col_delta_random" if comparison == "vs_control" else "abl_col_delta_full"
+        )
+        default_title = _title_html(ctx.t("abl_report_title"), self.label)
         columns = ["variant", "removed", "metric", "effect"]
         gt_tbl = (
             _fmt_raw_html(
@@ -4888,11 +4976,14 @@ class Ablation:
                 subtitle=html(subtitle),
             )
             .cols_label(
-                variant="Variant", removed="Removed", metric=_esc(metric), effect=effect_label
+                variant=ctx.t("abl_col_variant"),
+                removed=ctx.t("abl_col_removed"),
+                metric=_esc(metric),
+                effect=effect_label,
             )
             .cols_align(align="right", columns=["removed", "metric"])
             .opt_table_font(font=google_font("IBM Plex Sans"))
-            .opt_align_table_header(align="left")
+            .opt_align_table_header(align="right" if ctx.rtl else "left")
             .tab_style(style=style.text(size="12px"), locations=loc.body())
             .tab_style(style=style.text(size="12px", weight="bold"), locations=loc.column_labels())
             .cols_width(
@@ -4906,28 +4997,24 @@ class Ablation:
                 locations=loc.row_groups(),
             )
 
-        kind = "bootstrap percentile intervals" if self.ci == "bootstrap" else "paired t-intervals"
-        interval_note = f"Intervals are {self.conf_level:.0%} {kind}" + (
-            ", not adjusted for multiple comparisons; verdicts use Holm-adjusted p-values."
-            if self.adjust == "holm"
-            else "; verdicts use unadjusted p-values."
+        kind = "bootstrap" if self.ci == "bootstrap" else "t"
+        holm = "_holm" if self.adjust == "holm" else ""
+        interval_note = ctx.sentences(
+            [
+                ctx.t(f"abl_intervals_{kind}{holm}", conf=ctx.pct(self.conf_level, 0)),
+                ctx.t("abl_no_verdicts") if self.repeats < 3 else "",
+            ]
         )
-        if self.repeats < 3:
-            interval_note += " There are no verdicts with fewer than 3 repeats."
         source_notes = [interval_note]
         if self._loaded:
-            source_notes.append(
-                "The results were read with `load_results()`, from evaluations made elsewhere."
-            )
+            source_notes.append(ctx.t("abl_loaded"))
         n_cached = sum(run["cached"] for run in self._runs)
         if n_cached:
-            source_notes.append(
-                f"{n_cached:,} of the {len(self._runs):,} evaluations came from the cache."
-            )
+            source_notes.append(ctx.t("abl_cached", n=n_cached, total=len(self._runs)))
         if shapley_rows:
-            source_notes.append(self._shapley_note(fmt.delta(total)))
+            source_notes.append(self._shapley_note(fmt.delta(total), ctx))
         for note in [*source_notes, *self._notes, *resolved.notes]:
-            gt_tbl = gt_tbl.tab_source_note(source_note=html(_note_html(note)))
+            gt_tbl = gt_tbl.tab_source_note(source_note=html(_note_html(ctx.r(note))))
         # A curve for each sweep: how the metric changes with the sweep's value
         for sweep_id, sweep in self._sweeps.items():
             points = [row for row in variant_rows if row["sweep"] == sweep_id]
@@ -4941,10 +5028,11 @@ class Ablation:
                             fmt=fmt,
                             metric=metric,
                             direction=direction,
+                            name=lambda row: name(row["variant"]),
                         )
                     )
                 )
-        return gt_tbl
+        return _rtl_styles(gt_tbl, ctx)
 
     def _group_order(self, variant: AblationVariant) -> tuple[int, float]:
         """Where a variant is listed in the plan and the report: by its group, then its value."""
@@ -4954,30 +5042,28 @@ class Ablation:
             return (2 + len(self._sweeps), float(len(variant.steps)))
         return (int(variant.left_out is not None), 0.0)
 
-    def _group_label(self, variant: AblationVariant) -> str:
+    def _group_label(self, variant: AblationVariant, ctx: Localizer = ENGLISH) -> str:
         if variant.strategy == "inject":
-            return f"Injected: {self._sweeps[variant.sweep]['label']}"
+            return ctx.t("abl_group_injected", label=self._sweeps[variant.sweep]["label"])
         if variant.sweep is not None:
-            return f"Sweep: {self._sweeps[variant.sweep]['label']}"
+            return ctx.t("abl_group_sweep", label=self._sweeps[variant.sweep]["label"])
         if variant.strategy == "shapley":
-            return "Shapley: groups of steps"
-        return "Variants" if variant.left_out is None else "Leave one out"
+            return ctx.t("abl_group_shapley_groups")
+        return ctx.t(
+            "abl_group_variants" if variant.left_out is None else "abl_group_leave_one_out"
+        )
 
-    def _shapley_note(self, total: str) -> str:
+    def _shapley_note(self, total: str, ctx: Localizer = ENGLISH) -> str:
         info = self._shapley
         k = len(info["steps"])
-        vs_text = "removing as many random rows" if self.control is not None else "the full table"
         if info["exact"]:
-            how = f"The Shapley values are exact, from every order of the {k} steps"
+            how = ctx.t("abl_shapley_exact", k=k)
         else:
-            how = (
-                f"The Shapley values are estimated from {info['permutations']:,} random orders of "
-                f"the {k} steps (seed {info['seed']})"
+            how = ctx.t(
+                "abl_shapley_estimated", orders=info["permutations"], k=k, seed=str(info["seed"])
             )
-        return (
-            f"{how}. They add up to {total}, the effect of removing the rows of every step "
-            f"compared with {vs_text}."
-        )
+        total_key = "abl_shapley_sum_random" if self.control is not None else "abl_shapley_sum_full"
+        return ctx.sentences([how, ctx.t(total_key, total=total)])
 
 
 # ----------------------------------------------------------------------------------------------
@@ -5167,17 +5253,18 @@ def _add_comparison(
 class _NumberFormat:
     """Format a metric's values with a number of decimals that suits their size."""
 
-    def __init__(self, values: list[float]) -> None:
+    def __init__(self, values: list[float], ctx: Localizer = ENGLISH) -> None:
         size = max((abs(v) for v in values if v), default=1.0)
         self.decimals = max(0, min(6, 3 - math.floor(math.log10(size))))
+        self.ctx = ctx
 
     def number(self, x: float) -> str:
-        return f"{x:,.{self.decimals}f}".replace("-", "−")
+        return self.ctx.marks(f"{x:,.{self.decimals}f}").replace("-", "−")
 
     def delta(self, x: float | None) -> str:
         if x is None:
             return "—"  # pragma: no cover
-        return f"{x:+,.{self.decimals}f}".replace("-", "−")
+        return self.ctx.marks(f"{x:+,.{self.decimals}f}").replace("-", "−")
 
     def value(self, mean: float, sd: float | None) -> str:
         if sd is None:
@@ -5212,6 +5299,24 @@ def _note_html(note: str) -> str:
     return f"<span style='font-size: 11px; color: #555555;'>{_code_html(note)}</span>"
 
 
+def _rtl_styles(gt_tbl: GT, ctx: Localizer) -> GT:
+    """Set a report's text right to left, if its language is written that way."""
+    if not ctx.rtl:
+        return gt_tbl
+    from great_tables import loc, style
+
+    return gt_tbl.tab_style(
+        style=style.css("direction: rtl; text-align: right;"),
+        locations=[
+            loc.header(),
+            loc.column_labels(),
+            loc.body(),
+            loc.row_groups(),
+            loc.source_notes(),
+        ],
+    )
+
+
 def _frame(rows: list[dict[str, str]], columns: list[str]) -> Any:
     lib = _select_df_lib(preference="polars")
     if lib.__name__ == "polars":
@@ -5227,27 +5332,29 @@ def _variant_html(
     same_as: str | None = None,
     control: Any = None,
     max_briefs: int = 3,
-    detail: str | None = None,
+    detail: Text | str | None = None,
+    name: str | None = None,
+    ctx: Localizer = ENGLISH,
 ) -> str:
-    """The variant's name, with a line for each step (its brief) below (or the `detail=` line)."""
-    name = f"<div><strong>{_esc(variant.name)}</strong></div>"
+    """
+    The variant's name (`name=`, written in the report's language), with a line for each step (its
+    brief) below (or the `detail=` line).
+    """
+    name = f"<div><strong>{_esc(variant.name if name is None else name)}</strong></div>"
     if variant.strategy == "full":
-        return name + _small("Nothing removed")
+        return name + _small(_esc(ctx.t("abl_nothing_removed")))
     if variant.is_control:
-        within = ""
-        if isinstance(control, Stratified):
-            within = f" within each group of {_esc(', '.join(control.by))}"
+        within = isinstance(control, Stratified)
+        columns = _esc(ctx.list_sep.join(control.by)) if within else ""
         if variant.left_out is not None:
-            listed = ", ".join(str(i) for i in variant.steps)
-            label = "step" if len(variant.steps) == 1 else "steps"
-            text = (
-                f"The rows of {label} {listed}, plus random rows{within} drawn anew for each repeat"
-            )
+            key = "abl_control_left_out_within" if within else "abl_control_left_out"
+            text = ctx.t(key, steps=tuple(variant.steps), columns=columns, n=len(variant.steps))
         else:
-            text = f"Rows removed at random{within}, drawn anew for each repeat"
+            key = "abl_control_random_within" if within else "abl_control_random"
+            text = ctx.t(key, columns=columns)
         return name + _small(text)
     if variant.group_column is not None:
-        return name + _small("All the rows of this group")
+        return name + _small(_esc(ctx.t("abl_group_rows")))
 
     def brief(i: int) -> str:
         step = steps[i]
@@ -5255,37 +5362,37 @@ def _variant_html(
 
     lines = []
     if detail is not None:
-        lines.append(_code_html(detail))
+        lines.append(_code_html(ctx.r(detail)))
     elif variant.left_out is not None:
-        lines.append(f"Leaves out step {variant.left_out}: {brief(variant.left_out)}")
+        lines.append(ctx.t("abl_leaves_out", i=variant.left_out, brief=brief(variant.left_out)))
     else:
         for i in variant.steps[:max_briefs]:
             lines.append(brief(i) if len(variant.steps) == 1 else f"{i}: {brief(i)}")
         if len(variant.steps) > max_briefs:
-            lines.append(f"and {len(variant.steps) - max_briefs} more steps")
+            lines.append(_esc(ctx.t("abl_more_steps", n=len(variant.steps) - max_briefs)))
     if same_as is not None:
-        lines.append(f"Same rows as {_esc(same_as)}, so it isn't evaluated again")
+        lines.append(_esc(ctx.t("abl_same_rows_as", name=same_as)))
     return name + "".join(_small(line) for line in lines)
 
 
-def _pct_text(share: float) -> str:
+def _pct_text(share: float, ctx: Localizer = ENGLISH) -> str:
     pct = share * 100
     if pct == 0:
         return "0%"
     if pct < 0.1:
-        return "<0.1%"
-    return f"{pct:.1f}%"
+        return "<" + ctx.marks("0.1%")
+    return ctx.marks(f"{pct:.1f}%")
 
 
-def _removed_html(n_removed: int, f_removed: float) -> str:
-    return f"<div>{_mono(f'{n_removed:,}')}</div>" + _small(_esc(_pct_text(f_removed)))
+def _removed_html(n_removed: int, f_removed: float, ctx: Localizer = ENGLISH) -> str:
+    return f"<div>{_mono(ctx.int(n_removed))}</div>" + _small(_esc(_pct_text(f_removed, ctx)))
 
 
-def _corrupted_html(variant: AblationVariant, n_rows: int) -> str:
+def _corrupted_html(variant: AblationVariant, n_rows: int, ctx: Localizer = ENGLISH) -> str:
     """The number and share of the rows that an `inject()` variant corrupts (or copies)."""
-    verb = "copied" if variant.corruption == "duplicate" else "corrupted"
-    share = _pct_text(variant.n_corrupted / n_rows)
-    return f"<div>{_mono(f'{variant.n_corrupted:,}')}</div>" + _small(_esc(f"{share} {verb}"))
+    key = "abl_pct_copied" if variant.corruption == "duplicate" else "abl_pct_corrupted"
+    share = _pct_text(variant.n_corrupted / n_rows, ctx)
+    return f"<div>{_mono(ctx.int(variant.n_corrupted))}</div>" + _small(_esc(ctx.t(key, pct=share)))
 
 
 def _badge(text: str, color: str) -> str:
@@ -5322,6 +5429,7 @@ def _interval_svg(
 
 def _effect_html(row: dict[str, Any], prefix: str, fmt: _NumberFormat, scale: float) -> str:
     """A difference (e.g., from the control), its interval, and the verdict badge."""
+    ctx = fmt.ctx
     delta = row[f"delta_{prefix}"]
     lower = row[f"delta_{prefix}_lower"]
     upper = row[f"delta_{prefix}_upper"]
@@ -5330,9 +5438,12 @@ def _effect_html(row: dict[str, Any], prefix: str, fmt: _NumberFormat, scale: fl
 
     text = fmt.delta(delta)
     if lower is not None and upper is not None:
-        text += f" <span style='color: #777777;'>[{fmt.delta(lower)}, {fmt.delta(upper)}]</span>"
+        interval = ctx.interval(fmt.delta(lower), fmt.delta(upper))
+        text += f" <span style='color: #777777;'>{interval}</span>"
     plot = _interval_svg(delta, lower, upper, scale, color)
-    badge = f" {_badge(verdict, color)}" if verdict is not None else ""
+    badge = ""
+    if verdict is not None:
+        badge = f" {_badge(_esc(ctx.t(f'abl_verdict_{verdict}')), color)}"
     return f"<div>{_mono(text)}</div><div style='white-space: nowrap;'>{plot}{badge}</div>"
 
 
@@ -5343,11 +5454,14 @@ def _sweep_svg(
     fmt: _NumberFormat,
     metric: str,
     direction: str,
+    name: Callable[[dict[str, Any]], str] | None = None,
 ) -> str:
     """
     A plot of a sweep: the difference from the full table at each of its values (a dot with its
-    interval, colored by the verdict), with a dashed line for removing as many random rows.
+    interval, colored by the verdict), with a dashed line for removing as many random rows. The
+    texts are in the language of `fmt`, with `name=` giving the name of a point's variant.
     """
+    ctx = fmt.ctx
     width, height = 460, 230
     left, right, top, bottom = 58, 16, 44, 40
     points = sorted(points, key=lambda row: row["value"])
@@ -5381,7 +5495,7 @@ def _sweep_svg(
         return top + (y_max - y) / (y_max - y_min) * (height - top - bottom)
 
     text_style = "font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; fill: #555555;"
-    title = f"{sweep['label']}: Δ {metric} vs full{direction}"
+    title = ctx.t("abl_sweep_title", label=ctx.r(sweep["label"]), metric=metric) + direction
     parts = [
         f"<svg width='{width}' height='{height}' viewBox='0 0 {width} {height}' "
         "style='display: block; margin-top: 4px;'>",
@@ -5402,17 +5516,17 @@ def _sweep_svg(
             )
         parts.append(
             f"<text x='{left - 5}' y='{py(y) + 3:.1f}' text-anchor='end' "
-            f'style="{text_style}">{f"{y:+g}".replace("-", "−")}</text>'
+            f'style="{text_style}">{ctx.marks(f"{y:+g}").replace("-", "−")}</text>'
         )
     for x in xs:
-        label = f"{x:g}%" if sweep["percent"] else f"{x:g}"
+        label = ctx.marks(f"{x:g}%" if sweep["percent"] else f"{x:g}")
         parts.append(
             f"<text x='{px(x):.1f}' y='{height - bottom + 13}' text-anchor='middle' "
             f'style="{text_style}">{_esc(label)}</text>'
         )
     parts.append(
         f"<text x='{(left + width - right) / 2:.1f}' y='{height - 6}' text-anchor='middle' "
-        f'style="{text_style}">{_esc(sweep["axis"])}</text>'
+        f'style="{text_style}">{_esc(ctx.r(sweep["axis"]))}</text>'
     )
 
     # Removing as many random rows (when there's a control)
@@ -5442,14 +5556,14 @@ def _sweep_svg(
             )
         parts.append(
             f"<circle cx='{px(x):.1f}' cy='{py(row['delta_vs_full']):.1f}' r='3.5' "
-            f"fill='{color}'><title>{_esc(row['name'])}: "
+            f"fill='{color}'><title>{_esc(row['name'] if name is None else name(row))}: "
             f"{_esc(fmt.delta(row['delta_vs_full']))}</title></circle>"
         )
     if control_points:
         parts.append(
             f"<line x1='0' y1='26' x2='18' y2='26' stroke='#888888' stroke-width='1.5' "
             "stroke-dasharray='4,3'/>"
-            f"<text x='22' y='29' style=\"{text_style}\">Removing as many random rows</text>"
+            f"<text x='22' y='29' style=\"{text_style}\">{_esc(ctx.t('abl_sweep_legend'))}</text>"
         )
     parts.append("</svg>")
     return "".join(parts)
@@ -5471,7 +5585,7 @@ def _change_text(fmt: _NumberFormat, row: dict[str, Any], prefix: str) -> str:
     text = fmt.delta(row[f"delta_{prefix}"])
     lower, upper = row[f"delta_{prefix}_lower"], row[f"delta_{prefix}_upper"]
     if lower is not None and upper is not None:
-        text += f" [{fmt.delta(lower)}, {fmt.delta(upper)}]"
+        text += " " + fmt.ctx.interval(fmt.delta(lower), fmt.delta(upper))
     return text
 
 

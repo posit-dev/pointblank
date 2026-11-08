@@ -22186,6 +22186,8 @@ class Validate:
         citation: str | None = None,
         column_descriptions: dict[str, str] | None = None,
         by: str | None = None,
+        lang: str | None = None,
+        locale: str | None = None,
     ) -> str:
         """
         Write a data card for the table, with the evidence of the validation.
@@ -22228,7 +22230,9 @@ class Validate:
             The license of the dataset, as an identifier like `"cc-by-4.0"` or `"apache-2.0"` (the
             identifiers of the Hugging Face Hub, for a Hugging Face card).
         language
-            The language of the data (a code like `"en"`), or a list of them.
+            The language of the data (a code like `"en"`), or a list of them. This is a fact about
+            the dataset, for the card to state (and for the `language` of the front matter); the
+            language that the card is written in is set by `lang=`.
         source
             Where the data came from and how it was collected.
         citation
@@ -22240,6 +22244,16 @@ class Validate:
             The name of a column that steps are segmented by, for a table of the scores of each
             of its values (as with `get_health_score(by=)`), such as the scores of each language
             of a multilingual dataset.
+        lang
+            The language that the card is written in, as a two-letter language code (e.g., `"fr"`
+            or `"de"`; see the `lang=` argument of [`Validate`](`pointblank.Validate`) for the
+            languages). By default, the card is in the language of the validation. The headings,
+            questions, and text of the card are translated, while the keys and values of the front
+            matter, the arguments given here, and the briefs of the steps are written as they are.
+        locale
+            The locale for the numbers in the card (e.g., `"de-CH"`), which sets the decimal mark
+            and the thousands separator. By default, it's the locale of the validation (when the
+            card is in the validation's language), or `lang=`.
 
         Returns
         -------
@@ -22251,8 +22265,8 @@ class Validate:
         The card takes the curator and contact from the `owner=` of the validation, the uses from
         its `consumers=`, and the version from its `version=`. The number of missing values in
         each column is counted in the table of the validation (on its own backend), and the
-        results are those of the last interrogation, so it needs `interrogate()` first. The text
-        of the card is in English, whatever the `lang=` of the validation.
+        results are those of the last interrogation, so it needs `interrogate()` first. The card
+        is written in the `lang=` and `locale=` of the validation, unless they're given here.
 
         Examples
         --------
@@ -22305,7 +22319,8 @@ class Validate:
         The card starts with the front matter of a Hugging Face card, then has the structure of
         the table (one review is missing), the scores, the steps (one rating is out of range), and
         the scores of each language. With `path="README.md"`, it would also be written to a file,
-        and with `format="datasheet"`, it would be a datasheet instead.
+        and with `format="datasheet"`, it would be a datasheet instead. With `lang="fr"`, the card
+        would be written in French (whatever the languages of the data, given in `language=`).
         """
         from pointblank._data_card import make_data_card
 
@@ -22322,6 +22337,8 @@ class Validate:
             citation=citation,
             column_descriptions=column_descriptions,
             by=by,
+            lang=lang,
+            locale=locale,
         )
 
     def _enrich_schema_types(self, schema_doc: dict[str, Any]) -> None:  # pragma: no cover
