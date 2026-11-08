@@ -5,7 +5,11 @@ from typing import Any
 from importlib.resources import files
 
 from pointblank._constants import MODEL_PROVIDERS
-from pointblank._utils_ai import _check_ai_package, _check_provider_packages
+from pointblank._utils_ai import (
+    _check_ai_package,
+    _check_provider_packages,
+    _create_chat_instance,
+)
 from pointblank.datascan import DataScan
 
 __all__ = [
@@ -42,6 +46,8 @@ def assistant(
     - OpenAI
     - Ollama
     - Amazon Bedrock
+    - Azure OpenAI
+    - Cohere
 
     The PbA can be displayed in a browser (the default) or in the terminal. You can choose one or
     the other by setting the `display=` parameter to `"browser"` or `"terminal"`.
@@ -56,7 +62,7 @@ def assistant(
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
         `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
-        `"ollama"`, and `"bedrock"`.
+        `"ollama"`, `"bedrock"`, `"azure-openai"`, and `"cohere"`.
     data
         An optional data table to focus on during discussion with the PbA, which could be a
         DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, or a database
@@ -86,9 +92,15 @@ def assistant(
     - `"openai"` (OpenAI)
     - `"ollama"` (Ollama)
     - `"bedrock"` (Amazon Bedrock)
+    - `"azure-openai"` (Azure OpenAI)
+    - `"cohere"` (Cohere)
 
     The model name should be the specific model to be used from the provider. Model names are
     subject to change so consult the provider's documentation for the most up-to-date model names.
+    For `"azure-openai"`, the value after the colon is the Azure *deployment id*, and the
+    `AZURE_OPENAI_ENDPOINT` and `OPENAI_API_VERSION` environment variables must be set. For
+    `"cohere"`, the API key is read from `CO_API_KEY` (or `COHERE_API_KEY`) if `api_key=` isn't
+    given.
 
     Notes on Authentication
     -----------------------
@@ -311,6 +323,14 @@ def assistant(
 
         chat = ChatBedrockAnthropic(  # pragma: no cover
             model=model_name,
+            system_prompt=system_prompt,
+        )
+
+    if provider in ("azure-openai", "cohere"):  # pragma: no cover
+        chat = _create_chat_instance(  # pragma: no cover
+            provider=provider,
+            model_name=model_name,
+            api_key=api_key,
             system_prompt=system_prompt,
         )
 
