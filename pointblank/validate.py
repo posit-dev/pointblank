@@ -176,6 +176,7 @@ if TYPE_CHECKING:
     from narwhals.typing import IntoDataFrame, IntoFrame
 
     from pointblank._typing import AbsoluteBounds, Tolerance, _CompliantValue, _CompliantValues
+    from pointblank.ablation import Ablation
     from pointblank.steps import Steps
 
 
@@ -4998,7 +4999,12 @@ def _validation_info_to_step(
     elif at == "prompt":
         values = vi.values or {}
         params["prompt"] = values.get("prompt")
-        params["model"] = f"{values.get('llm_provider')}:{values.get('llm_model')}"
+        if values.get("judges"):
+            params["model"] = list(values["judges"])
+            if values.get("aggregate", "majority") != "majority":
+                params["aggregate"] = values["aggregate"]
+        else:
+            params["model"] = f"{values.get('llm_provider')}:{values.get('llm_model')}"
         if vi.column is not None:
             params["columns_subset"] = (
                 list(vi.column) if isinstance(vi.column, (list, tuple)) else vi.column
@@ -14217,7 +14223,7 @@ class Validate:
     def prompt(
         self,
         prompt: str,
-        model: str,
+        model: str | list[str],
         columns_subset: str | list[str] | None = None,
         attachments: list | None = None,
         batch_size: int = 1000,
@@ -14229,6 +14235,7 @@ class Validate:
         brief: str | bool | None = None,
         active: bool | Callable = True,
         dimension: str | None = None,
+        aggregate: str = "majority",
     ) -> Validate:
         """
         Validate rows using AI/LLM-powered analysis.
@@ -14278,10 +14285,12 @@ class Validate:
         model
             The model to be used. This should be in the form of `provider:model` (e.g.,
             `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
-            `"ollama"`, `"bedrock"`, and `"azure-openai"`. The model name should be the specific
-            model to be used from the provider (for `"azure-openai"`, the value after the colon is
-            the Azure *deployment id*). Model names are subject to change so consult the provider's
-            documentation for the most up-to-date model names.
+            `"ollama"`, `"bedrock"`, `"azure-openai"`, and `"cohere"`. The model name should be the
+            specific model to be used from the provider (for `"azure-openai"`, the value after the
+            colon is the Azure *deployment id*). Model names are subject to change so consult the
+            provider's documentation for the most up-to-date model names. A list of models makes
+            each of them a judge of every row, with their verdicts combined by `aggregate=` (see
+            the *Several Judges* section).
         batch_size
             Number of rows to process in each batch. Larger batches are more efficient but may hit
             API limits. Default is `1000`.
@@ -14326,6 +14335,11 @@ class Validate:
             `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
             dimension is inferred automatically from the assertion type. This label appears in the
             validation report and feeds the overall and per-dimension health scores.
+        aggregate
+            How the verdicts of several models (a list of them in `model=`) are combined into the
+            result of a row: `"majority"` (the default: more than half of the models pass it, so a
+            tie fails), `"all"` (every model passes it), or `"any"` (at least one does). It has no
+            effect with a single model.
 
         Returns
         -------
@@ -14342,6 +14356,7 @@ class Validate:
         - `"ollama"` (Ollama)
         - `"bedrock"` (Amazon Bedrock)
         - `"azure-openai"` (Azure OpenAI)
+        - `"cohere"` (Cohere)
 
         The model name should be the specific model to be used from the provider. Model names are
         subject to change so consult the provider's documentation for the most up-to-date model
@@ -14380,6 +14395,25 @@ class Validate:
         - **Bedrock**: configure AWS credentials through standard AWS methods
         - **Azure OpenAI**: set `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g.,
           `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`)
+        - **Cohere**: set the `CO_API_KEY` (or `COHERE_API_KEY`) environment variable (the requests
+          go to Cohere's OpenAI-compatible API, so the `openai` package is needed)
+
+        Several Judges
+        --------------
+        A model can be wrong about a row, and different models are wrong about different rows. With
+        a list of models in `model=`, each model judges every row (as a *judge*), and the verdicts
+        are combined into the result of the row with `aggregate=`. With three models and the default
+        `aggregate="majority"`, a row passes if at least two of them pass it. The rows are sent to
+        each model in turn, so the cost and the time of the step grow with the number of models.
+
+        The results of the step have a `pb_votes_` column (in the step report and the data
+        extracts) with the number of models that passed each row, and the step's note gives the
+        number of rows that each model passed and how often the models agreed. A row on which the
+        models disagree is worth a look by a person, and a model that disagrees with the others
+        often may not be suited to the prompt.
+
+        To measure how well the models agree with the judgments of a person, label some of the rows
+        and use [`calibrate_prompt()`](`pointblank.Validate.calibrate_prompt`) after interrogation.
 
         AI Validation Process
         ---------------------
@@ -14625,6 +14659,31 @@ class Validate:
 
         The brand guide is sent alongside the row JSON on every batch, so the LLM evaluates each
         description with the same reference document in view.
+
+        **Several judges:**
+
+        Here, three models from different providers judge each review, and a review passes if at
+        least two of them find that it's about the product.
+
+        ```python
+        validation = (
+            pb.Validate(data=reviews)
+            .prompt(
+                prompt="The review is about the product, not about the delivery or the seller.",
+                columns_subset="review",
+                model=[
+                    "anthropic:claude-sonnet-4-5",
+                    "openai:gpt-6-luna",
+                    "cohere:command-a-03-2025",
+                ],
+                aggregate="majority",
+            )
+            .interrogate()
+        )
+        ```
+
+        The step report has the number of models that passed each review (in `pb_votes_`), and the
+        step's note says how often the models agreed.
         """
 
         assertion_type = _get_fn_name()
@@ -14633,17 +14692,41 @@ class Validate:
         if not isinstance(prompt, str) or not prompt.strip():
             raise ValueError("prompt must be a non-empty string")
 
-        # Parse the provider and model name from the `model=` argument
-        try:
-            provider, model_name = model.split(sep=":", maxsplit=1)
-        except ValueError:
-            raise ValueError(f"Model must be in format 'provider:model_name', got: {model}")
+        # Parse the provider and model name of each model of the `model=` argument
+        models = list(model) if isinstance(model, (list, tuple)) else [model]
+        if not models:
+            raise ValueError("`model=` must be a model, or a list of at least one model.")
+        judges = []
+        for one_model in models:
+            if not isinstance(one_model, str):
+                raise TypeError(
+                    "`model=` must be a string like 'provider:model_name' or a list of them, "
+                    f"got {type(one_model).__name__}."
+                )
+            try:
+                provider, model_name = one_model.split(sep=":", maxsplit=1)
+            except ValueError:
+                raise ValueError(
+                    f"Model must be in format 'provider:model_name', got: {one_model}"
+                ) from None
 
-        # Error if an unsupported provider is used
-        if provider not in MODEL_PROVIDERS:
+            # Error if an unsupported provider is used
+            if provider not in MODEL_PROVIDERS:
+                raise ValueError(
+                    f"Unsupported provider: {provider}. Supported providers are {MODEL_PROVIDERS}."
+                )
+            judges.append((provider, model_name))
+        if len(set(models)) < len(models):
+            raise ValueError("The models of `model=` must be different.")
+
+        from pointblank._interrogation import PROMPT_AGGREGATES
+
+        if aggregate not in PROMPT_AGGREGATES:
             raise ValueError(
-                f"Unsupported provider: {provider}. Supported providers are {MODEL_PROVIDERS}."
+                f"`aggregate=` must be one of {', '.join(repr(a) for a in PROMPT_AGGREGATES)}, "
+                f"got {aggregate!r}."
             )
+        provider, model_name = judges[0]
 
         # Ensure that `batch_size` and `max_concurrent` are positive integers
         if not isinstance(batch_size, int) or batch_size < 1:
@@ -14683,6 +14766,10 @@ class Validate:
             "max_concurrent": max_concurrent,
             "attachments": prepared_attachments,
         }
+        # (with several models, the first is also the `llm_provider` and `llm_model`)
+        if len(judges) > 1:
+            ai_config["judges"] = list(models)
+            ai_config["aggregate"] = aggregate
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -19139,9 +19226,24 @@ class Validate:
                     elif assertion_type == "prompt":
                         from pointblank._interrogation import interrogate_prompt
 
+                        prompt_info: dict[str, Any] = {}
                         results_tbl = interrogate_prompt(
-                            tbl=data_tbl_step, columns_subset=column, ai_config=value
+                            tbl=data_tbl_step,
+                            columns_subset=column,
+                            ai_config=value,
+                            info=prompt_info,
                         )
+                        if prompt_info:
+                            validation.val_info = prompt_info
+                            if len(prompt_info["judges"]) > 1:
+                                judges_note_html, judges_note_text = _create_judges_note(
+                                    prompt_info
+                                )
+                                validation._add_note(
+                                    key="judges",
+                                    markdown=judges_note_html,
+                                    text=judges_note_text,
+                                )
 
                     elif assertion_type == "col_vals_scored":
                         from pointblank._interrogation import interrogate_scored
@@ -21299,6 +21401,178 @@ class Validate:
             return result[i]
         return result
 
+    def calibrate_prompt(self, i: int, labels: str | Any) -> dict[str, Any]:
+        """
+        Measure how well a `prompt()` step agrees with labels given by a person.
+
+        A [`prompt()`](`pointblank.Validate.prompt`) step is only as good as the model's judgment
+        of the rows. To know how far to trust it, label some of the rows by hand (whether each one
+        should pass) and compare the labels with the step's results. The `calibrate_prompt()`
+        method does that after interrogation: it gives the share of the labeled rows on which the
+        step and the labels agree, Cohen's kappa (the agreement beyond what's expected by chance),
+        and the counts of each kind of disagreement. With several models (a list of them in
+        `model=`), it also gives the agreement of each model with the labels, which shows whether
+        one of them is pulling the results the wrong way.
+
+        The labels can be a column of the table (with `True` for a row that should pass, `False`
+        for one that should fail, and a missing value for a row that wasn't labeled), or a list of
+        them with one for each row that the step checked. A column of labels must not be one of the
+        columns sent to the model (the step's `columns_subset=`), since the model would then see
+        the answers. The result is also added to the step as a note, so it's in the validation
+        report.
+
+        Parameters
+        ----------
+        i
+            The number of the `prompt()` step.
+        labels
+            The name of a column of the table with the labels, or a sequence of them (a list, a
+            tuple, or a Series, with one label for each row that the step checked, in order). A
+            label is `True` (the row should pass), `False` (it should fail), or missing (`None`)
+            for a row that wasn't labeled; `1` and `0` can also be used.
+
+        Returns
+        -------
+        dict[str, Any]
+            The calibration of the step: the number of labeled rows (`n_labeled`), the share of
+            them on which the step agreed with the labels (`agreement`), Cohen's kappa (`kappa`,
+            which is `None` if the step and the labels each gave every row the same verdict), and
+            the counts of the rows that the step passed and should pass (`true_pass`), passed but
+            should fail (`false_pass`), failed but should pass (`false_fail`), and failed and
+            should fail (`true_fail`). With several models, `judges` has the same measures for each
+            model, by its `provider:model` string.
+
+        Reading the Results
+        -------------------
+        Cohen's kappa is 1 for complete agreement and 0 for agreement no better than chance (it can
+        be negative for less). As a rough guide, a kappa above 0.8 is strong agreement, from 0.6 to
+        0.8 is substantial, and below 0.4 is weak. The agreement alone can mislead when most rows
+        pass: a step that passes every row agrees with the labels on all the rows that should pass,
+        but its kappa is 0.
+
+        A `false_pass` is a row the step lets through though a person would fail it, and a
+        `false_fail` is the reverse. Which matters more depends on the check, and a change of the
+        prompt (or of the models, or of `aggregate=`) can trade one for the other. Label a few dozen
+        rows at least, including some that should fail, for the measures to mean much.
+
+        See Also
+        --------
+        Validate.prompt : Validate rows using AI/LLM-powered analysis.
+
+        Examples
+        --------
+        Let's check that each review in a table is about the product (not about the delivery or the
+        seller), with two models as judges. A person has labeled some of the reviews in a column
+        called `about_product`, which isn't sent to the models (only the `review` column is).
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        reviews = pl.DataFrame(
+            {
+                "review": [
+                    "The kettle boils fast and the lid closes firmly.",
+                    "It arrived two weeks late and the box was crushed.",
+                    "Great blender, but the seller never answered my emails.",
+                    "The lamp is bright enough to read by.",
+                ],
+                "about_product": [True, False, None, True],
+            }
+        )
+
+        validation = (
+            pb.Validate(data=reviews)
+            .prompt(
+                prompt="The review is about the product, not the delivery or the seller.",
+                columns_subset="review",
+                model=["anthropic:claude-sonnet-4-5", "openai:gpt-6-luna"],
+                aggregate="all",
+            )
+            .interrogate()
+        )
+
+        validation.calibrate_prompt(i=1, labels="about_product")
+        ```
+
+        The third review wasn't labeled (it's about both), so the calibration uses the other three.
+        The result has the agreement and kappa of the step and of each of the two models, and the
+        step's note in the report has them too.
+        """
+        step = self._prompt_step(i)
+        results = nw.from_native(step.tbl_checked)
+        if is_narwhals_lazyframe(results):
+            results = results.collect()
+        judged = [bool(v) for v in results["pb_is_good_"].to_list()]
+
+        if isinstance(labels, str):
+            if labels not in results.columns:
+                raise ValueError(f"The table has no column {labels!r} of labels.")
+            if step.column is None or labels in step.column:
+                raise ValueError(
+                    f"The column of labels, {labels!r}, was sent to the model with the rows. Use "
+                    "`columns_subset=` in `prompt()` to leave it out, so that the model doesn't "
+                    "see the labels."
+                )
+            label_values = results[labels].to_list()
+        else:
+            if hasattr(labels, "to_list"):
+                label_values = labels.to_list()
+            elif isinstance(labels, (list, tuple)) or hasattr(labels, "tolist"):
+                label_values = list(labels.tolist() if hasattr(labels, "tolist") else labels)
+            else:
+                raise TypeError(
+                    "`labels=` must be the name of a column, or a list of labels (one for each "
+                    f"row), got {type(labels).__name__}."
+                )
+            if len(label_values) != len(judged):
+                raise ValueError(
+                    f"`labels=` has {len(label_values):,} labels, but step {i} checked "
+                    f"{_plural(len(judged), 'row')}."
+                )
+
+        keep = []
+        clean_labels = []
+        for k, value in enumerate(label_values):
+            label = _calibration_label(value)
+            if label is not None:
+                keep.append(k)
+                clean_labels.append(label)
+        if not keep:
+            raise ValueError("None of the rows has a label (all of the labels are missing).")
+
+        calibration = _calibrate([judged[k] for k in keep], clean_labels)
+        verdicts = (step.val_info or {}).get("judges") or {}
+        if len(verdicts) > 1:
+            calibration["judges"] = {
+                judge: _calibrate([rows[k] for k in keep], clean_labels)
+                for judge, rows in verdicts.items()
+            }
+
+        note_html, note_text = _create_calibration_note(calibration)
+        step._add_note(key="calibration", markdown=note_html, text=note_text)
+        return calibration
+
+    def _prompt_step(self, i: int) -> _ValidationInfo:
+        """Get an interrogated `prompt()` step by its number (for `calibrate_prompt()`)."""
+        if isinstance(i, bool) or not isinstance(i, int):
+            raise TypeError(f"`i=` must be the number of a step, got {type(i).__name__}.")
+        if self.time_start is None:
+            raise ValueError("There are no results yet. Call `interrogate()` first.")
+        step = next((v for v in self.validation_info if v.i == i), None)
+        if step is None:
+            raise ValueError(f"There is no step {i}.")
+        if step.assertion_type != "prompt":
+            raise ValueError(f"Step {i} is a `{step.assertion_type}()` step, not a `prompt()` one.")
+        if step.eval_error or not step.active:
+            raise ValueError(f"Step {i} has no results: it wasn't evaluated.")
+        if step.tbl_checked is None:
+            raise ValueError(
+                f"The row-level results of step {i} aren't available. Call `interrogate()` "
+                "(keeping its default of `collect_tbl_checked=True`) first."
+            )
+        return step
+
     def get_data_extracts(
         self, i: int | list[int] | None = None, frame: bool = False
     ) -> dict[int, Any] | Any:
@@ -21892,6 +22166,157 @@ class Validate:
 
         return schema_doc
 
+    def to_data_card(
+        self,
+        format: str = "huggingface",
+        path: str | Path | None = None,
+        ablation: Ablation | None = None,
+        title: str | None = None,
+        description: str | None = None,
+        license: str | None = None,
+        language: str | list[str] | None = None,
+        source: str | None = None,
+        citation: str | None = None,
+        column_descriptions: dict[str, str] | None = None,
+        by: str | None = None,
+    ) -> str:
+        """
+        Write a data card for the table, with the evidence of the validation.
+
+        A data card describes a dataset for the people who use it: what it has, where it came
+        from, how good it is, and who to ask about it. The `to_data_card()` method writes one in
+        Markdown from what the validation knows: the structure of the table (its columns, their
+        types, and how many values are missing), the results of the validation (the health score,
+        the score of each dimension of quality, and each step with its share of passing test
+        units), and, with `ablation=`, the measured effect of the checks on a model. The rest
+        (the description, the license, the source, and so on) can be given in the arguments, and
+        what isn't known is marked "[More Information Needed]", as in the template of Hugging
+        Face, so that it can be filled in later.
+
+        There are two formats. A Hugging Face dataset card (`format="huggingface"`) has YAML front
+        matter (`pretty_name`, `license`, `language`, and `size_categories`), then the sections of
+        the Hugging Face template, with *Data Quality* and *Ablation Evidence* sections for the
+        validation and the ablation. It can be saved as the `README.md` of a dataset on the
+        Hugging Face Hub. A datasheet (`format="datasheet"`) answers the questions of *Datasheets
+        for Datasets* (Gebru et al., 2021), in its sections: motivation, composition, collection,
+        preprocessing, uses, distribution, and maintenance.
+
+        Parameters
+        ----------
+        format
+            The format of the card: `"huggingface"` (the default) for a Hugging Face dataset
+            card, or `"datasheet"` for a datasheet.
+        path
+            A file to write the card to (e.g., `"README.md"`). The card is returned either way.
+        ablation
+            An [`Ablation`](`pointblank.Ablation`) of the validation that has been run, for the
+            measured effect of each check on a model (the change in the metric named in its
+            `metric=`, with its interval and verdict).
+        title
+            The name of the dataset. By default, the `tbl_name=` of the validation (or its
+            `label=`).
+        description
+            A summary of the dataset: what it is and what it's for.
+        license
+            The license of the dataset, as an identifier like `"cc-by-4.0"` or `"apache-2.0"` (the
+            identifiers of the Hugging Face Hub, for a Hugging Face card).
+        language
+            The language of the data (a code like `"en"`), or a list of them.
+        source
+            Where the data came from and how it was collected.
+        citation
+            How to cite the dataset (e.g., a BibTeX entry), written as a block of code.
+        column_descriptions
+            A description of each column, as a dict from the name of a column to its description.
+            The table of the columns gets a column of descriptions.
+        by
+            The name of a column that steps are segmented by, for a table of the scores of each
+            of its values (as with `get_health_score(by=)`), such as the scores of each language
+            of a multilingual dataset.
+
+        Returns
+        -------
+        str
+            The data card, in Markdown.
+
+        Validation Information Used
+        ---------------------------
+        The card takes the curator and contact from the `owner=` of the validation, the uses from
+        its `consumers=`, and the version from its `version=`. The number of missing values in
+        each column is counted in the table of the validation (on its own backend), and the
+        results are those of the last interrogation, so it needs `interrogate()` first. The text
+        of the card is in English, whatever the `lang=` of the validation.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Let's validate a small table of product reviews in two languages, with an owner for the
+        data and the language of each review.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        reviews = pl.DataFrame(
+            {
+                "review": [
+                    "The kettle boils fast.",
+                    "Le colis est arrivé en retard.",
+                    None,
+                    "The lamp is bright.",
+                    "Très bon produit.",
+                ],
+                "lang": ["en", "fr", "en", "en", "fr"],
+                "stars": [5, 2, 4, 9, 5],
+            }
+        )
+
+        validation = (
+            pb.Validate(data=reviews, tbl_name="reviews", owner="Data Team")
+            .col_vals_not_null(columns="review", segments="lang")
+            .col_vals_between(columns="stars", left=1, right=5)
+            .interrogate()
+        )
+
+        card = validation.to_data_card(
+            description="Short reviews of household products.",
+            license="cc-by-4.0",
+            language=["en", "fr"],
+            column_descriptions={"stars": "The rating, from 1 to 5."},
+            by="lang",
+        )
+
+        print(card)
+        ```
+
+        The card starts with the front matter of a Hugging Face card, then has the structure of
+        the table (one review is missing), the scores, the steps (one rating is out of range), and
+        the scores of each language. With `path="README.md"`, it would also be written to a file,
+        and with `format="datasheet"`, it would be a datasheet instead.
+        """
+        from pointblank._data_card import make_data_card
+
+        return make_data_card(
+            self,
+            format=format,
+            path=path,
+            ablation=ablation,
+            title=title,
+            description=description,
+            license=license,
+            language=language,
+            source=source,
+            citation=citation,
+            column_descriptions=column_descriptions,
+            by=by,
+        )
+
     def _enrich_schema_types(self, schema_doc: dict[str, Any]) -> None:  # pragma: no cover
         """Add JSON Schema ``type`` fields inferred from the data's column types."""
         try:  # pragma: no cover
@@ -22117,7 +22542,7 @@ class Validate:
             max_reprompts=max_reprompts,
         )
 
-    def get_dimension_scores(self) -> dict[str, float]:
+    def get_dimension_scores(self, by: str | None = None) -> dict[Any, Any]:
         """
         Get per-dimension health scores from the validation results.
 
@@ -22131,11 +22556,34 @@ class Validate:
         contribute proportionally more to each dimension's score. Only steps that have been
         interrogated contribute; inactive steps are excluded.
 
+        Parameters
+        ----------
+        by
+            The name of a column that steps are segmented by (with `segments=`), to get the scores
+            of each segment rather than of the whole validation. Only the steps segmented by that
+            column count toward the scores of a segment (a step without segments applies to the
+            whole table, so it's left out), and a segment whose steps have no results (being
+            inactive, or not evaluated) is left out too. It's an error if no step is segmented by
+            the column. See the *Scores by Segment* section for details.
+
         Returns
         -------
-        dict[str, float]
+        dict
             A dictionary mapping each dimension name to its score (a percentage from `0` to `100`).
-            Returns an empty dictionary if the validation has not been interrogated.
+            Returns an empty dictionary if the validation has not been interrogated. With `by=`,
+            a dictionary mapping each value of the column (in the order of the steps) to such a
+            dictionary for its segment (a group of values made with
+            [`seg_group()`](`pointblank.seg_group`) is a tuple).
+
+        Scores by Segment
+        -----------------
+        A table often holds several kinds of data whose quality differs: the languages of a
+        multilingual corpus, the regions of a sales table, or the sources of a feed. Steps with
+        `segments=` give results for each kind, and `by=` rolls them up into scores for each,
+        which says which part of the data needs work. The same `by=` is in
+        [`get_health_score()`](`pointblank.Validate.get_health_score`),
+        [`assert_dimension_scores()`](`pointblank.Validate.assert_dimension_scores`), and
+        [`get_scorecard()`](`pointblank.Validate.get_scorecard`).
 
         Examples
         --------
@@ -22172,13 +22620,72 @@ class Validate:
         this points to the kind of problem to fix, which the single number from
         [`get_health_score()`](`pointblank.Validate.get_health_score`) doesn't.
 
+        When the steps are segmented, `by=` gives the scores of each segment. Here, the first two
+        steps are segmented by the values of `f`.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=small_table)
+            .col_vals_not_null(columns="c", segments="f")
+            .col_vals_gt(columns="d", value=1000, segments="f")
+            .rows_distinct()
+            .interrogate()
+        )
+
+        validation.get_dimension_scores(by="f")
+        ```
+
+        The rows with `f` of `"low"` have no missing values in `c`, but only 2 of their 5 values
+        in `d` are above 1000. The `rows_distinct()` step isn't segmented, so it's not part of the
+        scores of any segment.
+
         See Also
         --------
         Validate.get_health_score : Get a single overall score across all dimensions.
+        Validate.get_scorecard : Get a scorecard of the scores.
         """
+        if by is not None:
+            groups = self._steps_by_segment(by)
+            return {
+                value: _compute_dimension_scores(steps)
+                for value, steps in groups.items()
+                if _aggregate_dimension_units(steps)
+            }
         return _compute_dimension_scores(self.validation_info)
 
-    def get_health_score(self) -> float:
+    def _steps_by_segment(self, by: str) -> dict[Any, list[_ValidationInfo]]:
+        """Group the steps segmented by the column `by` by their segment value."""
+        if not isinstance(by, str) or not by:
+            raise TypeError("`by=` must be the name of a column that steps are segmented by.")
+
+        # Before interrogation, the segments are only directives (they're expanded then)
+        if getattr(self, "time_start", None) is None:
+            return {}
+
+        groups: dict[Any, list[_ValidationInfo]] = {}
+        columns: list[str] = []
+        for step in self.validation_info:
+            segment = step.segments
+            if not (isinstance(segment, tuple) and len(segment) == 2):
+                continue
+            column, value = segment
+            if column not in columns:
+                columns.append(column)
+            if column == by:
+                # A group of values (from `seg_group()`) is a list, kept as a tuple for a key
+                key = tuple(value) if isinstance(value, list) else value
+                groups.setdefault(key, []).append(step)
+
+        if not groups:
+            if columns:
+                listed = ", ".join(repr(column) for column in columns)
+                detail = f"the steps are segmented by {listed}"
+            else:
+                detail = "no step has `segments=`"
+            raise ValueError(f"No step is segmented by the column {by!r} ({detail}).")
+        return groups
+
+    def get_health_score(self, by: str | None = None) -> float | dict[Any, float]:
         """
         Get the overall data quality health score from the validation results.
 
@@ -22194,11 +22701,21 @@ class Validate:
         test-unit contribution to the score (so a dimension's influence is its weight times its
         test-unit count); the returned score is always within `[0, 100]`.
 
+        Parameters
+        ----------
+        by
+            The name of a column that steps are segmented by (with `segments=`), to get the score
+            of each segment. Only the steps segmented by that column count toward the score of a
+            segment, as in [`get_dimension_scores()`](`pointblank.Validate.get_dimension_scores`)
+            (see its *Scores by Segment* section).
+
         Returns
         -------
-        float
+        float | dict
             The overall health score as a percentage from `0` to `100`. Returns `100.0` if the
-            validation has not been interrogated or contains no scorable steps.
+            validation has not been interrogated or contains no scorable steps. With `by=`, a
+            dictionary mapping each value of the column to the score of its segment (empty if the
+            validation has not been interrogated).
 
         Examples
         --------
@@ -22249,12 +22766,20 @@ class Validate:
         Validate.get_dimension_scores : Get a per-dimension breakdown of the score.
         """
         weights = getattr(global_config, "dimension_weights", None)
+        if by is not None:
+            groups = self._steps_by_segment(by)
+            return {
+                value: _compute_health_score(steps, dimension_weights=weights)
+                for value, steps in groups.items()
+                if _aggregate_dimension_units(steps)
+            }
         return _compute_health_score(self.validation_info, dimension_weights=weights)
 
     def assert_dimension_scores(
         self,
         thresholds: dict[str, float] | None = None,
         message: str | None = None,
+        by: str | None = None,
     ) -> None:
         """
         Raise an `AssertionError` if any dimension's health score falls below a minimum.
@@ -22273,6 +22798,11 @@ class Validate:
         message
             Custom error message to use if the assertion fails. If `None`, a default message that
             lists the offending dimensions (with actual vs. required scores) is generated.
+        by
+            The name of a column that steps are segmented by (with `segments=`), to require the
+            minimums of every segment rather than of the whole validation. The scores of each
+            segment are those of
+            [`get_dimension_scores(by=)`](`pointblank.Validate.get_dimension_scores`).
 
         Returns
         -------
@@ -22348,13 +22878,18 @@ class Validate:
         if not hasattr(self, "time_start") or self.time_start is None:
             self.interrogate()
 
-        dimension_scores = self.get_dimension_scores()
+        if by is None:
+            scores_of = {None: self.get_dimension_scores()}
+        else:
+            scores_of = self.get_dimension_scores(by=by)
 
         failures = []
-        for dimension, minimum in thresholds.items():
-            score = dimension_scores.get(dimension)
-            if score is not None and score < minimum:
-                failures.append((dimension, score, minimum))
+        for value, dimension_scores in scores_of.items():
+            for dimension, minimum in thresholds.items():
+                score = dimension_scores.get(dimension)
+                if score is not None and score < minimum:
+                    where = "" if by is None else f" in {by}={value!r}"
+                    failures.append((f"{dimension}{where}", score, minimum))
 
         if failures:
             if message is None:
@@ -22367,7 +22902,7 @@ class Validate:
                 )
             raise AssertionError(message)
 
-    def get_scorecard(self, title: str | None = ":default:") -> GT:
+    def get_scorecard(self, title: str | None = ":default:", by: str | None = None) -> GT:
         """
         Get a data quality scorecard as a GT table.
 
@@ -22386,6 +22921,11 @@ class Validate:
             Options for customizing the title of the scorecard. The default `":default:"` produces
             a generic title (optionally including the table name). Use `":tbl_name:"` to show just
             the table name, `":none:"` for no title, or provide your own Markdown text.
+        by
+            The name of a column that steps are segmented by (with `segments=`), for a scorecard
+            with a row for each segment: its health score as a bar, and a badge for each dimension
+            with the dimension's score. The scores are those of
+            [`get_dimension_scores(by=)`](`pointblank.Validate.get_dimension_scores`).
 
         Returns
         -------
@@ -22427,6 +22967,23 @@ class Validate:
         [`get_tabular_report()`](`pointblank.Validate.get_tabular_report`) gives the full picture
         for whoever has to fix the data.
 
+        With steps segmented by a column, `by=` gives a scorecard with a row for each segment.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=small_table, tbl_name="small_table")
+            .col_vals_not_null(columns="c", segments="f")
+            .col_vals_gt(columns="d", value=1000, segments="f")
+            .interrogate()
+        )
+
+        validation.get_scorecard(by="f")
+        ```
+
+        Each segment has its health score and a badge with the score of each dimension. The rows
+        with `f` of `"mid"` pass 3 of their 4 test units, while those with `"low"` pass 7 of 10,
+        all of the failures being in validity.
+
         See Also
         --------
         Validate.get_dimension_scores : Get the per-dimension scores behind the scorecard.
@@ -22441,7 +22998,15 @@ class Validate:
 
         lang = self.lang or "en"
 
-        dimension_scores = _compute_dimension_scores(self.validation_info)
+        if by is not None:
+            segment_steps = self._steps_by_segment(by)
+            dimension_scores = {
+                value: _compute_dimension_scores(steps)
+                for value, steps in segment_steps.items()
+                if _aggregate_dimension_units(steps)
+            }
+        else:
+            dimension_scores = _compute_dimension_scores(self.validation_info)
         scorecard_title = _get_report_text("report_dimension_scores", lang)
 
         # Resolve the title text
@@ -22486,6 +23051,39 @@ class Validate:
         weights = getattr(global_config, "dimension_weights", None)
         overall = _compute_health_score(self.validation_info, dimension_weights=weights)
 
+        if by is not None:
+            gt_tbl = _segment_scorecard(
+                segment_steps={value: segment_steps[value] for value in dimension_scores},
+                by=by,
+                lang=lang,
+                weights=weights,
+                df_lib=df_lib,
+            )
+        else:
+            gt_tbl = self._dimension_scorecard(dimension_scores, lang=lang, df_lib=df_lib)
+
+        health_label = _get_report_text("report_health_score", lang)
+        subtitle_html = (
+            '<div style="padding-top: 4px;">'
+            f'<span style="font-weight: 600; color: #444444; font-size: 13px;">{health_label}:'
+            "</span> "
+            f'<span style="font-weight: 700; font-size: 22px; color: {_health_score_color(overall)};">'
+            f"{overall:.0f}%</span>"
+            "</div>"
+        )
+
+        if title_text is not None:
+            gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(subtitle_html))
+
+        if version("great_tables") >= "0.17.0":
+            gt_tbl = gt_tbl.tab_options(quarto_disable_processing=True)
+
+        return gt_tbl
+
+    def _dimension_scorecard(
+        self, dimension_scores: dict[str, float], lang: str, df_lib: Any
+    ) -> GT:
+        """The body of the scorecard, with a row for each dimension."""
         agg = _aggregate_dimension_units(self.validation_info)
 
         # Order dimensions using the canonical order, appending any custom dimensions at the end
@@ -22499,13 +23097,7 @@ class Validate:
             n_passed, n = agg[dimension]
             score = dimension_scores[dimension]
             color = DIMENSION_COLORS.get(dimension, DIMENSION_COLORS["unknown"])
-            label = html_module.escape(_get_dimension_label(dimension, lang))
-            dimension_cells.append(
-                f'<span style="background-color: {color}; color: #FFFFFF; padding: 3px 9px; '
-                "border-radius: 9px; font-size: 11px; font-weight: 600; white-space: nowrap; "
-                'line-height: 1; display: inline-block; vertical-align: middle;">'
-                f"{label}</span>"
-            )
+            dimension_cells.append(_dimension_pill(dimension, lang))
             score_cells.append(
                 '<div style="display: flex; align-items: center; gap: 8px;">'
                 '<div style="background: #EEEEEE; border-radius: 4px; width: 110px; height: 14px; '
@@ -22525,17 +23117,7 @@ class Validate:
             }
         )
 
-        health_label = _get_report_text("report_health_score", lang)
-        subtitle_html = (
-            '<div style="padding-top: 4px;">'
-            f'<span style="font-weight: 600; color: #444444; font-size: 13px;">{health_label}:'
-            "</span> "
-            f'<span style="font-weight: 700; font-size: 22px; color: {_health_score_color(overall)};">'
-            f"{overall:.0f}%</span>"
-            "</div>"
-        )
-
-        gt_tbl = (
+        return (
             _fmt_raw_html(GT(df, id="pb_scorecard"), columns=["dimension", "score"])
             .opt_table_font(font=google_font(name="IBM Plex Sans"))
             .cols_label(
@@ -22560,14 +23142,6 @@ class Validate:
             )
             .tab_options(table_font_size="90%")
         )
-
-        if title_text is not None:
-            gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(subtitle_html))
-
-        if version("great_tables") >= "0.17.0":
-            gt_tbl = gt_tbl.tab_options(quarto_disable_processing=True)
-
-        return gt_tbl
 
     def get_json_report(
         self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
@@ -24018,7 +24592,7 @@ class Validate:
             elif assertion_type[i] in ["prompt"]:  # pragma: no cover
                 # For AI validation, show only the prompt, not the full config
                 if isinstance(value, dict) and "prompt" in value:  # pragma: no cover
-                    values_upd.append(value["prompt"])  # pragma: no cover
+                    values_upd.append(_prompt_values_text(value))  # pragma: no cover
                 else:  # pragma: no cover
                     values_upd.append(str(value))  # pragma: no cover
 
@@ -28139,6 +28713,99 @@ def _compute_health_score(
     return round(min(100.0, max(0.0, numerator / denominator * 100)), 2)
 
 
+def _dimension_pill(dimension: str, lang: str, score: float | None = None) -> str:
+    """A compact badge for a dimension, in its color, with its score if given."""
+    color = DIMENSION_COLORS.get(dimension, DIMENSION_COLORS["unknown"])
+    label = html_module.escape(_get_dimension_label(dimension, lang))
+    score_html = "" if score is None else f' <span style="font-weight: 400;">{score:.0f}%</span>'
+    return (
+        f'<span style="background-color: {color}; color: #FFFFFF; padding: 3px 9px; '
+        "border-radius: 9px; font-size: 11px; font-weight: 600; white-space: nowrap; "
+        'line-height: 1; display: inline-block; vertical-align: middle;">'
+        f"{label}{score_html}</span>"
+    )
+
+
+def _segment_scorecard(
+    segment_steps: dict[Any, list[_ValidationInfo]],
+    by: str,
+    lang: str,
+    weights: dict[str, float] | None,
+    df_lib: Any,
+) -> GT:
+    """The body of the scorecard by segment: a row for each segment, with a badge per dimension."""
+    segment_cells: list[str] = []
+    health_cells: list[str] = []
+    dimension_cells: list[str] = []
+    units_cells: list[str] = []
+    for value, steps in segment_steps.items():
+        agg = _aggregate_dimension_units(steps)
+        scores = _compute_dimension_scores(steps)
+        health = _compute_health_score(steps, dimension_weights=weights)
+        ordered = [d for d in DIMENSION_NAMES if d in scores]
+        ordered += [d for d in scores if d not in DIMENSION_NAMES]
+
+        shown = ", ".join(map(str, value)) if isinstance(value, tuple) else str(value)
+        segment_cells.append(html_module.escape(shown))
+        color = _health_score_color(health)
+        health_cells.append(
+            '<div style="display: flex; align-items: center; gap: 8px;">'
+            '<div style="background: #EEEEEE; border-radius: 4px; width: 80px; height: 14px; '
+            'overflow: hidden;">'
+            f'<div style="background: {color}; width: {health:g}%; height: 100%;"></div></div>'
+            "<span style=\"font-family: 'IBM Plex Mono', monospace; font-size: 12px; "
+            f'color: #444444; font-weight: 600;">{health:.0f}%</span>'
+            "</div>"
+        )
+        dimension_cells.append(
+            '<div style="display: flex; flex-wrap: wrap; gap: 4px;">'
+            + "".join(_dimension_pill(d, lang, scores[d]) for d in ordered)
+            + "</div>"
+        )
+        n_passed = sum(units[0] for units in agg.values())
+        n = sum(units[1] for units in agg.values())
+        units_cells.append(f"{n_passed} / {n}")
+
+    df = df_lib.DataFrame(
+        {
+            "segment": segment_cells,
+            "health": health_cells,
+            "dimensions": dimension_cells,
+            "test_units": units_cells,
+        }
+    )
+
+    return (
+        _fmt_raw_html(GT(df, id="pb_scorecard"), columns=["segment", "health", "dimensions"])
+        .opt_table_font(font=google_font(name="IBM Plex Sans"))
+        .cols_label(
+            cases={
+                "segment": by,
+                "health": _get_report_text("report_health_score", lang).upper(),
+                "dimensions": _get_report_text("report_col_dimension", lang),
+                "test_units": _get_report_text("report_col_units", lang),
+            }
+        )
+        .cols_align(align="left", columns=["segment", "health", "dimensions"])
+        .cols_align(align="right", columns=["test_units"])
+        .cols_width(
+            cases={
+                "segment": "110px",
+                "health": "140px",
+                "dimensions": "300px",
+                "test_units": "90px",
+            }
+        )
+        .tab_style(style=style.text(weight="bold", color="#666666"), locations=loc.column_labels())
+        .tab_style(style=style.css("height: 34px;"), locations=loc.body())
+        .tab_style(
+            style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="12px"),
+            locations=loc.body(columns=["segment", "test_units"]),
+        )
+        .tab_options(table_font_size="90%")
+    )
+
+
 def _get_assertion_icon(icon: list[str], length_val: int = 30) -> list[str]:
     # For each icon, get the assertion icon SVG test from SVG_ICONS_FOR_ASSERTION_TYPES dictionary
     icon_svg: list[str] = [SVG_ICONS_FOR_ASSERTION_TYPES[icon] for icon in icon]
@@ -29599,6 +30266,104 @@ def _create_near_distinct_note(info: dict[str, Any], value: dict[str, Any]) -> t
         if n_clusters > 1:
             text += f" (the largest has {_plural(info.get('largest', 0), 'row')})"
         text += f"; {how}. The group of each row is in the `pb_cluster_` column."
+    return _note_html(text), text
+
+
+def _prompt_values_text(value: dict[str, Any]) -> str:
+    """Get the VALUES cell of a `prompt()` step: the prompt (and a badge for several judges)."""
+    judges = value.get("judges") or []
+    if len(judges) < 2:
+        return value["prompt"]
+    return value["prompt"] + _badge(
+        f"{len(judges)} JUDGES · {value.get('aggregate', 'majority').upper()}"
+    )
+
+
+_AGGREGATE_RULES = {
+    "majority": "a row passes if most of them pass it",
+    "all": "a row passes if all of them pass it",
+    "any": "a row passes if any of them pass it",
+}
+
+
+def _create_judges_note(info: dict[str, Any]) -> tuple[str, str]:
+    """
+    Create the note of a `prompt()` step with several models (HTML and plain text): the rows each
+    model passed, and how often they agreed.
+    """
+    verdicts: dict[str, list[bool]] = info["judges"]
+    n_rows = len(next(iter(verdicts.values())))
+    passed = [f"`{judge}` passed {sum(rows):,}" for judge, rows in verdicts.items()]
+    agreed = sum(len(set(row)) == 1 for row in zip(*verdicts.values()))
+    rule = _AGGREGATE_RULES.get(info.get("aggregate", "majority"), "")
+    text = (
+        f"Judged by {len(verdicts)} models ({rule}): {_join_and(passed)} of "
+        f"{_plural(n_rows, 'row')}."
+    )
+    if n_rows:
+        text += (
+            f" They agreed on {agreed:,} of {_plural(n_rows, 'row')} "
+            f"({100 * agreed / n_rows:.0f}%)."
+        )
+    text += " The number of models that passed each row is in the `pb_votes_` column."
+    return _note_html(text), text
+
+
+def _calibration_label(value: Any) -> bool | None:
+    """A label of `calibrate_prompt()` as a Boolean (`None` if it's missing)."""
+    if hasattr(value, "item") and not isinstance(value, (str, bytes)):
+        # (a NumPy scalar)
+        value = value.item()
+    if value is None or (isinstance(value, float) and value != value):
+        return None
+    if type(value).__name__ in ("NAType", "NaTType"):
+        return None
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)) and value in (0, 1):
+        return bool(value)
+    raise ValueError(
+        f"A label must be True, False, 1, 0, or missing (for a row that wasn't labeled), got "
+        f"{value!r}."
+    )
+
+
+def _calibrate(judged: list[bool], labels: list[bool]) -> dict[str, Any]:
+    """The agreement of the verdicts of a `prompt()` step with labels, and Cohen's kappa."""
+    n = len(labels)
+    counts = {"true_pass": 0, "false_pass": 0, "false_fail": 0, "true_fail": 0}
+    for verdict, label in zip(judged, labels):
+        key = ("true_" if verdict == label else "false_") + ("pass" if verdict else "fail")
+        counts[key] += 1
+    agreement = (counts["true_pass"] + counts["true_fail"]) / n
+    judged_pass = (counts["true_pass"] + counts["false_pass"]) / n
+    labeled_pass = (counts["true_pass"] + counts["false_fail"]) / n
+    expected = judged_pass * labeled_pass + (1 - judged_pass) * (1 - labeled_pass)
+    kappa = None if expected >= 1 else (agreement - expected) / (1 - expected)
+    return {"n_labeled": n, "agreement": agreement, "kappa": kappa, **counts}
+
+
+def _create_calibration_note(calibration: dict[str, Any]) -> tuple[str, str]:
+    """
+    Create the note of `calibrate_prompt()` (HTML and plain text): the agreement of the step (and
+    of each model) with the labels.
+    """
+
+    def measures(result: dict[str, Any]) -> str:
+        kappa = "kappa undefined" if result["kappa"] is None else f"kappa {result['kappa']:.2f}"
+        return f"{100 * result['agreement']:.0f}%, {kappa}"
+
+    n = calibration["n_labeled"]
+    agreed = calibration["true_pass"] + calibration["true_fail"]
+    text = (
+        f"Calibrated with {_plural(n, 'labeled row')}: the step agreed with {agreed:,} "
+        f"({measures(calibration)}). It passed {_plural(calibration['false_pass'], 'row')} labeled "
+        f"to fail and failed {_plural(calibration['false_fail'], 'row')} labeled to pass."
+    )
+    judges = calibration.get("judges")
+    if judges:
+        by_judge = [f"`{judge}` {measures(result)}" for judge, result in judges.items()]
+        text += f" By model: {_join_and(by_judge)}."
     return _note_html(text), text
 
 
