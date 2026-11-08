@@ -408,8 +408,9 @@ def _with_row_index(
     order rather than in their actual order), so the native Polars row index is used for those.
     Other LazyFrames (e.g., database tables) have no inherent row order, so they're ordered by
     their first column, with ties broken by the other columns that can be sorted (numeric,
-    temporal, string, and boolean ones) so that the numbering doesn't vary from run to run. A
-    results column (`pb_is_good_`) isn't used, so a table is numbered the same with or without it.
+    temporal, string, and boolean ones) so that the numbering doesn't vary from run to run. The
+    results columns (`pb_is_good_`, and the scores of a `col_vals_scored()` step in `pb_score_`)
+    aren't used, so a table is numbered the same with or without them.
 
     Parameters
     ----------
@@ -433,7 +434,9 @@ def _with_row_index(
     if is_polars_lazyframe(native):
         return nw.from_native(native.with_row_index(name=name))
     schema = tbl_nw.collect_schema()
-    first_col, *other_cols = [c for c in schema.names() if c != "pb_is_good_" and c not in ignore]
+    first_col, *other_cols = [
+        c for c in schema.names() if c not in ("pb_is_good_", "pb_score_") and c not in ignore
+    ]
     tie_breakers = [
         c
         for c in other_cols

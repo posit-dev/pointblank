@@ -401,6 +401,7 @@ class YAMLValidator:
         "col_vals_decreasing": "col_vals_decreasing",
         "col_vals_within_spec": "col_vals_within_spec",
         "col_vals_str_len": "col_vals_str_len",
+        "col_vals_scored": "col_vals_scored",
         "col_pct_null": "col_pct_null",
         "col_pct_missing": "col_pct_missing",
         "col_missing_coded": "col_missing_coded",
@@ -841,6 +842,26 @@ class YAMLValidator:
             "or a MissingSpec."
         )
 
+    @staticmethod
+    def _parse_scorer_spec(spec: dict) -> Any:
+        """Make a `pb.scorers` adapter from its YAML form, `{<adapter>: {<settings>}}`."""
+        from pointblank import scorers
+
+        if len(spec) != 1 or next(iter(spec)) not in scorers.ADAPTERS:
+            raise YAMLValidationError(
+                "A `col_vals_scored` scorer must be written as `{<adapter>: {...}}`, where the "
+                f"adapter is one of {', '.join(scorers.ADAPTERS)} (or as a `python:` block); got "
+                f"{spec!r}."
+            )
+        kind, settings = next(iter(spec.items()))
+        settings = settings or {}
+        if not isinstance(settings, dict):
+            raise YAMLValidationError(f"The settings of the `{kind}` scorer must be a dictionary.")
+        try:
+            return getattr(scorers, kind)(**settings)
+        except (TypeError, ValueError) as e:
+            raise YAMLValidationError(f"The `{kind}` scorer couldn't be made: {e}") from e
+
     def _parse_validation_step(
         self,
         step_config: Union[str, dict],
@@ -983,6 +1004,12 @@ class YAMLValidator:
             if isinstance(expr_value, str):
                 # Treat string directly as Python code (shortcut syntax)
                 parameters["expr"] = _eval_python_code(expr_value, python_mode=python_mode)
+
+        # A `col_vals_scored()` scorer can be written as `{<adapter>: {...}}`, which calls the
+        # `pb.scorers` function of that name with the settings given (e.g.,
+        # `scorer: {classifier: {hf_model: ..., label: ...}}`)
+        if method_name == "col_vals_scored" and isinstance(parameters.get("scorer"), dict):
+            parameters["scorer"] = self._parse_scorer_spec(parameters["scorer"])
 
         # Convert `actions=` if present (ensure it's an Actions object)
         if "actions" in parameters:
@@ -1196,6 +1223,8 @@ _ABLATION_STRATEGIES = {
     "drop_steps": ({"steps", "name"}, {"steps"}),
     "drop_all_but_each": ({"steps"}, set()),
     "drop_groups": ({"column", "values"}, {"column"}),
+    "sweep_score": ({"score", "quantiles", "values", "remove"}, {"score"}),
+    "sweep_step": ({"step", "param", "values"}, {"step", "param", "values"}),
 }
 
 # An `evaluate:` function given by its import path (e.g., `my_models.training:evaluate`)
@@ -1419,8 +1448,8 @@ def yaml_ablation(
     function), or a `python:` block whose result is the function. The `control:` is
     `size_matched` (the default), `null` (for no control), or `stratified:` with one or more
     columns (for a [`Stratified`](`pointblank.ablation.Stratified`) control). Each strategy is
-    the name of an `Ablation` method that adds variants, with its parameters as a mapping. The
-    strategies are added in order.
+    the name of an `Ablation` method that adds variants (including the sweeps `sweep_score` and
+    `sweep_step`), with its parameters as a mapping. The strategies are added in order.
 
     The block is ignored by `yaml_interrogate()`, so the same configuration can be used both to
     validate the data and to measure what its steps do for a model.

@@ -138,6 +138,7 @@ def _get_api_text() -> str:
         "Validate.conjointly",
         "Validate.specially",
         "Validate.prompt",
+        "Validate.col_vals_scored",
     ]
 
     column_selection_exported = [

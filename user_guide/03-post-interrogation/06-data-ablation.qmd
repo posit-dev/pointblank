@@ -276,6 +276,83 @@ Removing the flights from Newark (`EWR`) hurts more than removing as many random
 seem to have something to teach the model that the flights from the other airports don't. The
 `values=` parameter picks the groups to try, for a column with many distinct values.
 
+## Sweeping a Threshold
+
+A step's variant tests one setting of its check, but the setting itself is often the question: is
+2,500 miles the right limit, or would a higher one do better? The
+[`Ablation.sweep_step()`](`Ablation.sweep_step`) method adds a variant for each of a list of values
+of one of a step's parameters, each removing the rows that fail the step with that value. Here's
+the limit of step 3 at four values:
+
+```{python}
+by_limit = (
+    pb.Ablation(
+        validation,
+        evaluate=evaluate,
+        metric="mae",
+        higher_is_better=False,
+        label="Air time model",
+    )
+    .sweep_step(3, "value", [1500, 2000, 2500, 3000])
+    .run()
+)
+
+by_limit
+```
+
+The variants of a sweep are a group of their own in the report, and below the table, a curve shows
+the change from the full table at each value, with a dashed line for the controls (removing as many
+random rows). The lower the limit, the more long flights are removed and the worse the model gets.
+Even a limit of 3,000 miles, which only removes the seven flights to Honolulu, hurts. No limit
+helps, so this check shouldn't be used to clean the data at all.
+
+A check whose limit is a model's score is the same question: a score is a matter of degree, and
+where to draw the line is a choice. A
+[`Validate.col_vals_scored()`](`Validate.col_vals_scored`) step (see
+[Scored Validation](../advanced-validation/scored-validation.qmd)) gives each row a score
+and keeps the scores. The [`Ablation.sweep_score()`](`Ablation.sweep_score`) method then removes
+more and more of the rows with the highest (or lowest) scores, whatever the step's own bound. Here,
+the score of a flight is the average speed implied by its distance and air time, which is far too
+high for the flights with their air times in hours:
+
+```{python}
+def speed(batch):
+    return [row["distance"] / (row["air_time"] / 60) for row in batch]
+
+
+scored_validation = (
+    pb.Validate(data=train, tbl_name="flights_train")
+    .col_vals_scored(
+        columns=["distance", "air_time"],
+        scorer=speed,
+        max_val=600,
+        brief="Implied speed is at most 600 mph",
+    )
+    .interrogate()
+)
+
+by_speed = (
+    pb.Ablation(
+        scored_validation,
+        evaluate=evaluate,
+        metric="mae",
+        higher_is_better=False,
+        label="Air time model",
+    )
+    .sweep_score(1, quantiles=[0.01, 0.02, 0.03, 0.05, 0.1, 0.2])
+    .run()
+)
+
+by_speed
+```
+
+Each variant removes a share of the rows with the highest scores (the step has only a `max_val=`, so
+it's the highest that are removed; `remove="lowest"` would remove the lowest instead). The curve is
+lowest at 2%, which is the share of flights with their air times in hours: removing fewer leaves
+some of them in, and removing more starts to remove good flights. By 20%, the sweep hurts. A sweep
+can also use the values of a column of the table as the scores (`sweep_score("column_name")`), or
+cutoffs on the scale of the scores rather than shares of the rows (`values=`).
+
 ## Getting the Results
 
 The [`Ablation.get_effects()`](`Ablation.get_effects`) method returns the results as a table, with
@@ -516,6 +593,9 @@ ablation:
 pb.yaml_ablation(config, set_tbl=train, evaluate=evaluate).plan()
 ```
 
+The sweeps are strategies too, with their arguments by name (e.g.,
+`- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}`).
+
 The block is ignored by [`yaml_interrogate()`](`yaml_interrogate`), so the same file can be used
 for validating the data, and [`yaml_to_python()`](`yaml_to_python`) writes out the equivalent
 Python code, ablation included.
@@ -556,6 +636,6 @@ have a note for each step that couldn't be used.
 A validation can say which rows break its rules, but only an experiment can say whether those rows
 hurt the model trained on them. An `Ablation` runs that experiment with controls, repeats, and
 intervals, so you can find the checks that are worth enforcing, the ones that don't matter, the
-ones that are redundant, and the ones that remove good data. It works with any model that you can
-wrap in an `evaluate` function (or train elsewhere, with `export()` and `load_results()`), and with
-any validation whose steps check rows.
+ones that are redundant, the ones that remove good data, and where to set their limits. It works
+with any model that you can wrap in an `evaluate` function (or train elsewhere, with `export()` and
+`load_results()`), and with any validation whose steps check rows.

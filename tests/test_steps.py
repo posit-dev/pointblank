@@ -145,6 +145,7 @@ class TestStepsMethodCoverage:
         "col_vals_regex",
         "col_vals_within_spec",
         "col_vals_str_len",
+        "col_vals_scored",
         "col_vals_expr",
         "col_exists",
         "col_pct_null",

@@ -53,6 +53,10 @@ _MANIFEST_VERSION = 1
 
 _ML_INSTALL_HINT = '`pip install "pointblank[ml]"`'
 
+# The parameters that `sweep_step()` can't vary: they don't change which rows fail a step, or they
+# change which rows the step checks
+_SWEEP_FIXED_PARAMS = ("thresholds", "actions", "brief", "active", "dimension", "pre", "segments")
+
 _VERDICT_COLORS = {
     "helps": "#4CA64C",
     "hurts": "#CF142B",
@@ -68,6 +72,8 @@ _EFFECT_COLUMNS = {
     "steps": "list",
     "left_out": "int",
     "group": "str",
+    "sweep": "str",
+    "value": "float",
     "n_removed": "int",
     "f_removed": "float",
     "metric": "str",
@@ -114,17 +120,21 @@ class AblationVariant:
         `"all"` for [`drop_all()`](`pointblank.Ablation.drop_all`), the `name=` (or
         `"steps_<i>_<j>"`) for [`drop_steps()`](`pointblank.Ablation.drop_steps`),
         `"all_but_<i>"` for [`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`),
-        `"<column>=<value>"` for [`drop_groups()`](`pointblank.Ablation.drop_groups`), and
-        `"control_<n>"` for the control that removes `n` random rows (or `"control_<id>"` for the
-        control of a `drop_all_but_each()` variant).
+        `"<column>=<value>"` for [`drop_groups()`](`pointblank.Ablation.drop_groups`),
+        `"<score>:lowest_<q>"` (or `"<score>:below_<value>"`, and the same with `highest` and
+        `above`) for [`sweep_score()`](`pointblank.Ablation.sweep_score`), where `<score>` is
+        `step_<i>` or the score column, `"step_<i>:<param>=<value>"` for
+        [`sweep_step()`](`pointblank.Ablation.sweep_step`), and `"control_<n>"` for the control
+        that removes `n` random rows (or `"control_<id>"` for the control of a
+        `drop_all_but_each()` variant).
     strategy
         The kind of version: `"full"`, `"drop_steps"`, `"drop_each"`, `"drop_all"`,
-        `"drop_all_but_each"`, `"drop_groups"`, or `"control"`.
+        `"drop_all_but_each"`, `"drop_groups"`, `"sweep_score"`, `"sweep_step"`, or `"control"`.
     name
         A name for the version, as shown in reports (e.g., `"Step 2"`).
     steps
         The numbers of the validation steps whose failing rows were removed (empty for the full
-        table, for groups, and for most controls).
+        table, for groups, for the points of a sweep, and for most controls).
     n_removed
         The number of rows removed from the table.
     f_removed
@@ -139,6 +149,12 @@ class AblationVariant:
     left_out
         For a variant of `drop_all_but_each()` (and its control), the step whose rows are kept
         (otherwise `None`).
+    sweep
+        For a point of a sweep (from `sweep_score()` or `sweep_step()`), the id of the sweep, which
+        its points share (e.g., `"step_2:lowest"` or `"step_2:min_val"`; otherwise `None`).
+    value
+        For a point of a sweep, its value: the share of the scored rows removed, the score
+        threshold, or the value of the step's parameter (otherwise `None`).
     """
 
     id: str
@@ -151,6 +167,8 @@ class AblationVariant:
     group: Any = None
     group_column: str | None = None
     left_out: int | None = None
+    sweep: str | None = None
+    value: float | None = None
 
     def _to_dict(self) -> dict[str, Any]:
         return {
@@ -164,6 +182,8 @@ class AblationVariant:
             "group": _json_value(self.group),
             "group_column": self.group_column,
             "left_out": self.left_out,
+            "sweep": self.sweep,
+            "value": self.value,
         }
 
 
@@ -178,10 +198,15 @@ class _Spec:
     left_out: int | None = None
     group_column: str | None = None
     group: Any = None
+    sweep: str | None = None
+    value: float | None = None
 
     @property
     def key(self) -> tuple[Any, ...]:
         """What the variant removes: specs with the same key remove the same rows."""
+        if self.sweep is not None:
+            # The rows of a sweep's point are found when it's added (`Ablation._sweep_rows`)
+            return ("sweep", self.id)
         if self.group_column is not None:
             return ("group", self.group_column, self.group)
         if self.left_out is not None:
@@ -341,8 +366,10 @@ class Ablation:
     ([`drop_each()`](`pointblank.Ablation.drop_each`),
     [`drop_all()`](`pointblank.Ablation.drop_all`),
     [`drop_steps()`](`pointblank.Ablation.drop_steps`),
-    [`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`), and
-    [`drop_groups()`](`pointblank.Ablation.drop_groups`)), and nothing is evaluated until
+    [`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`),
+    [`drop_groups()`](`pointblank.Ablation.drop_groups`), and the sweeps
+    [`sweep_score()`](`pointblank.Ablation.sweep_score`) and
+    [`sweep_step()`](`pointblank.Ablation.sweep_step`)), and nothing is evaluated until
     [`run()`](`pointblank.Ablation.run`) is called. Use [`plan()`](`pointblank.Ablation.plan`)
     before that to see how many rows each variant removes and how many evaluations the run needs.
     When training happens elsewhere (e.g., on a cluster), [`export()`](`pointblank.Ablation.export`)
@@ -648,6 +675,11 @@ class Ablation:
         # `Stratified` control)
         self._groups: dict[str, dict[Any, frozenset[int]]] = {}
         self._strata: list[list[int]] | None = None
+        # The sweeps (by id: their label and the label of their values), and for each of their
+        # points, the rows it removes and a line describing them
+        self._sweeps: dict[str, dict[str, Any]] = {}
+        self._sweep_rows: dict[str, frozenset[int]] = {}
+        self._sweep_details: dict[str, str] = {}
         self._data_fingerprint: str | None = None
         self._reset_results()
 
@@ -1126,6 +1158,426 @@ class Ablation:
             )
         return self
 
+    def sweep_score(
+        self,
+        score: int | str,
+        quantiles: list[float] | None = None,
+        values: list[float] | None = None,
+        remove: str | None = None,
+    ) -> Ablation:
+        """
+        Add a variant for each cutoff of a score, removing the rows on the wrong side of it.
+
+        A score (e.g., from a quality classifier) doesn't say where to draw the line between the
+        rows to keep and those to remove. This strategy measures it: each variant removes more of
+        the lowest-scoring rows than the last, so the results trace how the model changes as the
+        cutoff gets stricter (a dose-response curve). The report plots the curve, along with what
+        removing as many random rows does. The cutoffs are given as shares of the scored rows to
+        remove (`quantiles=`) or as score values (`values=`).
+
+        Parameters
+        ----------
+        score
+            Where the scores come from: the number of a
+            [`col_vals_scored()`](`pointblank.Validate.col_vals_scored`) step that kept its scores
+            (`keep_scores=True`, the default), or the name of a numeric column of the table.
+        quantiles
+            The shares of the scored rows to remove, each greater than `0` and at most `1` (e.g.,
+            `0.1` removes the tenth of the rows with the lowest scores). This is the default, with
+            the shares `0.05`, `0.1`, `0.2`, `0.3`, `0.4`, and `0.5`.
+        values
+            Score cutoffs to use instead of `quantiles=`: each variant removes the rows that score
+            below the cutoff (or above it, with `remove="highest"`).
+        remove
+            Which rows to remove: `"lowest"` (the lowest-scoring rows) or `"highest"`. By default,
+            it's `"highest"` for a step with only `max_val=` (e.g., a toxicity or perplexity score,
+            where a high score is bad) and `"lowest"` otherwise.
+
+        Returns
+        -------
+        Ablation
+            The `Ablation` object, with the variants added.
+
+        Details
+        -------
+        The rows without a score (a missing value, a row the scorer gave no score, or a row
+        outside a segmented step's segment) are never removed, and a note says how many there are.
+        With `quantiles=`, the rows are ranked by their score, and ties are broken by row order,
+        so each share removes a set number of rows. Each point of the sweep is a variant like any
+        other: it's compared with removing the same number of random rows and gets a verdict. A
+        point that removes no rows is left out, and a point that removes the same rows as another
+        version of the table isn't evaluated again.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False)
+        ```
+
+        Here's a table of temperature readings, some of them recorded in tenths of a degree, and a
+        scorer that rates how plausible each reading is (from `0` to `1`). The 'model' estimates
+        the average temperature and is evaluated by its error against the true average of `20`.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+        for k in range(0, 300, 25):
+            temps[k] *= 10
+        readings = pl.DataFrame({"temp": temps})
+
+        def plausibility(rows):
+            return [1 / (1 + abs(row["temp"] - 20) / 5) for row in rows]
+
+        def evaluate(train, *, seed):
+            sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+            return abs(sample["temp"].mean() - 20)
+
+        validation = (
+            pb.Validate(data=readings)
+            .col_vals_scored(columns="temp", scorer=plausibility, min_val=0.5)
+            .interrogate()
+        )
+
+        ablation = (
+            pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+            .sweep_score(1, quantiles=[0.02, 0.04, 0.1, 0.2])
+            .run()
+        )
+
+        ablation
+        ```
+
+        Removing the lowest-scoring 4% of the rows takes out every bad reading, and the curve below
+        the report shows the error dropping to near zero there. Removing more rows than that makes
+        no further difference.
+        """
+        from pointblank.validate import _has_kept_scores
+
+        if isinstance(score, bool) or not isinstance(score, (int, str)):
+            raise TypeError(
+                "`score=` must be the number of a `col_vals_scored()` step or the name of a "
+                f"column, got {type(score).__name__}."
+            )
+        if quantiles is not None and values is not None:
+            raise ValueError("Use either `quantiles=` or `values=`, not both.")
+        if remove is not None and remove not in ("lowest", "highest"):
+            raise ValueError(f"`remove=` must be 'lowest' or 'highest', got {remove!r}.")
+
+        if isinstance(score, str):
+            if score not in self._columns:
+                raise ValueError(f"The column {score!r} isn't in the table.")
+            scores = self._column_scores(score)
+            base_id, base_name = score, score
+            remove = remove or "lowest"
+        else:
+            if score not in self._steps:
+                raise ValueError(
+                    f"`sweep_score()` can't use step {score}: {self._ineligible_reason(score)}."
+                )
+            step = self._steps[score]
+            if not _has_kept_scores(step):
+                raise ValueError(
+                    f"`sweep_score()` can't use step {score}: it isn't a `col_vals_scored()` step "
+                    "that kept its scores (with `keep_scores=True`)."
+                )
+            scores = self._step_scores(score)
+            base_id, base_name = f"step_{score}", f"Step {score}"
+            if remove is None:
+                bounds = step.values or {}
+                only_max = bounds.get("min_val") is None and bounds.get("max_val") is not None
+                remove = "highest" if only_max else "lowest"
+
+        if values is None:
+            quantiles = self._check_sweep_values(
+                quantiles if quantiles is not None else [0.05, 0.1, 0.2, 0.3, 0.4, 0.5],
+                "quantiles",
+            )
+            for q in quantiles:
+                if not 0 < q <= 1:
+                    raise ValueError(
+                        f"The values of `quantiles=` must be greater than 0 and at most 1, got {q!r}."
+                    )
+        else:
+            values = self._check_sweep_values(values, "values")
+
+        n_scored = len(scores)
+        n_missing = self._n_rows - n_scored
+        if n_missing:
+            label = f"step {score}" if isinstance(score, int) else f"the column `{score}`"
+            self._add_note(
+                f"1 row has no score in {label}, so the sweep never removes it."
+                if n_missing == 1
+                else f"{n_missing:,} rows have no score in {label}, so the sweep never removes "
+                "them."
+            )
+
+        highest = remove == "highest"
+        if values is None:
+            sweep_id = f"{base_id}:{remove}"
+            self._sweeps[sweep_id] = {
+                "label": f"{base_name}, removing the {remove}-scoring rows",
+                "axis": "Share of the scored rows removed",
+                "percent": True,
+            }
+            ranked = sorted(scores.items(), key=lambda kv: (-kv[1] if highest else kv[1], kv[0]))
+            for q in quantiles:
+                n = math.floor(q * n_scored + 0.5)
+                pct = f"{q * 100:g}%"
+                spec_id = f"{sweep_id}_{_number_text(q)}"
+                self._sweep_rows[spec_id] = frozenset(k for k, _ in ranked[:n])
+                self._sweep_details[spec_id] = (
+                    f"The {n:,} rows with the {remove} scores (of {n_scored:,} scored rows)"
+                )
+                self._add_spec(
+                    _Spec(
+                        id=spec_id,
+                        name=f"{base_name}: {remove} {pct} of scores",
+                        strategy="sweep_score",
+                        sweep=sweep_id,
+                        value=float(q),
+                    )
+                )
+        else:
+            side = "above" if highest else "below"
+            sweep_id = f"{base_id}:{side}"
+            self._sweeps[sweep_id] = {
+                "label": f"{base_name}, removing the rows scoring {side} each cutoff",
+                "axis": "Score cutoff",
+                "percent": False,
+            }
+            for v in values:
+                text = _number_text(v)
+                spec_id = f"{sweep_id}_{text}"
+                self._sweep_rows[spec_id] = frozenset(
+                    k for k, x in scores.items() if (x > v if highest else x < v)
+                )
+                self._sweep_details[spec_id] = f"The rows with a score {side} {text}"
+                self._add_spec(
+                    _Spec(
+                        id=spec_id,
+                        name=f"{base_name}: scores {side} {text}",
+                        strategy="sweep_score",
+                        sweep=sweep_id,
+                        value=float(v),
+                    )
+                )
+        return self
+
+    def sweep_step(self, step: int, param: str, values: list[float]) -> Ablation:
+        """
+        Add a variant for each value of a step's parameter, removing the rows that fail it.
+
+        A check's bounds are often picked by hand: is `min_val=0.5` the right cutoff, or would
+        `0.3` keep more useful rows? This strategy measures it. For each value, the step is run
+        again on the table with `param=` set to that value, and the variant removes the rows that
+        fail it. The results trace how the model changes as the check gets stricter, and the
+        report plots the curve, along with what removing as many random rows does.
+
+        Parameters
+        ----------
+        step
+            The number of the step to vary. It must be a row-level step that the ablation can use
+            (active, and without a `pre=` function unless that function is marked with
+            [`row_preserving()`](`pointblank.row_preserving`)).
+        param
+            The name of the parameter of the step's validation method to vary (e.g., `"min_val"`
+            for [`col_vals_scored()`](`pointblank.Validate.col_vals_scored`), or `"right"` for
+            [`col_vals_between()`](`pointblank.Validate.col_vals_between`)). It can't be one of
+            the parameters that don't change which rows fail (`thresholds=`, `actions=`, `brief=`,
+            `active=`, and `dimension=`), nor `pre=` or `segments=`.
+        values
+            The values of `param=` to use, as numbers.
+
+        Returns
+        -------
+        Ablation
+            The `Ablation` object, with the variants added.
+
+        Details
+        -------
+        The step is run again as it was set up, with only `param=` changed, so a
+        `col_vals_scored()` step takes its scores from the score cache instead of scoring the rows
+        again. For a segmented step, only the step's own segment is checked. A value that the
+        validation method doesn't accept (e.g., a `min_val=` above the step's `max_val=`) gives an
+        error. As with any other variant, a value whose step fails no rows is left out, and a value
+        that removes the same rows as another version of the table isn't evaluated again.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False)
+        ```
+
+        Here's a table of temperature readings, some of them recorded in tenths of a degree, with
+        a check that the readings are below an upper limit. The 'model' estimates the average
+        temperature and is evaluated by its error against the true average of `20`.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+        for k in range(0, 300, 25):
+            temps[k] *= 10
+        readings = pl.DataFrame({"temp": temps})
+
+        def evaluate(train, *, seed):
+            sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+            return abs(sample["temp"].mean() - 20)
+
+        validation = (
+            pb.Validate(data=readings)
+            .col_vals_lt(columns="temp", value=100)
+            .interrogate()
+        )
+
+        ablation = (
+            pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+            .sweep_step(1, param="value", values=[21, 50, 190, 220])
+            .run()
+        )
+
+        ablation
+        ```
+
+        A limit of `50` removes every bad reading. A limit of `21` also removes many good readings
+        (the warmer ones), which leaves the average too low, and the limits of `190` and `220` miss
+        some of the bad readings.
+        """
+        from pointblank.validate import Validate, _validation_info_to_step
+
+        if not _is_int(step):
+            raise TypeError(f"`step=` must be a step number, got {step!r}.")
+        if step not in self._steps:
+            raise ValueError(
+                f"`sweep_step()` can't use step {step}: {self._ineligible_reason(step)}."
+            )
+        if not isinstance(param, str) or not param:
+            raise TypeError("`param=` must be the name of a parameter of the step's method.")
+        values = self._check_sweep_values(values, "values")
+
+        info = self._steps[step]
+        found = _validation_info_to_step(info, None, None, [], keep_objects=True)
+        if found is None:  # pragma: no cover
+            raise ValueError(f"`sweep_step()` can't run step {step} again.")
+        method, kwargs = found
+        parameters = inspect.signature(getattr(Validate, method)).parameters
+        if param in _SWEEP_FIXED_PARAMS or param == "self" or param not in parameters:
+            raise ValueError(
+                f"`sweep_step()` can't vary {param!r}: it isn't a parameter of `{method}()` that "
+                "changes which rows fail."
+            )
+        # The step is checked on its own: without actions (which could act on the results), and
+        # on the segment it was checked on (not every segment of its `segments=`)
+        for key in ("thresholds", "actions", "brief", "active", "dimension"):
+            kwargs.pop(key, None)
+        if info.segments is not None:
+            kwargs["segments"] = info.segments
+
+        sweep_id = f"step_{step}:{param}"
+        self._sweeps[sweep_id] = {
+            "label": f"Step {step}, varying {param}",
+            "axis": f"{param} (step {step})",
+            "percent": False,
+        }
+        for v in values:
+            text = _number_text(v)
+            spec_id = f"{sweep_id}={text}"
+            self._sweep_rows[spec_id] = self._rerun_failed_rows(
+                method, {**kwargs, param: v}, step=step, setting=f"{param}={text}"
+            )
+            self._sweep_details[spec_id] = f"The rows that fail step {step} with `{param}={text}`"
+            self._add_spec(
+                _Spec(
+                    id=spec_id,
+                    name=f"Step {step} with {param}={text}",
+                    strategy="sweep_step",
+                    sweep=sweep_id,
+                    value=float(v),
+                )
+            )
+        return self
+
+    def _check_sweep_values(self, values: Any, arg: str) -> list[float]:
+        if not isinstance(values, (list, tuple, range)):
+            raise TypeError(f"`{arg}=` must be a list of numbers, got {type(values).__name__}.")
+        values = list(values)
+        if not values:
+            raise ValueError(f"`{arg}=` must have at least one value.")
+        for v in values:
+            if not _is_number(v) or not math.isfinite(float(v)):
+                raise TypeError(f"The values of `{arg}=` must be finite numbers, got {v!r}.")
+        if len(set(values)) != len(values):
+            raise ValueError(f"The values of `{arg}=` must be different from each other.")
+        return values
+
+    def _step_scores(self, i: int) -> dict[int, float]:
+        """The scores of a `col_vals_scored()` step, by row number (rows with no score left out)."""
+        from pointblank.validate import _step_row_results
+
+        data_nw = _with_row_index(self.validation.data, name=_INDEX)
+        results = _step_row_results(
+            self._steps[i],
+            data_nw,
+            index_name=_INDEX,
+            duplicates=self.duplicates,
+            duplicates_order_by=self._order_by,
+            extra=("pb_score_",),
+        ).select(_INDEX, "pb_score_")
+        if isinstance(results, nw.LazyFrame):
+            results = results.collect()
+        return _scores_by_row(results[_INDEX].to_list(), results["pb_score_"].to_list())
+
+    def _column_scores(self, column: str) -> dict[int, float]:
+        """The values of a numeric column, by row number (rows with a missing value left out)."""
+        frame = _with_row_index(self.validation.data, name=_INDEX).select(_INDEX, column)
+        if not frame.collect_schema()[column].is_numeric():
+            raise TypeError(f"The column {column!r} must be numeric to be used as a score.")
+        if isinstance(frame, nw.LazyFrame):
+            frame = frame.collect()
+        return _scores_by_row(frame[_INDEX].to_list(), frame[column].to_list())
+
+    def _rerun_failed_rows(
+        self, method: str, kwargs: dict[str, Any], step: int, setting: str
+    ) -> frozenset[int]:
+        """Run a step again on the table with other settings, and get the rows that fail it."""
+        from pointblank.validate import Validate, _step_row_results
+
+        try:
+            validation = getattr(Validate(data=self.validation.data), method)(**kwargs)
+        except (TypeError, ValueError) as e:
+            raise ValueError(f"Step {step} can't be run with `{setting}`: {e}") from e
+        validation.interrogate(collect_extracts=False)
+
+        data_nw = _with_row_index(self.validation.data, name=_INDEX)
+        removed: set[int] = set()
+        for info in validation.validation_info:
+            if info.eval_error or info.tbl_checked is None:
+                raise ValueError(f"Step {step} couldn't be evaluated with `{setting}`.")
+            results = (
+                _step_row_results(
+                    info,
+                    data_nw,
+                    index_name=_INDEX,
+                    duplicates=self.duplicates,
+                    duplicates_order_by=self._order_by,
+                )
+                .filter(nw.col("pb_failed_"))
+                .select(_INDEX)
+            )
+            if isinstance(results, nw.LazyFrame):
+                results = results.collect()
+            removed.update(int(k) for k in results[_INDEX].to_list())
+        return frozenset(removed)
+
     def _check_steps(self, steps: Any, method: str) -> tuple[int, ...]:
         if _is_int(steps):
             steps = [steps]
@@ -1205,7 +1657,9 @@ class Ablation:
 
         usable = []
         for spec in self._specs:
-            if spec.group_column is not None:
+            if spec.sweep is not None:
+                removed = self._sweep_rows[spec.id]
+            elif spec.group_column is not None:
                 removed = self._group_rows(spec.group_column).get(spec.group, frozenset())
             else:
                 removed = frozenset().union(*(failed[i] for i in spec.steps))
@@ -1254,18 +1708,20 @@ class Ablation:
                 group=spec.group,
                 group_column=spec.group_column,
                 left_out=spec.left_out,
+                sweep=spec.sweep,
+                value=spec.value,
             )
             variants.append((variant, removed))
 
-        # A `drop_all_but_each()` variant that removes the same rows as another version of the
-        # table isn't evaluated again
+        # A `drop_all_but_each()` variant or a sweep's point that removes the same rows as another
+        # version of the table isn't evaluated again
         same_as = {}
         first_with_rows: dict[frozenset[int], str] = {}
         for variant, removed in variants:
-            if variant.left_out is None:
+            if variant.left_out is None and variant.sweep is None:
                 first_with_rows.setdefault(removed, variant.id)
         for variant, removed in variants:
-            if variant.left_out is None:
+            if variant.left_out is None and variant.sweep is None:
                 continue
             if not removed:
                 same_as[variant.id] = "full"
@@ -1636,13 +2092,16 @@ class Ablation:
             }
         ]
         variants = [v for v, _ in resolved.variants]
-        for v in sorted(variants, key=lambda v: v.left_out is not None):
+        for v in sorted(variants, key=self._group_order):
             same_as = resolved.same_as.get(v.id)
             rows.append(
                 {
-                    "group": "Variants" if v.left_out is None else "Leave one out",
+                    "group": self._group_label(v),
                     "variant": _variant_html(
-                        v, self._steps, same_as=names[same_as] if same_as else None
+                        v,
+                        self._steps,
+                        same_as=names[same_as] if same_as else None,
+                        detail=self._sweep_details.get(v.id) if v.sweep else None,
                     ),
                     "removed": _removed_html(v.n_removed, v.f_removed),
                 }
@@ -2796,6 +3255,11 @@ class Ablation:
             are kept
             - `group`: for a variant of [`drop_groups()`](`pointblank.Ablation.drop_groups`), the
             value of the group whose rows are removed, as a string
+            - `sweep`, `value`: for a point of a sweep (from
+            [`sweep_score()`](`pointblank.Ablation.sweep_score`) or
+            [`sweep_step()`](`pointblank.Ablation.sweep_step`)), the id of the sweep and the
+            point's value (the share of the scored rows removed, the score cutoff, or the value of
+            the step's parameter)
             - `n_removed`, `f_removed`: the number and share of rows removed
             - `metric`, `mean`, `sd`: the metric, and its mean and standard deviation across the
             repeats
@@ -3039,8 +3503,11 @@ class Ablation:
         full table, if `control=None`). The difference is shown with its interval, as a bar
         around zero (on the same scale for every variant), and with the verdict as a badge. The
         variants of [`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`) are in a
-        group of their own, showing what the left-out step's rows add to the other steps. The
-        header gives the metric for the full table and the settings of the run, and notes at the
+        group of their own, showing what the left-out step's rows add to the other steps. So is
+        each sweep (from [`sweep_score()`](`pointblank.Ablation.sweep_score`) or
+        [`sweep_step()`](`pointblank.Ablation.sweep_step`)), and a plot of its curve at the
+        bottom shows the difference from the full table at each of its values, next to that of
+        removing as many random rows. The header gives the metric for the full table and the settings of the run, and notes at the
         bottom list the variants and steps that weren't used.
 
         Parameters
@@ -3118,6 +3585,7 @@ class Ablation:
         baseline, variant_rows = effects[0], effects[1:]
         comparison = "vs_control" if self.control is not None else "vs_full"
         has_left_out = any(row["left_out"] is not None for row in variant_rows)
+        has_groups = has_left_out or any(row["sweep"] is not None for row in variant_rows)
         resolved = self._resolve()
         names = {"full": baseline["name"], **{row["variant"]: row["name"] for row in variant_rows}}
 
@@ -3139,7 +3607,9 @@ class Ablation:
 
         rows = []
         variants = {v.id: v for v in self._variants}
-        for row in sorted(variant_rows, key=lambda row: row["left_out"] is not None):
+        for row in sorted(
+            variant_rows, key=lambda row: self._group_order(variants[row["variant"]])
+        ):
             variant = variants[row["variant"]]
             same_as = resolved.same_as.get(variant.id)
             metric_html = _mono(fmt.value(row["mean"], row["sd"]))
@@ -3147,9 +3617,12 @@ class Ablation:
                 metric_html += _small(f"Δ vs full {fmt.delta(row['delta_vs_full'])}")
             rows.append(
                 {
-                    "group": "Variants" if variant.left_out is None else "Leave one out",
+                    "group": self._group_label(variant),
                     "variant": _variant_html(
-                        variant, self._steps, same_as=names.get(same_as) if same_as else None
+                        variant,
+                        self._steps,
+                        same_as=names.get(same_as) if same_as else None,
+                        detail=self._sweep_details.get(variant.id) if variant.sweep else None,
                     ),
                     "removed": _removed_html(row["n_removed"], row["f_removed"]),
                     "metric": metric_html,
@@ -3200,8 +3673,8 @@ class Ablation:
         gt_tbl = (
             _fmt_raw_html(
                 GT(
-                    _frame(rows, ["group", *columns] if has_left_out else columns),
-                    groupname_col="group" if has_left_out else None,
+                    _frame(rows, ["group", *columns] if has_groups else columns),
+                    groupname_col="group" if has_groups else None,
                     id="pb_ablation_report",
                 ),
                 columns=columns,
@@ -3223,7 +3696,7 @@ class Ablation:
             )
             .tab_options(table_width="100%")
         )
-        if has_left_out:
+        if has_groups:
             gt_tbl = gt_tbl.tab_style(
                 style=[style.text(weight="bold", size="12px"), style.fill(color="#F6F7F8")],
                 locations=loc.row_groups(),
@@ -3248,7 +3721,34 @@ class Ablation:
             )
         for note in [*source_notes, *self._notes, *resolved.notes]:
             gt_tbl = gt_tbl.tab_source_note(source_note=html(_note_html(note)))
+        # A curve for each sweep: how the metric changes with the sweep's value
+        for sweep_id, sweep in self._sweeps.items():
+            points = [row for row in variant_rows if row["sweep"] == sweep_id]
+            if points:
+                gt_tbl = gt_tbl.tab_source_note(
+                    source_note=html(
+                        _sweep_svg(
+                            sweep,
+                            points,
+                            baseline=baseline["mean"],
+                            fmt=fmt,
+                            metric=metric,
+                            direction=direction,
+                        )
+                    )
+                )
         return gt_tbl
+
+    def _group_order(self, variant: AblationVariant) -> tuple[int, float]:
+        """Where a variant is listed in the plan and the report: by its group, then its value."""
+        if variant.sweep is not None:
+            return (2 + list(self._sweeps).index(variant.sweep), variant.value)
+        return (int(variant.left_out is not None), 0.0)
+
+    def _group_label(self, variant: AblationVariant) -> str:
+        if variant.sweep is not None:
+            return f"Sweep: {self._sweeps[variant.sweep]['label']}"
+        return "Variants" if variant.left_out is None else "Leave one out"
 
 
 # ----------------------------------------------------------------------------------------------
@@ -3372,6 +3872,8 @@ def _effect_row(variant: AblationVariant, metric: str, mean: float, sd: float | 
         steps=list(variant.steps),
         left_out=variant.left_out,
         group=group,
+        sweep=variant.sweep,
+        value=variant.value,
         n_removed=variant.n_removed,
         f_removed=variant.f_removed,
         metric=metric,
@@ -3463,8 +3965,9 @@ def _variant_html(
     same_as: str | None = None,
     control: Any = None,
     max_briefs: int = 3,
+    detail: str | None = None,
 ) -> str:
-    """The variant's name, with a line for each step (its brief) below."""
+    """The variant's name, with a line for each step (its brief) below (or the `detail=` line)."""
     name = f"<div><strong>{_esc(variant.name)}</strong></div>"
     if variant.strategy == "full":
         return name + _small("Nothing removed")
@@ -3489,7 +3992,9 @@ def _variant_html(
         return _code_html(step.brief or step.autobrief or step.assertion_type)
 
     lines = []
-    if variant.left_out is not None:
+    if detail is not None:
+        lines.append(_code_html(detail))
+    elif variant.left_out is not None:
         lines.append(f"Leaves out step {variant.left_out}: {brief(variant.left_out)}")
     else:
         for i in variant.steps[:max_briefs]:
@@ -3560,6 +4065,136 @@ def _effect_html(row: dict[str, Any], prefix: str, fmt: _NumberFormat, scale: fl
     return f"<div>{_mono(text)}</div><div style='white-space: nowrap;'>{plot}{badge}</div>"
 
 
+def _sweep_svg(
+    sweep: dict[str, Any],
+    points: list[dict[str, Any]],
+    baseline: float,
+    fmt: _NumberFormat,
+    metric: str,
+    direction: str,
+) -> str:
+    """
+    A plot of a sweep: the difference from the full table at each of its values (a dot with its
+    interval, colored by the verdict), with a dashed line for removing as many random rows.
+    """
+    width, height = 460, 230
+    left, right, top, bottom = 58, 16, 44, 40
+    points = sorted(points, key=lambda row: row["value"])
+    scale_x = 100.0 if sweep["percent"] else 1.0
+    xs = [row["value"] * scale_x for row in points]
+    controls = [
+        row["control_mean"] - baseline if row["control_mean"] is not None else None
+        for row in points
+    ]
+    ys = [0.0, *controls]
+    for row in points:
+        ys += [row["delta_vs_full"], row["delta_vs_full_lower"], row["delta_vs_full_upper"]]
+    ys = [y for y in ys if y is not None]
+
+    x_min, x_max = min(xs), max(xs)
+    if x_min == x_max:
+        x_min, x_max = x_min - 1, x_max + 1
+    x_pad = (x_max - x_min) * 0.04
+    x_min, x_max = x_min - x_pad, x_max + x_pad
+    y_min, y_max = min(ys), max(ys)
+    if y_min == y_max:
+        y_min, y_max = y_min - 1, y_max + 1
+    ticks = _nice_ticks(y_min, y_max)
+    pad = (y_max - y_min) * 0.08
+    y_min, y_max = min(y_min - pad, ticks[0]), max(y_max + pad, ticks[-1])
+
+    def px(x: float) -> float:
+        return left + (x - x_min) / (x_max - x_min) * (width - left - right)
+
+    def py(y: float) -> float:
+        return top + (y_max - y) / (y_max - y_min) * (height - top - bottom)
+
+    text_style = "font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; fill: #555555;"
+    title = f"{sweep['label']}: Δ {metric} vs full{direction}"
+    parts = [
+        f"<svg width='{width}' height='{height}' viewBox='0 0 {width} {height}' "
+        "style='display: block; margin-top: 4px;'>",
+        f"<text x='0' y='13' style=\"{text_style} font-size: 11px; fill: #333333;\">"
+        f"{_esc(title)}</text>",
+        # The axes, and the line for no difference from the full table
+        f"<line x1='{left}' y1='{top}' x2='{left}' y2='{height - bottom}' stroke='#BBBBBB'/>",
+        f"<line x1='{left}' y1='{height - bottom}' x2='{width - right}' y2='{height - bottom}' "
+        "stroke='#BBBBBB'/>",
+        f"<line x1='{left}' y1='{py(0):.1f}' x2='{width - right}' y2='{py(0):.1f}' "
+        "stroke='#999999' stroke-width='1'/>",
+    ]
+    for y in ticks:
+        if y != 0:
+            parts.append(
+                f"<line x1='{left}' y1='{py(y):.1f}' x2='{width - right}' y2='{py(y):.1f}' "
+                "stroke='#EEEEEE' stroke-width='1'/>"
+            )
+        parts.append(
+            f"<text x='{left - 5}' y='{py(y) + 3:.1f}' text-anchor='end' "
+            f'style="{text_style}">{f"{y:+g}".replace("-", "−")}</text>'
+        )
+    for x in xs:
+        label = f"{x:g}%" if sweep["percent"] else f"{x:g}"
+        parts.append(
+            f"<text x='{px(x):.1f}' y='{height - bottom + 13}' text-anchor='middle' "
+            f'style="{text_style}">{_esc(label)}</text>'
+        )
+    parts.append(
+        f"<text x='{(left + width - right) / 2:.1f}' y='{height - 6}' text-anchor='middle' "
+        f'style="{text_style}">{_esc(sweep["axis"])}</text>'
+    )
+
+    # Removing as many random rows (when there's a control)
+    control_points = [(px(x), py(y)) for x, y in zip(xs, controls) if y is not None]
+    if len(control_points) > 1:
+        path = " ".join(f"{x:.1f},{y:.1f}" for x, y in control_points)
+        parts.append(
+            f"<polyline points='{path}' fill='none' stroke='#888888' stroke-width='1.5' "
+            "stroke-dasharray='4,3'/>"
+        )
+    elif control_points:
+        x, y = control_points[0]
+        parts.append(
+            f"<line x1='{x - 8:.1f}' y1='{y:.1f}' x2='{x + 8:.1f}' y2='{y:.1f}' stroke='#888888' "
+            "stroke-width='1.5' stroke-dasharray='4,3'/>"
+        )
+
+    path = " ".join(f"{px(x):.1f},{py(row['delta_vs_full']):.1f}" for x, row in zip(xs, points))
+    parts.append(f"<polyline points='{path}' fill='none' stroke='#333333' stroke-width='1.5'/>")
+    for x, row in zip(xs, points):
+        color = _VERDICT_COLORS.get(row["verdict"], "#666666")
+        lower, upper = row["delta_vs_full_lower"], row["delta_vs_full_upper"]
+        if lower is not None and upper is not None:
+            parts.append(
+                f"<line x1='{px(x):.1f}' y1='{py(lower):.1f}' x2='{px(x):.1f}' "
+                f"y2='{py(upper):.1f}' stroke='{color}' stroke-width='2'/>"
+            )
+        parts.append(
+            f"<circle cx='{px(x):.1f}' cy='{py(row['delta_vs_full']):.1f}' r='3.5' "
+            f"fill='{color}'><title>{_esc(row['name'])}: "
+            f"{_esc(fmt.delta(row['delta_vs_full']))}</title></circle>"
+        )
+    if control_points:
+        parts.append(
+            f"<line x1='0' y1='26' x2='18' y2='26' stroke='#888888' stroke-width='1.5' "
+            "stroke-dasharray='4,3'/>"
+            f"<text x='22' y='29' style=\"{text_style}\">Removing as many random rows</text>"
+        )
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+def _nice_ticks(low: float, high: float, n: int = 4) -> list[float]:
+    """Round values for the ticks of an axis from `low` to `high` (including zero)."""
+    span = high - low
+    raw = span / n
+    magnitude = 10 ** math.floor(math.log10(raw))
+    step = next(m * magnitude for m in (1, 2, 2.5, 5, 10) if m * magnitude >= raw)
+    first = math.floor(low / step + _ROUNDING)
+    last = math.ceil(high / step - _ROUNDING)
+    return [round(k * step, 12) for k in range(first, last + 1)]
+
+
 def _change_text(fmt: _NumberFormat, row: dict[str, Any], prefix: str) -> str:
     """A difference with its interval, as text (e.g., for a note)."""
     text = fmt.delta(row[f"delta_{prefix}"])
@@ -3613,6 +4248,27 @@ def _json_value(value: Any) -> Any:
     if hasattr(value, "isoformat"):
         return value.isoformat()
     return str(value)
+
+
+def _number_text(value: Any) -> str:
+    """A number as text for the id and name of a sweep's point (e.g., `0.1`, or `5` for `5.0`)."""
+    x = float(value)
+    if x.is_integer() and abs(x) < 1e15:
+        return str(int(x))
+    return repr(x)
+
+
+def _scores_by_row(rows: list[Any], scores: list[Any]) -> dict[int, float]:
+    """The scores of rows by row number, leaving out the missing ones."""
+    result = {}
+    for k, score in zip(rows, scores):
+        if score is None or type(score).__name__ in ("NAType", "NaTType"):
+            continue
+        score = float(score)
+        if math.isnan(score):
+            continue
+        result[int(k)] = score
+    return result
 
 
 def _group_value(value: Any) -> Any:

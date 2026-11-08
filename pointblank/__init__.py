@@ -93,6 +93,7 @@ from pointblank.metadata import (
 from pointblank.pipeline import ContractViolationError, Pipeline, PipelineResult
 from pointblank.preprocessing import row_preserving
 from pointblank.ablation import Ablation, AblationVariant
+from pointblank import scorers
 from pointblank.schema import Schema, generate_dataset, schema_from_tbl
 from pointblank.segments import seg_group
 from pointblank.thresholds import Actions, FinalActions, Thresholds
@@ -168,6 +169,7 @@ __all__ = [
     "row_preserving",
     "Ablation",
     "AblationVariant",
+    "scorers",
     "send_slack_notification",
     "emit_otel",
     # Data generation - Field classes

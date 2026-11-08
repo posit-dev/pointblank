@@ -578,6 +578,23 @@ class Validate:
         active: bool | Callable = True,
         dimension: str | None = None,
     ) -> Validate: ...
+    def col_vals_scored(
+        self,
+        columns: str | list[str],
+        scorer: Callable[..., Any],
+        min_val: float | None = None,
+        max_val: float | None = None,
+        na_pass: bool = False,
+        cache: bool | str | Path = True,
+        keep_scores: bool = True,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
     def col_schema_match(
         self,
         schema: Schema,
