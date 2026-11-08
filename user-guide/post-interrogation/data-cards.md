@@ -89,7 +89,7 @@ print(card)
 
     ## Data Quality
 
-    The data was validated with Pointblank 0.1.dev1+g33e3fc1f5 on 2026-11-08: 0 of 4 checks passed for every row (or other test unit).
+    The data was validated with Pointblank 0.1.dev1+gb5e20d132 on 2026-11-08: 0 of 4 checks passed for every row (or other test unit).
 
     The health score (the share of the test units that passed, from 0 to 100) is **96.7**.
 
@@ -135,7 +135,7 @@ print(card)
 
     Climate Data Team
 
-    *This card was made with [Pointblank](https://posit-dev.github.io/pointblank/) 0.1.dev1+g33e3fc1f5.*
+    *This card was made with [Pointblank](https://posit-dev.github.io/pointblank/) 0.1.dev1+gb5e20d132.*
 
 The card is a [Hugging Face dataset card](https://huggingface.co/docs/hub/datasets-cards), so it can be saved as the `README.md` of a dataset on the Hub (with `path="README.md"`). It has:
 
@@ -177,7 +177,7 @@ print(sheet[sheet.index("## Composition") : sheet.index("## Collection Process")
 
     **Are there any errors, sources of noise, or redundancies in the dataset?**
 
-    The data was validated with Pointblank 0.1.dev1+g33e3fc1f5 on 2026-11-08: 0 of 4 checks passed for every row (or other test unit).
+    The data was validated with Pointblank 0.1.dev1+gb5e20d132 on 2026-11-08: 0 of 4 checks passed for every row (or other test unit).
 
     The health score (the share of the test units that passed, from 0 to 100) is **96.7**.
 
@@ -233,6 +233,37 @@ print(card[card.index("## Ablation Evidence") : card.index("## Dataset Creation"
     | Step 4 | 3 removed (1.0%) | −0.217 [−2.290, +1.855] | inconclusive |
 
 The rows with temperatures that are ten times too large make the error much larger, so removing them helps. The rows without a humidity don't matter to a model of the temperature, so the verdicts of those steps are inconclusive: removing their rows isn't clearly better or worse than removing as many random rows.
+
+## Cards in Other Languages
+
+A card is written in the language of the validation (its `lang=`), with the numbers formatted for its `locale=`. The `lang=` and `locale=` arguments of [to_data_card()](../../reference/Validate.to_data_card.md#pointblank.Validate.to_data_card) give another language. The front matter stays as it is, since the Hub reads it, and so do the arguments with text of their own (like `description=`):
+
+``` python
+card = validation.to_data_card(lang="fr", by="station")
+
+print(card[card.index("## Qualité des données") : card.index("### Étapes de validation")])
+```
+
+    ## Qualité des données
+
+    Les données ont été validées avec Pointblank 0.1.dev1+gb5e20d132 le 2026-11-08 : 0 des 4 vérifications ont réussi pour chaque ligne (ou autre unité de test).
+
+    Le score de santé (la part des unités de test réussies, de 0 à 100) est de **96,7**.
+
+    | Dimension | Score |
+    |---|---|
+    | Validité | 96,0 |
+    | Complétude | 97,3 |
+
+    ### Scores par `station`
+
+    Les scores des vérifications de chaque valeur de `station` (les étapes segmentées par cette colonne).
+
+    | `station` | Santé | Complétude |
+    |---|---|---|
+    | east | 98,0 | 98,0 |
+    | north | 97,0 | 97,0 |
+    | south | 97,0 | 97,0 |
 
 ## Conclusion
 

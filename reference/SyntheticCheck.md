@@ -4,7 +4,7 @@ The results of [`check_synthetic()`](../reference/check_synthetic.md#pointblank.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/synthetic.py#L249-L699)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/synthetic.py#L249-L747)
 
 ``` python
 SyntheticCheck(

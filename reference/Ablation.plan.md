@@ -4,13 +4,24 @@ Show the versions of the table that the ablation will evaluate.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2718-L2860)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2774-L2937)
 
 ``` python
-Ablation.plan()
+Ablation.plan(
+    lang=None,
+    locale=None,
+)
 ```
 
 The plan is a dry run: it finds the rows that each variant removes, without evaluating anything. It lists the full table, each variant, and each control, with the number and share of rows they remove, and gives the number of evaluations that [`run()`](../reference/Ablation.run.md#pointblank.Ablation.run) will make in its header. Variants that won't be used (e.g., because they remove no rows) are listed in the notes at the bottom.
+
+## Parameters
+
+`lang: str | None = None`  
+The language of the plan's text, as a two-letter language code (e.g., `"fr"` or `"de"`; see the `lang=` argument of [`Validate`](../reference/Validate.md#pointblank.Validate) for the languages). By default, the plan is in the language of the validation.
+
+`locale: str | None = None`  
+The locale for the numbers in the plan (e.g., `"de-CH"`), which sets the decimal mark and the thousands separator. By default, it's the locale of the validation (when the plan is in the validation's language), or `lang=`.
 
 ## Returns
 

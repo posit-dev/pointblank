@@ -137,6 +137,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-synthetic-data.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-synthetic-data.html">
@@ -184,11 +185,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -693,7 +698,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-data" class="level1">
 <h1>The Data</h1>
 <p>Let’s make a seed of 500 customers of a bank, each with an age, a plan, a monthly spend, and a message to the bank’s support team. Then we’ll make 500 synthetic customers, with a generator that has some of the usual faults: it rarely gives the less common plans, it often leaves the spend out, its messages are about fewer things, and it memorized three customers of the seed (and gives one of them as it is, one in capital letters, and one with different punctuation).</p>
-<div id="05df829a" class="cell" data-execution_count="2">
+<div id="ab8ab9c7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -941,7 +946,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-the-synthetic-data" class="level1">
 <h1>Checking the Synthetic Data</h1>
 <p>The synthetic data comes first, then the seed. We’ll say which columns identify a customer, for finding copies: every column but the id, since the generator gives each synthetic customer an id of its own (and a copy with a new id is still a copy). We’ll also say which column has free text, so that its diversity is measured and copies of its text are found even if they’re not exactly the same.</p>
-<div id="76c295bd" class="cell" data-execution_count="3">
+<div id="ef659cd2" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>check <span class="op">=</span> pb.check_synthetic(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    synthetic, seed, columns<span class="op">=</span>[<span class="st">"age"</span>, <span class="st">"plan"</span>, <span class="st">"monthly_spend"</span>, <span class="st">"message"</span>], text<span class="op">=</span><span class="st">"message"</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1087,7 +1092,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-results" class="level1">
 <h1>The Results</h1>
 <p>The problems found are also in the <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> attribute, as messages, and <code>ok</code> is <code>True</code> when there are none, which makes a check of synthetic data easy to put in a test or a pipeline that makes it.</p>
-<div id="cf62fd9b" class="cell" data-execution_count="4">
+<div id="4e60c552" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>check.issues</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>["The distribution of 'plan' in the synthetic data differs from that in the seed (PSI 0.512).",
@@ -1097,7 +1102,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The <a href="../../reference/SyntheticCheck.get_copies.html#pointblank.SyntheticCheck.get_copies" class="gdls-link gdls-code">get_copies()</a> method gives the synthetic rows that copy a seed row, with the row number of each in its own table and the kind of copy.</p>
-<div id="28be3f9d" class="cell" data-execution_count="5">
+<div id="64abae35" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>check.get_copies()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div><style>
@@ -1111,6 +1116,138 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The other attributes have the numbers behind the report (<code>fidelity</code>, <code>duplicates</code>, <code>diversity</code>, and <code>copies</code>), and <code>to_dict()</code> gives all of them as a dictionary that can be written as JSON.</p>
+<p>The report is in English by default, and <code>get_tabular_report()</code> takes <code>lang=</code> and <code>locale=</code> for another language (the messages of <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> stay in English):</p>
+<div id="eef7606e" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>check.get_tabular_report(lang<span class="op">=</span><span class="st">"es"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div id="pb_synthetic_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_synthetic_report table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_synthetic_report thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_synthetic_report p { margin: 0; padding: 0; }
+ #pb_synthetic_report .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_synthetic_report .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_synthetic_report .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_synthetic_report .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_synthetic_report .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_synthetic_report .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_synthetic_report .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_synthetic_report .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_synthetic_report .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_synthetic_report .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_synthetic_report .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_synthetic_report .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_synthetic_report .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_synthetic_report .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_synthetic_report .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_synthetic_report .gt_from_md> :first-child { margin-top: 0; }
+ #pb_synthetic_report .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_synthetic_report .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_synthetic_report .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_synthetic_report .gt_indent_1 { text-indent: 5px; }
+ #pb_synthetic_report .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_synthetic_report .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_synthetic_report .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_synthetic_report .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_synthetic_report .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_synthetic_report .gt_row_group_first td { border-top-width: 2px; }
+ #pb_synthetic_report .gt_row_group_first th { border-top-width: 2px; }
+ #pb_synthetic_report .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_synthetic_report .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_synthetic_report .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_synthetic_report .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_synthetic_report .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_synthetic_report .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_synthetic_report .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_synthetic_report .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_synthetic_report .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_synthetic_report .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_synthetic_report .gt_left { text-align: left; }
+ #pb_synthetic_report .gt_center { text-align: center; }
+ #pb_synthetic_report .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_synthetic_report .gt_font_normal { font-weight: normal; }
+ #pb_synthetic_report .gt_font_bold { font-weight: bold; }
+ #pb_synthetic_report .gt_font_italic { font-style: italic; }
+ #pb_synthetic_report .gt_super { font-size: 65%; }
+ #pb_synthetic_report .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_synthetic_report .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_synthetic_report .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_synthetic_report .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_synthetic_report .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_synthetic_report .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_synthetic_report-title" aria-describedby="pb_synthetic_report-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:45%;">
+  <col style="width:55%;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_title gt_font_normal" id="pb_synthetic_report-title">Comprobación de los datos sintéticos</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_synthetic_report-subtitle"><div>sintéticos: 500 filas · datos semilla: 500 filas</div><div><strong>Se encontraron 4 problemas.</strong></div></td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="font-size: 12px;font-weight: bold;" scope="col" id="pb_synthetic_report-check">Comprobación</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="font-size: 12px;font-weight: bold;" scope="col" id="pb_synthetic_report-result">Resultado</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_synthetic_report-Fidelidad" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Fidelidad</th>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Fidelidad pb_synthetic_report-check" class="gt_row gt_left"><code>age</code><div style="font-size: 10px; color: #777777;">comparada con los datos semilla</div></td>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Fidelidad pb_synthetic_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #E5AB00; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">MODERADO</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">PSI 0,122</span></div><div style="font-size: 10px; color: #777777;">numérica; KS 0,124 (p = 0,000906); faltantes: 0,0% (datos semilla: 0,0%)</div></td>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Fidelidad pb_synthetic_report-check" class="gt_row gt_left"><code>plan</code><div style="font-size: 10px; color: #777777;">comparada con los datos semilla</div></td>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Fidelidad pb_synthetic_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #CF142B; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">MAYOR</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">PSI 0,512</span></div><div style="font-size: 10px; color: #777777;">categórica; faltantes: 0,0% (datos semilla: 0,0%)</div></td>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Fidelidad pb_synthetic_report-check" class="gt_row gt_left"><code>monthly_spend</code><div style="font-size: 10px; color: #777777;">comparada con los datos semilla</div></td>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Fidelidad pb_synthetic_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #CF142B; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">FALTANTES</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">PSI 0,0548</span></div><div style="font-size: 10px; color: #777777;">numérica; KS 0,0624 (p = 0,31); faltantes: 13,4% (datos semilla: 0,0%)</div></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_synthetic_report-Diversidad" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Diversidad</th>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Diversidad pb_synthetic_report-check" class="gt_row gt_left">Filas que repiten una fila anterior<div style="font-size: 10px; color: #777777;">comparadas en <code>age</code>, <code>plan</code>, <code>monthly_spend</code>, <code>message</code></div></td>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Diversidad pb_synthetic_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #4CA64C; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">OK</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">0 de 500 filas (0,0%)</span></div><div style="font-size: 10px; color: #777777;">datos semilla: 0 de 500 filas (0,0%)</div></td>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Diversidad pb_synthetic_report-check" class="gt_row gt_left">Distinct-1 de <code>message</code><div style="font-size: 10px; color: #777777;">la proporción de las palabras que son distintas</div></td>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Diversidad pb_synthetic_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #4CA64C; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">OK</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">0,00896</span></div><div style="font-size: 10px; color: #777777;">datos semilla: 0,00874 (102% de ese valor); en 500 filas de cada una</div></td>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Diversidad pb_synthetic_report-check" class="gt_row gt_left">Distinct-2 de <code>message</code><div style="font-size: 10px; color: #777777;">la proporción de los pares de palabras que son distintos</div></td>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Diversidad pb_synthetic_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #CF142B; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">BAJA</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">0,0131</span></div><div style="font-size: 10px; color: #777777;">datos semilla: 0,0228 (57% de ese valor); en 500 filas de cada una</div></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_synthetic_report-Copias" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Copias</th>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Copias pb_synthetic_report-check" class="gt_row gt_left">Filas sintéticas que copian una fila de los datos semilla<div style="font-size: 10px; color: #777777;">comparadas en <code>age</code>, <code>plan</code>, <code>monthly_spend</code>, <code>message</code>, y en el texto de <code>message</code></div></td>
+    <td style="font-size: 12px;" headers="pb_synthetic_report-Copias pb_synthetic_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #CF142B; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">COPIAS</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">3 de 500 filas (0,6%)</span></div><div style="font-size: 10px; color: #777777;">1 idéntica, 2 con un texto casi idéntico</div></td>
+  </tr>
+</tbody>
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="2"><span class="gt_from_md"><span style="font-size: 11px; color: #555555;">El PSI es el índice de estabilidad de la población de las proporciones de los valores (agrupados por los deciles de los datos semilla, para una columna numérica): un cambio es moderado desde 0,1 y mayor desde 0,2. KS es el estadístico de Kolmogórov-Smirnov. Un cambio de 10 puntos porcentuales o más en la proporción de valores faltantes es un problema.</span></span></td></tr><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="2"><span class="gt_from_md"><span style="font-size: 11px; color: #555555;">Una proporción de filas repetidas 5 puntos porcentuales o más por encima de la de los datos semilla es un problema, como lo es un distinct-n por debajo del 90% del de los datos semilla (medido en tantas filas de cada tabla, muestreadas de la más grande).</span></span></td></tr><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="2"><span class="gt_from_md"><span style="font-size: 11px; color: #555555;">Los textos son casi idénticos si la similitud de Jaccard de sus n-gramas de 5 palabras es de al menos 0,8 (hallados con MinHash, con 128 permutaciones).</span></span></td></tr></tfoot>
+</table>
+
+</div>
+</div>
+</div>
 </section>
 <section id="what-it-doesnt-check" class="level1">
 <h1>What It Doesn’t Check</h1>

@@ -4,10 +4,14 @@ Get a tabular report of the checks of the splits.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L531-L691)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L533-L744)
 
 ``` python
-SplitCheck.get_tabular_report(title=None)
+SplitCheck.get_tabular_report(
+    title=None,
+    lang=None,
+    locale=None,
+)
 ```
 
 The report has a group of rows for each check: the overlap of each pair of splits, the labels of each split, and the drift of each column in each split after the first. Each row has a badge with its result, and the header says how many issues there are.
@@ -16,6 +20,12 @@ The report has a group of rows for each check: the overlap of each pair of split
 
 `title: str | None = None`  
 An optional title replacing the default.
+
+`lang: str | None = None`  
+The language of the report's text, as a two-letter language code (e.g., `"fr"` or `"de"`; see the `lang=` argument of [`Validate`](../reference/Validate.md#pointblank.Validate) for the languages). By default, the report is in English. The names of the splits and the columns, and the labels, are shown as they are.
+
+`locale: str | None = None`  
+The locale for the numbers in the report (e.g., `"de-CH"`), which sets the decimal mark and the thousands separator. By default, it's `lang=`.
 
 ## Returns
 

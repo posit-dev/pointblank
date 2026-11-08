@@ -4,10 +4,14 @@ Get a tabular report of the checks of the synthetic data.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/synthetic.py#L513-L689)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/synthetic.py#L513-L737)
 
 ``` python
-SyntheticCheck.get_tabular_report(title=None)
+SyntheticCheck.get_tabular_report(
+    title=None,
+    lang=None,
+    locale=None,
+)
 ```
 
 The report has a group of rows for each check: the fidelity of each column, the diversity of the rows and of the text, and the copies of seed rows. Each row has a badge with its result, and the header says how many issues there are.
@@ -16,6 +20,12 @@ The report has a group of rows for each check: the fidelity of each column, the 
 
 `title: str | None = None`  
 An optional title replacing the default.
+
+`lang: str | None = None`  
+The language of the report's text, as a two-letter language code (e.g., `"fr"` or `"de"`; see the `lang=` argument of [`Validate`](../reference/Validate.md#pointblank.Validate) for the languages). By default, the report is in English. The names of the columns are shown as they are.
+
+`locale: str | None = None`  
+The locale for the numbers in the report (e.g., `"de-CH"`), which sets the decimal mark and the thousands separator. By default, it's `lang=`.
 
 ## Returns
 

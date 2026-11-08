@@ -133,6 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.all_passed.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Validate.all_passed.html">
@@ -180,11 +181,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2063,7 +2068,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). After interrogation, the <code>all_passed()</code> method is used to determine if all validation steps passed perfectly.</p>
-<div id="4864e52e" class="cell" data-execution_count="1">
+<div id="40cc3159" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>

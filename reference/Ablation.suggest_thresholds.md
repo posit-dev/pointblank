@@ -4,7 +4,7 @@ Suggest thresholds for the steps, from what their failing test units cost the mo
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4298-L4451)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4374-L4527)
 
 ``` python
 Ablation.suggest_thresholds(tolerance)

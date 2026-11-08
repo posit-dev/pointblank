@@ -137,6 +137,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-splits.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-splits.html">
@@ -184,11 +185,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -693,7 +698,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-splits" class="level1">
 <h1>The Splits</h1>
 <p>Let’s make three splits of a dataset of support tickets, labelled with their topic, for a model that sorts new tickets by topic. Each ticket also records how many days the customer waited. The test split was collected later than the others, and it shows: there are no tickets about returns, the waits are longer, and two tickets were copied from the training split (one as it is, and one in capital letters with different punctuation).</p>
-<div id="aea62387" class="cell" data-execution_count="2">
+<div id="f240ba49" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -892,7 +897,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-the-splits" class="level1">
 <h1>Checking the Splits</h1>
 <p>The splits are given in order, as <code>train=</code>, <code>valid=</code>, and <code>test=</code> (or as a dictionary of splits by name, with <code>splits=</code>). We’ll say which column identifies a ticket (its text) and which has the labels, and ask for rows that are nearly the same as well as rows that are the same.</p>
-<div id="87bef886" class="cell" data-execution_count="3">
+<div id="e0e22c40" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>check <span class="op">=</span> pb.check_splits(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    train<span class="op">=</span>train, valid<span class="op">=</span>valid, test<span class="op">=</span>test, columns<span class="op">=</span><span class="st">"text"</span>, label<span class="op">=</span><span class="st">"topic"</span>, near<span class="op">=</span><span class="va">True</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1042,7 +1047,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-results" class="level1">
 <h1>The Results</h1>
 <p>The problems found are also in the <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> attribute, as messages, and <code>ok</code> is <code>True</code> when there are none, which makes a check of the splits easy to put in a test or a pipeline.</p>
-<div id="30779fff" class="cell" data-execution_count="4">
+<div id="5afc0340" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>check.issues</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>["2 rows of 'test' (0.7%) are also in 'train' (1 the same and 1 nearly the same).",
@@ -1052,7 +1057,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The <a href="../../reference/SplitCheck.get_overlap.html#pointblank.SplitCheck.get_overlap" class="gdls-link gdls-code">get_overlap()</a> method gives the overlapping rows of a pair of splits, with the row number of each in its own split.</p>
-<div id="2f09813b" class="cell" data-execution_count="5">
+<div id="76b30e6a" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>check.get_overlap(<span class="st">"train"</span>, <span class="st">"test"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div><style>
@@ -1066,6 +1071,142 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The other attributes have the numbers behind the report (<code>overlap</code>, <code>labels</code>, and <code>drift</code>), and <code>to_dict()</code> gives all of them as a dictionary that can be written as JSON.</p>
+<p>The report is in English by default, and <code>get_tabular_report()</code> takes <code>lang=</code> and <code>locale=</code> for another language (the messages of <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> stay in English):</p>
+<div id="a5151e8e" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>check.get_tabular_report(lang<span class="op">=</span><span class="st">"es"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div id="pb_split_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_split_report table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_split_report thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_split_report p { margin: 0; padding: 0; }
+ #pb_split_report .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_split_report .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_split_report .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_split_report .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_split_report .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_split_report .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_split_report .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_split_report .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_split_report .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_split_report .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_split_report .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_split_report .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_split_report .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_split_report .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_split_report .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_split_report .gt_from_md> :first-child { margin-top: 0; }
+ #pb_split_report .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_split_report .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_split_report .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_split_report .gt_indent_1 { text-indent: 5px; }
+ #pb_split_report .gt_indent_2 { text-indent: calc(5px * 2); }
+ #pb_split_report .gt_indent_3 { text-indent: calc(5px * 3); }
+ #pb_split_report .gt_indent_4 { text-indent: calc(5px * 4); }
+ #pb_split_report .gt_indent_5 { text-indent: calc(5px * 5); }
+ #pb_split_report .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_split_report .gt_row_group_first td { border-top-width: 2px; }
+ #pb_split_report .gt_row_group_first th { border-top-width: 2px; }
+ #pb_split_report .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_split_report .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_split_report .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_split_report .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #pb_split_report .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_split_report .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_split_report .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_split_report .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_split_report .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_split_report .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_split_report .gt_left { text-align: left; }
+ #pb_split_report .gt_center { text-align: center; }
+ #pb_split_report .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_split_report .gt_font_normal { font-weight: normal; }
+ #pb_split_report .gt_font_bold { font-weight: bold; }
+ #pb_split_report .gt_font_italic { font-style: italic; }
+ #pb_split_report .gt_super { font-size: 65%; }
+ #pb_split_report .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_split_report .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #pb_split_report .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_split_report .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_split_report .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_split_report .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_split_report-title" aria-describedby="pb_split_report-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:45%;">
+  <col style="width:55%;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_title gt_font_normal" id="pb_split_report-title">Comprobación de las particiones</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_split_report-subtitle"><div>train: 1.000 filas · valid: 300 filas · test: 300 filas</div><div><strong>Se encontraron 4 problemas.</strong></div></td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="font-size: 12px;font-weight: bold;" scope="col" id="pb_split_report-check">Comprobación</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="font-size: 12px;font-weight: bold;" scope="col" id="pb_split_report-result">Resultado</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_split_report-Solapamiento" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Solapamiento</th>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_split_report-Solapamiento pb_split_report-check" class="gt_row gt_left">Filas de <strong>valid</strong> que también están en <strong>train</strong><div style="font-size: 10px; color: #777777;">comparadas en <code>text</code></div></td>
+    <td style="font-size: 12px;" headers="pb_split_report-Solapamiento pb_split_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #4CA64C; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">NINGUNA</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">0 de 300 filas (0,0%)</span></div><div style="font-size: 10px; color: #777777;">0 idénticas, 0 casi idénticas</div></td>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_split_report-Solapamiento pb_split_report-check" class="gt_row gt_left">Filas de <strong>test</strong> que también están en <strong>train</strong><div style="font-size: 10px; color: #777777;">comparadas en <code>text</code></div></td>
+    <td style="font-size: 12px;" headers="pb_split_report-Solapamiento pb_split_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #CF142B; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">FUGA</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">2 de 300 filas (0,7%)</span></div><div style="font-size: 10px; color: #777777;">1 idéntica, 1 casi idéntica</div></td>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_split_report-Solapamiento pb_split_report-check" class="gt_row gt_left">Filas de <strong>test</strong> que también están en <strong>valid</strong><div style="font-size: 10px; color: #777777;">comparadas en <code>text</code></div></td>
+    <td style="font-size: 12px;" headers="pb_split_report-Solapamiento pb_split_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #4CA64C; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">NINGUNA</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">0 de 300 filas (0,0%)</span></div><div style="font-size: 10px; color: #777777;">0 idénticas, 0 casi idénticas</div></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_split_report-Etiquetas" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Etiquetas</th>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_split_report-Etiquetas pb_split_report-check" class="gt_row gt_left">Etiquetas de <strong>train</strong><div style="font-size: 10px; color: #777777;">en <code>topic</code></div></td>
+    <td style="font-size: 12px;" headers="pb_split_report-Etiquetas pb_split_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #999999; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">BASE</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">shipping 40% · billing 20% · returns 20% · damaged 20%</span></div><div style="font-size: 10px; color: #777777;">4 etiquetas</div></td>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_split_report-Etiquetas pb_split_report-check" class="gt_row gt_left">Etiquetas de <strong>valid</strong><div style="font-size: 10px; color: #777777;">en <code>topic</code>, comparadas con train</div></td>
+    <td style="font-size: 12px;" headers="pb_split_report-Etiquetas pb_split_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #4CA64C; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">OK</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">shipping 43% · returns 21% · damaged 20% · billing 16%</span></div><div style="font-size: 10px; color: #777777;">PSI 0,0153</div></td>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_split_report-Etiquetas pb_split_report-check" class="gt_row gt_left">Etiquetas de <strong>test</strong><div style="font-size: 10px; color: #777777;">en <code>topic</code>, comparadas con train</div></td>
+    <td style="font-size: 12px;" headers="pb_split_report-Etiquetas pb_split_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #CF142B; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">PROBLEMA</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">shipping 67% · damaged 22% · billing 10%</span></div><div style="font-size: 10px; color: #777777;">faltan 'returns'; PSI 1,75</div></td>
+  </tr>
+  <tr class="gt_group_heading_row">
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_split_report-Deriva" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Deriva</th>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_split_report-Deriva pb_split_report-check" class="gt_row gt_left"><code>wait_days</code> en <strong>valid</strong><div style="font-size: 10px; color: #777777;">comparada con train</div></td>
+    <td style="font-size: 12px;" headers="pb_split_report-Deriva pb_split_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #4CA64C; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">ESTABLE</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">PSI 0,0296</span></div><div style="font-size: 10px; color: #777777;">numérica; KS 0,056 (p = 0,449)</div></td>
+  </tr>
+  <tr>
+    <td style="font-size: 12px;" headers="pb_split_report-Deriva pb_split_report-check" class="gt_row gt_left"><code>wait_days</code> en <strong>test</strong><div style="font-size: 10px; color: #777777;">comparada con train</div></td>
+    <td style="font-size: 12px;" headers="pb_split_report-Deriva pb_split_report-result" class="gt_row gt_left"><div style="white-space: nowrap;"><span style="background: #CF142B; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">MAYOR</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace;">PSI 0,798</span></div><div style="font-size: 10px; color: #777777;">numérica; KS 0,363 (p = 0)</div></td>
+  </tr>
+</tbody>
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="2"><span class="gt_from_md"><span style="font-size: 11px; color: #555555;">Las filas son casi idénticas si la similitud de Jaccard de sus n-gramas de 5 palabras es de al menos 0,8 (halladas con MinHash, con 128 permutaciones).</span></span></td></tr><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="2"><span class="gt_from_md"><span style="font-size: 11px; color: #555555;">El PSI es el índice de estabilidad de la población de las proporciones de los valores (agrupados por los deciles de 'train', para una columna numérica): un cambio es moderado desde 0,1 y mayor desde 0,2. KS es el estadístico de Kolmogórov-Smirnov.</span></span></td></tr></tfoot>
+</table>
+
+</div>
+</div>
+</div>
 </section>
 <section id="contamination-by-other-data" class="level1">
 <h1>Contamination by Other Data</h1>

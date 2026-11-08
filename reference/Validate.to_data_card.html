@@ -133,6 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.to_data_card.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Validate.to_data_card.html">
@@ -180,11 +181,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2042,7 +2047,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22176-L22325" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22176-L22342" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">to_data_card</span>(</span>
@@ -2057,7 +2062,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">citation</span><span class="op">=</span><span class="cn">None</span>,</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">column_descriptions</span><span class="op">=</span><span class="cn">None</span>,</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">by</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">lang</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">locale</span><span class="op">=</span><span class="cn">None</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>A data card describes a dataset for the people who use it: what it has, where it came from, how good it is, and who to ask about it. The <a href="../reference/Validate.to_data_card.html#pointblank.Validate.to_data_card" class="gdls-link gdls-code">to_data_card()</a> method writes one in Markdown from what the validation knows: the structure of the table (its columns, their types, and how many values are missing), the results of the validation (the health score, the score of each dimension of quality, and each step with its share of passing test units), and, with <code>ablation=</code>, the measured effect of the checks on a model. The rest (the description, the license, the source, and so on) can be given in the arguments, and what isn’t known is marked “[More Information Needed]”, as in the template of Hugging Face, so that it can be filled in later.</p>
@@ -2093,7 +2100,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">language</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | list[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>The language of the data (a code like <code>"en"</code>), or a list of them.</p>
+<p>The language of the data (a code like <code>"en"</code>), or a list of them. This is a fact about the dataset, for the card to state (and for the <code>language</code> of the front matter); the language that the card is written in is set by <code>lang=</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">source</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -2109,7 +2116,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">by</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-The name of a column that steps are segmented by, for a table of the scores of each of its values (as with <code>get_health_score(by=)</code>), such as the scores of each language of a multilingual dataset.
+<p>The name of a column that steps are segmented by, for a table of the scores of each of its values (as with <code>get_health_score(by=)</code>), such as the scores of each language of a multilingual dataset.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">lang</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+<p>The language that the card is written in, as a two-letter language code (e.g., <code>"fr"</code> or <code>"de"</code>; see the <code>lang=</code> argument of <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> for the languages). By default, the card is in the language of the validation. The headings, questions, and text of the card are translated, while the keys and values of the front matter, the arguments given here, and the briefs of the steps are written as they are.</p>
+</dd>
+<dt><code><span class="doc-parameter-name">locale</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
+<dd>
+The locale for the numbers in the card (e.g., <code>"de-CH"</code>), which sets the decimal mark and the thousands separator. By default, it’s the locale of the validation (when the card is in the validation’s language), or <code>lang=</code>.
 </dd>
 </dl>
 </div>
@@ -2127,12 +2142,12 @@ The data card, in Markdown.
 </section>
 <section id="validation-information-used" class="level2 doc-validation-information-used">
 <h2 class="doc-validation-information-used anchored" data-anchor-id="validation-information-used">Validation Information Used</h2>
-<p>The card takes the curator and contact from the <code>owner=</code> of the validation, the uses from its <code>consumers=</code>, and the version from its <code>version=</code>. The number of missing values in each column is counted in the table of the validation (on its own backend), and the results are those of the last interrogation, so it needs <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> first. The text of the card is in English, whatever the <code>lang=</code> of the validation.</p>
+<p>The card takes the curator and contact from the <code>owner=</code> of the validation, the uses from its <code>consumers=</code>, and the version from its <code>version=</code>. The number of missing values in each column is counted in the table of the validation (on its own backend), and the results are those of the last interrogation, so it needs <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a> first. The card is written in the <code>lang=</code> and <code>locale=</code> of the validation, unless they’re given here.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s validate a small table of product reviews in two languages, with an owner for the data and the language of each review.</p>
-<div id="c57d86d1" class="cell" data-execution_count="2">
+<div id="b372bb7f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2203,7 +2218,7 @@ The data has 5 rows and 3 columns.
 
 ## Data Quality
 
-The data was validated with Pointblank 0.1.dev1+g33e3fc1f5 on 2026-11-08: 1 of 3 checks passed for every row (or other test unit).
+The data was validated with Pointblank 0.1.dev1+gb5e20d132 on 2026-11-08: 1 of 3 checks passed for every row (or other test unit).
 
 The health score (the share of the test units that passed, from 0 to 100) is **80.0**.
 
@@ -2247,11 +2262,11 @@ The validation found problems in 2 of 3 checks (see *Data Quality*): 1 test unit
 
 Data Team
 
-*This card was made with [Pointblank](https://posit-dev.github.io/pointblank/) 0.1.dev1+g33e3fc1f5.*
+*This card was made with [Pointblank](https://posit-dev.github.io/pointblank/) 0.1.dev1+gb5e20d132.*
 </code></pre>
 </div>
 </div>
-<p>The card starts with the front matter of a Hugging Face card, then has the structure of the table (one review is missing), the scores, the steps (one rating is out of range), and the scores of each language. With <code>path="README.md"</code>, it would also be written to a file, and with <code>format="datasheet"</code>, it would be a datasheet instead.</p>
+<p>The card starts with the front matter of a Hugging Face card, then has the structure of the table (one review is missing), the scores, the steps (one rating is out of range), and the scores of each language. With <code>path="README.md"</code>, it would also be written to a file, and with <code>format="datasheet"</code>, it would be a datasheet instead. With <code>lang="fr"</code>, the card would be written in French (whatever the languages of the data, given in <code>language=</code>).</p>
 
 
 </section>

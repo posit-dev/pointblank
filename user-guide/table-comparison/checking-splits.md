@@ -132,6 +132,30 @@ shape: (2, 4)
 
 The other attributes have the numbers behind the report (`overlap`, `labels`, and `drift`), and `to_dict()` gives all of them as a dictionary that can be written as JSON.
 
+The report is in English by default, and `get_tabular_report()` takes `lang=` and `locale=` for another language (the messages of [issues](../../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) stay in English):
+
+``` python
+check.get_tabular_report(lang="es")
+```
+
+| Comprobación de las particiones |  |
+|----|----|
+| train: 1.000 filas · valid: 300 filas · test: 300 filas **Se encontraron 4 problemas.** |  |
+| Comprobación | Resultado |
+| Solapamiento |  |
+| Filas de **valid** que también están en **train** comparadas en `text` | NINGUNA 0 de 300 filas (0,0%) 0 idénticas, 0 casi idénticas |
+| Filas de **test** que también están en **train** comparadas en `text` | FUGA 2 de 300 filas (0,7%) 1 idéntica, 1 casi idéntica |
+| Filas de **test** que también están en **valid** comparadas en `text` | NINGUNA 0 de 300 filas (0,0%) 0 idénticas, 0 casi idénticas |
+| Etiquetas |  |
+| Etiquetas de **train** en `topic` | BASE shipping 40% · billing 20% · returns 20% · damaged 20% 4 etiquetas |
+| Etiquetas de **valid** en `topic`, comparadas con train | OK shipping 43% · returns 21% · damaged 20% · billing 16% PSI 0,0153 |
+| Etiquetas de **test** en `topic`, comparadas con train | PROBLEMA shipping 67% · damaged 22% · billing 10% faltan 'returns'; PSI 1,75 |
+| Deriva |  |
+| `wait_days` en **valid** comparada con train | ESTABLE PSI 0,0296 numérica; KS 0,056 (p = 0,449) |
+| `wait_days` en **test** comparada con train | MAYOR PSI 0,798 numérica; KS 0,363 (p = 0) |
+| Las filas son casi idénticas si la similitud de Jaccard de sus n-gramas de 5 palabras es de al menos 0,8 (halladas con MinHash, con 128 permutaciones). |  |
+| El PSI es el índice de estabilidad de la población de las proporciones de los valores (agrupados por los deciles de 'train', para una columna numérica): un cambio es moderado desde 0,1 y mayor desde 0,2. KS es el estadístico de Kolmogórov-Smirnov. |  |
+
 ## Contamination by Other Data
 
 [check_splits()](../../reference/check_splits.md#pointblank.check_splits) checks a dataset's own splits. To check that training data doesn't contain the questions of a benchmark that the model will be judged on (or any other text that shouldn't be in it), use the `rows_not_contaminated()` validation method, which is a step of a validation like any other (see the [Checking Text Data](../advanced-validation/text-checks.md) article).

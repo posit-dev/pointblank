@@ -136,6 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Ablation.annotate.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Ablation.annotate.html">
@@ -183,11 +184,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2044,13 +2049,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3903-L4060" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3980-L4136" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Ablation</span><span class="op">.</span><span class="fu">annotate</span>(<span class="va">validation</span><span class="op">=</span><span class="cn">None</span>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Each step with a variant of its own (from <a href="../reference/Ablation.drop_each.html#pointblank.Ablation.drop_each" class="gdls-link"><code>drop_each()</code></a>, or a <a href="../reference/Ablation.drop_steps.html#pointblank.Ablation.drop_steps" class="gdls-link"><code>drop_steps()</code></a> variant with just that step) gets a note with the effect of removing its failing rows and the verdict. A step with a variant from <a href="../reference/Ablation.drop_all_but_each.html#pointblank.Ablation.drop_all_but_each" class="gdls-link"><code>drop_all_but_each()</code></a> also gets the effect of its rows on top of the other steps, and a step with a Shapley value (from <a href="../reference/Ablation.shapley.html#pointblank.Ablation.shapley" class="gdls-link"><code>shapley()</code></a>) gets that value. The notes appear in the validation’s report, so that the report shows which checks matter to the model, next to the checks themselves.</p>
+<p>Each step with a variant of its own (from <a href="../reference/Ablation.drop_each.html#pointblank.Ablation.drop_each" class="gdls-link"><code>drop_each()</code></a>, or a <a href="../reference/Ablation.drop_steps.html#pointblank.Ablation.drop_steps" class="gdls-link"><code>drop_steps()</code></a> variant with just that step) gets a note with the effect of removing its failing rows and the verdict. A step with a variant from <a href="../reference/Ablation.drop_all_but_each.html#pointblank.Ablation.drop_all_but_each" class="gdls-link"><code>drop_all_but_each()</code></a> also gets the effect of its rows on top of the other steps, and a step with a Shapley value (from <a href="../reference/Ablation.shapley.html#pointblank.Ablation.shapley" class="gdls-link"><code>shapley()</code></a>) gets that value. The notes appear in the validation’s report, so that the report shows which checks matter to the model, next to the checks themselves. They’re written in the language of that validation (its <code>lang=</code>), with the numbers formatted for its <code>locale=</code>.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -2077,7 +2082,7 @@ The validation, with the notes added (any notes from an earlier <a href="../refe
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an ablation of a table of temperature readings with out-of-range and missing values.</p>
-<div id="db04bd86" class="cell" data-execution_count="2">
+<div id="1acdeb6f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>

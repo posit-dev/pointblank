@@ -4,7 +4,7 @@ Write out the versions of the table to evaluate, for training them elsewhere.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3078-L3241)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3155-L3318)
 
 ``` python
 Ablation.export(

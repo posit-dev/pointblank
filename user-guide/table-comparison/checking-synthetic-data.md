@@ -158,6 +158,30 @@ shape: (3, 7)
 
 The other attributes have the numbers behind the report (`fidelity`, `duplicates`, `diversity`, and `copies`), and `to_dict()` gives all of them as a dictionary that can be written as JSON.
 
+The report is in English by default, and `get_tabular_report()` takes `lang=` and `locale=` for another language (the messages of [issues](../../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) stay in English):
+
+``` python
+check.get_tabular_report(lang="es")
+```
+
+| Comprobación de los datos sintéticos |  |
+|----|----|
+| sintéticos: 500 filas · datos semilla: 500 filas **Se encontraron 4 problemas.** |  |
+| Comprobación | Resultado |
+| Fidelidad |  |
+| `age` comparada con los datos semilla | MODERADO PSI 0,122 numérica; KS 0,124 (p = 0,000906); faltantes: 0,0% (datos semilla: 0,0%) |
+| `plan` comparada con los datos semilla | MAYOR PSI 0,512 categórica; faltantes: 0,0% (datos semilla: 0,0%) |
+| `monthly_spend` comparada con los datos semilla | FALTANTES PSI 0,0548 numérica; KS 0,0624 (p = 0,31); faltantes: 13,4% (datos semilla: 0,0%) |
+| Diversidad |  |
+| Filas que repiten una fila anterior comparadas en `age`, `plan`, `monthly_spend`, `message` | OK 0 de 500 filas (0,0%) datos semilla: 0 de 500 filas (0,0%) |
+| Distinct-1 de `message` la proporción de las palabras que son distintas | OK 0,00896 datos semilla: 0,00874 (102% de ese valor); en 500 filas de cada una |
+| Distinct-2 de `message` la proporción de los pares de palabras que son distintos | BAJA 0,0131 datos semilla: 0,0228 (57% de ese valor); en 500 filas de cada una |
+| Copias |  |
+| Filas sintéticas que copian una fila de los datos semilla comparadas en `age`, `plan`, `monthly_spend`, `message`, y en el texto de `message` | COPIAS 3 de 500 filas (0,6%) 1 idéntica, 2 con un texto casi idéntico |
+| El PSI es el índice de estabilidad de la población de las proporciones de los valores (agrupados por los deciles de los datos semilla, para una columna numérica): un cambio es moderado desde 0,1 y mayor desde 0,2. KS es el estadístico de Kolmogórov-Smirnov. Un cambio de 10 puntos porcentuales o más en la proporción de valores faltantes es un problema. |  |
+| Una proporción de filas repetidas 5 puntos porcentuales o más por encima de la de los datos semilla es un problema, como lo es un distinct-n por debajo del 90% del de los datos semilla (medido en tantas filas de cada tabla, muestreadas de la más grande). |  |
+| Los textos son casi idénticos si la similitud de Jaccard de sus n-gramas de 5 palabras es de al menos 0,8 (hallados con MinHash, con 128 permutaciones). |  |
+
 ## What It Doesn't Check
 
 A synthetic dataset can pass these checks and still be a poor stand-in for its seed. The checks compare each column on its own, so a generator that gets every column right but the relationships between them wrong (customers of 18 with the largest spends, say) isn't caught. And a synthetic row that isn't a copy can still give a seed row away, by being very close to it in every numeric value, or by being so rare that it could only come from one customer; the check of copies finds rows that are the same (or whose text is nearly the same), not rows that are merely close. The best test of synthetic data for training a model is to train one on it, and to compare it with a model trained on the seed.

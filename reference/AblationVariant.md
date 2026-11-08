@@ -4,7 +4,7 @@ A version of the training table evaluated in an ablation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L124-L235)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L133-L244)
 
 ``` python
 AblationVariant(

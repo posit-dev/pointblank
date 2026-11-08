@@ -4,12 +4,14 @@ Get a tabular report of the ablation's results.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4634-L4947)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4710-L5035)
 
 ``` python
 Ablation.get_tabular_report(
     metric=None,
     title=None,
+    lang=None,
+    locale=None,
 )
 ```
 
@@ -22,6 +24,12 @@ The metric to show. By default, it's the one that verdicts are based on (named i
 
 `title: str | None = None`  
 An optional title replacing the default.
+
+`lang: str | None = None`  
+The language of the report's text, as a two-letter language code (e.g., `"fr"` or `"de"`; see the `lang=` argument of [`Validate`](../reference/Validate.md#pointblank.Validate) for the languages). By default, the report is in the language of the validation. The names of the variants given in [`drop_steps()`](../reference/Ablation.drop_steps.md#pointblank.Ablation.drop_steps), the metrics, and the briefs of the steps are shown as they are.
+
+`locale: str | None = None`  
+The locale for the numbers in the report (e.g., `"de-CH"`), which sets the decimal mark and the thousands separator. By default, it's the locale of the validation (when the report is in the validation's language), or `lang=`.
 
 ## Returns
 

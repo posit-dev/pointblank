@@ -20471,7 +20471,7 @@ result is a standard schema, it can be given to any JSON Schema validator, for e
 check records in an API before they're loaded into the table. With `path=`, the schema is
 also written to a file.
 
-to_data_card(self, format: 'str' = 'huggingface', path: 'str | Path | None' = None, ablation: 'Ablation | None' = None, title: 'str | None' = None, description: 'str | None' = None, license: 'str | None' = None, language: 'str | list[str] | None' = None, source: 'str | None' = None, citation: 'str | None' = None, column_descriptions: 'dict[str, str] | None' = None, by: 'str | None' = None) -> 'str'
+to_data_card(self, format: 'str' = 'huggingface', path: 'str | Path | None' = None, ablation: 'Ablation | None' = None, title: 'str | None' = None, description: 'str | None' = None, license: 'str | None' = None, language: 'str | list[str] | None' = None, source: 'str | None' = None, citation: 'str | None' = None, column_descriptions: 'dict[str, str] | None' = None, by: 'str | None' = None, lang: 'str | None' = None, locale: 'str | None' = None) -> 'str'
 
 Write a data card for the table, with the evidence of the validation.
 
@@ -20513,7 +20513,9 @@ license
     The license of the dataset, as an identifier like `"cc-by-4.0"` or `"apache-2.0"` (the
     identifiers of the Hugging Face Hub, for a Hugging Face card).
 language
-    The language of the data (a code like `"en"`), or a list of them.
+    The language of the data (a code like `"en"`), or a list of them. This is a fact about
+    the dataset, for the card to state (and for the `language` of the front matter); the
+    language that the card is written in is set by `lang=`.
 source
     Where the data came from and how it was collected.
 citation
@@ -20525,6 +20527,16 @@ by
     The name of a column that steps are segmented by, for a table of the scores of each
     of its values (as with `get_health_score(by=)`), such as the scores of each language
     of a multilingual dataset.
+lang
+    The language that the card is written in, as a two-letter language code (e.g., `"fr"`
+    or `"de"`; see the `lang=` argument of [`Validate`](`pointblank.Validate`) for the
+    languages). By default, the card is in the language of the validation. The headings,
+    questions, and text of the card are translated, while the keys and values of the front
+    matter, the arguments given here, and the briefs of the steps are written as they are.
+locale
+    The locale for the numbers in the card (e.g., `"de-CH"`), which sets the decimal mark
+    and the thousands separator. By default, it's the locale of the validation (when the
+    card is in the validation's language), or `lang=`.
 
 Returns
 -------
@@ -20536,8 +20548,8 @@ Validation Information Used
 The card takes the curator and contact from the `owner=` of the validation, the uses from
 its `consumers=`, and the version from its `version=`. The number of missing values in
 each column is counted in the table of the validation (on its own backend), and the
-results are those of the last interrogation, so it needs `interrogate()` first. The text
-of the card is in English, whatever the `lang=` of the validation.
+results are those of the last interrogation, so it needs `interrogate()` first. The card
+is written in the `lang=` and `locale=` of the validation, unless they're given here.
 
 Examples
 --------
@@ -20590,7 +20602,8 @@ print(card)
 The card starts with the front matter of a Hugging Face card, then has the structure of
 the table (one review is missing), the scores, the steps (one rating is out of range), and
 the scores of each language. With `path="README.md"`, it would also be written to a file,
-and with `format="datasheet"`, it would be a datasheet instead.
+and with `format="datasheet"`, it would be a datasheet instead. With `lang="fr"`, the card
+would be written in French (whatever the languages of the data, given in `language=`).
 
 suggest_improvements(self, model: 'str', api_key: 'str | None' = None, verify_ssl: 'bool' = True, max_reprompts: 'int' = 1) -> 'Any'
 
@@ -25626,7 +25639,7 @@ pb.check_splits(train=train, test=test).get_overlap()
 
 The second row of the test split is the same as the second row of the training split.
 
-get_tabular_report(self, title: 'str | None' = None) -> 'GT'
+get_tabular_report(self, title: 'str | None' = None, lang: 'str | None' = None, locale: 'str | None' = None) -> 'GT'
 
 Get a tabular report of the checks of the splits.
 
@@ -25638,6 +25651,14 @@ Parameters
 ----------
 title
     An optional title replacing the default.
+lang
+    The language of the report's text, as a two-letter language code (e.g., `"fr"` or
+    `"de"`; see the `lang=` argument of [`Validate`](`pointblank.Validate`) for the
+    languages). By default, the report is in English. The names of the splits and the
+    columns, and the labels, are shown as they are.
+locale
+    The locale for the numbers in the report (e.g., `"de-CH"`), which sets the decimal
+    mark and the thousands separator. By default, it's `lang=`.
 
 Returns
 -------
@@ -25854,7 +25875,7 @@ pb.check_synthetic(synthetic, seed).get_copies()
 The second synthetic row is the same as the second seed row. The third has the age of
 the third seed row but another name, so it isn't a copy.
 
-get_tabular_report(self, title: 'str | None' = None) -> 'GT'
+get_tabular_report(self, title: 'str | None' = None, lang: 'str | None' = None, locale: 'str | None' = None) -> 'GT'
 
 Get a tabular report of the checks of the synthetic data.
 
@@ -25866,6 +25887,14 @@ Parameters
 ----------
 title
     An optional title replacing the default.
+lang
+    The language of the report's text, as a two-letter language code (e.g., `"fr"` or
+    `"de"`; see the `lang=` argument of [`Validate`](`pointblank.Validate`) for the
+    languages). By default, the report is in English. The names of the columns are shown
+    as they are.
+locale
+    The locale for the numbers in the report (e.g., `"de-CH"`), which sets the decimal
+    mark and the thousands separator. By default, it's `lang=`.
 
 Returns
 -------
@@ -27461,7 +27490,7 @@ gets all the credit for the readings in tenths of a degree, which only it catche
 Shapley value is the larger one. As the note at the bottom says, the two values add up to
 the effect of removing the rows of both steps.
 
-plan(self) -> 'GT'
+plan(self, lang: 'str | None' = None, locale: 'str | None' = None) -> 'GT'
 
 Show the versions of the table that the ablation will evaluate.
 
@@ -27470,6 +27499,17 @@ anything. It lists the full table, each variant, and each control, with the numb
 share of rows they remove, and gives the number of evaluations that
 [`run()`](`pointblank.Ablation.run`) will make in its header. Variants that won't be used
 (e.g., because they remove no rows) are listed in the notes at the bottom.
+
+Parameters
+----------
+lang
+    The language of the plan's text, as a two-letter language code (e.g., `"fr"` or
+    `"de"`; see the `lang=` argument of [`Validate`](`pointblank.Validate`) for the
+    languages). By default, the plan is in the language of the validation.
+locale
+    The locale for the numbers in the plan (e.g., `"de-CH"`), which sets the decimal mark
+    and the thousands separator. By default, it's the locale of the validation (when the
+    plan is in the validation's language), or `lang=`.
 
 Returns
 -------
@@ -28115,7 +28155,7 @@ ablation.suggest_thresholds(tolerance=0.5)
 Each percent of missing readings adds about 0.2 degrees to the error, so the error
 threshold is the share of missing readings that adds 0.5 degrees: about 2.5%.
 
-get_tabular_report(self, metric: 'str | None' = None, title: 'str | None' = None) -> 'GT'
+get_tabular_report(self, metric: 'str | None' = None, title: 'str | None' = None, lang: 'str | None' = None, locale: 'str | None' = None) -> 'GT'
 
 Get a tabular report of the ablation's results.
 
@@ -28142,6 +28182,16 @@ metric
     `metric=` when the ablation was created). Verdicts are only shown for that metric.
 title
     An optional title replacing the default.
+lang
+    The language of the report's text, as a two-letter language code (e.g., `"fr"` or
+    `"de"`; see the `lang=` argument of [`Validate`](`pointblank.Validate`) for the
+    languages). By default, the report is in the language of the validation. The names
+    of the variants given in [`drop_steps()`](`pointblank.Ablation.drop_steps`), the
+    metrics, and the briefs of the steps are shown as they are.
+locale
+    The locale for the numbers in the report (e.g., `"de-CH"`), which sets the decimal
+    mark and the thousands separator. By default, it's the locale of the validation (when
+    the report is in the validation's language), or `lang=`.
 
 Returns
 -------
@@ -28204,7 +28254,8 @@ variant from [`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`) al
 the effect of its rows on top of the other steps, and a step with a Shapley value (from
 [`shapley()`](`pointblank.Ablation.shapley`)) gets that value. The notes appear in the
 validation's report, so that the report shows which checks matter to the model, next to
-the checks themselves.
+the checks themselves. They're written in the language of that validation (its `lang=`),
+with the numbers formatted for its `locale=`.
 
 Parameters
 ----------
@@ -45476,6 +45527,14 @@ validation
 The validation can also be a newer one with the same steps (e.g., an interrogation of next month's
 training data), passed as `annotate(validation=...)`.
 
+The plan, the report, and the notes are written in the language of the validation (its `lang=`),
+with the numbers formatted for its `locale=`. The plan and the report take `lang=` and `locale=`
+arguments of their own, for another language (the briefs of the steps stay as they are):
+
+```{python}
+ablation.get_tabular_report(lang="de", locale="de-CH")
+```
+
 ## A Ready-Made `evaluate` Function
 
 Many `evaluate` functions for tabular models are much the same: pick the features, encode them, fit
@@ -45934,6 +45993,19 @@ The rows with temperatures that are ten times too large make the error much larg
 them helps. The rows without a humidity don't matter to a model of the temperature, so the
 verdicts of those steps are inconclusive: removing their rows isn't clearly better or worse than
 removing as many random rows.
+
+## Cards in Other Languages
+
+A card is written in the language of the validation (its `lang=`), with the numbers formatted for
+its `locale=`. The `lang=` and `locale=` arguments of `to_data_card()` give another language. The
+front matter stays as it is, since the Hub reads it, and so do the arguments with text of their
+own (like `description=`):
+
+```{python}
+card = validation.to_data_card(lang="fr", by="station")
+
+print(card[card.index("## Qualité des données") : card.index("### Étapes de validation")])
+```
 
 ## Conclusion
 
@@ -47177,6 +47249,13 @@ check.get_overlap("train", "test")
 The other attributes have the numbers behind the report (`overlap`, `labels`, and `drift`), and
 `to_dict()` gives all of them as a dictionary that can be written as JSON.
 
+The report is in English by default, and `get_tabular_report()` takes `lang=` and `locale=` for
+another language (the messages of `issues` stay in English):
+
+```{python}
+check.get_tabular_report(lang="es")
+```
+
 ## Contamination by Other Data
 
 `check_splits()` checks a dataset's own splits. To check that training data doesn't contain the
@@ -47351,6 +47430,13 @@ check.get_copies()
 
 The other attributes have the numbers behind the report (`fidelity`, `duplicates`, `diversity`, and
 `copies`), and `to_dict()` gives all of them as a dictionary that can be written as JSON.
+
+The report is in English by default, and `get_tabular_report()` takes `lang=` and `locale=` for
+another language (the messages of `issues` stay in English):
+
+```{python}
+check.get_tabular_report(lang="es")
+```
 
 ## What It Doesn't Check
 

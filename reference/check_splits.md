@@ -4,7 +4,7 @@ Check the splits of a dataset for leaks, label coverage, and drift.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L34-L231)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L36-L233)
 
 ``` python
 check_splits(

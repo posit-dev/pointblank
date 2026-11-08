@@ -136,6 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Validate.col_avg_eq.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Validate.col_avg_eq.html">
@@ -183,11 +184,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../changelog.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2047,7 +2052,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1118-L1158" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1120-L1160" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">col_avg_eq</span>(</span>
@@ -2147,7 +2152,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples, we’ll use a simple Polars DataFrame with two numeric columns. The table is shown below:</p>
-<div id="6f6e22a7" class="cell" data-execution_count="2">
+<div id="bfba78ff" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2274,7 +2279,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>Let’s validate that the average of column <code>a</code> equals <code>3</code>:</p>
-<div id="4e8056f0" class="cell" data-execution_count="3">
+<div id="e0f658b8" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_eq(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">3</span>)</span>
@@ -2441,7 +2446,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 <p>The average of <code>a</code> is <code>3</code>, and <code>3 == 3</code> holds, so the step’s one test unit passes.</p>
 <p>When validating multiple columns, each column gets its own validation step:</p>
-<div id="b3167425" class="cell" data-execution_count="4">
+<div id="76980982" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_eq(columns<span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>], value<span class="op">=</span><span class="dv">3</span>)</span>
@@ -2653,7 +2658,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>Each column gets its own step: step 1 is for <code>a</code> and step 2 is for <code>b</code>. The average of <code>b</code> is <code>2</code>, so step 2 fails. The report doesn’t show the computed average, but the step report does:</p>
-<div id="a6a54bbc" class="cell" data-execution_count="5">
+<div id="a3c381a2" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">2</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_step_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2760,7 +2765,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 <p>The step report shows the average computed for <code>b</code> (<em>ACTUAL</em>), the target (<em>EXPECTED</em>), the tolerance (<em>TOL</em>, none here), and <em>DIFFERENCE</em>, which is how far the computed value is from the boundary it had to meet. Here that’s <code>-1</code>, with positive values above the boundary and negative values below it.</p>
 <p>Next, a target that the average of <code>a</code> just misses, first with an exact comparison and then with a 5% tolerance:</p>
-<div id="ea04dc0a" class="cell" data-execution_count="6">
+<div id="c243bdb9" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_eq(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="fl">3.1</span>)</span>
@@ -2974,7 +2979,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 <p>The average of <code>a</code> is <code>3</code>, so <code>3 == 3.1</code> doesn’t hold, if only just, and step 1 fails. In step 2, <code>tol=0.05</code> allows 5% of the target (<code>0.155</code>), so any average from <code>2.945</code> to <code>3.255</code> is accepted, and the step passes.</p>
 <p>The target can also be the same aggregate of another column, given with <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>:</p>
-<div id="e4081d10" class="cell" data-execution_count="7">
+<div id="57d8dd3c" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_avg_eq(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span>pb.col(<span class="st">"b"</span>))</span>
@@ -3141,7 +3146,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 <p>Here the target is the average of <code>b</code> (<code>2</code>) rather than a fixed number. The average of <code>a</code> is <code>3</code>, so <code>3 == 2</code> does not hold and the step fails. Both aggregates are computed from the same table when the validation is interrogated.</p>
 <p>Finally, the target can come from reference data, such as an earlier load of the same table that passed its checks:</p>
-<div id="eb5fb751" class="cell" data-execution_count="8">
+<div id="574f3900" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>current <span class="op">=</span> pl.DataFrame({<span class="st">"revenue"</span>: [<span class="fl">120.0</span>, <span class="fl">95.5</span>, <span class="fl">143.2</span>, <span class="fl">88.0</span>]})</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> pl.DataFrame({<span class="st">"revenue"</span>: [<span class="fl">110.0</span>, <span class="fl">101.0</span>, <span class="fl">150.0</span>, <span class="fl">90.0</span>]})</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>

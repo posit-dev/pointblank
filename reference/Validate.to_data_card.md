@@ -4,7 +4,7 @@ Write a data card for the table, with the evidence of the validation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22176-L22325)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22176-L22342)
 
 ``` python
 Validate.to_data_card(
@@ -19,6 +19,8 @@ Validate.to_data_card(
     citation=None,
     column_descriptions=None,
     by=None,
+    lang=None,
+    locale=None,
 )
 ```
 
@@ -47,7 +49,7 @@ A summary of the dataset: what it is and what it's for.
 The license of the dataset, as an identifier like `"cc-by-4.0"` or `"apache-2.0"` (the identifiers of the Hugging Face Hub, for a Hugging Face card).
 
 `language: str | list[str] | None = None`  
-The language of the data (a code like `"en"`), or a list of them.
+The language of the data (a code like `"en"`), or a list of them. This is a fact about the dataset, for the card to state (and for the `language` of the front matter); the language that the card is written in is set by `lang=`.
 
 `source: str | None = None`  
 Where the data came from and how it was collected.
@@ -61,6 +63,12 @@ A description of each column, as a dict from the name of a column to its descrip
 `by: str | None = None`  
 The name of a column that steps are segmented by, for a table of the scores of each of its values (as with `get_health_score(by=)`), such as the scores of each language of a multilingual dataset.
 
+`lang: str | None = None`  
+The language that the card is written in, as a two-letter language code (e.g., `"fr"` or `"de"`; see the `lang=` argument of [`Validate`](../reference/Validate.md#pointblank.Validate) for the languages). By default, the card is in the language of the validation. The headings, questions, and text of the card are translated, while the keys and values of the front matter, the arguments given here, and the briefs of the steps are written as they are.
+
+`locale: str | None = None`  
+The locale for the numbers in the card (e.g., `"de-CH"`), which sets the decimal mark and the thousands separator. By default, it's the locale of the validation (when the card is in the validation's language), or `lang=`.
+
 ## Returns
 
 `str`  
@@ -68,7 +76,7 @@ The data card, in Markdown.
 
 ## Validation Information Used
 
-The card takes the curator and contact from the `owner=` of the validation, the uses from its `consumers=`, and the version from its `version=`. The number of missing values in each column is counted in the table of the validation (on its own backend), and the results are those of the last interrogation, so it needs [interrogate()](../reference/Validate.interrogate.md#pointblank.Validate.interrogate) first. The text of the card is in English, whatever the `lang=` of the validation.
+The card takes the curator and contact from the `owner=` of the validation, the uses from its `consumers=`, and the version from its `version=`. The number of missing values in each column is counted in the table of the validation (on its own backend), and the results are those of the last interrogation, so it needs [interrogate()](../reference/Validate.interrogate.md#pointblank.Validate.interrogate) first. The card is written in the `lang=` and `locale=` of the validation, unless they're given here.
 
 ## Examples
 
@@ -146,7 +154,7 @@ print(card)
 
     ## Data Quality
 
-    The data was validated with Pointblank 0.1.dev1+g33e3fc1f5 on 2026-11-08: 1 of 3 checks passed for every row (or other test unit).
+    The data was validated with Pointblank 0.1.dev1+gb5e20d132 on 2026-11-08: 1 of 3 checks passed for every row (or other test unit).
 
     The health score (the share of the test units that passed, from 0 to 100) is **80.0**.
 
@@ -190,6 +198,6 @@ print(card)
 
     Data Team
 
-    *This card was made with [Pointblank](https://posit-dev.github.io/pointblank/) 0.1.dev1+g33e3fc1f5.*
+    *This card was made with [Pointblank](https://posit-dev.github.io/pointblank/) 0.1.dev1+gb5e20d132.*
 
-The card starts with the front matter of a Hugging Face card, then has the structure of the table (one review is missing), the scores, the steps (one rating is out of range), and the scores of each language. With `path="README.md"`, it would also be written to a file, and with `format="datasheet"`, it would be a datasheet instead.
+The card starts with the front matter of a Hugging Face card, then has the structure of the table (one review is missing), the scores, the steps (one rating is out of range), and the scores of each language. With `path="README.md"`, it would also be written to a file, and with `format="datasheet"`, it would be a datasheet instead. With `lang="fr"`, the card would be written in French (whatever the languages of the data, given in `language=`).

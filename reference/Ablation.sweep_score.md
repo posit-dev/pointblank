@@ -4,7 +4,7 @@ Add a variant for each cutoff of a score, removing the rows on the wrong side of
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1300-L1508)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1334-L1535)
 
 ``` python
 Ablation.sweep_score(

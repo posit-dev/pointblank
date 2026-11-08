@@ -4,13 +4,13 @@ Add the results of the ablation to the steps of the validation, as notes.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3903-L4060)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3980-L4136)
 
 ``` python
 Ablation.annotate(validation=None)
 ```
 
-Each step with a variant of its own (from [`drop_each()`](../reference/Ablation.drop_each.md#pointblank.Ablation.drop_each), or a [`drop_steps()`](../reference/Ablation.drop_steps.md#pointblank.Ablation.drop_steps) variant with just that step) gets a note with the effect of removing its failing rows and the verdict. A step with a variant from [`drop_all_but_each()`](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each) also gets the effect of its rows on top of the other steps, and a step with a Shapley value (from [`shapley()`](../reference/Ablation.shapley.md#pointblank.Ablation.shapley)) gets that value. The notes appear in the validation's report, so that the report shows which checks matter to the model, next to the checks themselves.
+Each step with a variant of its own (from [`drop_each()`](../reference/Ablation.drop_each.md#pointblank.Ablation.drop_each), or a [`drop_steps()`](../reference/Ablation.drop_steps.md#pointblank.Ablation.drop_steps) variant with just that step) gets a note with the effect of removing its failing rows and the verdict. A step with a variant from [`drop_all_but_each()`](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each) also gets the effect of its rows on top of the other steps, and a step with a Shapley value (from [`shapley()`](../reference/Ablation.shapley.md#pointblank.Ablation.shapley)) gets that value. The notes appear in the validation's report, so that the report shows which checks matter to the model, next to the checks themselves. They're written in the language of that validation (its `lang=`), with the numbers formatted for its `locale=`.
 
 ## Parameters
 

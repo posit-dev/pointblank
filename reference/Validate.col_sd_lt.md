@@ -4,7 +4,7 @@ Does the column standard deviation satisfy a less than comparison?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1454-L1494)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1456-L1496)
 
 ``` python
 Validate.col_sd_lt(
