@@ -10,7 +10,8 @@ import pytest
 
 import pointblank as pb
 from pointblank.ablation import _corrupted_html, _function_name, _is_missing
-from tests.test_ablation import _TBL, _evaluate, _tbl, _validation
+from pointblank._report_text import ENGLISH
+from tests.test_ablation import _TBL, _english, _evaluate, _tbl, _validation
 
 # The rows of `_TBL` that fail none of the steps of `_validation()`: those with `k % 10` from 3
 # to 9 (70 rows)
@@ -159,7 +160,7 @@ def test_inject_shuffle_truncate_duplicate():
     assert effects["inject:duplicate_0.02"]["column"] is None
     assert effects["inject:duplicate_0.02"]["name"] == "Duplicated rows: 2%"
     assert "2.0% copied" in ablation.plan().as_raw_html()
-    assert ablation._sweeps["inject:duplicate"]["axis"] == "Share of the rows copied"
+    assert ENGLISH.r(ablation._sweeps["inject:duplicate"]["axis"]) == "Share of the rows copied"
 
 
 def test_inject_pandas_and_pyarrow_keep_their_types():
@@ -238,7 +239,7 @@ def test_inject_notes_for_rates():
 
     # 1% of 30 rows rounds to no rows, and 90% needs more than the 20 clean rows
     assert [spec.id for spec in ablation._specs] == ["inject:null:x_0.5"]
-    assert ablation._notes == [
+    assert _english(ablation._notes) == [
         "Missing values in x: 1% isn't used: 1% of the 30 rows is too few rows to corrupt.",
         "Missing values in x: 90% isn't used: it needs 27 clean rows, but there are only 20.",
     ]
@@ -259,7 +260,7 @@ def test_inject_skips_missing_values_and_empty_text():
     ablation = pb.Ablation(validation, evaluate=_evaluate).inject(
         "truncate", column="t", rates=[0.6, 0.65]
     )
-    assert ablation._notes == [
+    assert _english(ablation._notes) == [
         "Truncated values of t: 65% isn't used: it needs 13 clean rows, but there are only 12."
     ]
     injection = ablation._injections["inject:truncate:t_0.6"]
@@ -268,7 +269,7 @@ def test_inject_skips_missing_values_and_empty_text():
 
     # A missing value can't be made missing (NaN counts as missing)
     nulls = pb.Ablation(validation, evaluate=_evaluate).inject("null", column="n", rates=[0.65])
-    assert nulls._notes == [
+    assert _english(nulls._notes) == [
         "Missing values in n: 65% isn't used: it needs 13 clean rows, but there are only 12."
     ]
 
@@ -718,7 +719,7 @@ def test_shapley_steps_and_errors():
     lonely = pb.Ablation(validation, evaluate=_evaluate)
     with pytest.raises(ValueError):
         lonely.shapley()
-    assert "Step 2 has no Shapley value: no rows failed it." in lonely._notes
+    assert "Step 2 has no Shapley value: no rows failed it." in _english(lonely._notes)
 
     every = (
         pb.Validate(data=_TBL)

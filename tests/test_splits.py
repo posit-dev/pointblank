@@ -260,6 +260,78 @@ def test_check_splits_report():
     assert "SHIFT" in moderate.get_tabular_report().as_raw_html()
 
 
+def _report_text(check, **kwargs):
+    import html
+
+    return html.unescape(check.get_tabular_report(**kwargs).as_raw_html())
+
+
+def test_check_splits_report_in_another_language():
+    check = pb.check_splits(
+        train=_TRAIN, test=_TEST, columns="text", label="topic", near=True, ngram=3
+    )
+
+    fr = _report_text(check, lang="fr")
+    for text in (
+        "Vérification des partitions",
+        "train : 40 lignes · test : 12 lignes",
+        "5 problèmes trouvés.",
+        "Chevauchement",
+        "Lignes de ",
+        "FUITE",
+        "2 sur 12 lignes (16,7%)",
+        "1 identique, 1 presque identique",
+        "manquantes : 'login', 'returns' ; inédites : 'refunds' ; PSI 5",
+        "MAJEUR",
+        "PSI 5,6",
+        "numérique ; KS 0,833 (p = ",
+        "n-grammes de 3 mots est d'au moins 0,8",
+        "de 0,1 et majeur à partir de 0,2. KS est",
+    ):
+        assert text in fr, text
+    assert "issues found" not in fr and "direction: rtl" not in fr
+    # The issues stay in English
+    assert check.issues[0].startswith("2 rows of 'test'")
+
+    ja = _report_text(check, lang="ja")
+    assert "分割のチェック" in ja and "12 行中 2 行（16.7%）" in ja
+
+    # Right to left
+    ar = _report_text(check, lang="ar")
+    assert "فحص التقسيمات" in ar and "train (صفوف: 40)" in ar and "direction: rtl" in ar
+
+    # The default is English
+    assert "Split check" in _report_text(check) and "Split check" in _report_text(check, lang="en")
+    with pytest.raises(ValueError):
+        check.get_tabular_report(lang="xx")
+
+
+def test_check_splits_report_locale():
+    check = pb.check_splits(
+        train=pl.DataFrame({"x": range(3000)}),
+        test=pl.DataFrame({"x": range(2990, 4000)}),
+        drift_columns=False,
+    )
+
+    assert "10 of 1,010 rows (1.0%)" in _report_text(check)
+    assert "10 von 1.010 Zeilen (1,0%)" in _report_text(check, lang="de")
+    assert "10 von 1’010 Zeilen (1.0%)" in _report_text(check, lang="de", locale="de-CH")
+    assert "train : 3\u202f000 lignes" in _report_text(check, lang="fr")
+
+
+def test_check_splits_report_singular_forms():
+    check = pb.check_splits(
+        train=pl.DataFrame({"x": [1], "y": ["a"]}),
+        test=pl.DataFrame({"x": [2], "y": ["a"]}),
+        label="y",
+        drift_columns=False,
+    )
+    text = _report_text(check)
+    assert "train: 1 row · test: 1 row" in text and "1 label" in text
+    assert "1 labels" not in text and "1 rows ·" not in text
+    assert "1 étiquette" in _report_text(check, lang="fr")
+
+
 @pytest.mark.parametrize(
     "kwargs, error, message",
     [

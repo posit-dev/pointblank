@@ -2,6 +2,7 @@ import json
 import os
 import pickle
 import random
+import re
 import statistics
 import warnings
 
@@ -20,6 +21,15 @@ from pointblank.ablation import (
     _t_p_value,
     _t_quantile,
 )
+from pointblank._report_text import ENGLISH
+
+
+def _english(texts):
+    """The notes (or the details of a sweep) of an ablation, in English."""
+    if isinstance(texts, dict):
+        return {key: ENGLISH.r(text) for key, text in texts.items()}
+    return [ENGLISH.r(text) for text in texts]
+
 
 # A table of 100 rows: 10 have a negative `x` (rows that hurt the model below), 10 others are
 # 'gold' rows (rows that help it), and 10 others have a missing `y` (rows that don't matter)
@@ -870,7 +880,7 @@ def test_ablation_plan_long_variant_and_brief():
     )
     html = pb.Ablation(validation, evaluate=_evaluate).drop_all().plan().as_raw_html()
     assert "No &lt;negative&gt; x" in html
-    assert "and 1 more steps" in html
+    assert "and 1 more step" in html
 
 
 def test_ablation_tabular_report():
@@ -896,6 +906,116 @@ def test_ablation_tabular_report():
     html = ablation.get_tabular_report(title="My <title>").as_raw_html()
     assert "My &lt;title&gt;" in html
     assert "Ablation report" not in html
+
+
+def _unescaped(gt) -> str:
+    import html
+
+    return html.unescape(gt.as_raw_html())
+
+
+def test_ablation_reports_in_another_language():
+    ablation = (
+        pb.Ablation(_validation(_TBL), evaluate=_evaluate, repeats=4, label="Train v7")
+        .drop_each()
+        .drop_all()
+    )
+
+    plan = _unescaped(ablation.plan(lang="fr"))
+    for text in (
+        "Plan d'ablation",
+        "l'exécution fera <strong>28</strong> évaluations",
+        "Table complète",
+        "Étape 1",
+    ):
+        assert text in plan, text
+    # The briefs are in the validation's language
+    assert "Expect that values in" in plan
+    assert "アブレーション計画" in _unescaped(ablation.plan(lang="ja"))
+
+    ablation.run()
+    fr = _unescaped(ablation.get_tabular_report(lang="fr"))
+    for text in (
+        "Rapport d'ablation",
+        "score sur la table complète (100 lignes) : ",
+        "(plus haut, c'est mieux)",
+        "Chaque version a été évaluée 4 fois ; ",
+        "Δ vs aléatoire",
+        "10,0%",
+        "aide",
+        "nuit",
+        "non concluant",
+        "Les intervalles sont des intervalles t appariés à 95%",
+    ):
+        assert text in fr, text
+    assert "Ablation report" not in fr and "direction: rtl" not in fr
+
+    de = _unescaped(ablation.get_tabular_report(lang="de"))
+    assert "Ablationsbericht" in de and "10,0%" in de
+    de_ch = _unescaped(ablation.get_tabular_report(lang="de", locale="de-CH"))
+    assert "Ablationsbericht" in de_ch and "10.0%" in de_ch and "10,0%" not in de_ch
+
+    assert "アブレーションレポート" in _unescaped(ablation.get_tabular_report(lang="ja"))
+
+    # Right to left
+    for gt in (ablation.get_tabular_report(lang="ar"), ablation.plan(lang="he")):
+        assert "direction: rtl" in gt.as_raw_html()
+
+    with pytest.raises(ValueError):
+        ablation.get_tabular_report(lang="xx")
+
+
+def test_ablation_reports_in_the_validation_language():
+    validation = (
+        pb.Validate(data=_TBL, lang="fr")
+        .col_vals_ge(columns="x", value=0)
+        .col_vals_ne(columns="g", value="gold")
+        .col_vals_not_null(columns="y")
+        .interrogate()
+    )
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=4).drop_each().run()
+
+    report = _unescaped(ablation.get_tabular_report())
+    assert "Rapport d'ablation" in report and "On s'attend à ce que" in report
+    assert "Plan d'ablation" in _unescaped(ablation.plan())
+    assert "Ablation report" in _unescaped(ablation.get_tabular_report(lang="en"))
+
+    # The locale of the validation is used when the report is in its language
+    swiss = (
+        pb.Validate(data=_TBL, lang="de", locale="de-CH")
+        .col_vals_ge(columns="x", value=0)
+        .interrogate()
+    )
+    ablation = pb.Ablation(swiss, evaluate=_evaluate, repeats=4).drop_each().run()
+    report = _unescaped(ablation.get_tabular_report())
+    assert "Ablationsbericht" in report and "10.0%" in report and "10,0%" not in report
+    assert "10,0%" in _unescaped(ablation.get_tabular_report(lang="fr"))
+
+
+def test_report_text_translations():
+    from pointblank._constants import REPORTING_LANGUAGES
+    from pointblank._constants_translations import MODEL_DATA_TEXT
+    from string import Formatter
+
+    def fields(text):
+        return {name for _, name, _, _ in Formatter().parse(text) if name is not None}
+
+    languages = set(REPORTING_LANGUAGES)
+    for key, entry in MODEL_DATA_TEXT.items():
+        english = MODEL_DATA_TEXT[key.removesuffix("_one")]["en"]
+        if key.endswith("_one"):
+            # Only the languages with a singular form have one
+            assert set(entry) < languages, key
+        else:
+            assert set(entry) == languages, key
+        for lang, text in entry.items():
+            assert text == text.strip(), (key, lang)
+            if key.endswith("_one"):
+                assert fields(text) in (fields(english), fields(english) - {"n"}), (key, lang)
+            else:
+                assert fields(text) == fields(english), (key, lang)
+            for mark in ("<strong>", "</strong>", "<code>", "**", "`"):
+                assert text.count(mark) == english.count(mark), (key, lang, mark)
 
 
 def test_ablation_to_json():
@@ -1180,7 +1300,7 @@ def test_ablation_drop_groups_values():
     )
     with pytest.raises(ValueError, match="None of the variants remove any rows"):
         ablation.run()
-    assert ablation._resolve().notes == ["src = mail isn't used: it removes no rows."]
+    assert _english(ablation._resolve().notes) == ["src = mail isn't used: it removes no rows."]
 
     # Integer groups
     ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).drop_groups(
@@ -1310,10 +1430,10 @@ def test_ablation_sweep_score_ties_and_rounding():
         "s:lowest_0.5": [0, 1, 3, 6],
         "s:lowest_1": [0, 1, 2, 3, 4, 6, 7],
     }
-    assert ablation._notes == [
+    assert _english(ablation._notes) == [
         "1 row has no score in the column `s`, so the sweep never removes it."
     ]
-    details = ablation._sweep_details
+    details = _english(ablation._sweep_details)
     assert details["s:lowest_0.5"] == "The 4 rows with the lowest scores (of 7 scored rows)"
 
 
@@ -1325,7 +1445,7 @@ def test_ablation_sweep_score_column_with_missing_values(tmp_path):
     removed = ablation._resolve().removed["y:below_10"]
     assert len(removed) == 18
     assert all(_TBL["y"][k] is not None for k in removed)
-    assert ablation._notes == [
+    assert _english(ablation._notes) == [
         "10 rows have no score in the column `y`, so the sweep never removes them."
     ]
 
@@ -1349,7 +1469,9 @@ def test_ablation_sweep_score_with_a_segmented_step():
     removed = ablation._resolve().removed["step_2:lowest_0.5"]
     assert len(removed) == 45
     assert all(_TBL["g"][k] == "plain" for k in removed)
-    assert ablation._notes == ["10 rows have no score in step 2, so the sweep never removes them."]
+    assert _english(ablation._notes) == [
+        "10 rows have no score in step 2, so the sweep never removes them."
+    ]
 
 
 def test_ablation_sweep_score_same_rows_and_no_rows():
@@ -1364,7 +1486,7 @@ def test_ablation_sweep_score_same_rows_and_no_rows():
     # Removing the scores below 0 removes the rows that fail step 1 (and step 2), and so does
     # removing those below 0.001, so they aren't evaluated again
     assert resolved.same_as == {"step_2:below_0": "step_1", "step_2:below_0.001": "step_1"}
-    assert "Step 2: scores below -0.5 isn't used: it removes no rows." in resolved.notes
+    assert "Step 2: scores below -0.5 isn't used: it removes no rows." in _english(resolved.notes)
     rows = _effects_by_variant(ablation)
     assert rows["step_2:below_0"]["mean"] == rows["step_1"]["mean"]
 
@@ -1372,7 +1494,7 @@ def test_ablation_sweep_score_same_rows_and_no_rows():
     ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3).sweep_score(
         2, quantiles=[0.5, 1]
     )
-    assert "Step 2: lowest 100% of scores isn't used: it removes every row." in (
+    assert "Step 2: lowest 100% of scores isn't used: it removes every row." in _english(
         ablation._resolve().notes
     )
 
@@ -1433,7 +1555,9 @@ def test_ablation_sweep_step(tbl_type):
     rows = _effects_by_variant(ablation)
     assert rows["step_1:value=0"]["verdict"] == "helps"
     assert rows["step_1:value=0"]["name"] == "Step 1 with value=0"
-    assert ablation._sweep_details["step_1:value=5"] == ("The rows that fail step 1 with `value=5`")
+    assert _english(ablation._sweep_details)["step_1:value=5"] == (
+        "The rows that fail step 1 with `value=5`"
+    )
 
 
 def test_ablation_sweep_step_of_a_scored_step_uses_the_cache():
@@ -2378,6 +2502,36 @@ def test_ablation_annotate():
     # Annotating again replaces the notes
     ablation.annotate()
     assert set(validation.validation_info[0].notes) == {"ablation"}
+
+
+def test_ablation_annotate_in_the_validation_language():
+    def validation(lang, locale=None):
+        return (
+            pb.Validate(data=_TBL, lang=lang, locale=locale)
+            .col_vals_ge(columns="x", value=0)
+            .col_vals_ne(columns="g", value="gold")
+            .col_vals_not_null(columns="y")
+            .interrogate()
+        )
+
+    french = validation("fr")
+    ablation = pb.Ablation(french, evaluate=_evaluate, repeats=5).drop_each().run()
+    ablation.annotate()
+    note = french.validation_info[0].notes["ablation"]
+    assert note["text"].startswith(
+        "Ablation (score, plus haut, c'est mieux) : retirer les 10 lignes qui ont échoué"
+    )
+    assert "comparé au retrait d'autant de lignes aléatoires : aide" in note["text"]
+    assert "**aide**" in note["markdown"]
+    # (French writes an interval with a semicolon, as its decimal mark is a comma)
+    assert re.search(r"\[[+−]\d+,\d\d; [+−]\d+,\d\d\]", note["text"])
+
+    # The notes are written for the validation that's annotated
+    swiss = validation("de", "de-CH")
+    ablation.annotate(swiss)
+    text = swiss.validation_info[0].notes["ablation"]["text"]
+    assert text.startswith("Ablation (score, höher ist besser): das Entfernen der 10 Zeilen")
+    assert re.search(r"\[[+−]\d+\.\d\d, [+−]\d+\.\d\d\]", text)
 
 
 def test_ablation_annotate_other_validation():
