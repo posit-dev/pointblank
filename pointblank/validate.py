@@ -20,7 +20,7 @@ import shutil
 import tempfile
 import threading
 import uuid
-from collections.abc import Collection
+from collections.abc import Collection, Sequence
 from dataclasses import dataclass
 from enum import Enum
 from functools import partial
@@ -74,6 +74,7 @@ from pointblank._constants_translations import (
     VALIDATION_REPORT_TEXT,
 )
 from pointblank._interrogation import (
+    CLUSTER_COLUMN,
     NumberOfTestUnits,
     SpeciallyValidation,
     StepEvaluationError,
@@ -4718,6 +4719,32 @@ def _column_to_name(column: Any) -> str | None:
     return None
 
 
+def _columns_literal(column: Any) -> str | list[str]:
+    """Get the columns of a step as one name, or a list of names when there are several."""
+    if isinstance(column, (list, tuple)):
+        return column[0] if len(column) == 1 else list(column)
+    return column
+
+
+def _literal_reference(reference: Any) -> str | list[str] | dict[str, Any] | None:
+    """
+    Get the reference of a `rows_not_contaminated()` step as a literal that can be written in
+    Python or YAML (a path, a list of texts, or a dictionary of them by name), or `None` if it
+    isn't one.
+    """
+    if isinstance(reference, (str, Path)):
+        return str(reference)
+    if isinstance(reference, (list, tuple)) and all(isinstance(v, str) for v in reference):
+        return list(reference)
+    if isinstance(reference, dict) and all(
+        isinstance(k, str) and not isinstance(v, dict) for k, v in reference.items()
+    ):
+        literal = {k: _literal_reference(v) for k, v in reference.items()}
+        if all(v is not None for v in literal.values()):
+            return literal
+    return None
+
+
 def _validation_info_to_step(
     vi: _ValidationInfo,
     global_thresholds: Thresholds | None,
@@ -5019,6 +5046,53 @@ def _validation_info_to_step(
             params["cache"] = cache if isinstance(cache, bool) else str(cache)
         if not values.get("keep_scores", True):
             params["keep_scores"] = False
+    elif at == "rows_near_distinct":
+        values = vi.values or {}
+        params["columns"] = _columns_literal(vi.column)
+        defaults = {"method": "minhash", "threshold": 0.85, "ngram": 5, "num_perm": 128}
+        for key, default in defaults.items():
+            if values.get(key, default) != default:
+                params[key] = values[key]
+    elif at == "rows_not_contaminated":
+        values = vi.values or {}
+        params["columns"] = _columns_literal(vi.column)
+        reference = _literal_reference(values.get("reference"))
+        if reference is not None:
+            # A path (or a list of texts, or a dictionary of paths by name) round-trips as-is
+            params["reference"] = reference
+        else:
+            params["reference"] = _placeholder(
+                values.get("reference"),
+                code="your_reference",
+                note=(
+                    "Step 'rows_not_contaminated' checks against a reference that cannot be "
+                    "serialized; a placeholder was emitted and must be edited manually."
+                ),
+            )
+        if values.get("reference_columns") is not None:
+            params["reference_columns"] = _columns_literal(values["reference_columns"])
+        defaults = {"method": "ngram", "ngram": None, "threshold": 0.8, "num_perm": 128}
+        for key, default in defaults.items():
+            if values.get(key, default) != default:
+                params[key] = values[key]
+    elif at == "col_vals_chat_format":
+        _columns_param()
+        values = vi.values or {}
+        defaults = {
+            "roles": ["system", "user", "assistant"],
+            "alternate": True,
+            "first_role": None,
+            "last_role": None,
+            "allow_empty": False,
+            "role_key": "role",
+            "content_key": "content",
+        }
+        for key, default in defaults.items():
+            value = values.get(key, default)
+            if isinstance(value, tuple):
+                value = list(value)
+            if value != default:
+                params[key] = value
     elif at == "specially":
         params["expr"] = _placeholder(
             vi.values,
@@ -14930,6 +15004,741 @@ class Validate:
 
         return self
 
+    def rows_near_distinct(
+        self,
+        columns: str | list[str],
+        method: Literal["minhash", "exact"] = "minhash",
+        threshold: float = 0.85,
+        ngram: int = 5,
+        num_perm: int = 128,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate whether the text of rows has no near duplicates.
+
+        The `rows_near_distinct()` validation method finds rows whose text is the same as, or
+        nearly the same as, another row's: the same document crawled twice, a template filled in
+        with different names, or a passage with a changed footer. Such near duplicates make up a
+        large share of many text corpora, and a model trained on them gives too much weight to
+        the repeated text. Each row is a test unit, and every row in a group of near duplicates
+        fails. Unlike [`rows_distinct()`](`pointblank.Validate.rows_distinct`), which compares
+        values exactly, the text is compared once normalized (in lower case, without punctuation
+        or extra whitespace), and with `method="minhash"` (the default), texts that share most of
+        their words in the same order are near duplicates too.
+
+        Parameters
+        ----------
+        columns
+            The column (or a list of columns) with the text of each row. The values of several
+            columns are joined by newlines.
+        method
+            How texts are compared: `"minhash"` (the default) finds texts whose word n-grams are
+            similar (see the *How Texts Are Compared* section) and `"exact"` finds texts that are
+            the same once normalized.
+        threshold
+            With `method="minhash"`, the lowest Jaccard similarity of the word n-grams of two
+            texts at which they are near duplicates, between `0` and `1`. The default, `0.85`,
+            finds texts that differ by a few words.
+        ngram
+            With `method="minhash"`, the number of words in each n-gram (the default is `5`). A
+            text shorter than this is one n-gram of all its words.
+        num_perm
+            With `method="minhash"`, the number of hash functions of the MinHash signatures (the
+            default is `128`). More find near duplicates more reliably, but take longer.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing.
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is `"uniqueness"`. This label appears in the validation report and feeds
+            the overall and per-dimension health scores.
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Raises
+        ------
+        TypeError
+            If `columns=` isn't a column name or a list of them, or if `threshold=`, `ngram=`, or
+            `num_perm=` isn't a number.
+        ValueError
+            If `method=` isn't `"minhash"` or `"exact"`, if `threshold=` isn't between `0` and
+            `1`, or if `ngram=` or `num_perm=` is less than `1`.
+
+        How Texts Are Compared
+        ----------------------
+        Texts are first normalized: in lower case (with Unicode compatibility forms folded), with
+        punctuation replaced by spaces, and with runs of whitespace made one space. Texts that are
+        the same once normalized are always near duplicates. With `method="minhash"`, each text is
+        also split into its overlapping n-grams of `ngram=` words, and two texts whose sets of
+        n-grams have a Jaccard similarity of at least `threshold=` (the share of their n-grams
+        that they have in common) are near duplicates. Comparing every pair of texts would take
+        too long for a large table, so candidate pairs are found with MinHash signatures and
+        locality-sensitive hashing (the way that corpora for language models are deduplicated),
+        and each candidate pair is confirmed with its exact Jaccard similarity. No pair below the
+        threshold is ever grouped, and a pair just above it is missed only rarely.
+
+        Groups of near duplicates are connected: if text A is a near duplicate of text B, and B of
+        C, then A, B, and C are one group, even if A and C are less alike. A row with a missing
+        value in any of `columns=` passes.
+
+        The group of each failing row (numbered from 1, in the order of the first row of each
+        group) is in a column of the results called `pb_cluster_`, which is in the extracts of
+        failing rows and in the step report, where the rows of each group are shown together.
+        The step's note says how many groups were found and how many rows are in them.
+
+        Every row of a group fails, as with `rows_distinct()`. When the rows of a validation are
+        used to clean a table (with [`get_row_flags()`](`pointblank.Validate.get_row_flags`), or
+        in an [`Ablation`](`pointblank.Ablation`)), `duplicates=` decides which rows of a group
+        are kept: `"keep_first"` keeps the first row of each group, `"keep_last"` the last, and
+        `"flag_all"` keeps none.
+
+        Comparing texts runs in Python. A Polars or pandas table is compared as it is (a Polars
+        LazyFrame is collected first). For a database table (through Ibis) or a PySpark
+        DataFrame, the distinct rows of `columns=` are collected and compared, and the groups are
+        joined back to the table on its own backend.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        For the examples here, we'll use a small table of documents, some of which are near
+        duplicates of others.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "doc_id": [1, 2, 3, 4, 5, 6],
+                "text": [
+                    "The library opens at nine in the morning and closes at six in the evening.",
+                    "The trail to the summit is steep, so bring water and good walking shoes.",
+                    "The library opens at nine in the morning and closes at six in the evening!",
+                    "Tickets for the museum are free for children under the age of twelve.",
+                    "the LIBRARY opens at nine in the morning, and closes at six in the evening",
+                    "The trail to the summit is steep, so bring water and sturdy walking shoes.",
+                ],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that the documents have no near duplicates.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .rows_near_distinct(columns="text")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        Three of the six rows fail: documents 1, 3, and 5 differ only in their punctuation and
+        letter case, so they're one group. Documents 2 and 6 differ by a word, which leaves fewer
+        than 85% of their 5-word n-grams in common, so they pass. A lower `threshold=` (or a
+        smaller `ngram=`) finds them too:
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .rows_near_distinct(columns="text", threshold=0.5)
+            .interrogate()
+        )
+
+        validation.get_step_report(i=1)
+        ```
+
+        The step report shows the rows of each group together, with the group in the
+        `pb_cluster_` column. Now five rows fail, in two groups: the library documents and the
+        trail documents.
+        """
+
+        assertion_type = _get_fn_name()
+
+        columns = _check_text_columns(columns)
+        if method not in ("minhash", "exact"):
+            raise ValueError(f'`method=` must be "minhash" or "exact", got {method!r}.')
+        _check_unit_interval(threshold, "threshold", allow_zero=False)
+        _check_positive_int(ngram, "ngram")
+        _check_positive_int(num_perm, "num_perm")
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        values = {"method": method, "threshold": threshold, "ngram": ngram, "num_perm": num_perm}
+
+        val_info = _ValidationInfo(
+            assertion_type=assertion_type,
+            column=columns,
+            values=values,
+            pre=pre,
+            segments=segments,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
+        )
+
+        self._add_validation(validation_info=val_info)
+
+        return self
+
+    def rows_not_contaminated(
+        self,
+        columns: str | list[str],
+        reference: Any,
+        reference_columns: str | list[str] | None = None,
+        method: Literal["ngram", "exact", "minhash"] = "ngram",
+        ngram: int | None = None,
+        threshold: float = 0.8,
+        num_perm: int = 128,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate whether the text of rows doesn't overlap with a reference, such as a benchmark.
+
+        The `rows_not_contaminated()` validation method checks that the text of each row doesn't
+        overlap with the texts of a reference: the questions of a benchmark that a model will be
+        evaluated on, the rows of a held-out test set, or any text that shouldn't be in the data.
+        Training data that contains the questions of a benchmark *contaminates* it, and the
+        model's score on the benchmark no longer says how well it does on questions it hasn't
+        seen. Each row is a test unit, and a row whose text overlaps with any text of the
+        reference fails.
+
+        Parameters
+        ----------
+        columns
+            The column (or a list of columns) with the text of each row. The values of several
+            columns are joined by newlines.
+        reference
+            The texts to check against: a table (any table that `Validate` can take, including
+            the path of a CSV or Parquet file), a list of tables or a dictionary of them by name
+            (so that the note can say which reference each overlap is with), or a list of texts.
+        reference_columns
+            The column (or a list of columns) of a reference table with its texts. The default is
+            the columns of `columns=`.
+        method
+            How texts overlap: `"ngram"` (the default) if they share an n-gram of `ngram=` words,
+            `"exact"` if they're the same once normalized, and `"minhash"` if the Jaccard
+            similarity of their n-grams is at least `threshold=`. See the *How Overlap Is Found*
+            section.
+        ngram
+            The number of words in each n-gram. The default is `13` with `method="ngram"` (the
+            length used to check training data for benchmark contamination) and `5` with
+            `method="minhash"`.
+        threshold
+            With `method="minhash"`, the lowest Jaccard similarity of the n-grams of a row's text
+            and a reference text at which they overlap, between `0` and `1` (the default is
+            `0.8`).
+        num_perm
+            With `method="minhash"`, the number of hash functions of the MinHash signatures (the
+            default is `128`).
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing.
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is `"validity"`. This label appears in the validation report and feeds the
+            overall and per-dimension health scores.
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Raises
+        ------
+        TypeError
+            If `columns=` or `reference_columns=` isn't a column name or a list of them, or if
+            `ngram=`, `threshold=`, or `num_perm=` isn't a number.
+        ValueError
+            If `method=` isn't `"ngram"`, `"exact"`, or `"minhash"`, if `reference=` is `None` or
+            empty, if `threshold=` isn't between `0` and `1`, or if `ngram=` or `num_perm=` is less
+            than `1`.
+
+        How Overlap Is Found
+        --------------------
+        The texts of the rows and of the reference are normalized first: in lower case (with
+        Unicode compatibility forms folded), with punctuation replaced by spaces, and with runs of
+        whitespace made one space. With `method="ngram"`, a row's text overlaps with a reference
+        text if they share any n-gram of `ngram=` words, which finds a benchmark question that's
+        been pasted into a longer document. A reference text that's shorter than `ngram=` words
+        overlaps with a row's text that contains it whole, and a row's text that's shorter than
+        `ngram=` words overlaps only with a reference text that's the same. With
+        `method="exact"`, a row's text overlaps only with a reference text that's the same, and
+        with `method="minhash"`, it overlaps with a reference text whose n-grams are similar
+        enough (found with MinHash signatures and locality-sensitive hashing, and confirmed with
+        the exact Jaccard similarity).
+
+        A row with a missing value in any of `columns=` passes. The first reference text that a
+        failing row overlaps with is in a column of the results called `pb_match_`, which is in
+        the extracts of failing rows and in the step report, and the step's note says how many
+        rows overlap with each reference.
+
+        The reference is read when the validation is interrogated, and its texts are kept in
+        memory, so a very large reference takes a lot of memory. The texts of the rows are
+        compared in Python: for a database table (through Ibis) or a PySpark DataFrame, the
+        distinct rows of `columns=` are collected and compared, and the matches are joined back to
+        the table on its own backend.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        For the examples here, we'll use a small table of training documents and a benchmark of
+        two questions. One document contains the first question of the benchmark, word for word.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        train = pl.DataFrame(
+            {
+                "doc_id": [1, 2, 3, 4],
+                "text": [
+                    "Rivers carry water from the hills down to the sea over many years.",
+                    "Quiz: What is the name of the largest moon of the planet Saturn in our solar "
+                    "system? Answer: Titan.",
+                    "Bread is made of flour, water, salt, and yeast, and baked in an oven.",
+                    "The train leaves the station at eight and arrives in the city at ten.",
+                ],
+            }
+        )
+
+        benchmark = pl.DataFrame(
+            {
+                "question": [
+                    "What is the name of the largest moon of the planet Saturn in our solar "
+                    "system?",
+                    "How many bones are there in the body of an adult human being?",
+                ]
+            }
+        )
+        ```
+
+        Let's validate that no training document overlaps with the benchmark's questions.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=train)
+            .rows_not_contaminated(
+                columns="text", reference=benchmark, reference_columns="question"
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The second document fails: it shares a run of 13 words (in fact, the whole question)
+        with the benchmark. The step report shows the benchmark question that it matched, in the
+        `pb_match_` column.
+
+        ```{python}
+        validation.get_step_report(i=1)
+        ```
+
+        The reference can also be a list of texts, or a dictionary of tables by name (such as
+        `{"mmlu": ..., "gsm8k": ...}`), and the step's note then says how many rows overlap with
+        each.
+        """
+
+        assertion_type = _get_fn_name()
+
+        columns = _check_text_columns(columns)
+        if reference_columns is not None:
+            reference_columns = _check_text_columns(reference_columns, "reference_columns")
+        if method not in ("ngram", "exact", "minhash"):
+            raise ValueError(f'`method=` must be "ngram", "exact", or "minhash", got {method!r}.')
+        if reference is None:
+            raise ValueError(
+                "`reference=` must be a table, a list or dictionary of them, or texts."
+            )
+        if isinstance(reference, (list, tuple, dict)) and not reference:
+            raise ValueError("`reference=` is empty.")
+        if ngram is not None:
+            _check_positive_int(ngram, "ngram")
+        _check_unit_interval(threshold, "threshold", allow_zero=False)
+        _check_positive_int(num_perm, "num_perm")
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        values = {
+            "reference": list(reference) if isinstance(reference, tuple) else reference,
+            "reference_columns": reference_columns,
+            "method": method,
+            "ngram": ngram,
+            "threshold": threshold,
+            "num_perm": num_perm,
+        }
+
+        val_info = _ValidationInfo(
+            assertion_type=assertion_type,
+            column=columns,
+            values=values,
+            pre=pre,
+            segments=segments,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+            dimension=dimension,
+        )
+
+        self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_vals_chat_format(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        roles: Sequence[str] = ("system", "user", "assistant"),
+        alternate: bool = True,
+        first_role: str | None = None,
+        last_role: str | None = None,
+        allow_empty: bool = False,
+        role_key: str = "role",
+        content_key: str = "content",
+        na_pass: bool = False,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate whether column values are well-formed chat conversations.
+
+        The `col_vals_chat_format()` validation method checks that each value of a column is a
+        well-formed conversation of the kind used to fine-tune a chat model: a list of messages,
+        each with a role and some content. Each row is a test unit, and a row fails if its value
+        isn't a list of messages, has a message without a role or with a role that isn't in
+        `roles=`, has a system message anywhere but first, has turns that don't alternate between
+        roles, starts or ends with the wrong role, or has a message without content. Malformed
+        conversations are common in chat data that's been converted from other formats, and a
+        training run can fail on them, or silently learn from them.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column. The values are lists of messages (such as a Polars column
+            of lists of structs, or a pandas column of lists of dictionaries) or the JSON text of
+            them, either as a list or as an object with a `"messages"` key.
+        roles
+            The roles that a message can have. The default is `("system", "user", "assistant")`.
+            If `"system"` is one of them, a system message can only be the first message.
+        alternate
+            Should the turns (the messages after a first system message) alternate, so that no
+            role follows itself? The default is `True`.
+        first_role
+            The role of the first turn (the first message after a system message), such as
+            `"user"`. The default, `None`, doesn't check it.
+        last_role
+            The role of the last message, such as `"assistant"` (for a conversation that ends with
+            the reply that a model should learn). The default, `None`, doesn't check it.
+        allow_empty
+            Can a message have empty content (missing, or only whitespace)? The default is
+            `False`.
+        role_key
+            The key of the role in each message. The default is `"role"`.
+        content_key
+            The key of the content in each message. The default is `"content"`.
+        na_pass
+            Should a missing value pass? The default is `False`.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing.
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is `"validity"`. This label appears in the validation report and feeds the
+            overall and per-dimension health scores.
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Raises
+        ------
+        TypeError
+            If `roles=` isn't a list of role names, or if `role_key=` or `content_key=` isn't a
+            string.
+        ValueError
+            If `roles=` is empty, or if `first_role=` or `last_role=` isn't one of `roles=`.
+
+        The Problems Found
+        ------------------
+        The first problem found with a conversation is in a column of the results called
+        `pb_reason_`, which is in the extracts of failing rows and in the step report. The step's
+        note says how many rows have each problem. The problems are checked in this order:
+
+        - `not_messages`: the value isn't a list of messages (or the JSON text of one)
+        - `no_messages`: the list of messages is empty
+        - `bad_message`: a message isn't a mapping with a role (under `role_key=`) that's a string
+        - `unknown_role`: a message has a role that isn't in `roles=`
+        - `system_position`: a system message isn't the first message
+        - `first_role`: the first turn doesn't have the role of `first_role=`
+        - `not_alternating`: a role follows itself (with `alternate=True`)
+        - `last_role`: the last message doesn't have the role of `last_role=`
+        - `empty_content`: a message has no content, or content that's only whitespace (unless
+          `allow_empty=True`)
+
+        A Polars or pandas column can hold the messages as lists (of structs or dictionaries) or
+        as JSON text. For a database table (through Ibis) or a PySpark DataFrame, the column must
+        hold JSON text: its distinct values are collected and checked, and the problems are joined
+        back to the table on its own backend.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        For the examples here, we'll use a small table of conversations, stored as JSON text.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "id": [1, 2, 3, 4],
+                "messages": [
+                    '[{"role": "user", "content": "Hi!"}, '
+                    '{"role": "assistant", "content": "Hello! How can I help?"}]',
+                    '[{"role": "user", "content": "Hi!"}, {"role": "user", "content": "Hello?"}]',
+                    '[{"role": "system", "content": "Be brief."}, '
+                    '{"role": "user", "content": "Capital of France?"}, '
+                    '{"role": "assistant", "content": "Paris."}]',
+                    '[{"role": "user", "content": "What is 2 + 2?"}, '
+                    '{"role": "bot", "content": "4"}]',
+                ],
+            }
+        )
+        ```
+
+        Let's validate that each conversation is well formed and ends with a reply of the
+        assistant.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_chat_format(columns="messages", last_role="assistant")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        Two of the four conversations fail: the second has two user messages in a row, and the
+        fourth has a message with the role `"bot"`. The step report shows the problem with each
+        failing row in the `pb_reason_` column.
+
+        ```{python}
+        validation.get_step_report(i=1)
+        ```
+
+        The third conversation passes: its system message is first, and its turns alternate
+        between the user and the assistant.
+        """
+
+        assertion_type = _get_fn_name()
+
+        if isinstance(roles, str) or not isinstance(roles, Sequence):
+            raise TypeError("`roles=` must be a list of role names.")
+        roles = list(roles)
+        if not roles:
+            raise ValueError("`roles=` must have at least one role.")
+        if not all(isinstance(r, str) and r for r in roles):
+            raise TypeError("`roles=` must be a list of role names.")
+        for role, param in ((first_role, "first_role"), (last_role, "last_role")):
+            if role is not None and role not in roles:
+                raise ValueError(f"`{param}=` ({role!r}) must be one of `roles=` ({roles}).")
+        _check_boolean_input(param=alternate, param_name="alternate")
+        _check_boolean_input(param=allow_empty, param_name="allow_empty")
+        _check_boolean_input(param=na_pass, param_name="na_pass")
+        for key, param in ((role_key, "role_key"), (content_key, "content_key")):
+            if not isinstance(key, str) or not key:
+                raise TypeError(f"`{param}=` must be a string.")
+        _check_column(column=columns)
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_active_input(param=active, param_name="active")
+
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # A column selector is resolved to its columns at interrogation, like `col_vals_regex()`
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+            columns = col(columns)
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        values = {
+            "roles": roles,
+            "alternate": alternate,
+            "first_role": first_role,
+            "last_role": last_role,
+            "allow_empty": allow_empty,
+            "role_key": role_key,
+            "content_key": content_key,
+        }
+
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values=dict(values),
+                na_pass=na_pass,
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+                dimension=dimension,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
     def col_schema_match(
         self,
         schema: Schema,
@@ -18347,6 +19156,55 @@ class Validate:
                             key="scores", markdown=scored_note_html, text=scored_note_text
                         )
 
+                    elif assertion_type == "rows_near_distinct":
+                        from pointblank._interrogation import interrogate_near_distinct
+
+                        results_tbl, validation.val_info = interrogate_near_distinct(
+                            tbl=data_tbl_step, columns=column, config=value
+                        )
+                        near_note_html, near_note_text = _create_near_distinct_note(
+                            validation.val_info, value
+                        )
+                        validation._add_note(
+                            key="near_duplicates", markdown=near_note_html, text=near_note_text
+                        )
+
+                    elif assertion_type == "rows_not_contaminated":
+                        from pointblank._interrogation import interrogate_not_contaminated
+
+                        results_tbl, validation.val_info = interrogate_not_contaminated(
+                            tbl=data_tbl_step,
+                            columns=column,
+                            config={**value, "ngram": _contamination_ngram(value)},
+                        )
+                        contam_note_html, contam_note_text = _create_contamination_note(
+                            validation.val_info
+                        )
+                        validation._add_note(
+                            key="contamination",
+                            markdown=contam_note_html,
+                            text=contam_note_text,
+                        )
+
+                    elif assertion_type == "col_vals_chat_format":
+                        from pointblank._interrogation import interrogate_chat_format
+
+                        results_tbl, validation.val_info = interrogate_chat_format(
+                            tbl=data_tbl_step,
+                            column=column,
+                            config={
+                                **value,
+                                "system_role": "system" if "system" in value["roles"] else None,
+                            },
+                            na_pass=na_pass,
+                        )
+                        chat_note_html, chat_note_text = _create_chat_format_note(
+                            validation.val_info, na_pass=na_pass
+                        )
+                        validation._add_note(
+                            key="chat_format", markdown=chat_note_html, text=chat_note_text
+                        )
+
                     elif assertion_type == "col_exists":
                         col_exists_result = col_exists_details(
                             data_tbl=data_tbl_step,
@@ -19202,6 +20060,13 @@ class Validate:
                         # single operation
                         .sort(by=["group_min_row"] + filled_names + ["_row_num_"])
                         .drop("group_min_row", *filled_names)
+                    )
+
+                # The rows of each group of near duplicates are put together, in the order of
+                # the groups (which are numbered by their first row)
+                if assertion_type == "rows_near_distinct":
+                    validation_extract_nw = validation_extract_nw.sort(
+                        [CLUSTER_COLUMN, "_row_num_"]
                     )
 
                 # Ensure that the extract is collected and set to its native format
@@ -21924,7 +22789,8 @@ class Validate:
         them is the 'wrong' one. Such steps are only used for sundering if you say which copy to
         keep with `duplicates=`: the kept copy goes to the 'pass' piece (if it passes the other
         steps) and the other copies go to the 'fail' piece. With `duplicates="flag_all"`, every
-        copy goes to the 'fail' piece.
+        copy goes to the 'fail' piece. The same goes for the groups of near duplicates found by
+        [`rows_near_distinct()`](`pointblank.Validate.rows_near_distinct`) steps.
 
         Parameters
         ----------
@@ -21934,8 +22800,9 @@ class Validate:
             latter returns a table only containing rows had test units that failed in at least one
             validation step.
         duplicates
-            How to treat the duplicate rows found by `rows_distinct()` steps. The default `None`
-            leaves those steps out of the sundering. Use `"keep_first"` or `"keep_last"` to keep one
+            How to treat the duplicate rows found by `rows_distinct()` (and
+            `rows_near_distinct()`) steps. The default `None` leaves those steps out of the
+            sundering. Use `"keep_first"` or `"keep_last"` to keep one
             copy of each group of duplicates (the first or last one, in row order or in the order
             given by `duplicates_order_by=`), or `"flag_all"` to treat every copy as failing.
         duplicates_order_by
@@ -22136,7 +23003,9 @@ class Validate:
         [`rows_distinct()`](`pointblank.Validate.rows_distinct`) are included by default: one copy
         of each group of duplicate rows (the first one) isn't flagged, and the other copies are. So
         a `rows_distinct()` flag marks the rows that removing duplicates would remove. Use
-        `duplicates=` and `duplicates_order_by=` to choose which copy is kept.
+        `duplicates=` and `duplicates_order_by=` to choose which copy is kept. Steps that use
+        [`rows_near_distinct()`](`pointblank.Validate.rows_near_distinct`) are treated in the same
+        way, with a group of near duplicates in place of the copies of a row.
 
         A row-level step that can't be used is reported in a warning: that's a step that uses an
         unmarked `pre=` function (it can change the rows, so its results may not line up with the
@@ -22146,11 +23015,11 @@ class Validate:
         Parameters
         ----------
         duplicates
-            How to flag the duplicate rows found by `rows_distinct()` steps. With `"keep_first"`
-            (the default) or `"keep_last"`, one copy of each group of duplicates (the first or last
-            one, in row order or in the order given by `duplicates_order_by=`) isn't flagged.
-            `"flag_all"` flags every copy, as the step itself counts them, and `None` leaves
-            `rows_distinct()` steps out.
+            How to flag the duplicate rows found by `rows_distinct()` (and `rows_near_distinct()`)
+            steps. With `"keep_first"` (the default) or `"keep_last"`, one copy of each group of
+            duplicates (the first or last one, in row order or in the order given by
+            `duplicates_order_by=`) isn't flagged. `"flag_all"` flags every copy, as the step
+            itself counts them, and `None` leaves those steps out.
         duplicates_order_by
             One or more columns that order the copies of a duplicated row, to decide which copy
             isn't flagged. For example, use `duplicates="keep_last",
@@ -22893,6 +23762,8 @@ class Validate:
                 "rows_complete",
                 "prompt",
                 "col_vals_scored",
+                "rows_near_distinct",
+                "rows_not_contaminated",
             ]:
                 if not column:
                     # If there is no column subset, then all columns are used
@@ -23134,6 +24005,15 @@ class Validate:
             elif assertion_type[i] in ["col_vals_scored"]:
                 # The bounds, and a compact badge for the scorer (its full name is in the note)
                 values_upd.append(_scored_values_text(value))
+
+            elif assertion_type[i] in ["rows_near_distinct"]:
+                values_upd.append(_near_distinct_values_text(value))
+
+            elif assertion_type[i] in ["rows_not_contaminated"]:
+                values_upd.append(_contamination_values_text(value))
+
+            elif assertion_type[i] in ["col_vals_chat_format"]:
+                values_upd.append(_chat_format_values_text(value))
 
             elif assertion_type[i] in ["prompt"]:  # pragma: no cover
                 # For AI validation, show only the prompt, not the full config
@@ -24954,7 +25834,7 @@ def _row_result_steps(
     active and have no `pre=` (it can change the rows, so the results may not line up with the
     data) unless it's marked with `row_preserving()`. A `rows_distinct()` step takes part only when
     `duplicates=` says which copy of a duplicate row to keep, as the step itself counts every copy
-    as failing.
+    as failing (and so does a `rows_near_distinct()` step).
 
     Returns the usable steps, and the row-checking steps that were left out along with the reason
     (inactive steps aren't included, as leaving them out was the user's choice).
@@ -24980,7 +25860,7 @@ def _row_result_steps(
         if validation.pre is not None and not _is_row_preserving(validation.pre):
             skipped.append((validation.i, "it uses `pre=` without `pb.row_preserving()`"))
             continue
-        if assertion_type == "rows_distinct" and duplicates is None:
+        if assertion_type in ("rows_distinct", "rows_near_distinct") and duplicates is None:
             skipped.append((validation.i, "no `duplicates=` policy was given"))
             continue
 
@@ -25066,6 +25946,16 @@ def _step_row_results(
     # The results can be an `object` column in pandas, so they're made Boolean first
     is_good = nw.col("pb_is_good_").fill_null(True).cast(nw.Boolean)
     results_tbl = results_tbl.with_columns(pb_failed_=~is_good)
+
+    if validation.assertion_type == "rows_near_distinct" and duplicates != "flag_all":
+        # The rows of a group of near duplicates share their group number
+        results_tbl = _with_kept_duplicates(
+            results_tbl,
+            keys=[CLUSTER_COLUMN],
+            order_by=duplicates_order_by,
+            last=duplicates == "keep_last",
+            index_name=index_name,
+        )
 
     if validation.assertion_type == "rows_distinct" and duplicates != "flag_all":
         keys = validation.column
@@ -26027,6 +26917,11 @@ def _create_autobrief_or_failure_text(
     if assertion_type == "col_vals_scored":
         return _create_text_scored(lang=lang, column=column, values=values, for_failure=for_failure)
 
+    if assertion_type in ("rows_near_distinct", "rows_not_contaminated", "col_vals_chat_format"):
+        return _create_text_text_check(
+            lang=lang, assertion_type=assertion_type, column=column, for_failure=for_failure
+        )
+
     if assertion_type == "prompt":
         return _create_text_prompt(
             lang=lang,
@@ -26535,6 +27430,15 @@ def _create_text_specially(lang: str, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     return EXPECT_FAIL_TEXT[f"specially_{type_}_text"][lang]
+
+
+def _create_text_text_check(
+    lang: str, assertion_type: str, column: str | list[str], for_failure: bool = False
+) -> str:
+    type_ = _expect_failure_type(for_failure=for_failure)
+    columns = [column] if isinstance(column, str) else list(column)
+    column_text = ", ".join(f"`{c}`" for c in columns)
+    return EXPECT_FAIL_TEXT[f"{assertion_type}_{type_}_text"][lang].format(column_text=column_text)
 
 
 def _create_text_scored(
@@ -28482,6 +29386,38 @@ def _create_threshold_reset_note_text() -> str:
     return "Global thresholds explicitly not used for this step."
 
 
+def _check_text_columns(columns: Any, param: str = "columns") -> list[str]:
+    """Check the columns of a text step (a column name or a list of them) and give them as a list."""
+    if isinstance(columns, str):
+        columns = [columns]
+    if (
+        not isinstance(columns, (list, tuple))
+        or not columns
+        or not all(isinstance(c, str) and c for c in columns)
+    ):
+        raise TypeError(f"`{param}=` must be the name of a column or a list of column names.")
+    if len(set(columns)) != len(columns):
+        raise ValueError(f"`{param}=` has the same column more than once.")
+    return list(columns)
+
+
+def _check_unit_interval(value: Any, param: str, allow_zero: bool = True) -> None:
+    """Check that a value is a number between 0 and 1 (and not 0, unless `allow_zero=True`)."""
+    if isinstance(value, bool) or not isinstance(value, numbers.Real):
+        raise TypeError(f"`{param}=` must be a number, got {type(value).__name__}.")
+    if not (0 <= value <= 1) or (value == 0 and not allow_zero):
+        bounds = "between 0 and 1" if allow_zero else "greater than 0 and at most 1"
+        raise ValueError(f"`{param}=` must be {bounds}, got {value}.")
+
+
+def _check_positive_int(value: Any, param: str) -> None:
+    """Check that a value is a whole number of at least 1."""
+    if isinstance(value, bool) or not isinstance(value, numbers.Integral):
+        raise TypeError(f"`{param}=` must be a whole number, got {type(value).__name__}.")
+    if value < 1:
+        raise ValueError(f"`{param}=` must be at least 1, got {value}.")
+
+
 def _scored_values_text(value: dict[str, Any]) -> str:
     """Get the VALUES cell of a `col_vals_scored()` step: its bounds and a badge of its scorer."""
     from pointblank.scorers import scorer_label
@@ -28497,11 +29433,7 @@ def _scored_values_text(value: dict[str, Any]) -> str:
     label = scorer_label(value.get("scorer"))
     if len(label) > 24:
         label = label[:23] + "…"
-    badge = (
-        "<br/><span style='font-size: 8px; font-weight: 600; letter-spacing: 0.5px; "
-        f"color: #7B68A6;'>{html_module.escape(label)}</span>"
-    )
-    return f"{bounds}{badge}"
+    return f"{bounds}{_badge(label)}"
 
 
 def _create_scored_note(info: dict[str, Any], na_pass: bool = False) -> tuple[str, str]:
@@ -28556,6 +29488,170 @@ def _create_scored_note(info: dict[str, Any], na_pass: bool = False) -> tuple[st
     name_html = html_module.escape(str(scorer)).replace("_", "&#95;")
     markdown = f"Scored by <code>{name_html}</code>{version_text}: {rest_html}"
     return markdown, text
+
+
+def _badge(text: str) -> str:
+    """A compact badge for the VALUES cell of the report (under the cell's main text)."""
+    return (
+        "<br/><span style='font-size: 8px; font-weight: 600; letter-spacing: 0.5px; "
+        f"color: #7B68A6;'>{html_module.escape(text)}</span>"
+    )
+
+
+def _near_distinct_values_text(value: dict[str, Any]) -> str:
+    """Get the VALUES cell of a `rows_near_distinct()` step: the threshold and the method."""
+    if value.get("method") == "exact":
+        return "NORMALIZED" + _badge("EXACT")
+    return f"≥{value.get('threshold')}" + _badge(f"MINHASH {value.get('ngram')}-GRAM")
+
+
+def _contamination_ngram(value: dict[str, Any]) -> int:
+    """The n-gram length of a `rows_not_contaminated()` step (by default, for its method)."""
+    if value.get("ngram") is not None:
+        return value["ngram"]
+    return 5 if value.get("method") == "minhash" else 13
+
+
+def _reference_label(reference: Any) -> str:
+    """A short description of the reference of a `rows_not_contaminated()` step."""
+    if isinstance(reference, (str, Path)):
+        return Path(str(reference)).name
+    if isinstance(reference, dict):
+        return ", ".join(str(name) for name in reference)
+    if isinstance(reference, (list, tuple)):
+        if all(isinstance(v, str) for v in reference):
+            return f"{len(reference):,} TEXT{'' if len(reference) == 1 else 'S'}"
+        return f"{len(reference):,} TABLE{'' if len(reference) == 1 else 'S'}"
+    return "REFERENCE"
+
+
+def _contamination_values_text(value: dict[str, Any]) -> str:
+    """Get the VALUES cell of a `rows_not_contaminated()` step: the reference and the method."""
+    label = _reference_label(value.get("reference"))
+    if len(label) > 24:
+        label = label[:23] + "…"
+    method = value.get("method")
+    if method == "exact":
+        badge = "EXACT"
+    elif method == "minhash":
+        badge = f"MINHASH ≥{value.get('threshold')}"
+    else:
+        badge = f"{_contamination_ngram(value)}-GRAM"
+    return html_module.escape(label) + _badge(badge)
+
+
+def _chat_format_values_text(value: dict[str, Any]) -> str:
+    """Get the VALUES cell of a `col_vals_chat_format()` step: a badge for each rule."""
+    rules = []
+    if value.get("alternate"):
+        rules.append("ALTERNATING")
+    if value.get("first_role"):
+        rules.append(f"FIRST: {value['first_role'].upper()}")
+    if value.get("last_role"):
+        rules.append(f"LAST: {value['last_role'].upper()}")
+    return "CHAT" + "".join(_badge(rule if len(rule) <= 20 else rule[:19] + "…") for rule in rules)
+
+
+def _plural(n: int, word: str, plural: str | None = None) -> str:
+    return f"{n:,} {word if n == 1 else (plural or word + 's')}"
+
+
+def _join_and(parts: list[str]) -> str:
+    """Join parts as a list in a sentence ("a", "a and b", or "a, b, and c")."""
+    if len(parts) <= 2:
+        return " and ".join(parts)
+    return ", ".join(parts[:-1]) + ", and " + parts[-1]
+
+
+def _note_html(text: str) -> str:
+    """Turn the plain text of a note into HTML, with `code` spans (and underscores as entities)."""
+    parts = text.split("`")
+    out = []
+    for k, part in enumerate(parts):
+        escaped = html_module.escape(part)
+        if k % 2:
+            out.append(f"<code>{escaped.replace('_', '&#95;')}</code>")
+        else:
+            out.append(escaped.replace("_", "&#95;"))
+    return "".join(out)
+
+
+def _create_near_distinct_note(info: dict[str, Any], value: dict[str, Any]) -> tuple[str, str]:
+    """
+    Create the note of a `rows_near_distinct()` step (HTML and plain text): the groups of near
+    duplicates found, and how texts were compared.
+    """
+    if value.get("method") == "exact":
+        how = "texts compared once normalized"
+    else:
+        how = (
+            f"MinHash of {value.get('ngram')}-word n-grams, with a Jaccard similarity of at least "
+            f"{value.get('threshold')}"
+        )
+    n_clusters = info.get("n_clusters", 0)
+    if not n_clusters:
+        text = f"No near duplicates found ({how})."
+    else:
+        text = (
+            f"{_plural(n_clusters, 'group')} of near duplicates, with "
+            f"{_plural(info.get('n_in_clusters', 0), 'row')}"
+        )
+        if n_clusters > 1:
+            text += f" (the largest has {_plural(info.get('largest', 0), 'row')})"
+        text += f"; {how}. The group of each row is in the `pb_cluster_` column."
+    return _note_html(text), text
+
+
+def _create_contamination_note(info: dict[str, Any]) -> tuple[str, str]:
+    """
+    Create the note of a `rows_not_contaminated()` step (HTML and plain text): how many rows
+    overlap with the reference, and with which of its tables.
+    """
+    n_reference = info.get("n_reference", 0)
+    n = info.get("n_contaminated", 0)
+    by_reference = info.get("by_reference") or {}
+    of = f"of {_plural(n_reference, 'text')}"
+    if not n:
+        text = f"No rows overlap with the reference ({of})."
+    else:
+        verb = "overlaps" if n == 1 else "overlap"
+        text = f"{_plural(n, 'row')} {verb} with the reference ({of})"
+        named = {k: v for k, v in by_reference.items() if k not in ("reference", "texts")}
+        if named:
+            parts = [f"{v:,} with `{k}`" for k, v in named.items()]
+            text += ": " + _join_and(parts)
+        text += ". The matching reference text of each row is in the `pb_match_` column."
+    return _note_html(text), text
+
+
+def _create_chat_format_note(info: dict[str, Any], na_pass: bool = False) -> tuple[str, str]:
+    """
+    Create the note of a `col_vals_chat_format()` step (HTML and plain text): how many rows have
+    each problem, and the missing values.
+    """
+    from pointblank._text import CHAT_REASONS
+
+    reasons = info.get("reasons") or {}
+    n = sum(reasons.values())
+    if not n:
+        sentences = ["Every conversation is well formed."]
+    else:
+        parts = [
+            f"{count:,} {CHAT_REASONS.get(code, code)} (`{code}`)"
+            for code, count in sorted(reasons.items(), key=lambda item: (-item[1], item[0]))
+        ]
+        listed = _join_and(parts)
+        verb = "isn't a well-formed conversation" if n == 1 else "aren't well-formed conversations"
+        sentences = [
+            f"{_plural(n, 'row')} {verb}: {listed}. The problem with each row is in the "
+            "`pb_reason_` column."
+        ]
+    n_missing = info.get("n_missing", 0)
+    if n_missing:
+        outcome = "passed with `na_pass=True`" if na_pass else "failed"
+        sentences.append(f"{_plural(n_missing, 'row')} had a missing value and {outcome}.")
+    text = " ".join(sentences)
+    return _note_html(text), text
 
 
 def _create_no_columns_resolved_note_html(
@@ -29210,6 +30306,14 @@ def _check_step_report_extract(extract: Any, i: int, all_passed: bool) -> None:
         )
 
 
+# The column that the results of each text check add, which is shown in its step report
+_TEXT_CHECK_RESULT_COLUMNS = {
+    "rows_near_distinct": "pb_cluster_",
+    "rows_not_contaminated": "pb_match_",
+    "col_vals_chat_format": "pb_reason_",
+}
+
+
 def _step_report_row_based(
     assertion_type: str,
     i: int,
@@ -29303,6 +30407,25 @@ def _step_report_row_based(
             text = f"{scored} &ge; {min_v}"
         else:
             text = f"{scored} &le; {max_v}"
+    elif assertion_type == "rows_near_distinct":
+        cols = html_module.escape(", ".join(column))
+        if values.get("method") == "exact":
+            text = f"normalize({cols}) distinct"
+        else:
+            text = f"max jaccard({cols}) &lt; {values.get('threshold')}"
+    elif assertion_type == "rows_not_contaminated":
+        cols = html_module.escape(", ".join(column))
+        reference = html_module.escape(_reference_label(values.get("reference")).lower())
+        method = values.get("method")
+        if method == "exact":
+            text = f"normalize({cols}) &NotElement; {reference}"
+        elif method == "minhash":
+            text = f"max jaccard({cols}, {reference}) &lt; {values.get('threshold')}"
+        else:
+            text = f"{_contamination_ngram(values)}-grams({cols}) &cap; {reference} = &empty;"
+    elif assertion_type == "col_vals_chat_format":
+        roles = html_module.escape(", ".join(values.get("roles") or []))
+        text = f"{column} is a chat of {{{roles}}}"
     else:
         # Fallback for any other assertion type: show the assertion type name
         text = str(assertion_type)  # pragma: no cover
@@ -29317,8 +30440,8 @@ def _step_report_row_based(
         # in the `tbl_preview` (i.e., it may not be present if `columns_subset=` didn't include it)
         preview_tbl_columns = tbl_preview._boxhead._get_columns()
         preview_tbl_has_target_column = column in preview_tbl_columns
-        if assertion_type == "col_vals_scored":
-            # The columns that were scored
+        if assertion_type in ("col_vals_scored", "rows_near_distinct", "rows_not_contaminated"):
+            # The columns that were checked
             column = [c for c in column if c in preview_tbl_columns]
             preview_tbl_has_target_column = bool(column)
 
@@ -29420,6 +30543,12 @@ def _step_report_row_based(
         if assertion_type == "col_vals_scored":
             # The columns that were scored, and their scores
             column = [c for c in [*column, "pb_score_"] if c in extract_tbl_columns]
+            extract_tbl_has_target_column = bool(column)
+        elif assertion_type in _TEXT_CHECK_RESULT_COLUMNS:
+            # The columns that were checked, and the column of the results that says why
+            checked = [column] if isinstance(column, str) else list(column)
+            added = _TEXT_CHECK_RESULT_COLUMNS[assertion_type]
+            column = [c for c in [*checked, added] if c in extract_tbl_columns]
             extract_tbl_has_target_column = bool(column)
 
         if extract_tbl_has_target_column:
