@@ -1218,6 +1218,9 @@ _ABLATION_KEYS = (
     "adjust",
     "label",
     "cache",
+    "holdout",
+    "ci",
+    "pass_as",
     "strategies",
 )
 _ABLATION_STRATEGIES = {
@@ -1295,6 +1298,14 @@ def _check_ablation_block(block: Any) -> None:
             "`my_models.training:evaluate`) or a `python:` block, got "
             f"{evaluate!r}."
         )
+    holdout = block.get("holdout")
+    if holdout is not None and not (
+        isinstance(holdout, str) or (isinstance(holdout, dict) and set(holdout) == {"python"})
+    ):
+        raise YAMLValidationError(
+            "'ablation.holdout' must be a data source like `tbl:` (a dataset name or a file path) "
+            f"or a `python:` block, got {holdout!r}."
+        )
     control = block.get("control", "size_matched")
     if not (
         control is None
@@ -1336,7 +1347,10 @@ def _ablation_kwargs(
     """The arguments of `Ablation()` from an `ablation:` block."""
     from pointblank.ablation import Stratified
 
-    kwargs = {k: v for k, v in block.items() if k not in ("evaluate", "strategies", "control")}
+    # (the `holdout:` is a data source, which is loaded with the validation's `tbl:`)
+    kwargs = {
+        k: v for k, v in block.items() if k not in ("evaluate", "strategies", "control", "holdout")
+    }
     if "control" in block:
         control = block["control"]
         if isinstance(control, dict):
@@ -1381,6 +1395,7 @@ def yaml_ablation(
     yaml: Union[str, Path],
     evaluate: Any = None,
     set_tbl: Any = None,
+    holdout: Any = None,
     namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
     allow_python: bool = False,
 ) -> "Ablation":
@@ -1404,6 +1419,9 @@ def yaml_ablation(
         `allow_python=True`.
     set_tbl
         A table to use in place of the configuration's `tbl` (as in `yaml_interrogate()`).
+    holdout
+        A table to use in place of the block's `holdout:` (the holdout set that the validation's
+        steps are also applied to, as in the `holdout=` of `Ablation`).
     namespaces
         Modules to make available to Python code in the configuration (as in
         `yaml_interrogate()`). This only has an effect with `allow_python=True`.
@@ -1439,6 +1457,7 @@ def yaml_ablation(
       control:
         stratified: sensor
       cache: .ablation_cache
+      holdout: data/holdout.parquet
       strategies:
         - drop_each
         - drop_all_but_each
@@ -1452,7 +1471,9 @@ def yaml_ablation(
     The `evaluate:` is the import path of a function (the module, a colon, and the name of the
     function), or a `python:` block whose result is the function. The `control:` is
     `size_matched` (the default), `null` (for no control), or `stratified:` with one or more
-    columns (for a [`Stratified`](`pointblank.ablation.Stratified`) control). Each strategy is
+    columns (for a [`Stratified`](`pointblank.ablation.Stratified`) control). The `holdout:` is a
+    data source like the `tbl:` of the configuration (a dataset name, a file path, or a `python:`
+    block), loaded with its `df_library:`. Each strategy is
     the name of an `Ablation` method that adds variants (including the sweeps `sweep_score` and
     `sweep_step`, the injected defects of `inject`, and the Shapley values of `shapley`), with its
     parameters as a mapping. The strategies are added in order. In YAML, the `corruption:` of
@@ -1534,6 +1555,12 @@ def yaml_ablation(
     validation = validator.build_validation(
         config, namespaces=namespaces, tbl=set_tbl, allow_python=allow_python
     ).interrogate()
+    if holdout is not None:
+        kwargs["holdout"] = holdout
+    elif block.get("holdout") is not None:
+        kwargs["holdout"] = validator._load_data_source(
+            block["holdout"], config.get("df_library", "polars"), python_mode=python_mode
+        )
 
     ablation = Ablation(validation, **kwargs)
     for method, params in _ablation_strategies(block):
@@ -1541,8 +1568,11 @@ def yaml_ablation(
     return ablation
 
 
-def _ablation_code(block: dict) -> tuple[list[str], list[str]]:
-    """The imports and the code of the `pb.Ablation()` from an `ablation:` block."""
+def _ablation_code(block: dict, df_library: str) -> tuple[list[str], list[str], str | None]:
+    """
+    The imports and the code of the `pb.Ablation()` from an `ablation:` block, and the import alias
+    that the code of its `holdout:` needs (`"pl"`, `"pd"` or `None`).
+    """
     imports = []
     evaluate = block.get("evaluate")
     if isinstance(evaluate, str):
@@ -1554,6 +1584,13 @@ def _ablation_code(block: dict) -> tuple[list[str], list[str]]:
     if "evaluate" in kwargs:
         args.append(f"evaluate={kwargs.pop('evaluate')}")
     args += [f"{key}={_literal_code(value)}" for key, value in kwargs.items()]
+    holdout = block.get("holdout")
+    alias = None
+    if isinstance(holdout, dict):
+        args.append(f"holdout={holdout['python'].strip()}")
+    elif holdout is not None:
+        holdout_code, alias = _data_source_code(holdout, df_library)
+        args.append(f"holdout={holdout_code}")
 
     lines = ["ablation = (", "    pb.Ablation("]
     lines += [f"        {arg}," for arg in args]
@@ -1562,7 +1599,7 @@ def _ablation_code(block: dict) -> tuple[list[str], list[str]]:
         params_str = ", ".join(f"{k}={_literal_code(v)}" for k, v in params.items())
         lines.append(f"    .{method}({params_str})")
     lines.append(")")
-    return imports, lines
+    return imports, lines, alias
 
 
 def _literal_code(value: Any) -> str:
@@ -2738,8 +2775,12 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
     # An `ablation:` block becomes a `pb.Ablation()` of the validation, with its strategies
     if "ablation" in config:
         code_lines[0] = "validation = ("
-        ablation_imports, ablation_lines = _ablation_code(config["ablation"])
+        ablation_imports, ablation_lines, holdout_import = _ablation_code(
+            config["ablation"], df_library
+        )
         imports += ablation_imports
+        needs_polars_import = needs_polars_import or holdout_import == "pl"
+        needs_pandas_import = needs_pandas_import or holdout_import == "pd"
         code_lines += ["", *ablation_lines]
 
     # Add imports at the beginning

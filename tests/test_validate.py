@@ -19959,6 +19959,25 @@ def test_set_tbl_with_different_dataframe_libraries() -> None:
     assert all(step.all_passed for step in result2.validation_info)
 
 
+def test_set_tbl_after_interrogating_a_pyspark_table() -> None:
+    """`set_tbl()` doesn't copy the tables held by a validation (PySpark's can't be copied)."""
+
+    spark = get_spark_session()
+    first = spark.createDataFrame([(1,), (2,), (None,)], "x long")
+    second = spark.createDataFrame([(5,), (None,), (None,), (7,)], "x long")
+
+    validation = (
+        Validate(data=first).col_vals_not_null(columns="x").col_vals_lt(columns="x", value=4)
+    ).interrogate()
+    result = validation.set_tbl(second, tbl_name="second").interrogate()
+
+    assert [(step.n, step.n_failed) for step in result.validation_info] == [(4, 2), (4, 4)]
+    assert result.tbl_name == "second"
+    # The first validation keeps its results and its table
+    assert [(step.n, step.n_failed) for step in validation.validation_info] == [(3, 1), (3, 1)]
+    assert validation.data is first
+
+
 def test_set_tbl_preserves_thresholds_and_actions() -> None:
     """Test that `set_tbl()` preserves thresholds and actions."""
 

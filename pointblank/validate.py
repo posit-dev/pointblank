@@ -6714,8 +6714,15 @@ class Validate:
         """
         from copy import deepcopy
 
-        # Create a deep copy of the current Validate object
-        new_validate = deepcopy(self)
+        # Create a deep copy of the current Validate object, without copying the tables that it
+        # holds (some, such as PySpark DataFrames, can't be copied, and they're replaced anyway)
+        memo: dict[int, Any] = {id(self.data): None}
+        for info in self.validation_info:
+            for name in ("tbl_checked", "extract"):
+                value = getattr(info, name, None)
+                if value is not None:
+                    memo[id(value)] = None
+        new_validate = deepcopy(self, memo)
 
         # Process the new table through the centralized data processing pipeline
         new_validate.data = _process_data(tbl)

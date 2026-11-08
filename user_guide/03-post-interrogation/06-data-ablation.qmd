@@ -533,6 +533,39 @@ on the model, which is why an ablation is worth running with the model that will
 data. Pass `estimator=` to use another model or pipeline: it's cloned for each evaluation, with its
 `random_state` set to the seed.
 
+## Checking the Held-Out Data
+
+The held-out data is the yardstick of every comparison, so a problem in it is a problem in all of
+them: a model that's scored on bad data can be rewarded for learning the same mistakes. With
+`holdout=`, the `Ablation` checks the held-out data with the same steps as the training table (it's
+never ablated, only checked), and the plan and the report give the health score of each:
+
+```{python}
+checked = pb.Ablation(
+    validation,
+    evaluate=evaluate,
+    metric="mae",
+    higher_is_better=False,
+    holdout=holdout,
+).drop_each()
+
+checked.plan()
+```
+
+The full results are in the `holdout_validation` attribute, an interrogated validation of the
+held-out data:
+
+```{python}
+checked.holdout_validation
+```
+
+The held-out flights have no air times in hours and no zero distances, but they do have flights
+longer than 2,500 miles. That's another sign that step 3 is a problem with the check rather than
+with the data: the flights it fails are the ones the model is asked to predict. The health scores
+are also in [`Ablation.to_dict()`](`Ablation.to_dict`) (with the results of each step) and in a
+[data card](data-cards.qmd) made with the ablation. Any table that a validation takes can be the
+holdout, including the path of a file.
+
 ## Running Larger Ablations
 
 The ablations here make a few dozen evaluations, but with a model that takes minutes to train, a
@@ -575,6 +608,30 @@ ablation.run(max_workers=4)
 ```
 
 The report says how many of the evaluations came from the cache.
+
+When the training pipeline loads the data itself (from a database, say, or a file that's too large
+to copy for each version), `pass_as="row_index"` gives the `evaluate` function the list of the
+numbers of the rows to keep (counting from `0`, in the order of the table) instead of the table.
+A list can be sent to another process, so this also makes `executor="process"` work for any kind of
+table:
+
+```{python}
+#| eval: false
+def evaluate_rows(rows, *, seed):
+    return evaluate(train[rows], seed=seed)
+
+
+pb.Ablation(
+    validation,
+    evaluate=evaluate_rows,
+    metric="mae",
+    higher_is_better=False,
+    pass_as="row_index",
+).drop_each().run()
+```
+
+With a list of rows, the defects of [`Ablation.inject()`](`Ablation.inject`) can't be passed on,
+so they need the default `pass_as="table"`.
 
 ## Evaluating Somewhere Else
 
@@ -693,7 +750,9 @@ pb.yaml_ablation(config, set_tbl=train, evaluate=evaluate).plan()
 The sweeps, `inject`, and `shapley` are strategies too, with their arguments by name (e.g.,
 `- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}` or
 `- inject: {corruption: "null", step: 2}`). In YAML, a defect must be one of the four kinds by
-name, not a function.
+name, not a function. The `holdout:` is a data source like `tbl:` (e.g.,
+`holdout: flights_holdout.parquet`), which `yaml_ablation(..., holdout=...)` can replace with a
+table, as `set_tbl=` does for `tbl:`.
 
 The block is ignored by [`yaml_interrogate()`](`yaml_interrogate`), so the same file can be used
 for validating the data, and [`yaml_to_python()`](`yaml_to_python`) writes out the equivalent
@@ -711,7 +770,17 @@ p-values of their own (from the values of each repeat), adjusted for the number 
 
 With fewer than three repeats, there's too little data for a useful interval, so the report gives
 no verdicts (and `Ablation` warns about this). More repeats give narrower intervals, at the cost of
-more evaluations. A few other options are worth knowing about:
+more evaluations.
+
+The *t*-interval assumes that the differences are roughly normal, which a few outlying repeats (a
+model that sometimes fails to converge, say) can make untrue. With `ci="bootstrap"`, the intervals
+and p-values come from 4,000 resamples of the repeats instead: the interval has the middle 95% of
+the resampled mean differences, and the p-value is the share of them on the other side of zero. The
+bootstrap assumes nothing about the distribution of the differences, but it needs more repeats
+(with fewer than 10, its intervals are too narrow, and `Ablation` warns about this). The resamples
+are made from the `seed=`, so the results are the same each time.
+
+A few other options are worth knowing about:
 
 - `control=None` compares variants only to the full table, which saves evaluations but leaves the
 effect of removing *any* rows mixed in with the effect of removing these rows

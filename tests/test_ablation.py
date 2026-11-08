@@ -2,6 +2,7 @@ import json
 import os
 import pickle
 import random
+import statistics
 import warnings
 
 import narwhals as nw
@@ -915,7 +916,9 @@ def test_ablation_to_json():
         "effects",
         "shapley",
         "notes",
+        "holdout",
     ]
+    assert data["holdout"] is None
     assert set(data["fingerprints"]) == {"data", "plan"}
     assert data["same_as"] == {}
     assert data["settings"] == {
@@ -931,6 +934,8 @@ def test_ablation_to_json():
         "max_removed": 0.5,
         "conf_level": 0.95,
         "adjust": "holm",
+        "ci": "t",
+        "pass_as": "table",
         "evaluate_version": None,
         "n_rows": 100,
         "tbl_name": None,
@@ -2901,3 +2906,307 @@ def test_sklearn_evaluator_without_sklearn(monkeypatch):
     monkeypatch.setattr(builtins, "__import__", fake_import)
     with pytest.raises(ImportError, match='pip install "pointblank\\[ml\\]"'):
         pb.ablation.sklearn_evaluator(_TBL, target="x")
+
+
+# ----------------------------------------------------------------------------------------------
+# Bootstrap intervals, row numbers, and the holdout set
+# ----------------------------------------------------------------------------------------------
+
+# A holdout set like `_TBL`, with 2 negative `x` values and 1 missing `y` in its 20 rows
+_HOLDOUT = pl.DataFrame(
+    {
+        "rid": list(range(20)),
+        "x": [-1.0 if k in (3, 11) else float(k) for k in range(20)],
+        "g": ["plain"] * 20,
+        "y": [None if k == 5 else k * 0.5 for k in range(20)],
+    }
+)
+
+
+def _evaluate_rows(rows, *, seed, variant):
+    """`_evaluate()` for `pass_as="row_index"`, with the kept rows looked up in `_TBL`."""
+    return _evaluate(_TBL[rows], seed=seed, variant=variant)
+
+
+def test_paired_bootstrap():
+    from pointblank.ablation import _bootstrap_resamples, _quantile
+
+    resamples = _bootstrap_resamples(10, 3)
+    assert len(resamples) == 4000
+    assert all(len(sample) == 10 and set(sample) <= set(range(10)) for sample in resamples)
+    # The resamples depend only on the number of repeats and the seed
+    assert _bootstrap_resamples(10, 3) == resamples
+    assert _bootstrap_resamples(10, 4) != resamples
+
+    values = [2.1, 1.7, 2.6, 1.9, 2.4, 2.0, 1.5, 2.8, 2.2, 1.8]
+    reference = [0.0] * 10
+    mean, lower, upper, p = _paired(values, reference, 0.95, resamples)
+    means = sorted(sum(values[k] for k in sample) / 10 for sample in resamples)
+    assert mean == pytest.approx(statistics.fmean(values))
+    assert lower == pytest.approx(_quantile(means, 0.025))
+    assert upper == pytest.approx(_quantile(means, 0.975))
+    assert lower < mean < upper
+    # Every resampled mean is above zero, so the p-value is the smallest there can be
+    assert p == pytest.approx(2 / 4001)
+
+    # Differences around zero have a large p-value, and an interval around zero
+    centered = [v - mean for v in values]
+    _, lower, upper, p = _paired(centered, reference, 0.95, resamples)
+    assert lower < 0 < upper
+    assert p > 0.5
+    # A narrower interval at a lower confidence level
+    _, lower_80, upper_80, _ = _paired(centered, reference, 0.8, resamples)
+    assert lower < lower_80 < upper_80 < upper
+
+    # As with the t-interval, for one pair and for differences that are all the same
+    assert _paired([2.0], [1.0], 0.95, _bootstrap_resamples(1, 0)) == (1.0, None, None, None)
+    assert _paired([2.0, 3.0], [1.0, 2.0], 0.95, _bootstrap_resamples(2, 0)) == (
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+    )
+
+    assert _quantile([1.0, 2.0, 3.0, 4.0], 0.5) == 2.5
+    assert _quantile([1.0, 2.0, 3.0, 4.0], 1.0) == 4.0
+    assert _quantile([5.0], 0.3) == 5.0
+
+
+def test_ablation_bootstrap():
+    def make(**kwargs):
+        return (
+            pb.Ablation(_validation(_TBL), evaluate=_evaluate, repeats=10, **kwargs)
+            .drop_each()
+            .drop_all_but_each()
+            .shapley()
+            .run()
+        )
+
+    t_ablation = make()
+    ablation = make(ci="bootstrap")
+    effects = _effects_by_variant(ablation)
+    t_effects = _effects_by_variant(t_ablation)
+
+    # The same evaluations, with other intervals and p-values
+    assert ablation.ci == "bootstrap"
+    assert ablation._plan_fingerprint() == t_ablation._plan_fingerprint()
+    for variant, row in effects.items():
+        assert row["delta_vs_full"] == t_effects[variant]["delta_vs_full"]
+    assert (
+        effects["step_1"]["delta_vs_control_lower"]
+        != (t_effects["step_1"]["delta_vs_control_lower"])
+    )
+    assert effects["step_1"]["verdict"] == "helps"
+    assert effects["step_2"]["verdict"] == "hurts"
+    assert effects["step_3"]["verdict"] == "inconclusive"
+    assert effects["all_but_1"]["verdict"] == "helps"
+    for row in effects.values():
+        if row["delta_vs_control"] is not None:
+            assert row["delta_vs_control_lower"] <= row["delta_vs_control"]
+            assert row["delta_vs_control"] <= row["delta_vs_control_upper"]
+    shapley = {row["step"]: row for row in ablation.get_shapley().to_dicts()}
+    assert shapley[1]["lower"] > 0 and shapley[2]["upper"] < 0
+    assert shapley[1]["lower"] != t_ablation.get_shapley().to_dicts()[0]["lower"]
+
+    # The same seed gives the same results
+    assert make(ci="bootstrap").to_dict()["effects"] == ablation.to_dict()["effects"]
+
+    assert ablation.to_dict()["settings"]["ci"] == "bootstrap"
+    html = ablation.get_tabular_report().as_raw_html()
+    assert "Intervals are 95% bootstrap percentile intervals" in html
+    assert "Intervals are 95% paired t-intervals" in t_ablation.get_tabular_report().as_raw_html()
+
+
+def test_ablation_bootstrap_errors_and_warnings():
+    validation = _validation(_TBL)
+    with pytest.raises(ValueError, match="`ci=` must be one of 't', 'bootstrap'"):
+        pb.Ablation(validation, evaluate=_evaluate, ci="bca")
+    with pytest.warns(UserWarning, match='intervals of `ci="bootstrap"` are too narrow'):
+        pb.Ablation(validation, evaluate=_evaluate, repeats=5, ci="bootstrap")
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        pb.Ablation(validation, evaluate=_evaluate, repeats=10, ci="bootstrap")
+        pb.Ablation(validation, evaluate=_evaluate, repeats=5)
+
+
+@pytest.mark.parametrize("tbl_type", _TBL_TYPES)
+def test_ablation_pass_as_row_index(tbl_type):
+    received = []
+
+    def evaluate(rows, *, seed, variant):
+        received.append((variant.id, rows))
+        return _evaluate_rows(rows, seed=seed, variant=variant)
+
+    ablation = (
+        pb.Ablation(_validation(_tbl(tbl_type)), evaluate=evaluate, repeats=3, pass_as="row_index")
+        .drop_each()
+        .drop_all_but_each()
+        .run()
+    )
+    full = [rows for variant_id, rows in received if variant_id == "full"]
+    assert full[0] == list(range(_N))
+    step_1 = next(rows for variant_id, rows in received if variant_id == "step_1")
+    # Step 1 fails the rows with a negative `x` (every tenth row, from row 0)
+    assert step_1 == [k for k in range(_N) if k % 10 != 0]
+    assert all(type(k) is int for k in step_1)
+
+    # The same results as with the tables
+    expected = (
+        pb.Ablation(_validation(_TBL), evaluate=_evaluate, repeats=3)
+        .drop_each()
+        .drop_all_but_each()
+        .run()
+    )
+    assert ablation.get_effects().equals(expected.get_effects())
+    assert ablation.to_dict()["settings"]["pass_as"] == "row_index"
+    assert ablation.check_determinism() is True
+
+
+def test_ablation_pass_as_row_index_in_processes():
+    # A list of row numbers can be sent to another process, whatever the table is
+    ablation = pb.Ablation(
+        _validation(_tbl("duckdb")), evaluate=_evaluate_rows, repeats=3, pass_as="row_index"
+    ).drop_each()
+    sequential = (
+        pb.Ablation(_validation(_TBL), evaluate=_evaluate, repeats=3).drop_each().run().to_dict()
+    )
+    result = ablation.run(max_workers=2, executor="process").to_dict()
+    assert result["effects"] == sequential["effects"]
+
+
+def test_ablation_pass_as_errors():
+    validation = _validation(_TBL)
+    with pytest.raises(ValueError, match="`pass_as=` must be one of 'table', 'row_index'"):
+        pb.Ablation(validation, evaluate=_evaluate, pass_as="indices")
+    ablation = pb.Ablation(validation, evaluate=_evaluate_rows, repeats=3, pass_as="row_index")
+    with pytest.raises(ValueError, match='so it needs `pass_as="table"`'):
+        ablation.inject("null", column="y")
+
+    pytest.importorskip("sklearn")
+    evaluate = pb.ablation.sklearn_evaluator(_HOLDOUT, target="x", features=["rid"])
+    with pytest.raises(ValueError, match='trains on the training table, so it needs `pass_as="t'):
+        pb.Ablation(validation, evaluate=evaluate, pass_as="row_index")
+
+
+@pytest.mark.parametrize("tbl_type", _TBL_TYPES)
+def test_ablation_holdout(tbl_type):
+    if tbl_type == "sqlite":
+        ibis = pytest.importorskip("ibis")
+        holdout = ibis.sqlite.connect().create_table("abl_holdout", _HOLDOUT.to_pandas())
+    else:
+        holdout = _tbl(tbl_type, _HOLDOUT)
+    validation = _validation(_tbl(tbl_type))
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3, holdout=holdout)
+
+    # The holdout is interrogated with the same steps, and the training table isn't changed
+    assert ablation.holdout_validation is not None
+    assert ablation.holdout_validation is not validation
+    assert [step.n_failed for step in ablation.holdout_validation.validation_info] == [2, 0, 1, 0]
+    assert [step.n_failed for step in validation.validation_info] == [10, 10, 10, 0]
+    assert validation.data is not ablation.holdout_validation.data
+
+    plan_html = ablation.drop_each().plan().as_raw_html()
+    health = (
+        f"Health score of the training table: <strong>"
+        f"{validation.get_health_score():.2f}</strong>; of the holdout set (20 rows): "
+        f"<strong>{ablation.holdout_validation.get_health_score():.2f}</strong>."
+    )
+    assert health in plan_html
+    ablation.run()
+    assert health in ablation.get_tabular_report().as_raw_html()
+
+    summary = ablation.to_dict()["holdout"]
+    assert summary["n_rows"] == 20
+    assert summary["health_score"] == pytest.approx(ablation.holdout_validation.get_health_score())
+    assert summary["steps"][0] == {"step": 1, "n": 20, "n_failed": 2, "f_failed": 0.1}
+    assert summary["steps"][3]["n_failed"] == 0
+    json.dumps(summary)
+
+    card = validation.to_data_card(ablation=ablation)
+    assert "The model was scored on a holdout set of 20 rows" in card
+
+
+def test_ablation_holdout_details():
+    validation = _validation(_TBL)
+    without = pb.Ablation(validation, evaluate=_evaluate, repeats=3).drop_each()
+    assert without.holdout_validation is None
+    assert "Health score" not in without.plan().as_raw_html()
+    without.run()
+    assert "Health score" not in without.get_tabular_report().as_raw_html()
+    assert "holdout set" not in validation.to_data_card(ablation=without)
+
+    # The holdout doesn't change the plan or the results
+    ablation = pb.Ablation(validation, evaluate=_evaluate, repeats=3, holdout=_HOLDOUT)
+    ablation.drop_each().run()
+    assert ablation._plan_fingerprint() == without._plan_fingerprint()
+    assert ablation.get_effects().equals(without.get_effects())
+
+    # A step that can't be checked on the holdout has no results there
+    missing_y = _HOLDOUT.drop("y")
+    summary = pb.Ablation(validation, evaluate=_evaluate, holdout=missing_y)._holdout_summary()
+    assert summary["steps"][2] == {"step": 3, "n": None, "n_failed": None, "f_failed": None}
+
+    # A holdout that isn't a table
+    with pytest.raises(ValueError, match="The `holdout=` table couldn't be validated"):
+        pb.Ablation(validation, evaluate=_evaluate, holdout=1)
+
+
+def test_ablation_holdout_from_a_file(tmp_path):
+    path = tmp_path / "holdout.csv"
+    _HOLDOUT.write_csv(path)
+    ablation = pb.Ablation(_validation(_TBL), evaluate=_evaluate, holdout=str(path))
+    assert ablation._holdout_summary()["n_rows"] == 20
+
+
+def test_yaml_ablation_holdout_ci_and_pass_as(tmp_path):
+    path = tmp_path / "holdout.csv"
+    _HOLDOUT.write_csv(path)
+    config = f"""
+tbl: small_table
+steps:
+- col_vals_ge:
+    columns: x
+    value: 0
+ablation:
+  repeats: 10
+  ci: bootstrap
+  pass_as: row_index
+  holdout: {path}
+  strategies:
+  - drop_each
+"""
+    ablation = pb.yaml_ablation(config, evaluate=_evaluate_rows, set_tbl=_TBL)
+    assert ablation.ci == "bootstrap"
+    assert ablation.pass_as == "row_index"
+    assert ablation._holdout_summary()["steps"][0]["n_failed"] == 2
+    ablation.run()
+    assert _effects_by_variant(ablation)["step_1"]["verdict"] == "helps"
+
+    # A table in place of the block's `holdout:`
+    other = pb.yaml_ablation(
+        config, evaluate=_evaluate_rows, set_tbl=_TBL, holdout=_HOLDOUT.head(10)
+    )
+    assert other._holdout_summary()["n_rows"] == 10
+
+    code = pb.yaml_to_python(config)
+    assert '        ci="bootstrap",\n' in code
+    assert '        pass_as="row_index",\n' in code
+    assert f"        holdout=pl.read_csv({json.dumps(str(path))}),\n" in code
+    assert "import polars as pl" in code
+    source = code.removeprefix("```python\n").removesuffix("\n```")
+    source = source.replace('pb.load_dataset("small_table", tbl_type="polars")', "tbl")
+    # (the configuration has no `evaluate:`, so it's added here)
+    source = source.replace("        validation,\n", "        validation,\n        evaluate=e,\n")
+    namespace = {"tbl": _TBL, "e": _evaluate_rows}
+    exec(source, namespace)
+    assert namespace["ablation"]._holdout_summary()["n_rows"] == 20
+
+    # A `python:` block is only run with `allow_python=True`
+    block = config.replace(f"holdout: {path}", "holdout:\n    python: pl.DataFrame()")
+    assert "        holdout=pl.DataFrame(),\n" in pb.yaml_to_python(block)
+    with pytest.raises(pb.yaml.YAMLValidationError, match="python"):
+        pb.yaml_ablation(block, evaluate=_evaluate_rows, set_tbl=_TBL)
+
+    bad = config.replace(f"holdout: {path}", "holdout: [1, 2]")
+    with pytest.raises(pb.yaml.YAMLValidationError, match="'ablation.holdout' must be"):
+        pb.yaml_ablation(bad, evaluate=_evaluate_rows, set_tbl=_TBL)
