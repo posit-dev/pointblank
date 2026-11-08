@@ -1,0 +1,153 @@
+---
+title: Data Cards
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+A data card describes a dataset for the people who use it: what it has, where it came from, how good
+it is, and who to ask about it. Most data cards say little about the quality of the data, since it
+takes work to measure. A validation has already done that work, so the
+[`to_data_card()`](`pointblank.Validate.to_data_card`) method writes a card from it, in Markdown,
+with the results of the validation as the evidence of the data's quality.
+
+## A Card from a Validation
+
+Let's validate a table of readings from weather stations, with an owner for the data and its users.
+A few of the temperatures were recorded in tenths of a degree, so they're ten times too large, and
+some readings have no humidity.
+
+```{python}
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+
+readings = pl.DataFrame(
+    {
+        "station": ["north", "south", "east"] * 100,
+        "temp": temps,
+        "humidity": [None if k % 40 == 3 else 40 + k % 30 for k in range(300)],
+    }
+)
+
+validation = (
+    pb.Validate(
+        data=readings,
+        tbl_name="station_readings",
+        owner="Climate Data Team",
+        consumers=["forecasting", "dashboards"],
+        version="2026.11",
+    )
+    .col_vals_between(columns="temp", left=-30, right=50)
+    .col_vals_not_null(columns="humidity", segments="station")
+    .interrogate()
+)
+```
+
+The card is made from the validation, with what it doesn't know (a description, the license, the
+source of the data, and so on) given as arguments:
+
+```{python}
+card = validation.to_data_card(
+    description="Hourly readings from three weather stations.",
+    license="cc-by-4.0",
+    language="en",
+    source="Read from the stations' loggers every hour in 2026.",
+    column_descriptions={
+        "temp": "The temperature, in degrees Celsius.",
+        "humidity": "The relative humidity, in percent.",
+    },
+    by="station",
+)
+
+print(card)
+```
+
+The card is a [Hugging Face dataset card](https://huggingface.co/docs/hub/datasets-cards), so it
+can be saved as the `README.md` of a dataset on the Hub (with `path="README.md"`). It has:
+
+- **Front matter.** The YAML that the Hub reads: `pretty_name`, `license`, `language`, and
+  `size_categories` (from the number of rows). Only what's known is written.
+- **Dataset Details and Uses.** The curator and contact come from the validation's `owner=`, the
+  uses from its `consumers=`, and the version from its `version=`.
+- **Dataset Structure.** The number of rows and columns, and a table of the columns with their
+  types, their numbers of missing values (counted in the table, on its own backend), and the
+  descriptions of `column_descriptions=`.
+- **Data Quality.** The health score and the score of each dimension of quality (as in the
+  [scores of a validation](quality-dimensions-and-scoring.qmd)), the scores of each value of the
+  `by=` column (here, of each station), and a table of the steps with their share of passing test
+  units and their status.
+- **Bias, Risks, and Limitations.** The steps that found problems, and how many test units failed
+  each.
+
+What isn't known is marked "[More Information Needed]", as in the template of the Hub, so that it
+can be filled in later.
+
+## A Datasheet
+
+The other format is a datasheet, from *Datasheets for Datasets* (Gebru et al., 2021), which answers
+a list of questions about a dataset in seven sections: its motivation, composition, collection,
+preprocessing, uses, distribution, and maintenance. The results of the validation answer the
+questions about the composition of the data, including "Are there any errors, sources of noise, or
+redundancies in the dataset?"
+
+```{python}
+sheet = validation.to_data_card(
+    format="datasheet", description="Hourly readings from three weather stations."
+)
+
+print(sheet[sheet.index("## Composition") : sheet.index("## Collection Process")])
+```
+
+## Evidence from an Ablation
+
+A validation says which rows fail its checks, but not whether those rows matter. An
+[`Ablation`](data-ablation.qmd) measures that, by training a model on the data with the failing
+rows of each step removed. With `ablation=`, the card gets an *Ablation Evidence* section with the
+measured effect of each check (and, in a datasheet, it's the answer to the question about
+preprocessing).
+
+Here, the "model" is as simple as can be: it predicts the mean of the temperatures that it's
+trained on, and it's scored by its mean absolute error on readings that it wasn't trained on.
+
+```{python}
+holdout = [20 + (k * 41 % 11 - 5) * 0.6 for k in range(200)]
+
+
+def evaluate(train, *, seed):
+    sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+    prediction = sample["temp"].mean()
+    return sum(abs(t - prediction) for t in holdout) / len(holdout)
+
+
+ablation = pb.Ablation(
+    validation, evaluate=evaluate, metric="error", higher_is_better=False, repeats=5
+)
+ablation.drop_each().run()
+
+card = validation.to_data_card(ablation=ablation)
+
+print(card[card.index("## Ablation Evidence") : card.index("## Dataset Creation")])
+```
+
+The rows with temperatures that are ten times too large make the error much larger, so removing
+them helps. The rows without a humidity don't matter to a model of the temperature, so the
+verdicts of those steps are inconclusive: removing their rows isn't clearly better or worse than
+removing as many random rows.
+
+## Conclusion
+
+The `to_data_card()` method writes a data card from a validation: a Hugging Face dataset card or a
+datasheet, with the structure of the table, the results of the validation as the evidence of its
+quality, and, with an ablation, the measured effect of each check on a model. What the validation
+doesn't know can be given as arguments, or filled in later.
