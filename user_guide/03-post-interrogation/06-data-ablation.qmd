@@ -353,6 +353,103 @@ some of them in, and removing more starts to remove good flights. By 20%, the sw
 can also use the values of a column of the table as the scores (`sweep_score("column_name")`), or
 cutoffs on the scale of the scores rather than shares of the rows (`values=`).
 
+## Injecting Defects
+
+The variants so far remove rows that a check flags, which asks whether the flagged rows hurt the
+model. The opposite question is just as useful: if a defect got into the data, how much would it
+hurt? The [`Ablation.inject()`](`Ablation.inject`) method answers it by adding the defect to
+clean rows (those that fail no step) and evaluating the corrupted table. The defect can be one of
+four kinds:
+
+- `"null"`: the values of a column are made missing
+- `"shuffle"`: the values of a column are moved between rows, so each is a valid value in the
+  wrong row
+- `"truncate"`: text values are cut to half their length
+- `"duplicate"`: rows are copied
+
+or a function, which is applied to the values of a column. Here, the defect is the problem that
+step 1 catches, air times in hours, made by a function that divides the air time by 60:
+
+```{python}
+injected = (
+    pb.Ablation(
+        validation,
+        evaluate=evaluate,
+        metric="mae",
+        higher_is_better=False,
+        label="Air time model",
+    )
+    .inject(lambda minutes: minutes / 60, step=1, name="hours", rates=[0.01, 0.02, 0.05, 0.1])
+    .run()
+)
+
+injected
+```
+
+Each rate is a share of the rows to corrupt, and each is a variant. The rows corrupted at a rate
+include those at the lower rates, so the curve shows the same defect getting worse. Since no rows
+are removed, there's no control: each variant is compared with the full table. Even 1% of the
+flights in hours makes the error almost a minute larger, and the harm grows steadily with the share.
+
+The `step=` says which step checks for the defect (and its column is the one corrupted, unless
+`column=` says otherwise). The table must be a Polars, pandas, or PyArrow table, as the defect is
+made in memory, and the injected rows are the same in every repeat (they're chosen from the
+ablation's `seed=`).
+
+## Suggesting Thresholds
+
+A step's thresholds say how many failing rows are too many, but the right number depends on how
+much the failures cost. With a curve like the one above, that can be worked out: the
+[`Ablation.suggest_thresholds()`](`Ablation.suggest_thresholds`) method fits a line through the
+harm of each injected defect against the share of rows that fail its step, and gives the share at
+which the harm reaches a `tolerance=` (in the units of the metric):
+
+```{python}
+injected.suggest_thresholds(tolerance=1)
+```
+
+If the model can lose at most a minute of mean absolute error, step 1 should give an error once
+1% of its rows fail (with a warning at half that). The suggestions are dictionaries of
+[`Thresholds`](`Thresholds`) by step, ready for the `thresholds=` of the steps. A step whose
+defect doesn't clearly hurt the model, or that doesn't catch its defect (a shuffled distance, for
+example, is still greater than zero), gets no suggestion, with a warning that says why.
+
+## Sharing the Effect Among the Steps
+
+Removing every step's rows has an effect, but the steps' rows overlap and work together, so their
+effects on their own don't add up to it. The *Shapley value* of a step is its fair share of the
+whole effect: its average effect when it's added to every combination of the other steps. The
+[`Ablation.shapley()`](`Ablation.shapley`) method adds a variant for each combination that's
+needed (reusing those already in the ablation), and the report shows a Shapley value for each step:
+
+```{python}
+shares = (
+    pb.Ablation(
+        validation,
+        evaluate=evaluate,
+        metric="mae",
+        higher_is_better=False,
+        label="Air time model",
+    )
+    .shapley()
+    .run()
+)
+
+shares
+```
+
+The Shapley values add up to the effect of removing the rows of every step, so each step gets a
+share of the total (in the **mae** column). Step 1's rows bring the error down by more than the
+whole cleaning does, and step 3's rows take back almost half of that, so the shares are above
+100% and below zero. Step 2's share is close to nothing. The
+[`Ablation.get_shapley()`](`Ablation.get_shapley`) method gives the values as a table, with
+their intervals and p-values for every metric.
+
+With three steps, there are seven combinations to evaluate, and the values are exact. The number
+of combinations doubles with each step, so with more steps than `permutations=` allows (by
+default, those with at most 200 orders, or five steps), the values are estimated from that many
+random orders of the steps instead, and the report says so.
+
 ## Getting the Results
 
 The [`Ablation.get_effects()`](`Ablation.get_effects`) method returns the results as a table, with
@@ -593,8 +690,10 @@ ablation:
 pb.yaml_ablation(config, set_tbl=train, evaluate=evaluate).plan()
 ```
 
-The sweeps are strategies too, with their arguments by name (e.g.,
-`- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}`).
+The sweeps, `inject`, and `shapley` are strategies too, with their arguments by name (e.g.,
+`- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}` or
+`- inject: {corruption: "null", step: 2}`). In YAML, a defect must be one of the four kinds by
+name, not a function.
 
 The block is ignored by [`yaml_interrogate()`](`yaml_interrogate`), so the same file can be used
 for validating the data, and [`yaml_to_python()`](`yaml_to_python`) writes out the equivalent
@@ -606,7 +705,9 @@ For each variant, the difference from its control is computed for each repeat, a
 the mean of these differences with a paired *t*-interval (95% by default, set with
 `conf_level=`). The p-values are adjusted for the number of variants with the Holm method, and the
 verdicts use the adjusted p-values: a variant helps or hurts only if its adjusted p-value is below
-`1 - conf_level`. You can turn off the adjustment with `adjust=None`.
+`1 - conf_level`. You can turn off the adjustment with `adjust=None`. Injected defects remove no
+rows, so they're always compared with the full table, and the Shapley values have intervals and
+p-values of their own (from the values of each repeat), adjusted for the number of steps.
 
 With fewer than three repeats, there's too little data for a useful interval, so the report gives
 no verdicts (and `Ablation` warns about this). More repeats give narrower intervals, at the cost of
@@ -636,6 +737,8 @@ have a note for each step that couldn't be used.
 A validation can say which rows break its rules, but only an experiment can say whether those rows
 hurt the model trained on them. An `Ablation` runs that experiment with controls, repeats, and
 intervals, so you can find the checks that are worth enforcing, the ones that don't matter, the
-ones that are redundant, the ones that remove good data, and where to set their limits. It works
-with any model that you can wrap in an `evaluate` function (or train elsewhere, with `export()` and
-`load_results()`), and with any validation whose steps check rows.
+ones that are redundant, the ones that remove good data, and where to set their limits. Injecting
+defects shows how much a problem would cost (and gives thresholds to match), and Shapley values
+share the effect of the whole cleaning fairly among the steps. It works with any model that you can
+wrap in an `evaluate` function (or train elsewhere, with `export()` and `load_results()`), and with
+any validation whose steps check rows.
