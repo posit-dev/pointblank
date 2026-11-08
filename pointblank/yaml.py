@@ -402,12 +402,15 @@ class YAMLValidator:
         "col_vals_within_spec": "col_vals_within_spec",
         "col_vals_str_len": "col_vals_str_len",
         "col_vals_scored": "col_vals_scored",
+        "col_vals_chat_format": "col_vals_chat_format",
         "col_pct_null": "col_pct_null",
         "col_pct_missing": "col_pct_missing",
         "col_missing_coded": "col_missing_coded",
         "col_missing_only_coded": "col_missing_only_coded",
         "col_missing_consistent": "col_missing_consistent",
         "rows_distinct": "rows_distinct",
+        "rows_near_distinct": "rows_near_distinct",
+        "rows_not_contaminated": "rows_not_contaminated",
         "rows_complete": "rows_complete",
         "col_count_match": "col_count_match",
         "row_count_match": "row_count_match",
@@ -1225,6 +1228,8 @@ _ABLATION_STRATEGIES = {
     "drop_groups": ({"column", "values"}, {"column"}),
     "sweep_score": ({"score", "quantiles", "values", "remove"}, {"score"}),
     "sweep_step": ({"step", "param", "values"}, {"step", "param", "values"}),
+    "inject": ({"corruption", "column", "step", "rates", "name"}, {"corruption"}),
+    "shapley": ({"steps", "permutations", "seed"}, set()),
 }
 
 # An `evaluate:` function given by its import path (e.g., `my_models.training:evaluate`)
@@ -1449,7 +1454,10 @@ def yaml_ablation(
     `size_matched` (the default), `null` (for no control), or `stratified:` with one or more
     columns (for a [`Stratified`](`pointblank.ablation.Stratified`) control). Each strategy is
     the name of an `Ablation` method that adds variants (including the sweeps `sweep_score` and
-    `sweep_step`), with its parameters as a mapping. The strategies are added in order.
+    `sweep_step`, the injected defects of `inject`, and the Shapley values of `shapley`), with its
+    parameters as a mapping. The strategies are added in order. In YAML, the `corruption:` of
+    `inject` is the name of a defect (`null`, `shuffle`, `truncate`, or `duplicate`), not a
+    function.
 
     The block is ignored by `yaml_interrogate()`, so the same configuration can be used both to
     validate the data and to measure what its steps do for a model.
