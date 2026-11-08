@@ -397,6 +397,10 @@ def _is_in(column: str, values: Collection[Any], dtype: DType | None) -> nw.Expr
     return nw.col(column).is_in(values)
 
 
+# The results columns of a step (whether each row passed, and what some steps add next to it)
+_RESULT_COLUMNS = ("pb_is_good_", "pb_score_", "pb_cluster_", "pb_match_", "pb_reason_")
+
+
 def _with_row_index(
     tbl: Any, name: str, ignore: tuple[str, ...] = ()
 ) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
@@ -409,8 +413,9 @@ def _with_row_index(
     Other LazyFrames (e.g., database tables) have no inherent row order, so they're ordered by
     their first column, with ties broken by the other columns that can be sorted (numeric,
     temporal, string, and boolean ones) so that the numbering doesn't vary from run to run. The
-    results columns (`pb_is_good_`, and the scores of a `col_vals_scored()` step in `pb_score_`)
-    aren't used, so a table is numbered the same with or without them.
+    results columns (`pb_is_good_`, and the `pb_score_`, `pb_cluster_`, `pb_match_`, and
+    `pb_reason_` columns that some steps add next to it) aren't used, so a table is numbered the
+    same with or without them.
 
     Parameters
     ----------
@@ -435,7 +440,7 @@ def _with_row_index(
         return nw.from_native(native.with_row_index(name=name))
     schema = tbl_nw.collect_schema()
     first_col, *other_cols = [
-        c for c in schema.names() if c not in ("pb_is_good_", "pb_score_") and c not in ignore
+        c for c in schema.names() if c not in _RESULT_COLUMNS and c not in ignore
     ]
     tie_breakers = [
         c

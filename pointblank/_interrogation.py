@@ -2672,7 +2672,30 @@ def _score_plain_rows(
 
 def _scored_lookup(nw_tbl: Any, columns: list[str], rows: list[dict], scores: list) -> Any:
     """Make a table of the distinct rows that have a score, on the backend of a lazy table."""
-    keep = [(row, score) for row, score in zip(rows, scores) if score is not None]
+    keep = [k for k, score in enumerate(scores) if score is not None]
+    return _value_lookup(
+        nw_tbl,
+        columns,
+        [rows[k] for k in keep],
+        {SCORE_COLUMN: ([scores[k] for k in keep], "float64")},
+        step="col_vals_scored",
+    )
+
+
+def _value_lookup(
+    nw_tbl: Any,
+    columns: list[str],
+    rows: list[dict],
+    values: dict[str, tuple[list, str]],
+    step: str,
+) -> Any:
+    """
+    Make a table of distinct rows of `columns` with values computed for them, on the backend of a
+    lazy table (an Ibis table or a PySpark DataFrame), to join to it.
+
+    `values` maps each new column to its values (one for each row) and its type (`"float64"`,
+    `"int64"`, or `"string"`).
+    """
     native = nw_tbl.to_native()
 
     if nw_tbl.implementation == nw.Implementation.IBIS:
@@ -2680,24 +2703,31 @@ def _scored_lookup(nw_tbl: Any, columns: list[str], rows: list[dict], scores: li
 
         data_schema = native.schema()
         schema = {c: data_schema[c] for c in columns}
-        schema[SCORE_COLUMN] = "float64"
-        data = {c: [row[c] for row, _ in keep] for c in columns}
-        data[SCORE_COLUMN] = [score for _, score in keep]
+        data = {c: [row[c] for row in rows] for c in columns}
+        for name, (column_values, dtype) in values.items():
+            schema[name] = dtype
+            data[name] = list(column_values)
         return nw.from_native(ibis.memtable(data, schema=ibis.schema(schema)))
 
     if nw_tbl.implementation.is_pyspark() or nw_tbl.implementation.is_pyspark_connect():
-        from pyspark.sql.types import DoubleType, StructField, StructType
+        from pyspark.sql.types import DoubleType, LongType, StringType, StructField, StructType
 
+        spark_types = {"float64": DoubleType, "int64": LongType, "string": StringType}
         fields = {field.name: field for field in native.schema.fields}
         schema = StructType(
-            [fields[c] for c in columns] + [StructField(SCORE_COLUMN, DoubleType(), True)]
+            [fields[c] for c in columns]
+            + [StructField(name, spark_types[dtype](), True) for name, (_, dtype) in values.items()]
         )
-        data = [tuple(row[c] for c in columns) + (score,) for row, score in keep]
+        columns_values = [column_values for column_values, _ in values.values()]
+        data = [
+            tuple(row[c] for c in columns) + tuple(v[k] for v in columns_values)
+            for k, row in enumerate(rows)
+        ]
         return nw.from_native(native.sparkSession.createDataFrame(data, schema=schema))
 
     raise StepEvaluationError(
-        "col_vals_scored() can score Polars and pandas tables, Ibis tables, and PySpark "
-        f"DataFrames, not a {nw_tbl.implementation} table."
+        f"{step}() can check Polars and pandas tables, Ibis tables, and PySpark DataFrames, not a "
+        f"{nw_tbl.implementation} table."
     )
 
 
@@ -2825,6 +2855,423 @@ def _lazy_score_stats(scored_tbl: Any) -> dict[str, Any]:
     for key in ("min", "max", "median"):
         out[key] = None if out[key] is None else float(out[key])
     return out
+
+
+# ---------------------------------------------------------------------------------------------
+# Text checks: `rows_near_distinct()`, `rows_not_contaminated()`, and `col_vals_chat_format()`
+# ---------------------------------------------------------------------------------------------
+
+# The columns that the text checks add to their results, next to `pb_is_good_`
+CLUSTER_COLUMN = "pb_cluster_"
+MATCH_COLUMN = "pb_match_"
+REASON_COLUMN = "pb_reason_"
+
+
+def _check_step_columns(nw_tbl: Any, columns: list[str], step: str, added: str) -> None:
+    """Check that the columns of a step are in the table, and that the table hasn't `added`."""
+    names = list(nw_tbl.collect_schema().names())
+    missing = [c for c in columns if c not in names]
+    if missing:
+        listed = ", ".join(repr(c) for c in missing)
+        raise StepEvaluationError(
+            f"The column{'s' if len(missing) > 1 else ''} {listed} of the {step}() step "
+            f"{'aren' if len(missing) > 1 else 'isn'}'t in the table."
+        )
+    if added in names:
+        raise StepEvaluationError(
+            f"The table has a column {added!r}, which is the name of a column of the results of "
+            f"a {step}() step: rename it first (e.g., with `pre=`)."
+        )
+
+
+def _row_values(row: dict[str, Any], columns: list[str]) -> list[Any] | None:
+    """The plain values of a row's columns, or `None` if any is missing."""
+    from pointblank.scorers import python_value
+
+    values = [python_value(row[c]) for c in columns]
+    return None if any(v is None for v in values) else values
+
+
+def _distinct_with_counts(nw_tbl: Any, columns: list[str]) -> list[tuple[dict[str, Any], int]]:
+    """
+    Get the distinct rows of `columns` of a lazy table that have no missing value, with the number
+    of rows of each, sorted by their values (so that the order doesn't vary from run to run).
+    """
+    counted = (
+        nw_tbl.filter(*[~nw.col(c).is_null() for c in columns])
+        .group_by(columns)
+        .agg(nw.len().alias("pb_n_"))
+        .collect()
+    )
+    out = []
+    for row in counted.rows(named=True):
+        values = _row_values(row, columns)
+        if values is not None:
+            out.append(({c: row[c] for c in columns}, int(row["pb_n_"])))
+    out.sort(key=lambda item: [repr(item[0][c]) for c in columns])
+    return out
+
+
+def _with_eager_columns(nw_tbl: Any, values: dict[str, tuple[list, str]]) -> Any:
+    """Add columns of values (one for each row, by position) to an eager table."""
+    native = nw_tbl.to_native()
+    if is_polars_dataframe(native):
+        import polars as pl
+
+        types = {"float64": pl.Float64, "int64": pl.Int64, "string": pl.String}
+        native = native.with_columns(
+            [pl.Series(name, v, dtype=types[dtype]) for name, (v, dtype) in values.items()]
+        )
+    elif is_pandas_dataframe(native):
+        import pandas as pd
+
+        # Align by position: the frame's index need not be 0..n-1
+        types = {"float64": "float64", "int64": "Int64", "string": "object"}
+        native = native.assign(
+            **{
+                name: pd.Series(v, dtype=types[dtype], index=native.index)
+                for name, (v, dtype) in values.items()
+            }
+        )
+    else:  # pragma: no cover
+        types = {"float64": nw.Float64(), "int64": nw.Int64(), "string": nw.String()}
+        native = nw_tbl.with_columns(
+            *[
+                nw.new_series(name, v, types[dtype], backend=nw_tbl.implementation)
+                for name, (v, dtype) in values.items()
+            ]
+        ).to_native()
+    return nw.from_native(native)
+
+
+def _check_lazy_backend(nw_tbl: Any, step: str) -> None:
+    if not (
+        nw_tbl.implementation == nw.Implementation.IBIS
+        or nw_tbl.implementation.is_pyspark()
+        or nw_tbl.implementation.is_pyspark_connect()
+    ):
+        raise StepEvaluationError(
+            f"{step}() can check Polars and pandas tables, Ibis tables, and PySpark DataFrames, "
+            f"not a {nw_tbl.implementation} table."
+        )
+
+
+def _with_row_text_values(
+    tbl: IntoFrame,
+    columns: list[str],
+    step: str,
+    added: dict[str, str],
+    compute: Callable[[list[str], list[int]], dict[str, list]],
+) -> tuple[Any, bool, list[int]]:
+    """
+    Add columns computed from the text of each row (the values of `columns`, joined by newlines).
+
+    `compute` gets the texts of the distinct rows that have no missing value, with the number of
+    rows of each (one for each row of an eager table), and gives a value of each column in `added`
+    (name to type) for each. An eager table is computed in place (a Polars LazyFrame is collected,
+    and is made lazy again at the end); an Ibis table or a PySpark DataFrame has its distinct rows
+    collected, and the values are joined back to it on its own backend.
+
+    Returns the table with the new columns (as Narwhals), whether it was a Polars LazyFrame, and
+    the numbers of rows of the texts given to `compute`.
+    """
+    from pointblank._text import join_values
+
+    nw_tbl = nw.from_native(tbl)
+    for name in added:
+        _check_step_columns(nw_tbl, columns, step, name)
+
+    was_polars_lazy = is_polars_lazyframe(nw_tbl.to_native())
+    if was_polars_lazy:
+        nw_tbl = nw_tbl.collect()
+
+    if isinstance(nw_tbl, nw.DataFrame):
+        rows = nw_tbl.select(columns).rows(named=True)
+        positions = []
+        texts = []
+        for k, row in enumerate(rows):
+            values = _row_values(row, columns)
+            if values is not None:
+                positions.append(k)
+                texts.append(join_values(values))
+        computed = compute(texts, [1] * len(texts))
+        out: dict[str, tuple[list, str]] = {}
+        for name, dtype in added.items():
+            column_values: list[Any] = [None] * len(rows)
+            for position, value in zip(positions, computed[name]):
+                column_values[position] = value
+            out[name] = (column_values, dtype)
+        return _with_eager_columns(nw_tbl, out), was_polars_lazy, [1] * len(texts)
+
+    _check_lazy_backend(nw_tbl, step)
+    distinct = _distinct_with_counts(nw_tbl, columns)
+    texts = [join_values([row[c] for c in columns]) for row, _ in distinct]
+    counts = [n for _, n in distinct]
+    computed = compute(texts, counts)
+    keep = [k for k in range(len(distinct)) if any(computed[name][k] is not None for name in added)]
+    lookup = _value_lookup(
+        nw_tbl,
+        columns,
+        [distinct[k][0] for k in keep],
+        {name: ([computed[name][k] for k in keep], dtype) for name, dtype in added.items()},
+        step=step,
+    )
+    return nw_tbl.join(lookup, on=columns, how="left"), was_polars_lazy, counts
+
+
+def interrogate_near_distinct(
+    tbl: IntoFrame, columns: list[str], config: dict[str, Any]
+) -> tuple[Any, dict[str, Any]]:
+    """
+    Find the rows whose text is a near duplicate of another row's.
+
+    The text of a row is the values of `columns`, joined by newlines. Rows in a group of near
+    duplicates (see `pointblank._text.near_duplicate_groups()`) fail, and their group is in the
+    `pb_cluster_` column of the results (numbered from 1); a row with a missing value passes.
+
+    Returns the results table and the information on the groups for the step's note.
+    """
+    from pointblank._text import near_duplicate_groups
+
+    info: dict[str, Any] = {}
+
+    def compute(texts: list[str], counts: list[int]) -> dict[str, list]:
+        groups, n_compared = near_duplicate_groups(
+            texts,
+            method=config["method"],
+            threshold=config["threshold"],
+            ngram=config["ngram"],
+            num_perm=config["num_perm"],
+        )
+        sizes: dict[int, int] = {}
+        for group, n in zip(groups, counts):
+            sizes[group] = sizes.get(group, 0) + n
+        # Number the groups of more than one row from 1, in the order of their first text
+        numbers: dict[int, int] = {}
+        clusters: list[Any] = []
+        for group in groups:
+            if sizes[group] < 2:
+                clusters.append(None)
+                continue
+            clusters.append(numbers.setdefault(group, len(numbers) + 1))
+        dup_sizes = [size for group, size in sizes.items() if size >= 2]
+        info.update(
+            {
+                "n_clusters": len(dup_sizes),
+                "n_in_clusters": sum(dup_sizes),
+                "largest": max(dup_sizes) if dup_sizes else 0,
+                "n_compared": n_compared,
+            }
+        )
+        return {CLUSTER_COLUMN: clusters}
+
+    nw_tbl, was_polars_lazy, _ = _with_row_text_values(
+        tbl, columns, "rows_near_distinct", {CLUSTER_COLUMN: "int64"}, compute
+    )
+    results = nw_tbl.with_columns(pb_is_good_=nw.col(CLUSTER_COLUMN).is_null())
+    if was_polars_lazy:
+        results = results.lazy()
+    return results.to_native(), info
+
+
+def reference_texts(
+    reference: Any, reference_columns: list[str] | None, columns: list[str]
+) -> tuple[list[str], list[str]]:
+    """
+    Get the texts of the reference of `rows_not_contaminated()` and the name of the reference that
+    each comes from.
+
+    The reference is a table (or the path of a file, read like the data of a validation), a list
+    of them (named `1`, `2`, ...), a dictionary of them by name, or a list of texts. The text of a
+    row of a table is the values of `reference_columns` (or of `columns`), joined by newlines.
+    """
+    from pointblank._text import join_values
+    from pointblank.validate import _process_data
+
+    if isinstance(reference, dict):
+        items = [(str(name), value) for name, value in reference.items()]
+    elif isinstance(reference, (list, tuple)) and all(isinstance(v, str) for v in reference):
+        return [v for v in reference], ["texts"] * len(reference)
+    elif isinstance(reference, (list, tuple)):
+        items = [(str(k), value) for k, value in enumerate(reference, start=1)]
+    else:
+        items = [("reference", reference)]
+
+    ref_columns = reference_columns or columns
+    texts: list[str] = []
+    names: list[str] = []
+    for name, value in items:
+        if isinstance(value, (list, tuple)) and all(isinstance(v, str) for v in value):
+            texts.extend(value)
+            names.extend([name] * len(value))
+            continue
+        try:
+            table = nw.from_native(_process_data(value))
+        except Exception as e:
+            raise StepEvaluationError(
+                f"The reference {name!r} of the rows_not_contaminated() step couldn't be read "
+                f"({_first_line(e)})."
+            ) from e
+        schema_names = list(table.collect_schema().names())
+        missing = [c for c in ref_columns if c not in schema_names]
+        if missing:
+            raise StepEvaluationError(
+                f"The reference {name!r} of the rows_not_contaminated() step has no column "
+                f"{', '.join(repr(c) for c in missing)} (set `reference_columns=`)."
+            )
+        selected = table.select(ref_columns)
+        if isinstance(selected, nw.LazyFrame):
+            selected = selected.collect()
+        for row in selected.rows(named=True):
+            values = _row_values(row, ref_columns)
+            if values is not None:
+                texts.append(join_values(values))
+                names.append(name)
+    return texts, names
+
+
+def interrogate_not_contaminated(
+    tbl: IntoFrame, columns: list[str], config: dict[str, Any]
+) -> tuple[Any, dict[str, Any]]:
+    """
+    Find the rows whose text overlaps with a reference (e.g., the questions of a benchmark).
+
+    A row fails if its text (the values of `columns`, joined by newlines) overlaps with a text of
+    the reference (see `pointblank._text.ReferenceIndex`), and the first reference text that it
+    overlaps with is in the `pb_match_` column of the results. A row with a missing value passes.
+
+    Returns the results table and the information on the overlap for the step's note.
+    """
+    from pointblank._text import ReferenceIndex
+
+    ref_texts, ref_names = reference_texts(
+        config["reference"], config.get("reference_columns"), columns
+    )
+    index = ReferenceIndex(
+        ref_texts,
+        method=config["method"],
+        ngram=config["ngram"],
+        threshold=config["threshold"],
+        num_perm=config["num_perm"],
+    )
+    info: dict[str, Any] = {"n_reference": len(ref_texts)}
+
+    def compute(texts: list[str], counts: list[int]) -> dict[str, list]:
+        matches: list[Any] = []
+        by_name: dict[str, int] = {}
+        for text, n in zip(texts, counts):
+            k = index.match(text)
+            if k is None:
+                matches.append(None)
+                continue
+            matches.append(ref_texts[k])
+            by_name[ref_names[k]] = by_name.get(ref_names[k], 0) + n
+        info["n_contaminated"] = sum(by_name.values())
+        info["by_reference"] = by_name
+        return {MATCH_COLUMN: matches}
+
+    nw_tbl, was_polars_lazy, _ = _with_row_text_values(
+        tbl, columns, "rows_not_contaminated", {MATCH_COLUMN: "string"}, compute
+    )
+    results = nw_tbl.with_columns(pb_is_good_=nw.col(MATCH_COLUMN).is_null())
+    if was_polars_lazy:
+        results = results.lazy()
+    return results.to_native(), info
+
+
+def interrogate_chat_format(
+    tbl: IntoFrame, column: str, config: dict[str, Any], na_pass: bool
+) -> tuple[Any, dict[str, Any]]:
+    """
+    Check that each row of a column is a well-formed chat conversation.
+
+    The value of a row is a list of messages (e.g., a Polars list of structs) or the JSON text of
+    one. The code of the first problem found with a conversation is in the `pb_reason_` column of
+    the results (see `pointblank._text.CHAT_REASONS`), and a row with a problem fails. A missing
+    value passes if `na_pass=True`. On an Ibis table or a PySpark DataFrame, the conversations
+    must be stored as JSON text.
+
+    Returns the results table and the counts of each problem for the step's note.
+    """
+    from pointblank._text import chat_reason
+    from pointblank.scorers import python_value
+
+    def check(value: Any) -> str | None:
+        return chat_reason(
+            value,
+            roles=config["roles"],
+            system_role=config["system_role"],
+            alternate=config["alternate"],
+            first_role=config["first_role"],
+            last_role=config["last_role"],
+            allow_empty=config["allow_empty"],
+            role_key=config["role_key"],
+            content_key=config["content_key"],
+        )
+
+    nw_tbl = nw.from_native(tbl)
+    _check_step_columns(nw_tbl, [column], "col_vals_chat_format", REASON_COLUMN)
+
+    was_polars_lazy = is_polars_lazyframe(nw_tbl.to_native())
+    if was_polars_lazy:
+        nw_tbl = nw_tbl.collect()
+
+    reasons_count: dict[str, int] = {}
+    if isinstance(nw_tbl, nw.DataFrame):
+        values = nw_tbl.get_column(column).to_list()
+        reasons: list[Any] = []
+        n_missing = 0
+        for value in values:
+            value = python_value(value) if not isinstance(value, (list, tuple)) else value
+            if value is None:
+                reasons.append(None)
+                n_missing += 1
+                continue
+            reason = check(value)
+            reasons.append(reason)
+            if reason is not None:
+                reasons_count[reason] = reasons_count.get(reason, 0) + 1
+        nw_tbl = _with_eager_columns(nw_tbl, {REASON_COLUMN: (reasons, "string")})
+    else:
+        _check_lazy_backend(nw_tbl, "col_vals_chat_format")
+        if nw_tbl.collect_schema()[column] != nw.String:
+            raise StepEvaluationError(
+                "col_vals_chat_format() checks the conversations of a database table or a PySpark "
+                f"DataFrame as JSON text, and the column {column!r} is of type "
+                f"{nw_tbl.collect_schema()[column]} (store the messages as JSON, or check an "
+                "eager table)."
+            )
+        distinct = _distinct_with_counts(nw_tbl, [column])
+        reasons = []
+        for row, n in distinct:
+            reason = check(row[column])
+            reasons.append(reason)
+            if reason is not None:
+                reasons_count[reason] = reasons_count.get(reason, 0) + n
+        keep = [k for k, reason in enumerate(reasons) if reason is not None]
+        lookup = _value_lookup(
+            nw_tbl,
+            [column],
+            [distinct[k][0] for k in keep],
+            {REASON_COLUMN: ([reasons[k] for k in keep], "string")},
+            step="col_vals_chat_format",
+        )
+        nw_tbl = nw_tbl.join(lookup, on=[column], how="left")
+        n_missing = int(
+            nw_tbl.select(nw.col(column).is_null().cast(nw.Int64).sum().alias("n"))
+            .collect()
+            .item(0, "n")
+            or 0
+        )
+
+    results = nw_tbl.with_columns(
+        pb_is_good_=nw.when(nw.col(column).is_null())
+        .then(nw.lit(bool(na_pass)))
+        .otherwise(nw.col(REASON_COLUMN).is_null())
+    )
+    if was_polars_lazy:
+        results = results.lazy()
+    return results.to_native(), {"reasons": reasons_count, "n_missing": n_missing}
 
 
 def data_freshness(

@@ -94,8 +94,10 @@ from pointblank.pipeline import ContractViolationError, Pipeline, PipelineResult
 from pointblank.preprocessing import row_preserving
 from pointblank.ablation import Ablation, AblationVariant
 from pointblank import scorers
+from pointblank import text
 from pointblank.schema import Schema, generate_dataset, schema_from_tbl
 from pointblank.segments import seg_group
+from pointblank.splits import SplitCheck, check_splits
 from pointblank.thresholds import Actions, FinalActions, Thresholds
 from pointblank.validate import (
     Validate,
@@ -170,6 +172,9 @@ __all__ = [
     "Ablation",
     "AblationVariant",
     "scorers",
+    "text",
+    "check_splits",
+    "SplitCheck",
     "send_slack_notification",
     "emit_otel",
     # Data generation - Field classes

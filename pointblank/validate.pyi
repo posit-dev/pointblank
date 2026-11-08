@@ -1,6 +1,6 @@
 import datetime
 from _typeshed import Incomplete
-from collections.abc import Collection
+from collections.abc import Collection, Sequence
 from dataclasses import dataclass
 from great_tables import GT
 from narwhals.typing import IntoDataFrame, IntoFrame
@@ -587,6 +587,57 @@ class Validate:
         na_pass: bool = False,
         cache: bool | str | Path = True,
         keep_scores: bool = True,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def rows_near_distinct(
+        self,
+        columns: str | list[str],
+        method: Literal["minhash", "exact"] = "minhash",
+        threshold: float = 0.85,
+        ngram: int = 5,
+        num_perm: int = 128,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def rows_not_contaminated(
+        self,
+        columns: str | list[str],
+        reference: Any,
+        reference_columns: str | list[str] | None = None,
+        method: Literal["ngram", "exact", "minhash"] = "ngram",
+        ngram: int | None = None,
+        threshold: float = 0.8,
+        num_perm: int = 128,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_chat_format(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        roles: Sequence[str] = ("system", "user", "assistant"),
+        alternate: bool = True,
+        first_role: str | None = None,
+        last_role: str | None = None,
+        allow_empty: bool = False,
+        role_key: str = "role",
+        content_key: str = "content",
+        na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,

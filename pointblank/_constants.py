@@ -59,6 +59,9 @@ ASSERTION_TYPE_METHOD_MAP: dict[str, str] = {
     "rows_complete": "rows_complete",
     "prompt": "prompt",
     "col_vals_scored": "scored",
+    "rows_near_distinct": "rows_near_distinct",
+    "rows_not_contaminated": "rows_not_contaminated",
+    "col_vals_chat_format": "chat_format",
     "col_schema_match": "col_schema_match",
     "row_count_match": "row_count_match",
     "col_count_match": "col_count_match",
@@ -123,9 +126,12 @@ ASSERTION_TYPE_TO_DIMENSION: dict[str, str] = {
     "col_sum_eq": "validity",
     "prompt": "validity",
     "col_vals_scored": "validity",
+    "rows_not_contaminated": "validity",
+    "col_vals_chat_format": "validity",
     "specially": "validity",
     # Uniqueness: absence of duplicate rows
     "rows_distinct": "uniqueness",
+    "rows_near_distinct": "uniqueness",
     # Timeliness: data recency/freshness
     "data_freshness": "timeliness",
     # Volume: expected row/column counts
@@ -200,6 +206,9 @@ ROW_BASED_VALIDATION_TYPES = [
     "conjointly",
     "prompt",
     "col_vals_scored",
+    "rows_near_distinct",
+    "rows_not_contaminated",
+    "col_vals_chat_format",
 ]
 
 # Validation steps that don't check values row by row; their step reports show a summary of the
@@ -966,6 +975,57 @@ SVG_ICONS_FOR_ASSERTION_TYPES: dict[str, str] = {
             </g>
             <circle id="hub" fill="#000000" cx="33.5" cy="43" r="3.5"></circle>
             <path d="M14,52 L53,52" id="baseline" stroke="#000000" stroke-width="2" stroke-linecap="round"></path>
+        </g>
+    </g>
+</svg>""",
+    "rows_near_distinct": """<?xml version="1.0" encoding="UTF-8"?>
+<svg width="67px" height="67px" viewBox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>rows_near_distinct</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="rows_near_distinct" transform="translate(0.000000, 0.965517)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="documents" stroke="#000000" stroke-width="2" stroke-linecap="round">
+                <rect id="doc_left" x="12" y="12" width="19" height="25" rx="2" fill="#FFFFFF"></rect>
+                <rect id="doc_right" x="36" y="12" width="19" height="25" rx="2" fill="#FFFFFF"></rect>
+                <path d="M16,19 L27,19 M16,24 L27,24 M16,29 L23,29" id="lines_left"></path>
+                <path d="M40,19 L51,19 M40,24 L49,24 M40,29 L47,29" id="lines_right"></path>
+            </g>
+            <g id="approx" stroke="#000000" stroke-width="3" stroke-linecap="round">
+                <path d="M23,46 C26.5,42.5 30,42.5 33.5,46 C37,49.5 40.5,49.5 44,46" id="wave_top"></path>
+                <path d="M23,54 C26.5,50.5 30,50.5 33.5,54 C37,57.5 40.5,57.5 44,54" id="wave_bottom"></path>
+            </g>
+        </g>
+    </g>
+</svg>""",
+    "rows_not_contaminated": """<?xml version="1.0" encoding="UTF-8"?>
+<svg width="67px" height="67px" viewBox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>rows_not_contaminated</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="rows_not_contaminated" transform="translate(0.000000, 0.965517)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="document" stroke="#000000" stroke-width="2" stroke-linecap="round">
+                <rect id="doc" x="14" y="10" width="25" height="33" rx="2" fill="#FFFFFF"></rect>
+                <path d="M19,18 L34,18 M19,23 L34,23 M19,28 L34,28 M19,33 L28,33" id="lines"></path>
+            </g>
+            <g id="no_entry" transform="translate(29.000000, 31.000000)" stroke="#000000" stroke-width="3">
+                <circle id="ring" fill="#FFFFFF" cx="12.5" cy="12.5" r="10.5"></circle>
+                <path d="M5,5 L20,20" id="bar" stroke-linecap="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>""",
+    "col_vals_chat_format": """<?xml version="1.0" encoding="UTF-8"?>
+<svg width="67px" height="67px" viewBox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>col_vals_chat_format</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_vals_chat_format" transform="translate(0.000000, 0.965517)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="bubbles" stroke="#000000" stroke-width="2" stroke-linejoin="round">
+                <path d="M12,12 L40,12 C41.1,12 42,12.9 42,14 L42,30 C42,31.1 41.1,32 40,32 L22,32 L15,38 L16,32 L12,32 C10.9,32 10,31.1 10,30 L10,14 C10,12.9 10.9,12 12,12 Z" id="bubble_user" fill="#FFFFFF"></path>
+                <path d="M27,30 L55,30 C56.1,30 57,30.9 57,32 L57,48 C57,49.1 56.1,50 55,50 L51,50 L52,56 L45,50 L27,50 C25.9,50 25,49.1 25,48 L25,32 C25,30.9 25.9,30 27,30 Z" id="bubble_assistant" fill="#000000"></path>
+            </g>
+            <path d="M16,19 L36,19 M16,25 L30,25" id="lines_user" stroke="#000000" stroke-width="2" stroke-linecap="round"></path>
+            <path d="M31,37 L51,37 M31,43 L45,43" id="lines_assistant" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"></path>
         </g>
     </g>
 </svg>""",

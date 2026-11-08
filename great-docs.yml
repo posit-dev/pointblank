@@ -231,6 +231,8 @@ reference:
             - col_vals_regex
             - col_vals_within_spec
             - col_vals_str_len
+            - col_vals_scored
+            - col_vals_chat_format
             - col_vals_in_table
             - col_vals_expr
             - col_exists
@@ -240,6 +242,8 @@ reference:
             - col_missing_only_coded
             - col_missing_consistent
             - rows_distinct
+            - rows_near_distinct
+            - rows_not_contaminated
             - rows_complete
             - col_schema_match
             - row_count_match
@@ -332,6 +336,9 @@ reference:
         - Validate.specially
         - Validate.prompt
         - Validate.col_vals_scored
+        - Validate.rows_near_distinct
+        - Validate.rows_not_contaminated
+        - Validate.col_vals_chat_format
 
     - title: Aggregation Steps
       desc: >
@@ -369,7 +376,21 @@ reference:
         - scorers.classifier
         - scorers.langid
         - scorers.perplexity
+        - scorers.text_stat
+        - scorers.token_count
         - scorers.clear_cache
+
+    - title: Text Checks
+      desc: >
+        Checks of text data, for corpora used to train or evaluate language models. Each function
+        makes a `Steps` collection of ordinary validation steps (heuristic quality filters, the
+        language of the text, its length in tokens, and personal information) to be added to a
+        validation with `Validate.add_steps()`.
+      contents:
+        - text.heuristic_filters
+        - text.in_language
+        - text.token_length
+        - text.no_pii
 
     - title: Column Selection
       desc: >
@@ -488,6 +509,21 @@ reference:
         - Comparison.to_dict
         - Comparison.to_json
 
+    - title: Split Checks
+      desc: >
+        Check the splits of a dataset (training, validation, and test) before training a model:
+        `check_splits()` finds the rows of a later split that are also in an earlier one (exactly
+        or nearly the same), labels that a split is missing or that only it has, and columns whose
+        distribution changes between splits. The result is a `SplitCheck` object with the issues
+        found, the overlapping rows, and a tabular report.
+      contents:
+        - check_splits
+        - name: SplitCheck
+          members: false
+        - SplitCheck.get_overlap
+        - SplitCheck.get_tabular_report
+        - SplitCheck.to_dict
+
     - title: Table Pre-checks
       desc: >
         Helper functions for use with the `active=` parameter of validation methods. These inspect
@@ -527,12 +563,16 @@ reference:
         - Ablation.drop_groups
         - Ablation.sweep_score
         - Ablation.sweep_step
+        - Ablation.inject
+        - Ablation.shapley
         - Ablation.plan
         - Ablation.run
         - Ablation.check_determinism
         - Ablation.export
         - Ablation.load_results
         - Ablation.get_effects
+        - Ablation.get_shapley
+        - Ablation.suggest_thresholds
         - Ablation.get_tabular_report
         - Ablation.annotate
         - Ablation.to_dict

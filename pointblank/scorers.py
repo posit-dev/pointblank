@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import datetime
 import decimal
+import functools
 import hashlib
 import inspect
 import itertools
@@ -34,6 +35,8 @@ __all__ = [
     "classifier",
     "langid",
     "perplexity",
+    "text_stat",
+    "token_count",
     "clear_cache",
 ]
 
@@ -47,7 +50,15 @@ _MEMORY_CACHE_LIMIT = 1_000_000
 CACHE_FILE = "scores.sqlite"
 
 # The adapters that can be written in YAML as `scorer: {<name>: {<arguments>}}`
-ADAPTERS = ("embedding_similarity", "reranker", "classifier", "langid", "perplexity")
+ADAPTERS = (
+    "embedding_similarity",
+    "reranker",
+    "classifier",
+    "langid",
+    "perplexity",
+    "text_stat",
+    "token_count",
+)
 
 _RERANK_PROVIDERS = ("cohere", "sentence-transformers")
 _DEFAULT_RERANK_MODELS = {
@@ -931,9 +942,17 @@ class _LangId(_Adapter):
     _kind = "langid"
     _label = "LANGID"
 
-    def __init__(self, expected, backend, model, column, name, version, batch_size):
-        codes = [expected] if isinstance(expected, str) else expected
-        if not isinstance(codes, (list, tuple)) or not codes:
+    def __init__(
+        self, expected, backend, model, column, expected_column, name, version, batch_size
+    ):
+        if (expected is None) == (expected_column is None):
+            raise ValueError("langid() needs one of `expected=` and `expected_column=`.")
+        if expected_column is not None and (
+            not isinstance(expected_column, str) or not expected_column
+        ):
+            raise TypeError("`expected_column=` must be the name of a column.")
+        codes = [] if expected is None else [expected] if isinstance(expected, str) else expected
+        if expected is not None and (not isinstance(codes, (list, tuple)) or not codes):
             raise TypeError("`expected=` must be a language code or a list of them.")
         if not all(isinstance(c, str) and c for c in codes):
             raise TypeError("`expected=` must be a language code or a list of them.")
@@ -953,11 +972,14 @@ class _LangId(_Adapter):
             )
         _check_column(column)
         self._expected = [c.lower() for c in codes]
+        self._expected_column = expected_column
         self._backend = backend
         self._model = model
         self._column = column
         self._rank = None
-        params: dict[str, Any] = {"expected": expected}
+        params: dict[str, Any] = (
+            {"expected": expected} if expected is not None else {"expected_column": expected_column}
+        )
         if backend != "langid":
             params["backend"] = backend
         if model is not None:
@@ -965,12 +987,29 @@ class _LangId(_Adapter):
         if column is not None:
             params["column"] = column
         settings = {
-            "expected": sorted(self._expected),
+            "expected": sorted(self._expected) or None,
+            "expected_column": expected_column,
             "backend": backend,
             "model": params.get("model"),
             "column": column,
         }
         super().__init__(params, settings, name, version, batch_size)
+
+    def _text_and_expected(self, record: dict[str, Any]) -> tuple[str, list[str]]:
+        """Get the text of a row, and the languages that it's expected to be in."""
+        if self._expected_column is None:
+            return _text_of(record, self._column, self._kind), self._expected
+        if self._expected_column not in record:
+            raise ValueError(
+                f"langid() reads the expected language from the column "
+                f"{self._expected_column!r} (`expected_column=`), which isn't one of the columns "
+                f"of the step ({', '.join(map(repr, record))}): add it to `columns=`."
+            )
+        others = {k: v for k, v in record.items() if k != self._expected_column}
+        text = _text_of(others if self._column is None else record, self._column, self._kind)
+        codes = record[self._expected_column]
+        codes = [codes] if isinstance(codes, str) else list(codes)
+        return text, [str(c).lower() for c in codes]
 
     def _get_rank(self):
         if self._rank is None:
@@ -1005,19 +1044,19 @@ class _LangId(_Adapter):
         rank = self._get_rank()
         scores = []
         for record in batch:
-            ranking = rank(_text_of(record, self._column, self._kind))
+            text, expected = self._text_and_expected(record)
+            ranking = rank(text)
             pairs = ranking.items() if isinstance(ranking, Mapping) else ranking
-            scores.append(
-                sum(float(p) for lang, p in pairs if _lang_matches(str(lang), self._expected))
-            )
+            scores.append(sum(float(p) for lang, p in pairs if _lang_matches(str(lang), expected)))
         return scores
 
 
 def langid(
-    expected: str | list[str],
+    expected: str | list[str] | None = None,
     backend: str | Callable[[str], Any] = "langid",
     model: str | None = None,
     column: str | None = None,
+    expected_column: str | None = None,
     name: str | None = None,
     version: str | None = None,
     batch_size: int | None = None,
@@ -1035,7 +1074,7 @@ def langid(
     expected
         The expected language (an ISO 639 code like `"en"`), or a list of them. A code matches
         the model's languages with the same code or with a region or script after it (`"en"`
-        matches `"en_US"`).
+        matches `"en_US"`). Give this or `expected_column=`.
     backend
         The language identification model: `"langid"` (the default, which needs the `langid`
         package), `"fasttext"` (a fastText model, which needs the `fasttext` package and the path
@@ -1044,10 +1083,15 @@ def langid(
     model
         The path of the fastText model (e.g., `lid.176.bin`), with `backend="fasttext"`.
     column
-        The column with the text to score. It can be left out if the step has one column.
+        The column with the text to score. It can be left out if the step has one column (or two,
+        with one of them as `expected_column=`).
+    expected_column
+        A column with the expected language of each row, instead of `expected=` (for a
+        multilingual corpus, where each document is labelled with its language). The column must
+        be one of the columns of the step.
     name
         A name for the scorer, for the score cache and the report. By default, it's made from the
-        expected languages, the backend, and the model.
+        expected languages (or `expected_column=`), the backend, and the model.
     version
         A version, which is part of the key of the score cache.
     batch_size
@@ -1091,9 +1135,28 @@ def langid(
     ).interrogate()
     ```
 
-    The review in French fails, and so does `"ok"`, which can't be told apart.
+    The review in French fails, and so does `"ok"`, which can't be told apart. In a corpus with
+    documents in several languages, the expected language of each row can come from a column,
+    with `expected_column=`:
+
+    ```{python}
+    tbl = pl.DataFrame(
+        {
+            "review": ["the soup is good", "le pain est bon", "le vin est bon"],
+            "lang": ["en", "fr", "en"],
+        }
+    )
+
+    pb.Validate(data=tbl).col_vals_scored(
+        columns=["review", "lang"],
+        scorer=pb.scorers.langid(expected_column="lang", backend=guess),
+        min_val=0.6,
+    ).interrogate()
+    ```
+
+    The third review is labelled as English, but it's in French, so it fails.
     """
-    return _LangId(expected, backend, model, column, name, version, batch_size)
+    return _LangId(expected, backend, model, column, expected_column, name, version, batch_size)
 
 
 class _Perplexity(_Adapter):
@@ -1222,6 +1285,308 @@ def perplexity(
     The garbled text has the highest score, above `max_val=4`, so it's the row that fails.
     """
     return _Perplexity(fn, kenlm_model, column, per_row, name, version, batch_size)
+
+
+class _TextStat(_Adapter):
+    _kind = "text_stat"
+    _default_batch_size = 1024
+
+    def __init__(self, stat, column, stop_words, name, version, batch_size):
+        from pointblank._text import STATS, STOP_WORDS
+
+        if stat not in STATS:
+            raise ValueError(f"`stat=` must be one of {', '.join(map(repr, STATS))}, got {stat!r}.")
+        if stop_words is not None:
+            if isinstance(stop_words, str) or not isinstance(stop_words, (list, tuple)):
+                raise TypeError("`stop_words=` must be a list of words.")
+            if not stop_words or not all(isinstance(w, str) and w for w in stop_words):
+                raise TypeError("`stop_words=` must be a list of words.")
+            if stat != "stop_words":
+                raise ValueError('`stop_words=` can only be used with `stat="stop_words"`.')
+        _check_column(column)
+        self._stat = stat
+        self._column = column
+        self._stop_words = STOP_WORDS if stop_words is None else tuple(stop_words)
+        params: dict[str, Any] = {"stat": stat}
+        if column is not None:
+            params["column"] = column
+        if stop_words is not None:
+            params["stop_words"] = list(stop_words)
+        settings = {"stat": stat, "column": column, "stop_words": params.get("stop_words")}
+        super().__init__(params, settings, name, version, batch_size)
+        self._label = stat.upper().replace("_", " ")
+
+    def __call__(self, batch):
+        from pointblank._text import text_stat
+
+        return [
+            text_stat(_text_of(record, self._column, self._kind), self._stat, self._stop_words)
+            for record in batch
+        ]
+
+
+def text_stat(
+    stat: str,
+    column: str | None = None,
+    stop_words: list[str] | None = None,
+    name: str | None = None,
+    version: str | None = None,
+    batch_size: int | None = None,
+) -> Scorer:
+    """
+    Score text by a simple statistic, like its number of words or its share of bullet lines.
+
+    These are the statistics of the quality filters that are used to clean web text for language
+    models (those of the Gopher models, by Rae et al., 2021). They need no model, so they're fast,
+    and they catch much of the text that isn't prose: lists of links, menus, tables of numbers,
+    and boilerplate. [`pb.text.heuristic_filters()`](`pointblank.text.heuristic_filters`) makes
+    a step for each of them, with the bounds used for Gopher.
+
+    Words are the text split on whitespace, and lines are the text split on newlines (blank
+    lines are left out). The statistics are:
+
+    - `"char_count"`: the number of characters
+    - `"word_count"`: the number of words
+    - `"mean_word_length"`: the mean number of characters of the words
+    - `"symbol_ratio"`: the number of hash symbols (`#`) and ellipses for each word
+    - `"bullet_lines"`: the share of lines that start with a bullet point
+    - `"ellipsis_lines"`: the share of lines that end with an ellipsis
+    - `"alpha_words"`: the share of words with at least one letter
+    - `"stop_words"`: the number of distinct stop words in the text
+    - `"repeated_lines"`: the share of lines that are the same as an earlier line
+
+    A text without words has no score for the statistics that are shares of its words (and
+    without lines, for those that are shares of its lines).
+
+    Parameters
+    ----------
+    stat
+        The statistic, one of those above.
+    column
+        The column with the text to score. It can be left out if the step has one column.
+    stop_words
+        The stop words, with `stat="stop_words"`. By default, they're the eight English words
+        of the Gopher filters (`the`, `be`, `to`, `of`, `and`, `that`, `have`, and `with`).
+    name
+        A name for the scorer, for the score cache and the report. By default, it's made from the
+        statistic and its settings.
+    version
+        A version, which is part of the key of the score cache.
+    batch_size
+        The number of texts scored at a time (`1024` by default).
+
+    Returns
+    -------
+    Scorer
+        A scorer for `Validate.col_vals_scored()`.
+
+    Examples
+    --------
+    ```{python}
+    #| echo: false
+    #| output: false
+    import pointblank as pb
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+    ```
+
+    Let's check that each document of a small corpus has at least eight words, and that no more
+    than half of its lines are bullet points.
+
+    ```{python}
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "text": [
+                "The museum opens at nine and closes at five on weekdays.",
+                "Home | About | Contact",
+                "- Bread\\n- Milk\\n- Eggs\\nA short list of what to buy for the weekend.",
+            ]
+        }
+    )
+
+    (
+        pb.Validate(data=tbl)
+        .col_vals_scored(columns="text", scorer=pb.scorers.text_stat("word_count"), min_val=8)
+        .col_vals_scored(
+            columns="text", scorer=pb.scorers.text_stat("bullet_lines"), max_val=0.5
+        )
+        .interrogate()
+    )
+    ```
+
+    The menu in the second row has only five words, so it fails step 1, and three of the four
+    lines of the shopping list are bullet points, so it fails step 2.
+    """
+    return _TextStat(stat, column, stop_words, name, version, batch_size)
+
+
+def _count_tokens(output: Any) -> int:
+    """The number of tokens in the output of a tokenizer (a count, a list, or an encoding)."""
+    if isinstance(output, Mapping) and "input_ids" in output:
+        output = output["input_ids"]
+    for attribute in ("ids", "input_ids"):
+        if hasattr(output, attribute) and not isinstance(output, (list, tuple)):
+            output = getattr(output, attribute)
+    if isinstance(output, bool):
+        raise TypeError("the tokenizer returned a boolean")
+    if isinstance(output, int):
+        return output
+    if hasattr(output, "tolist"):
+        output = output.tolist()
+    return len(output)
+
+
+class _TokenCount(_Adapter):
+    _kind = "token_count"
+    _label = "TOKENS"
+    _default_batch_size = 512
+
+    def __init__(self, tokenizer, column, name, version, batch_size):
+        if isinstance(tokenizer, str):
+            if not tokenizer or tokenizer == "tiktoken:":
+                raise ValueError("`tokenizer=` must name a tokenizer.")
+        elif not (callable(tokenizer) or callable(getattr(tokenizer, "encode", None))):
+            raise TypeError(
+                "`tokenizer=` must be the name of a tokenizer, an object with an `encode()` "
+                f"method, or a function, got {type(tokenizer).__name__}."
+            )
+        _check_column(column)
+        self._tokenizer = tokenizer
+        self._column = column
+        self._encode = None
+        params: dict[str, Any] = {"tokenizer": tokenizer}
+        if column is not None:
+            params["column"] = column
+        settings = {"tokenizer": tokenizer, "column": column}
+        super().__init__(params, settings, name, version, batch_size)
+
+    def _get_encode(self) -> Callable[[str], Any]:
+        if self._encode is not None:
+            return self._encode
+        tokenizer = self._tokenizer
+        if tokenizer == "whitespace":
+            self._encode = str.split
+        elif isinstance(tokenizer, str) and tokenizer.startswith("tiktoken:"):
+            try:
+                import tiktoken
+            except ImportError as e:
+                raise _install_hint(f"token_count({tokenizer!r})", "tiktoken", e) from e
+            encoding = tokenizer.removeprefix("tiktoken:")
+            try:
+                enc = tiktoken.get_encoding(encoding)
+            except ValueError:
+                # (the name of a model, like `gpt-4o`, rather than of an encoding)
+                enc = tiktoken.encoding_for_model(encoding)
+            self._encode = functools.partial(enc.encode, disallowed_special=())
+        elif isinstance(tokenizer, str):
+            try:
+                from transformers import AutoTokenizer
+            except ImportError as e:
+                raise _install_hint(f"token_count({tokenizer!r})", "transformers", e) from e
+            hf_tokenizer = AutoTokenizer.from_pretrained(tokenizer)
+            self._encode = functools.partial(hf_tokenizer.encode, add_special_tokens=False)
+        elif callable(getattr(tokenizer, "encode", None)):
+            self._encode = tokenizer.encode
+        else:
+            self._encode = tokenizer
+        return self._encode
+
+    def __call__(self, batch):
+        encode = self._get_encode()
+        return [
+            float(_count_tokens(encode(_text_of(record, self._column, self._kind))))
+            for record in batch
+        ]
+
+
+def token_count(
+    tokenizer: str | Any,
+    column: str | None = None,
+    name: str | None = None,
+    version: str | None = None,
+    batch_size: int | None = None,
+) -> Scorer:
+    """
+    Score text by its number of tokens.
+
+    A language model reads text as tokens, and most have a limit on how many they can take, so a
+    corpus for training (or a set of prompts) usually needs texts with neither too few tokens nor
+    too many. The score of a row is the number of tokens of its text, with the tokenizer of a
+    model, which makes `min_val=` and `max_val=` bounds on the length of each text in tokens.
+
+    Parameters
+    ----------
+    tokenizer
+        The tokenizer. It can be:
+
+        - the name of a Hugging Face tokenizer (e.g., `"gpt2"` or `"bert-base-uncased"`), which
+          needs the `transformers` package (special tokens aren't counted)
+        - `"tiktoken:"` and the name of a `tiktoken` encoding or model (e.g.,
+          `"tiktoken:cl100k_base"` or `"tiktoken:gpt-4o"`), which needs the `tiktoken` package
+        - `"whitespace"`, to count the words of the text, split on whitespace
+        - a tokenizer object with an `encode()` method (from `tiktoken`, `tokenizers`, or
+          `transformers`)
+        - a function that takes a text and returns its tokens, or the number of them
+    column
+        The column with the text to score. It can be left out if the step has one column.
+    name
+        A name for the scorer, for the score cache and the report. A tokenizer given by name
+        names the scorer; a tokenizer object or a function needs a `name=` for the scores to be
+        kept on disk.
+    version
+        A version, which is part of the key of the score cache.
+    batch_size
+        The number of texts scored at a time (`512` by default).
+
+    Returns
+    -------
+    Scorer
+        A scorer for `Validate.col_vals_scored()`.
+
+    Examples
+    --------
+    ```{python}
+    #| echo: false
+    #| output: false
+    import pointblank as pb
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+    ```
+
+    A real check would use the tokenizer of a model, such as `"tiktoken:cl100k_base"`. To keep
+    this example self-contained, the tokenizer here splits text into words and punctuation.
+
+    ```{python}
+    import re
+
+    import pointblank as pb
+    import polars as pl
+
+    def tokenize(text):
+        return re.findall(r"\\w+|[^\\w\\s]", text)
+
+    tbl = pl.DataFrame(
+        {
+            "prompt": [
+                "Summarize the article in two sentences.",
+                "Hi",
+                "Translate this paragraph into French, keeping the names as they are.",
+            ]
+        }
+    )
+
+    pb.Validate(data=tbl).col_vals_scored(
+        columns="prompt",
+        scorer=pb.scorers.token_count(tokenize),
+        min_val=3,
+        max_val=12,
+    ).interrogate()
+    ```
+
+    The second prompt has one token and the third has thirteen, so both fail.
+    """
+    return _TokenCount(tokenizer, column, name, version, batch_size)
 
 
 # ---------------------------------------------------------------------------------------------

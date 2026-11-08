@@ -4,6 +4,7 @@ import csv
 import hashlib
 import html as html_lib
 import inspect
+import itertools
 import json
 import math
 import numbers
@@ -23,6 +24,7 @@ from pointblank._utils import _select_df_lib, _with_row_index
 if TYPE_CHECKING:
     from great_tables import GT
 
+    from pointblank.thresholds import Thresholds
     from pointblank.validate import Validate
 
 __all__ = [
@@ -57,6 +59,16 @@ _ML_INSTALL_HINT = '`pip install "pointblank[ml]"`'
 # change which rows the step checks
 _SWEEP_FIXED_PARAMS = ("thresholds", "actions", "brief", "active", "dimension", "pre", "segments")
 
+# The parameters of a step that don't change which rows fail it, left out when it's run again
+_RERUN_DROPPED_PARAMS = ("thresholds", "actions", "brief", "active", "dimension")
+
+# The defects that `inject()` can put into clean rows (a function can be given too)
+_CORRUPTIONS = ("null", "shuffle", "truncate", "duplicate")
+_INJECT_RATES = (0.01, 0.05, 0.1)
+
+# The tables that `inject()` can corrupt (it changes the values in memory)
+_INJECT_IMPLEMENTATIONS = ("polars", "pandas", "pyarrow")
+
 _VERDICT_COLORS = {
     "helps": "#4CA64C",
     "hurts": "#CF142B",
@@ -76,6 +88,10 @@ _EFFECT_COLUMNS = {
     "value": "float",
     "n_removed": "int",
     "f_removed": "float",
+    "corruption": "str",
+    "column": "str",
+    "n_corrupted": "int",
+    "checked_by": "int",
     "metric": "str",
     "mean": "float",
     "sd": "float",
@@ -124,17 +140,22 @@ class AblationVariant:
         `"<score>:lowest_<q>"` (or `"<score>:below_<value>"`, and the same with `highest` and
         `above`) for [`sweep_score()`](`pointblank.Ablation.sweep_score`), where `<score>` is
         `step_<i>` or the score column, `"step_<i>:<param>=<value>"` for
-        [`sweep_step()`](`pointblank.Ablation.sweep_step`), and `"control_<n>"` for the control
+        [`sweep_step()`](`pointblank.Ablation.sweep_step`), `"inject:<corruption>:<column>_<rate>"`
+        (or `"inject:duplicate_<rate>"`) for [`inject()`](`pointblank.Ablation.inject`),
+        `"shapley_<i>_<j>"` for a group of steps that only
+        [`shapley()`](`pointblank.Ablation.shapley`) needs, and `"control_<n>"` for the control
         that removes `n` random rows (or `"control_<id>"` for the control of a
         `drop_all_but_each()` variant).
     strategy
         The kind of version: `"full"`, `"drop_steps"`, `"drop_each"`, `"drop_all"`,
-        `"drop_all_but_each"`, `"drop_groups"`, `"sweep_score"`, `"sweep_step"`, or `"control"`.
+        `"drop_all_but_each"`, `"drop_groups"`, `"sweep_score"`, `"sweep_step"`, `"inject"`,
+        `"shapley"`, or `"control"`.
     name
         A name for the version, as shown in reports (e.g., `"Step 2"`).
     steps
         The numbers of the validation steps whose failing rows were removed (empty for the full
-        table, for groups, for the points of a sweep, and for most controls).
+        table, for groups, for the points of a sweep, for injected defects, and for most
+        controls).
     n_removed
         The number of rows removed from the table.
     f_removed
@@ -154,7 +175,20 @@ class AblationVariant:
         its points share (e.g., `"step_2:lowest"` or `"step_2:min_val"`; otherwise `None`).
     value
         For a point of a sweep, its value: the share of the scored rows removed, the score
-        threshold, or the value of the step's parameter (otherwise `None`).
+        threshold, or the value of the step's parameter. For a variant of `inject()`, the share of
+        the rows corrupted (otherwise `None`).
+    corruption
+        For a variant of [`inject()`](`pointblank.Ablation.inject`), the defect put into the rows:
+        `"null"`, `"shuffle"`, `"truncate"`, `"duplicate"`, or the name of the corruption function
+        (otherwise `None`).
+    column
+        For a variant of `inject()`, the column whose values were corrupted (`None` for
+        `"duplicate"`, and otherwise).
+    n_corrupted
+        For a variant of `inject()`, the number of rows corrupted (or copied, for `"duplicate"`).
+    checked_by
+        For a variant of `inject()`, the step that checks for the defect, given as its `step=`
+        (otherwise `None`).
     """
 
     id: str
@@ -169,6 +203,10 @@ class AblationVariant:
     left_out: int | None = None
     sweep: str | None = None
     value: float | None = None
+    corruption: str | None = None
+    column: str | None = None
+    n_corrupted: int = 0
+    checked_by: int | None = None
 
     def _to_dict(self) -> dict[str, Any]:
         return {
@@ -184,7 +222,25 @@ class AblationVariant:
             "left_out": self.left_out,
             "sweep": self.sweep,
             "value": self.value,
+            "corruption": self.corruption,
+            "column": self.column,
+            "n_corrupted": self.n_corrupted,
+            "checked_by": self.checked_by,
         }
+
+
+@dataclass(frozen=True)
+class _Injection:
+    """The rows that a variant of `inject()` corrupts, and their new values."""
+
+    kind: str
+    label: str
+    column: str | None
+    rows: tuple[int, ...]
+    # The new values of the rows (empty for `"null"` and `"duplicate"`)
+    values: tuple[Any, ...]
+    step: int | None
+    key: str
 
 
 @dataclass(frozen=True)
@@ -240,6 +296,8 @@ class _Resolved:
     references: dict[str, str]
     # Every evaluation that a run makes (the version of the table and the repeat)
     tasks: list[tuple[AblationVariant, int]] | None = None
+    # For `shapley()`: the variant of each group of steps
+    shapley: dict[tuple[int, ...], str] | None = None
 
 
 @dataclass(frozen=True)
@@ -367,9 +425,12 @@ class Ablation:
     [`drop_all()`](`pointblank.Ablation.drop_all`),
     [`drop_steps()`](`pointblank.Ablation.drop_steps`),
     [`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`),
-    [`drop_groups()`](`pointblank.Ablation.drop_groups`), and the sweeps
+    [`drop_groups()`](`pointblank.Ablation.drop_groups`), the sweeps
     [`sweep_score()`](`pointblank.Ablation.sweep_score`) and
-    [`sweep_step()`](`pointblank.Ablation.sweep_step`)), and nothing is evaluated until
+    [`sweep_step()`](`pointblank.Ablation.sweep_step`),
+    [`inject()`](`pointblank.Ablation.inject`), which corrupts clean rows to measure what a defect
+    costs, and [`shapley()`](`pointblank.Ablation.shapley`), which splits the credit among
+    overlapping steps), and nothing is evaluated until
     [`run()`](`pointblank.Ablation.run`) is called. Use [`plan()`](`pointblank.Ablation.plan`)
     before that to see how many rows each variant removes and how many evaluations the run needs.
     When training happens elsewhere (e.g., on a cluster), [`export()`](`pointblank.Ablation.export`)
@@ -680,6 +741,12 @@ class Ablation:
         self._sweeps: dict[str, dict[str, Any]] = {}
         self._sweep_rows: dict[str, frozenset[int]] = {}
         self._sweep_details: dict[str, str] = {}
+        # The rows that each variant of `inject()` corrupts, and for each of them, the share of
+        # failing test units that the corruption adds to its step (found when needed)
+        self._injections: dict[str, _Injection] = {}
+        self._caught: dict[str, float] = {}
+        # The steps of `shapley()` and the groups of them it needs evaluated
+        self._shapley: dict[str, Any] | None = None
         self._data_fingerprint: str | None = None
         self._reset_results()
 
@@ -687,8 +754,12 @@ class Ablation:
         n_variants = len(self._specs)
         status = "run" if self._effects is not None else "not run"
         label = f"{self.label!r}: " if self.label else ""
+        # (the variants of the groups of steps for Shapley values are made when the ablation runs)
+        shapley = (
+            f", Shapley values of {len(self._shapley['steps'])} steps" if self._shapley else ""
+        )
         return (
-            f"Ablation({label}{n_variants} variant{'s' if n_variants != 1 else ''}, "
+            f"Ablation({label}{n_variants} variant{'s' if n_variants != 1 else ''}{shapley}, "
             f"{self.repeats} repeats, control={self.control!r}; {status})"
         )
 
@@ -1477,7 +1548,7 @@ class Ablation:
             )
         # The step is checked on its own: without actions (which could act on the results), and
         # on the segment it was checked on (not every segment of its `segments=`)
-        for key in ("thresholds", "actions", "brief", "active", "dimension"):
+        for key in _RERUN_DROPPED_PARAMS:
             kwargs.pop(key, None)
         if info.segments is not None:
             kwargs["segments"] = info.segments
@@ -1504,6 +1575,448 @@ class Ablation:
                     value=float(v),
                 )
             )
+        return self
+
+    def inject(
+        self,
+        corruption: str | Callable[[Any], Any],
+        column: str | None = None,
+        step: int | None = None,
+        rates: list[float] | None = None,
+        name: str | None = None,
+    ) -> Ablation:
+        """
+        Add a variant for each rate of a defect, put into clean rows of the table.
+
+        The other strategies remove the rows that failed a check, to see whether they matter. This
+        one runs the experiment the other way around: it takes rows that pass every check and
+        gives them a defect (e.g., a missing value) at a few rates, to see how much the defect
+        costs the model. The results trace how the model gets worse as the defect gets more common
+        (a dose-response curve), and the report plots the curve. When the defect is one that a
+        step checks for (given as `step=`), this measures what a failing test unit of the step
+        costs, which [`suggest_thresholds()`](`pointblank.Ablation.suggest_thresholds`) turns into
+        thresholds for the step.
+
+        Parameters
+        ----------
+        corruption
+            The defect to put into the rows:
+
+            - `"null"`: replace the value with a missing value
+            - `"shuffle"`: swap the values of the corrupted rows among themselves (e.g., to
+            shuffle the labels of a classification target)
+            - `"truncate"`: cut a text value to the first half of its characters
+            - `"duplicate"`: add a copy of each corrupted row (whole rows, so there's no
+            `column=`)
+
+            It can also be a function that takes a value and returns the corrupted value (e.g.,
+            `lambda x: x * 10`, for a reading recorded in the wrong unit).
+        column
+            The column to corrupt. By default, it's the column that `step=` checks (if it checks
+            a single column).
+        step
+            The number of the step that checks for the defect (e.g., a
+            [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`) step, for `"null"`).
+            It must be a row-level step that the ablation can use. `suggest_thresholds()` only
+            suggests thresholds for the steps given here.
+        rates
+            The shares of the table's rows to corrupt, each greater than `0` and at most `1`. By
+            default, they're `0.01`, `0.05`, and `0.1`.
+        name
+            A name for the defect, used in the ids and names of the variants (e.g., `"unit_error"`).
+            By default, it's `corruption=`, or the name of the function.
+
+        Returns
+        -------
+        Ablation
+            The `Ablation` object, with the variants added.
+
+        Details
+        -------
+        The corrupted rows are drawn at random (with the ablation's `seed=`) from the clean rows:
+        the rows that fail none of the ablation's steps and have a value in `column=` (a text
+        value with at least one character, for `"truncate"`). The draws are nested, so the rows
+        corrupted at one rate are also corrupted at every higher rate, and they're the same in
+        every repeat. A rate that needs more rows than there are clean rows, or that rounds to no
+        rows, is left out, with a note. The copies of `"duplicate"` rows are added at the end of
+        the table. With `"shuffle"`, the values move around in a ring, so no row keeps its own
+        value (though it can get an equal one).
+
+        Each variant is compared with the full table rather than with a control, since no rows are
+        removed. A verdict of `"hurts"` means that the defect makes the model clearly worse. The
+        table is corrupted in memory, so this strategy needs a Polars, pandas, or PyArrow table
+        (or a Polars `LazyFrame`). The versions of the table can be exported with
+        [`export()`](`pointblank.Ablation.export`), but only as Parquet files.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False)
+        ```
+
+        Here's a table of temperature readings with no missing values, and a 'model' that
+        estimates the average temperature, filling in a missing reading with `0`. It's evaluated
+        by its error against the true average of `20`.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+        readings = pl.DataFrame({"temp": temps})
+
+        def evaluate(train, *, seed):
+            sample = train.fill_null(0).sample(fraction=1.0, with_replacement=True, seed=seed)
+            return abs(sample["temp"].mean() - 20)
+
+        validation = (
+            pb.Validate(data=readings)
+            .col_vals_not_null(columns="temp")
+            .interrogate()
+        )
+
+        ablation = (
+            pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+            .inject("null", step=1)
+            .run()
+        )
+
+        ablation
+        ```
+
+        Each missing reading pulls the estimate down, so the error grows with the share of
+        missing readings, by about 0.2 degrees for each percent. That's the cost of a failing
+        test unit of step 1, which `suggest_thresholds()` uses.
+        """
+        if isinstance(corruption, str):
+            if corruption not in _CORRUPTIONS:
+                raise ValueError(
+                    f"`corruption=` must be one of {', '.join(map(repr, _CORRUPTIONS))}, or a "
+                    f"function; got {corruption!r}."
+                )
+            kind = corruption
+        elif callable(corruption):
+            kind = "function"
+        else:
+            raise TypeError(
+                "`corruption=` must be the name of a defect or a function, got "
+                f"{type(corruption).__name__}."
+            )
+        if name is not None and (not isinstance(name, str) or not name):
+            raise TypeError("`name=` must be a non-empty string.")
+        label = name or (_function_name(corruption) if kind == "function" else kind)
+
+        if step is not None:
+            if not _is_int(step):
+                raise TypeError(f"`step=` must be a step number, got {step!r}.")
+            if step not in self._steps:
+                raise ValueError(
+                    f"`inject()` can't use step {step}: {self._ineligible_reason(step)}."
+                )
+        if kind == "duplicate":
+            if column is not None:
+                raise ValueError(
+                    '`column=` isn\'t used with `corruption="duplicate"`, which copies whole rows.'
+                )
+        else:
+            if column is None and step is not None:
+                checked = self._steps[step].column
+                if isinstance(checked, list) and len(checked) == 1:
+                    checked = checked[0]
+                if isinstance(checked, str):
+                    column = checked
+            if column is None:
+                reason = f" (step {step} doesn't check a single column)" if step is not None else ""
+                raise ValueError(f"`inject()` needs the column to corrupt, as `column=`{reason}.")
+            if not isinstance(column, str):
+                raise TypeError(f"`column=` must be the name of a column, got {column!r}.")
+            if column not in self._columns:
+                raise ValueError(f"The column {column!r} isn't in the table.")
+
+        rates = self._check_sweep_values(list(_INJECT_RATES) if rates is None else rates, "rates")
+        for rate in rates:
+            if not 0 < rate <= 1:
+                raise ValueError(
+                    f"The values of `rates=` must be greater than 0 and at most 1, got {rate!r}."
+                )
+        implementation = nw.from_native(self.validation.data).implementation
+        if implementation.name.lower() not in _INJECT_IMPLEMENTATIONS:
+            raise ValueError(
+                "`inject()` corrupts the table in memory, which works for Polars, pandas, and "
+                f"PyArrow tables, but not for this table ({type(self.validation.data).__name__})."
+            )
+
+        frame = _with_row_index(self.validation.data, name=_INDEX)
+        dtype = None
+        if kind != "duplicate":
+            frame = frame.select(_INDEX, column)
+            dtype = frame.collect_schema()[column]
+            if kind == "truncate" and dtype != nw.String:
+                raise TypeError(
+                    f'`corruption="truncate"` needs a text column, but {column!r} is {dtype}.'
+                )
+        else:
+            frame = frame.select(_INDEX)
+        if isinstance(frame, nw.LazyFrame):
+            frame = frame.collect()
+        rows = [int(k) for k in frame[_INDEX].to_list()]
+        values = dict(zip(rows, frame[column].to_list())) if kind != "duplicate" else {}
+
+        # The clean rows: those that fail none of the steps (and have a value to corrupt)
+        dirty = frozenset().union(*self._failed_rows(sorted(self._steps)).values())
+        pool = [
+            k
+            for k in rows
+            if k not in dirty
+            and (
+                kind == "duplicate"
+                or (not _is_missing(values[k]) and (kind != "truncate" or values[k] != ""))
+            )
+        ]
+        random.Random(f"pointblank-ablation-inject:{self.seed}:{label}:{column}").shuffle(pool)
+
+        sweep_id = f"inject:{label}" if kind == "duplicate" else f"inject:{label}:{column}"
+        description = {
+            "null": f"missing values in {column}",
+            "shuffle": f"shuffled values of {column}",
+            "truncate": f"truncated values of {column}",
+            "duplicate": "duplicated rows" if label == "duplicate" else label,
+            "function": f"{label} on {column}",
+        }[kind]
+        self._sweeps[sweep_id] = {
+            "label": description,
+            "axis": "Share of the rows copied"
+            if kind == "duplicate"
+            else ("Share of the rows corrupted"),
+            "percent": True,
+            "inject": True,
+        }
+        title = description[0].upper() + description[1:]
+        for rate in rates:
+            n = math.floor(rate * self._n_rows + 0.5)
+            pct = f"{rate * 100:g}%"
+            spec_id = f"{sweep_id}_{_number_text(rate)}"
+            spec_name = f"{title}: {pct}"
+            if n < (2 if kind == "shuffle" else 1):
+                self._add_note(
+                    f"{spec_name} isn't used: {pct} of the {self._n_rows:,} rows is too few rows "
+                    "to corrupt."
+                )
+                continue
+            if n > len(pool):
+                self._add_note(
+                    f"{spec_name} isn't used: it needs {n:,} clean rows, but there are only "
+                    f"{len(pool):,}."
+                )
+                continue
+            chosen = pool[:n]
+            new_values = _corrupted_values(kind, corruption, [values.get(k) for k in chosen])
+            if new_values:
+                _check_corrupted_values(new_values, column, dtype, implementation, kind)
+            pairs = sorted(zip(chosen, new_values or [None] * n), key=lambda pair: pair[0])
+            injection = _Injection(
+                kind=kind,
+                label=label,
+                column=column,
+                rows=tuple(k for k, _ in pairs),
+                values=tuple(v for _, v in pairs) if new_values else (),
+                step=step,
+                key=_hash_json(
+                    {
+                        "kind": kind,
+                        "label": label,
+                        "column": column,
+                        "rows": _rows_hash(frozenset(chosen)),
+                        "values": hashlib.sha256(
+                            repr([v for _, v in pairs] if new_values else []).encode("utf-8")
+                        ).hexdigest(),
+                    }
+                ),
+            )
+            self._injections[spec_id] = injection
+            self._caught.pop(spec_id, None)
+            self._sweep_details[spec_id] = {
+                "null": f"{n:,} clean rows get a missing value in `{column}`",
+                "shuffle": f"The values of `{column}` are shuffled among {n:,} clean rows",
+                "truncate": f"{n:,} clean rows have their value of `{column}` cut in half",
+                "duplicate": f"{n:,} clean rows are copied",
+                "function": f"{n:,} clean rows have `{label}()` applied to `{column}`",
+            }[kind] + (f" (checked by step {step})" if step is not None else "")
+            self._add_spec(
+                _Spec(
+                    id=spec_id,
+                    name=spec_name,
+                    strategy="inject",
+                    sweep=sweep_id,
+                    value=float(rate),
+                )
+            )
+        return self
+
+    def shapley(
+        self,
+        steps: int | list[int] | None = None,
+        permutations: int = 200,
+        seed: int | None = None,
+    ) -> Ablation:
+        """
+        Split the effect of removing the steps' rows fairly among the steps (Shapley values).
+
+        When steps fail many of the same rows, the variants of
+        [`drop_each()`](`pointblank.Ablation.drop_each`) can't say which step deserves the
+        credit: each one looks useful on its own, and
+        [`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`) shows each adding little
+        on top of the others. Shapley values settle it the way game theory splits a payout among
+        players: each step gets its average contribution over the orders in which the steps could
+        be added. Steps that remove the same rows share the credit for them, and the values of
+        the steps add up to the effect of removing every step's rows. This method adds the
+        variants that the values need (one for each group of steps), and after the run, the
+        report shows the values in a group of their own. They're also available from
+        [`get_shapley()`](`pointblank.Ablation.get_shapley`).
+
+        Parameters
+        ----------
+        steps
+            The steps to split the effect among, as a list of step numbers. By default, it's every
+            step that the ablation can use. Steps that no row failed are left out (with a note),
+            and at least two steps must remain.
+        permutations
+            The number of random orders of the steps to average over, when there are too many
+            steps to use every order. With `k` steps, there are `k!` orders: when that's at most
+            `permutations=` (with the default of `200`, for up to 5 steps), every group of steps is
+            evaluated and the values are exact.
+        seed
+            The seed of the random orders. By default, it's the `seed=` of the ablation.
+
+        Returns
+        -------
+        Ablation
+            The `Ablation` object, with the variants added (replacing those of an earlier
+            `shapley()`).
+
+        Details
+        -------
+        The value of a group of steps is the effect of removing the rows that fail any of them,
+        compared with the control (or with the full table, with `control=None`), as for the
+        verdicts of the other variants. The Shapley value of a step is the average of what it adds
+        to the value of the steps before it, over the orders of the steps. The exact values need
+        every group of the `k` steps (`2^k - 1` of them), and the estimated ones need the groups
+        that start each random order. Each group is a variant (with its control) evaluated
+        `repeats=` times, so the values can take many evaluations: check
+        [`plan()`](`pointblank.Ablation.plan`) first. A variant of another strategy that removes
+        the rows of the same steps is reused, and a group that removes the same rows as another
+        isn't evaluated again.
+
+        The values are computed for each repeat, so each has an interval and a p-value across the
+        repeats, and a verdict like that of a variant (`"helps"`, `"hurts"`, or
+        `"inconclusive"`), with the p-values adjusted across the steps. The groups of steps are
+        listed in the plan, and in the results of [`get_effects()`](`pointblank.Ablation.get_effects`)
+        (with the strategy `"shapley"`), but not in the report.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False)
+        ```
+
+        Here's a table of temperature readings, some of them recorded in tenths of a degree and
+        some with the sentinel value `-999`. Step 1 catches the sentinels, and step 2 catches both
+        kinds of bad readings, so the steps overlap.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+        for k in range(0, 300, 25):
+            temps[k] *= 10
+        for k in range(7, 300, 40):
+            temps[k] = -999
+        readings = pl.DataFrame({"temp": temps})
+
+        def evaluate(train, *, seed):
+            sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+            return abs(sample["temp"].mean() - 20)
+
+        validation = (
+            pb.Validate(data=readings)
+            .col_vals_gt(columns="temp", value=-50)
+            .col_vals_between(columns="temp", left=-50, right=50)
+            .interrogate()
+        )
+
+        ablation = (
+            pb.Ablation(
+                validation, evaluate=evaluate, metric="error", higher_is_better=False, repeats=10
+            )
+            .shapley()
+            .run()
+        )
+
+        ablation
+        ```
+
+        Both steps remove the sentinels, so they share the credit for them equally. Step 2 also
+        gets all the credit for the readings in tenths of a degree, which only it catches, so its
+        Shapley value is the larger one. As the note at the bottom says, the two values add up to
+        the effect of removing the rows of both steps.
+        """
+        if seed is None:
+            seed = self.seed
+        elif not _is_int(seed):
+            raise TypeError(f"`seed=` must be an integer, got {seed!r}.")
+        if not _is_int(permutations) or permutations < 1:
+            raise ValueError(f"`permutations=` must be a positive integer, got {permutations!r}.")
+        players = (
+            self._all_steps("shapley") if steps is None else self._check_steps(steps, "shapley")
+        )
+
+        failed = self._failed_rows(list(players))
+        for i in players:
+            if not failed[i]:
+                self._add_note(f"Step {i} has no Shapley value: no rows failed it.")
+        players = tuple(i for i in players if failed[i])
+        if len(players) < 2:
+            raise ValueError(
+                "`shapley()` needs at least two steps that rows failed, to split the effect among."
+            )
+        if len(frozenset().union(*(failed[i] for i in players))) >= self._n_rows:
+            raise ValueError("`shapley()` can't use these steps: together, they remove every row.")
+
+        k = len(players)
+        exact = math.factorial(k) <= permutations
+        orders = None
+        if exact:
+            coalitions = [
+                c for size in range(1, k + 1) for c in itertools.combinations(players, size)
+            ]
+        else:
+            rng = random.Random(f"pointblank-ablation-shapley:{seed}")
+            orders = []
+            for _ in range(permutations):
+                order = list(players)
+                rng.shuffle(order)
+                orders.append(tuple(order))
+            needed = {tuple(sorted(order[:m])) for order in orders for m in range(1, k + 1)}
+            coalitions = sorted(needed, key=lambda c: (len(c), c))
+
+        self._shapley = {
+            "steps": players,
+            "n_failed": {i: len(failed[i]) for i in players},
+            "exact": exact,
+            "permutations": permutations,
+            "seed": seed,
+            "orders": orders,
+            "coalitions": coalitions,
+        }
+        self._resolved = None
+        self._reset_results()
         return self
 
     def _check_sweep_values(self, values: Any, arg: str) -> list[float]:
@@ -1617,7 +2130,7 @@ class Ablation:
         return "it doesn't check rows"
 
     def _add_spec(self, spec: _Spec) -> None:
-        if spec.id == "full" or spec.id.startswith("control_"):
+        if spec.id == "full" or spec.id.startswith(("control_", "shapley_")):
             raise ValueError(f"The variant name {spec.id!r} is reserved; choose another one.")
         for existing in self._specs:
             if existing.id == spec.id:
@@ -1651,12 +2164,19 @@ class Ablation:
         if self._resolved is not None:
             return self._resolved
 
-        failed = self._failed_rows(sorted({i for spec in self._specs for i in spec.steps}))
+        players = self._shapley["steps"] if self._shapley is not None else ()
+        failed = self._failed_rows(
+            sorted({i for spec in self._specs for i in spec.steps} | set(players))
+        )
         n_rows = self._n_rows
         notes: list[str] = []
 
         usable = []
         for spec in self._specs:
+            if spec.strategy == "inject":
+                # An injected defect removes no rows (it corrupts some)
+                usable.append((spec, frozenset()))
+                continue
             if spec.sweep is not None:
                 removed = self._sweep_rows[spec.id]
             elif spec.group_column is not None:
@@ -1689,6 +2209,7 @@ class Ablation:
                 references[spec.id] = reference.id
             n_removed = len(removed)
             f_removed = n_removed / n_rows
+            injection = self._injections.get(spec.id) if spec.strategy == "inject" else None
             if f_removed > self.max_removed:
                 warnings.warn(
                     f"{spec.name} removes {f_removed:.1%} of the rows, more than "
@@ -1710,18 +2231,56 @@ class Ablation:
                 left_out=spec.left_out,
                 sweep=spec.sweep,
                 value=spec.value,
+                corruption=injection.kind if injection else None,
+                column=injection.column if injection else None,
+                n_corrupted=len(injection.rows) if injection else 0,
+                checked_by=injection.step if injection else None,
             )
             variants.append((variant, removed))
 
-        # A `drop_all_but_each()` variant or a sweep's point that removes the same rows as another
-        # version of the table isn't evaluated again
+        # The groups of steps of `shapley()`, reusing the variants that remove the same steps' rows
+        shapley_ids = None
+        if self._shapley is not None:
+            shapley_ids = {}
+            by_steps = {
+                variant.steps: variant.id
+                for variant, _ in variants
+                if variant.left_out is None
+                and variant.sweep is None
+                and variant.group_column is None
+            }
+            for coalition in self._shapley["coalitions"]:
+                if coalition in by_steps:
+                    shapley_ids[coalition] = by_steps[coalition]
+                    continue
+                removed = frozenset().union(*(failed[i] for i in coalition))
+                variant = AblationVariant(
+                    id="shapley_" + "_".join(map(str, coalition)),
+                    strategy="shapley",
+                    name=f"Step{'s' if len(coalition) > 1 else ''} "
+                    + ", ".join(map(str, coalition)),
+                    steps=coalition,
+                    n_removed=len(removed),
+                    f_removed=len(removed) / n_rows,
+                )
+                variants.append((variant, removed))
+                shapley_ids[coalition] = variant.id
+
+        # A `drop_all_but_each()` variant, a sweep's point, or a group of steps of `shapley()` that
+        # removes the same rows as another version of the table isn't evaluated again
         same_as = {}
         first_with_rows: dict[frozenset[int], str] = {}
+
+        def independent(variant: AblationVariant) -> bool:
+            return (
+                variant.left_out is None and variant.sweep is None and variant.strategy != "shapley"
+            )
+
         for variant, removed in variants:
-            if variant.left_out is None and variant.sweep is None:
+            if independent(variant):
                 first_with_rows.setdefault(removed, variant.id)
         for variant, removed in variants:
-            if variant.left_out is None and variant.sweep is None:
+            if independent(variant) or variant.strategy == "inject":
                 continue
             if not removed:
                 same_as[variant.id] = "full"
@@ -1735,7 +2294,9 @@ class Ablation:
         variant_control = {}
         removed_by_id = {variant.id: removed for variant, removed in variants}
         if self.control is not None:
-            for n in sorted({v.n_removed for v, _ in variants if v.left_out is None}):
+            for n in sorted(
+                {v.n_removed for v, _ in variants if v.left_out is None and v.strategy != "inject"}
+            ):
                 control = AblationVariant(
                     id=f"control_{n}",
                     strategy="control",
@@ -1747,6 +2308,8 @@ class Ablation:
                 controls.append(control)
                 control_draws[control.id] = (frozenset(), n, str(n))
             for variant, removed in variants:
+                if variant.strategy == "inject":
+                    continue
                 if variant.left_out is None:
                     variant_control[variant.id] = f"control_{variant.n_removed}"
                     continue
@@ -1782,6 +2345,7 @@ class Ablation:
             control_draws=control_draws,
             variant_control=variant_control,
             references=references,
+            shapley=shapley_ids,
         )
         return self._resolved
 
@@ -1899,15 +2463,25 @@ class Ablation:
             return frozenset()
         return self._resolve().removed[variant.id]
 
-    def _training_frame(self, removed: frozenset[int]) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
+    def _training_frame(
+        self, removed: frozenset[int], injection: _Injection | None = None
+    ) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
         data_nw = _with_row_index(self.validation.data, name=_INDEX)
+        if injection is not None:
+            data_nw = _apply_injection(data_nw, injection)
         if removed:
             data_nw = data_nw.filter(~nw.col(_INDEX).is_in(sorted(removed)))
         return data_nw.drop(_INDEX)
 
-    def _training_table(self, removed: frozenset[int]) -> Any:
-        """The target table without the `removed` rows, of the same type as the target table."""
-        return self._training_frame(removed).to_native()
+    def _training_table(self, removed: frozenset[int], injection: _Injection | None = None) -> Any:
+        """
+        The target table without the `removed` rows (and with the defect of an `inject()`
+        variant), of the same type as the target table.
+        """
+        return self._training_frame(removed, injection).to_native()
+
+    def _injection(self, variant: AblationVariant) -> _Injection | None:
+        return self._injections.get(variant.id) if variant.strategy == "inject" else None
 
     # ------------------------------------------------------------------------------------------
     # Fingerprints and the cache
@@ -1929,24 +2503,40 @@ class Ablation:
                 for key in ("repeats", "seed", "control", "duplicates", "duplicates_order_by")
             },
             "tasks": [
-                [variant.id, r, self.seed + r, _rows_hash(self._removed_rows(variant, r))]
+                [variant.id, r, self.seed + r, self._version_hash(variant, r)]
                 for variant, r in self._tasks()
             ],
             "same_as": self._resolve().same_as,
         }
         return _hash_json(payload)
 
-    def _cache_key(self, removed: frozenset[int], seed: int) -> str:
-        return _hash_json(
-            {
-                "version": _CACHE_VERSION,
-                "data": self._fingerprint(),
-                "n_rows": self._n_rows,
-                "removed": _rows_hash(removed),
-                "seed": seed,
-                "evaluate_version": self.evaluate_version,
-            }
+    def _version_hash(self, variant: AblationVariant, repeat: int) -> str:
+        """A hash of the version of the table that a variant evaluates in a repeat."""
+        injection = self._injection(variant)
+        if injection is not None:
+            return f"inject:{injection.key}"
+        return _rows_hash(self._removed_rows(variant, repeat))
+
+    def _task_key(self, variant: AblationVariant, repeat: int) -> str:
+        """The key of an evaluation in the cache."""
+        return self._cache_key(
+            self._removed_rows(variant, repeat), self.seed + repeat, self._injection(variant)
         )
+
+    def _cache_key(
+        self, removed: frozenset[int], seed: int, injection: _Injection | None = None
+    ) -> str:
+        payload = {
+            "version": _CACHE_VERSION,
+            "data": self._fingerprint(),
+            "n_rows": self._n_rows,
+            "removed": _rows_hash(removed),
+            "seed": seed,
+            "evaluate_version": self.evaluate_version,
+        }
+        if injection is not None:
+            payload["injected"] = injection.key
+        return _hash_json(payload)
 
     def _cache_get(self, key: str) -> Any:
         """The result of an evaluation in the cache (`None` if it isn't there)."""
@@ -1991,6 +2581,8 @@ class Ablation:
         self._variants: list[AblationVariant] = []
         self._control_variants: list[AblationVariant] = []
         self._effects: list[dict[str, Any]] | None = None
+        self._shapley_values: list[dict[str, Any]] | None = None
+        self._shapley_total: dict[str, float] = {}
         # Were the results read with `load_results()`?
         self._loaded = False
 
@@ -2103,7 +2695,11 @@ class Ablation:
                         same_as=names[same_as] if same_as else None,
                         detail=self._sweep_details.get(v.id) if v.sweep else None,
                     ),
-                    "removed": _removed_html(v.n_removed, v.f_removed),
+                    "removed": (
+                        _corrupted_html(v, self._n_rows)
+                        if v.strategy == "inject"
+                        else _removed_html(v.n_removed, v.f_removed)
+                    ),
                 }
             )
         rows += [
@@ -2121,11 +2717,7 @@ class Ablation:
             f"<strong>{len(tasks):,}</strong> evaluations."
         )
         if self.cache is not None:
-            n_cached = sum(
-                self._cache_get(self._cache_key(self._removed_rows(v, r), self.seed + r))
-                is not None
-                for v, r in tasks
-            )
+            n_cached = sum(self._cache_get(self._task_key(v, r)) is not None for v, r in tasks)
             if n_cached:
                 subtitle += f" {n_cached:,} of them are already in the cache."
         notes = resolved.notes
@@ -2472,6 +3064,11 @@ class Ablation:
             raise TypeError(f"`path=` must be the path of a directory, got {type(path).__name__}.")
         resolved = self._check_variants()
         tasks = self._tasks()
+        if format == "indices" and any(v.strategy == "inject" for v, _ in resolved.variants):
+            raise ValueError(
+                '`format="indices"` can only describe versions of the table with rows removed, '
+                'not the corrupted tables of `inject()`. Use `format="parquet"` instead.'
+            )
 
         root = Path(path)
         if (root / "manifest.json").exists() and not overwrite:
@@ -2720,7 +3317,7 @@ class Ablation:
 
     def _check_variants(self) -> _Resolved:
         resolved = self._resolve()
-        if not self._specs:
+        if not self._specs and self._shapley is None:
             raise ValueError(
                 "There are no variants to evaluate. Add some with `drop_each()`, `drop_all()`, "
                 "or `drop_steps()` first."
@@ -2764,7 +3361,7 @@ class Ablation:
         kwargs: dict[str, Any] = {"seed": seed}
         if self._pass_variant:
             kwargs["variant"] = variant
-        return self.evaluate(self._training_table(removed), **kwargs)
+        return self.evaluate(self._training_table(removed, self._injection(variant)), **kwargs)
 
     def _task_values(self, variant: AblationVariant, repeat: int) -> tuple[dict[str, float], bool]:
         """Evaluate a version of the table (or get the result from the cache)."""
@@ -2772,7 +3369,7 @@ class Ablation:
         removed = self._removed_rows(variant, repeat)
         key = None
         if self.cache is not None:
-            key = self._cache_key(removed, seed)
+            key = self._task_key(variant, repeat)
             cached = self._cache_get(key)
             if cached is not None:
                 return self._result_values(cached, variant, seed), True
@@ -2802,7 +3399,7 @@ class Ablation:
             key = None
             if self.cache is not None:
                 seed = self.seed + repeat
-                key = self._cache_key(self._removed_rows(variant, repeat), seed)
+                key = self._task_key(variant, repeat)
                 cached = self._cache_get(key)
                 if cached is not None:
                     outcomes[k] = (self._result_values(cached, variant, seed), True)
@@ -2839,7 +3436,7 @@ class Ablation:
             if executor == "process":
                 future = pool.submit(
                     _worker_evaluate,
-                    self._training_table(removed),
+                    self._training_table(removed, self._injection(variant)),
                     seed,
                     variant if self._pass_variant else None,
                 )
@@ -2953,6 +3550,7 @@ class Ablation:
             for r in range(self.repeats):
                 self._values[(variant_id, r)] = self._values[(same_as, r)]
         self._effects = self._compute_effects()
+        self._shapley_values = self._compute_shapley() if self._shapley is not None else None
 
     def _check_manifest(self, path: Path) -> None:
         try:
@@ -2992,7 +3590,7 @@ class Ablation:
             with open(file, "w", encoding="utf-8") as f:
                 json.dump(payload, f)
             return
-        frame = self._training_frame(removed)
+        frame = self._training_frame(removed, self._injection(variant))
         if isinstance(frame, nw.LazyFrame):
             frame = frame.collect()
         if frame.implementation.is_pandas_like():
@@ -3044,12 +3642,23 @@ class Ablation:
                     _add_comparison(row, "added", reference, baseline, self.conf_level)
                 variant_rows.append(row)
 
-            normal = [row for row in variant_rows if row["left_out"] is None]
+            normal = [
+                row
+                for row in variant_rows
+                if row["left_out"] is None and row["strategy"] not in ("inject", "shapley")
+            ]
+            injected = [row for row in variant_rows if row["strategy"] == "inject"]
             left_out = [row for row in variant_rows if row["left_out"] is not None]
+            # The groups of steps of `shapley()` are only there for the Shapley values, so they
+            # don't change the adjusted p-values of the other variants
+            coalitions = [row for row in variant_rows if row["strategy"] == "shapley"]
+            judged = [row for row in variant_rows if row["strategy"] != "shapley"]
             for prefix, family in (
-                ("vs_full", variant_rows),
+                ("vs_full", judged),
                 ("vs_control", normal),
                 ("added", left_out),
+                ("vs_full", coalitions),
+                ("vs_control", coalitions),
             ):
                 p_values = [row[f"p_{prefix}"] for row in family]
                 adjusted = _holm(p_values) if self.adjust == "holm" else p_values
@@ -3063,6 +3672,9 @@ class Ablation:
                     row["verdict"] = self._verdict(row, comparison)
                     if len(row["steps"]) == 1:
                         alone[row["steps"][0]] = row["verdict"]
+                # A defect is compared with the full table, as it removes no rows
+                for row in injected:
+                    row["verdict"] = self._verdict(row, "vs_full")
                 for row in left_out:
                     verdict = self._verdict(row, "added")
                     # The step's rows help on their own, but add nothing to the other steps
@@ -3075,16 +3687,88 @@ class Ablation:
         return rows
 
     def _verdict(self, row: dict[str, Any], prefix: str) -> str | None:
+        return self._judge(row[f"p_adj_{prefix}"], row[f"delta_{prefix}"])
+
+    def _judge(self, p_adj: float | None, delta: float | None) -> str | None:
         if self.repeats < 3:
             return None
-        p_adj = row[f"p_adj_{prefix}"]
-        delta = row[f"delta_{prefix}"]
         if p_adj is None or delta is None:
             return None  # pragma: no cover
         if p_adj < 1 - self.conf_level and delta != 0:
             better = delta > 0 if self.higher_is_better else delta < 0
             return "helps" if better else "hurts"
         return "inconclusive"
+
+    def _compute_shapley(self) -> list[dict[str, Any]]:
+        """The Shapley value of each step of `shapley()`, for each metric."""
+        resolved = self._resolve()
+        info = self._shapley
+        players = info["steps"]
+        k = len(players)
+        repeats = range(self.repeats)
+        weights = [
+            math.factorial(size) * math.factorial(k - size - 1) / math.factorial(k)
+            for size in range(k)
+        ]
+        rows = []
+        self._shapley_total = {}
+        for metric in self._metrics:
+            full = [self._values[("full", r)][metric] for r in repeats]
+            per_repeat: dict[int, list[float]] = {i: [] for i in players}
+            totals = []
+            for r in repeats:
+                # The value of each group of steps: its effect in this repeat
+                value: dict[tuple[int, ...], float] = {(): 0.0}
+                for coalition, variant_id in resolved.shapley.items():
+                    control_id = resolved.variant_control.get(variant_id)
+                    reference = self._values[(control_id, r)][metric] if control_id else full[r]
+                    value[coalition] = self._values[(variant_id, r)][metric] - reference
+                totals.append(value[players])
+                for i in players:
+                    if info["exact"]:
+                        others = [j for j in players if j != i]
+                        phi = 0.0
+                        for size in range(k):
+                            for before in itertools.combinations(others, size):
+                                with_i = tuple(sorted((*before, i)))
+                                phi += weights[size] * (value[with_i] - value[before])
+                    else:
+                        contributions = []
+                        for order in info["orders"]:
+                            at = order.index(i)
+                            before = tuple(sorted(order[:at]))
+                            with_i = tuple(sorted(order[: at + 1]))
+                            contributions.append(value[with_i] - value[before])
+                        phi = statistics.fmean(contributions)
+                    per_repeat[i].append(phi)
+            self._shapley_total[metric] = statistics.fmean(totals)
+
+            family = []
+            for i in players:
+                mean, lower, upper, p = _paired(
+                    per_repeat[i], [0.0] * self.repeats, self.conf_level
+                )
+                family.append(
+                    {
+                        "step": i,
+                        "n_failed": info["n_failed"][i],
+                        "metric": metric,
+                        "shapley": mean,
+                        "lower": lower,
+                        "upper": upper,
+                        "p": p,
+                        "p_adj": None,
+                        "verdict": None,
+                    }
+                )
+            p_values = [row["p"] for row in family]
+            adjusted = _holm(p_values) if self.adjust == "holm" else p_values
+            for row, p_adj in zip(family, adjusted):
+                row["p_adj"] = p_adj
+                if metric == self._primary:
+                    row["verdict"] = self._judge(p_adj, row["shapley"])
+            rows += family
+        return rows
 
     def _check_run(self) -> None:
         if self._effects is None:
@@ -3098,9 +3782,10 @@ class Ablation:
         or a [`drop_steps()`](`pointblank.Ablation.drop_steps`) variant with just that step) gets
         a note with the effect of removing its failing rows and the verdict. A step with a
         variant from [`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`) also gets
-        the effect of its rows on top of the other steps. The notes appear in the validation's
-        report, so that the report shows which checks matter to the model, next to the checks
-        themselves.
+        the effect of its rows on top of the other steps, and a step with a Shapley value (from
+        [`shapley()`](`pointblank.Ablation.shapley`)) gets that value. The notes appear in the
+        validation's report, so that the report shows which checks matter to the model, next to
+        the checks themselves.
 
         Parameters
         ----------
@@ -3189,7 +3874,7 @@ class Ablation:
         alone = {}
         on_top: dict[int, list[dict[str, Any]]] = {}
         for row in effects:
-            if row["strategy"] in ("full", "drop_groups"):
+            if row["strategy"] in ("full", "drop_groups", "inject", "shapley"):
                 continue
             if row["left_out"] is not None:
                 on_top.setdefault(row["left_out"], []).append(row)
@@ -3199,7 +3884,10 @@ class Ablation:
         comparison = "vs_control" if self.control is not None else "vs_full"
         vs_text = "removing as many random rows" if self.control is not None else "the full table"
         direction = "higher" if self.higher_is_better else "lower"
-        for i in sorted(set(alone) | set(on_top)):
+        shapley = {
+            row["step"]: row for row in self._shapley_values or [] if row["metric"] == self._primary
+        }
+        for i in sorted(set(alone) | set(on_top) | set(shapley)):
             if i not in info:
                 continue  # pragma: no cover
             parts = []
@@ -3220,6 +3908,18 @@ class Ablation:
                     (
                         f"on top of {label} {others}, this step's rows change it by "
                         f"{_change_text(fmt, row, 'added')}",
+                        row["verdict"],
+                    )
+                )
+            if i in shapley:
+                row = shapley[i]
+                value = fmt.delta(row["shapley"])
+                if row["lower"] is not None and row["upper"] is not None:
+                    value += f" [{fmt.delta(row['lower'])}, {fmt.delta(row['upper'])}]"
+                parts.append(
+                    (
+                        f"its Shapley value (its share of the effect of removing every step's "
+                        f"rows) is {value}",
                         row["verdict"],
                     )
                 )
@@ -3261,6 +3961,10 @@ class Ablation:
             point's value (the share of the scored rows removed, the score cutoff, or the value of
             the step's parameter)
             - `n_removed`, `f_removed`: the number and share of rows removed
+            - `corruption`, `column`, `n_corrupted`, `checked_by`: for a variant of
+            [`inject()`](`pointblank.Ablation.inject`), the defect (`"function"` for a function),
+            the column it's put into (missing for `"duplicate"`), the number of rows corrupted (or
+            copied), and the step that checks for it (`0` and missing for the other variants)
             - `metric`, `mean`, `sd`: the metric, and its mean and standard deviation across the
             repeats
             - `delta_vs_full`, `delta_vs_full_lower`, `delta_vs_full_upper`: the mean paired
@@ -3280,10 +3984,15 @@ class Ablation:
             own but adds nothing to the other steps
 
             The comparisons are missing for the full table, and the control columns are missing
-            when `control=None`. The intervals and p-values need at least 2 repeats. The verdict
-            of a `drop_all_but_each()` variant is based on the `delta_added` columns, and those
-            of the other variants on the `delta_vs_control` columns (or the `delta_vs_full`
-            columns, when `control=None`).
+            when `control=None` (and for the variants of `inject()`, which remove no rows). The
+            intervals and p-values need at least 2 repeats. The verdict of a
+            `drop_all_but_each()` variant is based on the `delta_added` columns, that of an
+            `inject()` variant on the `delta_vs_full` columns, and those of the other variants on
+            the `delta_vs_control` columns (or the `delta_vs_full` columns, when `control=None`).
+            The groups of steps that [`shapley()`](`pointblank.Ablation.shapley`) adds have the
+            strategy `"shapley"` and no verdict, and their p-values are adjusted on their own;
+            the Shapley values themselves are in
+            [`get_shapley()`](`pointblank.Ablation.get_shapley`).
 
         Examples
         --------
@@ -3354,6 +4063,297 @@ class Ablation:
                 df[name] = df[name].astype("Int64" if df[name].isna().any() else "int64")
         return df
 
+    def get_shapley(self) -> Any:
+        """
+        Get the Shapley values of the steps as a table.
+
+        The Shapley values (from [`shapley()`](`pointblank.Ablation.shapley`)) split the effect
+        of removing every step's rows among the steps, giving each step its average contribution
+        over the orders in which the steps could be added. This method gives them with their
+        intervals and verdicts, for every metric.
+
+        Returns
+        -------
+        DataFrame
+            A Polars DataFrame (or a pandas DataFrame, if Polars isn't installed) with a row for
+            each step and metric, and these columns:
+
+            - `step`: the number of the step
+            - `n_failed`: the number of rows that failed the step
+            - `metric`: the metric
+            - `shapley`: the Shapley value of the step, the mean across the repeats
+            - `lower`, `upper`: its interval at `conf_level=` (with at least 2 repeats)
+            - `p`, `p_adj`: the p-value of the Shapley value (against no effect), and the p-value
+            adjusted across the steps (as set by `adjust=`)
+            - `verdict`: `"helps"`, `"hurts"`, or `"inconclusive"` for the metric named in
+            `metric=` (missing for other metrics, and with fewer than 3 repeats)
+
+            For each metric, the Shapley values add up to the effect of removing the rows of every
+            step (compared with the control, or with the full table when `control=None`).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Here's an ablation of a table of temperature readings with overlapping steps: step 1
+        catches the sentinel value `-999`, and step 2 catches the sentinels along with the readings
+        in tenths of a degree. There are 10 repeats, since the sentinels make the error vary a lot
+        from one repeat to the next.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+        for k in range(0, 300, 25):
+            temps[k] *= 10
+        for k in range(7, 300, 40):
+            temps[k] = -999
+        readings = pl.DataFrame({"temp": temps})
+
+        def evaluate(train, *, seed):
+            sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+            return abs(sample["temp"].mean() - 20)
+
+        validation = (
+            pb.Validate(data=readings)
+            .col_vals_gt(columns="temp", value=-50)
+            .col_vals_between(columns="temp", left=-50, right=50)
+            .interrogate()
+        )
+
+        ablation = (
+            pb.Ablation(
+                validation, evaluate=evaluate, metric="error", higher_is_better=False, repeats=10
+            )
+            .shapley()
+            .run()
+        )
+
+        ablation.get_shapley().select("step", "shapley", "lower", "upper", "verdict")
+        ```
+
+        Both steps lower the error, and step 2 gets the larger share, since it also catches the
+        readings that step 1 misses.
+        """
+        self._check_run()
+        if self._shapley_values is None:
+            raise ValueError("There are no Shapley values: call `shapley()` before the run.")
+        columns = {
+            "step": "int",
+            "n_failed": "int",
+            "metric": "str",
+            "shapley": "float",
+            "lower": "float",
+            "upper": "float",
+            "p": "float",
+            "p_adj": "float",
+            "verdict": "str",
+        }
+        rows = [[row[c] for c in columns] for row in self._shapley_values]
+        lib = _select_df_lib(preference="polars")
+        if lib.__name__ == "polars":
+            dtypes = {"str": lib.String, "int": lib.Int64, "float": lib.Float64}
+            schema = {name: dtypes[kind] for name, kind in columns.items()}
+            return lib.DataFrame(rows, schema=schema, orient="row")
+        df = lib.DataFrame(rows, columns=list(columns))
+        for name, kind in columns.items():
+            if kind == "float":
+                df[name] = df[name].astype("float64")
+            elif kind == "int":
+                df[name] = df[name].astype("int64")
+        return df
+
+    def suggest_thresholds(self, tolerance: float) -> dict[int, Thresholds]:
+        """
+        Suggest thresholds for the steps, from what their failing test units cost the model.
+
+        Thresholds are usually picked by feel: is 1% of missing values a warning, or an error?
+        With the variants of [`inject()`](`pointblank.Ablation.inject`), the ablation has measured
+        how much the model gets worse as a defect gets more common. This method turns that into
+        thresholds: for each step that checks for an injected defect (given as `step=` to
+        `inject()`), the error threshold is the share of failing test units at which the model
+        would get worse by `tolerance=`, and the warning threshold is half of that.
+
+        Parameters
+        ----------
+        tolerance
+            How much worse the model can get before it's an error, in the units of the metric that
+            the verdicts are based on (e.g., `0.01` for an accuracy that can drop by a percentage
+            point).
+
+        Returns
+        -------
+        dict[int, Thresholds]
+            The suggested thresholds, by step number, as [`Thresholds`](`pointblank.Thresholds`)
+            objects with the `warning=` and `error=` levels set as shares of the test units. They
+            can be given to the steps (e.g., as the `thresholds=` of the validation method).
+
+        Details
+        -------
+        For each rate of a defect, the step is checked again on the corrupted table, which gives
+        the share of its test units that the defect makes fail (beyond those that failed
+        already). The cost of a failing test unit is then the slope of the harm to the model
+        (how much worse the metric is than on the full table) against that share, fitted through
+        zero over the rates. The error threshold is `tolerance=` divided by that slope, rounded to
+        two significant digits.
+
+        A step gets no thresholds (with a warning saying why) when the defect makes none of its
+        test units fail, when the defect doesn't make the model worse (or when none of the
+        verdicts are `"hurts"`, with at least 3 repeats), or when even failing every test unit
+        would cost less than `tolerance=`. When a step has several injected defects, its
+        thresholds come from the costliest one. The thresholds are only as good as the defects
+        are realistic: a defect that's injected into random clean rows can cost less (or more)
+        than the same defect in the rows where it really happens.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False)
+        ```
+
+        Here's a table of temperature readings with no missing values, and a 'model' that
+        estimates the average temperature, filling in a missing reading with `0`. Missing
+        readings are injected at three rates.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+        readings = pl.DataFrame({"temp": temps})
+
+        def evaluate(train, *, seed):
+            sample = train.fill_null(0).sample(fraction=1.0, with_replacement=True, seed=seed)
+            return abs(sample["temp"].mean() - 20)
+
+        validation = (
+            pb.Validate(data=readings)
+            .col_vals_not_null(columns="temp")
+            .interrogate()
+        )
+
+        ablation = (
+            pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+            .inject("null", step=1)
+            .run()
+        )
+
+        ablation.suggest_thresholds(tolerance=0.5)
+        ```
+
+        Each percent of missing readings adds about 0.2 degrees to the error, so the error
+        threshold is the share of missing readings that adds 0.5 degrees: about 2.5%.
+        """
+        from pointblank.thresholds import Thresholds
+
+        self._check_run()
+        if not _is_number(tolerance) or not math.isfinite(float(tolerance)):
+            raise TypeError(f"`tolerance=` must be a number, got {tolerance!r}.")
+        if tolerance <= 0:
+            raise ValueError(f"`tolerance=` must be greater than 0, got {tolerance!r}.")
+        effects = {
+            row["variant"]: row
+            for row in self._effects
+            if row["metric"] == self._primary and row["strategy"] == "inject"
+        }
+        by_sweep: dict[str, list[dict[str, Any]]] = {}
+        for variant_id, row in effects.items():
+            if self._injections[variant_id].step is not None:
+                by_sweep.setdefault(row["sweep"], []).append(row)
+        if not by_sweep:
+            raise ValueError(
+                "`suggest_thresholds()` needs `inject()` variants with the step that checks for "
+                "the defect, given as `step=`."
+            )
+
+        suggested: dict[int, float] = {}
+        skipped: dict[int, list[str]] = {}
+        for sweep_id, points in by_sweep.items():
+            step = self._injections[points[0]["variant"]].step
+            label = self._sweeps[sweep_id]["label"]
+            shares = [self._caught_share(row["variant"]) for row in points]
+            harms = [
+                -row["delta_vs_full"] if self.higher_is_better else row["delta_vs_full"]
+                for row in points
+            ]
+            used = [(x, d) for x, d in zip(shares, harms) if x > 0]
+            reason = None
+            cost = None
+            if not used:
+                reason = f"the {label} make none of its test units fail"
+            else:
+                cost = sum(x * d for x, d in used) / sum(x * x for x, _ in used)
+                verdicts = [row["verdict"] for row in points if row["verdict"] is not None]
+                if cost <= 0:
+                    reason = f"the {label} don't make the model worse"
+                elif verdicts and "hurts" not in verdicts:
+                    reason = f"the {label} don't clearly make the model worse"
+                elif tolerance / cost >= 1:
+                    reason = (
+                        f"even with every test unit failing, the {label} would cost less than "
+                        f"`tolerance={tolerance:g}`"
+                    )
+            if reason is not None:
+                skipped.setdefault(step, []).append(reason)
+                continue
+            error = float(f"{tolerance / cost:.2g}")
+            suggested[step] = min(error, suggested.get(step, error))
+
+        if any(step not in suggested for step in skipped):
+            lines = [
+                f"step {step}: {'; '.join(reasons)}"
+                for step, reasons in sorted(skipped.items())
+                if step not in suggested
+            ]
+            warnings.warn(
+                "Some steps get no suggested thresholds (" + "; ".join(lines) + ").",
+                UserWarning,
+                stacklevel=2,
+            )
+        return {
+            step: Thresholds(warning=float(f"{error / 2:.2g}"), error=error)
+            for step, error in sorted(suggested.items())
+        }
+
+    def _caught_share(self, variant_id: str) -> float:
+        """
+        The share of a step's test units that an `inject()` variant's defect makes fail (beyond
+        those that failed already).
+        """
+        if variant_id in self._caught:
+            return self._caught[variant_id]
+        from pointblank.validate import Validate, _validation_info_to_step
+
+        injection = self._injections[variant_id]
+        info = self._steps[injection.step]
+        found = _validation_info_to_step(info, None, None, [], keep_objects=True)
+        if found is None:  # pragma: no cover
+            raise ValueError(f"Step {injection.step} can't be checked again.")
+        method, kwargs = found
+        for key in _RERUN_DROPPED_PARAMS:
+            kwargs.pop(key, None)
+        if info.segments is not None:
+            kwargs["segments"] = info.segments
+
+        table = self._training_table(frozenset(), injection)
+        validation = getattr(Validate(data=table), method)(**kwargs)
+        validation.interrogate(collect_extracts=False)
+        n_failed = sum(step.n_failed or 0 for step in validation.validation_info)
+        n = sum(step.n or 0 for step in validation.validation_info)
+        before = (info.n_failed or 0) / info.n if info.n else 0.0
+        share = max(0.0, n_failed / n - before) if n else 0.0
+        self._caught[variant_id] = share
+        return share
+
     def to_dict(self) -> dict[str, Any]:
         """
         Get the settings and results of the ablation as a JSON-serializable dict.
@@ -3369,8 +4369,11 @@ class Ablation:
             from each to that version), the metrics from every evaluation (`"runs"`, one entry per
             version and repeat, with its seed and whether its result came from the cache), the
             results (`"effects"`, with the same fields as the columns of
-            [`get_effects()`](`pointblank.Ablation.get_effects`)), and the notes about variants
-            and steps that weren't used (`"notes"`).
+            [`get_effects()`](`pointblank.Ablation.get_effects`)), the Shapley values
+            (`"shapley"`, with the same fields as the columns of
+            [`get_shapley()`](`pointblank.Ablation.get_shapley`), or `None` without
+            [`shapley()`](`pointblank.Ablation.shapley`)), and the notes about variants and steps
+            that weren't used (`"notes"`).
 
         Examples
         --------
@@ -3425,6 +4428,11 @@ class Ablation:
             "same_as": dict(resolved.same_as),
             "runs": [{**run, "metrics": dict(run["metrics"])} for run in self._runs],
             "effects": [{**row, "steps": list(row["steps"])} for row in self._effects],
+            "shapley": (
+                [dict(row) for row in self._shapley_values]
+                if self._shapley_values is not None
+                else None
+            ),
             "notes": [*self._notes, *resolved.notes],
         }
 
@@ -3507,8 +4515,12 @@ class Ablation:
         each sweep (from [`sweep_score()`](`pointblank.Ablation.sweep_score`) or
         [`sweep_step()`](`pointblank.Ablation.sweep_step`)), and a plot of its curve at the
         bottom shows the difference from the full table at each of its values, next to that of
-        removing as many random rows. The header gives the metric for the full table and the settings of the run, and notes at the
-        bottom list the variants and steps that weren't used.
+        removing as many random rows. The defects of [`inject()`](`pointblank.Ablation.inject`)
+        are shown in the same way, compared with the full table. The Shapley values of
+        [`shapley()`](`pointblank.Ablation.shapley`) are in a group of their own, with each
+        step's share of the total effect. The header gives the metric for the full table and the
+        settings of the run, and notes at the bottom list the variants and steps that weren't
+        used.
 
         Parameters
         ----------
@@ -3581,16 +4593,29 @@ class Ablation:
                 f"{', '.join(map(repr, self._metrics))})."
             )
 
-        effects = [row for row in self._effects if row["metric"] == metric]
+        # The groups of steps of `shapley()` are shown through the Shapley values
+        effects = [
+            row for row in self._effects if row["metric"] == metric and row["strategy"] != "shapley"
+        ]
         baseline, variant_rows = effects[0], effects[1:]
-        comparison = "vs_control" if self.control is not None else "vs_full"
         has_left_out = any(row["left_out"] is not None for row in variant_rows)
-        has_groups = has_left_out or any(row["sweep"] is not None for row in variant_rows)
+        has_injected = any(row["strategy"] == "inject" for row in variant_rows)
+        shapley_rows = [row for row in self._shapley_values or [] if row["metric"] == metric]
+        # (injected defects are always compared with the full table)
+        compared = shapley_rows or any(row["strategy"] != "inject" for row in variant_rows)
+        comparison = "vs_control" if self.control is not None and compared else "vs_full"
+        has_groups = (
+            has_left_out
+            or bool(shapley_rows)
+            or any(row["sweep"] is not None for row in variant_rows)
+        )
         resolved = self._resolve()
         names = {"full": baseline["name"], **{row["variant"]: row["name"] for row in variant_rows}}
 
         def prefix(row: dict[str, Any]) -> str:
-            return "added" if row["left_out"] is not None else comparison
+            if row["left_out"] is not None:
+                return "added"
+            return "vs_full" if row["strategy"] == "inject" else comparison
 
         fmt = _NumberFormat([row["mean"] for row in effects])
         bounds = [
@@ -3601,6 +4626,11 @@ class Ablation:
                 f"delta_{prefix(row)}_lower",
                 f"delta_{prefix(row)}_upper",
             )
+            if row[key] is not None
+        ] + [
+            abs(row[key])
+            for row in shapley_rows
+            for key in ("shapley", "lower", "upper")
             if row[key] is not None
         ]
         scale = max(bounds, default=0.0) or 1.0
@@ -3613,8 +4643,12 @@ class Ablation:
             variant = variants[row["variant"]]
             same_as = resolved.same_as.get(variant.id)
             metric_html = _mono(fmt.value(row["mean"], row["sd"]))
-            if comparison == "vs_control" or variant.left_out is not None:
+            if prefix(row) != "vs_full":
                 metric_html += _small(f"Δ vs full {fmt.delta(row['delta_vs_full'])}")
+            if variant.strategy == "inject":
+                removed_html = _corrupted_html(variant, self._n_rows)
+            else:
+                removed_html = _removed_html(row["n_removed"], row["f_removed"])
             rows.append(
                 {
                     "group": self._group_label(variant),
@@ -3624,9 +4658,39 @@ class Ablation:
                         same_as=names.get(same_as) if same_as else None,
                         detail=self._sweep_details.get(variant.id) if variant.sweep else None,
                     ),
-                    "removed": _removed_html(row["n_removed"], row["f_removed"]),
+                    "removed": removed_html,
                     "metric": metric_html,
                     "effect": _effect_html(row, prefix(row), fmt, scale),
+                }
+            )
+        total = self._shapley_total.get(metric) if shapley_rows else None
+        for row in shapley_rows:
+            i = row["step"]
+            step = AblationVariant(
+                id=f"shapley_{i}", strategy="shapley", name=f"Step {i}", steps=(i,)
+            )
+            share = row["shapley"] / total if total and abs(total) > _ROUNDING else None
+            rows.append(
+                {
+                    "group": "Shapley values",
+                    "variant": _variant_html(step, self._steps),
+                    "removed": _removed_html(row["n_failed"], row["n_failed"] / self._n_rows),
+                    "metric": (
+                        _mono(f"{share:.0%}") + _small("of the total Δ")
+                        if share is not None
+                        else _mono("—")
+                    ),
+                    "effect": _effect_html(
+                        {
+                            "delta_shapley": row["shapley"],
+                            "delta_shapley_lower": row["lower"],
+                            "delta_shapley_upper": row["upper"],
+                            "verdict": row["verdict"],
+                        },
+                        "shapley",
+                        fmt,
+                        scale,
+                    ),
                 }
             )
 
@@ -3657,6 +4721,16 @@ class Ablation:
             subtitle += (
                 "<div>For leaving one out, Δ is what the left-out step's rows add to the other "
                 f"steps: removing every step's rows, compared with removing {others}.</div>"
+            )
+        if has_injected and comparison != "vs_full":
+            subtitle += (
+                "<div>For injected defects, Δ is the difference from the full table, since no "
+                "rows are removed.</div>"
+            )
+        if shapley_rows:
+            subtitle += (
+                "<div>For the Shapley values, Δ is each step's share of the effect of removing "
+                "the rows of every step.</div>"
             )
         if self.evaluate_version is not None:
             subtitle += (
@@ -3719,6 +4793,8 @@ class Ablation:
             source_notes.append(
                 f"{n_cached:,} of the {len(self._runs):,} evaluations came from the cache."
             )
+        if shapley_rows:
+            source_notes.append(self._shapley_note(fmt.delta(total)))
         for note in [*source_notes, *self._notes, *resolved.notes]:
             gt_tbl = gt_tbl.tab_source_note(source_note=html(_note_html(note)))
         # A curve for each sweep: how the metric changes with the sweep's value
@@ -3743,12 +4819,34 @@ class Ablation:
         """Where a variant is listed in the plan and the report: by its group, then its value."""
         if variant.sweep is not None:
             return (2 + list(self._sweeps).index(variant.sweep), variant.value)
+        if variant.strategy == "shapley":
+            return (2 + len(self._sweeps), float(len(variant.steps)))
         return (int(variant.left_out is not None), 0.0)
 
     def _group_label(self, variant: AblationVariant) -> str:
+        if variant.strategy == "inject":
+            return f"Injected: {self._sweeps[variant.sweep]['label']}"
         if variant.sweep is not None:
             return f"Sweep: {self._sweeps[variant.sweep]['label']}"
+        if variant.strategy == "shapley":
+            return "Shapley: groups of steps"
         return "Variants" if variant.left_out is None else "Leave one out"
+
+    def _shapley_note(self, total: str) -> str:
+        info = self._shapley
+        k = len(info["steps"])
+        vs_text = "removing as many random rows" if self.control is not None else "the full table"
+        if info["exact"]:
+            how = f"The Shapley values are exact, from every order of the {k} steps"
+        else:
+            how = (
+                f"The Shapley values are estimated from {info['permutations']:,} random orders of "
+                f"the {k} steps (seed {info['seed']})"
+            )
+        return (
+            f"{how}. They add up to {total}, the effect of removing the rows of every step "
+            f"compared with {vs_text}."
+        )
 
 
 # ----------------------------------------------------------------------------------------------
@@ -3876,6 +4974,10 @@ def _effect_row(variant: AblationVariant, metric: str, mean: float, sd: float | 
         value=variant.value,
         n_removed=variant.n_removed,
         f_removed=variant.f_removed,
+        corruption=variant.corruption,
+        column=variant.column,
+        n_corrupted=variant.n_corrupted,
+        checked_by=variant.checked_by,
         metric=metric,
         mean=mean,
         sd=sd,
@@ -4006,15 +5108,24 @@ def _variant_html(
     return name + "".join(_small(line) for line in lines)
 
 
-def _removed_html(n_removed: int, f_removed: float) -> str:
-    pct = f_removed * 100
+def _pct_text(share: float) -> str:
+    pct = share * 100
     if pct == 0:
-        pct_text = "0%"
-    elif pct < 0.1:
-        pct_text = "<0.1%"
-    else:
-        pct_text = f"{pct:.1f}%"
-    return f"<div>{_mono(f'{n_removed:,}')}</div>" + _small(_esc(pct_text))
+        return "0%"
+    if pct < 0.1:
+        return "<0.1%"
+    return f"{pct:.1f}%"
+
+
+def _removed_html(n_removed: int, f_removed: float) -> str:
+    return f"<div>{_mono(f'{n_removed:,}')}</div>" + _small(_esc(_pct_text(f_removed)))
+
+
+def _corrupted_html(variant: AblationVariant, n_rows: int) -> str:
+    """The number and share of the rows that an `inject()` variant corrupts (or copies)."""
+    verb = "copied" if variant.corruption == "duplicate" else "corrupted"
+    share = _pct_text(variant.n_corrupted / n_rows)
+    return f"<div>{_mono(f'{variant.n_corrupted:,}')}</div>" + _small(_esc(f"{share} {verb}"))
 
 
 def _badge(text: str, color: str) -> str:
@@ -4369,6 +5480,89 @@ def _table_fingerprint(data: Any) -> str:
         for row in frame.iter_rows():
             digest.update(repr(row).encode())
     return digest.hexdigest()
+
+
+def _is_missing(value: Any) -> bool:
+    """Is a value missing (`None`, or a NaN float or timestamp)?"""
+    if value is None or type(value).__name__ == "NAType":
+        return True
+    try:
+        return bool(value != value)
+    except Exception:
+        return False
+
+
+def _function_name(fn: Callable[..., Any]) -> str:
+    name = getattr(fn, "__name__", None)
+    if not isinstance(name, str) or not name or name == "<lambda>":
+        return "custom"
+    return name
+
+
+def _corrupted_values(kind: str, fn: Any, values: list[Any]) -> list[Any]:
+    """The new values of the rows that `inject()` corrupts (none for `"null"` and `"duplicate"`)."""
+    if kind == "shuffle":
+        # A ring: each row gets the value of the next one
+        return values[1:] + values[:1]
+    if kind == "truncate":
+        return [v[: len(v) // 2] for v in values]
+    if kind == "function":
+        new = []
+        for v in values:
+            try:
+                new.append(fn(v))
+            except Exception as e:
+                raise ValueError(
+                    f"The `corruption=` function raised an error for the value {v!r}: {e}"
+                ) from e
+        return new
+    return []
+
+
+def _corrupted_series(
+    name: str, values: list[Any], dtype: Any, implementation: Any
+) -> nw.Series[Any]:
+    series = nw.new_series(name, values, backend=implementation)
+    if series.dtype != dtype:
+        series = series.cast(dtype)
+    return series
+
+
+def _check_corrupted_values(
+    values: list[Any], column: str, dtype: Any, implementation: Any, kind: str
+) -> None:
+    try:
+        _corrupted_series(column, values, dtype, implementation)
+    except Exception as e:
+        if kind != "function":  # pragma: no cover
+            raise
+        raise TypeError(
+            f"The values from the `corruption=` function can't be put in the column {column!r} "
+            f"(of type {dtype}): {e}"
+        ) from e
+
+
+def _apply_injection(frame: Any, injection: _Injection) -> Any:
+    """Put the defect of an `inject()` variant into a table (with the row numbers in `_INDEX`)."""
+    rows = list(injection.rows)
+    if injection.kind == "duplicate":
+        return nw.concat([frame, frame.filter(nw.col(_INDEX).is_in(rows))])
+    column = injection.column
+    if injection.kind == "null":
+        return frame.with_columns(
+            nw.when(~nw.col(_INDEX).is_in(rows)).then(nw.col(column)).alias(column)
+        )
+    lazy = isinstance(frame, nw.LazyFrame)
+    if lazy:
+        frame = frame.collect()
+    dtype = frame.collect_schema()[column]
+    new = dict(zip(rows, injection.values))
+    values = [
+        new[int(k)] if int(k) in new else v
+        for k, v in zip(frame[_INDEX].to_list(), frame[column].to_list())
+    ]
+    frame = frame.with_columns(_corrupted_series(column, values, dtype, frame.implementation))
+    return frame.lazy() if lazy else frame
 
 
 def _rows_hash(removed: frozenset[int]) -> str:

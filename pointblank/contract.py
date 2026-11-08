@@ -177,7 +177,9 @@ class Step:
     method: str
     kwargs: dict[str, Any] = field(default_factory=dict)
 
-    def __init__(self, method: str, **kwargs: Any) -> None:
+    def __init__(self, method: str, /, **kwargs: Any) -> None:
+        # (`method` is positional-only, so that a step can have a `method=` argument, as in
+        # `rows_near_distinct()`)
         self.method = method
         self.kwargs = kwargs
 

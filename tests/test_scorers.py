@@ -1056,6 +1056,186 @@ def test_adapter_names_of_long_settings():
     assert scorer.name.startswith("langid(expected=<") and len(scorer.name) < 60
 
 
+def test_langid_with_expected_column():
+    def guess(text):
+        return {"en": 0.9, "fr": 0.1} if "the" in text else {"en": 0.2, "fr": 0.8}
+
+    scorer = pb.scorers.langid(expected_column="lang", backend=guess)
+    batch = [
+        {"t": "the cat", "lang": "en"},
+        {"t": "le chat", "lang": "EN"},
+        {"t": "le chat", "lang": ["fr", "en"]},
+    ]
+    assert scorer(batch) == [pytest.approx(0.9), pytest.approx(0.2), pytest.approx(1.0)]
+    # With a third column, `column=` names the text
+    named = pb.scorers.langid(expected_column="lang", backend=guess, column="t")
+    assert named([{"t": "the", "lang": "fr", "id": 1}]) == [pytest.approx(0.1)]
+
+    with pytest.raises(ValueError, match="choose one with `column=`"):
+        scorer([{"t": "the", "lang": "fr", "id": 1}])
+    with pytest.raises(ValueError, match="reads the expected language from the column 'lang'"):
+        scorer([{"t": "the"}])
+
+    validation = (
+        pb.Validate(data=pl.DataFrame({"t": ["the cat", "le chat"], "lang": ["en", "en"]}))
+        .col_vals_scored(columns=["t", "lang"], scorer=scorer, min_val=0.5)
+        .interrogate()
+    )
+    assert validation.n_failed(i=1, scalar=True) == 1
+
+    langid_scorer = pb.scorers.langid(expected_column="lang")
+    assert langid_scorer._to_yaml() == {"langid": {"expected_column": "lang"}}
+    assert langid_scorer.name == "langid(expected_column='lang', backend='langid')"
+
+
+def test_langid_expected_column_errors():
+    with pytest.raises(ValueError, match="needs one of `expected=` and `expected_column=`"):
+        pb.scorers.langid()
+    with pytest.raises(ValueError, match="needs one of `expected=` and `expected_column=`"):
+        pb.scorers.langid(expected="en", expected_column="lang")
+    with pytest.raises(TypeError, match="`expected_column=` must be the name of a column"):
+        pb.scorers.langid(expected_column="")
+
+
+def test_text_stat():
+    words = pb.scorers.text_stat("word_count")
+    assert words.name == "text_stat(stat='word_count')"
+    assert words([{"t": "one two three"}, {"t": ""}]) == [3.0, 0.0]
+    assert words._label == "WORD COUNT"
+
+    length = pb.scorers.text_stat("mean_word_length", column="t")
+    # A text without words has no mean word length
+    assert length([{"t": "ab abcd", "u": 1}, {"t": " ", "u": 2}]) == [3.0, None]
+
+    stops = pb.scorers.text_stat("stop_words", stop_words=["le", "la"])
+    assert stops([{"t": "Le chat et la souris, la nuit."}]) == [2.0]
+    assert stops._to_yaml() == {"text_stat": {"stat": "stop_words", "stop_words": ["le", "la"]}}
+    assert stops._to_code() == 'pb.scorers.text_stat(stat="stop_words", stop_words=["le", "la"])'
+
+    validation = (
+        pb.Validate(data=pl.DataFrame({"t": ["a b c d", "a b", None]}))
+        .col_vals_scored(columns="t", scorer=words, min_val=3, na_pass=True)
+        .interrogate()
+    )
+    assert validation.n_failed(i=1, scalar=True) == 1
+
+
+def test_text_stat_errors():
+    with pytest.raises(ValueError, match="`stat=` must be one of 'char_count'"):
+        pb.scorers.text_stat("letters")
+    for stop_words in ("the", [], ["the", ""], 1):
+        with pytest.raises(TypeError, match="`stop_words=` must be a list of words"):
+            pb.scorers.text_stat("stop_words", stop_words=stop_words)
+    with pytest.raises(ValueError, match='can only be used with `stat="stop_words"`'):
+        pb.scorers.text_stat("word_count", stop_words=["the"])
+    with pytest.raises(TypeError, match="`column=` must be"):
+        pb.scorers.text_stat("word_count", column=1)
+    with pytest.raises(ValueError, match="choose one with `column=`"):
+        pb.scorers.text_stat("word_count")([{"t": "a", "u": "b"}])
+
+
+def test_token_count(monkeypatch):
+    words = pb.scorers.token_count("whitespace")
+    assert words.name == "token_count(tokenizer='whitespace')"
+    assert words._label == "TOKENS"
+    assert words([{"t": "one two  three"}, {"t": ""}]) == [3.0, 0.0]
+
+    # A function can give the tokens, or their number
+    assert pb.scorers.token_count(list)([{"t": "abc"}]) == [3.0]
+    assert pb.scorers.token_count(len)([{"t": "abcd"}]) == [4.0]
+
+    class Encoding:
+        def __init__(self, ids):
+            self.ids = ids
+
+    class Tokenizer:
+        def encode(self, text):
+            return Encoding(list(text))
+
+    assert pb.scorers.token_count(Tokenizer(), column="t")([{"t": "ab", "u": 1}]) == [2.0]
+    assert pb.scorers.token_count(lambda t: {"input_ids": [1, 2]})([{"t": "x"}]) == [2.0]
+    assert pb.scorers.token_count(lambda t: np.arange(5))([{"t": "x"}]) == [5.0]
+
+    calls = []
+
+    class TiktokenEncoding:
+        def encode(self, text, disallowed_special):
+            assert disallowed_special == ()
+            return text.split("-")
+
+    def get_encoding(name):
+        calls.append(("get_encoding", name))
+        if name != "cl100k_base":
+            raise ValueError(name)
+        return TiktokenEncoding()
+
+    def encoding_for_model(name):
+        calls.append(("encoding_for_model", name))
+        return TiktokenEncoding()
+
+    _module(
+        monkeypatch, "tiktoken", get_encoding=get_encoding, encoding_for_model=encoding_for_model
+    )
+    assert pb.scorers.token_count("tiktoken:cl100k_base")([{"t": "a-b-c"}]) == [3.0]
+    assert pb.scorers.token_count("tiktoken:gpt-4o")([{"t": "a-b"}]) == [2.0]
+    assert calls[-2:] == [("get_encoding", "gpt-4o"), ("encoding_for_model", "gpt-4o")]
+
+    class AutoTokenizer:
+        @classmethod
+        def from_pretrained(cls, name):
+            assert name == "org/model"
+            return types.SimpleNamespace(
+                encode=lambda text, add_special_tokens: [0] * (len(text) + add_special_tokens)
+            )
+
+    _module(monkeypatch, "transformers", AutoTokenizer=AutoTokenizer)
+    scorer = pb.scorers.token_count("org/model")
+    assert scorer([{"t": "abc"}]) == [3.0]
+    assert scorer._to_yaml() == {"token_count": {"tokenizer": "org/model"}}
+
+    monkeypatch.setitem(sys.modules, "tiktoken", None)
+    with pytest.raises(ImportError, match="pip install tiktoken"):
+        pb.scorers.token_count("tiktoken:cl100k_base")([{"t": "a"}])
+    monkeypatch.setitem(sys.modules, "transformers", None)
+    with pytest.raises(ImportError, match="pip install transformers"):
+        pb.scorers.token_count("org/model")([{"t": "a"}])
+
+
+def test_token_count_errors():
+    for tokenizer in ("", "tiktoken:"):
+        with pytest.raises(ValueError, match="`tokenizer=` must name a tokenizer"):
+            pb.scorers.token_count(tokenizer)
+    with pytest.raises(TypeError, match="`tokenizer=` must be the name of a tokenizer.*got int"):
+        pb.scorers.token_count(1)
+    with pytest.raises(TypeError, match="returned a boolean"):
+        pb.scorers.token_count(lambda t: True)([{"t": "a"}])
+
+
+def test_text_adapters_in_yaml():
+    config = """
+    tbl: docs
+    steps:
+    - col_vals_scored:
+        columns: t
+        scorer:
+          text_stat:
+            stat: word_count
+        min_val: 3
+    - col_vals_scored:
+        columns: t
+        scorer:
+          token_count:
+            tokenizer: whitespace
+        max_val: 3
+    """
+    docs = pl.DataFrame({"t": ["a b", "a b c", "a b c d"]})
+
+    validation = pb.yaml_interrogate(config, set_tbl=docs)
+
+    assert [s.n_failed for s in validation.validation_info] == [1, 1]
+    assert "token_count:\n        tokenizer: whitespace" in validation.to_yaml()
+
+
 # ---------------------------------------------------------------------------------------------
 # Code and YAML
 # ---------------------------------------------------------------------------------------------
