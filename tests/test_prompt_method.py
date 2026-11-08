@@ -454,7 +454,7 @@ def test_prompt_parameter_types():
     validate = Validate(data=[])
 
     # Test non-string model parameter
-    with pytest.raises(AttributeError):
+    with pytest.raises(TypeError, match="`model=` must be a string"):
         validate.prompt(
             prompt="Test prompt",
             model=123,  # Should be string
