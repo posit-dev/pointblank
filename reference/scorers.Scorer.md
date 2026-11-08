@@ -4,7 +4,7 @@ The protocol of the scorers used by [Validate.col_vals_scored()](../reference/Va
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L60-L119)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L71-L130)
 
 ``` python
 scorers.Scorer()

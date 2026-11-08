@@ -4,7 +4,7 @@ Get the settings and results of the ablation as a JSON-serializable dict.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3357-L3429)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4357-L4437)
 
 ``` python
 Ablation.to_dict()
@@ -13,7 +13,7 @@ Ablation.to_dict()
 ## Returns
 
 `dict[str, Any]`  
-A dictionary with the ablation's settings (`"settings"`), fingerprints of the data and of the plan (`"fingerprints"`, as in the manifest of [`export()`](../reference/Ablation.export.md#pointblank.Ablation.export)), the versions of the table that were evaluated (`"variants"`, including the full table and the controls), the variants that weren't evaluated because they remove the same rows as another version (`"same_as"`, from each to that version), the metrics from every evaluation (`"runs"`, one entry per version and repeat, with its seed and whether its result came from the cache), the results (`"effects"`, with the same fields as the columns of [`get_effects()`](../reference/Ablation.get_effects.md#pointblank.Ablation.get_effects)), and the notes about variants and steps that weren't used (`"notes"`).
+A dictionary with the ablation's settings (`"settings"`), fingerprints of the data and of the plan (`"fingerprints"`, as in the manifest of [`export()`](../reference/Ablation.export.md#pointblank.Ablation.export)), the versions of the table that were evaluated (`"variants"`, including the full table and the controls), the variants that weren't evaluated because they remove the same rows as another version (`"same_as"`, from each to that version), the metrics from every evaluation (`"runs"`, one entry per version and repeat, with its seed and whether its result came from the cache), the results (`"effects"`, with the same fields as the columns of [`get_effects()`](../reference/Ablation.get_effects.md#pointblank.Ablation.get_effects)), the Shapley values (`"shapley"`, with the same fields as the columns of [`get_shapley()`](../reference/Ablation.get_shapley.md#pointblank.Ablation.get_shapley), or `None` without [`shapley()`](../reference/Ablation.shapley.md#pointblank.Ablation.shapley)), and the notes about variants and steps that weren't used (`"notes"`).
 
 ## Examples
 

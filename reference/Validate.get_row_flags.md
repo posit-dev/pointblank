@@ -4,7 +4,7 @@ Get the target table with columns flagging the validation steps each row failed.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22098-L22349)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22965-L23218)
 
 ``` python
 Validate.get_row_flags(
@@ -26,14 +26,14 @@ This is useful when removing every row that failed a check is too blunt. You can
 
 The steps that get flag columns are the same ones used by [get_sundered_data()](../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data): steps that check rows or cells down a column, that are active, and that don't use `pre=` (unless the `pre=` function is marked with [`row_preserving()`](../reference/row_preserving.md#pointblank.row_preserving)). A row that a step didn't check (e.g., a row outside the segment of a step that uses `segments=`, or a row that a row-preserving `pre=` function filtered out) isn't flagged by it, and isn't counted in its `pb_row_score_`. A row that no step checked has a missing `pb_row_score_`.
 
-Unlike [get_sundered_data()](../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data), steps that use [`rows_distinct()`](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) are included by default: one copy of each group of duplicate rows (the first one) isn't flagged, and the other copies are. So a `rows_distinct()` flag marks the rows that removing duplicates would remove. Use `duplicates=` and `duplicates_order_by=` to choose which copy is kept.
+Unlike [get_sundered_data()](../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data), steps that use [`rows_distinct()`](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) are included by default: one copy of each group of duplicate rows (the first one) isn't flagged, and the other copies are. So a `rows_distinct()` flag marks the rows that removing duplicates would remove. Use `duplicates=` and `duplicates_order_by=` to choose which copy is kept. Steps that use [`rows_near_distinct()`](../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct) are treated in the same way, with a group of near duplicates in place of the copies of a row.
 
 A row-level step that can't be used is reported in a warning: that's a step that uses an unmarked `pre=` function (it can change the rows, so its results may not line up with the table's rows), a step that couldn't be evaluated, or a `rows_distinct()` step when `duplicates=None`.
 
 ## Parameters
 
 `duplicates: str | None = "keep_first"`  
-How to flag the duplicate rows found by `rows_distinct()` steps. With `"keep_first"` (the default) or `"keep_last"`, one copy of each group of duplicates (the first or last one, in row order or in the order given by `duplicates_order_by=`) isn't flagged. `"flag_all"` flags every copy, as the step itself counts them, and `None` leaves `rows_distinct()` steps out.
+How to flag the duplicate rows found by `rows_distinct()` (and `rows_near_distinct()`) steps. With `"keep_first"` (the default) or `"keep_last"`, one copy of each group of duplicates (the first or last one, in row order or in the order given by `duplicates_order_by=`) isn't flagged. `"flag_all"` flags every copy, as the step itself counts them, and `None` leaves those steps out.
 
 `duplicates_order_by: str | list[str] | None = None`  
 One or more columns that order the copies of a duplicated row, to decide which copy isn't flagged. For example, use `duplicates="keep_last", duplicates_order_by="updated_at"` to keep the newest record. Ties are broken by row order, and a copy with a missing value in one of these columns is kept only if every copy is missing that value. Without this, the copies are taken in row order (for a database table, which has no row order of its own, rows are ordered by their values, so the choice is arbitrary but the same from run to run).

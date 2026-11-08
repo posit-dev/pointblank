@@ -592,6 +592,26 @@ Examples:
     brief: "Stock levels decrease (small restocks allowed)"
 ```
 
+#### Chat Format Methods
+
+`col_vals_chat_format`: is each value a well-formed chat conversation?
+
+``` yaml
+- col_vals_chat_format:
+    columns: messages                  # REQUIRED: Column(s) with the conversations
+    roles: [system, user, assistant]   # OPTIONAL: The roles that a message can have
+    alternate: true                    # OPTIONAL: No role follows itself in the turns
+    first_role: user                   # OPTIONAL: Role of the first turn (after a system message)
+    last_role: assistant               # OPTIONAL: Role of the last message
+    allow_empty: false                 # OPTIONAL: Allow messages with empty content
+    role_key: role                     # OPTIONAL: Key of each message's role
+    content_key: content               # OPTIONAL: Key of each message's content
+    na_pass: false                     # OPTIONAL: Pass missing values
+    brief: "Conversations for fine-tuning"  # OPTIONAL: Step description
+```
+
+A conversation is a list of messages (each a dictionary with a role and some content) or the same as JSON text.
+
 ### Row-based Validations
 
 `rows_distinct`: are row data distinct?
@@ -624,6 +644,48 @@ Examples:
     actions:                           # OPTIONAL: Step-level actions
       warning: "Custom message"
     brief: "Complete rows only"        # OPTIONAL: Step description
+```
+
+`rows_near_distinct`: are rows free of near duplicates?
+
+``` yaml
+- rows_near_distinct:
+    columns: text                      # REQUIRED: Column(s) with the text of each row
+    method: minhash                    # OPTIONAL: "minhash" (default) or "exact"
+    threshold: 0.85                    # OPTIONAL: Lowest Jaccard similarity of a near duplicate
+    ngram: 5                           # OPTIONAL: Words in each n-gram (MinHash)
+    num_perm: 128                      # OPTIONAL: Hash functions of the signatures (MinHash)
+    thresholds:                        # OPTIONAL: Step-level thresholds
+      warning: 0.05
+    brief: "No near-duplicate documents"  # OPTIONAL: Step description
+```
+
+`rows_not_contaminated`: does the text of each row not overlap with a reference, like a benchmark?
+
+``` yaml
+- rows_not_contaminated:
+    columns: text                      # REQUIRED: Column(s) with the text of each row
+    reference: benchmark.csv           # REQUIRED: The texts to check against
+    reference_columns: question        # OPTIONAL: Column(s) of the reference with its texts
+    method: ngram                      # OPTIONAL: "ngram" (default), "exact", or "minhash"
+    ngram: 13                          # OPTIONAL: Words in each n-gram
+    threshold: 0.8                     # OPTIONAL: Lowest Jaccard similarity (MinHash)
+    num_perm: 128                      # OPTIONAL: Hash functions of the signatures (MinHash)
+    brief: "No benchmark questions"    # OPTIONAL: Step description
+```
+
+The `reference` can be the path of a CSV or Parquet file, a list of texts, a dictionary of references by name (so that the note says which one each overlap is with), or a `python:` block that makes a table (which needs `allow_python=True`):
+
+``` yaml
+# Two benchmarks, by name
+- rows_not_contaminated:
+    columns: text
+    reference:
+      quiz: quiz_questions.csv
+      trivia:
+      - "Which planet has the most moons?"
+      - "What is the tallest mountain on Earth?"
+    reference_columns: question
 ```
 
 ### Structure Validations
@@ -899,7 +961,7 @@ Examples:
 
 ### Model-Scored Validation
 
-[col_vals_scored](../../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored): are the scores that a model gives each row within bounds?
+`col_vals_scored`: are the scores that a model gives each row within bounds?
 
 ``` yaml
 - col_vals_scored:
@@ -921,7 +983,7 @@ Examples:
     brief: "Passages answer their queries"             # OPTIONAL: Step description
 ```
 
-At least one of `min_val` and `max_val` is needed. The scorer is written as one of the adapters of `pb.scorers` with its settings, as `{<adapter>: {<settings>}}`, where the adapter is one of [embedding_similarity](../../reference/scorers.embedding_similarity.md#pointblank.scorers.embedding_similarity), [reranker](../../reference/scorers.reranker.md#pointblank.scorers.reranker), [classifier](../../reference/scorers.classifier.md#pointblank.scorers.classifier), [langid](../../reference/scorers.langid.md#pointblank.scorers.langid), or [perplexity](../../reference/scorers.perplexity.md#pointblank.scorers.perplexity). A scorer that's a function of your own is written as a `python:` block, which is only run with `allow_python=True`:
+At least one of `min_val` and `max_val` is needed. The scorer is written as one of the adapters of `pb.scorers` with its settings, as `{<adapter>: {<settings>}}`, where the adapter is one of [embedding_similarity](../../reference/scorers.embedding_similarity.md#pointblank.scorers.embedding_similarity), [reranker](../../reference/scorers.reranker.md#pointblank.scorers.reranker), [classifier](../../reference/scorers.classifier.md#pointblank.scorers.classifier), [langid](../../reference/scorers.langid.md#pointblank.scorers.langid), [perplexity](../../reference/scorers.perplexity.md#pointblank.scorers.perplexity), [text_stat](../../reference/scorers.text_stat.md#pointblank.scorers.text_stat), or [token_count](../../reference/scorers.token_count.md#pointblank.scorers.token_count). A scorer that's a function of your own is written as a `python:` block, which is only run with `allow_python=True`:
 
 ``` yaml
 # Text in English, with a cache of the scores on disk
@@ -932,6 +994,28 @@ At least one of `min_val` and `max_val` is needed. The scorer is written as one 
         expected: en
     min_val: 0.5
     cache: .scores
+
+# The language of each row given by another column
+- col_vals_scored:
+    columns: text
+    scorer:
+      langid:
+        expected_column: lang
+    min_val: 0.5
+
+# Documents of at least 50 words, and at most 2048 tokens
+- col_vals_scored:
+    columns: text
+    scorer:
+      text_stat:
+        stat: word_count
+    min_val: 50
+- col_vals_scored:
+    columns: text
+    scorer:
+      token_count:
+        tokenizer: "tiktoken:cl100k_base"
+    max_val: 2048
 
 # Documents of educational quality (a regression model, scored from 0 to 5)
 - col_vals_scored:

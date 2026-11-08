@@ -4,7 +4,7 @@ Show the versions of the table that the ablation will evaluate.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2019-L2159)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2611-L2751)
 
 ``` python
 Ablation.plan()

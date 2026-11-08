@@ -4,7 +4,7 @@ Propose AI-generated improvements to this validation plan.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21105-L21172)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21970-L22037)
 
 ``` python
 Validate.suggest_improvements(

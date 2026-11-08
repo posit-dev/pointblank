@@ -4,7 +4,7 @@ Make a scorer from a function, with a name, a version, and a batch size.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L313-L382)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L324-L393)
 
 ``` python
 scorers.from_function(

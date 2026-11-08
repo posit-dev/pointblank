@@ -4,11 +4,12 @@ A single validation step, stored as data.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L18-L338)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L18-L340)
 
 ``` python
 Step(
     method,
+    /,
     **kwargs,
 )
 ```
@@ -142,7 +143,7 @@ Convert the step to a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L195-L253)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L197-L255)
 
 ``` python
 to_dict()
@@ -198,7 +199,7 @@ Create a step from a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L255-L338)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L257-L340)
 
 ``` python
 from_dict(data)

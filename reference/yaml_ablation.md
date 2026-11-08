@@ -4,7 +4,7 @@ Set up an ablation from a YAML configuration.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1375-L1533)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1380-L1541)
 
 ``` python
 yaml_ablation(
@@ -69,7 +69,7 @@ ablation:
         column: sensor
 ```
 
-The `evaluate:` is the import path of a function (the module, a colon, and the name of the function), or a `python:` block whose result is the function. The `control:` is `size_matched` (the default), `null` (for no control), or `stratified:` with one or more columns (for a [`Stratified`](../reference/ablation.Stratified.md#pointblank.ablation.Stratified) control). Each strategy is the name of an [Ablation](../reference/Ablation.md#pointblank.Ablation) method that adds variants (including the sweeps [sweep_score](../reference/Ablation.sweep_score.md#pointblank.Ablation.sweep_score) and [sweep_step](../reference/Ablation.sweep_step.md#pointblank.Ablation.sweep_step)), with its parameters as a mapping. The strategies are added in order.
+The `evaluate:` is the import path of a function (the module, a colon, and the name of the function), or a `python:` block whose result is the function. The `control:` is `size_matched` (the default), `null` (for no control), or `stratified:` with one or more columns (for a [`Stratified`](../reference/ablation.Stratified.md#pointblank.ablation.Stratified) control). Each strategy is the name of an [Ablation](../reference/Ablation.md#pointblank.Ablation) method that adds variants (including the sweeps [sweep_score](../reference/Ablation.sweep_score.md#pointblank.Ablation.sweep_score) and [sweep_step](../reference/Ablation.sweep_step.md#pointblank.Ablation.sweep_step), the injected defects of [inject](../reference/Ablation.inject.md#pointblank.Ablation.inject), and the Shapley values of [shapley](../reference/Ablation.shapley.md#pointblank.Ablation.shapley)), with its parameters as a mapping. The strategies are added in order. In YAML, the `corruption:` of [inject](../reference/Ablation.inject.md#pointblank.Ablation.inject) is the name of a defect (`null`, `shuffle`, `truncate`, or `duplicate`), not a function.
 
 The block is ignored by [yaml_interrogate()](../reference/yaml_interrogate.md#pointblank.yaml_interrogate), so the same configuration can be used both to validate the data and to measure what its steps do for a model.
 

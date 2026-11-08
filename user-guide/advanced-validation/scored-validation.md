@@ -1,6 +1,6 @@
 # Scored Validation
 
-Most validation checks are about the form of the data: whether a value is in a range, matches a pattern, or isn't missing. Some of the checks that matter most for text are about its meaning instead. Does a passage answer the query it was retrieved for? Is a document of good quality, or toxic? Is it in the expected language? Is it fluent, or garbled? These checks are made with a model that gives each row a score, and the [col_vals_scored()](../../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) validation method is for them: it scores each row with a *scorer* and checks that the score is within bounds.
+Most validation checks are about the form of the data: whether a value is in a range, matches a pattern, or isn't missing. Some of the checks that matter most for text are about its meaning instead. Does a passage answer the query it was retrieved for? Is a document of good quality, or toxic? Is it in the expected language? Is it fluent, or garbled? These checks are made with a model that gives each row a score, and the `col_vals_scored()` validation method is for them: it scores each row with a *scorer* and checks that the score is within bounds.
 
 This page covers how to write a scorer, the adapters of `pb.scorers` for common kinds of models, how scores are cached so that rows aren't scored twice, and how to use the scores once the validation is done.
 
@@ -106,6 +106,10 @@ The `pb.scorers` module has adapters for common kinds of models. Each one uses a
 | [classifier()](../../reference/scorers.classifier.md#pointblank.scorers.classifier) | A label of a classifier (e.g., quality) | A Hugging Face model or pipeline |
 | [langid()](../../reference/scorers.langid.md#pointblank.scorers.langid) | Being in the expected languages | [langid](../../reference/scorers.langid.md#pointblank.scorers.langid), fastText, or a function |
 | [perplexity()](../../reference/scorers.perplexity.md#pointblank.scorers.perplexity) | How surprising text is to a language model | KenLM, or a function |
+| [text_stat()](../../reference/scorers.text_stat.md#pointblank.scorers.text_stat) | A statistic of text, like its number of words | None |
+| [token_count()](../../reference/scorers.token_count.md#pointblank.scorers.token_count) | The number of tokens of text | A Hugging Face tokenizer, `tiktoken`, or a function |
+
+The last two need no model to score with (other than a tokenizer), and they're the scorers of the bundles of steps in `pb.text`, for the heuristic quality filters and the length of text in tokens (see the [Checking Text Data](text-checks.md) article).
 
 With real models, the adapters look like this:
 
@@ -127,6 +131,12 @@ on_topic = pb.scorers.embedding_similarity(
 
 # Is each document in English?
 english = pb.scorers.langid(expected="en")
+
+# Is each document in the language of its `lang` column?
+own_language = pb.scorers.langid(expected_column="lang")
+
+# Does each document fit in a model's context?
+tokens = pb.scorers.token_count(tokenizer="tiktoken:cl100k_base")
 ```
 
 The adapters that take a model can also take a function in its place, which is how we'll keep the examples on this page self-contained. Here, `guess_language()` stands in for a language identification model (it counts common English and French words), and `vowel_ratio()` stands in for a language model's perplexity (garbled text has few vowels for its letters).
@@ -274,4 +284,4 @@ A scorer that's a function of your own can be written as a `python:` block, whic
 
 ## Conclusion
 
-The [col_vals_scored()](../../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) validation method brings checks of meaning into a validation plan, with the same reports, thresholds, and actions as any other step. A scorer is any function of a batch of rows, and the adapters of `pb.scorers` use rerankers, classifiers, language identification, embeddings, and perplexity. Scores are cached, so that rows aren't scored again, and they're kept with the results, where they can be seen in the step report and used to choose the bounds with an [`Ablation`](../post-interrogation/data-ablation.md).
+The `col_vals_scored()` validation method brings checks of meaning into a validation plan, with the same reports, thresholds, and actions as any other step. A scorer is any function of a batch of rows, and the adapters of `pb.scorers` use rerankers, classifiers, language identification, embeddings, perplexity, statistics of text, and tokenizers. Scores are cached, so that rows aren't scored again, and they're kept with the results, where they can be seen in the step report and used to choose the bounds with an [`Ablation`](../post-interrogation/data-ablation.md).

@@ -84,6 +84,9 @@
 - [Validate.specially](https://posit-dev.github.io/pointblank/reference/Validate.specially.html)
 - [Validate.prompt](https://posit-dev.github.io/pointblank/reference/Validate.prompt.html)
 - [Validate.col_vals_scored](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_scored.html)
+- [Validate.rows_near_distinct](https://posit-dev.github.io/pointblank/reference/Validate.rows_near_distinct.html)
+- [Validate.rows_not_contaminated](https://posit-dev.github.io/pointblank/reference/Validate.rows_not_contaminated.html)
+- [Validate.col_vals_chat_format](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_chat_format.html)
 
 #### Aggregation Steps
 > These validation methods check aggregated column values (sums, averages, standard deviations) against fixed values or column references.
@@ -116,7 +119,18 @@
 - [scorers.classifier](https://posit-dev.github.io/pointblank/reference/scorers.classifier.html)
 - [scorers.langid](https://posit-dev.github.io/pointblank/reference/scorers.langid.html)
 - [scorers.perplexity](https://posit-dev.github.io/pointblank/reference/scorers.perplexity.html)
+- [scorers.text_stat](https://posit-dev.github.io/pointblank/reference/scorers.text_stat.html)
+- [scorers.token_count](https://posit-dev.github.io/pointblank/reference/scorers.token_count.html)
 - [scorers.clear_cache](https://posit-dev.github.io/pointblank/reference/scorers.clear_cache.html)
+
+#### Text Checks
+> Checks of text data, for corpora used to train or evaluate language models. Each function makes a `Steps` collection of ordinary validation steps (heuristic quality filters, the language of the text, its length in tokens, and personal information) to be added to a validation with `Validate.add_steps()`.
+
+
+- [text.heuristic_filters](https://posit-dev.github.io/pointblank/reference/text.heuristic_filters.html)
+- [text.in_language](https://posit-dev.github.io/pointblank/reference/text.in_language.html)
+- [text.token_length](https://posit-dev.github.io/pointblank/reference/text.token_length.html)
+- [text.no_pii](https://posit-dev.github.io/pointblank/reference/text.no_pii.html)
 
 #### Column Selection
 > Use the `col()` function along with column selection helpers to flexibly select columns for validation. Combine `col()` with `starts_with()`, `matches()`, etc. for selecting multiple target columns.
@@ -223,6 +237,16 @@
 - [Comparison.to_dict](https://posit-dev.github.io/pointblank/reference/Comparison.to_dict.html)
 - [Comparison.to_json](https://posit-dev.github.io/pointblank/reference/Comparison.to_json.html)
 
+#### Split Checks
+> Check the splits of a dataset (training, validation, and test) before training a model: `check_splits()` finds the rows of a later split that are also in an earlier one (exactly or nearly the same), labels that a split is missing or that only it has, and columns whose distribution changes between splits. The result is a `SplitCheck` object with the issues found, the overlapping rows, and a tabular report.
+
+
+- [check_splits](https://posit-dev.github.io/pointblank/reference/check_splits.html): Check the splits of a dataset for leaks, label coverage, and drift
+- [SplitCheck](https://posit-dev.github.io/pointblank/reference/SplitCheck.html): The results of [`check_splits()`](`pointblank.check_splits`)
+- [SplitCheck.get_overlap](https://posit-dev.github.io/pointblank/reference/SplitCheck.get_overlap.html)
+- [SplitCheck.get_tabular_report](https://posit-dev.github.io/pointblank/reference/SplitCheck.get_tabular_report.html)
+- [SplitCheck.to_dict](https://posit-dev.github.io/pointblank/reference/SplitCheck.to_dict.html)
+
 #### Table Pre-checks
 > Helper functions for use with the `active=` parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.
 
@@ -255,12 +279,16 @@
 - [Ablation.drop_groups](https://posit-dev.github.io/pointblank/reference/Ablation.drop_groups.html)
 - [Ablation.sweep_score](https://posit-dev.github.io/pointblank/reference/Ablation.sweep_score.html)
 - [Ablation.sweep_step](https://posit-dev.github.io/pointblank/reference/Ablation.sweep_step.html)
+- [Ablation.inject](https://posit-dev.github.io/pointblank/reference/Ablation.inject.html)
+- [Ablation.shapley](https://posit-dev.github.io/pointblank/reference/Ablation.shapley.html)
 - [Ablation.plan](https://posit-dev.github.io/pointblank/reference/Ablation.plan.html)
 - [Ablation.run](https://posit-dev.github.io/pointblank/reference/Ablation.run.html)
 - [Ablation.check_determinism](https://posit-dev.github.io/pointblank/reference/Ablation.check_determinism.html)
 - [Ablation.export](https://posit-dev.github.io/pointblank/reference/Ablation.export.html)
 - [Ablation.load_results](https://posit-dev.github.io/pointblank/reference/Ablation.load_results.html)
 - [Ablation.get_effects](https://posit-dev.github.io/pointblank/reference/Ablation.get_effects.html)
+- [Ablation.get_shapley](https://posit-dev.github.io/pointblank/reference/Ablation.get_shapley.html)
+- [Ablation.suggest_thresholds](https://posit-dev.github.io/pointblank/reference/Ablation.suggest_thresholds.html)
 - [Ablation.get_tabular_report](https://posit-dev.github.io/pointblank/reference/Ablation.get_tabular_report.html)
 - [Ablation.annotate](https://posit-dev.github.io/pointblank/reference/Ablation.annotate.html)
 - [Ablation.to_dict](https://posit-dev.github.io/pointblank/reference/Ablation.to_dict.html)

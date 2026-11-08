@@ -193,6 +193,15 @@ Validate rows using AI/LLM-powered analysis.
 [Validate.col_vals_scored()](Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored)  
 Validate whether rows have a score from a model within bounds.
 
+[Validate.rows_near_distinct()](Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct)  
+Validate whether the text of rows has no near duplicates.
+
+[Validate.rows_not_contaminated()](Validate.rows_not_contaminated.md#pointblank.Validate.rows_not_contaminated)  
+Validate whether the text of rows doesn't overlap with a reference, such as a benchmark.
+
+[Validate.col_vals_chat_format()](Validate.col_vals_chat_format.md#pointblank.Validate.col_vals_chat_format)  
+Validate whether column values are well-formed chat conversations.
+
 ## Aggregation Steps
 
 These validation methods check aggregated column values (sums, averages, standard deviations) against fixed values or column references.
@@ -267,8 +276,30 @@ Score text by how likely it is to be in the expected languages.
 [scorers.perplexity()](scorers.perplexity.md#pointblank.scorers.perplexity)  
 Score text by its perplexity under a language model.
 
+[scorers.text_stat()](scorers.text_stat.md#pointblank.scorers.text_stat)  
+Score text by a simple statistic, like its number of words or its share of bullet lines.
+
+[scorers.token_count()](scorers.token_count.md#pointblank.scorers.token_count)  
+Score text by its number of tokens.
+
 [scorers.clear_cache()](scorers.clear_cache.md#pointblank.scorers.clear_cache)  
 Clear the scores that [Validate.col_vals_scored()](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) keeps in memory.
+
+## Text Checks
+
+Checks of text data, for corpora used to train or evaluate language models. Each function makes a [Steps](../reference/Steps.md#pointblank.Steps) collection of ordinary validation steps (heuristic quality filters, the language of the text, its length in tokens, and personal information) to be added to a validation with [Validate.add_steps()](../reference/Validate.add_steps.md#pointblank.Validate.add_steps).
+
+[text.heuristic_filters()](text.heuristic_filters.md#pointblank.text.heuristic_filters)  
+Make the heuristic quality filters of web text, as validation steps.
+
+[text.in_language()](text.in_language.md#pointblank.text.in_language)  
+Make a validation step that checks that text is in the expected language.
+
+[text.token_length()](text.token_length.md#pointblank.text.token_length)  
+Make a validation step that checks the length of text in tokens.
+
+[text.no_pii()](text.no_pii.md#pointblank.text.no_pii)  
+Make validation steps that check that text has no personal information.
 
 ## Column Selection
 
@@ -514,6 +545,25 @@ Get the comparison results as a JSON-serializable dict.
 [Comparison.to_json()](Comparison.to_json.md#pointblank.Comparison.to_json)  
 Get the comparison results as a JSON string.
 
+## Split Checks
+
+Check the splits of a dataset (training, validation, and test) before training a model: [check_splits()](../reference/check_splits.md#pointblank.check_splits) finds the rows of a later split that are also in an earlier one (exactly or nearly the same), labels that a split is missing or that only it has, and columns whose distribution changes between splits. The result is a [SplitCheck](../reference/SplitCheck.md#pointblank.SplitCheck) object with the issues found, the overlapping rows, and a tabular report.
+
+[check_splits()](check_splits.md#pointblank.check_splits)  
+Check the splits of a dataset for leaks, label coverage, and drift.
+
+[SplitCheck](SplitCheck.md#pointblank.SplitCheck)  
+The results of [`check_splits()`](../reference/check_splits.md#pointblank.check_splits).
+
+[SplitCheck.get_overlap()](SplitCheck.get_overlap.md#pointblank.SplitCheck.get_overlap)  
+Get the rows of a split that are also in an earlier split.
+
+[SplitCheck.get_tabular_report()](SplitCheck.get_tabular_report.md#pointblank.SplitCheck.get_tabular_report)  
+Get a tabular report of the checks of the splits.
+
+[SplitCheck.to_dict()](SplitCheck.to_dict.md#pointblank.SplitCheck.to_dict)  
+Get the results as a dictionary (that can be written as JSON).
+
 ## Table Pre-checks
 
 Helper functions for use with the `active=` parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.
@@ -572,6 +622,12 @@ Add a variant for each cutoff of a score, removing the rows on the wrong side of
 [Ablation.sweep_step()](Ablation.sweep_step.md#pointblank.Ablation.sweep_step)  
 Add a variant for each value of a step's parameter, removing the rows that fail it.
 
+[Ablation.inject()](Ablation.inject.md#pointblank.Ablation.inject)  
+Add a variant for each rate of a defect, put into clean rows of the table.
+
+[Ablation.shapley()](Ablation.shapley.md#pointblank.Ablation.shapley)  
+Split the effect of removing the steps' rows fairly among the steps (Shapley values).
+
 [Ablation.plan()](Ablation.plan.md#pointblank.Ablation.plan)  
 Show the versions of the table that the ablation will evaluate.
 
@@ -589,6 +645,12 @@ Read the results of evaluations made elsewhere, and compute the effects.
 
 [Ablation.get_effects()](Ablation.get_effects.md#pointblank.Ablation.get_effects)  
 Get the results of the ablation as a table.
+
+[Ablation.get_shapley()](Ablation.get_shapley.md#pointblank.Ablation.get_shapley)  
+Get the Shapley values of the steps as a table.
+
+[Ablation.suggest_thresholds()](Ablation.suggest_thresholds.md#pointblank.Ablation.suggest_thresholds)  
+Suggest thresholds for the steps, from what their failing test units cost the model.
 
 [Ablation.get_tabular_report()](Ablation.get_tabular_report.md#pointblank.Ablation.get_tabular_report)  
 Get a tabular report of the ablation's results.

@@ -4,7 +4,7 @@ A declarative boundary contract for pipeline data.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L373-L1369)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L375-L1371)
 
 ``` python
 Contract(
@@ -271,7 +271,7 @@ Check a table against the contract.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L825-L917)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L827-L919)
 
 ``` python
 validate(data)
@@ -345,7 +345,7 @@ Compile the contract into a validation plan for a table, without running it.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L706-L823)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L708-L825)
 
 ``` python
 to_validate(data)
@@ -416,7 +416,7 @@ Write the contract as YAML.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1265-L1359)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1267-L1361)
 
 ``` python
 to_yaml(path=None)
@@ -512,7 +512,7 @@ Read a contract from a YAML file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1138-L1263)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1140-L1265)
 
 ``` python
 from_yaml(path)
@@ -614,7 +614,7 @@ Convert the contract to a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L919-L1006)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L921-L1008)
 
 ``` python
 to_dict()
@@ -703,7 +703,7 @@ Create a contract from a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1008-L1136)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1010-L1138)
 
 ``` python
 from_dict(data)

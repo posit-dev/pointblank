@@ -4,7 +4,7 @@ Validate whether rows have a score from a model within bounds.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14630-L14931)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14704-L15005)
 
 ``` python
 Validate.col_vals_scored(
@@ -25,7 +25,7 @@ Validate.col_vals_scored(
 )
 ```
 
-The [col_vals_scored()](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) validation method gives each row a score with a model (a *scorer*) and checks that the score is at least `min_val=`, at most `max_val=`, or both. It's for the checks that are about meaning rather than form: whether a passage answers its query (a reranker), whether a document is of good quality or toxic (a classifier), whether text is in the expected language, or whether it's fluent (perplexity). Each row is a test unit, and the scorer gets the values of `columns=` for the row.
+The `col_vals_scored()` validation method gives each row a score with a model (a *scorer*) and checks that the score is at least `min_val=`, at most `max_val=`, or both. It's for the checks that are about meaning rather than form: whether a passage answers its query (a reranker), whether a document is of good quality or toxic (a classifier), whether text is in the expected language, or whether it's fluent (perplexity). Each row is a test unit, and the scorer gets the values of `columns=` for the row.
 
 The scorer can be any function of a batch of rows (see the [`Scorer`](../reference/scorers.Scorer.md#pointblank.scorers.Scorer) protocol), or one of the adapters of `pb.scorers`, which use models from common packages: [`embedding_similarity()`](../reference/scorers.embedding_similarity.md#pointblank.scorers.embedding_similarity), [`reranker()`](../reference/scorers.reranker.md#pointblank.scorers.reranker), [`classifier()`](../reference/scorers.classifier.md#pointblank.scorers.classifier), [`langid()`](../reference/scorers.langid.md#pointblank.scorers.langid), and [`perplexity()`](../reference/scorers.perplexity.md#pointblank.scorers.perplexity). Pointblank never trains a model: the scorers use models that are given to them.
 

@@ -4,7 +4,7 @@ Validate whether a column has a specific percentage of Null values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12494-L12801)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12568-L12875)
 
 ``` python
 Validate.col_pct_null(

@@ -4,13 +4,13 @@ Clear the scores that [Validate.col_vals_scored()](../reference/Validate.col_val
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1236-L1271)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1601-L1636)
 
 ``` python
 scorers.clear_cache()
 ```
 
-With `cache=True` (the default of [col_vals_scored()](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored)), the scores of a scorer are kept in memory for the rest of the session, so that interrogating the same data again (as in an ablation, or after a change to another step) doesn't score it again. This clears them, for all the scorers. A cache on disk (`cache=` as a directory) isn't changed: delete its directory to clear it.
+With `cache=True` (the default of `col_vals_scored()`), the scores of a scorer are kept in memory for the rest of the session, so that interrogating the same data again (as in an ablation, or after a change to another step) doesn't score it again. This clears them, for all the scorers. A cache on disk (`cache=` as a directory) isn't changed: delete its directory to clear it.
 
 ## Returns
 

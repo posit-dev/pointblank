@@ -4,7 +4,7 @@ Score how relevant a document is to a query, with a reranking model.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L665-L747)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L676-L758)
 
 ``` python
 scorers.reranker(

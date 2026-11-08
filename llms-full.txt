@@ -2011,7 +2011,7 @@ Pipeline : Enforce source and target contracts around a transformation.
 pointblank.export_contract : Convert a contract to JSON Schema, Frictionless, dbt, or ODCS.
 pointblank.import_contract : Read an external format, then call `to_contract()` on it.
 
-Step(method: 'str', **kwargs: 'Any') -> 'None'
+Step(method: 'str', /, **kwargs: 'Any') -> 'None'
 
 A single validation step, stored as data.
 
@@ -12282,6 +12282,538 @@ The scores of a scored step can be used to see how the threshold affects a model
 the data, by removing more or fewer rows; see
 [`Ablation.sweep_score()`](`pointblank.Ablation.sweep_score`).
 
+rows_near_distinct(self, columns: 'str | list[str]', method: "Literal['minhash', 'exact']" = 'minhash', threshold: 'float' = 0.85, ngram: 'int' = 5, num_perm: 'int' = 128, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+
+Validate whether the text of rows has no near duplicates.
+
+The `rows_near_distinct()` validation method finds rows whose text is the same as, or
+nearly the same as, another row's: the same document crawled twice, a template filled in
+with different names, or a passage with a changed footer. Such near duplicates make up a
+large share of many text corpora, and a model trained on them gives too much weight to
+the repeated text. Each row is a test unit, and every row in a group of near duplicates
+fails. Unlike [`rows_distinct()`](`pointblank.Validate.rows_distinct`), which compares
+values exactly, the text is compared once normalized (in lower case, without punctuation
+or extra whitespace), and with `method="minhash"` (the default), texts that share most of
+their words in the same order are near duplicates too.
+
+Parameters
+----------
+columns
+    The column (or a list of columns) with the text of each row. The values of several
+    columns are joined by newlines.
+method
+    How texts are compared: `"minhash"` (the default) finds texts whose word n-grams are
+    similar (see the *How Texts Are Compared* section) and `"exact"` finds texts that are
+    the same once normalized.
+threshold
+    With `method="minhash"`, the lowest Jaccard similarity of the word n-grams of two
+    texts at which they are near duplicates, between `0` and `1`. The default, `0.85`,
+    finds texts that differ by a few words.
+ngram
+    With `method="minhash"`, the number of words in each n-gram (the default is `5`). A
+    text shorter than this is one n-gram of all its words.
+num_perm
+    With `method="minhash"`, the number of hash functions of the MinHash signatures (the
+    default is `128`). More find near duplicates more reliably, but take longer.
+pre
+    An optional preprocessing function or lambda to apply to the data table during
+    interrogation. This function should take a table as input and return a modified table.
+segments
+    An optional directive on segmentation, which serves to split a validation step into
+    multiple (one step per segment). Can be a single column name, a tuple that specifies a
+    column name and its corresponding values to segment on, or a combination of both
+    (provided as a list).
+thresholds
+    Set threshold failure levels for reporting and reacting to exceedences of the levels.
+    The thresholds are set at the step level and will override any global thresholds set in
+    `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+    be set locally and global thresholds (if any) will take effect.
+actions
+    Optional actions to take when the validation step meets or exceeds any set threshold
+    levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+    define the actions.
+brief
+    An optional brief description of the validation step that will be displayed in the
+    reporting table. You can use the templating elements like `"{step}"` to insert
+    the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+    the entire brief will be automatically generated. If `None` (the default) then there
+    won't be a brief.
+active
+    A boolean value or callable that determines whether the validation step should be
+    active. Using `False` will make the validation step inactive (still reporting its
+    presence and keeping indexes for the steps unchanged). A callable can also be
+    provided; it will receive the data table as its single argument and must return a
+    boolean value. The callable is evaluated *before* any `pre=` processing.
+dimension
+    An optional data quality dimension to categorize this validation step for health
+    scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+    `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+    dimension is `"uniqueness"`. This label appears in the validation report and feeds
+    the overall and per-dimension health scores.
+
+Returns
+-------
+Validate
+    The `Validate` object with the added validation step.
+
+Raises
+------
+TypeError
+    If `columns=` isn't a column name or a list of them, or if `threshold=`, `ngram=`, or
+    `num_perm=` isn't a number.
+ValueError
+    If `method=` isn't `"minhash"` or `"exact"`, if `threshold=` isn't between `0` and
+    `1`, or if `ngram=` or `num_perm=` is less than `1`.
+
+How Texts Are Compared
+----------------------
+Texts are first normalized: in lower case (with Unicode compatibility forms folded), with
+punctuation replaced by spaces, and with runs of whitespace made one space. Texts that are
+the same once normalized are always near duplicates. With `method="minhash"`, each text is
+also split into its overlapping n-grams of `ngram=` words, and two texts whose sets of
+n-grams have a Jaccard similarity of at least `threshold=` (the share of their n-grams
+that they have in common) are near duplicates. Comparing every pair of texts would take
+too long for a large table, so candidate pairs are found with MinHash signatures and
+locality-sensitive hashing (the way that corpora for language models are deduplicated),
+and each candidate pair is confirmed with its exact Jaccard similarity. No pair below the
+threshold is ever grouped, and a pair just above it is missed only rarely.
+
+Groups of near duplicates are connected: if text A is a near duplicate of text B, and B of
+C, then A, B, and C are one group, even if A and C are less alike. A row with a missing
+value in any of `columns=` passes.
+
+The group of each failing row (numbered from 1, in the order of the first row of each
+group) is in a column of the results called `pb_cluster_`, which is in the extracts of
+failing rows and in the step report, where the rows of each group are shown together.
+The step's note says how many groups were found and how many rows are in them.
+
+Every row of a group fails, as with `rows_distinct()`. When the rows of a validation are
+used to clean a table (with [`get_row_flags()`](`pointblank.Validate.get_row_flags`), or
+in an [`Ablation`](`pointblank.Ablation`)), `duplicates=` decides which rows of a group
+are kept: `"keep_first"` keeps the first row of each group, `"keep_last"` the last, and
+`"flag_all"` keeps none.
+
+Comparing texts runs in Python. A Polars or pandas table is compared as it is (a Polars
+LazyFrame is collected first). For a database table (through Ibis) or a PySpark
+DataFrame, the distinct rows of `columns=` are collected and compared, and the groups are
+joined back to the table on its own backend.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+For the examples here, we'll use a small table of documents, some of which are near
+duplicates of others.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+tbl = pl.DataFrame(
+    {
+        "doc_id": [1, 2, 3, 4, 5, 6],
+        "text": [
+            "The library opens at nine in the morning and closes at six in the evening.",
+            "The trail to the summit is steep, so bring water and good walking shoes.",
+            "The library opens at nine in the morning and closes at six in the evening!",
+            "Tickets for the museum are free for children under the age of twelve.",
+            "the LIBRARY opens at nine in the morning, and closes at six in the evening",
+            "The trail to the summit is steep, so bring water and sturdy walking shoes.",
+        ],
+    }
+)
+
+pb.preview(tbl)
+```
+
+Let's validate that the documents have no near duplicates.
+
+```{python}
+validation = (
+    pb.Validate(data=tbl)
+    .rows_near_distinct(columns="text")
+    .interrogate()
+)
+
+validation
+```
+
+Three of the six rows fail: documents 1, 3, and 5 differ only in their punctuation and
+letter case, so they're one group. Documents 2 and 6 differ by a word, which leaves fewer
+than 85% of their 5-word n-grams in common, so they pass. A lower `threshold=` (or a
+smaller `ngram=`) finds them too:
+
+```{python}
+validation = (
+    pb.Validate(data=tbl)
+    .rows_near_distinct(columns="text", threshold=0.5)
+    .interrogate()
+)
+
+validation.get_step_report(i=1)
+```
+
+The step report shows the rows of each group together, with the group in the
+`pb_cluster_` column. Now five rows fail, in two groups: the library documents and the
+trail documents.
+
+rows_not_contaminated(self, columns: 'str | list[str]', reference: 'Any', reference_columns: 'str | list[str] | None' = None, method: "Literal['ngram', 'exact', 'minhash']" = 'ngram', ngram: 'int | None' = None, threshold: 'float' = 0.8, num_perm: 'int' = 128, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+
+Validate whether the text of rows doesn't overlap with a reference, such as a benchmark.
+
+The `rows_not_contaminated()` validation method checks that the text of each row doesn't
+overlap with the texts of a reference: the questions of a benchmark that a model will be
+evaluated on, the rows of a held-out test set, or any text that shouldn't be in the data.
+Training data that contains the questions of a benchmark *contaminates* it, and the
+model's score on the benchmark no longer says how well it does on questions it hasn't
+seen. Each row is a test unit, and a row whose text overlaps with any text of the
+reference fails.
+
+Parameters
+----------
+columns
+    The column (or a list of columns) with the text of each row. The values of several
+    columns are joined by newlines.
+reference
+    The texts to check against: a table (any table that `Validate` can take, including
+    the path of a CSV or Parquet file), a list of tables or a dictionary of them by name
+    (so that the note can say which reference each overlap is with), or a list of texts.
+reference_columns
+    The column (or a list of columns) of a reference table with its texts. The default is
+    the columns of `columns=`.
+method
+    How texts overlap: `"ngram"` (the default) if they share an n-gram of `ngram=` words,
+    `"exact"` if they're the same once normalized, and `"minhash"` if the Jaccard
+    similarity of their n-grams is at least `threshold=`. See the *How Overlap Is Found*
+    section.
+ngram
+    The number of words in each n-gram. The default is `13` with `method="ngram"` (the
+    length used to check training data for benchmark contamination) and `5` with
+    `method="minhash"`.
+threshold
+    With `method="minhash"`, the lowest Jaccard similarity of the n-grams of a row's text
+    and a reference text at which they overlap, between `0` and `1` (the default is
+    `0.8`).
+num_perm
+    With `method="minhash"`, the number of hash functions of the MinHash signatures (the
+    default is `128`).
+pre
+    An optional preprocessing function or lambda to apply to the data table during
+    interrogation. This function should take a table as input and return a modified table.
+segments
+    An optional directive on segmentation, which serves to split a validation step into
+    multiple (one step per segment). Can be a single column name, a tuple that specifies a
+    column name and its corresponding values to segment on, or a combination of both
+    (provided as a list).
+thresholds
+    Set threshold failure levels for reporting and reacting to exceedences of the levels.
+    The thresholds are set at the step level and will override any global thresholds set in
+    `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+    be set locally and global thresholds (if any) will take effect.
+actions
+    Optional actions to take when the validation step meets or exceeds any set threshold
+    levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+    define the actions.
+brief
+    An optional brief description of the validation step that will be displayed in the
+    reporting table. You can use the templating elements like `"{step}"` to insert
+    the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+    the entire brief will be automatically generated. If `None` (the default) then there
+    won't be a brief.
+active
+    A boolean value or callable that determines whether the validation step should be
+    active. Using `False` will make the validation step inactive (still reporting its
+    presence and keeping indexes for the steps unchanged). A callable can also be
+    provided; it will receive the data table as its single argument and must return a
+    boolean value. The callable is evaluated *before* any `pre=` processing.
+dimension
+    An optional data quality dimension to categorize this validation step for health
+    scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+    `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+    dimension is `"validity"`. This label appears in the validation report and feeds the
+    overall and per-dimension health scores.
+
+Returns
+-------
+Validate
+    The `Validate` object with the added validation step.
+
+Raises
+------
+TypeError
+    If `columns=` or `reference_columns=` isn't a column name or a list of them, or if
+    `ngram=`, `threshold=`, or `num_perm=` isn't a number.
+ValueError
+    If `method=` isn't `"ngram"`, `"exact"`, or `"minhash"`, if `reference=` is `None` or
+    empty, if `threshold=` isn't between `0` and `1`, or if `ngram=` or `num_perm=` is less
+    than `1`.
+
+How Overlap Is Found
+--------------------
+The texts of the rows and of the reference are normalized first: in lower case (with
+Unicode compatibility forms folded), with punctuation replaced by spaces, and with runs of
+whitespace made one space. With `method="ngram"`, a row's text overlaps with a reference
+text if they share any n-gram of `ngram=` words, which finds a benchmark question that's
+been pasted into a longer document. A reference text that's shorter than `ngram=` words
+overlaps with a row's text that contains it whole, and a row's text that's shorter than
+`ngram=` words overlaps only with a reference text that's the same. With
+`method="exact"`, a row's text overlaps only with a reference text that's the same, and
+with `method="minhash"`, it overlaps with a reference text whose n-grams are similar
+enough (found with MinHash signatures and locality-sensitive hashing, and confirmed with
+the exact Jaccard similarity).
+
+A row with a missing value in any of `columns=` passes. The first reference text that a
+failing row overlaps with is in a column of the results called `pb_match_`, which is in
+the extracts of failing rows and in the step report, and the step's note says how many
+rows overlap with each reference.
+
+The reference is read when the validation is interrogated, and its texts are kept in
+memory, so a very large reference takes a lot of memory. The texts of the rows are
+compared in Python: for a database table (through Ibis) or a PySpark DataFrame, the
+distinct rows of `columns=` are collected and compared, and the matches are joined back to
+the table on its own backend.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+For the examples here, we'll use a small table of training documents and a benchmark of
+two questions. One document contains the first question of the benchmark, word for word.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+train = pl.DataFrame(
+    {
+        "doc_id": [1, 2, 3, 4],
+        "text": [
+            "Rivers carry water from the hills down to the sea over many years.",
+            "Quiz: What is the name of the largest moon of the planet Saturn in our solar "
+            "system? Answer: Titan.",
+            "Bread is made of flour, water, salt, and yeast, and baked in an oven.",
+            "The train leaves the station at eight and arrives in the city at ten.",
+        ],
+    }
+)
+
+benchmark = pl.DataFrame(
+    {
+        "question": [
+            "What is the name of the largest moon of the planet Saturn in our solar "
+            "system?",
+            "How many bones are there in the body of an adult human being?",
+        ]
+    }
+)
+```
+
+Let's validate that no training document overlaps with the benchmark's questions.
+
+```{python}
+validation = (
+    pb.Validate(data=train)
+    .rows_not_contaminated(
+        columns="text", reference=benchmark, reference_columns="question"
+    )
+    .interrogate()
+)
+
+validation
+```
+
+The second document fails: it shares a run of 13 words (in fact, the whole question)
+with the benchmark. The step report shows the benchmark question that it matched, in the
+`pb_match_` column.
+
+```{python}
+validation.get_step_report(i=1)
+```
+
+The reference can also be a list of texts, or a dictionary of tables by name (such as
+`{"mmlu": ..., "gsm8k": ...}`), and the step's note then says how many rows overlap with
+each.
+
+col_vals_chat_format(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', roles: 'Sequence[str]' = ('system', 'user', 'assistant'), alternate: 'bool' = True, first_role: 'str | None' = None, last_role: 'str | None' = None, allow_empty: 'bool' = False, role_key: 'str' = 'role', content_key: 'str' = 'content', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+
+Validate whether column values are well-formed chat conversations.
+
+The `col_vals_chat_format()` validation method checks that each value of a column is a
+well-formed conversation of the kind used to fine-tune a chat model: a list of messages,
+each with a role and some content. Each row is a test unit, and a row fails if its value
+isn't a list of messages, has a message without a role or with a role that isn't in
+`roles=`, has a system message anywhere but first, has turns that don't alternate between
+roles, starts or ends with the wrong role, or has a message without content. Malformed
+conversations are common in chat data that's been converted from other formats, and a
+training run can fail on them, or silently learn from them.
+
+Parameters
+----------
+columns
+    A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+    multiple columns are supplied or resolved, there will be a separate validation step
+    generated for each column. The values are lists of messages (such as a Polars column
+    of lists of structs, or a pandas column of lists of dictionaries) or the JSON text of
+    them, either as a list or as an object with a `"messages"` key.
+roles
+    The roles that a message can have. The default is `("system", "user", "assistant")`.
+    If `"system"` is one of them, a system message can only be the first message.
+alternate
+    Should the turns (the messages after a first system message) alternate, so that no
+    role follows itself? The default is `True`.
+first_role
+    The role of the first turn (the first message after a system message), such as
+    `"user"`. The default, `None`, doesn't check it.
+last_role
+    The role of the last message, such as `"assistant"` (for a conversation that ends with
+    the reply that a model should learn). The default, `None`, doesn't check it.
+allow_empty
+    Can a message have empty content (missing, or only whitespace)? The default is
+    `False`.
+role_key
+    The key of the role in each message. The default is `"role"`.
+content_key
+    The key of the content in each message. The default is `"content"`.
+na_pass
+    Should a missing value pass? The default is `False`.
+pre
+    An optional preprocessing function or lambda to apply to the data table during
+    interrogation. This function should take a table as input and return a modified table.
+segments
+    An optional directive on segmentation, which serves to split a validation step into
+    multiple (one step per segment). Can be a single column name, a tuple that specifies a
+    column name and its corresponding values to segment on, or a combination of both
+    (provided as a list).
+thresholds
+    Set threshold failure levels for reporting and reacting to exceedences of the levels.
+    The thresholds are set at the step level and will override any global thresholds set in
+    `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+    be set locally and global thresholds (if any) will take effect.
+actions
+    Optional actions to take when the validation step meets or exceeds any set threshold
+    levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+    define the actions.
+brief
+    An optional brief description of the validation step that will be displayed in the
+    reporting table. You can use the templating elements like `"{step}"` to insert
+    the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+    the entire brief will be automatically generated. If `None` (the default) then there
+    won't be a brief.
+active
+    A boolean value or callable that determines whether the validation step should be
+    active. Using `False` will make the validation step inactive (still reporting its
+    presence and keeping indexes for the steps unchanged). A callable can also be
+    provided; it will receive the data table as its single argument and must return a
+    boolean value. The callable is evaluated *before* any `pre=` processing.
+dimension
+    An optional data quality dimension to categorize this validation step for health
+    scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+    `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+    dimension is `"validity"`. This label appears in the validation report and feeds the
+    overall and per-dimension health scores.
+
+Returns
+-------
+Validate
+    The `Validate` object with the added validation step.
+
+Raises
+------
+TypeError
+    If `roles=` isn't a list of role names, or if `role_key=` or `content_key=` isn't a
+    string.
+ValueError
+    If `roles=` is empty, or if `first_role=` or `last_role=` isn't one of `roles=`.
+
+The Problems Found
+------------------
+The first problem found with a conversation is in a column of the results called
+`pb_reason_`, which is in the extracts of failing rows and in the step report. The step's
+note says how many rows have each problem. The problems are checked in this order:
+
+- `not_messages`: the value isn't a list of messages (or the JSON text of one)
+- `no_messages`: the list of messages is empty
+- `bad_message`: a message isn't a mapping with a role (under `role_key=`) that's a string
+- `unknown_role`: a message has a role that isn't in `roles=`
+- `system_position`: a system message isn't the first message
+- `first_role`: the first turn doesn't have the role of `first_role=`
+- `not_alternating`: a role follows itself (with `alternate=True`)
+- `last_role`: the last message doesn't have the role of `last_role=`
+- `empty_content`: a message has no content, or content that's only whitespace (unless
+  `allow_empty=True`)
+
+A Polars or pandas column can hold the messages as lists (of structs or dictionaries) or
+as JSON text. For a database table (through Ibis) or a PySpark DataFrame, the column must
+hold JSON text: its distinct values are collected and checked, and the problems are joined
+back to the table on its own backend.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+For the examples here, we'll use a small table of conversations, stored as JSON text.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+tbl = pl.DataFrame(
+    {
+        "id": [1, 2, 3, 4],
+        "messages": [
+            '[{"role": "user", "content": "Hi!"}, '
+            '{"role": "assistant", "content": "Hello! How can I help?"}]',
+            '[{"role": "user", "content": "Hi!"}, {"role": "user", "content": "Hello?"}]',
+            '[{"role": "system", "content": "Be brief."}, '
+            '{"role": "user", "content": "Capital of France?"}, '
+            '{"role": "assistant", "content": "Paris."}]',
+            '[{"role": "user", "content": "What is 2 + 2?"}, '
+            '{"role": "bot", "content": "4"}]',
+        ],
+    }
+)
+```
+
+Let's validate that each conversation is well formed and ends with a reply of the
+assistant.
+
+```{python}
+validation = (
+    pb.Validate(data=tbl)
+    .col_vals_chat_format(columns="messages", last_role="assistant")
+    .interrogate()
+)
+
+validation
+```
+
+Two of the four conversations fail: the second has two user messages in a row, and the
+fourth has a message with the role `"bot"`. The step report shows the problem with each
+failing row in the `pb_reason_` column.
+
+```{python}
+validation.get_step_report(i=1)
+```
+
+The third conversation passes: its system message is first, and its turns alternate
+between the user and the assistant.
+
 
 ## Aggregation Steps
 
@@ -16328,7 +16860,7 @@ validation = (
 For a classifier with several labels, like a toxicity model, `label=` chooses the label to
 score and `max_val=` would keep the rows that score low for it.
 
-langid(expected: 'str | list[str]', backend: 'str | Callable[[str], Any]' = 'langid', model: 'str | None' = None, column: 'str | None' = None, name: 'str | None' = None, version: 'str | None' = None, batch_size: 'int | None' = None) -> 'Scorer'
+langid(expected: 'str | list[str] | None' = None, backend: 'str | Callable[[str], Any]' = 'langid', model: 'str | None' = None, column: 'str | None' = None, expected_column: 'str | None' = None, name: 'str | None' = None, version: 'str | None' = None, batch_size: 'int | None' = None) -> 'Scorer'
 
 Score text by how likely it is to be in the expected languages.
 
@@ -16342,7 +16874,7 @@ Parameters
 expected
     The expected language (an ISO 639 code like `"en"`), or a list of them. A code matches
     the model's languages with the same code or with a region or script after it (`"en"`
-    matches `"en_US"`).
+    matches `"en_US"`). Give this or `expected_column=`.
 backend
     The language identification model: `"langid"` (the default, which needs the `langid`
     package), `"fasttext"` (a fastText model, which needs the `fasttext` package and the path
@@ -16351,10 +16883,15 @@ backend
 model
     The path of the fastText model (e.g., `lid.176.bin`), with `backend="fasttext"`.
 column
-    The column with the text to score. It can be left out if the step has one column.
+    The column with the text to score. It can be left out if the step has one column (or two,
+    with one of them as `expected_column=`).
+expected_column
+    A column with the expected language of each row, instead of `expected=` (for a
+    multilingual corpus, where each document is labelled with its language). The column must
+    be one of the columns of the step.
 name
     A name for the scorer, for the score cache and the report. By default, it's made from the
-    expected languages, the backend, and the model.
+    expected languages (or `expected_column=`), the backend, and the model.
 version
     A version, which is part of the key of the score cache.
 batch_size
@@ -16398,7 +16935,26 @@ pb.Validate(data=tbl).col_vals_scored(
 ).interrogate()
 ```
 
-The review in French fails, and so does `"ok"`, which can't be told apart.
+The review in French fails, and so does `"ok"`, which can't be told apart. In a corpus with
+documents in several languages, the expected language of each row can come from a column,
+with `expected_column=`:
+
+```{python}
+tbl = pl.DataFrame(
+    {
+        "review": ["the soup is good", "le pain est bon", "le vin est bon"],
+        "lang": ["en", "fr", "en"],
+    }
+)
+
+pb.Validate(data=tbl).col_vals_scored(
+    columns=["review", "lang"],
+    scorer=pb.scorers.langid(expected_column="lang", backend=guess),
+    min_val=0.6,
+).interrogate()
+```
+
+The third review is labelled as English, but it's in French, so it fails.
 
 perplexity(fn: 'Callable[..., Any] | None' = None, kenlm_model: 'str | None' = None, column: 'str | None' = None, per_row: 'bool' = True, name: 'str | None' = None, version: 'str | None' = None, batch_size: 'int | None' = None) -> 'Scorer'
 
@@ -16467,6 +17023,172 @@ pb.Validate(data=tbl).col_vals_scored(
 
 The garbled text has the highest score, above `max_val=4`, so it's the row that fails.
 
+text_stat(stat: 'str', column: 'str | None' = None, stop_words: 'list[str] | None' = None, name: 'str | None' = None, version: 'str | None' = None, batch_size: 'int | None' = None) -> 'Scorer'
+
+Score text by a simple statistic, like its number of words or its share of bullet lines.
+
+These are the statistics of the quality filters that are used to clean web text for language
+models (those of the Gopher models, by Rae et al., 2021). They need no model, so they're fast,
+and they catch much of the text that isn't prose: lists of links, menus, tables of numbers,
+and boilerplate. [`pb.text.heuristic_filters()`](`pointblank.text.heuristic_filters`) makes
+a step for each of them, with the bounds used for Gopher.
+
+Words are the text split on whitespace, and lines are the text split on newlines (blank
+lines are left out). The statistics are:
+
+- `"char_count"`: the number of characters
+- `"word_count"`: the number of words
+- `"mean_word_length"`: the mean number of characters of the words
+- `"symbol_ratio"`: the number of hash symbols (`#`) and ellipses for each word
+- `"bullet_lines"`: the share of lines that start with a bullet point
+- `"ellipsis_lines"`: the share of lines that end with an ellipsis
+- `"alpha_words"`: the share of words with at least one letter
+- `"stop_words"`: the number of distinct stop words in the text
+- `"repeated_lines"`: the share of lines that are the same as an earlier line
+
+A text without words has no score for the statistics that are shares of its words (and
+without lines, for those that are shares of its lines).
+
+Parameters
+----------
+stat
+    The statistic, one of those above.
+column
+    The column with the text to score. It can be left out if the step has one column.
+stop_words
+    The stop words, with `stat="stop_words"`. By default, they're the eight English words
+    of the Gopher filters (`the`, `be`, `to`, `of`, `and`, `that`, `have`, and `with`).
+name
+    A name for the scorer, for the score cache and the report. By default, it's made from the
+    statistic and its settings.
+version
+    A version, which is part of the key of the score cache.
+batch_size
+    The number of texts scored at a time (`1024` by default).
+
+Returns
+-------
+Scorer
+    A scorer for `Validate.col_vals_scored()`.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's check that each document of a small corpus has at least eight words, and that no more
+than half of its lines are bullet points.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+tbl = pl.DataFrame(
+    {
+        "text": [
+            "The museum opens at nine and closes at five on weekdays.",
+            "Home | About | Contact",
+            "- Bread\n- Milk\n- Eggs\nA short list of what to buy for the weekend.",
+        ]
+    }
+)
+
+(
+    pb.Validate(data=tbl)
+    .col_vals_scored(columns="text", scorer=pb.scorers.text_stat("word_count"), min_val=8)
+    .col_vals_scored(
+        columns="text", scorer=pb.scorers.text_stat("bullet_lines"), max_val=0.5
+    )
+    .interrogate()
+)
+```
+
+The menu in the second row has only five words, so it fails step 1, and three of the four
+lines of the shopping list are bullet points, so it fails step 2.
+
+token_count(tokenizer: 'str | Any', column: 'str | None' = None, name: 'str | None' = None, version: 'str | None' = None, batch_size: 'int | None' = None) -> 'Scorer'
+
+Score text by its number of tokens.
+
+A language model reads text as tokens, and most have a limit on how many they can take, so a
+corpus for training (or a set of prompts) usually needs texts with neither too few tokens nor
+too many. The score of a row is the number of tokens of its text, with the tokenizer of a
+model, which makes `min_val=` and `max_val=` bounds on the length of each text in tokens.
+
+Parameters
+----------
+tokenizer
+    The tokenizer. It can be:
+
+    - the name of a Hugging Face tokenizer (e.g., `"gpt2"` or `"bert-base-uncased"`), which
+      needs the `transformers` package (special tokens aren't counted)
+    - `"tiktoken:"` and the name of a `tiktoken` encoding or model (e.g.,
+      `"tiktoken:cl100k_base"` or `"tiktoken:gpt-4o"`), which needs the `tiktoken` package
+    - `"whitespace"`, to count the words of the text, split on whitespace
+    - a tokenizer object with an `encode()` method (from `tiktoken`, `tokenizers`, or
+      `transformers`)
+    - a function that takes a text and returns its tokens, or the number of them
+column
+    The column with the text to score. It can be left out if the step has one column.
+name
+    A name for the scorer, for the score cache and the report. A tokenizer given by name
+    names the scorer; a tokenizer object or a function needs a `name=` for the scores to be
+    kept on disk.
+version
+    A version, which is part of the key of the score cache.
+batch_size
+    The number of texts scored at a time (`512` by default).
+
+Returns
+-------
+Scorer
+    A scorer for `Validate.col_vals_scored()`.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+A real check would use the tokenizer of a model, such as `"tiktoken:cl100k_base"`. To keep
+this example self-contained, the tokenizer here splits text into words and punctuation.
+
+```{python}
+import re
+
+import pointblank as pb
+import polars as pl
+
+def tokenize(text):
+    return re.findall(r"\w+|[^\w\s]", text)
+
+tbl = pl.DataFrame(
+    {
+        "prompt": [
+            "Summarize the article in two sentences.",
+            "Hi",
+            "Translate this paragraph into French, keeping the names as they are.",
+        ]
+    }
+)
+
+pb.Validate(data=tbl).col_vals_scored(
+    columns="prompt",
+    scorer=pb.scorers.token_count(tokenize),
+    min_val=3,
+    max_val=12,
+).interrogate()
+```
+
+The second prompt has one token and the third has thirteen, so both fail.
+
 clear_cache() -> 'None'
 
 Clear the scores that `Validate.col_vals_scored()` keeps in memory.
@@ -16499,6 +17221,376 @@ pb.scorers.clear_cache()
 ```
 
 This is useful when a scorer's model has changed without a change to its name or version.
+
+
+## Text Checks
+
+Checks of text data, for corpora used to train or evaluate language models. Each function makes a `Steps` collection of ordinary validation steps (heuristic quality filters, the language of the text, its length in tokens, and personal information) to be added to a validation with `Validate.add_steps()`.
+
+
+
+heuristic_filters(column: 'str', min_words: 'int | None' = 50, max_words: 'int | None' = 100000, min_mean_word_length: 'float | None' = 3, max_mean_word_length: 'float | None' = 10, max_symbol_ratio: 'float | None' = 0.1, max_bullet_lines: 'float | None' = 0.9, max_ellipsis_lines: 'float | None' = 0.3, min_alpha_words: 'float | None' = 0.8, min_stop_words: 'int | None' = 2, max_repeated_lines: 'float | None' = 0.3, stop_words: 'Sequence[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Steps'
+
+Make the heuristic quality filters of web text, as validation steps.
+
+Text collected from the web for training language models has a lot that isn't prose: menus,
+lists of links, tables of numbers, placeholder text, and pages that repeat themselves. The
+quality filters of the Gopher models (Rae et al., 2021) catch much of it with a few simple
+statistics of each document, and this function makes a validation step for each of them,
+with the bounds used for Gopher as the defaults:
+
+- the number of words is between `min_words=` and `max_words=` (50 and 100,000)
+- the mean length of the words is between `min_mean_word_length=` and
+  `max_mean_word_length=` (3 and 10 characters)
+- there are no more than `max_symbol_ratio=` hash symbols and ellipses for each word (0.1)
+- no more than `max_bullet_lines=` of the lines start with a bullet point (90%)
+- no more than `max_ellipsis_lines=` of the lines end with an ellipsis (30%)
+- at least `min_alpha_words=` of the words have a letter (80%)
+- the text has at least `min_stop_words=` distinct stop words (2 of the, be, to, of, and,
+  that, have, and with)
+- no more than `max_repeated_lines=` of the lines repeat an earlier line (30%)
+
+Each check is a `col_vals_scored()` step with a
+[`text_stat()`](`pointblank.scorers.text_stat`) scorer, so the report shows each one, with
+its own counts of the documents that fail, and a brief that says what it checks. Set a
+bound to `None` to leave its check out (a check with two bounds is left out when both are
+`None`). A document with a missing value passes, as do documents without the words or lines
+that a check needs (the check of the number of words catches them).
+
+The defaults are for English web text. Text in other languages needs other stop words (and
+perhaps other bounds), and short texts (like titles or chat messages) need a lower
+`min_words=`.
+
+Parameters
+----------
+column
+    The column with the text.
+min_words, max_words
+    The fewest and the most words a document can have.
+min_mean_word_length, max_mean_word_length
+    The bounds of the mean length of the words of a document, in characters.
+max_symbol_ratio
+    The most hash symbols and ellipses that a document can have for each word.
+max_bullet_lines
+    The largest share of the lines of a document that can start with a bullet point.
+max_ellipsis_lines
+    The largest share of the lines of a document that can end with an ellipsis.
+min_alpha_words
+    The smallest share of the words of a document that must have a letter.
+min_stop_words
+    The fewest distinct stop words that a document must have.
+max_repeated_lines
+    The largest share of the lines of a document that can be the same as an earlier line.
+stop_words
+    The stop words, for `min_stop_words=`. By default, they're the eight English words of the
+    Gopher filters.
+pre
+    A function that transforms the table before each step, as in the validation methods.
+segments
+    The segments of the steps, as in the validation methods.
+thresholds
+    The thresholds of the steps (by default, those of the validation).
+actions
+    The actions of the steps.
+active
+    Whether the steps are active.
+
+Returns
+-------
+Steps
+    The steps, to be added to a validation with
+    [`Validate.add_steps()`](`pointblank.Validate.add_steps`).
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's check a small corpus of web documents. The documents are short, so we'll use a lower
+`min_words=` than the default.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+corpus = pl.DataFrame(
+    {
+        "text": [
+            "The museum is open from nine to five, and the entry is free for children "
+            "under the age of twelve, so it's a good place to spend the day with family.",
+            "Home\nAbout\nHome\nAbout\nHome\nContact us",
+            "#sale #deals #shoes #free #today ... click to see more of the best deals",
+            "Our library lends books, films, and music to members of the town for up to "
+            "three weeks, and the books can be returned to any of its branches.",
+        ]
+    }
+)
+
+(
+    pb.Validate(data=corpus)
+    .add_steps(pb.text.heuristic_filters("text", min_words=10))
+    .interrogate()
+)
+```
+
+The menu in the second row has too few words and too many repeated lines, and few stop
+words. The third row, a list of hashtags, has too many symbols for its words. The two
+documents of prose pass every check.
+
+in_language(column: 'str', expected: 'str | list[str] | None' = None, expected_column: 'str | None' = None, min_confidence: 'float' = 0.5, backend: 'str | Callable[[str], Any]' = 'langid', model: 'str | None' = None, na_pass: 'bool' = False, cache: 'bool | str' = True, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Steps'
+
+Make a validation step that checks that text is in the expected language.
+
+The step is a `col_vals_scored()` step with a [`langid()`](`pointblank.scorers.langid`)
+scorer: a language identification model gives the probability that the text of each row is
+in one of the expected languages, and a row fails if the probability is below
+`min_confidence=`. The expected languages are the same for every row (`expected=`) or come
+from a column (`expected_column=`), for a corpus with documents in several languages.
+
+Parameters
+----------
+column
+    The column with the text.
+expected
+    The expected language (an ISO 639 code like `"en"`), or a list of them.
+expected_column
+    A column with the expected language of each row, instead of `expected=`.
+min_confidence
+    The smallest probability that a text is in the expected languages for it to pass.
+backend
+    The language identification model: `"langid"`, `"fasttext"` (with the path of the model
+    as `model=`), or a function that gives the probabilities of a text by language (see
+    [`langid()`](`pointblank.scorers.langid`)).
+model
+    The path of the fastText model, with `backend="fasttext"`.
+na_pass
+    Whether a row with a missing value passes.
+cache
+    Where the scores are kept: in memory (`True`), in a directory, or not at all (`False`).
+pre
+    A function that transforms the table before the step, as in the validation methods.
+segments
+    The segments of the step, as in the validation methods.
+thresholds
+    The thresholds of the step (by default, those of the validation).
+actions
+    The actions of the step.
+brief
+    A brief for the step.
+active
+    Whether the step is active.
+
+Returns
+-------
+Steps
+    The step, to be added to a validation with
+    [`Validate.add_steps()`](`pointblank.Validate.add_steps`).
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+A real check would use the `langid` package or a fastText model. To keep this example
+self-contained, the backend is a toy function that guesses the language from a few words.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+def guess(text):
+    words = set(text.lower().split())
+    if words & {"the", "and", "is"}:
+        return {"en": 0.9, "fr": 0.1}
+    if words & {"le", "et", "est"}:
+        return {"en": 0.1, "fr": 0.9}
+    return {"en": 0.5, "fr": 0.5}
+
+docs = pl.DataFrame(
+    {
+        "text": ["the soup is good", "le pain est bon", "the bread is fresh"],
+        "lang": ["en", "fr", "fr"],
+    }
+)
+
+(
+    pb.Validate(data=docs)
+    .add_steps(pb.text.in_language("text", expected="en", backend=guess))
+    .add_steps(pb.text.in_language("text", expected_column="lang", backend=guess))
+    .interrogate()
+)
+```
+
+The document in French fails step 1, which expects English for every row. In step 2, each
+row is checked against its own label, and the last document fails: it's labelled as French,
+but it's in English.
+
+token_length(column: 'str', tokenizer: 'str | Any', min_val: 'int | None' = None, max_val: 'int | None' = None, na_pass: 'bool' = False, cache: 'bool | str' = True, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Steps'
+
+Make a validation step that checks the length of text in tokens.
+
+A language model reads text as tokens, and most have a limit on how many they can take in, so
+the documents of a corpus for training (or a set of prompts) need to be neither too short nor
+too long, in the tokens of the model's tokenizer. The step is a `col_vals_scored()` step with
+a [`token_count()`](`pointblank.scorers.token_count`) scorer, and a row fails if its number of
+tokens is below `min_val=` or above `max_val=`.
+
+Parameters
+----------
+column
+    The column with the text.
+tokenizer
+    The tokenizer: the name of a Hugging Face tokenizer, `"tiktoken:"` and the name of an
+    encoding or a model, `"whitespace"`, a tokenizer object, or a function (see
+    [`token_count()`](`pointblank.scorers.token_count`)).
+min_val, max_val
+    The fewest and the most tokens that a text can have (at least one of them is needed).
+na_pass
+    Whether a row with a missing value passes.
+cache
+    Where the counts are kept: in memory (`True`), in a directory, or not at all (`False`).
+pre
+    A function that transforms the table before the step, as in the validation methods.
+segments
+    The segments of the step, as in the validation methods.
+thresholds
+    The thresholds of the step (by default, those of the validation).
+actions
+    The actions of the step.
+brief
+    A brief for the step.
+active
+    Whether the step is active.
+
+Returns
+-------
+Steps
+    The step, to be added to a validation with
+    [`Validate.add_steps()`](`pointblank.Validate.add_steps`).
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+A real check would use the tokenizer of a model (e.g., `"tiktoken:cl100k_base"`). Here, the
+tokens are the words, split on whitespace.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+prompts = pl.DataFrame(
+    {"prompt": ["Summarize the article in two sentences.", "Hi", "List three uses of salt."]}
+)
+
+(
+    pb.Validate(data=prompts)
+    .add_steps(pb.text.token_length("prompt", tokenizer="whitespace", min_val=3))
+    .interrogate()
+)
+```
+
+The second prompt has a single token, so it fails.
+
+no_pii(columns: 'str | list[str]', entities: 'Sequence[str] | Mapping[str, str]' = ('email', 'phone', 'credit_card'), na_pass: 'bool' = True, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Steps'
+
+Make validation steps that check that text has no personal information.
+
+Text collected for training or evaluating a model shouldn't have personal information in it,
+such as email addresses, phone numbers, or credit card numbers. This function makes a
+`col_vals_regex()` step (with `inverse=True`) for each column and each kind of information:
+a row fails if its text has something that looks like one. The patterns use only the features
+of regular expressions that every backend has, so the checks run in the database (or in
+PySpark) like any other `col_vals_regex()` step.
+
+The patterns find likely matches, not certain ones: a number with the shape of a credit card
+number matches, with no checksum, and an unusual format of a phone number can be missed. For
+a thorough check, use a model for named entities (e.g., with `col_vals_scored()`).
+
+The entities are:
+
+- `"email"`: email addresses
+- `"phone"`: phone numbers of North America, with or without a country code (like
+  `(555) 123-4567` or `+1 555.123.4567`)
+- `"credit_card"`: credit card numbers (Visa, Mastercard, American Express, and Discover),
+  with or without spaces or dashes
+- `"ip_address"`: IPv4 addresses
+- `"us_ssn"`: US Social Security numbers (like `123-45-6789`)
+- `"iban"`: International Bank Account Numbers
+
+Parameters
+----------
+columns
+    The column with the text, or a list of them.
+entities
+    The kinds of information to look for (by default, `"email"`, `"phone"`, and
+    `"credit_card"`), or a dictionary of patterns of your own, by name (which can be mixed
+    with the names above, as in `{"email": None, "employee_id": r"EMP-[0-9]{6}"}`, where
+    `None` is the pattern of an entity above).
+na_pass
+    Whether a row with a missing value passes (it does by default, as a missing text has no
+    personal information).
+pre
+    A function that transforms the table before each step, as in the validation methods.
+segments
+    The segments of the steps, as in the validation methods.
+thresholds
+    The thresholds of the steps (by default, those of the validation).
+actions
+    The actions of the steps.
+active
+    Whether the steps are active.
+
+Returns
+-------
+Steps
+    The steps, to be added to a validation with
+    [`Validate.add_steps()`](`pointblank.Validate.add_steps`).
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Let's check a table of support tickets for personal information.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+tickets = pl.DataFrame(
+    {
+        "text": [
+            "The app crashes when I open the settings page.",
+            "Please email me at jo.smith@example.com when it's fixed.",
+            "Call me back on (555) 123-4567 after five.",
+            "I was charged twice on card 4111 1111 1111 1111.",
+        ]
+    }
+)
+
+pb.Validate(data=tickets).add_steps(pb.text.no_pii("text")).interrogate()
+```
+
+Each of the last three tickets fails one of the steps: the email address in step 1, the
+phone number in step 2, and the card number in step 3.
 
 
 ## Column Selection
@@ -19226,7 +20318,8 @@ That step counts every copy of a duplicated row as failing, since it can't know 
 them is the 'wrong' one. Such steps are only used for sundering if you say which copy to
 keep with `duplicates=`: the kept copy goes to the 'pass' piece (if it passes the other
 steps) and the other copies go to the 'fail' piece. With `duplicates="flag_all"`, every
-copy goes to the 'fail' piece.
+copy goes to the 'fail' piece. The same goes for the groups of near duplicates found by
+[`rows_near_distinct()`](`pointblank.Validate.rows_near_distinct`) steps.
 
 Parameters
 ----------
@@ -19236,8 +20329,9 @@ type
     latter returns a table only containing rows had test units that failed in at least one
     validation step.
 duplicates
-    How to treat the duplicate rows found by `rows_distinct()` steps. The default `None`
-    leaves those steps out of the sundering. Use `"keep_first"` or `"keep_last"` to keep one
+    How to treat the duplicate rows found by `rows_distinct()` (and
+    `rows_near_distinct()`) steps. The default `None` leaves those steps out of the
+    sundering. Use `"keep_first"` or `"keep_last"` to keep one
     copy of each group of duplicates (the first or last one, in row order or in the order
     given by `duplicates_order_by=`), or `"flag_all"` to treat every copy as failing.
 duplicates_order_by
@@ -19373,7 +20467,9 @@ Unlike `get_sundered_data()`, steps that use
 [`rows_distinct()`](`pointblank.Validate.rows_distinct`) are included by default: one copy
 of each group of duplicate rows (the first one) isn't flagged, and the other copies are. So
 a `rows_distinct()` flag marks the rows that removing duplicates would remove. Use
-`duplicates=` and `duplicates_order_by=` to choose which copy is kept.
+`duplicates=` and `duplicates_order_by=` to choose which copy is kept. Steps that use
+[`rows_near_distinct()`](`pointblank.Validate.rows_near_distinct`) are treated in the same
+way, with a group of near duplicates in place of the copies of a row.
 
 A row-level step that can't be used is reported in a warning: that's a step that uses an
 unmarked `pre=` function (it can change the rows, so its results may not line up with the
@@ -19383,11 +20479,11 @@ table's rows), a step that couldn't be evaluated, or a `rows_distinct()` step wh
 Parameters
 ----------
 duplicates
-    How to flag the duplicate rows found by `rows_distinct()` steps. With `"keep_first"`
-    (the default) or `"keep_last"`, one copy of each group of duplicates (the first or last
-    one, in row order or in the order given by `duplicates_order_by=`) isn't flagged.
-    `"flag_all"` flags every copy, as the step itself counts them, and `None` leaves
-    `rows_distinct()` steps out.
+    How to flag the duplicate rows found by `rows_distinct()` (and `rows_near_distinct()`)
+    steps. With `"keep_first"` (the default) or `"keep_last"`, one copy of each group of
+    duplicates (the first or last one, in row order or in the order given by
+    `duplicates_order_by=`) isn't flagged. `"flag_all"` flags every copy, as the step
+    itself counts them, and `None` leaves those steps out.
 duplicates_order_by
     One or more columns that order the copies of a duplicated row, to decide which copy
     isn't flagged. For example, use `duplicates="keep_last",
@@ -23763,6 +24859,227 @@ Each such record is one line, so a series of comparisons can be appended to a si
 and read back later, one comparison per line.
 
 
+## Split Checks
+
+Check the splits of a dataset (training, validation, and test) before training a model: `check_splits()` finds the rows of a later split that are also in an earlier one (exactly or nearly the same), labels that a split is missing or that only it has, and columns whose distribution changes between splits. The result is a `SplitCheck` object with the issues found, the overlapping rows, and a tabular report.
+
+
+
+check_splits(train: 'Any' = None, valid: 'Any' = None, test: 'Any' = None, *, splits: 'Mapping[str, Any] | None' = None, columns: 'str | list[str] | None' = None, label: 'str | None' = None, near: 'bool' = False, threshold: 'float' = 0.8, ngram: 'int' = 5, num_perm: 'int' = 128, drift_columns: 'str | list[str] | bool | None' = None) -> 'SplitCheck'
+
+Check the splits of a dataset for leaks, label coverage, and drift.
+
+A model is trained on one split of a dataset and judged on another, so the judgment is only
+fair if the splits are independent and alike. This checks three ways that they can fail to be:
+
+- **Overlap.** A row of a later split (e.g., of the test split) that's also in an earlier one
+  (e.g., in the training split) leaks: the model is judged on data it has seen, so it looks
+  better than it is. Rows overlap if they have the same values of `columns=`; with
+  `near=True`, rows whose text is nearly the same (a Jaccard similarity of their word n-grams
+  of at least `threshold=`, found with MinHash) overlap too, which catches copies that differ
+  by a few words, by case, or by punctuation.
+- **Labels.** With `label=`, every label of the first split should be in the others (or the
+  model is never judged on it), no split should have a label that isn't in the first (the
+  model never learns it), and the shares of the labels should be about the same.
+- **Drift.** The distribution of each column of `drift_columns=` in each split is compared
+  with that in the first split, with the population stability index (PSI, from binned
+  shares of the values) and, for a numeric column, the Kolmogorov-Smirnov (KS) statistic. A
+  PSI of at least 0.1 is a moderate change, and one of at least 0.2 is a major change.
+
+The splits can be tables of any kind that Pointblank can validate (or the paths of files).
+The columns that are checked are read into memory, so a split in a database is read in full.
+
+Parameters
+----------
+train, valid, test
+    The splits, in that order (give at least two). Or use `splits=` instead.
+splits
+    A dictionary of the splits, by name, in order (the first one is the one that the others
+    are compared with).
+columns
+    The columns whose values identify a row, for the check of overlap: a column, or a list of
+    them. By default, they're all the columns that the splits share, except for `label=`.
+label
+    The column with the labels, if any. A numeric label with more than 50 distinct values
+    (e.g., the target of a regression) is checked for drift only.
+near
+    Whether to find rows whose text is nearly the same, as well as rows that are the same.
+threshold
+    The smallest Jaccard similarity of two rows' word n-grams for them to be nearly the same
+    (with `near=True`).
+ngram
+    The number of words of the n-grams (with `near=True`).
+num_perm
+    The number of MinHash permutations (with `near=True`).
+drift_columns
+    The columns to check for drift. By default, they're the numeric columns that the splits
+    share and the others with few distinct values in the first split (at most 50, and at most
+    half as many as its rows, which leaves out free text and identifiers), except for
+    `label=`. Use `False` to check none.
+
+Returns
+-------
+SplitCheck
+    The results, with a report from
+    [`get_tabular_report()`](`pointblank.SplitCheck.get_tabular_report`) and the overlapping
+    rows from [`get_overlap()`](`pointblank.SplitCheck.get_overlap`).
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here are the training and test splits of a dataset of support tickets, labelled with their
+topic. Two of the test tickets are copies of training tickets: one exactly, and one with
+different case and punctuation.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+topics = ["billing", "login", "shipping", "billing", "returns"]
+train = pl.DataFrame(
+    {
+        "text": [f"Ticket {k}: question number {k} about {topics[k % 5]}" for k in range(40)],
+        "topic": [topics[k % 5] for k in range(40)],
+        "length": [20 + k % 7 for k in range(40)],
+    }
+)
+test = pl.DataFrame(
+    {
+        "text": [
+            "Ticket 3: question number 3 about billing",
+            "ticket 7 -- question NUMBER 7 about shipping!",
+        ]
+        + [f"New ticket {k} about a lost parcel" for k in range(10)],
+        "topic": ["billing", "shipping"] + ["shipping"] * 10,
+        "length": [20, 22] + [40 + k for k in range(10)],
+    }
+)
+
+check = pb.check_splits(
+    train=train, test=test, columns="text", label="topic", near=True, ngram=3
+)
+check
+```
+
+The report shows both copies, and that the test split has none of the tickets about logins
+or returns, so the model would never be judged on those. The tickets are also much longer in
+the test split. The overlapping rows can be had as a table:
+
+```{python}
+check.get_overlap("train", "test")
+```
+
+And `check.issues` lists the problems, so that a pipeline can stop when there are any.
+
+SplitCheck(values: 'dict[str, dict[str, list[Any]]]', schema: 'dict[str, Any]', columns: 'list[str]', label: 'str | None', near: 'bool', threshold: 'float', ngram: 'int', num_perm: 'int', drift_columns: 'list[str]')
+
+The results of [`check_splits()`](`pointblank.check_splits`).
+
+Attributes
+----------
+splits
+    The number of rows of each split, by name.
+overlap
+    A dictionary for each pair of splits (an earlier split `first` and a later one
+    `second`), with the number of rows of the later split that are also in the earlier
+    one (`exact`) and, with `near=True`, the number of other rows of the later split that
+    are nearly the same as one in the earlier split (`near`).
+labels
+    The check of the labels (or `None` without `label=`): the counts of the labels in each
+    split, the labels of the first split that each other split doesn't have (`missing`),
+    those of each other split that the first doesn't have (`unseen`), and the PSI of the
+    shares of the labels of each other split, compared with the first.
+drift
+    A dictionary for each column of `drift_columns=` and each split after the first, with the
+    PSI and (for a numeric column) the KS statistic and its p-value, compared with the first
+    split, and the level of the change (`"stable"`, `"moderate"`, `"major"`, or `None` when
+    there are too few values).
+issues
+    The problems found, as messages: overlapping rows, missing or unseen labels, and major
+    changes in distribution (a PSI of at least 0.2). A moderate change isn't an issue, but
+    it's shown in the report.
+
+get_overlap(self, first: 'str | None' = None, second: 'str | None' = None) -> 'Any'
+
+Get the rows of a split that are also in an earlier split.
+
+Parameters
+----------
+first, second
+    The names of the earlier and later splits. By default, they're the first two.
+
+Returns
+-------
+DataFrame
+    A Polars DataFrame (or a pandas one, if Polars isn't installed) with a row for each
+    row of `second` that's also in `first`: the row numbers in each split (from 1), the
+    kind of overlap (`"exact"` or `"near"`), and the values of the columns that were
+    compared (from the later split).
+
+Examples
+--------
+```{python}
+import pointblank as pb
+import polars as pl
+
+train = pl.DataFrame({"text": ["a cat", "a dog", "a bird"]})
+test = pl.DataFrame({"text": ["a fish", "a dog"]})
+
+pb.check_splits(train=train, test=test).get_overlap()
+```
+
+The second row of the test split is the same as the second row of the training split.
+
+get_tabular_report(self, title: 'str | None' = None) -> 'GT'
+
+Get a tabular report of the checks of the splits.
+
+The report has a group of rows for each check: the overlap of each pair of splits, the
+labels of each split, and the drift of each column in each split after the first. Each
+row has a badge with its result, and the header says how many issues there are.
+
+Parameters
+----------
+title
+    An optional title replacing the default.
+
+Returns
+-------
+GT
+    A Great Tables object.
+
+Examples
+--------
+```{python}
+import pointblank as pb
+import polars as pl
+
+train = pl.DataFrame({"x": list(range(100)), "y": ["a", "b"] * 50})
+test = pl.DataFrame({"x": list(range(50, 100)), "y": ["a"] * 50})
+
+pb.check_splits(train=train, test=test, label="y").get_tabular_report()
+```
+
+Each row of the test split is also in the training split, the test split has none of the
+label `"b"`, and its values of `x` are larger.
+
+to_dict(self) -> 'dict[str, Any]'
+
+Get the results as a dictionary (that can be written as JSON).
+
+Returns
+-------
+dict
+    The splits and their sizes, the settings, and the results of the checks of overlap,
+    labels, and drift, with the issues found.
+
+
 ## Table Pre-checks
 
 Helper functions for use with the `active=` parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.
@@ -24101,9 +25418,12 @@ An `Ablation` is built in two parts, like a validation: the strategy methods add
 [`drop_all()`](`pointblank.Ablation.drop_all`),
 [`drop_steps()`](`pointblank.Ablation.drop_steps`),
 [`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`),
-[`drop_groups()`](`pointblank.Ablation.drop_groups`), and the sweeps
+[`drop_groups()`](`pointblank.Ablation.drop_groups`), the sweeps
 [`sweep_score()`](`pointblank.Ablation.sweep_score`) and
-[`sweep_step()`](`pointblank.Ablation.sweep_step`)), and nothing is evaluated until
+[`sweep_step()`](`pointblank.Ablation.sweep_step`),
+[`inject()`](`pointblank.Ablation.inject`), which corrupts clean rows to measure what a defect
+costs, and [`shapley()`](`pointblank.Ablation.shapley`), which splits the credit among
+overlapping steps), and nothing is evaluated until
 [`run()`](`pointblank.Ablation.run`) is called. Use [`plan()`](`pointblank.Ablation.plan`)
 before that to see how many rows each variant removes and how many evaluations the run needs.
 When training happens elsewhere (e.g., on a cluster), [`export()`](`pointblank.Ablation.export`)
@@ -24288,7 +25608,7 @@ Validate.get_row_flags : Get which steps each row failed, as columns added to th
 AblationVariant : A version of the training table evaluated in an ablation.
 yaml_ablation : Set up an ablation from a YAML configuration.
 
-AblationVariant(id: 'str', strategy: 'str', name: 'str', steps: 'tuple[int, ...]' = (), n_removed: 'int' = 0, f_removed: 'float' = 0.0, is_control: 'bool' = False, group: 'Any' = None, group_column: 'str | None' = None, left_out: 'int | None' = None, sweep: 'str | None' = None, value: 'float | None' = None) -> None
+AblationVariant(id: 'str', strategy: 'str', name: 'str', steps: 'tuple[int, ...]' = (), n_removed: 'int' = 0, f_removed: 'float' = 0.0, is_control: 'bool' = False, group: 'Any' = None, group_column: 'str | None' = None, left_out: 'int | None' = None, sweep: 'str | None' = None, value: 'float | None' = None, corruption: 'str | None' = None, column: 'str | None' = None, n_corrupted: 'int' = 0, checked_by: 'int | None' = None) -> None
 
 A version of the training table evaluated in an ablation.
 
@@ -24312,17 +25632,22 @@ id
     `"<score>:lowest_<q>"` (or `"<score>:below_<value>"`, and the same with `highest` and
     `above`) for [`sweep_score()`](`pointblank.Ablation.sweep_score`), where `<score>` is
     `step_<i>` or the score column, `"step_<i>:<param>=<value>"` for
-    [`sweep_step()`](`pointblank.Ablation.sweep_step`), and `"control_<n>"` for the control
+    [`sweep_step()`](`pointblank.Ablation.sweep_step`), `"inject:<corruption>:<column>_<rate>"`
+    (or `"inject:duplicate_<rate>"`) for [`inject()`](`pointblank.Ablation.inject`),
+    `"shapley_<i>_<j>"` for a group of steps that only
+    [`shapley()`](`pointblank.Ablation.shapley`) needs, and `"control_<n>"` for the control
     that removes `n` random rows (or `"control_<id>"` for the control of a
     `drop_all_but_each()` variant).
 strategy
     The kind of version: `"full"`, `"drop_steps"`, `"drop_each"`, `"drop_all"`,
-    `"drop_all_but_each"`, `"drop_groups"`, `"sweep_score"`, `"sweep_step"`, or `"control"`.
+    `"drop_all_but_each"`, `"drop_groups"`, `"sweep_score"`, `"sweep_step"`, `"inject"`,
+    `"shapley"`, or `"control"`.
 name
     A name for the version, as shown in reports (e.g., `"Step 2"`).
 steps
     The numbers of the validation steps whose failing rows were removed (empty for the full
-    table, for groups, for the points of a sweep, and for most controls).
+    table, for groups, for the points of a sweep, for injected defects, and for most
+    controls).
 n_removed
     The number of rows removed from the table.
 f_removed
@@ -24342,7 +25667,20 @@ sweep
     its points share (e.g., `"step_2:lowest"` or `"step_2:min_val"`; otherwise `None`).
 value
     For a point of a sweep, its value: the share of the scored rows removed, the score
-    threshold, or the value of the step's parameter (otherwise `None`).
+    threshold, or the value of the step's parameter. For a variant of `inject()`, the share of
+    the rows corrupted (otherwise `None`).
+corruption
+    For a variant of [`inject()`](`pointblank.Ablation.inject`), the defect put into the rows:
+    `"null"`, `"shuffle"`, `"truncate"`, `"duplicate"`, or the name of the corruption function
+    (otherwise `None`).
+column
+    For a variant of `inject()`, the column whose values were corrupted (`None` for
+    `"duplicate"`, and otherwise).
+n_corrupted
+    For a variant of `inject()`, the number of rows corrupted (or copied, for `"duplicate"`).
+checked_by
+    For a variant of `inject()`, the step that checks for the defect, given as its `step=`
+    (otherwise `None`).
 
 Stratified(by: 'str | list[str] | tuple[str, ...]') -> None
 
@@ -25064,6 +26402,219 @@ A limit of `50` removes every bad reading. A limit of `21` also removes many goo
 (the warmer ones), which leaves the average too low, and the limits of `190` and `220` miss
 some of the bad readings.
 
+inject(self, corruption: 'str | Callable[[Any], Any]', column: 'str | None' = None, step: 'int | None' = None, rates: 'list[float] | None' = None, name: 'str | None' = None) -> 'Ablation'
+
+Add a variant for each rate of a defect, put into clean rows of the table.
+
+The other strategies remove the rows that failed a check, to see whether they matter. This
+one runs the experiment the other way around: it takes rows that pass every check and
+gives them a defect (e.g., a missing value) at a few rates, to see how much the defect
+costs the model. The results trace how the model gets worse as the defect gets more common
+(a dose-response curve), and the report plots the curve. When the defect is one that a
+step checks for (given as `step=`), this measures what a failing test unit of the step
+costs, which [`suggest_thresholds()`](`pointblank.Ablation.suggest_thresholds`) turns into
+thresholds for the step.
+
+Parameters
+----------
+corruption
+    The defect to put into the rows:
+
+    - `"null"`: replace the value with a missing value
+    - `"shuffle"`: swap the values of the corrupted rows among themselves (e.g., to
+    shuffle the labels of a classification target)
+    - `"truncate"`: cut a text value to the first half of its characters
+    - `"duplicate"`: add a copy of each corrupted row (whole rows, so there's no
+    `column=`)
+
+    It can also be a function that takes a value and returns the corrupted value (e.g.,
+    `lambda x: x * 10`, for a reading recorded in the wrong unit).
+column
+    The column to corrupt. By default, it's the column that `step=` checks (if it checks
+    a single column).
+step
+    The number of the step that checks for the defect (e.g., a
+    [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`) step, for `"null"`).
+    It must be a row-level step that the ablation can use. `suggest_thresholds()` only
+    suggests thresholds for the steps given here.
+rates
+    The shares of the table's rows to corrupt, each greater than `0` and at most `1`. By
+    default, they're `0.01`, `0.05`, and `0.1`.
+name
+    A name for the defect, used in the ids and names of the variants (e.g., `"unit_error"`).
+    By default, it's `corruption=`, or the name of the function.
+
+Returns
+-------
+Ablation
+    The `Ablation` object, with the variants added.
+
+Details
+-------
+The corrupted rows are drawn at random (with the ablation's `seed=`) from the clean rows:
+the rows that fail none of the ablation's steps and have a value in `column=` (a text
+value with at least one character, for `"truncate"`). The draws are nested, so the rows
+corrupted at one rate are also corrupted at every higher rate, and they're the same in
+every repeat. A rate that needs more rows than there are clean rows, or that rounds to no
+rows, is left out, with a note. The copies of `"duplicate"` rows are added at the end of
+the table. With `"shuffle"`, the values move around in a ring, so no row keeps its own
+value (though it can get an equal one).
+
+Each variant is compared with the full table rather than with a control, since no rows are
+removed. A verdict of `"hurts"` means that the defect makes the model clearly worse. The
+table is corrupted in memory, so this strategy needs a Polars, pandas, or PyArrow table
+(or a Polars `LazyFrame`). The versions of the table can be exported with
+[`export()`](`pointblank.Ablation.export`), but only as Parquet files.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's a table of temperature readings with no missing values, and a 'model' that
+estimates the average temperature, filling in a missing reading with `0`. It's evaluated
+by its error against the true average of `20`.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed):
+    sample = train.fill_null(0).sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_not_null(columns="temp")
+    .interrogate()
+)
+
+ablation = (
+    pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+    .inject("null", step=1)
+    .run()
+)
+
+ablation
+```
+
+Each missing reading pulls the estimate down, so the error grows with the share of
+missing readings, by about 0.2 degrees for each percent. That's the cost of a failing
+test unit of step 1, which `suggest_thresholds()` uses.
+
+shapley(self, steps: 'int | list[int] | None' = None, permutations: 'int' = 200, seed: 'int | None' = None) -> 'Ablation'
+
+Split the effect of removing the steps' rows fairly among the steps (Shapley values).
+
+When steps fail many of the same rows, the variants of
+[`drop_each()`](`pointblank.Ablation.drop_each`) can't say which step deserves the
+credit: each one looks useful on its own, and
+[`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`) shows each adding little
+on top of the others. Shapley values settle it the way game theory splits a payout among
+players: each step gets its average contribution over the orders in which the steps could
+be added. Steps that remove the same rows share the credit for them, and the values of
+the steps add up to the effect of removing every step's rows. This method adds the
+variants that the values need (one for each group of steps), and after the run, the
+report shows the values in a group of their own. They're also available from
+[`get_shapley()`](`pointblank.Ablation.get_shapley`).
+
+Parameters
+----------
+steps
+    The steps to split the effect among, as a list of step numbers. By default, it's every
+    step that the ablation can use. Steps that no row failed are left out (with a note),
+    and at least two steps must remain.
+permutations
+    The number of random orders of the steps to average over, when there are too many
+    steps to use every order. With `k` steps, there are `k!` orders: when that's at most
+    `permutations=` (with the default of `200`, for up to 5 steps), every group of steps is
+    evaluated and the values are exact.
+seed
+    The seed of the random orders. By default, it's the `seed=` of the ablation.
+
+Returns
+-------
+Ablation
+    The `Ablation` object, with the variants added (replacing those of an earlier
+    `shapley()`).
+
+Details
+-------
+The value of a group of steps is the effect of removing the rows that fail any of them,
+compared with the control (or with the full table, with `control=None`), as for the
+verdicts of the other variants. The Shapley value of a step is the average of what it adds
+to the value of the steps before it, over the orders of the steps. The exact values need
+every group of the `k` steps (`2^k - 1` of them), and the estimated ones need the groups
+that start each random order. Each group is a variant (with its control) evaluated
+`repeats=` times, so the values can take many evaluations: check
+[`plan()`](`pointblank.Ablation.plan`) first. A variant of another strategy that removes
+the rows of the same steps is reused, and a group that removes the same rows as another
+isn't evaluated again.
+
+The values are computed for each repeat, so each has an interval and a p-value across the
+repeats, and a verdict like that of a variant (`"helps"`, `"hurts"`, or
+`"inconclusive"`), with the p-values adjusted across the steps. The groups of steps are
+listed in the plan, and in the results of [`get_effects()`](`pointblank.Ablation.get_effects`)
+(with the strategy `"shapley"`), but not in the report.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's a table of temperature readings, some of them recorded in tenths of a degree and
+some with the sentinel value `-999`. Step 1 catches the sentinels, and step 2 catches both
+kinds of bad readings, so the steps overlap.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+for k in range(7, 300, 40):
+    temps[k] = -999
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed):
+    sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_gt(columns="temp", value=-50)
+    .col_vals_between(columns="temp", left=-50, right=50)
+    .interrogate()
+)
+
+ablation = (
+    pb.Ablation(
+        validation, evaluate=evaluate, metric="error", higher_is_better=False, repeats=10
+    )
+    .shapley()
+    .run()
+)
+
+ablation
+```
+
+Both steps remove the sentinels, so they share the credit for them equally. Step 2 also
+gets all the credit for the readings in tenths of a degree, which only it catches, so its
+Shapley value is the larger one. As the note at the bottom says, the two values add up to
+the effect of removing the rows of both steps.
+
 plan(self) -> 'GT'
 
 Show the versions of the table that the ablation will evaluate.
@@ -25481,6 +27032,10 @@ DataFrame
     point's value (the share of the scored rows removed, the score cutoff, or the value of
     the step's parameter)
     - `n_removed`, `f_removed`: the number and share of rows removed
+    - `corruption`, `column`, `n_corrupted`, `checked_by`: for a variant of
+    [`inject()`](`pointblank.Ablation.inject`), the defect (`"function"` for a function),
+    the column it's put into (missing for `"duplicate"`), the number of rows corrupted (or
+    copied), and the step that checks for it (`0` and missing for the other variants)
     - `metric`, `mean`, `sd`: the metric, and its mean and standard deviation across the
     repeats
     - `delta_vs_full`, `delta_vs_full_lower`, `delta_vs_full_upper`: the mean paired
@@ -25500,10 +27055,15 @@ DataFrame
     own but adds nothing to the other steps
 
     The comparisons are missing for the full table, and the control columns are missing
-    when `control=None`. The intervals and p-values need at least 2 repeats. The verdict
-    of a `drop_all_but_each()` variant is based on the `delta_added` columns, and those
-    of the other variants on the `delta_vs_control` columns (or the `delta_vs_full`
-    columns, when `control=None`).
+    when `control=None` (and for the variants of `inject()`, which remove no rows). The
+    intervals and p-values need at least 2 repeats. The verdict of a
+    `drop_all_but_each()` variant is based on the `delta_added` columns, that of an
+    `inject()` variant on the `delta_vs_full` columns, and those of the other variants on
+    the `delta_vs_control` columns (or the `delta_vs_full` columns, when `control=None`).
+    The groups of steps that [`shapley()`](`pointblank.Ablation.shapley`) adds have the
+    strategy `"shapley"` and no verdict, and their p-values are adjusted on their own;
+    the Shapley values themselves are in
+    [`get_shapley()`](`pointblank.Ablation.get_shapley`).
 
 Examples
 --------
@@ -25547,6 +27107,168 @@ ablation.get_effects().select("variant", "mean", "delta_vs_control", "verdict")
 Removing the 12 rows that failed step 1 lowers the error by about 7 degrees compared
 with removing 12 random rows, so the verdict is that the step helps.
 
+get_shapley(self) -> 'Any'
+
+Get the Shapley values of the steps as a table.
+
+The Shapley values (from [`shapley()`](`pointblank.Ablation.shapley`)) split the effect
+of removing every step's rows among the steps, giving each step its average contribution
+over the orders in which the steps could be added. This method gives them with their
+intervals and verdicts, for every metric.
+
+Returns
+-------
+DataFrame
+    A Polars DataFrame (or a pandas DataFrame, if Polars isn't installed) with a row for
+    each step and metric, and these columns:
+
+    - `step`: the number of the step
+    - `n_failed`: the number of rows that failed the step
+    - `metric`: the metric
+    - `shapley`: the Shapley value of the step, the mean across the repeats
+    - `lower`, `upper`: its interval at `conf_level=` (with at least 2 repeats)
+    - `p`, `p_adj`: the p-value of the Shapley value (against no effect), and the p-value
+    adjusted across the steps (as set by `adjust=`)
+    - `verdict`: `"helps"`, `"hurts"`, or `"inconclusive"` for the metric named in
+    `metric=` (missing for other metrics, and with fewer than 3 repeats)
+
+    For each metric, the Shapley values add up to the effect of removing the rows of every
+    step (compared with the control, or with the full table when `control=None`).
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Here's an ablation of a table of temperature readings with overlapping steps: step 1
+catches the sentinel value `-999`, and step 2 catches the sentinels along with the readings
+in tenths of a degree. There are 10 repeats, since the sentinels make the error vary a lot
+from one repeat to the next.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+for k in range(7, 300, 40):
+    temps[k] = -999
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed):
+    sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_gt(columns="temp", value=-50)
+    .col_vals_between(columns="temp", left=-50, right=50)
+    .interrogate()
+)
+
+ablation = (
+    pb.Ablation(
+        validation, evaluate=evaluate, metric="error", higher_is_better=False, repeats=10
+    )
+    .shapley()
+    .run()
+)
+
+ablation.get_shapley().select("step", "shapley", "lower", "upper", "verdict")
+```
+
+Both steps lower the error, and step 2 gets the larger share, since it also catches the
+readings that step 1 misses.
+
+suggest_thresholds(self, tolerance: 'float') -> 'dict[int, Thresholds]'
+
+Suggest thresholds for the steps, from what their failing test units cost the model.
+
+Thresholds are usually picked by feel: is 1% of missing values a warning, or an error?
+With the variants of [`inject()`](`pointblank.Ablation.inject`), the ablation has measured
+how much the model gets worse as a defect gets more common. This method turns that into
+thresholds: for each step that checks for an injected defect (given as `step=` to
+`inject()`), the error threshold is the share of failing test units at which the model
+would get worse by `tolerance=`, and the warning threshold is half of that.
+
+Parameters
+----------
+tolerance
+    How much worse the model can get before it's an error, in the units of the metric that
+    the verdicts are based on (e.g., `0.01` for an accuracy that can drop by a percentage
+    point).
+
+Returns
+-------
+dict[int, Thresholds]
+    The suggested thresholds, by step number, as [`Thresholds`](`pointblank.Thresholds`)
+    objects with the `warning=` and `error=` levels set as shares of the test units. They
+    can be given to the steps (e.g., as the `thresholds=` of the validation method).
+
+Details
+-------
+For each rate of a defect, the step is checked again on the corrupted table, which gives
+the share of its test units that the defect makes fail (beyond those that failed
+already). The cost of a failing test unit is then the slope of the harm to the model
+(how much worse the metric is than on the full table) against that share, fitted through
+zero over the rates. The error threshold is `tolerance=` divided by that slope, rounded to
+two significant digits.
+
+A step gets no thresholds (with a warning saying why) when the defect makes none of its
+test units fail, when the defect doesn't make the model worse (or when none of the
+verdicts are `"hurts"`, with at least 3 repeats), or when even failing every test unit
+would cost less than `tolerance=`. When a step has several injected defects, its
+thresholds come from the costliest one. The thresholds are only as good as the defects
+are realistic: a defect that's injected into random clean rows can cost less (or more)
+than the same defect in the rows where it really happens.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's a table of temperature readings with no missing values, and a 'model' that
+estimates the average temperature, filling in a missing reading with `0`. Missing
+readings are injected at three rates.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed):
+    sample = train.fill_null(0).sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_not_null(columns="temp")
+    .interrogate()
+)
+
+ablation = (
+    pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+    .inject("null", step=1)
+    .run()
+)
+
+ablation.suggest_thresholds(tolerance=0.5)
+```
+
+Each percent of missing readings adds about 0.2 degrees to the error, so the error
+threshold is the share of missing readings that adds 0.5 degrees: about 2.5%.
+
 get_tabular_report(self, metric: 'str | None' = None, title: 'str | None' = None) -> 'GT'
 
 Get a tabular report of the ablation's results.
@@ -25560,8 +27282,12 @@ group of their own, showing what the left-out step's rows add to the other steps
 each sweep (from [`sweep_score()`](`pointblank.Ablation.sweep_score`) or
 [`sweep_step()`](`pointblank.Ablation.sweep_step`)), and a plot of its curve at the
 bottom shows the difference from the full table at each of its values, next to that of
-removing as many random rows. The header gives the metric for the full table and the settings of the run, and notes at the
-bottom list the variants and steps that weren't used.
+removing as many random rows. The defects of [`inject()`](`pointblank.Ablation.inject`)
+are shown in the same way, compared with the full table. The Shapley values of
+[`shapley()`](`pointblank.Ablation.shapley`) are in a group of their own, with each
+step's share of the total effect. The header gives the metric for the full table and the
+settings of the run, and notes at the bottom list the variants and steps that weren't
+used.
 
 Parameters
 ----------
@@ -25629,9 +27355,10 @@ Each step with a variant of its own (from [`drop_each()`](`pointblank.Ablation.d
 or a [`drop_steps()`](`pointblank.Ablation.drop_steps`) variant with just that step) gets
 a note with the effect of removing its failing rows and the verdict. A step with a
 variant from [`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`) also gets
-the effect of its rows on top of the other steps. The notes appear in the validation's
-report, so that the report shows which checks matter to the model, next to the checks
-themselves.
+the effect of its rows on top of the other steps, and a step with a Shapley value (from
+[`shapley()`](`pointblank.Ablation.shapley`)) gets that value. The notes appear in the
+validation's report, so that the report shows which checks matter to the model, next to
+the checks themselves.
 
 Parameters
 ----------
@@ -25708,8 +27435,11 @@ dict[str, Any]
     from each to that version), the metrics from every evaluation (`"runs"`, one entry per
     version and repeat, with its seed and whether its result came from the cache), the
     results (`"effects"`, with the same fields as the columns of
-    [`get_effects()`](`pointblank.Ablation.get_effects`)), and the notes about variants
-    and steps that weren't used (`"notes"`).
+    [`get_effects()`](`pointblank.Ablation.get_effects`)), the Shapley values
+    (`"shapley"`, with the same fields as the columns of
+    [`get_shapley()`](`pointblank.Ablation.get_shapley`), or `None` without
+    [`shapley()`](`pointblank.Ablation.shapley`)), and the notes about variants and steps
+    that weren't used (`"notes"`).
 
 Examples
 --------
@@ -26596,7 +28326,10 @@ function), or a `python:` block whose result is the function. The `control:` is
 `size_matched` (the default), `null` (for no control), or `stratified:` with one or more
 columns (for a [`Stratified`](`pointblank.ablation.Stratified`) control). Each strategy is
 the name of an `Ablation` method that adds variants (including the sweeps `sweep_score` and
-`sweep_step`), with its parameters as a mapping. The strategies are added in order.
+`sweep_step`, the injected defects of `inject`, and the Shapley values of `shapley`), with its
+parameters as a mapping. The strategies are added in order. In YAML, the `corruption:` of
+`inject` is the name of a defect (`null`, `shuffle`, `truncate`, or `duplicate`), not a
+function.
 
 The block is ignored by `yaml_interrogate()`, so the same configuration can be used both to
 validate the data and to measure what its steps do for a model.
@@ -39509,6 +41242,12 @@ to install it. Pointblank never trains a model: the adapters use models that are
 | `classifier()` | A label of a classifier (e.g., quality) | A Hugging Face model or pipeline |
 | `langid()` | Being in the expected languages | `langid`, fastText, or a function |
 | `perplexity()` | How surprising text is to a language model | KenLM, or a function |
+| `text_stat()` | A statistic of text, like its number of words | None |
+| `token_count()` | The number of tokens of text | A Hugging Face tokenizer, `tiktoken`, or a function |
+
+The last two need no model to score with (other than a tokenizer), and they're the scorers of the
+bundles of steps in `pb.text`, for the heuristic quality filters and the length of text in tokens
+(see the [Checking Text Data](text-checks.qmd) article).
 
 With real models, the adapters look like this:
 
@@ -39531,6 +41270,12 @@ on_topic = pb.scorers.embedding_similarity(
 
 # Is each document in English?
 english = pb.scorers.langid(expected="en")
+
+# Is each document in the language of its `lang` column?
+own_language = pb.scorers.langid(expected_column="lang")
+
+# Does each document fit in a model's context?
+tokens = pb.scorers.token_count(tokenizer="tiktoken:cl100k_base")
 ```
 
 The adapters that take a model can also take a function in its place, which is how we'll keep the
@@ -39682,9 +41427,280 @@ adapter is written in this form by `to_yaml()`, so it can be saved and run again
 The `col_vals_scored()` validation method brings checks of meaning into a validation plan, with the
 same reports, thresholds, and actions as any other step. A scorer is any function of a batch of
 rows, and the adapters of `pb.scorers` use rerankers, classifiers, language identification,
-embeddings, and perplexity. Scores are cached, so that rows aren't scored again, and they're kept
+embeddings, perplexity, statistics of text, and tokenizers. Scores are cached, so that rows aren't scored again, and they're kept
 with the results, where they can be seen in the step report and used to choose the bounds with an
 [`Ablation`](../post-interrogation/data-ablation.qmd).
+
+
+### Checking Text Data
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+A corpus of text for training a language model has problems that a table of numbers doesn't. Web
+pages are often menus, lists of hashtags, or the same page crawled twice. Some documents are in the
+wrong language, are too long for the model, or have someone's email address in them. Chat data for
+fine-tuning can have conversations that are out of order, and any training data can contain the
+questions of the benchmarks that the model will be scored on.
+
+Pointblank has validation methods and step bundles for each of these problems. They give reports,
+thresholds, and actions like any other step, so a corpus can be checked with the same tools as any
+other table, and each check can be measured with an [`Ablation`](../post-interrogation/data-ablation.qmd)
+to see how much it matters to the model.
+
+## A Corpus to Check
+
+Let's make a small corpus of web documents. Most are fine, but there's a near duplicate, a menu, a
+list of hashtags, a document in French, and one with an email address.
+
+```{python}
+import polars as pl
+
+corpus = pl.DataFrame(
+    {
+        "doc_id": list(range(1, 10)),
+        "text": [
+            "The museum opens at nine and closes at five on weekdays, and entry is free for "
+            "children under twelve.",
+            "The museum opens at nine and closes at five on weekdays, and entry is free for "
+            "children under 12!",
+            "Home\nAbout us\nHome\nAbout us\nHome\nContact",
+            "Our library lends books, films, and music to members of the town for up to three "
+            "weeks at a time.",
+            "#sale #deals #shoes #free #today #now #best #cheap ... click for more",
+            "Le musée ouvre à neuf heures et ferme à dix-sept heures, et l'entrée est gratuite "
+            "pour les enfants.",
+            "Questions about your order? Write to help@shop-example.com and we will reply within "
+            "a day or two.",
+            "The trail to the lake is steep in places, so bring water, good shoes, and a jacket "
+            "for the wind.",
+            "Which planet in the solar system has the most moons, and how many of them have been "
+            "named so far?",
+        ],
+    }
+)
+
+pb.preview(corpus)
+```
+
+## Heuristic Quality Filters
+
+The corpora used to train language models are cleaned with simple rules about each document: how
+many words it has, how long they are, how many of its lines are bullet points or repeat an earlier
+line, and whether it has common words like *the* and *of*. The
+[`pb.text.heuristic_filters()`](`pointblank.text.heuristic_filters`) function makes a validation
+step for each of the quality filters of the Gopher models, with their bounds as the defaults. It
+returns a [`Steps`](`pointblank.Steps`) collection, which is added to a validation with
+`add_steps()`. Our documents are short, so we'll lower the number of words that a document needs.
+
+```{python}
+validation = (
+    pb.Validate(data=corpus, tbl_name="corpus")
+    .add_steps(pb.text.heuristic_filters("text", min_words=10))
+    .interrogate()
+)
+
+validation
+```
+
+Each rule is a `col_vals_scored()` step with a [`text_stat()`](`pointblank.scorers.text_stat`)
+scorer, so the report shows what each one checks and how many documents fail it. The menu has too
+few words, repeats its lines, and has too few common words, and the list of hashtags has too many
+symbols for its words. The document in French fails the check of common words too, since the
+default stop words are English (use `stop_words=` for other languages). Any rule can be turned off
+by setting its bound to `None`, and since each is an ordinary step, it can be changed like any
+other.
+
+## Near Duplicates
+
+A document that's in a corpus many times gets too much weight in training. The `rows_distinct()`
+method finds rows that are exactly the same, but most duplicates in text differ a little: a changed
+date, a different footer, or a name filled into a template. The `rows_near_distinct()` method finds
+those too. It normalizes the text (in lower case, without punctuation), and with the default
+`method="minhash"`, it finds texts whose sequences of words are mostly the same.
+
+```{python}
+validation = (
+    pb.Validate(data=corpus, tbl_name="corpus")
+    .rows_near_distinct(columns="text", threshold=0.8)
+    .interrogate()
+)
+
+validation.get_step_report(i=1)
+```
+
+The first two documents differ only in *twelve* and *12!*, so both fail, and the step report shows
+them together as one group (in the `pb_cluster_` column). Every row of a group fails, as with
+`rows_distinct()`, since the validation can't know which copy we'd want to keep. That's decided when
+the results are used to clean the table: `get_row_flags()` and `get_sundered_data()` keep the first
+row of each group by default (`duplicates="keep_first"`).
+
+## Language, Length, and Personal Information
+
+Three more bundles cover checks that most text corpora need:
+
+- [`pb.text.in_language()`](`pointblank.text.in_language`) checks that each document is in the
+  expected language, with a language identification model (from the `langid` package, a fastText
+  model, or a function of your own). The expected language can also come from a column, for a
+  corpus with documents in several languages.
+- [`pb.text.token_length()`](`pointblank.text.token_length`) checks the length of each document in
+  the tokens of a model's tokenizer (a Hugging Face tokenizer, a `tiktoken` encoding, or any
+  function that splits text into tokens).
+- [`pb.text.no_pii()`](`pointblank.text.no_pii`) checks that the text has no email addresses, phone
+  numbers, or credit card numbers (or other kinds of personal information, or patterns of your own).
+
+With real models, the first two look like this:
+
+```{python}
+#| eval: false
+pb.text.in_language("text", expected="en", min_confidence=0.8)
+pb.text.token_length("text", tokenizer="tiktoken:cl100k_base", max_val=4096)
+```
+
+To keep this page self-contained, we'll use a function that guesses the language from a few common
+words, and a tokenizer that splits text into words and punctuation.
+
+```{python}
+import re
+
+
+def guess_language(text):
+    words = set(text.lower().split())
+    english = len(words & {"the", "and", "at", "is", "for", "so", "our", "to", "in", "of"})
+    french = len(words & {"le", "la", "et", "à", "les", "est", "un", "une", "pour"})
+    if english + french == 0:
+        return {"en": 0.5, "fr": 0.5}
+    return {"en": english / (english + french), "fr": french / (english + french)}
+
+
+def tokenize(text):
+    return re.findall(r"\w+|[^\w\s]", text)
+
+
+validation = (
+    pb.Validate(data=corpus, tbl_name="corpus")
+    .add_steps(pb.text.in_language("text", expected="en", backend=guess_language))
+    .add_steps(pb.text.token_length("text", tokenizer=tokenize, min_val=10, max_val=25))
+    .add_steps(pb.text.no_pii("text"))
+    .interrogate()
+)
+
+validation
+```
+
+The document in French fails step 1, the menu is too short for step 2, and the email address fails
+step 3. The checks of personal information are `col_vals_regex()` steps, so they run on any backend,
+including in a database. Their patterns find likely matches rather than certain ones (a number with
+the shape of a credit card number matches, with no checksum), so for a thorough check, a model of
+named entities can be used with `col_vals_scored()`.
+
+## Chat Conversations
+
+Data for fine-tuning a chat model is a list of messages for each example, each with a role and some
+content. Data converted from other formats often has conversations with roles out of order, an
+unknown role, or an empty message, and a training run can fail on them (or quietly learn from them).
+The `col_vals_chat_format()` method checks each conversation, given as a list of messages or as JSON
+text.
+
+```{python}
+chats = pl.DataFrame(
+    {
+        "id": [1, 2, 3, 4],
+        "messages": [
+            '[{"role": "user", "content": "Hi!"}, '
+            '{"role": "assistant", "content": "Hello! How can I help?"}]',
+            '[{"role": "user", "content": "Hi!"}, {"role": "user", "content": "Hello?"}]',
+            '[{"role": "system", "content": "Be brief."}, '
+            '{"role": "user", "content": "Capital of France?"}, '
+            '{"role": "assistant", "content": "Paris."}]',
+            '[{"role": "user", "content": "What is 2 + 2?"}, {"role": "assistant", "content": ""}]',
+        ],
+    }
+)
+
+validation = (
+    pb.Validate(data=chats, tbl_name="chats")
+    .col_vals_chat_format(columns="messages", first_role="user", last_role="assistant")
+    .interrogate()
+)
+
+validation.get_step_report(i=1)
+```
+
+The second conversation has two user messages in a row, and the last one ends with an empty reply.
+The step report gives the problem with each failing row in the `pb_reason_` column, and the step's
+note counts the rows with each problem. The third conversation passes: a system message can come
+first, before the turns of the user and the assistant.
+
+## Benchmark Contamination
+
+A model is often judged by its score on a benchmark, a set of questions with known answers. If the
+training data contains those questions, the score no longer says how well the model does on
+questions it hasn't seen: the benchmark is *contaminated*. The `rows_not_contaminated()` method
+checks the text of each row against a reference, such as the questions of a benchmark or the rows of
+a test set.
+
+```{python}
+benchmark = pl.DataFrame(
+    {
+        "question": [
+            "Which planet in the solar system has the most moons?",
+            "What is the boiling point of water at sea level in degrees Celsius?",
+        ]
+    }
+)
+
+validation = (
+    pb.Validate(data=corpus, tbl_name="corpus")
+    .rows_not_contaminated(
+        columns="text", reference=benchmark, reference_columns="question", ngram=8
+    )
+    .interrogate()
+)
+
+validation.get_step_report(i=1)
+```
+
+The last document of the corpus contains the first question of the benchmark, so it fails, and the
+step report shows the question it overlaps with (in the `pb_match_` column). By default, a row
+overlaps with a reference text if they share a sequence of 13 words, the length used to check the
+training data of large language models for contamination. We used a shorter one here, as the
+question is short. With `method="exact"`, a row overlaps only with a text that's the same, and with
+`method="minhash"`, with one that's nearly the same. The reference can also be a list of tables, or
+a dictionary of them by name, so that the note says which benchmark each overlap is with.
+
+To check a dataset's own splits (that the test split doesn't overlap with the training split, that
+they have the same labels, and that their columns are distributed alike), see the
+[`check_splits()`](../table-comparison/checking-splits.qmd) article.
+
+## Which Checks Matter?
+
+Each of these checks removes some documents, and it isn't always clear which of them make a model
+better. Since they're ordinary validation steps, an [`Ablation`](../post-interrogation/data-ablation.qmd)
+can measure that: it trains and evaluates a model on the corpus with the failing documents of each
+step removed, and compares each version with the full corpus. Its `sweep_score()` method can also
+find the bound of a scored step (like the number of words) that works best.
+
+## Databases and PySpark
+
+The checks of `pb.text.no_pii()` are regular expressions, so they run on any backend. The other
+checks run in Python: a Polars or pandas table is checked as it is, and for a database table
+(through Ibis) or a PySpark DataFrame, the distinct values of the step's columns are collected,
+checked, and the results are joined back to the table on its own backend. With a large table, a
+`pre=` function that takes a sample of the rows keeps the cost down. For `col_vals_chat_format()`,
+the conversations in a database table must be JSON text.
+
+## Conclusion
+
+Text data has its own kinds of problems, and Pointblank checks them with the same reports,
+thresholds, and actions as any other validation. The `pb.text` functions make bundles of steps for
+the heuristic quality filters, the language and length of the text, and personal information;
+`rows_near_distinct()` finds near duplicates; `col_vals_chat_format()` checks conversations for
+fine-tuning; and `rows_not_contaminated()` keeps benchmark questions out of the training data.
 
 
 ### Validation Reports
@@ -42186,6 +44202,103 @@ some of them in, and removing more starts to remove good flights. By 20%, the sw
 can also use the values of a column of the table as the scores (`sweep_score("column_name")`), or
 cutoffs on the scale of the scores rather than shares of the rows (`values=`).
 
+## Injecting Defects
+
+The variants so far remove rows that a check flags, which asks whether the flagged rows hurt the
+model. The opposite question is just as useful: if a defect got into the data, how much would it
+hurt? The [`Ablation.inject()`](`Ablation.inject`) method answers it by adding the defect to
+clean rows (those that fail no step) and evaluating the corrupted table. The defect can be one of
+four kinds:
+
+- `"null"`: the values of a column are made missing
+- `"shuffle"`: the values of a column are moved between rows, so each is a valid value in the
+  wrong row
+- `"truncate"`: text values are cut to half their length
+- `"duplicate"`: rows are copied
+
+or a function, which is applied to the values of a column. Here, the defect is the problem that
+step 1 catches, air times in hours, made by a function that divides the air time by 60:
+
+```{python}
+injected = (
+    pb.Ablation(
+        validation,
+        evaluate=evaluate,
+        metric="mae",
+        higher_is_better=False,
+        label="Air time model",
+    )
+    .inject(lambda minutes: minutes / 60, step=1, name="hours", rates=[0.01, 0.02, 0.05, 0.1])
+    .run()
+)
+
+injected
+```
+
+Each rate is a share of the rows to corrupt, and each is a variant. The rows corrupted at a rate
+include those at the lower rates, so the curve shows the same defect getting worse. Since no rows
+are removed, there's no control: each variant is compared with the full table. Even 1% of the
+flights in hours makes the error almost a minute larger, and the harm grows steadily with the share.
+
+The `step=` says which step checks for the defect (and its column is the one corrupted, unless
+`column=` says otherwise). The table must be a Polars, pandas, or PyArrow table, as the defect is
+made in memory, and the injected rows are the same in every repeat (they're chosen from the
+ablation's `seed=`).
+
+## Suggesting Thresholds
+
+A step's thresholds say how many failing rows are too many, but the right number depends on how
+much the failures cost. With a curve like the one above, that can be worked out: the
+[`Ablation.suggest_thresholds()`](`Ablation.suggest_thresholds`) method fits a line through the
+harm of each injected defect against the share of rows that fail its step, and gives the share at
+which the harm reaches a `tolerance=` (in the units of the metric):
+
+```{python}
+injected.suggest_thresholds(tolerance=1)
+```
+
+If the model can lose at most a minute of mean absolute error, step 1 should give an error once
+1% of its rows fail (with a warning at half that). The suggestions are dictionaries of
+[`Thresholds`](`Thresholds`) by step, ready for the `thresholds=` of the steps. A step whose
+defect doesn't clearly hurt the model, or that doesn't catch its defect (a shuffled distance, for
+example, is still greater than zero), gets no suggestion, with a warning that says why.
+
+## Sharing the Effect Among the Steps
+
+Removing every step's rows has an effect, but the steps' rows overlap and work together, so their
+effects on their own don't add up to it. The *Shapley value* of a step is its fair share of the
+whole effect: its average effect when it's added to every combination of the other steps. The
+[`Ablation.shapley()`](`Ablation.shapley`) method adds a variant for each combination that's
+needed (reusing those already in the ablation), and the report shows a Shapley value for each step:
+
+```{python}
+shares = (
+    pb.Ablation(
+        validation,
+        evaluate=evaluate,
+        metric="mae",
+        higher_is_better=False,
+        label="Air time model",
+    )
+    .shapley()
+    .run()
+)
+
+shares
+```
+
+The Shapley values add up to the effect of removing the rows of every step, so each step gets a
+share of the total (in the **mae** column). Step 1's rows bring the error down by more than the
+whole cleaning does, and step 3's rows take back almost half of that, so the shares are above
+100% and below zero. Step 2's share is close to nothing. The
+[`Ablation.get_shapley()`](`Ablation.get_shapley`) method gives the values as a table, with
+their intervals and p-values for every metric.
+
+With three steps, there are seven combinations to evaluate, and the values are exact. The number
+of combinations doubles with each step, so with more steps than `permutations=` allows (by
+default, those with at most 200 orders, or five steps), the values are estimated from that many
+random orders of the steps instead, and the report says so.
+
 ## Getting the Results
 
 The [`Ablation.get_effects()`](`Ablation.get_effects`) method returns the results as a table, with
@@ -42426,8 +44539,10 @@ ablation:
 pb.yaml_ablation(config, set_tbl=train, evaluate=evaluate).plan()
 ```
 
-The sweeps are strategies too, with their arguments by name (e.g.,
-`- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}`).
+The sweeps, `inject`, and `shapley` are strategies too, with their arguments by name (e.g.,
+`- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}` or
+`- inject: {corruption: "null", step: 2}`). In YAML, a defect must be one of the four kinds by
+name, not a function.
 
 The block is ignored by [`yaml_interrogate()`](`yaml_interrogate`), so the same file can be used
 for validating the data, and [`yaml_to_python()`](`yaml_to_python`) writes out the equivalent
@@ -42439,7 +44554,9 @@ For each variant, the difference from its control is computed for each repeat, a
 the mean of these differences with a paired *t*-interval (95% by default, set with
 `conf_level=`). The p-values are adjusted for the number of variants with the Holm method, and the
 verdicts use the adjusted p-values: a variant helps or hurts only if its adjusted p-value is below
-`1 - conf_level`. You can turn off the adjustment with `adjust=None`.
+`1 - conf_level`. You can turn off the adjustment with `adjust=None`. Injected defects remove no
+rows, so they're always compared with the full table, and the Shapley values have intervals and
+p-values of their own (from the values of each repeat), adjusted for the number of steps.
 
 With fewer than three repeats, there's too little data for a useful interval, so the report gives
 no verdicts (and `Ablation` warns about this). More repeats give narrower intervals, at the cost of
@@ -42469,9 +44586,11 @@ have a note for each step that couldn't be used.
 A validation can say which rows break its rules, but only an experiment can say whether those rows
 hurt the model trained on them. An `Ablation` runs that experiment with controls, repeats, and
 intervals, so you can find the checks that are worth enforcing, the ones that don't matter, the
-ones that are redundant, the ones that remove good data, and where to set their limits. It works
-with any model that you can wrap in an `evaluate` function (or train elsewhere, with `export()` and
-`load_results()`), and with any validation whose steps check rows.
+ones that are redundant, the ones that remove good data, and where to set their limits. Injecting
+defects shows how much a problem would cost (and gives thresholds to match), and Shapley values
+share the effect of the whole cleaning fairly among the steps. It works with any model that you can
+wrap in an `evaluate` function (or train elsewhere, with `export()` and `load_results()`), and with
+any validation whose steps check rows.
 
 
 ### Previewing Data
@@ -43582,6 +45701,145 @@ The HTML report can be kept as a build artifact for anyone to look at. If the da
 `--no-samples` to keep row values out of the JSON output. To make the comparison one check among
 others in a validation, use `Validate.tbl_match()`, which accepts the same settings, including
 `partitions=` (see [Finding Differences Between Tables](01-comparing-tables.qmd)).
+
+
+### Checking Dataset Splits
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+A model is trained on one split of a dataset and judged on another. That judgment is only fair if
+the splits are independent and alike: if the test split has rows from the training split, the model
+is judged on data it's already seen and looks better than it is; if a label is missing from the test
+split, the model is never judged on it; and if the test split is distributed differently from the
+training split, its score says little about the data the model was trained for.
+
+The [`check_splits()`](`pointblank.check_splits`) function checks the splits of a dataset for all
+three problems at once: overlapping rows, the coverage and balance of the labels, and drift in the
+distributions of the columns.
+
+## The Splits
+
+Let's make three splits of a dataset of support tickets, labelled with their topic, for a model that
+sorts new tickets by topic. Each ticket also records how many days the customer waited. The test
+split was collected later than the others, and it shows: there are no tickets about returns, the
+waits are longer, and two tickets were copied from the training split (one as it is, and one in
+capital letters with different punctuation).
+
+```{python}
+import random
+
+import polars as pl
+
+rng = random.Random(7)
+products = ["kettle", "toaster", "blender", "lamp", "fan", "heater"]
+problems = {
+    "shipping": "hasn't arrived yet",
+    "damaged": "arrived with a cracked lid",
+    "billing": "was charged to my card twice",
+    "returns": "needs to be sent back",
+}
+
+
+def tickets(first, n, weights, wait):
+    rows = []
+    for order in range(first, first + n):
+        topic = rng.choices(list(weights), list(weights.values()))[0]
+        product = rng.choice(products)
+        rows.append(
+            {
+                "text": f"Order {order}: the {product} I bought {problems[topic]}.",
+                "topic": topic,
+                "wait_days": round(rng.gammavariate(2, wait), 1),
+            }
+        )
+    return pl.DataFrame(rows)
+
+
+weights = {"shipping": 4, "damaged": 2, "billing": 2, "returns": 2}
+train = tickets(1000, 1000, weights, wait=1.5)
+valid = tickets(3000, 300, weights, wait=1.5)
+test = tickets(4000, 298, {"shipping": 7, "damaged": 2, "billing": 1}, wait=3)
+
+copies = train[[5, 17]].with_columns(
+    pl.Series("text", [train["text"][5], train["text"][17].upper().replace(":", " -")])
+)
+test = pl.concat([test, copies])
+
+pb.preview(train)
+```
+
+## Checking the Splits
+
+The splits are given in order, as `train=`, `valid=`, and `test=` (or as a dictionary of splits by
+name, with `splits=`). We'll say which column identifies a ticket (its text) and which has the
+labels, and ask for rows that are nearly the same as well as rows that are the same.
+
+```{python}
+check = pb.check_splits(
+    train=train, valid=valid, test=test, columns="text", label="topic", near=True
+)
+
+check.get_tabular_report()
+```
+
+The report has a row for each check, in three groups:
+
+- **Overlap.** For each pair of splits, the rows of the later split that are also in the earlier
+  one. Two tickets of the test split leak from the training split: one is the same, and the other
+  is nearly the same (its words, once in lower case and without punctuation, mostly match). Rows are
+  the same if they have the same values of `columns=` (by default, every column that the splits
+  share, except for the label). With `near=True`, rows are nearly the same if the Jaccard similarity
+  of their sequences of words is at least `threshold=` (0.8 by default), found with MinHash.
+- **Labels.** The shares of the labels in each split. Every label of the first split should be in
+  the others, no split should have a label that the first doesn't, and the shares should be about
+  the same. The test split has no tickets about returns, and its shares of the other labels are
+  quite different.
+- **Drift.** For each column, its distribution in each split compared with the first split, with
+  the population stability index (PSI) and, for a numeric column, the Kolmogorov-Smirnov
+  statistic. A PSI from 0.1 is a moderate change, and from 0.2 a major one. The waits of the test
+  split are much longer. By default, the columns checked are the numeric columns and those with few
+  distinct values (which leaves out free text and identifiers); `drift_columns=` chooses others.
+
+PSI is noisy for small splits: with a few dozen rows, a split can show a moderate change from
+chance alone. It's most useful with at least a few hundred rows in each split.
+
+## The Results
+
+The problems found are also in the `issues` attribute, as messages, and `ok` is `True` when there
+are none, which makes a check of the splits easy to put in a test or a pipeline.
+
+```{python}
+check.issues
+```
+
+The `get_overlap()` method gives the overlapping rows of a pair of splits, with the row number of
+each in its own split.
+
+```{python}
+check.get_overlap("train", "test")
+```
+
+The other attributes have the numbers behind the report (`overlap`, `labels`, and `drift`), and
+`to_dict()` gives all of them as a dictionary that can be written as JSON.
+
+## Contamination by Other Data
+
+`check_splits()` checks a dataset's own splits. To check that training data doesn't contain the
+questions of a benchmark that the model will be judged on (or any other text that shouldn't be in
+it), use the `rows_not_contaminated()` validation method, which is a step of a validation like any
+other (see the [Checking Text Data](../advanced-validation/text-checks.qmd) article).
+
+## Conclusion
+
+A model's score on a test split is only as good as the split. The `check_splits()` function finds
+the rows that leak between splits (exactly or nearly the same), the labels that a split is missing
+or that only it has, and the columns whose distribution changes between splits, with a report of
+each check and the issues found as messages.
 
 
 ### Generating Test Data
@@ -46147,6 +48405,27 @@ Examples:
     brief: "Stock levels decrease (small restocks allowed)"
 ```
 
+#### Chat Format Methods
+
+`col_vals_chat_format`: is each value a well-formed chat conversation?
+
+```yaml
+- col_vals_chat_format:
+    columns: messages                  # REQUIRED: Column(s) with the conversations
+    roles: [system, user, assistant]   # OPTIONAL: The roles that a message can have
+    alternate: true                    # OPTIONAL: No role follows itself in the turns
+    first_role: user                   # OPTIONAL: Role of the first turn (after a system message)
+    last_role: assistant               # OPTIONAL: Role of the last message
+    allow_empty: false                 # OPTIONAL: Allow messages with empty content
+    role_key: role                     # OPTIONAL: Key of each message's role
+    content_key: content               # OPTIONAL: Key of each message's content
+    na_pass: false                     # OPTIONAL: Pass missing values
+    brief: "Conversations for fine-tuning"  # OPTIONAL: Step description
+```
+
+A conversation is a list of messages (each a dictionary with a role and some content) or the same
+as JSON text.
+
 ### Row-based Validations
 
 `rows_distinct`: are row data distinct?
@@ -46179,6 +48458,50 @@ Examples:
     actions:                           # OPTIONAL: Step-level actions
       warning: "Custom message"
     brief: "Complete rows only"        # OPTIONAL: Step description
+```
+
+`rows_near_distinct`: are rows free of near duplicates?
+
+```yaml
+- rows_near_distinct:
+    columns: text                      # REQUIRED: Column(s) with the text of each row
+    method: minhash                    # OPTIONAL: "minhash" (default) or "exact"
+    threshold: 0.85                    # OPTIONAL: Lowest Jaccard similarity of a near duplicate
+    ngram: 5                           # OPTIONAL: Words in each n-gram (MinHash)
+    num_perm: 128                      # OPTIONAL: Hash functions of the signatures (MinHash)
+    thresholds:                        # OPTIONAL: Step-level thresholds
+      warning: 0.05
+    brief: "No near-duplicate documents"  # OPTIONAL: Step description
+```
+
+`rows_not_contaminated`: does the text of each row not overlap with a reference, like a benchmark?
+
+```yaml
+- rows_not_contaminated:
+    columns: text                      # REQUIRED: Column(s) with the text of each row
+    reference: benchmark.csv           # REQUIRED: The texts to check against
+    reference_columns: question        # OPTIONAL: Column(s) of the reference with its texts
+    method: ngram                      # OPTIONAL: "ngram" (default), "exact", or "minhash"
+    ngram: 13                          # OPTIONAL: Words in each n-gram
+    threshold: 0.8                     # OPTIONAL: Lowest Jaccard similarity (MinHash)
+    num_perm: 128                      # OPTIONAL: Hash functions of the signatures (MinHash)
+    brief: "No benchmark questions"    # OPTIONAL: Step description
+```
+
+The `reference` can be the path of a CSV or Parquet file, a list of texts, a dictionary of
+references by name (so that the note says which one each overlap is with), or a `python:` block
+that makes a table (which needs `allow_python=True`):
+
+```yaml
+# Two benchmarks, by name
+- rows_not_contaminated:
+    columns: text
+    reference:
+      quiz: quiz_questions.csv
+      trivia:
+      - "Which planet has the most moons?"
+      - "What is the tallest mountain on Earth?"
+    reference_columns: question
 ```
 
 ### Structure Validations
@@ -46487,7 +48810,8 @@ Examples:
 
 At least one of `min_val` and `max_val` is needed. The scorer is written as one of the adapters of
 `pb.scorers` with its settings, as `{<adapter>: {<settings>}}`, where the adapter is one of
-`embedding_similarity`, `reranker`, `classifier`, `langid`, or `perplexity`. A scorer that's a
+`embedding_similarity`, `reranker`, `classifier`, `langid`, `perplexity`, `text_stat`, or
+`token_count`. A scorer that's a
 function of your own is written as a `python:` block, which is only run with `allow_python=True`:
 
 ```yaml
@@ -46499,6 +48823,28 @@ function of your own is written as a `python:` block, which is only run with `al
         expected: en
     min_val: 0.5
     cache: .scores
+
+# The language of each row given by another column
+- col_vals_scored:
+    columns: text
+    scorer:
+      langid:
+        expected_column: lang
+    min_val: 0.5
+
+# Documents of at least 50 words, and at most 2048 tokens
+- col_vals_scored:
+    columns: text
+    scorer:
+      text_stat:
+        stat: word_count
+    min_val: 50
+- col_vals_scored:
+    columns: text
+    scorer:
+      token_count:
+        tokenizer: "tiktoken:cl100k_base"
+    max_val: 2048
 
 # Documents of educational quality (a regression model, scored from 0 to 5)
 - col_vals_scored:

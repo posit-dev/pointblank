@@ -357,6 +357,96 @@ by_speed
 
 Each variant removes a share of the rows with the highest scores (the step has only a `max_val=`, so it's the highest that are removed; `remove="lowest"` would remove the lowest instead). The curve is lowest at 2%, which is the share of flights with their air times in hours: removing fewer leaves some of them in, and removing more starts to remove good flights. By 20%, the sweep hurts. A sweep can also use the values of a column of the table as the scores (`sweep_score("column_name")`), or cutoffs on the scale of the scores rather than shares of the rows (`values=`).
 
+## Injecting Defects
+
+The variants so far remove rows that a check flags, which asks whether the flagged rows hurt the model. The opposite question is just as useful: if a defect got into the data, how much would it hurt? The [`Ablation.inject()`](../../reference/Ablation.inject.md#pointblank.Ablation.inject) method answers it by adding the defect to clean rows (those that fail no step) and evaluating the corrupted table. The defect can be one of four kinds:
+
+- `"null"`: the values of a column are made missing
+- `"shuffle"`: the values of a column are moved between rows, so each is a valid value in the wrong row
+- `"truncate"`: text values are cut to half their length
+- `"duplicate"`: rows are copied
+
+or a function, which is applied to the values of a column. Here, the defect is the problem that step 1 catches, air times in hours, made by a function that divides the air time by 60:
+
+``` python
+injected = (
+    pb.Ablation(
+        validation,
+        evaluate=evaluate,
+        metric="mae",
+        higher_is_better=False,
+        label="Air time model",
+    )
+    .inject(lambda minutes: minutes / 60, step=1, name="hours", rates=[0.01, 0.02, 0.05, 0.1])
+    .run()
+)
+
+injected
+```
+
+| Ablation report Air time model |  |  |  |
+|----|----|----|----|
+| mae on the full table (4,000 rows): **9.12 ± 0.06** (lower is better). Each version was evaluated 5 times; Δ is the mean paired difference from the full table. |  |  |  |
+| Variant | Removed | mae | Δ vs full |
+| Injected: hours on air_time |  |  |  |
+| **Hours on air_time: 1%** 40 clean rows have `hours()` applied to `air_time` (checked by step 1) | 40 1.0% corrupted | 9.89 ± 0.06 | +0.77 \[+0.71, +0.83\] ![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyIiB2aWV3Ym94PSIwIDAgMTAwIDEyIiBzdHlsZT0idmVydGljYWwtYWxpZ246IG1pZGRsZTsiPjxsaW5lIHgxPSI1MC4wIiB5MT0iMCIgeDI9IjUwLjAiIHkyPSIxMiIgc3Ryb2tlPSIjQkJCQkJCIiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT48bGluZSB4MT0iNTMuMiIgeTE9IjYuMCIgeDI9IjUzLjciIHkyPSI2LjAiIHN0cm9rZT0iI0NGMTQyQiIgc3Ryb2tlLXdpZHRoPSIyIj48L2xpbmU+PGNpcmNsZSBjeD0iNTMuNCIgY3k9IjYuMCIgcj0iMyIgZmlsbD0iI0NGMTQyQiI+PC9jaXJjbGU+PC9zdmc+) hurts |
+| **Hours on air_time: 2%** 80 clean rows have `hours()` applied to `air_time` (checked by step 1) | 80 2.0% corrupted | 10.62 ± 0.05 | +1.50 \[+1.45, +1.56\] ![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyIiB2aWV3Ym94PSIwIDAgMTAwIDEyIiBzdHlsZT0idmVydGljYWwtYWxpZ246IG1pZGRsZTsiPjxsaW5lIHgxPSI1MC4wIiB5MT0iMCIgeDI9IjUwLjAiIHkyPSIxMiIgc3Ryb2tlPSIjQkJCQkJCIiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT48bGluZSB4MT0iNTYuNSIgeTE9IjYuMCIgeDI9IjU3LjAiIHkyPSI2LjAiIHN0cm9rZT0iI0NGMTQyQiIgc3Ryb2tlLXdpZHRoPSIyIj48L2xpbmU+PGNpcmNsZSBjeD0iNTYuNyIgY3k9IjYuMCIgcj0iMyIgZmlsbD0iI0NGMTQyQiI+PC9jaXJjbGU+PC9zdmc+) hurts |
+| **Hours on air_time: 5%** 200 clean rows have `hours()` applied to `air_time` (checked by step 1) | 200 5.0% corrupted | 13.58 ± 0.08 | +4.46 \[+4.40, +4.52\] ![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyIiB2aWV3Ym94PSIwIDAgMTAwIDEyIiBzdHlsZT0idmVydGljYWwtYWxpZ246IG1pZGRsZTsiPjxsaW5lIHgxPSI1MC4wIiB5MT0iMCIgeDI9IjUwLjAiIHkyPSIxMiIgc3Ryb2tlPSIjQkJCQkJCIiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT48bGluZSB4MT0iNjkuNyIgeTE9IjYuMCIgeDI9IjcwLjIiIHkyPSI2LjAiIHN0cm9rZT0iI0NGMTQyQiIgc3Ryb2tlLXdpZHRoPSIyIj48L2xpbmU+PGNpcmNsZSBjeD0iNjkuOSIgY3k9IjYuMCIgcj0iMyIgZmlsbD0iI0NGMTQyQiI+PC9jaXJjbGU+PC9zdmc+) hurts |
+| **Hours on air_time: 10%** 400 clean rows have `hours()` applied to `air_time` (checked by step 1) | 400 10.0% corrupted | 19.32 ± 0.12 | +10.20 \[+10.11, +10.30\] ![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyIiB2aWV3Ym94PSIwIDAgMTAwIDEyIiBzdHlsZT0idmVydGljYWwtYWxpZ246IG1pZGRsZTsiPjxsaW5lIHgxPSI1MC4wIiB5MT0iMCIgeDI9IjUwLjAiIHkyPSIxMiIgc3Ryb2tlPSIjQkJCQkJCIiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT48bGluZSB4MT0iOTUuMSIgeTE9IjYuMCIgeDI9Ijk2LjAiIHkyPSI2LjAiIHN0cm9rZT0iI0NGMTQyQiIgc3Ryb2tlLXdpZHRoPSIyIj48L2xpbmU+PGNpcmNsZSBjeD0iOTUuNiIgY3k9IjYuMCIgcj0iMyIgZmlsbD0iI0NGMTQyQiI+PC9jaXJjbGU+PC9zdmc+) hurts |
+| Intervals are 95% paired t-intervals, not adjusted for multiple comparisons; verdicts use Holm-adjusted p-values. |  |  |  |
+| ![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDYwIiBoZWlnaHQ9IjIzMCIgdmlld2JveD0iMCAwIDQ2MCAyMzAiIHN0eWxlPSJkaXNwbGF5OiBibG9jazsgbWFyZ2luLXRvcDogNHB4OyI+PHRleHQgeD0iMCIgeT0iMTMiIHN0eWxlPSJmb250LWZhbWlseTogJiMzOTtJQk0gUGxleCBTYW5zJiMzOTssIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMTBweDsgZmlsbDogIzU1NTU1NTsgZm9udC1zaXplOiAxMXB4OyBmaWxsOiAjMzMzMzMzOyI+aG91cnMgb24gYWlyX3RpbWU6IM6UIG1hZSB2cyBmdWxsIChsb3dlciBpcyBiZXR0ZXIpPC90ZXh0PjxsaW5lIHgxPSI1OCIgeTE9IjQ0IiB4Mj0iNTgiIHkyPSIxOTAiIHN0cm9rZT0iI0JCQkJCQiI+PC9saW5lPjxsaW5lIHgxPSI1OCIgeTE9IjE5MCIgeDI9IjQ0NCIgeTI9IjE5MCIgc3Ryb2tlPSIjQkJCQkJCIj48L2xpbmU+PGxpbmUgeDE9IjU4IiB5MT0iMTgyLjQiIHgyPSI0NDQiIHkyPSIxODIuNCIgc3Ryb2tlPSIjOTk5OTk5IiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT48dGV4dCB4PSI1MyIgeT0iMTg1LjQiIHRleHQtYW5jaG9yPSJlbmQiIHN0eWxlPSJmb250LWZhbWlseTogJiMzOTtJQk0gUGxleCBTYW5zJiMzOTssIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMTBweDsgZmlsbDogIzU1NTU1NTsiPiswPC90ZXh0PjxsaW5lIHgxPSI1OCIgeTE9IjEzNi4zIiB4Mj0iNDQ0IiB5Mj0iMTM2LjMiIHN0cm9rZT0iI0VFRUVFRSIgc3Ryb2tlLXdpZHRoPSIxIj48L2xpbmU+PHRleHQgeD0iNTMiIHk9IjEzOS4zIiB0ZXh0LWFuY2hvcj0iZW5kIiBzdHlsZT0iZm9udC1mYW1pbHk6ICYjMzk7SUJNIFBsZXggU2FucyYjMzk7LCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDEwcHg7IGZpbGw6ICM1NTU1NTU7Ij4rNTwvdGV4dD48bGluZSB4MT0iNTgiIHkxPSI5MC4xIiB4Mj0iNDQ0IiB5Mj0iOTAuMSIgc3Ryb2tlPSIjRUVFRUVFIiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT48dGV4dCB4PSI1MyIgeT0iOTMuMSIgdGV4dC1hbmNob3I9ImVuZCIgc3R5bGU9ImZvbnQtZmFtaWx5OiAmIzM5O0lCTSBQbGV4IFNhbnMmIzM5Oywgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxMHB4OyBmaWxsOiAjNTU1NTU1OyI+KzEwPC90ZXh0PjxsaW5lIHgxPSI1OCIgeTE9IjQ0LjAiIHgyPSI0NDQiIHkyPSI0NC4wIiBzdHJva2U9IiNFRUVFRUUiIHN0cm9rZS13aWR0aD0iMSI+PC9saW5lPjx0ZXh0IHg9IjUzIiB5PSI0Ny4wIiB0ZXh0LWFuY2hvcj0iZW5kIiBzdHlsZT0iZm9udC1mYW1pbHk6ICYjMzk7SUJNIFBsZXggU2FucyYjMzk7LCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDEwcHg7IGZpbGw6ICM1NTU1NTU7Ij4rMTU8L3RleHQ+PHRleHQgeD0iNzIuMyIgeT0iMjAzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBzdHlsZT0iZm9udC1mYW1pbHk6ICYjMzk7SUJNIFBsZXggU2FucyYjMzk7LCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDEwcHg7IGZpbGw6ICM1NTU1NTU7Ij4xJTwvdGV4dD48dGV4dCB4PSIxMTIuMCIgeT0iMjAzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBzdHlsZT0iZm9udC1mYW1pbHk6ICYjMzk7SUJNIFBsZXggU2FucyYjMzk7LCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDEwcHg7IGZpbGw6ICM1NTU1NTU7Ij4yJTwvdGV4dD48dGV4dCB4PSIyMzEuMSIgeT0iMjAzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBzdHlsZT0iZm9udC1mYW1pbHk6ICYjMzk7SUJNIFBsZXggU2FucyYjMzk7LCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDEwcHg7IGZpbGw6ICM1NTU1NTU7Ij41JTwvdGV4dD48dGV4dCB4PSI0MjkuNyIgeT0iMjAzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBzdHlsZT0iZm9udC1mYW1pbHk6ICYjMzk7SUJNIFBsZXggU2FucyYjMzk7LCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDEwcHg7IGZpbGw6ICM1NTU1NTU7Ij4xMCU8L3RleHQ+PHRleHQgeD0iMjUxLjAiIHk9IjIyNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgc3R5bGU9ImZvbnQtZmFtaWx5OiAmIzM5O0lCTSBQbGV4IFNhbnMmIzM5Oywgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxMHB4OyBmaWxsOiAjNTU1NTU1OyI+U2hhcmUgb2YgdGhlIHJvd3MgY29ycnVwdGVkPC90ZXh0Pjxwb2x5bGluZSBwb2ludHM9IjcyLjMsMTc1LjMgMTEyLjAsMTY4LjUgMjMxLjEsMTQxLjIgNDI5LjcsODguMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSI+PC9wb2x5bGluZT48bGluZSB4MT0iNzIuMyIgeTE9IjE3NS44IiB4Mj0iNzIuMyIgeTI9IjE3NC44IiBzdHJva2U9IiNDRjE0MkIiIHN0cm9rZS13aWR0aD0iMiI+PC9saW5lPjxjaXJjbGUgY3g9IjcyLjMiIGN5PSIxNzUuMyIgcj0iMy41IiBmaWxsPSIjQ0YxNDJCIj48dGl0bGU+SG91cnMgb24gYWlyX3RpbWU6IDElOiArMC43NzwvdGl0bGU+PC9jaXJjbGU+PGxpbmUgeDE9IjExMi4wIiB5MT0iMTY5LjAiIHgyPSIxMTIuMCIgeTI9IjE2OC4wIiBzdHJva2U9IiNDRjE0MkIiIHN0cm9rZS13aWR0aD0iMiI+PC9saW5lPjxjaXJjbGUgY3g9IjExMi4wIiBjeT0iMTY4LjUiIHI9IjMuNSIgZmlsbD0iI0NGMTQyQiI+PHRpdGxlPkhvdXJzIG9uIGFpcl90aW1lOiAyJTogKzEuNTA8L3RpdGxlPjwvY2lyY2xlPjxsaW5lIHgxPSIyMzEuMSIgeTE9IjE0MS44IiB4Mj0iMjMxLjEiIHkyPSIxNDAuNyIgc3Ryb2tlPSIjQ0YxNDJCIiBzdHJva2Utd2lkdGg9IjIiPjwvbGluZT48Y2lyY2xlIGN4PSIyMzEuMSIgY3k9IjE0MS4yIiByPSIzLjUiIGZpbGw9IiNDRjE0MkIiPjx0aXRsZT5Ib3VycyBvbiBhaXJfdGltZTogNSU6ICs0LjQ2PC90aXRsZT48L2NpcmNsZT48bGluZSB4MT0iNDI5LjciIHkxPSI4OS4yIiB4Mj0iNDI5LjciIHkyPSI4Ny40IiBzdHJva2U9IiNDRjE0MkIiIHN0cm9rZS13aWR0aD0iMiI+PC9saW5lPjxjaXJjbGUgY3g9IjQyOS43IiBjeT0iODguMyIgcj0iMy41IiBmaWxsPSIjQ0YxNDJCIj48dGl0bGU+SG91cnMgb24gYWlyX3RpbWU6IDEwJTogKzEwLjIwPC90aXRsZT48L2NpcmNsZT48L3N2Zz4=) |  |  |  |
+
+Each rate is a share of the rows to corrupt, and each is a variant. The rows corrupted at a rate include those at the lower rates, so the curve shows the same defect getting worse. Since no rows are removed, there's no control: each variant is compared with the full table. Even 1% of the flights in hours makes the error almost a minute larger, and the harm grows steadily with the share.
+
+The `step=` says which step checks for the defect (and its column is the one corrupted, unless `column=` says otherwise). The table must be a Polars, pandas, or PyArrow table, as the defect is made in memory, and the injected rows are the same in every repeat (they're chosen from the ablation's `seed=`).
+
+## Suggesting Thresholds
+
+A step's thresholds say how many failing rows are too many, but the right number depends on how much the failures cost. With a curve like the one above, that can be worked out: the [`Ablation.suggest_thresholds()`](../../reference/Ablation.suggest_thresholds.md#pointblank.Ablation.suggest_thresholds) method fits a line through the harm of each injected defect against the share of rows that fail its step, and gives the share at which the harm reaches a `tolerance=` (in the units of the metric):
+
+``` python
+injected.suggest_thresholds(tolerance=1)
+```
+
+    {1: Thresholds(warning=0.005, error=0.01, critical=None)}
+
+If the model can lose at most a minute of mean absolute error, step 1 should give an error once 1% of its rows fail (with a warning at half that). The suggestions are dictionaries of [`Thresholds`](../../reference/Thresholds.md#pointblank.Thresholds) by step, ready for the `thresholds=` of the steps. A step whose defect doesn't clearly hurt the model, or that doesn't catch its defect (a shuffled distance, for example, is still greater than zero), gets no suggestion, with a warning that says why.
+
+## Sharing the Effect Among the Steps
+
+Removing every step's rows has an effect, but the steps' rows overlap and work together, so their effects on their own don't add up to it. The *Shapley value* of a step is its fair share of the whole effect: its average effect when it's added to every combination of the other steps. The [`Ablation.shapley()`](../../reference/Ablation.shapley.md#pointblank.Ablation.shapley) method adds a variant for each combination that's needed (reusing those already in the ablation), and the report shows a Shapley value for each step:
+
+``` python
+shares = (
+    pb.Ablation(
+        validation,
+        evaluate=evaluate,
+        metric="mae",
+        higher_is_better=False,
+        label="Air time model",
+    )
+    .shapley()
+    .run()
+)
+
+shares
+```
+
+| Ablation report Air time model |  |  |  |
+|----|----|----|----|
+| mae on the full table (4,000 rows): **9.122 ± 0.059** (lower is better). Each version was evaluated 5 times; Δ is the mean paired difference from removing the same number of random rows. For the Shapley values, Δ is each step's share of the effect of removing the rows of every step. |  |  |  |
+| Variant | Removed | mae | Δ vs random |
+| Shapley values |  |  |  |
+| **Step 1** Air time is between 20 and 700 minutes | 80 2.0% | 148% of the total Δ | −1.166 \[−1.308, −1.024\] ![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyIiB2aWV3Ym94PSIwIDAgMTAwIDEyIiBzdHlsZT0idmVydGljYWwtYWxpZ246IG1pZGRsZTsiPjxsaW5lIHgxPSI1MC4wIiB5MT0iMCIgeDI9IjUwLjAiIHkyPSIxMiIgc3Ryb2tlPSIjQkJCQkJCIiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT48bGluZSB4MT0iNC4wIiB5MT0iNi4wIiB4Mj0iMTQuMCIgeTI9IjYuMCIgc3Ryb2tlPSIjNENBNjRDIiBzdHJva2Utd2lkdGg9IjIiPjwvbGluZT48Y2lyY2xlIGN4PSI5LjAiIGN5PSI2LjAiIHI9IjMiIGZpbGw9IiM0Q0E2NEMiPjwvY2lyY2xlPjwvc3ZnPg==) helps |
+| **Step 2** Distance is greater than zero | 122 3.0% | -1% of the total Δ | +0.011 \[−0.092, +0.114\] ![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyIiB2aWV3Ym94PSIwIDAgMTAwIDEyIiBzdHlsZT0idmVydGljYWwtYWxpZ246IG1pZGRsZTsiPjxsaW5lIHgxPSI1MC4wIiB5MT0iMCIgeDI9IjUwLjAiIHkyPSIxMiIgc3Ryb2tlPSIjQkJCQkJCIiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT48bGluZSB4MT0iNDYuOCIgeTE9IjYuMCIgeDI9IjU0LjAiIHkyPSI2LjAiIHN0cm9rZT0iIzk5OTk5OSIgc3Ryb2tlLXdpZHRoPSIyIj48L2xpbmU+PGNpcmNsZSBjeD0iNTAuNCIgY3k9IjYuMCIgcj0iMyIgZmlsbD0iIzk5OTk5OSI+PC9jaXJjbGU+PC9zdmc+) inconclusive |
+| **Step 3** Distance is at most 2,500 miles | 182 4.5% | -47% of the total Δ | +0.368 \[+0.291, +0.446\] ![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyIiB2aWV3Ym94PSIwIDAgMTAwIDEyIiBzdHlsZT0idmVydGljYWwtYWxpZ246IG1pZGRsZTsiPjxsaW5lIHgxPSI1MC4wIiB5MT0iMCIgeDI9IjUwLjAiIHkyPSIxMiIgc3Ryb2tlPSIjQkJCQkJCIiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT48bGluZSB4MT0iNjAuMiIgeTE9IjYuMCIgeDI9IjY1LjciIHkyPSI2LjAiIHN0cm9rZT0iI0NGMTQyQiIgc3Ryb2tlLXdpZHRoPSIyIj48L2xpbmU+PGNpcmNsZSBjeD0iNjMuMCIgY3k9IjYuMCIgcj0iMyIgZmlsbD0iI0NGMTQyQiI+PC9jaXJjbGU+PC9zdmc+) hurts |
+| Intervals are 95% paired t-intervals, not adjusted for multiple comparisons; verdicts use Holm-adjusted p-values. |  |  |  |
+| The Shapley values are exact, from every order of the 3 steps. They add up to −0.786, the effect of removing the rows of every step compared with removing as many random rows. |  |  |  |
+
+The Shapley values add up to the effect of removing the rows of every step, so each step gets a share of the total (in the **mae** column). Step 1's rows bring the error down by more than the whole cleaning does, and step 3's rows take back almost half of that, so the shares are above 100% and below zero. Step 2's share is close to nothing. The [`Ablation.get_shapley()`](../../reference/Ablation.get_shapley.md#pointblank.Ablation.get_shapley) method gives the values as a table, with their intervals and p-values for every metric.
+
+With three steps, there are seven combinations to evaluate, and the values are exact. The number of combinations doubles with each step, so with more steps than `permutations=` allows (by default, those with at most 200 orders, or five steps), the values are estimated from that many random orders of the steps instead, and the report says so.
+
 ## Getting the Results
 
 The [`Ablation.get_effects()`](../../reference/Ablation.get_effects.md#pointblank.Ablation.get_effects) method returns the results as a table, with a row for each variant and metric. Along with the differences from the controls, it has the differences from the full table, the interval bounds, and the p-values:
@@ -626,13 +716,13 @@ pb.yaml_ablation(config, set_tbl=train, evaluate=evaluate).plan()
 | **All steps but step 2, plus 120 random rows** The rows of steps 1, 3, plus random rows drawn anew for each repeat | 380 9.5% |
 | **All steps but step 3, plus 180 random rows** The rows of steps 1, 2, plus random rows drawn anew for each repeat | 380 9.5% |
 
-The sweeps are strategies too, with their arguments by name (e.g., `- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}`).
+The sweeps, [inject](../../reference/Ablation.inject.md#pointblank.Ablation.inject), and [shapley](../../reference/Ablation.shapley.md#pointblank.Ablation.shapley) are strategies too, with their arguments by name (e.g., `- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}` or `- inject: {corruption: "null", step: 2}`). In YAML, a defect must be one of the four kinds by name, not a function.
 
 The block is ignored by [`yaml_interrogate()`](../../reference/yaml_interrogate.md#pointblank.yaml_interrogate), so the same file can be used for validating the data, and [`yaml_to_python()`](../../reference/yaml_to_python.md#pointblank.yaml_to_python) writes out the equivalent Python code, ablation included.
 
 ## How the Comparisons Are Made
 
-For each variant, the difference from its control is computed for each repeat, and the report shows the mean of these differences with a paired *t*-interval (95% by default, set with `conf_level=`). The p-values are adjusted for the number of variants with the Holm method, and the verdicts use the adjusted p-values: a variant helps or hurts only if its adjusted p-value is below `1 - conf_level`. You can turn off the adjustment with `adjust=None`.
+For each variant, the difference from its control is computed for each repeat, and the report shows the mean of these differences with a paired *t*-interval (95% by default, set with `conf_level=`). The p-values are adjusted for the number of variants with the Holm method, and the verdicts use the adjusted p-values: a variant helps or hurts only if its adjusted p-value is below `1 - conf_level`. You can turn off the adjustment with `adjust=None`. Injected defects remove no rows, so they're always compared with the full table, and the Shapley values have intervals and p-values of their own (from the values of each repeat), adjusted for the number of steps.
 
 With fewer than three repeats, there's too little data for a useful interval, so the report gives no verdicts (and [Ablation](../../reference/Ablation.md#pointblank.Ablation) warns about this). More repeats give narrower intervals, at the cost of more evaluations. A few other options are worth knowing about:
 
@@ -645,4 +735,4 @@ Only steps that check rows can be used in an ablation. Steps that check the tabl
 
 ## Conclusion
 
-A validation can say which rows break its rules, but only an experiment can say whether those rows hurt the model trained on them. An [Ablation](../../reference/Ablation.md#pointblank.Ablation) runs that experiment with controls, repeats, and intervals, so you can find the checks that are worth enforcing, the ones that don't matter, the ones that are redundant, the ones that remove good data, and where to set their limits. It works with any model that you can wrap in an `evaluate` function (or train elsewhere, with `export()` and [load_results()](../../reference/Ablation.load_results.md#pointblank.Ablation.load_results)), and with any validation whose steps check rows.
+A validation can say which rows break its rules, but only an experiment can say whether those rows hurt the model trained on them. An [Ablation](../../reference/Ablation.md#pointblank.Ablation) runs that experiment with controls, repeats, and intervals, so you can find the checks that are worth enforcing, the ones that don't matter, the ones that are redundant, the ones that remove good data, and where to set their limits. Injecting defects shows how much a problem would cost (and gives thresholds to match), and Shapley values share the effect of the whole cleaning fairly among the steps. It works with any model that you can wrap in an `evaluate` function (or train elsewhere, with `export()` and [load_results()](../../reference/Ablation.load_results.md#pointblank.Ablation.load_results)), and with any validation whose steps check rows.

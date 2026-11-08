@@ -4,7 +4,7 @@ Score text by its similarity to reference texts, with an embedding model.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L473-L550)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L484-L561)
 
 ``` python
 scorers.embedding_similarity(

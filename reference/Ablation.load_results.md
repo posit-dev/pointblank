@@ -4,7 +4,7 @@ Read the results of evaluations made elsewhere, and compute the effects.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2537-L2719)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3134-L3316)
 
 ``` python
 Ablation.load_results(

@@ -4,14 +4,15 @@ Score text by how likely it is to be in the expected languages.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1016-L1096)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1054-L1159)
 
 ``` python
 scorers.langid(
-    expected,
+    expected=None,
     backend="langid",
     model=None,
     column=None,
+    expected_column=None,
     name=None,
     version=None,
     batch_size=None,
@@ -22,8 +23,8 @@ The score of a row is the probability, according to a language identification mo
 
 ## Parameters
 
-`expected: str | list[str]`  
-The expected language (an ISO 639 code like `"en"`), or a list of them. A code matches the model's languages with the same code or with a region or script after it (`"en"` matches `"en_US"`).
+`expected: str | list[str] | None = None`  
+The expected language (an ISO 639 code like `"en"`), or a list of them. A code matches the model's languages with the same code or with a region or script after it (`"en"` matches `"en_US"`). Give this or `expected_column=`.
 
 `backend: str | Callable[[str], Any] = "langid"`  
 The language identification model: `"langid"` (the default, which needs the [langid](../reference/scorers.langid.md#pointblank.scorers.langid) package), `"fasttext"` (a fastText model, which needs the `fasttext` package and the path of the model as `model=`), or a function that takes a text and returns its probabilities by language (a dictionary or a list of `(language, probability)` pairs).
@@ -32,10 +33,13 @@ The language identification model: `"langid"` (the default, which needs the [lan
 The path of the fastText model (e.g., `lid.176.bin`), with `backend="fasttext"`.
 
 `column: str | None = None`  
-The column with the text to score. It can be left out if the step has one column.
+The column with the text to score. It can be left out if the step has one column (or two, with one of them as `expected_column=`).
+
+`expected_column: str | None = None`  
+A column with the expected language of each row, instead of `expected=` (for a multilingual corpus, where each document is labelled with its language). The column must be one of the columns of the step.
 
 `name: str | None = None`  
-A name for the scorer, for the score cache and the report. By default, it's made from the expected languages, the backend, and the model.
+A name for the scorer, for the score cache and the report. By default, it's made from the expected languages (or `expected_column=`), the backend, and the model.
 
 `version: str | None = None`  
 A version, which is part of the key of the score cache.
@@ -75,4 +79,23 @@ pb.Validate(data=tbl).col_vals_scored(
 
 [TABLE]
 
-The review in French fails, and so does `"ok"`, which can't be told apart.
+The review in French fails, and so does `"ok"`, which can't be told apart. In a corpus with documents in several languages, the expected language of each row can come from a column, with `expected_column=`:
+
+``` python
+tbl = pl.DataFrame(
+    {
+        "review": ["the soup is good", "le pain est bon", "le vin est bon"],
+        "lang": ["en", "fr", "en"],
+    }
+)
+
+pb.Validate(data=tbl).col_vals_scored(
+    columns=["review", "lang"],
+    scorer=pb.scorers.langid(expected_column="lang", backend=guess),
+    min_val=0.6,
+).interrogate()
+```
+
+[TABLE]
+
+The third review is labelled as English, but it's in French, so it fails.
