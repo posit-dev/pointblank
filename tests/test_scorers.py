@@ -156,11 +156,15 @@ def test_col_vals_scored_rows_without_a_score():
     assert (vi.n_passed, vi.n_failed) == (2, 3)
     assert vi.val_info["n_unscored"] == 3
     assert "3 rows had no score" in validation.get_note(1, "scores", format="text")
-    assert "failed (`na_pass=True` lets them pass)" in validation.get_note(1, "scores", format="text")
+    assert "failed (`na_pass=True` lets them pass)" in validation.get_note(
+        1, "scores", format="text"
+    )
     passing = _scored(scorer=some_none, min_val=0, na_pass=True)
     assert passing.n_passed(i=1, scalar=True) == 5
     assert "passed with `na_pass=True`." in passing.get_note(1, "scores", format="text")
-    assert "passed with <code>na_pass=True</code>." in passing.get_note(1, "scores", format="markdown")
+    assert "passed with <code>na_pass=True</code>." in passing.get_note(
+        1, "scores", format="markdown"
+    )
 
     # NaN and numpy numbers are scores too (NaN is no score)
     def numpy_scores(batch):
@@ -867,7 +871,9 @@ def test_classifier(monkeypatch):
 
     def pipe(texts, **kwargs):
         calls.append(kwargs)
-        out = [[{"label": "POS", "score": len(t) / 10}, {"label": "NEG", "score": 0.5}] for t in texts]
+        out = [
+            [{"label": "POS", "score": len(t) / 10}, {"label": "NEG", "score": 0.5}] for t in texts
+        ]
         # A pipeline gives one text's labels without the outer list
         return out[0] if len(texts) == 1 else out
 
