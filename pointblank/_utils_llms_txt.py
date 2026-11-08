@@ -139,6 +139,9 @@ def _get_api_text() -> str:
         "Validate.specially",
         "Validate.prompt",
         "Validate.col_vals_scored",
+        "Validate.rows_near_distinct",
+        "Validate.rows_not_contaminated",
+        "Validate.col_vals_chat_format",
     ]
 
     column_selection_exported = [
