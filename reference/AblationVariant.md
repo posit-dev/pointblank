@@ -4,7 +4,7 @@ A version of the training table evaluated in an ablation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L96-L167)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L102-L187)
 
 ``` python
 AblationVariant(
@@ -18,6 +18,8 @@ AblationVariant(
     group=None,
     group_column=None,
     left_out=None,
+    sweep=None,
+    value=None,
 )
 ```
 
@@ -26,16 +28,16 @@ An [`Ablation`](../reference/Ablation.md#pointblank.Ablation) evaluates a model 
 ## Attributes
 
 `id: str`  
-A short identifier for the version, unique within the ablation: `"full"` for the full table, `"step_<i>"` for a variant of [`drop_each()`](../reference/Ablation.drop_each.md#pointblank.Ablation.drop_each), `"all"` for [`drop_all()`](../reference/Ablation.drop_all.md#pointblank.Ablation.drop_all), the `name=` (or `"steps_<i>_<j>"`) for [`drop_steps()`](../reference/Ablation.drop_steps.md#pointblank.Ablation.drop_steps), `"all_but_<i>"` for [`drop_all_but_each()`](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each), `"<column>=<value>"` for [`drop_groups()`](../reference/Ablation.drop_groups.md#pointblank.Ablation.drop_groups), and `"control_<n>"` for the control that removes `n` random rows (or `"control_<id>"` for the control of a [drop_all_but_each()](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each) variant).
+A short identifier for the version, unique within the ablation: `"full"` for the full table, `"step_<i>"` for a variant of [`drop_each()`](../reference/Ablation.drop_each.md#pointblank.Ablation.drop_each), `"all"` for [`drop_all()`](../reference/Ablation.drop_all.md#pointblank.Ablation.drop_all), the `name=` (or `"steps_<i>_<j>"`) for [`drop_steps()`](../reference/Ablation.drop_steps.md#pointblank.Ablation.drop_steps), `"all_but_<i>"` for [`drop_all_but_each()`](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each), `"<column>=<value>"` for [`drop_groups()`](../reference/Ablation.drop_groups.md#pointblank.Ablation.drop_groups), `"<score>:lowest_<q>"` (or `"<score>:below_<value>"`, and the same with `highest` and `above`) for [`sweep_score()`](../reference/Ablation.sweep_score.md#pointblank.Ablation.sweep_score), where `<score>` is `step_<i>` or the score column, `"step_<i>:<param>=<value>"` for [`sweep_step()`](../reference/Ablation.sweep_step.md#pointblank.Ablation.sweep_step), and `"control_<n>"` for the control that removes `n` random rows (or `"control_<id>"` for the control of a [drop_all_but_each()](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each) variant).
 
 `strategy: str`  
-The kind of version: `"full"`, `"drop_steps"`, `"drop_each"`, `"drop_all"`, `"drop_all_but_each"`, `"drop_groups"`, or `"control"`.
+The kind of version: `"full"`, `"drop_steps"`, `"drop_each"`, `"drop_all"`, `"drop_all_but_each"`, `"drop_groups"`, `"sweep_score"`, `"sweep_step"`, or `"control"`.
 
 `name: str`  
 A name for the version, as shown in reports (e.g., `"Step 2"`).
 
 `steps: tuple[int, …]`  
-The numbers of the validation steps whose failing rows were removed (empty for the full table, for groups, and for most controls).
+The numbers of the validation steps whose failing rows were removed (empty for the full table, for groups, for the points of a sweep, and for most controls).
 
 `n_removed: int`  
 The number of rows removed from the table.
@@ -54,3 +56,9 @@ For a variant of [drop_groups()](../reference/Ablation.drop_groups.md#pointblank
 
 `left_out: int | None`  
 For a variant of [drop_all_but_each()](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each) (and its control), the step whose rows are kept (otherwise `None`).
+
+`sweep: str | None`  
+For a point of a sweep (from [sweep_score()](../reference/Ablation.sweep_score.md#pointblank.Ablation.sweep_score) or [sweep_step()](../reference/Ablation.sweep_step.md#pointblank.Ablation.sweep_step)), the id of the sweep, which its points share (e.g., `"step_2:lowest"` or `"step_2:min_val"`; otherwise `None`).
+
+`value: float | None`  
+For a point of a sweep, its value: the share of the scored rows removed, the score threshold, or the value of the step's parameter (otherwise `None`).

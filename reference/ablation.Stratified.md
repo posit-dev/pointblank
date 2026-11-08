@@ -4,7 +4,7 @@ A control that removes random rows in proportion to groups of the table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L220-L318)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L245-L343)
 
 ``` python
 ablation.Stratified(by)

@@ -4,7 +4,7 @@ Get the settings and results of the ablation as a JSON-serializable dict.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2893-L2965)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3357-L3429)
 
 ``` python
 Ablation.to_dict()

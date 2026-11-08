@@ -190,6 +190,9 @@ Perform a specialized validation with customized logic.
 [Validate.prompt()](Validate.prompt.md#pointblank.Validate.prompt)  
 Validate rows using AI/LLM-powered analysis.
 
+[Validate.col_vals_scored()](Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored)  
+Validate whether rows have a score from a model within bounds.
+
 ## Aggregation Steps
 
 These validation methods check aggregated column values (sums, averages, standard deviations) against fixed values or column references.
@@ -238,6 +241,34 @@ Does the column standard deviation satisfy a less than or equal to comparison?
 
 [Validate.col_sd_eq()](Validate.col_sd_eq.md#pointblank.Validate.col_sd_eq)  
 Does the column standard deviation satisfy an equal to comparison?
+
+## Scorers
+
+Scorers give each row a score with a model, for [Validate.col_vals_scored()](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored). Any function of a batch of rows is a scorer; [from_function()](../reference/scorers.from_function.md#pointblank.scorers.from_function) gives one a name, a version, and a batch size, and the adapters use models from common packages (embeddings, rerankers, text classifiers, language identification, and perplexity). Scores are cached by the scorer's name and version, in memory or on disk.
+
+[scorers.Scorer](scorers.Scorer.md#pointblank.scorers.Scorer)  
+The protocol of the scorers used by [Validate.col_vals_scored()](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored).
+
+[scorers.from_function()](scorers.from_function.md#pointblank.scorers.from_function)  
+Make a scorer from a function, with a name, a version, and a batch size.
+
+[scorers.embedding_similarity()](scorers.embedding_similarity.md#pointblank.scorers.embedding_similarity)  
+Score text by its similarity to reference texts, with an embedding model.
+
+[scorers.reranker()](scorers.reranker.md#pointblank.scorers.reranker)  
+Score how relevant a document is to a query, with a reranking model.
+
+[scorers.classifier()](scorers.classifier.md#pointblank.scorers.classifier)  
+Score text with a text-classification model from Hugging Face.
+
+[scorers.langid()](scorers.langid.md#pointblank.scorers.langid)  
+Score text by how likely it is to be in the expected languages.
+
+[scorers.perplexity()](scorers.perplexity.md#pointblank.scorers.perplexity)  
+Score text by its perplexity under a language model.
+
+[scorers.clear_cache()](scorers.clear_cache.md#pointblank.scorers.clear_cache)  
+Clear the scores that [Validate.col_vals_scored()](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) keeps in memory.
 
 ## Column Selection
 
@@ -534,6 +565,12 @@ Add a variant for each step, removing the rows that failed every other step.
 
 [Ablation.drop_groups()](Ablation.drop_groups.md#pointblank.Ablation.drop_groups)  
 Add a variant for each group of rows, removing the rows of that group.
+
+[Ablation.sweep_score()](Ablation.sweep_score.md#pointblank.Ablation.sweep_score)  
+Add a variant for each cutoff of a score, removing the rows on the wrong side of it.
+
+[Ablation.sweep_step()](Ablation.sweep_step.md#pointblank.Ablation.sweep_step)  
+Add a variant for each value of a step's parameter, removing the rows that fail it.
 
 [Ablation.plan()](Ablation.plan.md#pointblank.Ablation.plan)  
 Show the versions of the table that the ablation will evaluate.

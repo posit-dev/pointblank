@@ -83,6 +83,7 @@
 - [Validate.conjointly](https://posit-dev.github.io/pointblank/reference/Validate.conjointly.html)
 - [Validate.specially](https://posit-dev.github.io/pointblank/reference/Validate.specially.html)
 - [Validate.prompt](https://posit-dev.github.io/pointblank/reference/Validate.prompt.html)
+- [Validate.col_vals_scored](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_scored.html)
 
 #### Aggregation Steps
 > These validation methods check aggregated column values (sums, averages, standard deviations) against fixed values or column references.
@@ -103,6 +104,19 @@
 - [Validate.col_sd_ge](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_ge.html)
 - [Validate.col_sd_le](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_le.html)
 - [Validate.col_sd_eq](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_eq.html)
+
+#### Scorers
+> Scorers give each row a score with a model, for `Validate.col_vals_scored()`. Any function of a batch of rows is a scorer; `from_function()` gives one a name, a version, and a batch size, and the adapters use models from common packages (embeddings, rerankers, text classifiers, language identification, and perplexity). Scores are cached by the scorer's name and version, in memory or on disk.
+
+
+- [scorers.Scorer](https://posit-dev.github.io/pointblank/reference/scorers.Scorer.html)
+- [scorers.from_function](https://posit-dev.github.io/pointblank/reference/scorers.from_function.html)
+- [scorers.embedding_similarity](https://posit-dev.github.io/pointblank/reference/scorers.embedding_similarity.html)
+- [scorers.reranker](https://posit-dev.github.io/pointblank/reference/scorers.reranker.html)
+- [scorers.classifier](https://posit-dev.github.io/pointblank/reference/scorers.classifier.html)
+- [scorers.langid](https://posit-dev.github.io/pointblank/reference/scorers.langid.html)
+- [scorers.perplexity](https://posit-dev.github.io/pointblank/reference/scorers.perplexity.html)
+- [scorers.clear_cache](https://posit-dev.github.io/pointblank/reference/scorers.clear_cache.html)
 
 #### Column Selection
 > Use the `col()` function along with column selection helpers to flexibly select columns for validation. Combine `col()` with `starts_with()`, `matches()`, etc. for selecting multiple target columns.
@@ -239,6 +253,8 @@
 - [Ablation.drop_all](https://posit-dev.github.io/pointblank/reference/Ablation.drop_all.html)
 - [Ablation.drop_all_but_each](https://posit-dev.github.io/pointblank/reference/Ablation.drop_all_but_each.html)
 - [Ablation.drop_groups](https://posit-dev.github.io/pointblank/reference/Ablation.drop_groups.html)
+- [Ablation.sweep_score](https://posit-dev.github.io/pointblank/reference/Ablation.sweep_score.html)
+- [Ablation.sweep_step](https://posit-dev.github.io/pointblank/reference/Ablation.sweep_step.html)
 - [Ablation.plan](https://posit-dev.github.io/pointblank/reference/Ablation.plan.html)
 - [Ablation.run](https://posit-dev.github.io/pointblank/reference/Ablation.run.html)
 - [Ablation.check_determinism](https://posit-dev.github.io/pointblank/reference/Ablation.check_determinism.html)

@@ -4,7 +4,7 @@ Get the results of the ablation as a table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2777-L2891)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3236-L3355)
 
 ``` python
 Ablation.get_effects()
@@ -21,6 +21,7 @@ A Polars DataFrame (or a pandas DataFrame, if Polars isn't installed) with these
 - `steps`: the numbers of the steps whose failing rows were removed, as a list
 - `left_out`: for a variant of [`drop_all_but_each()`](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each), the step whose rows are kept
 - `group`: for a variant of [`drop_groups()`](../reference/Ablation.drop_groups.md#pointblank.Ablation.drop_groups), the value of the group whose rows are removed, as a string
+- `sweep`, `value`: for a point of a sweep (from [`sweep_score()`](../reference/Ablation.sweep_score.md#pointblank.Ablation.sweep_score) or [`sweep_step()`](../reference/Ablation.sweep_step.md#pointblank.Ablation.sweep_step)), the id of the sweep and the point's value (the share of the scored rows removed, the score cutoff, or the value of the step's parameter)
 - `n_removed`, `f_removed`: the number and share of rows removed
 - `metric`, `mean`, `sd`: the metric, and its mean and standard deviation across the repeats
 - `delta_vs_full`, `delta_vs_full_lower`, `delta_vs_full_upper`: the mean paired difference from the full table, with its interval at `conf_level=`

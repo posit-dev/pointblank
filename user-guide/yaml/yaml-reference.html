@@ -346,6 +346,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Composable Steps</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../user-guide/advanced-validation/scored-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scored Validation</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -640,6 +646,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#structure-validations" id="toc-structure-validations" class="nav-link" data-scroll-target="#structure-validations">Structure Validations</a></li>
   <li><a href="#special-validation-methods" id="toc-special-validation-methods" class="nav-link" data-scroll-target="#special-validation-methods">Special Validation Methods</a></li>
   <li><a href="#ai-powered-validation" id="toc-ai-powered-validation" class="nav-link" data-scroll-target="#ai-powered-validation">AI-Powered Validation</a></li>
+  <li><a href="#model-scored-validation" id="toc-model-scored-validation" class="nav-link" data-scroll-target="#model-scored-validation">Model-Scored Validation</a></li>
   <li><a href="#data-quality-methods" id="toc-data-quality-methods" class="nav-link" data-scroll-target="#data-quality-methods">Data Quality Methods</a></li>
   <li><a href="#aggregate-validations" id="toc-aggregate-validations" class="nav-link" data-scroll-target="#aggregate-validations">Aggregate Validations</a></li>
   </ul></li>
@@ -1404,49 +1411,97 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <li>When deterministic results are required</li>
 </ul>
 </section>
+<section id="model-scored-validation" class="level2">
+<h2 class="anchored" data-anchor-id="model-scored-validation">Model-Scored Validation</h2>
+<p><a href="../../reference/Validate.col_vals_scored.html#pointblank.Validate.col_vals_scored" class="gdls-link gdls-code">col_vals_scored</a>: are the scores that a model gives each row within bounds?</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_scored</span><span class="kw">:</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">query</span><span class="kw">,</span><span class="at"> passage</span><span class="kw">]</span><span class="co">                          # REQUIRED: Column(s) given to the scorer</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">scorer</span><span class="kw">:</span><span class="co">                                            # REQUIRED: An adapter and its settings</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">reranker</span><span class="kw">:</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">provider</span><span class="kw">:</span><span class="at"> sentence-transformers</span></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">query</span><span class="kw">:</span><span class="at"> query</span></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">document</span><span class="kw">:</span><span class="at"> passage</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">min_val</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.5</span><span class="co">                                       # OPTIONAL: Lowest passing score</span></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">max_val</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.0</span><span class="co">                                       # OPTIONAL: Highest passing score</span></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">na_pass</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">                                     # OPTIONAL: Pass rows without a score</span></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">cache</span><span class="kw">:</span><span class="at"> .scores</span><span class="co">                                     # OPTIONAL: Directory of a score cache</span></span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">keep_scores</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">                                  # OPTIONAL: Keep the scores (`pb_score_`)</span></span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span><span class="co">                                             # OPTIONAL: Data preprocessing</span></span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a>      lambda df: df.head(1000)</span>
+<span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Passages answer their queries"</span><span class="co">             # OPTIONAL: Step description</span></span></code></pre></div>
+<p>At least one of <code>min_val</code> and <code>max_val</code> is needed. The scorer is written as one of the adapters of <code>pb.scorers</code> with its settings, as <code>{&lt;adapter&gt;: {&lt;settings&gt;}}</code>, where the adapter is one of <a href="../../reference/scorers.embedding_similarity.html#pointblank.scorers.embedding_similarity" class="gdls-link gdls-code">embedding_similarity</a>, <a href="../../reference/scorers.reranker.html#pointblank.scorers.reranker" class="gdls-link gdls-code">reranker</a>, <a href="../../reference/scorers.classifier.html#pointblank.scorers.classifier" class="gdls-link gdls-code">classifier</a>, <a href="../../reference/scorers.langid.html#pointblank.scorers.langid" class="gdls-link gdls-code">langid</a>, or <a href="../../reference/scorers.perplexity.html#pointblank.scorers.perplexity" class="gdls-link gdls-code">perplexity</a>. A scorer that’s a function of your own is written as a <code>python:</code> block, which is only run with <code>allow_python=True</code>:</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Text in English, with a cache of the scores on disk</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_scored</span><span class="kw">:</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> text</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">scorer</span><span class="kw">:</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">langid</span><span class="kw">:</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">expected</span><span class="kw">:</span><span class="at"> en</span></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">min_val</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.5</span></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">cache</span><span class="kw">:</span><span class="at"> .scores</span></span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Documents of educational quality (a regression model, scored from 0 to 5)</span></span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_scored</span><span class="kw">:</span></span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> text</span></span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">scorer</span><span class="kw">:</span></span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">classifier</span><span class="kw">:</span></span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">hf_model</span><span class="kw">:</span><span class="at"> HuggingFaceFW/fineweb-edu-classifier</span></span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">function_to_apply</span><span class="kw">:</span><span class="at"> none</span></span>
+<span id="cb50-17"><a href="#cb50-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">min_val</span><span class="kw">:</span><span class="at"> </span><span class="fl">2.5</span></span>
+<span id="cb50-18"><a href="#cb50-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-19"><a href="#cb50-19" aria-hidden="true" tabindex="-1"></a><span class="co"># A scorer of your own (needs `allow_python=True`)</span></span>
+<span id="cb50-20"><a href="#cb50-20" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_scored</span><span class="kw">:</span></span>
+<span id="cb50-21"><a href="#cb50-21" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> text</span></span>
+<span id="cb50-22"><a href="#cb50-22" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">scorer</span><span class="kw">:</span></span>
+<span id="cb50-23"><a href="#cb50-23" aria-hidden="true" tabindex="-1"></a><span class="fu">      python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb50-24"><a href="#cb50-24" aria-hidden="true" tabindex="-1"></a>        pb.scorers.from_function(lambda row: len(row["text"].split()), name="words", per_row=True)</span>
+<span id="cb50-25"><a href="#cb50-25" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">min_val</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span></code></pre></div>
+<p>See the <a href="../../user-guide/advanced-validation/scored-validation.html">Scored Validation</a> article for more on scorers and the score cache.</p>
+</section>
 <section id="data-quality-methods" class="level2">
 <h2 class="anchored" data-anchor-id="data-quality-methods">Data Quality Methods</h2>
 <p><code>col_pct_null</code>: is the percentage of null values in a column within bounds?</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_pct_null</span><span class="kw">:</span></span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span><span class="co">                        # REQUIRED: Maximum allowed null fraction</span></span>
-<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
-<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
-<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
-<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
-<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Null rate check"</span><span class="co">           # OPTIONAL: Step description</span></span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_pct_null</span><span class="kw">:</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span><span class="co">                        # REQUIRED: Maximum allowed null fraction</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Null rate check"</span><span class="co">           # OPTIONAL: Step description</span></span></code></pre></div>
 <p><code>data_freshness</code>: is the data in a date/datetime column recent?</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">data_freshness</span><span class="kw">:</span></span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">column</span><span class="kw">:</span><span class="at"> date_column</span><span class="co">                # REQUIRED: Date/datetime column</span></span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">max_age</span><span class="kw">:</span><span class="at"> </span><span class="st">"24h"</span><span class="co">                     # REQUIRED: Maximum age of data</span></span>
-<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">timezone</span><span class="kw">:</span><span class="at"> </span><span class="st">"UTC"</span><span class="co">                    # OPTIONAL: Timezone for naive datetimes</span></span>
-<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">allow_future</span><span class="kw">:</span><span class="at"> </span><span class="st">"5m"</span><span class="co">                 # OPTIONAL: Allow data this far ahead (true for any amount)</span></span>
-<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
-<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
-<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
-<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
-<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Data is recent"</span><span class="co">            # OPTIONAL: Step description</span></span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">data_freshness</span><span class="kw">:</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">column</span><span class="kw">:</span><span class="at"> date_column</span><span class="co">                # REQUIRED: Date/datetime column</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">max_age</span><span class="kw">:</span><span class="at"> </span><span class="st">"24h"</span><span class="co">                     # REQUIRED: Maximum age of data</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">timezone</span><span class="kw">:</span><span class="at"> </span><span class="st">"UTC"</span><span class="co">                    # OPTIONAL: Timezone for naive datetimes</span></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">allow_future</span><span class="kw">:</span><span class="at"> </span><span class="st">"5m"</span><span class="co">                 # OPTIONAL: Allow data this far ahead (true for any amount)</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Data is recent"</span><span class="co">            # OPTIONAL: Step description</span></span></code></pre></div>
 </section>
 <section id="aggregate-validations" class="level2">
 <h2 class="anchored" data-anchor-id="aggregate-validations">Aggregate Validations</h2>
 <p>Aggregate methods validate column-level statistics (sum, average, standard deviation) against a threshold. They follow the pattern <code>col_{stat}_{comparator}</code>:</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sum validations</span></span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_sum_gt</span><span class="kw">:</span></span>
-<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">revenue</span><span class="kw">]</span></span>
-<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
-<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Total revenue is positive"</span></span>
-<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Average validations</span></span>
-<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_avg_le</span><span class="kw">:</span></span>
-<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">rating</span><span class="kw">]</span></span>
-<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
-<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Average rating at most 5"</span></span>
-<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard deviation validations</span></span>
-<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_sd_lt</span><span class="kw">:</span></span>
-<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">temperature</span><span class="kw">]</span></span>
-<span id="cb51-16"><a href="#cb51-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span></span>
-<span id="cb51-17"><a href="#cb51-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Temperature variation is bounded"</span></span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sum validations</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_sum_gt</span><span class="kw">:</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">revenue</span><span class="kw">]</span></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Total revenue is positive"</span></span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Average validations</span></span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_avg_le</span><span class="kw">:</span></span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">rating</span><span class="kw">]</span></span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
+<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Average rating at most 5"</span></span>
+<span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-13"><a href="#cb53-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard deviation validations</span></span>
+<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_sd_lt</span><span class="kw">:</span></span>
+<span id="cb53-15"><a href="#cb53-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">temperature</span><span class="kw">]</span></span>
+<span id="cb53-16"><a href="#cb53-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span></span>
+<span id="cb53-17"><a href="#cb53-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Temperature variation is bounded"</span></span></code></pre></div>
 <p>Available aggregate methods:</p>
 <ul>
 <li><strong>Sum</strong>: <a href="../../reference/Validate.col_sum_gt.html#pointblank.Validate.col_sum_gt" class="gdls-link gdls-code">col_sum_gt</a>, <a href="../../reference/Validate.col_sum_lt.html#pointblank.Validate.col_sum_lt" class="gdls-link gdls-code">col_sum_lt</a>, <a href="../../reference/Validate.col_sum_ge.html#pointblank.Validate.col_sum_ge" class="gdls-link gdls-code">col_sum_ge</a>, <a href="../../reference/Validate.col_sum_le.html#pointblank.Validate.col_sum_le" class="gdls-link gdls-code">col_sum_le</a>, <a href="../../reference/Validate.col_sum_eq.html#pointblank.Validate.col_sum_eq" class="gdls-link gdls-code">col_sum_eq</a></li>
@@ -1459,20 +1514,20 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <section id="column-selection-patterns" class="level1">
 <h1>Column Selection Patterns</h1>
 <p>All validation methods that accept a <code>columns</code> parameter support these selection patterns:</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Single column</span></span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> column_name</span></span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple columns as list</span></span>
-<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">col1</span><span class="kw">,</span><span class="at"> col2</span><span class="kw">,</span><span class="at"> col3</span><span class="kw">]</span></span>
-<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Column selector functions (when used in Python expressions)</span></span>
-<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span></span>
-<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>    starts_with("prefix_")</span>
-<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Examples of common patterns</span></span>
-<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">customer_id</span><span class="kw">,</span><span class="at"> order_id</span><span class="kw">]</span><span class="co">     # Specific columns</span></span>
-<span id="cb52-14"><a href="#cb52-14" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> user_email</span><span class="co">                  # Single column</span></span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Single column</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> column_name</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple columns as list</span></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">col1</span><span class="kw">,</span><span class="at"> col2</span><span class="kw">,</span><span class="at"> col3</span><span class="kw">]</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Column selector functions (when used in Python expressions)</span></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span></span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>    starts_with("prefix_")</span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Examples of common patterns</span></span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">customer_id</span><span class="kw">,</span><span class="at"> order_id</span><span class="kw">]</span><span class="co">     # Specific columns</span></span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> user_email</span><span class="co">                  # Single column</span></span></code></pre></div>
 </section>
 <section id="parameter-details" class="level1">
 <h1>Parameter Details</h1>
@@ -1493,60 +1548,60 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <section id="active-parameter" class="level2">
 <h2 class="anchored" data-anchor-id="active-parameter">Active Parameter</h2>
 <p>The <code>active</code> parameter controls whether a validation step runs. It defaults to <code>true</code>; set it to <code>false</code> to skip a step without removing it from the configuration:</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="co">  # This step will be skipped</span></span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_gt</span><span class="kw">:</span></span>
-<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">amount</span><span class="kw">]</span></span>
-<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
-<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">active</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
-<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a><span class="co">  # This step runs normally (default active: true)</span></span>
-<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_not_null</span><span class="kw">:</span></span>
-<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">customer_id</span><span class="kw">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="co">  # This step will be skipped</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_gt</span><span class="kw">:</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">amount</span><span class="kw">]</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">active</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a><span class="co">  # This step runs normally (default active: true)</span></span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_not_null</span><span class="kw">:</span></span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">customer_id</span><span class="kw">]</span></span></code></pre></div>
 </section>
 <section id="brief-parameter-options" class="level2">
 <h2 class="anchored" data-anchor-id="brief-parameter-options">Brief Parameter Options</h2>
 <p>The <code>brief</code> parameter supports several formats:</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom description"</span><span class="co">          # Custom text</span></span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">                         # Auto-generated description</span></span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">                        # No description</span></span>
-<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Step {step}: {auto}"</span><span class="co">        # Template with auto-generated text</span></span>
-<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Column '{col}' validation"</span><span class="co">  # Template with variables</span></span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom description"</span><span class="co">          # Custom text</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">                         # Auto-generated description</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">                        # No description</span></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Step {step}: {auto}"</span><span class="co">        # Template with auto-generated text</span></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Column '{col}' validation"</span><span class="co">  # Template with variables</span></span></code></pre></div>
 <p>template variables: <code>{step}</code>, <code>{col}</code>, <code>{value}</code>, <code>{set}</code>, <code>{pattern}</code>, <code>{auto}</code></p>
 </section>
 <section id="python-expressions" class="level2">
 <h2 class="anchored" data-anchor-id="python-expressions">Python Expressions</h2>
 <p>Several parameters support Python expressions using the <code>python:</code> block syntax:</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data source loading</span></span>
-<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span></span>
-<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>    pl.scan_csv("data.csv").filter(pl.col("active") == True)</span>
-<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Preprocessing</span></span>
-<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="fu">pre</span><span class="kw">:</span></span>
-<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>    lambda df: df.filter(pl.col("date") &gt;= "2024-01-01")</span>
-<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom expressions</span></span>
-<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a><span class="fu">expr</span><span class="kw">:</span></span>
-<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>    pl.col("value").is_between(0, 100)</span>
-<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb55-16"><a href="#cb55-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Callable actions</span></span>
-<span id="cb55-17"><a href="#cb55-17" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
-<span id="cb55-18"><a href="#cb55-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span></span>
-<span id="cb55-19"><a href="#cb55-19" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb55-20"><a href="#cb55-20" aria-hidden="true" tabindex="-1"></a>      lambda: print("VALIDATION ERROR: Critical data quality issue detected!")</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data source loading</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>    pl.scan_csv("data.csv").filter(pl.col("active") == True)</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Preprocessing</span></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="fu">pre</span><span class="kw">:</span></span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>    lambda df: df.filter(pl.col("date") &gt;= "2024-01-01")</span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom expressions</span></span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a><span class="fu">expr</span><span class="kw">:</span></span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>    pl.col("value").is_between(0, 100)</span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Callable actions</span></span>
+<span id="cb57-17"><a href="#cb57-17" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
+<span id="cb57-18"><a href="#cb57-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span></span>
+<span id="cb57-19"><a href="#cb57-19" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb57-20"><a href="#cb57-20" aria-hidden="true" tabindex="-1"></a>      lambda: print("VALIDATION ERROR: Critical data quality issue detected!")</span></code></pre></div>
 <p>Python code only runs with <code>allow_python=True</code>, and it isn’t sandboxed (see <a href="#running-python-code">Running Python Code</a>).</p>
 <p>You can also use the shortcut syntax for lambda expressions:</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shortcut syntax (equivalent to python: block)</span></span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pre</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  lambda df: df.filter(pl.col("status") == "active")</span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shortcut syntax (equivalent to python: block)</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pre</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  lambda df: df.filter(pl.col("status") == "active")</span></code></pre></div>
 </section>
 <section id="running-python-code" class="level2">
 <h2 class="anchored" data-anchor-id="running-python-code">Running Python Code</h2>
 <p>Python code in a YAML configuration (<code>python:</code> blocks and the <code>expr</code>, <code>pre</code>, and <code>active</code> shortcuts) only runs if you allow it, with <code>allow_python=True</code>:</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>pb.yaml_interrogate(<span class="st">"validation.yaml"</span>, allow_python<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>pb.yaml_interrogate(<span class="st">"validation.yaml"</span>, allow_python<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <p>From the command line, use <code>pb run validation.yaml --allow-python</code>. Without it, a configuration that contains Python code raises an error saying so.</p>
 <p>The code isn’t sandboxed. It runs with the same access as any Python script you run, so it can read and write files, import modules, make network requests, or run commands. Treat a YAML configuration that contains Python code like a Python script, and only allow it for configurations you wrote or otherwise trust.</p>
 <p>When the code runs, these names are available without importing them:</p>
@@ -1571,27 +1626,27 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <p>A date or datetime can also be written as an ISO 8601 string (e.g., <code>"2024-01-15"</code> or <code>"2024-01-15T10:30:00"</code>), with a UTC offset for a timezone-aware datetime (e.g., <code>"2024-01-15T10:30:00+05:00"</code> or <code>"2024-01-15T10:30:00Z"</code>).</p>
 <p><a href="../../reference/yaml_to_python.html#pointblank.yaml_to_python" class="gdls-link gdls-code">yaml_to_python()</a> never runs Python code from the configuration. It copies the code into the generated Python as written, so it doesn’t need <code>allow_python=True</code>.</p>
 <p><strong>Examples of callable actions:</strong></p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple output with built-in functions</span></span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
-<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span></span>
-<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>      lambda: print(f"WARNING: {sum([1, 2, 3])} validation issues detected")</span>
-<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Using available variables and string formatting</span></span>
-<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
-<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span></span>
-<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>      lambda: print("ERROR: Data validation failed at " + str(len("validation")))</span>
-<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple statements in lambda (using parentheses)</span></span>
-<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
-<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">critical</span><span class="kw">:</span></span>
-<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a>      lambda: (</span>
-<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>          print("CRITICAL ALERT:"),</span>
-<span id="cb58-19"><a href="#cb58-19" aria-hidden="true" tabindex="-1"></a>          print("Immediate attention required"),</span>
-<span id="cb58-20"><a href="#cb58-20" aria-hidden="true" tabindex="-1"></a>          print("Contact data team")</span>
-<span id="cb58-21"><a href="#cb58-21" aria-hidden="true" tabindex="-1"></a>      )[-1]  # Return the last value</span></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple output with built-in functions</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span></span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>      lambda: print(f"WARNING: {sum([1, 2, 3])} validation issues detected")</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Using available variables and string formatting</span></span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
+<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span></span>
+<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>      lambda: print("ERROR: Data validation failed at " + str(len("validation")))</span>
+<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple statements in lambda (using parentheses)</span></span>
+<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
+<span id="cb60-15"><a href="#cb60-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">critical</span><span class="kw">:</span></span>
+<span id="cb60-16"><a href="#cb60-16" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb60-17"><a href="#cb60-17" aria-hidden="true" tabindex="-1"></a>      lambda: (</span>
+<span id="cb60-18"><a href="#cb60-18" aria-hidden="true" tabindex="-1"></a>          print("CRITICAL ALERT:"),</span>
+<span id="cb60-19"><a href="#cb60-19" aria-hidden="true" tabindex="-1"></a>          print("Immediate attention required"),</span>
+<span id="cb60-20"><a href="#cb60-20" aria-hidden="true" tabindex="-1"></a>          print("Contact data team")</span>
+<span id="cb60-21"><a href="#cb60-21" aria-hidden="true" tabindex="-1"></a>      )[-1]  # Return the last value</span></code></pre></div>
 <p>String template actions are plain text, so they work without <code>allow_python=True</code>. For alerting from configurations you don’t fully trust, use string template actions and handle the external communication in your application code after validation completes.</p>
 </section>
 </section>

@@ -4,7 +4,7 @@ Get the target table with columns flagging the validation steps each row failed.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21740-L21962)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22098-L22349)
 
 ``` python
 Validate.get_row_flags(
@@ -16,6 +16,7 @@ Validate.get_row_flags(
 Where [`get_sundered_data()`](../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data) splits the table into the rows that passed every step and those that failed any of them, [get_row_flags()](../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags) keeps every row and says *which* steps each one failed. The returned table is the target table with these columns added:
 
 - `pb_failed_<i>_`, one for each row-level step (where `<i>` is the step number): `True` if the row failed step `<i>`
+- `pb_score_<i>_`, one for each [`col_vals_scored()`](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) step that keeps its scores (the default, `keep_scores=True`): the row's score in step `<i>`, missing if the row wasn't scored
 - `pb_n_failed_`: the number of steps the row failed
 - `pb_row_score_`: the share of the row's checks that passed (from `0` to `1`), weighted by the dimension weights set with `config(dimension_weights=...)` just as in [`get_health_score()`](../reference/Validate.get_health_score.md#pointblank.Validate.get_health_score)
 

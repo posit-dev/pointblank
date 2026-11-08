@@ -4,7 +4,7 @@ Do columns in the table (and their types) match a predefined schema?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14588-L14823)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14933-L15168)
 
 ``` python
 Validate.col_schema_match(

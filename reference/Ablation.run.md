@@ -4,7 +4,7 @@ Evaluate the full table, each variant, and each control.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1702-L1816)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2161-L2275)
 
 ``` python
 Ablation.run(

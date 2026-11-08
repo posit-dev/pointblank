@@ -2209,9 +2209,9 @@ Recording Steps
 ---------------
 Each validation method records one step and returns the same `Steps` object, so calls can be
 chained. All of the row-based and table-level validation methods are available, from
-`col_vals_gt()` to `tbl_reconcile()`. The aggregation methods (`col_sum_*()`, `col_avg_*()`,
-and `col_sd_*()`), `specially()`, and `prompt()` aren't, so add those directly to the
-validation.
+`col_vals_gt()` to `tbl_reconcile()`, including `col_vals_scored()`. The aggregation methods
+(`col_sum_*()`, `col_avg_*()`, and `col_sd_*()`), `specially()`, and `prompt()` aren't, so add
+those directly to the validation.
 
 Because each method adds to the object it's called on, a collection isn't copied when you add
 to it. Calling a method on a shared collection (e.g., `extended = id_checks.col_exists(...)`)
@@ -12067,6 +12067,221 @@ validation = (
 The brand guide is sent alongside the row JSON on every batch, so the LLM evaluates each
 description with the same reference document in view.
 
+col_vals_scored(self, columns: 'str | list[str]', scorer: 'Callable[..., Any]', min_val: 'float | None' = None, max_val: 'float | None' = None, na_pass: 'bool' = False, cache: 'bool | str | Path' = True, keep_scores: 'bool' = True, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+
+Validate whether rows have a score from a model within bounds.
+
+The `col_vals_scored()` validation method gives each row a score with a model (a
+*scorer*) and checks that the score is at least `min_val=`, at most `max_val=`, or both.
+It's for the checks that are about meaning rather than form: whether a passage answers
+its query (a reranker), whether a document is of good quality or toxic (a classifier),
+whether text is in the expected language, or whether it's fluent (perplexity). Each row
+is a test unit, and the scorer gets the values of `columns=` for the row.
+
+The scorer can be any function of a batch of rows (see the
+[`Scorer`](`pointblank.scorers.Scorer`) protocol), or one of the adapters of
+`pb.scorers`, which use models from common packages:
+[`embedding_similarity()`](`pointblank.scorers.embedding_similarity`),
+[`reranker()`](`pointblank.scorers.reranker`),
+[`classifier()`](`pointblank.scorers.classifier`),
+[`langid()`](`pointblank.scorers.langid`), and
+[`perplexity()`](`pointblank.scorers.perplexity`). Pointblank never trains a model: the
+scorers use models that are given to them.
+
+Parameters
+----------
+columns
+    The column (or a list of columns) whose values the scorer gets for each row. A
+    reranker, for example, needs two columns: the query and the document.
+scorer
+    The scorer: a function that takes a list of rows (dictionaries of the values of
+    `columns=`) and returns a score for each, or an adapter of `pb.scorers`. A score is a
+    number, or `None` for a row that can't be scored.
+min_val
+    The lowest score that passes (inclusive).
+max_val
+    The highest score that passes (inclusive). At least one of `min_val=` and `max_val=`
+    is needed.
+na_pass
+    Should a row with a missing value in any of `columns=` (which isn't scored), or a row
+    that the scorer gives no score, pass? The default is `False`, so such rows fail.
+cache
+    Where to keep the scores, so that rows aren't scored again: `True` (the default) keeps
+    them in memory for the session, a path is the directory of a cache on disk (an SQLite
+    file, `scores.sqlite`) that's kept between sessions, and `False` doesn't keep them.
+    Scores are kept by the scorer's name and version, and by the values of the row. A
+    cache on disk needs a scorer with a stable name (see the *Score Cache* section).
+keep_scores
+    Should the results of the step keep the scores, in a column called `pb_score_`? With
+    `True` (the default), the scores are in the extracts of failing rows, in the step
+    report, and in [`get_row_flags()`](`pointblank.Validate.get_row_flags`) (as
+    `pb_score_<step>_`), and they can be used by
+    [`Ablation.sweep_score()`](`pointblank.Ablation.sweep_score`).
+pre
+    An optional preprocessing function or lambda to apply to the data table during
+    interrogation. This function should take a table as input and return a modified table.
+    Have a look at the *Preprocessing* section for more information on how to use this
+    argument.
+segments
+    An optional directive on segmentation, which serves to split a validation step into
+    multiple (one step per segment). Can be a single column name, a tuple that specifies a
+    column name and its corresponding values to segment on, or a combination of both
+    (provided as a list).
+thresholds
+    Set threshold failure levels for reporting and reacting to exceedences of the levels.
+    The thresholds are set at the step level and will override any global thresholds set in
+    `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+    be set locally and global thresholds (if any) will take effect.
+actions
+    Optional actions to take when the validation step meets or exceeds any set threshold
+    levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+    define the actions.
+brief
+    An optional brief description of the validation step that will be displayed in the
+    reporting table. You can use the templating elements like `"{step}"` to insert
+    the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+    the entire brief will be automatically generated. If `None` (the default) then there
+    won't be a brief.
+active
+    A boolean value or callable that determines whether the validation step should be
+    active. Using `False` will make the validation step inactive (still reporting its
+    presence and keeping indexes for the steps unchanged). A callable can also be
+    provided; it will receive the data table as its single argument and must return a
+    boolean value. The callable is evaluated *before* any `pre=` processing.
+dimension
+    An optional data quality dimension to categorize this validation step for health
+    scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+    `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+    dimension is `"validity"`. This label appears in the validation report and feeds the
+    overall and per-dimension health scores.
+
+Returns
+-------
+Validate
+    The `Validate` object with the added validation step.
+
+Raises
+------
+TypeError
+    If `columns=` isn't a column name or a list of them, if `scorer=` isn't callable, or if
+    `min_val=` or `max_val=` isn't a number.
+ValueError
+    If neither `min_val=` nor `max_val=` is given, if `min_val=` is greater than
+    `max_val=`, or if `cache=` is a directory and the scorer has no stable name.
+
+Preprocessing
+-------------
+The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
+table during interrogation. This function should take a table as input and return a
+modified table. This is useful for performing any necessary transformations or filtering on
+the data before the validation step is applied, such as taking a sample of the rows to keep
+the cost of scoring down.
+
+The preprocessing function can be any callable that takes a table as input and returns a
+modified table. Regardless of which is used, the function should return a table with the
+columns of `columns=`.
+
+How Rows Are Scored
+-------------------
+The scorer gets the rows in batches (of the scorer's `batch_size`, or 256 rows), as
+dictionaries of the values of `columns=`. Rows with the same values are scored once, and a
+row with a missing value in any of `columns=` isn't scored at all (it passes or fails by
+`na_pass=`). A scorer that fails, or that returns something other than a number (or
+`None`) for each row, stops the step with an evaluation error and a note that says why,
+as does a scorer whose package isn't installed (the note says how to install it).
+
+Scoring runs in Python, on the rows' values. A Polars or pandas table is scored as it is
+(a Polars LazyFrame is collected first). For a database table (through Ibis) or a PySpark
+DataFrame, the distinct rows of `columns=` are collected and scored, and the scores are
+joined back to the table on its own backend; other kinds of table give an evaluation
+error. The step's note says which scorer was used, how many rows it scored, how many
+scores came from the cache, and the range of the scores.
+
+Score Cache
+-----------
+Scores are kept in a cache by the scorer's name and version (its `name` and `version`
+attributes) and by the values of the row, so that interrogating the same data again (as an
+[`Ablation`](`pointblank.Ablation`) does, or after a change to another step) doesn't run
+the model again. The scores are written after each batch, so a run that's interrupted
+picks up where it left off.
+
+With `cache=True`, the scores are kept in memory until the end of the session (or until
+[`pb.scorers.clear_cache()`](`pointblank.scorers.clear_cache`)). With a directory as
+`cache=`, they're kept on disk and can be shared between sessions and projects; this needs
+a scorer with a stable name, which the adapters of `pb.scorers` have (unless they're given
+a model object), as does a function defined at the top level of a module. A lambda can be
+given a name with [`pb.scorers.from_function()`](`pointblank.scorers.from_function`).
+Change the version of a scorer when its model changes, so that older scores aren't used.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+For the examples here, we'll use a table of product reviews and a scorer that stands in
+for a model: it scores a review by the share of its words that are on a list of positive
+words. A real scorer would be a classifier, such as
+`pb.scorers.classifier(hf_model=..., label="POSITIVE")`.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+tbl = pl.DataFrame(
+    {
+        "product": ["kettle", "kettle", "toaster", "toaster", "lamp", "lamp"],
+        "review": [
+            "great kettle and fast",
+            "broke after a week",
+            "good toast every time",
+            "great value",
+            "too dim",
+            None,
+        ],
+    }
+)
+
+POSITIVE = {"great", "good", "fast", "value", "every"}
+
+def positivity(batch):
+    return [
+        sum(w in POSITIVE for w in row["review"].split()) / len(row["review"].split())
+        for row in batch
+    ]
+
+pb.preview(tbl)
+```
+
+Let's validate that each review scores at least `0.25`.
+
+```{python}
+validation = (
+    pb.Validate(data=tbl)
+    .col_vals_scored(columns="review", scorer=positivity, min_val=0.25)
+    .interrogate()
+)
+
+validation
+```
+
+The step has six test units, one for each row, and three fail: two reviews have no
+positive words, and the missing review isn't scored (use `na_pass=True` to let such rows
+pass). The step's note gives the range of the scores. The failing rows can be seen with
+their scores, in the `pb_score_` column, with
+[`get_step_report()`](`pointblank.Validate.get_step_report`).
+
+```{python}
+validation.get_step_report(i=1)
+```
+
+The scores of a scored step can be used to see how the threshold affects a model trained on
+the data, by removing more or fewer rows; see
+[`Ablation.sweep_score()`](`pointblank.Ablation.sweep_score`).
+
 
 ## Aggregation Steps
 
@@ -15780,6 +15995,512 @@ validation
 With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `25.0684 == 26.1454` (the standard deviation of `revenue` in `current`, then in `baseline`), so it fails. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
 
+## Scorers
+
+Scorers give each row a score with a model, for `Validate.col_vals_scored()`. Any function of a batch of rows is a scorer; `from_function()` gives one a name, a version, and a batch size, and the adapters use models from common packages (embeddings, rerankers, text classifiers, language identification, and perplexity). Scores are cached by the scorer's name and version, in memory or on disk.
+
+
+
+Scorer(*args, **kwargs)
+
+The protocol of the scorers used by `Validate.col_vals_scored()`.
+
+A scorer is a callable that takes a batch of rows and returns one score for each. Each row is
+a dictionary of the values of the columns of the step (e.g., `{"query": ..., "passage": ...}`),
+and the scores are numbers (or `None` for a row that can't be scored), in the order of the
+rows. Any function that does this is a scorer, as are the adapters of `pb.scorers` (like
+[`classifier()`](`pointblank.scorers.classifier`)).
+
+A scorer can have three attributes, all optional:
+
+- `name`: a stable name for the scorer, which identifies it in the score cache and in the
+  report (a function defined at the top level of a module is named after the function)
+- `version`: a version, which is part of the key of the score cache, so that the scores of an
+  older version of a model aren't used for a newer one
+- `batch_size`: the number of rows to give the scorer at a time (`256` if it doesn't say)
+
+[`from_function()`](`pointblank.scorers.from_function`) sets these attributes for a function,
+and can also wrap a function that scores one row at a time.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Here's a scorer that gives each row the share of its words that are longer than three
+letters, as a plain function of a batch of rows.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+def long_words(batch):
+    scores = []
+    for row in batch:
+        words = row["text"].split()
+        scores.append(sum(len(w) > 3 for w in words) / len(words))
+    return scores
+
+tbl = pl.DataFrame(
+    {"text": ["the cat sat on a mat", "careful thinking pays off", "no", "ok go"]}
+)
+
+pb.Validate(data=tbl).col_vals_scored(
+    columns="text", scorer=long_words, min_val=0.5
+).interrogate()
+```
+
+Three of the four rows have a score below `0.5`, so they fail.
+
+from_function(fn: 'Callable[..., Any]', name: 'str | None' = None, version: 'str | None' = None, batch_size: 'int | None' = None, per_row: 'bool' = False) -> 'Scorer'
+
+Make a scorer from a function, with a name, a version, and a batch size.
+
+Any function of a batch of rows can be used as a scorer in `Validate.col_vals_scored()`. This
+wraps one to give it the attributes of the [`Scorer`](`pointblank.scorers.Scorer`) protocol:
+a stable name for the score cache and the report, a version that's part of the key of the
+cache, and the number of rows to score at a time. With `per_row=True`, it also wraps a
+function that scores one row at a time.
+
+Parameters
+----------
+fn
+    The function. It takes a list of rows (dictionaries of the values of the columns of the
+    step) and returns a score for each, or with `per_row=True`, it takes one row and returns
+    its score. A score is a number, or `None` for a row that can't be scored.
+name
+    A stable name for the scorer. A function defined at the top level of a module is named
+    after its module and its name by default; a lambda or a function defined inside another
+    function has no name unless it's given here, and its scores can only be cached in memory.
+version
+    A version of the scorer (e.g., of its model). Scores in the cache are kept by name and
+    version, so changing the version means scoring the rows again.
+batch_size
+    The number of rows that the function gets at a time (`256` by default).
+per_row
+    Whether the function scores one row at a time (`True`) or a list of rows (`False`, the
+    default).
+
+Returns
+-------
+Scorer
+    A scorer for `Validate.col_vals_scored()`.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+Here, a function that scores one row (a ratio of two columns) becomes a scorer with a name
+and a version.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+tbl = pl.DataFrame({"clicks": [5, 40, 2, 18], "views": [100, 200, 120, 90]})
+
+ctr = pb.scorers.from_function(
+    lambda row: row["clicks"] / row["views"], name="ctr", version="1", per_row=True
+)
+
+pb.Validate(data=tbl).col_vals_scored(
+    columns=["clicks", "views"], scorer=ctr, min_val=0.03
+).interrogate()
+```
+
+The scorer's name, `ctr`, is shown in the report. One row has a click-through rate below 3%.
+
+embedding_similarity(reference: 'str | list[str]', embedder: 'Any', column: 'str | None' = None, name: 'str | None' = None, version: 'str | None' = None, batch_size: 'int | None' = None) -> 'Scorer'
+
+Score text by its similarity to reference texts, with an embedding model.
+
+Each row's text is embedded, and its score is the cosine similarity of its embedding to the
+closest of the embeddings of the reference texts: close to `1` for text like one of the
+references, and lower for text that isn't. It's a way to check that text is on topic, or to
+find text that's too close to a set of texts that shouldn't be repeated (with `max_val=`).
+
+Parameters
+----------
+reference
+    A reference text, or a list of them.
+embedder
+    The embedding model: the name of a
+    [sentence-transformers](https://sbert.net) model (e.g., `"all-MiniLM-L6-v2"`), which
+    needs the `sentence-transformers` package, a model with an `encode()` method that takes a
+    list of texts, or a function that takes a list of texts and returns their embeddings (a
+    list of vectors or a 2D array).
+column
+    The column with the text to score. It can be left out if the step has one column.
+name
+    A name for the scorer, for the score cache and the report. By default, it's made from the
+    embedder (if it's a model name or a function at the top level of a module), the
+    references, and `column=`. With a model object or a lambda as the embedder, the scores
+    can only be cached in memory unless there's a name.
+version
+    A version (e.g., of the model), which is part of the key of the score cache.
+batch_size
+    The number of rows embedded at a time (`64` by default).
+
+Returns
+-------
+Scorer
+    A scorer for `Validate.col_vals_scored()`.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+A real embedder would be a model like `"all-MiniLM-L6-v2"`. To keep this example
+self-contained, the embedding of a text here counts its letters.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+def letter_counts(texts):
+    return [[t.lower().count(c) for c in "abcdefghijklmnopqrstuvwxyz"] for t in texts]
+
+tbl = pl.DataFrame(
+    {"title": ["data validation", "validating data", "zzz", "quality of data"]}
+)
+
+on_topic = pb.scorers.embedding_similarity(
+    reference="data validation", embedder=letter_counts
+)
+
+pb.Validate(data=tbl).col_vals_scored(
+    columns="title", scorer=on_topic, min_val=0.6
+).interrogate()
+```
+
+The title `"zzz"` has nothing in common with the reference, so it's the one that fails.
+
+reranker(provider: 'str' = 'cohere', model: 'str | None' = None, query: 'str | None' = None, document: 'str | None' = None, api_key: 'str | None' = None, name: 'str | None' = None, version: 'str | None' = None, batch_size: 'int | None' = None) -> 'Scorer'
+
+Score how relevant a document is to a query, with a reranking model.
+
+A reranker scores a pair of texts: how well a document (e.g., a passage retrieved for a
+search) answers a query. This is a check of the pairs of a retrieval dataset or of the
+results of a search: rows with a low score pair a query with a passage that doesn't answer it.
+The step needs two columns, the query and the document.
+
+Parameters
+----------
+provider
+    Where the model runs: `"cohere"` (the Cohere Rerank API, which needs the `cohere` package
+    and an API key) or `"sentence-transformers"` (a cross-encoder model that runs locally,
+    which needs the `sentence-transformers` package).
+model
+    The model. For Cohere, the name of a rerank model (`"rerank-v3.5"` by default). For
+    sentence-transformers, the name of a cross-encoder model
+    (`"cross-encoder/ms-marco-MiniLM-L6-v2"` by default) or a model with a `predict()` method
+    that takes a list of (query, document) pairs.
+query
+    The column of the queries. By default, the first column of the step.
+document
+    The column of the documents. By default, the first column of the step that isn't the
+    query column.
+api_key
+    The Cohere API key. By default, it's read from the `CO_API_KEY` environment variable. The
+    key is never written in the code or the YAML made from a validation.
+name
+    A name for the scorer, for the score cache and the report. By default, it's made from the
+    provider, the model, and the columns.
+version
+    A version (e.g., of the model), which is part of the key of the score cache.
+batch_size
+    The number of pairs scored at a time (`100` by default). For Cohere, the pairs of a batch
+    with the same query are sent in one request.
+
+Returns
+-------
+Scorer
+    A scorer for `Validate.col_vals_scored()`.
+
+Details
+-------
+The scores of different models aren't on the same scale: Cohere's relevance scores are
+between `0` and `1`, while a cross-encoder may give unbounded logits. Look at the scores
+(they're kept in the step's results with `keep_scores=True`) before choosing a threshold, or
+use [`Ablation.sweep_score()`](`pointblank.Ablation.sweep_score`) to see how the threshold
+affects a model trained on the data.
+
+Examples
+--------
+This checks that the passages of a retrieval dataset are relevant to their queries, with
+Cohere's reranker (an API key is needed).
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(data=pairs)
+    .col_vals_scored(
+        columns=["query", "passage"],
+        scorer=pb.scorers.reranker(provider="cohere", model="rerank-v3.5"),
+        min_val=0.5,
+    )
+    .interrogate()
+)
+```
+
+The same check with a cross-encoder that runs locally would use
+`pb.scorers.reranker(provider="sentence-transformers")`. Its scores are on another scale, so
+the threshold would be different.
+
+classifier(hf_model: 'Any', label: 'str | None' = None, column: 'str | None' = None, function_to_apply: 'str | None' = None, device: 'Any' = None, name: 'str | None' = None, version: 'str | None' = None, batch_size: 'int | None' = None) -> 'Scorer'
+
+Score text with a text-classification model from Hugging Face.
+
+A text classifier scores text for a label: a quality or toxicity classifier, a sentiment
+model, or a classifier of topics. The score of a row is the score that the model gives its
+text for `label=` (with a regression model that has one output, like an educational quality
+classifier, there's no label to choose). It needs the `transformers` package (and a backend
+for it, like PyTorch) unless it's given a pipeline that's already made.
+
+Parameters
+----------
+hf_model
+    The model: the name of a model on the Hugging Face Hub (e.g.,
+    `"HuggingFaceFW/fineweb-edu-classifier"`), or a `transformers` text-classification
+    pipeline (or any function that takes a list of texts and returns, for each, a list of
+    `{"label": ..., "score": ...}` dictionaries).
+label
+    The label whose score is the score of a row. It can be left out for a model with one
+    output.
+column
+    The column with the text to score. It can be left out if the step has one column.
+function_to_apply
+    How the model's outputs are turned into scores: `"sigmoid"`, `"softmax"`, or `"none"`
+    (the raw outputs, e.g., for a regression model). By default, the pipeline chooses.
+device
+    The device that the model runs on (e.g., `"cuda"`, `"mps"`, or `-1` for the CPU), when
+    the model is given by name.
+name
+    A name for the scorer, for the score cache and the report. By default, it's made from the
+    model and the other settings.
+version
+    A version (e.g., a revision of the model), which is part of the key of the score cache.
+batch_size
+    The number of texts classified at a time (`32` by default).
+
+Returns
+-------
+Scorer
+    A scorer for `Validate.col_vals_scored()`.
+
+Examples
+--------
+This checks the educational quality of the documents of a pretraining dataset with the
+FineWeb-Edu classifier, a regression model that scores text from `0` to `5`.
+
+```python
+import pointblank as pb
+
+validation = (
+    pb.Validate(data=documents)
+    .col_vals_scored(
+        columns="text",
+        scorer=pb.scorers.classifier(
+            hf_model="HuggingFaceFW/fineweb-edu-classifier", function_to_apply="none"
+        ),
+        min_val=2.5,
+        thresholds=(0.3, 0.5),
+    )
+    .interrogate()
+)
+```
+
+For a classifier with several labels, like a toxicity model, `label=` chooses the label to
+score and `max_val=` would keep the rows that score low for it.
+
+langid(expected: 'str | list[str]', backend: 'str | Callable[[str], Any]' = 'langid', model: 'str | None' = None, column: 'str | None' = None, name: 'str | None' = None, version: 'str | None' = None, batch_size: 'int | None' = None) -> 'Scorer'
+
+Score text by how likely it is to be in the expected languages.
+
+The score of a row is the probability, according to a language identification model, that
+its text is in one of the expected languages. It's a check that a corpus or a column of
+free text is in the languages it should be, with `min_val=` as the confidence needed (e.g.,
+`0.5`).
+
+Parameters
+----------
+expected
+    The expected language (an ISO 639 code like `"en"`), or a list of them. A code matches
+    the model's languages with the same code or with a region or script after it (`"en"`
+    matches `"en_US"`).
+backend
+    The language identification model: `"langid"` (the default, which needs the `langid`
+    package), `"fasttext"` (a fastText model, which needs the `fasttext` package and the path
+    of the model as `model=`), or a function that takes a text and returns its probabilities
+    by language (a dictionary or a list of `(language, probability)` pairs).
+model
+    The path of the fastText model (e.g., `lid.176.bin`), with `backend="fasttext"`.
+column
+    The column with the text to score. It can be left out if the step has one column.
+name
+    A name for the scorer, for the score cache and the report. By default, it's made from the
+    expected languages, the backend, and the model.
+version
+    A version, which is part of the key of the score cache.
+batch_size
+    The number of texts scored at a time (`256` by default).
+
+Returns
+-------
+Scorer
+    A scorer for `Validate.col_vals_scored()`.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+A real check would use the `langid` package or a fastText model. To keep this example
+self-contained, the backend is a toy function that guesses the language from a few words.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+def guess(text):
+    words = set(text.lower().split())
+    if words & {"the", "and", "is"}:
+        return {"en": 0.9, "fr": 0.1}
+    if words & {"le", "et", "est"}:
+        return {"en": 0.1, "fr": 0.9}
+    return {"en": 0.5, "fr": 0.5}
+
+tbl = pl.DataFrame(
+    {"review": ["the soup is good", "le pain est bon", "and the bread", "ok"]}
+)
+
+pb.Validate(data=tbl).col_vals_scored(
+    columns="review", scorer=pb.scorers.langid(expected="en", backend=guess), min_val=0.6
+).interrogate()
+```
+
+The review in French fails, and so does `"ok"`, which can't be told apart.
+
+perplexity(fn: 'Callable[..., Any] | None' = None, kenlm_model: 'str | None' = None, column: 'str | None' = None, per_row: 'bool' = True, name: 'str | None' = None, version: 'str | None' = None, batch_size: 'int | None' = None) -> 'Scorer'
+
+Score text by its perplexity under a language model.
+
+Perplexity measures how surprising a text is to a language model: it's low for fluent text
+like the text the model was trained on, and high for garbled text, boilerplate in another
+language, or encoding errors. A check of perplexity keeps the text that's fluent, with
+`max_val=` as the highest perplexity allowed. The model is a function given as `fn=` (e.g.,
+one that runs a small causal language model) or a [KenLM](https://github.com/kpu/kenlm)
+model, which needs the `kenlm` package.
+
+Parameters
+----------
+fn
+    A function that gives the perplexity of a text (or with `per_row=False`, of each of a
+    list of texts).
+kenlm_model
+    The path of a KenLM model (an `.arpa` or `.bin` file), instead of `fn=`.
+column
+    The column with the text to score. It can be left out if the step has one column.
+per_row
+    Whether `fn=` takes one text (`True`, the default) or a list of texts (`False`).
+name
+    A name for the scorer, for the score cache and the report. By default, it's made from the
+    function (if it's defined at the top level of a module) or the path of the KenLM model.
+version
+    A version (e.g., of the model), which is part of the key of the score cache.
+batch_size
+    The number of texts scored at a time (`256` by default).
+
+Returns
+-------
+Scorer
+    A scorer for `Validate.col_vals_scored()`.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+```
+
+A real model would be a language model. To keep this example self-contained, the
+"perplexity" of a text here is higher when it has fewer vowels, as garbled text often does.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+def toy_perplexity(text):
+    letters = [c for c in text.lower() if c.isalpha()]
+    vowels = sum(c in "aeiou" for c in letters)
+    return len(letters) / max(vowels, 1)
+
+tbl = pl.DataFrame(
+    {"text": ["a plain sentence", "xkcd qwrt zzpf", "another fine line", "ok then"]}
+)
+
+pb.Validate(data=tbl).col_vals_scored(
+    columns="text", scorer=pb.scorers.perplexity(fn=toy_perplexity), max_val=4
+).interrogate()
+```
+
+The garbled text has the highest score, above `max_val=4`, so it's the row that fails.
+
+clear_cache() -> 'None'
+
+Clear the scores that `Validate.col_vals_scored()` keeps in memory.
+
+With `cache=True` (the default of `col_vals_scored()`), the scores of a scorer are kept in
+memory for the rest of the session, so that interrogating the same data again (as in an
+ablation, or after a change to another step) doesn't score it again. This clears them, for
+all the scorers. A cache on disk (`cache=` as a directory) isn't changed: delete its
+directory to clear it.
+
+Returns
+-------
+None
+    Nothing; the scores in memory are deleted.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+```
+
+After this, the next interrogation of a scored step scores its rows again.
+
+```{python}
+import pointblank as pb
+
+pb.scorers.clear_cache()
+```
+
+This is useful when a scorer's model has changed without a change to its name or version.
+
+
 ## Column Selection
 
 Use the `col()` function along with column selection helpers to flexibly select columns for validation. Combine `col()` with `starts_with()`, `matches()`, etc. for selecting multiple target columns.
@@ -18626,6 +19347,9 @@ with these columns added:
 
 - `pb_failed_<i>_`, one for each row-level step (where `<i>` is the step number): `True`
   if the row failed step `<i>`
+- `pb_score_<i>_`, one for each [`col_vals_scored()`](`pointblank.Validate.col_vals_scored`)
+  step that keeps its scores (the default, `keep_scores=True`): the row's score in step
+  `<i>`, missing if the row wasn't scored
 - `pb_n_failed_`: the number of steps the row failed
 - `pb_row_score_`: the share of the row's checks that passed (from `0` to `1`), weighted
   by the dimension weights set with [`config(dimension_weights=...)`](`pointblank.config`)
@@ -23376,8 +24100,10 @@ An `Ablation` is built in two parts, like a validation: the strategy methods add
 ([`drop_each()`](`pointblank.Ablation.drop_each`),
 [`drop_all()`](`pointblank.Ablation.drop_all`),
 [`drop_steps()`](`pointblank.Ablation.drop_steps`),
-[`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`), and
-[`drop_groups()`](`pointblank.Ablation.drop_groups`)), and nothing is evaluated until
+[`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`),
+[`drop_groups()`](`pointblank.Ablation.drop_groups`), and the sweeps
+[`sweep_score()`](`pointblank.Ablation.sweep_score`) and
+[`sweep_step()`](`pointblank.Ablation.sweep_step`)), and nothing is evaluated until
 [`run()`](`pointblank.Ablation.run`) is called. Use [`plan()`](`pointblank.Ablation.plan`)
 before that to see how many rows each variant removes and how many evaluations the run needs.
 When training happens elsewhere (e.g., on a cluster), [`export()`](`pointblank.Ablation.export`)
@@ -23562,7 +24288,7 @@ Validate.get_row_flags : Get which steps each row failed, as columns added to th
 AblationVariant : A version of the training table evaluated in an ablation.
 yaml_ablation : Set up an ablation from a YAML configuration.
 
-AblationVariant(id: 'str', strategy: 'str', name: 'str', steps: 'tuple[int, ...]' = (), n_removed: 'int' = 0, f_removed: 'float' = 0.0, is_control: 'bool' = False, group: 'Any' = None, group_column: 'str | None' = None, left_out: 'int | None' = None) -> None
+AblationVariant(id: 'str', strategy: 'str', name: 'str', steps: 'tuple[int, ...]' = (), n_removed: 'int' = 0, f_removed: 'float' = 0.0, is_control: 'bool' = False, group: 'Any' = None, group_column: 'str | None' = None, left_out: 'int | None' = None, sweep: 'str | None' = None, value: 'float | None' = None) -> None
 
 A version of the training table evaluated in an ablation.
 
@@ -23582,17 +24308,21 @@ id
     `"all"` for [`drop_all()`](`pointblank.Ablation.drop_all`), the `name=` (or
     `"steps_<i>_<j>"`) for [`drop_steps()`](`pointblank.Ablation.drop_steps`),
     `"all_but_<i>"` for [`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`),
-    `"<column>=<value>"` for [`drop_groups()`](`pointblank.Ablation.drop_groups`), and
-    `"control_<n>"` for the control that removes `n` random rows (or `"control_<id>"` for the
-    control of a `drop_all_but_each()` variant).
+    `"<column>=<value>"` for [`drop_groups()`](`pointblank.Ablation.drop_groups`),
+    `"<score>:lowest_<q>"` (or `"<score>:below_<value>"`, and the same with `highest` and
+    `above`) for [`sweep_score()`](`pointblank.Ablation.sweep_score`), where `<score>` is
+    `step_<i>` or the score column, `"step_<i>:<param>=<value>"` for
+    [`sweep_step()`](`pointblank.Ablation.sweep_step`), and `"control_<n>"` for the control
+    that removes `n` random rows (or `"control_<id>"` for the control of a
+    `drop_all_but_each()` variant).
 strategy
     The kind of version: `"full"`, `"drop_steps"`, `"drop_each"`, `"drop_all"`,
-    `"drop_all_but_each"`, `"drop_groups"`, or `"control"`.
+    `"drop_all_but_each"`, `"drop_groups"`, `"sweep_score"`, `"sweep_step"`, or `"control"`.
 name
     A name for the version, as shown in reports (e.g., `"Step 2"`).
 steps
     The numbers of the validation steps whose failing rows were removed (empty for the full
-    table, for groups, and for most controls).
+    table, for groups, for the points of a sweep, and for most controls).
 n_removed
     The number of rows removed from the table.
 f_removed
@@ -23607,6 +24337,12 @@ group_column
 left_out
     For a variant of `drop_all_but_each()` (and its control), the step whose rows are kept
     (otherwise `None`).
+sweep
+    For a point of a sweep (from `sweep_score()` or `sweep_step()`), the id of the sweep, which
+    its points share (e.g., `"step_2:lowest"` or `"step_2:min_val"`; otherwise `None`).
+value
+    For a point of a sweep, its value: the share of the scored rows removed, the score
+    threshold, or the value of the step's parameter (otherwise `None`).
 
 Stratified(by: 'str | list[str] | tuple[str, ...]') -> None
 
@@ -24152,6 +24888,182 @@ ablation
 Removing the readings of sensor `"c"` helps, while removing either of the other sensors
 hurts, since it leaves a larger share of the readings from sensor `"c"`.
 
+sweep_score(self, score: 'int | str', quantiles: 'list[float] | None' = None, values: 'list[float] | None' = None, remove: 'str | None' = None) -> 'Ablation'
+
+Add a variant for each cutoff of a score, removing the rows on the wrong side of it.
+
+A score (e.g., from a quality classifier) doesn't say where to draw the line between the
+rows to keep and those to remove. This strategy measures it: each variant removes more of
+the lowest-scoring rows than the last, so the results trace how the model changes as the
+cutoff gets stricter (a dose-response curve). The report plots the curve, along with what
+removing as many random rows does. The cutoffs are given as shares of the scored rows to
+remove (`quantiles=`) or as score values (`values=`).
+
+Parameters
+----------
+score
+    Where the scores come from: the number of a
+    [`col_vals_scored()`](`pointblank.Validate.col_vals_scored`) step that kept its scores
+    (`keep_scores=True`, the default), or the name of a numeric column of the table.
+quantiles
+    The shares of the scored rows to remove, each greater than `0` and at most `1` (e.g.,
+    `0.1` removes the tenth of the rows with the lowest scores). This is the default, with
+    the shares `0.05`, `0.1`, `0.2`, `0.3`, `0.4`, and `0.5`.
+values
+    Score cutoffs to use instead of `quantiles=`: each variant removes the rows that score
+    below the cutoff (or above it, with `remove="highest"`).
+remove
+    Which rows to remove: `"lowest"` (the lowest-scoring rows) or `"highest"`. By default,
+    it's `"highest"` for a step with only `max_val=` (e.g., a toxicity or perplexity score,
+    where a high score is bad) and `"lowest"` otherwise.
+
+Returns
+-------
+Ablation
+    The `Ablation` object, with the variants added.
+
+Details
+-------
+The rows without a score (a missing value, a row the scorer gave no score, or a row
+outside a segmented step's segment) are never removed, and a note says how many there are.
+With `quantiles=`, the rows are ranked by their score, and ties are broken by row order,
+so each share removes a set number of rows. Each point of the sweep is a variant like any
+other: it's compared with removing the same number of random rows and gets a verdict. A
+point that removes no rows is left out, and a point that removes the same rows as another
+version of the table isn't evaluated again.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's a table of temperature readings, some of them recorded in tenths of a degree, and a
+scorer that rates how plausible each reading is (from `0` to `1`). The 'model' estimates
+the average temperature and is evaluated by its error against the true average of `20`.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+readings = pl.DataFrame({"temp": temps})
+
+def plausibility(rows):
+    return [1 / (1 + abs(row["temp"] - 20) / 5) for row in rows]
+
+def evaluate(train, *, seed):
+    sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_scored(columns="temp", scorer=plausibility, min_val=0.5)
+    .interrogate()
+)
+
+ablation = (
+    pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+    .sweep_score(1, quantiles=[0.02, 0.04, 0.1, 0.2])
+    .run()
+)
+
+ablation
+```
+
+Removing the lowest-scoring 4% of the rows takes out every bad reading, and the curve below
+the report shows the error dropping to near zero there. Removing more rows than that makes
+no further difference.
+
+sweep_step(self, step: 'int', param: 'str', values: 'list[float]') -> 'Ablation'
+
+Add a variant for each value of a step's parameter, removing the rows that fail it.
+
+A check's bounds are often picked by hand: is `min_val=0.5` the right cutoff, or would
+`0.3` keep more useful rows? This strategy measures it. For each value, the step is run
+again on the table with `param=` set to that value, and the variant removes the rows that
+fail it. The results trace how the model changes as the check gets stricter, and the
+report plots the curve, along with what removing as many random rows does.
+
+Parameters
+----------
+step
+    The number of the step to vary. It must be a row-level step that the ablation can use
+    (active, and without a `pre=` function unless that function is marked with
+    [`row_preserving()`](`pointblank.row_preserving`)).
+param
+    The name of the parameter of the step's validation method to vary (e.g., `"min_val"`
+    for [`col_vals_scored()`](`pointblank.Validate.col_vals_scored`), or `"right"` for
+    [`col_vals_between()`](`pointblank.Validate.col_vals_between`)). It can't be one of
+    the parameters that don't change which rows fail (`thresholds=`, `actions=`, `brief=`,
+    `active=`, and `dimension=`), nor `pre=` or `segments=`.
+values
+    The values of `param=` to use, as numbers.
+
+Returns
+-------
+Ablation
+    The `Ablation` object, with the variants added.
+
+Details
+-------
+The step is run again as it was set up, with only `param=` changed, so a
+`col_vals_scored()` step takes its scores from the score cache instead of scoring the rows
+again. For a segmented step, only the step's own segment is checked. A value that the
+validation method doesn't accept (e.g., a `min_val=` above the step's `max_val=`) gives an
+error. As with any other variant, a value whose step fails no rows is left out, and a value
+that removes the same rows as another version of the table isn't evaluated again.
+
+Examples
+--------
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Here's a table of temperature readings, some of them recorded in tenths of a degree, with
+a check that the readings are below an upper limit. The 'model' estimates the average
+temperature and is evaluated by its error against the true average of `20`.
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+readings = pl.DataFrame({"temp": temps})
+
+def evaluate(train, *, seed):
+    sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_lt(columns="temp", value=100)
+    .interrogate()
+)
+
+ablation = (
+    pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+    .sweep_step(1, param="value", values=[21, 50, 190, 220])
+    .run()
+)
+
+ablation
+```
+
+A limit of `50` removes every bad reading. A limit of `21` also removes many good readings
+(the warmer ones), which leaves the average too low, and the limits of `190` and `220` miss
+some of the bad readings.
+
 plan(self) -> 'GT'
 
 Show the versions of the table that the ablation will evaluate.
@@ -24563,6 +25475,11 @@ DataFrame
     are kept
     - `group`: for a variant of [`drop_groups()`](`pointblank.Ablation.drop_groups`), the
     value of the group whose rows are removed, as a string
+    - `sweep`, `value`: for a point of a sweep (from
+    [`sweep_score()`](`pointblank.Ablation.sweep_score`) or
+    [`sweep_step()`](`pointblank.Ablation.sweep_step`)), the id of the sweep and the
+    point's value (the share of the scored rows removed, the score cutoff, or the value of
+    the step's parameter)
     - `n_removed`, `f_removed`: the number and share of rows removed
     - `metric`, `mean`, `sd`: the metric, and its mean and standard deviation across the
     repeats
@@ -24639,8 +25556,11 @@ standard deviation across the repeats, and its difference from the control (or f
 full table, if `control=None`). The difference is shown with its interval, as a bar
 around zero (on the same scale for every variant), and with the verdict as a badge. The
 variants of [`drop_all_but_each()`](`pointblank.Ablation.drop_all_but_each`) are in a
-group of their own, showing what the left-out step's rows add to the other steps. The
-header gives the metric for the full table and the settings of the run, and notes at the
+group of their own, showing what the left-out step's rows add to the other steps. So is
+each sweep (from [`sweep_score()`](`pointblank.Ablation.sweep_score`) or
+[`sweep_step()`](`pointblank.Ablation.sweep_step`)), and a plot of its curve at the
+bottom shows the difference from the full table at each of its values, next to that of
+removing as many random rows. The header gives the metric for the full table and the settings of the run, and notes at the
 bottom list the variants and steps that weren't used.
 
 Parameters
@@ -25675,8 +26595,8 @@ The `evaluate:` is the import path of a function (the module, a colon, and the n
 function), or a `python:` block whose result is the function. The `control:` is
 `size_matched` (the default), `null` (for no control), or `stratified:` with one or more
 columns (for a [`Stratified`](`pointblank.ablation.Stratified`) control). Each strategy is
-the name of an `Ablation` method that adds variants, with its parameters as a mapping. The
-strategies are added in order.
+the name of an `Ablation` method that adds variants (including the sweeps `sweep_score` and
+`sweep_step`), with its parameters as a mapping. The strategies are added in order.
 
 The block is ignored by `yaml_interrogate()`, so the same configuration can be used both to
 validate the data and to measure what its steps do for a model.
@@ -38462,6 +39382,311 @@ approaches produce the same validation steps at interrogation time. Choose `Step
 code-first composition and `Contract` for declarative, YAML-friendly definitions.
 
 
+### Scored Validation
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
+```
+
+Most validation checks are about the form of the data: whether a value is in a range, matches a
+pattern, or isn't missing. Some of the checks that matter most for text are about its meaning
+instead. Does a passage answer the query it was retrieved for? Is a document of good quality, or
+toxic? Is it in the expected language? Is it fluent, or garbled? These checks are made with a model
+that gives each row a score, and the `col_vals_scored()` validation method is for them: it scores
+each row with a *scorer* and checks that the score is within bounds.
+
+This page covers how to write a scorer, the adapters of `pb.scorers` for common kinds of models, how
+scores are cached so that rows aren't scored twice, and how to use the scores once the validation is
+done.
+
+## A First Scored Step
+
+Let's make a small corpus of short documents, of the kind that might be collected to train a
+language model. Some of them aren't what we'd want: one is spam, one is in French, one is
+keyboard-mashing, and one is missing.
+
+```{python}
+import polars as pl
+
+corpus = pl.DataFrame(
+    {
+        "doc_id": list(range(1, 9)),
+        "text": [
+            "The museum opens at nine and closes at five on weekdays.",
+            "Click here click here click here buy now buy now",
+            "Le musée ouvre à neuf heures et ferme à dix-sept heures.",
+            "Our library lends books, films, and music for three weeks.",
+            "asdf qwer zxcv uiop hjkl",
+            "The trail is steep, so bring water and good shoes.",
+            None,
+            "Tickets are free for children under twelve.",
+        ],
+    }
+)
+
+pb.preview(corpus)
+```
+
+A scorer is a function that takes a batch of rows and returns a score for each. Here's one that
+scores a document by the share of its words that are distinct, which is low for text that repeats
+itself.
+
+```{python}
+def distinct_share(batch):
+    scores = []
+    for row in batch:
+        words = row["text"].lower().split()
+        scores.append(len(set(words)) / len(words))
+    return scores
+```
+
+We'll validate that at least 60% of the words of each document are distinct.
+
+```{python}
+validation = (
+    pb.Validate(data=corpus, tbl_name="corpus")
+    .col_vals_scored(columns="text", scorer=distinct_share, min_val=0.6)
+    .interrogate()
+)
+
+validation
+```
+
+Each row is a test unit, and two of the eight fail: the spam document, which has a score of `0.4`,
+and the missing document, which isn't scored at all. The note under the report says which scorer
+was used, how many rows it scored, and the range of the scores.
+
+## Writing a Scorer
+
+A scorer gets the rows as a list of dictionaries, one for each row, with the values of the columns
+of the step. With `columns="text"`, each row is a dictionary like `{"text": "..."}`; with
+`columns=["query", "passage"]`, it has both values. The scorer returns a list of scores, in the
+order of the rows. A score is a number, or `None` for a row that can't be scored.
+
+Rows come in batches, which is what most models want: a model scores a batch of texts much faster
+than it scores them one at a time. Rows with the same values are scored only once, and a row with a
+missing value in any of the columns isn't given to the scorer at all.
+
+A scorer can also have a `name`, a `version`, and a `batch_size`. The name identifies the scorer in
+the report and in the score cache (a function defined at the top level of a module is named after
+the function), and the version is part of the key of the cache. The `pb.scorers.from_function()`
+function gives these to any function, and it can also wrap a function that scores one row at a
+time, with `per_row=True`:
+
+```{python}
+word_count = pb.scorers.from_function(
+    lambda row: len(row["text"].split()), name="word_count", version="1", per_row=True
+)
+
+(
+    pb.Validate(data=corpus, tbl_name="corpus")
+    .col_vals_scored(columns="text", scorer=word_count, min_val=6, na_pass=True)
+    .interrogate()
+)
+```
+
+The report shows the scorer by its name, `word_count`. The keyboard-mashing document has only five
+words, so it fails, while the missing document passes this time because of `na_pass=True` (more on
+that below).
+
+A scorer that raises an error, or that returns something other than a number (or `None`) for each
+row, stops its step with an evaluation error, and the step's note says why. The other steps of the
+validation are still interrogated.
+
+## The Adapters
+
+The `pb.scorers` module has adapters for common kinds of models. Each one uses a package that's only
+imported when the scorer is first used, and if the package isn't installed, the step's note says how
+to install it. Pointblank never trains a model: the adapters use models that are given to them.
+
+| Adapter | What it scores | Model |
+|---------|----------------|-------|
+| `embedding_similarity()` | Similarity to reference texts | sentence-transformers, or a function |
+| `reranker()` | How well a document answers a query | Cohere Rerank, or a cross-encoder |
+| `classifier()` | A label of a classifier (e.g., quality) | A Hugging Face model or pipeline |
+| `langid()` | Being in the expected languages | `langid`, fastText, or a function |
+| `perplexity()` | How surprising text is to a language model | KenLM, or a function |
+
+With real models, the adapters look like this:
+
+```{python}
+#| eval: false
+# Is each document of educational quality (on a scale from 0 to 5)?
+quality = pb.scorers.classifier(
+    hf_model="HuggingFaceFW/fineweb-edu-classifier", function_to_apply="none"
+)
+
+# Does each passage answer its query?
+relevance = pb.scorers.reranker(
+    provider="sentence-transformers", query="query", document="passage"
+)
+
+# Is each title about data validation?
+on_topic = pb.scorers.embedding_similarity(
+    reference=["data validation", "data quality"], embedder="all-MiniLM-L6-v2"
+)
+
+# Is each document in English?
+english = pb.scorers.langid(expected="en")
+```
+
+The adapters that take a model can also take a function in its place, which is how we'll keep the
+examples on this page self-contained. Here, `guess_language()` stands in for a language
+identification model (it counts common English and French words), and `vowel_ratio()` stands in for
+a language model's perplexity (garbled text has few vowels for its letters).
+
+```{python}
+def guess_language(text):
+    words = set(text.lower().split())
+    english = len(words & {"the", "and", "at", "is", "for", "are", "so", "our", "on"})
+    french = len(words & {"le", "la", "et", "à", "les", "est", "un", "une"})
+    if english + french == 0:
+        return {"en": 0.5, "fr": 0.5}
+    return {"en": english / (english + french), "fr": french / (english + french)}
+
+
+def vowel_ratio(text):
+    letters = [c for c in text.lower() if c.isalpha()]
+    vowels = sum(c in "aeiouéà" for c in letters)
+    return len(letters) / max(vowels, 1)
+```
+
+Now we can check the corpus in three ways at once: that it doesn't repeat itself, that it's in
+English, and that it's fluent (with `max_val=` as the highest perplexity allowed).
+
+```{python}
+validation = (
+    pb.Validate(data=corpus, tbl_name="corpus")
+    .col_vals_scored(columns="text", scorer=distinct_share, min_val=0.6)
+    .col_vals_scored(
+        columns="text",
+        scorer=pb.scorers.langid(expected="en", backend=guess_language),
+        min_val=0.5,
+    )
+    .col_vals_scored(columns="text", scorer=pb.scorers.perplexity(fn=vowel_ratio), max_val=3)
+    .interrogate()
+)
+
+validation
+```
+
+Each step catches a different problem document: the spam in step 1, the French document in step 2,
+and the keyboard-mashing in step 3. The adapters are shown in the report by their kind, and the
+notes give their settings.
+
+## Rows Without a Score
+
+A row with a missing value in any of the step's columns isn't scored, and neither is a row that the
+scorer gives `None`. By default, such rows fail, which is why the missing document failed every step
+above. That's usually what we want: a document without text isn't a good document. When it isn't,
+use `na_pass=True` to let such rows pass, as we did with `word_count`. The note of the step says how
+many rows had no score, and whether they passed.
+
+## The Score Cache
+
+Models are slow and can be costly, so scores are kept in a cache: by the scorer's name and version,
+and by the values of the row. Interrogating the same data again (after a change to another step,
+say, or in an [`Ablation`](../post-interrogation/data-ablation.qmd), which interrogates many
+variants of a table) doesn't run the model again for rows that it has already scored. In fact, the
+note of step 1 in the last report says that every score came from the cache, since the first
+validation on this page had already scored those rows with `distinct_share`.
+
+```{python}
+validation.get_note(1, "scores", format="text")
+```
+
+With `cache=True` (the default), the scores are kept in memory for the rest of the session. With a
+directory as `cache=`, they're kept on disk, in an SQLite file, and can be shared between sessions
+and projects:
+
+```{python}
+#| eval: false
+pb.Validate(data=corpus).col_vals_scored(
+    columns="text",
+    scorer=pb.scorers.langid(expected="en"),
+    min_val=0.5,
+    cache="scores",
+).interrogate()
+```
+
+The scores are written after each batch, so a run that's interrupted picks up where it left off. A
+cache on disk needs a scorer with a stable name: the adapters have one (unless they're given a model
+object), as does a function defined at the top level of a module, and `from_function()` can give one
+to a lambda. Use `cache=False` to not keep the scores at all.
+
+When a scorer's model changes, give it a new version (`version=` in the adapters and in
+`from_function()`), so that the scores of the older model aren't used. To clear the scores kept in
+memory, use `pb.scorers.clear_cache()`; to clear a cache on disk, delete its directory.
+
+## Using the Scores
+
+The scores of a step are kept with its results, in a column called `pb_score_`. They're in the
+extracts of the failing rows and in the step report, which makes it easy to see how far a failing
+row is from the bounds:
+
+```{python}
+validation.get_step_report(i=2)
+```
+
+They're also in the table of `get_row_flags()`, as a column for each scored step
+(`pb_score_<step>_`), next to the flags of the steps:
+
+```{python}
+validation.get_row_flags()
+```
+
+Use `keep_scores=False` to not keep the scores (the results then only say whether each row passed).
+
+A bound like `min_val=0.5` is a choice, and it isn't always clear where to set it. The scores of a
+step can show how the bound affects a model trained on the data:
+[`Ablation.sweep_score()`](../post-interrogation/data-ablation.qmd#sweeping-a-threshold) removes
+more or fewer of the lowest-scoring rows and measures the effect of each on a model.
+
+## Databases and PySpark
+
+Scoring runs in Python, on the values of the rows. A Polars or pandas table is scored as it is. For
+a database table (through Ibis) or a PySpark DataFrame, the distinct rows of the step's columns are
+collected and scored, and the scores are joined back to the table on its own backend. With a large
+table, a `pre=` function that takes a sample of the rows keeps the cost of scoring down.
+
+## Scored Steps in YAML
+
+In a YAML workflow, a scorer is written as one of the adapters with its settings, as
+`{<adapter>: {<settings>}}`:
+
+```{python}
+config = """
+tbl: corpus.parquet
+steps:
+- col_vals_scored:
+    columns: text
+    scorer:
+      langid:
+        expected: en
+    min_val: 0.5
+    cache: .scores
+"""
+
+print(pb.yaml_to_python(config))
+```
+
+A scorer that's a function of your own can be written as a `python:` block, which needs
+`allow_python=True` (see the [YAML Reference](../yaml/yaml-reference.qmd)). A validation with an
+adapter is written in this form by `to_yaml()`, so it can be saved and run again.
+
+## Conclusion
+
+The `col_vals_scored()` validation method brings checks of meaning into a validation plan, with the
+same reports, thresholds, and actions as any other step. A scorer is any function of a batch of
+rows, and the adapters of `pb.scorers` use rerankers, classifiers, language identification,
+embeddings, and perplexity. Scores are cached, so that rows aren't scored again, and they're kept
+with the results, where they can be seen in the step report and used to choose the bounds with an
+[`Ablation`](../post-interrogation/data-ablation.qmd).
+
+
 ### Validation Reports
 
 ```{python}
@@ -40884,6 +42109,83 @@ Removing the flights from Newark (`EWR`) hurts more than removing as many random
 seem to have something to teach the model that the flights from the other airports don't. The
 `values=` parameter picks the groups to try, for a column with many distinct values.
 
+## Sweeping a Threshold
+
+A step's variant tests one setting of its check, but the setting itself is often the question: is
+2,500 miles the right limit, or would a higher one do better? The
+[`Ablation.sweep_step()`](`Ablation.sweep_step`) method adds a variant for each of a list of values
+of one of a step's parameters, each removing the rows that fail the step with that value. Here's
+the limit of step 3 at four values:
+
+```{python}
+by_limit = (
+    pb.Ablation(
+        validation,
+        evaluate=evaluate,
+        metric="mae",
+        higher_is_better=False,
+        label="Air time model",
+    )
+    .sweep_step(3, "value", [1500, 2000, 2500, 3000])
+    .run()
+)
+
+by_limit
+```
+
+The variants of a sweep are a group of their own in the report, and below the table, a curve shows
+the change from the full table at each value, with a dashed line for the controls (removing as many
+random rows). The lower the limit, the more long flights are removed and the worse the model gets.
+Even a limit of 3,000 miles, which only removes the seven flights to Honolulu, hurts. No limit
+helps, so this check shouldn't be used to clean the data at all.
+
+A check whose limit is a model's score is the same question: a score is a matter of degree, and
+where to draw the line is a choice. A
+[`Validate.col_vals_scored()`](`Validate.col_vals_scored`) step (see
+[Scored Validation](../advanced-validation/scored-validation.qmd)) gives each row a score
+and keeps the scores. The [`Ablation.sweep_score()`](`Ablation.sweep_score`) method then removes
+more and more of the rows with the highest (or lowest) scores, whatever the step's own bound. Here,
+the score of a flight is the average speed implied by its distance and air time, which is far too
+high for the flights with their air times in hours:
+
+```{python}
+def speed(batch):
+    return [row["distance"] / (row["air_time"] / 60) for row in batch]
+
+
+scored_validation = (
+    pb.Validate(data=train, tbl_name="flights_train")
+    .col_vals_scored(
+        columns=["distance", "air_time"],
+        scorer=speed,
+        max_val=600,
+        brief="Implied speed is at most 600 mph",
+    )
+    .interrogate()
+)
+
+by_speed = (
+    pb.Ablation(
+        scored_validation,
+        evaluate=evaluate,
+        metric="mae",
+        higher_is_better=False,
+        label="Air time model",
+    )
+    .sweep_score(1, quantiles=[0.01, 0.02, 0.03, 0.05, 0.1, 0.2])
+    .run()
+)
+
+by_speed
+```
+
+Each variant removes a share of the rows with the highest scores (the step has only a `max_val=`, so
+it's the highest that are removed; `remove="lowest"` would remove the lowest instead). The curve is
+lowest at 2%, which is the share of flights with their air times in hours: removing fewer leaves
+some of them in, and removing more starts to remove good flights. By 20%, the sweep hurts. A sweep
+can also use the values of a column of the table as the scores (`sweep_score("column_name")`), or
+cutoffs on the scale of the scores rather than shares of the rows (`values=`).
+
 ## Getting the Results
 
 The [`Ablation.get_effects()`](`Ablation.get_effects`) method returns the results as a table, with
@@ -41124,6 +42426,9 @@ ablation:
 pb.yaml_ablation(config, set_tbl=train, evaluate=evaluate).plan()
 ```
 
+The sweeps are strategies too, with their arguments by name (e.g.,
+`- sweep_step: {step: 3, param: value, values: [1500, 2000, 2500, 3000]}`).
+
 The block is ignored by [`yaml_interrogate()`](`yaml_interrogate`), so the same file can be used
 for validating the data, and [`yaml_to_python()`](`yaml_to_python`) writes out the equivalent
 Python code, ablation included.
@@ -41164,9 +42469,9 @@ have a note for each step that couldn't be used.
 A validation can say which rows break its rules, but only an experiment can say whether those rows
 hurt the model trained on them. An `Ablation` runs that experiment with controls, repeats, and
 intervals, so you can find the checks that are worth enforcing, the ones that don't matter, the
-ones that are redundant, and the ones that remove good data. It works with any model that you can
-wrap in an `evaluate` function (or train elsewhere, with `export()` and `load_results()`), and with
-any validation whose steps check rows.
+ones that are redundant, the ones that remove good data, and where to set their limits. It works
+with any model that you can wrap in an `evaluate` function (or train elsewhere, with `export()` and
+`load_results()`), and with any validation whose steps check rows.
 
 
 ### Previewing Data
@@ -45155,6 +46460,66 @@ Examples:
 - Schema validation (use `col_schema_match`)
 - Performance-critical validations with large datasets
 - When deterministic results are required
+
+### Model-Scored Validation
+
+`col_vals_scored`: are the scores that a model gives each row within bounds?
+
+```yaml
+- col_vals_scored:
+    columns: [query, passage]                          # REQUIRED: Column(s) given to the scorer
+    scorer:                                            # REQUIRED: An adapter and its settings
+      reranker:
+        provider: sentence-transformers
+        query: query
+        document: passage
+    min_val: 0.5                                       # OPTIONAL: Lowest passing score
+    max_val: 1.0                                       # OPTIONAL: Highest passing score
+    na_pass: false                                     # OPTIONAL: Pass rows without a score
+    cache: .scores                                     # OPTIONAL: Directory of a score cache
+    keep_scores: true                                  # OPTIONAL: Keep the scores (`pb_score_`)
+    pre: |                                             # OPTIONAL: Data preprocessing
+      lambda df: df.head(1000)
+    thresholds:                                        # OPTIONAL: Step-level thresholds
+      warning: 0.1
+    brief: "Passages answer their queries"             # OPTIONAL: Step description
+```
+
+At least one of `min_val` and `max_val` is needed. The scorer is written as one of the adapters of
+`pb.scorers` with its settings, as `{<adapter>: {<settings>}}`, where the adapter is one of
+`embedding_similarity`, `reranker`, `classifier`, `langid`, or `perplexity`. A scorer that's a
+function of your own is written as a `python:` block, which is only run with `allow_python=True`:
+
+```yaml
+# Text in English, with a cache of the scores on disk
+- col_vals_scored:
+    columns: text
+    scorer:
+      langid:
+        expected: en
+    min_val: 0.5
+    cache: .scores
+
+# Documents of educational quality (a regression model, scored from 0 to 5)
+- col_vals_scored:
+    columns: text
+    scorer:
+      classifier:
+        hf_model: HuggingFaceFW/fineweb-edu-classifier
+        function_to_apply: none
+    min_val: 2.5
+
+# A scorer of your own (needs `allow_python=True`)
+- col_vals_scored:
+    columns: text
+    scorer:
+      python: |
+        pb.scorers.from_function(lambda row: len(row["text"].split()), name="words", per_row=True)
+    min_val: 5
+```
+
+See the [Scored Validation](../advanced-validation/scored-validation.qmd) article for more on
+scorers and the score cache.
 
 ### Data Quality Methods
 

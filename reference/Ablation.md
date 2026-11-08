@@ -4,7 +4,7 @@ Measure how the rows that fail validation steps affect a model trained on the da
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L321-L3251)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L346-L3751)
 
 ``` python
 Ablation(
@@ -30,7 +30,7 @@ A validation says which rows of a training table fail its checks, but not whethe
 
 Removing rows can change a score just because there are fewer rows to train on, so each variant is also compared to a *control* that removes the same number of rows at random. The difference between the two is the effect of the rows that failed the steps, as opposed to the effect of having less data. Training is often random too (e.g., the initial weights of a model), so every version is evaluated `repeats=` times with different seeds. The `r`-th evaluation of every version gets the same seed, so the differences between versions are compared seed by seed (paired), which cancels out much of the noise.
 
-An [Ablation](../reference/Ablation.md#pointblank.Ablation) is built in two parts, like a validation: the strategy methods add variants ([`drop_each()`](../reference/Ablation.drop_each.md#pointblank.Ablation.drop_each), [`drop_all()`](../reference/Ablation.drop_all.md#pointblank.Ablation.drop_all), [`drop_steps()`](../reference/Ablation.drop_steps.md#pointblank.Ablation.drop_steps), [`drop_all_but_each()`](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each), and [`drop_groups()`](../reference/Ablation.drop_groups.md#pointblank.Ablation.drop_groups)), and nothing is evaluated until [`run()`](../reference/Ablation.run.md#pointblank.Ablation.run) is called. Use [`plan()`](../reference/Ablation.plan.md#pointblank.Ablation.plan) before that to see how many rows each variant removes and how many evaluations the run needs. When training happens elsewhere (e.g., on a cluster), [`export()`](../reference/Ablation.export.md#pointblank.Ablation.export) writes out the versions of the table to train on, and [`load_results()`](../reference/Ablation.load_results.md#pointblank.Ablation.load_results) reads back the metrics.
+An [Ablation](../reference/Ablation.md#pointblank.Ablation) is built in two parts, like a validation: the strategy methods add variants ([`drop_each()`](../reference/Ablation.drop_each.md#pointblank.Ablation.drop_each), [`drop_all()`](../reference/Ablation.drop_all.md#pointblank.Ablation.drop_all), [`drop_steps()`](../reference/Ablation.drop_steps.md#pointblank.Ablation.drop_steps), [`drop_all_but_each()`](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each), [`drop_groups()`](../reference/Ablation.drop_groups.md#pointblank.Ablation.drop_groups), and the sweeps [`sweep_score()`](../reference/Ablation.sweep_score.md#pointblank.Ablation.sweep_score) and [`sweep_step()`](../reference/Ablation.sweep_step.md#pointblank.Ablation.sweep_step)), and nothing is evaluated until [`run()`](../reference/Ablation.run.md#pointblank.Ablation.run) is called. Use [`plan()`](../reference/Ablation.plan.md#pointblank.Ablation.plan) before that to see how many rows each variant removes and how many evaluations the run needs. When training happens elsewhere (e.g., on a cluster), [`export()`](../reference/Ablation.export.md#pointblank.Ablation.export) writes out the versions of the table to train on, and [`load_results()`](../reference/Ablation.load_results.md#pointblank.Ablation.load_results) reads back the metrics.
 
 ## Parameters
 

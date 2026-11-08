@@ -4,7 +4,7 @@ Make an `evaluate=` function that trains a scikit-learn model and scores it on h
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3868-L4059)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4524-L4715)
 
 ``` python
 ablation.sklearn_evaluator(
