@@ -398,7 +398,14 @@ def _is_in(column: str, values: Collection[Any], dtype: DType | None) -> nw.Expr
 
 
 # The results columns of a step (whether each row passed, and what some steps add next to it)
-_RESULT_COLUMNS = ("pb_is_good_", "pb_score_", "pb_cluster_", "pb_match_", "pb_reason_")
+_RESULT_COLUMNS = (
+    "pb_is_good_",
+    "pb_score_",
+    "pb_cluster_",
+    "pb_match_",
+    "pb_reason_",
+    "pb_votes_",
+)
 
 
 def _with_row_index(
@@ -413,8 +420,8 @@ def _with_row_index(
     Other LazyFrames (e.g., database tables) have no inherent row order, so they're ordered by
     their first column, with ties broken by the other columns that can be sorted (numeric,
     temporal, string, and boolean ones) so that the numbering doesn't vary from run to run. The
-    results columns (`pb_is_good_`, and the `pb_score_`, `pb_cluster_`, `pb_match_`, and
-    `pb_reason_` columns that some steps add next to it) aren't used, so a table is numbered the
+    results columns (`pb_is_good_`, and the `pb_score_`, `pb_cluster_`, `pb_match_`, `pb_reason_`,
+    and `pb_votes_` columns that some steps add next to it) aren't used, so a table is numbered the
     same with or without them.
 
     Parameters

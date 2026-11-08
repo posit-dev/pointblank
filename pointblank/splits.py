@@ -298,44 +298,19 @@ class SplitCheck:
     # ------------------------------------------------------------------------------------------
 
     def _check_overlap(self, a: str, b: str) -> dict[str, Any]:
-        from pointblank._text import ReferenceIndex, join_values
-
         rows_a = list(zip(*(self._values[a][c] for c in self.columns)))
         rows_b = list(zip(*(self._values[b][c] for c in self.columns)))
-        first_of: dict[tuple, int] = {}
-        for k, row in enumerate(rows_a):
-            if any(v is not None for v in row):
-                first_of.setdefault(_key(row), k)
-        pairs: list[tuple[int, int, str]] = []
-        for k, row in enumerate(rows_b):
-            if any(v is not None for v in row):
-                found = first_of.get(_key(row))
-                if found is not None:
-                    pairs.append((found, k, "exact"))
-        n_exact = len(pairs)
-
-        n_near = None
-        if self.near:
-            exact_rows = {k for _, k, _ in pairs}
-            texts_a = [join_values(row) for row in rows_a if all(v is not None for v in row)]
-            positions_a = [k for k, row in enumerate(rows_a) if all(v is not None for v in row)]
-            index = ReferenceIndex(
-                texts_a,
-                method="minhash",
-                ngram=self.ngram,
-                threshold=self.threshold,
-                num_perm=self.num_perm,
-            )
-            n_near = 0
-            for k, row in enumerate(rows_b):
-                if k in exact_rows or any(v is None for v in row):
-                    continue
-                found = index.match(join_values(row))
-                if found is not None:
-                    pairs.append((positions_a[found], k, "near"))
-                    n_near += 1
-            pairs.sort(key=lambda pair: pair[1])
+        pairs = _overlapping_rows(
+            rows_a,
+            rows_b,
+            near=self.near,
+            threshold=self.threshold,
+            ngram=self.ngram,
+            num_perm=self.num_perm,
+        )
         self._pairs[(a, b)] = pairs
+        n_exact = sum(kind == "exact" for _, _, kind in pairs)
+        n_near = sum(kind == "near" for _, _, kind in pairs) if self.near else None
         n_b = self.splits[b]
         return {
             "first": a,
@@ -392,36 +367,15 @@ class SplitCheck:
         }
 
     def _check_drift(self, column: str, name: str) -> dict[str, Any]:
-        from pointblank.datascan import (
-            _compute_ks_statistic,
-            _compute_psi_categorical,
-            _compute_psi_numeric,
-        )
-
         first = next(iter(self._values))
-        base = [v for v in self._values[first][column] if v is not None]
-        current = [v for v in self._values[name][column] if v is not None]
-        ks = None
-        if _is_numeric(self._schema[column]):
-            kind = "numeric"
-            base = [float(v) for v in base]
-            current = [float(v) for v in current]
-            psi = _compute_psi_numeric(base, current)
-            ks = _compute_ks_statistic(base, current)
-        else:
-            kind = "categorical"
-            psi = _compute_psi_categorical(
-                {_freq_key(k): n for k, n in _counts(base).items()},
-                {_freq_key(k): n for k, n in _counts(current).items()},
-            )
         return {
             "column": column,
             "split": name,
-            "kind": kind,
-            "psi": _round(psi),
-            "ks": _round(float(ks["statistic"])) if ks else None,
-            "ks_p_value": float(ks["p_value"]) if ks else None,
-            "level": _psi_level(psi),
+            **_distribution_change(
+                self._values[first][column],
+                self._values[name][column],
+                numeric=_is_numeric(self._schema[column]),
+            ),
         }
 
     def _issues(self) -> list[str]:
@@ -867,6 +821,83 @@ def _listed(values: list[Any]) -> str:
 
 def _rows(n: int) -> str:
     return f"{n:,} row{'s' if n != 1 else ''}"
+
+
+def _overlapping_rows(
+    rows_a: list[tuple],
+    rows_b: list[tuple],
+    near: bool,
+    threshold: float,
+    ngram: int,
+    num_perm: int,
+) -> list[tuple[int, int, str]]:
+    """
+    The rows of `rows_b` that are also in `rows_a`, as (the position in `rows_a`, the position in
+    `rows_b`, `"exact"` or `"near"`), in the order of `rows_b`. Rows with no values are skipped,
+    and rows with a missing value aren't compared for being nearly the same.
+    """
+    from pointblank._text import ReferenceIndex, join_values
+
+    first_of: dict[tuple, int] = {}
+    for k, row in enumerate(rows_a):
+        if any(v is not None for v in row):
+            first_of.setdefault(_key(row), k)
+    pairs: list[tuple[int, int, str]] = []
+    for k, row in enumerate(rows_b):
+        if any(v is not None for v in row):
+            found = first_of.get(_key(row))
+            if found is not None:
+                pairs.append((found, k, "exact"))
+    if not near:
+        return pairs
+
+    exact_rows = {k for _, k, _ in pairs}
+    positions_a = [k for k, row in enumerate(rows_a) if all(v is not None for v in row)]
+    index = ReferenceIndex(
+        [join_values(rows_a[k]) for k in positions_a],
+        method="minhash",
+        ngram=ngram,
+        threshold=threshold,
+        num_perm=num_perm,
+    )
+    for k, row in enumerate(rows_b):
+        if k in exact_rows or any(v is None for v in row):
+            continue
+        found = index.match(join_values(row))
+        if found is not None:
+            pairs.append((positions_a[found], k, "near"))
+    pairs.sort(key=lambda pair: pair[1])
+    return pairs
+
+
+def _distribution_change(base: list[Any], current: list[Any], numeric: bool) -> dict[str, Any]:
+    """The PSI (and, for numeric values, the KS statistic) of `current` compared with `base`."""
+    from pointblank.datascan import (
+        _compute_ks_statistic,
+        _compute_psi_categorical,
+        _compute_psi_numeric,
+    )
+
+    base = [v for v in base if v is not None]
+    current = [v for v in current if v is not None]
+    ks = None
+    if numeric:
+        base = [float(v) for v in base]
+        current = [float(v) for v in current]
+        psi = _compute_psi_numeric(base, current)
+        ks = _compute_ks_statistic(base, current)
+    else:
+        psi = _compute_psi_categorical(
+            {_freq_key(k): n for k, n in _counts(base).items()},
+            {_freq_key(k): n for k, n in _counts(current).items()},
+        )
+    return {
+        "kind": "numeric" if numeric else "categorical",
+        "psi": _round(psi),
+        "ks": _round(float(ks["statistic"])) if ks else None,
+        "ks_p_value": float(ks["p_value"]) if ks else None,
+        "level": _psi_level(psi),
+    }
 
 
 def _drift_issue(row: dict[str, Any], first: str) -> str:

@@ -34,7 +34,11 @@ _PROVIDER_PACKAGES = {
     "ollama": ["openai"],
     "bedrock": ["anthropic", "boto3"],
     "azure-openai": ["openai"],
+    "cohere": ["openai"],
 }
+
+# Cohere's OpenAI-compatible API (its Chat Completions endpoint), used for the `cohere` provider
+_COHERE_BASE_URL = "https://api.cohere.ai/compatibility/v1"
 
 
 # The reply-length limit for the Anthropic and Bedrock providers. chatlas's default is 4096, but on
@@ -145,7 +149,7 @@ def _create_chat_instance(
     Parameters
     ----------
     provider
-        The provider name (e.g., 'anthropic', 'openai', 'ollama', 'bedrock').
+        The provider name (e.g., 'anthropic', 'openai', 'ollama', 'bedrock', 'cohere').
     model_name
         The model name for the provider.
     api_key
@@ -242,6 +246,29 @@ def _create_chat_instance(
             deployment_id=model_name,
             api_version=api_version,
             api_key=api_key,
+            system_prompt=system_prompt,
+            kwargs={"http_client": _async_http_client("openai", verify_ssl)},
+        )
+
+    elif provider == "cohere":
+        import os
+
+        import chatlas
+
+        api_key = api_key or os.getenv("CO_API_KEY") or os.getenv("COHERE_API_KEY")
+        if not api_key:
+            raise ValueError(
+                "The CO_API_KEY (or COHERE_API_KEY) environment variable must be set to use the "
+                "'cohere' provider."
+            )
+
+        # Cohere's compatible API has the Chat Completions endpoint, not the Responses one (which
+        # `ChatOpenAI` uses in newer versions of chatlas)
+        chat_class = getattr(chatlas, "ChatOpenAICompletions", chatlas.ChatOpenAI)
+        chat = chat_class(
+            model=model_name,
+            api_key=api_key,
+            base_url=_COHERE_BASE_URL,
             system_prompt=system_prompt,
             kwargs={"http_client": _async_http_client("openai", verify_ssl)},
         )

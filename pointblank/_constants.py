@@ -270,6 +270,7 @@ MODEL_PROVIDERS = [
     "ollama",
     "bedrock",
     "azure-openai",
+    "cohere",
 ]
 
 TABLE_TYPE_STYLES = {

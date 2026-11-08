@@ -112,8 +112,8 @@ class EditValidation:
     human in control.
 
     `EditValidation` reuses the same provider abstraction as `DraftValidation` (via the `chatlas`
-    package), supporting the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, and
-    `"azure-openai"` providers. Install the optional requirements with
+    package), supporting the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, `"azure-openai"`,
+    and `"cohere"` providers. Install the optional requirements with
     `pip install pointblank[generate]`.
 
     :::{.callout-warning}
@@ -134,7 +134,7 @@ class EditValidation:
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
         `"anthropic:claude-opus-4-8"`). Supported providers are `"anthropic"`, `"openai"`,
-        `"ollama"`, `"bedrock"`, and `"azure-openai"`.
+        `"ollama"`, `"bedrock"`, `"azure-openai"`, and `"cohere"`.
     data
         Optional data table. When provided, a [`DataScan`](`pointblank.DataScan`) summary of the
         table is included in the prompt so the model can make *informed* edits (e.g., tightening a
