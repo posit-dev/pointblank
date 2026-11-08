@@ -322,6 +322,13 @@ class _Card:
         )
         if repeats < 3:
             intro += " There are no verdicts, as they need at least 3 repeats."
+        holdout = ablation._holdout_summary()
+        if holdout is not None:
+            intro += (
+                f" The model was scored on a holdout set of {holdout['n_rows']:,} rows, which was "
+                f"checked by the same steps: its health score is {holdout['health_score']:.2f} "
+                f"(the training data's is {ablation.validation.get_health_score():.2f})."
+            )
 
         rows = []
         for row in variants:
