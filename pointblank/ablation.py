@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import functools
 import hashlib
 import html as html_lib
 import inspect
@@ -41,6 +42,11 @@ _CONTROLS = ("size_matched",)
 _ADJUSTMENTS = ("holm",)
 _EXECUTORS = ("thread", "process")
 _EXPORT_FORMATS = ("parquet", "indices")
+_INTERVALS = ("t", "bootstrap")
+_PASS_AS = ("table", "row_index")
+# The number of resamples of the repeats for `ci="bootstrap"`, and the fewest repeats it's suited to
+_BOOTSTRAP_RESAMPLES = 4000
+_BOOTSTRAP_MIN_REPEATS = 10
 
 # `drop_groups()` needs `values=` for a column with more distinct values than this
 _MAX_GROUPS = 50
@@ -449,12 +455,14 @@ class Ablation:
         type as the validation's target table; a lazy or database table is passed as a lazy
         table), `seed` is an integer to seed any randomness in training with, and `variant` is an
         [`AblationVariant`](`pointblank.AblationVariant`) describing the version of the table. The
-        function can leave out the `variant=` parameter if it doesn't need it. It must return a
-        number, or a dictionary of named numbers (one per metric). The evaluation data should be a
-        fixed holdout set that the function holds on to: it must not depend on `train`. For
-        scikit-learn models, [`sklearn_evaluator()`](`pointblank.ablation.sklearn_evaluator`)
-        makes this function for you. It can be left out (`None`) if the evaluations are done
-        elsewhere, with [`export()`](`pointblank.Ablation.export`) and
+        function can leave out the `variant=` parameter if it doesn't need it. With
+        `pass_as="row_index"`, `train` is the list of the numbers of the rows that are kept
+        instead. It must return a number, or a dictionary of named numbers (one per metric). The
+        evaluation data should be a fixed holdout set that the function holds on to: it must not
+        depend on `train`. For scikit-learn models,
+        [`sklearn_evaluator()`](`pointblank.ablation.sklearn_evaluator`) makes this function for
+        you. It can be left out (`None`) if the evaluations are done elsewhere, with
+        [`export()`](`pointblank.Ablation.export`) and
         [`load_results()`](`pointblank.Ablation.load_results`).
     metric
         The name of the metric that verdicts are based on. It's needed when `evaluate=` returns a
@@ -511,6 +519,32 @@ class Ablation:
         started again without losing work, and adding a variant only evaluates what's new. The
         `evaluate=` function itself isn't part of the key, so change `evaluate_version=` (or use
         another directory) when it changes.
+    holdout
+        The holdout set that `evaluate=` scores the model on (a table of any kind that
+        [`Validate`](`pointblank.Validate`) takes, or the path of a file), to be checked with the
+        same validation steps. The holdout isn't used in the ablation (rows are never removed from
+        it), but a model can only be scored as well as its holdout allows, so the reports give its
+        health score next to that of the training table. The holdout is interrogated when the
+        `Ablation` is created, and the results are in the `holdout_validation` attribute (steps
+        that call a model, such as those of [`prompt()`](`pointblank.Validate.prompt`), call it
+        again for the holdout). With
+        [`sklearn_evaluator()`](`pointblank.ablation.sklearn_evaluator`), it's the same table as
+        the evaluator's `holdout=`.
+    ci
+        How the intervals and p-values are computed from the paired differences of the repeats.
+        With `"t"` (the default), they come from a paired t-test, which assumes the differences
+        are roughly normal. With `"bootstrap"`, they come from 4,000 resamples of the repeats (a
+        percentile interval, and a p-value from the share of resampled means on either side of
+        zero), which assumes nothing about their distribution but needs more repeats: with fewer
+        than 10, it gives intervals that are too narrow (there's a warning).
+    pass_as
+        What `evaluate=` gets as its first argument. With `"table"` (the default), it's the
+        training table with the rows removed. With `"row_index"`, it's a sorted list of the
+        numbers of the rows that are kept (counting from `0`, in the order of the table, as in
+        the `format="indices"` of [`export()`](`pointblank.Ablation.export`)), for a pipeline that
+        loads the training data itself. This can't be used with
+        [`inject()`](`pointblank.Ablation.inject`), which changes the values of the table, or
+        with [`sklearn_evaluator()`](`pointblank.ablation.sklearn_evaluator`).
 
     Returns
     -------
@@ -521,10 +555,10 @@ class Ablation:
     -------
     For each variant and metric, the results give the mean and standard deviation of the metric
     across the repeats, and two paired comparisons: with the full table (`delta_vs_full`) and with
-    the control (`delta_vs_control`). Each comparison has a t-interval at `conf_level=` and a
-    p-value from a paired t-test, along with the p-value adjusted across the variants. The
-    verdict on a variant is based on the metric named in `metric=` and the comparison with the
-    control (or with the full table, if `control=None`):
+    the control (`delta_vs_control`). Each comparison has an interval at `conf_level=` and a
+    p-value (from a paired t-test, or from the bootstrap with `ci="bootstrap"`), along with the
+    p-value adjusted across the variants. The verdict on a variant is based on the metric named in
+    `metric=` and the comparison with the control (or with the full table, if `control=None`):
 
     - `"helps"`: removing the variant's rows makes the metric better, with an adjusted p-value
       below `1 - conf_level`
@@ -633,6 +667,9 @@ class Ablation:
         label: str | None = None,
         evaluate_version: str | None = None,
         cache: str | os.PathLike[str] | None = None,
+        holdout: Any = None,
+        ci: str = "t",
+        pass_as: str = "table",
     ) -> None:
         from pointblank.validate import (
             Validate,
@@ -687,6 +724,19 @@ class Ablation:
             )
         if cache is not None and Path(cache).exists() and not Path(cache).is_dir():
             raise ValueError(f"`cache=` must be a directory, but {str(cache)!r} is a file.")
+        if ci not in _INTERVALS:
+            raise ValueError(
+                f"`ci=` must be one of {', '.join(repr(c) for c in _INTERVALS)}; got {ci!r}."
+            )
+        if pass_as not in _PASS_AS:
+            raise ValueError(
+                f"`pass_as=` must be one of {', '.join(repr(p) for p in _PASS_AS)}; got "
+                f"{pass_as!r}."
+            )
+        if pass_as == "row_index" and isinstance(evaluate, _SklearnEvaluator):
+            raise ValueError(
+                '`sklearn_evaluator()` trains on the training table, so it needs `pass_as="table"`.'
+            )
 
         columns = nw.from_native(validation.data).collect_schema().names()
         if isinstance(control, Stratified):
@@ -707,6 +757,14 @@ class Ablation:
                 UserWarning,
                 stacklevel=2,
             )
+        elif ci == "bootstrap" and repeats < _BOOTSTRAP_MIN_REPEATS:
+            warnings.warn(
+                f'With `repeats={repeats}`, the intervals of `ci="bootstrap"` are too narrow (and '
+                "its verdicts too confident), as there are too few repeats to resample. Use at "
+                f'least {_BOOTSTRAP_MIN_REPEATS} repeats, or the default `ci="t"`.',
+                UserWarning,
+                stacklevel=2,
+            )
 
         self.validation = validation
         self.evaluate = evaluate
@@ -723,6 +781,16 @@ class Ablation:
         self.label = label
         self.evaluate_version = evaluate_version
         self.cache = Path(cache) if cache is not None else None
+        self.ci = ci
+        self.pass_as = pass_as
+        # The validation's steps, applied to the holdout set
+        self.holdout_validation: Validate | None = None
+        if holdout is not None:
+            try:
+                self.holdout_validation = validation.set_tbl(holdout).interrogate()
+            except Exception as e:
+                raise ValueError(f"The `holdout=` table couldn't be validated ({e}).") from e
+            self._holdout_n_rows = get_row_count(self.holdout_validation.data)
 
         self._n_rows = get_row_count(validation.data)
         self._steps = {step.i: step for step in steps}
@@ -1742,6 +1810,11 @@ class Ablation:
                 raise ValueError(
                     f"The values of `rates=` must be greater than 0 and at most 1, got {rate!r}."
                 )
+        if self.pass_as == "row_index":
+            raise ValueError(
+                "`inject()` changes the values of the table, which a list of row numbers can't "
+                'describe, so it needs `pass_as="table"`.'
+            )
         implementation = nw.from_native(self.validation.data).implementation
         if implementation.name.lower() not in _INJECT_IMPLEMENTATIONS:
             raise ValueError(
@@ -2600,6 +2673,8 @@ class Ablation:
             "max_removed": self.max_removed,
             "conf_level": self.conf_level,
             "adjust": self.adjust,
+            "ci": self.ci,
+            "pass_as": self.pass_as,
             "evaluate_version": self.evaluate_version,
             "n_rows": self._n_rows,
             "tbl_name": getattr(self.validation, "tbl_name", None),
@@ -2607,6 +2682,38 @@ class Ablation:
 
     def _full_variant(self) -> AblationVariant:
         return AblationVariant(id="full", strategy="full", name="Full table")
+
+    def _holdout_summary(self) -> dict[str, Any] | None:
+        """The results of the validation's steps on the holdout set (`None` without one)."""
+        if self.holdout_validation is None:
+            return None
+        steps = []
+        for info in self.holdout_validation.validation_info:
+            failed = info.eval_error or info.n is None
+            steps.append(
+                {
+                    "step": info.i,
+                    "n": None if failed else info.n,
+                    "n_failed": None if failed else info.n_failed,
+                    "f_failed": None if failed else info.f_failed,
+                }
+            )
+        return {
+            "n_rows": self._holdout_n_rows,
+            "health_score": self.holdout_validation.get_health_score(),
+            "steps": steps,
+        }
+
+    def _holdout_html(self) -> str:
+        """A line for the subtitle of a report, with the health score of the holdout set."""
+        summary = self._holdout_summary()
+        if summary is None:
+            return ""
+        return (
+            f"<div>Health score of the training table: "
+            f"<strong>{self.validation.get_health_score():.2f}</strong>; of the holdout set "
+            f"({summary['n_rows']:,} rows): <strong>{summary['health_score']:.2f}</strong>.</div>"
+        )
 
     def plan(self) -> GT:
         """
@@ -2720,6 +2827,8 @@ class Ablation:
             n_cached = sum(self._cache_get(self._task_key(v, r)) is not None for v, r in tasks)
             if n_cached:
                 subtitle += f" {n_cached:,} of them are already in the cache."
+        if self.holdout_validation is not None:
+            subtitle = f"<div>{subtitle}</div>{self._holdout_html()}"
         notes = resolved.notes
         gt_tbl = (
             _fmt_raw_html(
@@ -3333,7 +3442,8 @@ class Ablation:
         import pickle
 
         implementation = nw.from_native(self.validation.data).implementation
-        if implementation not in (
+        # (a list of row numbers can be sent to another process whatever the table is)
+        if self.pass_as == "table" and implementation not in (
             nw.Implementation.POLARS,
             nw.Implementation.PANDAS,
             nw.Implementation.PYARROW,
@@ -3341,7 +3451,8 @@ class Ablation:
             raise ValueError(
                 '`executor="process"` sends each training table to another process, which works '
                 "for Polars, pandas, and PyArrow tables, but not for this table "
-                f'({type(self.validation.data).__name__}). Use `executor="thread"` instead.'
+                f'({type(self.validation.data).__name__}). Use `executor="thread"` (or '
+                '`pass_as="row_index"`) instead.'
             )
         try:
             pickle.dumps(self.evaluate)
@@ -3361,7 +3472,13 @@ class Ablation:
         kwargs: dict[str, Any] = {"seed": seed}
         if self._pass_variant:
             kwargs["variant"] = variant
-        return self.evaluate(self._training_table(removed, self._injection(variant)), **kwargs)
+        return self.evaluate(self._training_input(variant, removed), **kwargs)
+
+    def _training_input(self, variant: AblationVariant, removed: frozenset[int]) -> Any:
+        """What `evaluate=` is given: the training table, or the numbers of its kept rows."""
+        if self.pass_as == "row_index":
+            return [k for k in range(self._n_rows) if k not in removed]
+        return self._training_table(removed, self._injection(variant))
 
     def _task_values(self, variant: AblationVariant, repeat: int) -> tuple[dict[str, float], bool]:
         """Evaluate a version of the table (or get the result from the cache)."""
@@ -3436,7 +3553,7 @@ class Ablation:
             if executor == "process":
                 future = pool.submit(
                     _worker_evaluate,
-                    self._training_table(removed, self._injection(variant)),
+                    self._training_input(variant, removed),
                     seed,
                     variant if self._pass_variant else None,
                 )
@@ -3601,9 +3718,16 @@ class Ablation:
     # Results
     # ------------------------------------------------------------------------------------------
 
+    def _bootstrap(self) -> list[list[int]] | None:
+        """The resamples of the repeats for `ci="bootstrap"` (the same for every comparison)."""
+        if self.ci != "bootstrap":
+            return None
+        return _bootstrap_resamples(self.repeats, self.seed)
+
     def _compute_effects(self) -> list[dict[str, Any]]:
         resolved = self._resolve()
         repeats = range(self.repeats)
+        resamples = self._bootstrap()
         rows = []
 
         def series(version_id: str, metric: str) -> list[float]:
@@ -3626,20 +3750,22 @@ class Ablation:
                 row = _effect_row(
                     variant, metric=metric, mean=statistics.fmean(values), sd=_sd(values)
                 )
-                _add_comparison(row, "vs_full", values, full, self.conf_level)
+                _add_comparison(row, "vs_full", values, full, self.conf_level, resamples)
                 control_id = resolved.variant_control.get(variant.id)
                 control = series(control_id, metric) if control_id is not None else None
                 if control is not None:
                     row["control_mean"] = statistics.fmean(control)
                 if variant.left_out is None:
                     if control is not None:
-                        _add_comparison(row, "vs_control", values, control, self.conf_level)
+                        _add_comparison(
+                            row, "vs_control", values, control, self.conf_level, resamples
+                        )
                 else:
                     # What the left-out step adds: removing every step's rows compared with
                     # removing the other steps' rows (plus as many random rows, with a control)
                     reference = series(resolved.references[variant.id], metric)
                     baseline = control if control is not None else values
-                    _add_comparison(row, "added", reference, baseline, self.conf_level)
+                    _add_comparison(row, "added", reference, baseline, self.conf_level, resamples)
                 variant_rows.append(row)
 
             normal = [
@@ -3746,7 +3872,7 @@ class Ablation:
             family = []
             for i in players:
                 mean, lower, upper, p = _paired(
-                    per_repeat[i], [0.0] * self.repeats, self.conf_level
+                    per_repeat[i], [0.0] * self.repeats, self.conf_level, self._bootstrap()
                 )
                 family.append(
                     {
@@ -4372,8 +4498,10 @@ class Ablation:
             [`get_effects()`](`pointblank.Ablation.get_effects`)), the Shapley values
             (`"shapley"`, with the same fields as the columns of
             [`get_shapley()`](`pointblank.Ablation.get_shapley`), or `None` without
-            [`shapley()`](`pointblank.Ablation.shapley`)), and the notes about variants and steps
-            that weren't used (`"notes"`).
+            [`shapley()`](`pointblank.Ablation.shapley`)), the notes about variants and steps
+            that weren't used (`"notes"`), and the results of the steps on the holdout set
+            (`"holdout"`, with its number of rows, its health score, and the number and share of
+            failing test units of each step, or `None` without `holdout=`).
 
         Examples
         --------
@@ -4434,6 +4562,7 @@ class Ablation:
                 else None
             ),
             "notes": [*self._notes, *resolved.notes],
+            "holdout": self._holdout_summary(),
         }
 
     def to_json(self, indent: int | None = 2) -> str:
@@ -4736,6 +4865,7 @@ class Ablation:
             subtitle += (
                 f"<div>Version of <code>evaluate</code>: {_esc(self.evaluate_version)}.</div>"
             )
+        subtitle += self._holdout_html()
         if metric != self._primary:
             subtitle += (
                 f"<div>Verdicts are based on {_esc(self._primary)}, so none are shown here.</div>"
@@ -4776,7 +4906,8 @@ class Ablation:
                 locations=loc.row_groups(),
             )
 
-        interval_note = f"Intervals are {self.conf_level:.0%} paired t-intervals" + (
+        kind = "bootstrap percentile intervals" if self.ci == "bootstrap" else "paired t-intervals"
+        interval_note = f"Intervals are {self.conf_level:.0%} {kind}" + (
             ", not adjusted for multiple comparisons; verdicts use Holm-adjusted p-values."
             if self.adjust == "holm"
             else "; verdicts use unadjusted p-values."
@@ -4926,13 +5057,19 @@ def _t_quantile(prob: float, df: int) -> float:
 
 
 def _paired(
-    values: list[float], reference: list[float], conf_level: float
+    values: list[float],
+    reference: list[float],
+    conf_level: float,
+    resamples: list[list[int]] | None = None,
 ) -> tuple[float, float | None, float | None, float | None]:
     """
-    Compare paired values: the mean difference, its t-interval, and the p-value of a paired t-test.
+    Compare paired values: the mean difference, its interval, and its p-value.
 
-    With one pair, there's no interval or p-value. When the differences are all the same, the
-    interval is that difference, and the p-value is 0 (or 1, if the difference is 0).
+    The interval and the p-value are those of a paired t-test or, with `resamples=` (from
+    `_bootstrap_resamples()`), the percentile interval of the bootstrap and the share of the
+    resampled means on the other side of zero. With one pair, there's no interval or p-value. When
+    the differences are all the same, the interval is that difference, and the p-value is 0 (or 1,
+    if the difference is 0).
     """
     diffs = [v - r for v, r in zip(values, reference)]
     mean = statistics.fmean(diffs)
@@ -4942,8 +5079,30 @@ def _paired(
     se = statistics.stdev(diffs) / math.sqrt(n)
     if se == 0:
         return mean, mean, mean, (0.0 if mean != 0 else 1.0)
+    if resamples is not None:
+        means = sorted(sum(diffs[k] for k in sample) / n for sample in resamples)
+        tail = (1 - conf_level) / 2
+        n_below = sum(1 for m in means if m <= 0)
+        n_above = sum(1 for m in means if m >= 0)
+        p = min(1.0, 2 * (min(n_below, n_above) + 1) / (len(means) + 1))
+        return mean, _quantile(means, tail), _quantile(means, 1 - tail), p
     half_width = _t_quantile(1 - (1 - conf_level) / 2, n - 1) * se
     return mean, mean - half_width, mean + half_width, _t_p_value(mean / se, n - 1)
+
+
+@functools.lru_cache(maxsize=4)
+def _bootstrap_resamples(n: int, seed: int) -> list[list[int]]:
+    """Resamples (with replacement) of `n` repeats, made the same way for the same seed."""
+    rng = random.Random(f"pointblank-ablation-bootstrap:{seed}:{n}")
+    return [[rng.randrange(n) for _ in range(n)] for _ in range(_BOOTSTRAP_RESAMPLES)]
+
+
+def _quantile(ordered: list[float], q: float) -> float:
+    """The `q` quantile of sorted values, interpolated between them (R's type 7)."""
+    h = (len(ordered) - 1) * q
+    below = math.floor(h)
+    above = min(below + 1, len(ordered) - 1)
+    return ordered[below] + (h - below) * (ordered[above] - ordered[below])
 
 
 def _holm(p_values: list[float | None]) -> list[float | None]:
@@ -4991,8 +5150,9 @@ def _add_comparison(
     values: list[float],
     reference: list[float],
     conf_level: float,
+    resamples: list[list[int]] | None = None,
 ) -> None:
-    delta, lower, upper, p = _paired(values, reference, conf_level)
+    delta, lower, upper, p = _paired(values, reference, conf_level, resamples)
     row[f"delta_{prefix}"] = delta
     row[f"delta_{prefix}_lower"] = lower
     row[f"delta_{prefix}_upper"] = upper
