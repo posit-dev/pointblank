@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING, Any
 
 import narwhals as nw
 
+from pointblank._report_text import ENGLISH, Localizer
+
 if TYPE_CHECKING:
     from great_tables import GT
 
@@ -528,7 +530,9 @@ class SplitCheck:
             "issues": list(self.issues),
         }
 
-    def get_tabular_report(self, title: str | None = None) -> GT:
+    def get_tabular_report(
+        self, title: str | None = None, lang: str | None = None, locale: str | None = None
+    ) -> GT:
         """
         Get a tabular report of the checks of the splits.
 
@@ -540,6 +544,14 @@ class SplitCheck:
         ----------
         title
             An optional title replacing the default.
+        lang
+            The language of the report's text, as a two-letter language code (e.g., `"fr"` or
+            `"de"`; see the `lang=` argument of [`Validate`](`pointblank.Validate`) for the
+            languages). By default, the report is in English. The names of the splits and the
+            columns, and the labels, are shown as they are.
+        locale
+            The locale for the numbers in the report (e.g., `"de-CH"`), which sets the decimal
+            mark and the thousands separator. By default, it's `lang=`.
 
         Returns
         -------
@@ -563,31 +575,42 @@ class SplitCheck:
         """
         from great_tables import GT, google_font, html, loc, style
 
+        from pointblank._report_text import msg, report_localizer
         from pointblank._utils_html import _fmt_raw_html
-        from pointblank.ablation import _esc, _note_html, _small, _title_html
+        from pointblank.ablation import _esc, _note_html, _rtl_styles, _small, _title_html
 
+        ctx = report_localizer(lang, locale)
         names = list(self.splits)
         first = names[0]
         rows: list[dict[str, str]] = []
 
-        compared = ", ".join(f"<code>{_esc(c)}</code>" for c in self.columns)
+        compared = ctx.list_sep.join(f"<code>{_esc(c)}</code>" for c in self.columns)
         for row in self.overlap:
             n = row["exact"] + (row["near"] or 0)
             status = "issue" if n else "ok"
-            detail = f"{row['exact']:,} the same"
+            detail = ctx.t("chk_same", n=row["exact"])
             if row["near"] is not None:
-                detail += f", {row['near']:,} nearly the same"
+                detail += ctx.list_sep + ctx.t("split_nearly_same", n=row["near"])
             rows.append(
                 {
-                    "group": "Overlap",
+                    "group": ctx.t("split_group_overlap"),
                     "check": (
-                        f"Rows of {_split(row['second'])} also in {_split(row['first'])}"
-                        + _small(f"compared on {compared}")
+                        ctx.t(
+                            "split_overlap_check",
+                            second=_split(row["second"]),
+                            first=_split(row["first"]),
+                        )
+                        + _small(ctx.t("chk_compared_on", columns=compared))
                     ),
                     "result": _result(
                         status,
-                        "LEAK" if n else "NONE",
-                        f"{n:,} of {row['n_second']:,} rows ({row['share']:.1%})",
+                        ctx.t("chk_badge_leak" if n else "chk_badge_none"),
+                        ctx.t(
+                            "chk_n_of_rows",
+                            count=n,
+                            total=row["n_second"],
+                            pct=ctx.pct(row["share"]),
+                        ),
                         detail,
                     ),
                 }
@@ -599,10 +622,14 @@ class SplitCheck:
                 counts = self.labels["counts"]
                 rows.append(
                     {
-                        "group": "Labels",
-                        "check": f"Labels of {_split(first)}" + _small(f"in {label_html}"),
+                        "group": ctx.t("split_group_labels"),
+                        "check": ctx.t("split_labels_check", split=_split(first))
+                        + _small(ctx.t("split_labels_in", label=label_html)),
                         "result": _result(
-                            "n/a", "BASE", _shares(counts[first]), f"{len(counts[first]):,} labels"
+                            "n/a",
+                            ctx.t("chk_badge_base"),
+                            _shares(counts[first], ctx),
+                            ctx.t("split_n_labels", n=len(counts[first])),
                         ),
                     }
                 )
@@ -612,40 +639,54 @@ class SplitCheck:
                     psi = self.labels["psi"][name]
                     problems = []
                     if missing:
-                        problems.append(f"missing {_esc(_listed(missing))}")
+                        problems.append(
+                            ctx.t("split_missing_labels", labels=_esc(_listed(missing, ctx)))
+                        )
                     if unseen:
-                        problems.append(f"unseen {_esc(_listed(unseen))}")
+                        problems.append(
+                            ctx.t("split_unseen_labels", labels=_esc(_listed(unseen, ctx)))
+                        )
                     level = _psi_level(psi)
                     if problems or level == "major":
-                        status, badge = "issue", "ISSUE"
+                        status, badge = "issue", "issue"
                     elif level == "moderate":
-                        status, badge = "moderate", "SHIFT"
+                        status, badge = "moderate", "shift"
                     else:
-                        status, badge = "ok", "OK"
-                    detail = "; ".join(problems + [_psi_text(psi)])
+                        status, badge = "ok", "ok"
+                    detail = ctx.clause_sep.join(problems + [_psi_text(psi, ctx)])
                     rows.append(
                         {
-                            "group": "Labels",
-                            "check": f"Labels of {_split(name)}"
-                            + _small(f"in {label_html}, compared with {_esc(first)}"),
-                            "result": _result(status, badge, _shares(counts[name]), detail),
+                            "group": ctx.t("split_group_labels"),
+                            "check": ctx.t("split_labels_check", split=_split(name))
+                            + _small(
+                                ctx.t(
+                                    "split_labels_in_compared", label=label_html, first=_esc(first)
+                                )
+                            ),
+                            "result": _result(
+                                status,
+                                ctx.t(f"chk_badge_{badge}"),
+                                _shares(counts[name], ctx),
+                                detail,
+                            ),
                         }
                     )
             else:
                 for row in self.labels["drift"]:
-                    rows.append({"group": "Labels", **_drift_row(row, first)})
+                    rows.append(
+                        {"group": ctx.t("split_group_labels"), **_drift_row(row, first, ctx)}
+                    )
 
         for row in self.drift:
-            rows.append({"group": "Drift", **_drift_row(row, first)})
+            rows.append({"group": ctx.t("split_group_drift"), **_drift_row(row, first, ctx)})
 
         n_issues = len(self.issues)
-        sizes = " · ".join(f"{_esc(name)}: {n:,} rows" for name, n in self.splits.items())
-        verdict = (
-            "<strong>No issues found.</strong>"
-            if not n_issues
-            else f"<strong>{n_issues:,} issue{'s' if n_issues != 1 else ''} found.</strong>"
+        sizes = " · ".join(
+            ctx.t("split_size", name=_esc(name), rows=msg("n_rows", n=n))
+            for name, n in self.splits.items()
         )
-        subtitle = f"<div>{sizes}</div><div>{verdict}</div>"
+        verdict = ctx.t("chk_n_issues", n=n_issues) if n_issues else ctx.t("chk_no_issues")
+        subtitle = f"<div>{sizes}</div><div><strong>{verdict}</strong></div>"
 
         gt_tbl = (
             _fmt_raw_html(
@@ -657,12 +698,14 @@ class SplitCheck:
                 columns=["check", "result"],
             )
             .tab_header(
-                title=html(_esc(title) if title is not None else _title_html("Split check", None)),
+                title=html(
+                    _esc(title) if title is not None else _title_html(ctx.t("split_title"), None)
+                ),
                 subtitle=html(subtitle),
             )
-            .cols_label(check="Check", result="Result")
+            .cols_label(check=ctx.t("chk_col_check"), result=ctx.t("chk_col_result"))
             .opt_table_font(font=google_font("IBM Plex Sans"))
-            .opt_align_table_header(align="left")
+            .opt_align_table_header(align="right" if ctx.rtl else "left")
             .tab_style(style=style.text(size="12px"), locations=loc.body())
             .tab_style(style=style.text(size="12px", weight="bold"), locations=loc.column_labels())
             .tab_style(
@@ -675,20 +718,30 @@ class SplitCheck:
         notes = []
         if self.near:
             notes.append(
-                f"Rows are nearly the same if the Jaccard similarity of their {self.ngram}-word "
-                f"n-grams is at least {self.threshold:g} (found with MinHash, with "
-                f"{self.num_perm} permutations)."
+                ctx.t(
+                    "split_near_note",
+                    ngram=self.ngram,
+                    threshold=ctx.marks(f"{self.threshold:g}"),
+                    num_perm=self.num_perm,
+                )
             )
         if self.drift or self.labels is not None:
             notes.append(
-                f"PSI is the population stability index of the shares of the values (binned by "
-                f"the deciles of {first!r}, for a numeric column): a change is moderate from "
-                f"{PSI_MODERATE:g} and major from {PSI_MAJOR:g}. KS is the Kolmogorov-Smirnov "
-                "statistic."
+                ctx.sentences(
+                    [
+                        ctx.t(
+                            "split_psi_note",
+                            first=repr(first),
+                            moderate=ctx.marks(f"{PSI_MODERATE:g}"),
+                            major=ctx.marks(f"{PSI_MAJOR:g}"),
+                        ),
+                        ctx.t("chk_ks_note"),
+                    ]
+                )
             )
         for note in notes:
             gt_tbl = gt_tbl.tab_source_note(source_note=html(_note_html(note)))
-        return gt_tbl
+        return _rtl_styles(gt_tbl, ctx)
 
     def _repr_html_(self) -> str:
         return self.get_tabular_report().as_raw_html()
@@ -804,18 +857,18 @@ def _psi_level(psi: float | None) -> str | None:
     return "moderate" if psi >= PSI_MODERATE else "stable"
 
 
-def _psi_text(psi: float | None) -> str:
-    return "too few values for PSI" if psi is None else f"PSI {psi:.3g}"
+def _psi_text(psi: float | None, ctx: Localizer = ENGLISH) -> str:
+    return ctx.t("chk_too_few_psi") if psi is None else f"PSI {ctx.marks(f'{psi:.3g}')}"
 
 
 def _json(value: Any) -> Any:
     return value if isinstance(value, (str, int, float, bool)) or value is None else str(value)
 
 
-def _listed(values: list[Any]) -> str:
-    shown = ", ".join(repr(_json(v)) for v in values[:_MAX_LISTED])
+def _listed(values: list[Any], ctx: Localizer = ENGLISH) -> str:
+    shown = ctx.list_sep.join(repr(_json(v)) for v in values[:_MAX_LISTED])
     if len(values) > _MAX_LISTED:
-        shown += f", and {len(values) - _MAX_LISTED:,} more"
+        shown = ctx.t("chk_listed_more", shown=shown, n=len(values) - _MAX_LISTED)
     return shown
 
 
@@ -917,43 +970,52 @@ def _result(status: str, badge: str, main: str, detail: str) -> str:
     from pointblank.ablation import _badge, _mono, _small
 
     color = _STATUS_COLORS[status]
+    from pointblank.ablation import _esc
+
     return (
-        f"<div style='white-space: nowrap;'>{_badge(badge, color)} {_mono(main)}</div>"
+        f"<div style='white-space: nowrap;'>{_badge(_esc(badge), color)} {_mono(main)}</div>"
         f"{_small(detail)}"
     )
 
 
-def _shares(counts: dict[Any, int]) -> str:
+def _shares(counts: dict[Any, int], ctx: Localizer = ENGLISH) -> str:
     from pointblank.ablation import _esc
 
     total = sum(counts.values())
     if not total:
-        return "no labels"
-    parts = [f"{_esc(_json(k))} {n / total:.0%}" for k, n in list(counts.items())[:_MAX_LISTED]]
+        return ctx.t("split_no_labels")
+    parts = [
+        f"{_esc(_json(k))} {ctx.pct(n / total, 0)}" for k, n in list(counts.items())[:_MAX_LISTED]
+    ]
     if len(counts) > _MAX_LISTED:
         parts.append("…")
     return " · ".join(parts)
 
 
-def _drift_row(row: dict[str, Any], first: str) -> dict[str, str]:
+def _drift_row(row: dict[str, Any], first: str, ctx: Localizer = ENGLISH) -> dict[str, str]:
     from pointblank.ablation import _esc, _small
 
     level = row["level"]
     status, badge = {
-        "major": ("issue", "MAJOR"),
-        "moderate": ("moderate", "MODERATE"),
-        "stable": ("ok", "STABLE"),
-        None: ("n/a", "N/A"),
+        "major": ("issue", "major"),
+        "moderate": ("moderate", "moderate"),
+        "stable": ("ok", "stable"),
+        None: ("n/a", "na"),
     }[level]
-    detail = row["kind"]
+    detail = ctx.t(f"chk_kind_{row['kind']}")
     if row["ks"] is not None:
-        detail += f"; KS {row['ks']:.3g} (p = {row['ks_p_value']:.3g})"
+        ks, p = ctx.marks(f"{row['ks']:.3g}"), ctx.marks(f"{row['ks_p_value']:.3g}")
+        detail += ctx.clause_sep + f"KS {ks} (p = {p})"
     return {
         "check": (
-            f"<code>{_esc(row['column'])}</code> in {_split(row['split'])}"
-            + _small(f"compared with {_esc(first)}")
+            ctx.t(
+                "split_drift_check",
+                column=f"<code>{_esc(row['column'])}</code>",
+                split=_split(row["split"]),
+            )
+            + _small(ctx.t("split_compared_with", first=_esc(first)))
         ),
-        "result": _result(status, badge, _psi_text(row["psi"]), detail),
+        "result": _result(status, ctx.t(f"chk_badge_{badge}"), _psi_text(row["psi"], ctx), detail),
     }
 
 

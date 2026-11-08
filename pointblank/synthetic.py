@@ -510,7 +510,9 @@ class SyntheticCheck:
             "issues": list(self.issues),
         }
 
-    def get_tabular_report(self, title: str | None = None) -> GT:
+    def get_tabular_report(
+        self, title: str | None = None, lang: str | None = None, locale: str | None = None
+    ) -> GT:
         """
         Get a tabular report of the checks of the synthetic data.
 
@@ -522,6 +524,14 @@ class SyntheticCheck:
         ----------
         title
             An optional title replacing the default.
+        lang
+            The language of the report's text, as a two-letter language code (e.g., `"fr"` or
+            `"de"`; see the `lang=` argument of [`Validate`](`pointblank.Validate`) for the
+            languages). By default, the report is in English. The names of the columns are shown
+            as they are.
+        locale
+            The locale for the numbers in the report (e.g., `"de-CH"`), which sets the decimal
+            mark and the thousands separator. By default, it's `lang=`.
 
         Returns
         -------
@@ -545,97 +555,131 @@ class SyntheticCheck:
         """
         from great_tables import GT, google_font, html, loc, style
 
+        from pointblank._report_text import msg, report_localizer
         from pointblank._utils_html import _fmt_raw_html
-        from pointblank.ablation import _esc, _note_html, _small, _title_html
+        from pointblank.ablation import _esc, _note_html, _rtl_styles, _small, _title_html
 
+        ctx = report_localizer(lang, locale)
         rows: list[dict[str, str]] = []
         for row in self.fidelity:
             status, badge = {
-                "major": ("issue", "MAJOR"),
-                "moderate": ("moderate", "MODERATE"),
-                "stable": ("ok", "STABLE"),
-                None: ("n/a", "N/A"),
+                "major": ("issue", "major"),
+                "moderate": ("moderate", "moderate"),
+                "stable": ("ok", "stable"),
+                None: ("n/a", "na"),
             }[row["level"]]
             if _missing_changed(row) and status != "issue":
-                status, badge = "issue", "MISSING"
-            detail = row["kind"]
+                status, badge = "issue", "missing"
+            details = [ctx.t(f"chk_kind_{row['kind']}")]
             if row["ks"] is not None:
-                detail += f"; KS {row['ks']:.3g} (p = {row['ks_p_value']:.3g})"
-            detail += (
-                f"; missing {row['missing_synthetic']:.1%} (the seed: {row['missing_seed']:.1%})"
+                ks, p = ctx.marks(f"{row['ks']:.3g}"), ctx.marks(f"{row['ks_p_value']:.3g}")
+                details.append(f"KS {ks} (p = {p})")
+            details.append(
+                ctx.t(
+                    "syn_missing_detail",
+                    synthetic=ctx.pct(row["missing_synthetic"]),
+                    seed=ctx.pct(row["missing_seed"]),
+                )
             )
             rows.append(
                 {
-                    "group": "Fidelity",
+                    "group": ctx.t("syn_group_fidelity"),
                     "check": f"<code>{_esc(row['column'])}</code>"
-                    + _small("compared with the seed"),
-                    "result": _result(status, badge, _psi_text(row["psi"]), detail),
+                    + _small(ctx.t("syn_compared_with_seed")),
+                    "result": _result(
+                        status,
+                        ctx.t(f"chk_badge_{badge}"),
+                        _psi_text(row["psi"], ctx),
+                        ctx.clause_sep.join(details),
+                    ),
                 }
             )
 
         synthetic, seed = self.duplicates["synthetic"], self.duplicates["seed"]
-        compared = ", ".join(f"<code>{_esc(c)}</code>" for c in self.columns)
+        compared = ctx.list_sep.join(f"<code>{_esc(c)}</code>" for c in self.columns)
         more = _more_duplicates(self.duplicates)
         rows.append(
             {
-                "group": "Diversity",
-                "check": "Rows that repeat an earlier row" + _small(f"compared on {compared}"),
+                "group": ctx.t("syn_group_diversity"),
+                "check": ctx.t("syn_repeats_check")
+                + _small(ctx.t("chk_compared_on", columns=compared)),
                 "result": _result(
                     "issue" if more else "ok",
-                    "MORE" if more else "OK",
-                    f"{synthetic['n']:,} of {self.rows['synthetic']:,} rows "
-                    f"({synthetic['share']:.1%})",
-                    f"the seed: {seed['n']:,} of {self.rows['seed']:,} rows ({seed['share']:.1%})",
+                    ctx.t("chk_badge_more" if more else "chk_badge_ok"),
+                    ctx.t(
+                        "chk_n_of_rows",
+                        count=synthetic["n"],
+                        total=self.rows["synthetic"],
+                        pct=ctx.pct(synthetic["share"]),
+                    ),
+                    ctx.t(
+                        "syn_seed_n_of_rows",
+                        count=seed["n"],
+                        total=self.rows["seed"],
+                        pct=ctx.pct(seed["share"]),
+                    ),
                 ),
             }
         )
         for row in self.diversity:
             if row["ratio"] is None:
-                status, badge = "n/a", "N/A"
+                status, badge = "n/a", "na"
             elif _less_diverse(row):
-                status, badge = "issue", "LOW"
+                status, badge = "issue", "low"
             else:
-                status, badge = "ok", "OK"
-            main = "no text" if row["synthetic"] is None else f"{row['synthetic']:.3g}"
-            detail = f"the seed: {'no text' if row['seed'] is None else format(row['seed'], '.3g')}"
-            if row["ratio"] is not None:
-                detail += f" ({row['ratio']:.0%} of it)"
-            detail += f"; on {row['rows']:,} rows of each"
+                status, badge = "ok", "ok"
+            no_text = ctx.t("syn_no_text")
+            main = no_text if row["synthetic"] is None else ctx.marks(f"{row['synthetic']:.3g}")
+            seed_value = no_text if row["seed"] is None else ctx.marks(f"{row['seed']:.3g}")
+            if row["ratio"] is None:
+                detail = ctx.t("syn_the_seed", value=seed_value)
+            else:
+                detail = ctx.t("syn_seed_ratio", value=seed_value, ratio=ctx.pct(row["ratio"], 0))
+            detail += ctx.clause_sep + ctx.t("syn_rows_of_each", n=row["rows"])
+            column = f"<code>{_esc(row['column'])}</code>"
             rows.append(
                 {
-                    "group": "Diversity",
-                    "check": f"Distinct-{row['n']} of <code>{_esc(row['column'])}</code>"
-                    + _small(f"the share of the {_GRAMS[row['n']]} that are distinct"),
-                    "result": _result(status, badge, main, detail),
+                    "group": ctx.t("syn_group_diversity"),
+                    "check": ctx.t("syn_distinct_check", k=str(row["n"]), column=column)
+                    + _small(ctx.t(f"syn_distinct_{row['n']}")),
+                    "result": _result(status, ctx.t(f"chk_badge_{badge}"), main, detail),
                 }
             )
 
         n = self.copies["exact"] + (self.copies["near"] or 0)
-        detail = f"{self.copies['exact']:,} the same"
-        on = f"compared on {compared}"
+        detail = ctx.t("chk_same", n=self.copies["exact"])
         if self.copies["near"] is not None:
-            detail += f", {self.copies['near']:,} with nearly the same text"
-            on += ", and on the text of " + ", ".join(f"<code>{_esc(c)}</code>" for c in self.text)
+            detail += ctx.list_sep + ctx.t("syn_nearly_same_text", n=self.copies["near"])
+            text = ctx.list_sep.join(f"<code>{_esc(c)}</code>" for c in self.text)
+            on = ctx.t("syn_compared_on_text", columns=compared, text=text)
+        else:
+            on = ctx.t("chk_compared_on", columns=compared)
         rows.append(
             {
-                "group": "Copies",
-                "check": "Synthetic rows that copy a seed row" + _small(on),
+                "group": ctx.t("syn_group_copies"),
+                "check": ctx.t("syn_copies_check") + _small(on),
                 "result": _result(
                     "issue" if n else "ok",
-                    "COPIES" if n else "NONE",
-                    f"{n:,} of {self.rows['synthetic']:,} rows ({self.copies['share']:.1%})",
+                    ctx.t("chk_badge_copies" if n else "chk_badge_none"),
+                    ctx.t(
+                        "chk_n_of_rows",
+                        count=n,
+                        total=self.rows["synthetic"],
+                        pct=ctx.pct(self.copies["share"]),
+                    ),
                     detail,
                 ),
             }
         )
 
         n_issues = len(self.issues)
-        sizes = f"synthetic: {self.rows['synthetic']:,} rows · seed: {self.rows['seed']:,} rows"
-        verdict = (
-            "<strong>No issues found.</strong>"
-            if not n_issues
-            else f"<strong>{n_issues:,} issue{'s' if n_issues != 1 else ''} found.</strong>"
+        sizes = " · ".join(
+            [
+                ctx.t("syn_size_synthetic", rows=msg("n_rows", n=self.rows["synthetic"])),
+                ctx.t("syn_size_seed", rows=msg("n_rows", n=self.rows["seed"])),
+            ]
         )
+        verdict = ctx.t("chk_n_issues", n=n_issues) if n_issues else ctx.t("chk_no_issues")
         gt_tbl = (
             _fmt_raw_html(
                 GT(_report_frame(rows), groupname_col="group", id="pb_synthetic_report"),
@@ -643,13 +687,13 @@ class SyntheticCheck:
             )
             .tab_header(
                 title=html(
-                    _esc(title) if title is not None else _title_html("Synthetic data check", None)
+                    _esc(title) if title is not None else _title_html(ctx.t("syn_title"), None)
                 ),
-                subtitle=html(f"<div>{sizes}</div><div>{verdict}</div>"),
+                subtitle=html(f"<div>{sizes}</div><div><strong>{verdict}</strong></div>"),
             )
-            .cols_label(check="Check", result="Result")
+            .cols_label(check=ctx.t("chk_col_check"), result=ctx.t("chk_col_result"))
             .opt_table_font(font=google_font("IBM Plex Sans"))
-            .opt_align_table_header(align="left")
+            .opt_align_table_header(align="right" if ctx.rtl else "left")
             .tab_style(style=style.text(size="12px"), locations=loc.body())
             .tab_style(style=style.text(size="12px", weight="bold"), locations=loc.column_labels())
             .tab_style(
@@ -662,31 +706,35 @@ class SyntheticCheck:
         notes = []
         if self.fidelity:
             notes.append(
-                f"PSI is the population stability index of the shares of the values (binned by "
-                f"the deciles of the seed, for a numeric column): a change is moderate from "
-                f"{PSI_MODERATE:g} and major from {PSI_MAJOR:g}. KS is the Kolmogorov-Smirnov "
-                f"statistic. A change of {MISSING_SHIFT * 100:g} percentage points or more in "
-                "the share of missing values is an issue."
+                ctx.sentences(
+                    [
+                        ctx.t(
+                            "syn_psi_note",
+                            moderate=ctx.marks(f"{PSI_MODERATE:g}"),
+                            major=ctx.marks(f"{PSI_MAJOR:g}"),
+                        ),
+                        ctx.t("chk_ks_note"),
+                        ctx.t("syn_missing_note", points=ctx.marks(f"{MISSING_SHIFT * 100:g}")),
+                    ]
+                )
             )
-        notes.append(
-            f"A share of repeated rows {DUPLICATE_SHIFT * 100:g} percentage points or more "
-            "above the seed's is an issue"
-            + (
-                f", as is a distinct-n below {MIN_DIVERSITY:.0%} of the seed's (measured on as "
-                "many rows of each table, sampled from the larger one)."
-                if self.text
-                else "."
-            )
-        )
+        points = ctx.marks(f"{DUPLICATE_SHIFT * 100:g}")
+        if self.text:
+            notes.append(ctx.t("syn_dup_note_text", points=points, share=ctx.pct(MIN_DIVERSITY, 0)))
+        else:
+            notes.append(ctx.t("syn_dup_note", points=points))
         if self.copies["near"] is not None:
             notes.append(
-                f"Texts are nearly the same if the Jaccard similarity of their {self.ngram}-word "
-                f"n-grams is at least {self.threshold:g} (found with MinHash, with "
-                f"{self.num_perm} permutations)."
+                ctx.t(
+                    "syn_near_note",
+                    ngram=self.ngram,
+                    threshold=ctx.marks(f"{self.threshold:g}"),
+                    num_perm=self.num_perm,
+                )
             )
         for note in notes:
             gt_tbl = gt_tbl.tab_source_note(source_note=html(_note_html(note)))
-        return gt_tbl
+        return _rtl_styles(gt_tbl, ctx)
 
     def _repr_html_(self) -> str:
         return self.get_tabular_report().as_raw_html()
@@ -702,8 +750,6 @@ class SyntheticCheck:
 # ----------------------------------------------------------------------------------------------
 # Helpers
 # ----------------------------------------------------------------------------------------------
-
-_GRAMS = {1: "words", 2: "pairs of words"}
 
 
 def _read_table(key: str, data: Any) -> Any:
