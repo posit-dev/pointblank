@@ -36602,7 +36602,7 @@ validation
 specs via [`MetadataImport.missing_specs()`](`pointblank.MetadataImport`). For a fuller treatment of
 structured-missingness *reporting*, see the *Missing Values Reporting* article.
 
-### Referential Integrity with `col_vals_in_table()`
+### Referential Integrity with `~~pointblank.Validate.col_vals_in_table()` {#referential-integrity-with-col_vals_in_table}
 
 When your data spans multiple tables, you often need to verify that foreign key values in one table
 actually exist in another. The [`col_vals_in_table()`](`Validate.col_vals_in_table`) method handles
@@ -36832,7 +36832,7 @@ These parameters all default to `True`, providing strict schema validation. Sett
 relaxes the validation requirements, making the checks more flexible when exact matching isn't
 necessary or practical for your use case.
 
-### Comparing Tables with `tbl_match()`
+### Comparing Tables with `~~pointblank.Validate.tbl_match()` {#comparing-tables-with-tbl_match}
 
 The [`Validate.tbl_match()`](`Validate.tbl_match`) validation method provides a comprehensive way to verify that two
 tables are identical. It performs a progressive series of checks, from least to most stringent:
@@ -40418,7 +40418,7 @@ include this step when using assertions directly.
 In addition to assertion methods that raise exceptions, Pointblank provides status check methods
 that return boolean values:
 
-### `all_passed()`
+### `~~pointblank.Validate.all_passed()` {#all_passed}
 
 The [`Validate.all_passed()`](`Validate.all_passed`) method will return `True` only if every single test unit in every
 validation step passed:
@@ -41289,7 +41289,7 @@ validation.to_json_schema(path="schemas/small_table.schema.json")
 This is useful for checking schemas into version control or feeding them into downstream tooling
 that consumes JSON Schema files.
 
-### Relationship to `export_contract()`
+### Relationship to `~~pointblank.export_contract()` {#relationship-to-export_contract}
 
 Under the hood, `to_json_schema()` delegates to the
 [`export_contract()`](`pointblank.export_contract`) function with `format="json_schema"`. The
@@ -51060,7 +51060,7 @@ class, covered in the next guide page):
 - `"raise"`: raise a `RuntimeError` (halts execution)
 - `"log"`: log via the `pointblank.contract` logger
 
-## Using `to_validate()` for Custom Workflows
+## Using `~~pointblank.Contract.to_validate()` for Custom Workflows {#using-to_validate-for-custom-workflows}
 
 If you need more control, [`to_validate()`](`Contract.to_validate`) gives you back an
 un-interrogated `Validate` object that you can extend with additional checks:

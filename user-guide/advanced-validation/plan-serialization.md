@@ -239,7 +239,7 @@ validation.to_json_schema(path="schemas/small_table.schema.json")
 
 This is useful for checking schemas into version control or feeding them into downstream tooling that consumes JSON Schema files.
 
-### Relationship to `export_contract()`
+### Relationship to [export_contract()](../../reference/export_contract.md#pointblank.export_contract)
 
 Under the hood, [to_json_schema()](../../reference/Validate.to_json_schema.md#pointblank.Validate.to_json_schema) delegates to the [`export_contract()`](../../reference/export_contract.md#pointblank.export_contract) function with `format="json_schema"`. The convenience method adds type enrichment from the data and handles file output. If you need the raw adapter behavior (for example, to export without type enrichment, or to work with a [Contract](../../reference/Contract.md#pointblank.Contract) object rather than a [Validate](../../reference/Validate.md#pointblank.Validate) object), use [export_contract()](../../reference/export_contract.md#pointblank.export_contract) directly. See the [Importing and Exporting Contracts](../contracts-and-pipelines/importing-contracts.md) guide for the full story on contract adapters.
 

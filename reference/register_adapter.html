@@ -2103,7 +2103,7 @@ If no name is given and the class has an empty <code>format_name</code> attribut
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose a team keeps a simple list of required columns in a dictionary with a <code>required_columns</code> key. A minimal adapter for this format only needs to say how to recognize it and how to turn it into a <a href="../reference/ContractImport.html#pointblank.ContractImport" class="gdls-link"><code>ContractImport</code></a>. Since this adapter can’t export, it sets <code>supports_export = False</code>.</p>
-<div id="cd40c992" class="cell" data-execution_count="2">
+<div id="bca9b298" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.adapters <span class="im">import</span> MappedConstraint</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2129,7 +2129,7 @@ If no name is given and the class has an empty <code>format_name</code> attribut
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        )</span></code></pre></div>
 </div>
 <p>The new format now appears next to the built-in ones in <a href="../reference/list_adapters.html#pointblank.list_adapters" class="gdls-link gdls-code">list_adapters()</a>.</p>
-<div id="5b5084f8" class="cell" data-execution_count="3">
+<div id="f154c482" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, info <span class="kw">in</span> pb.list_adapters().items():</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:&lt;18}</span><span class="ss"> import=</span><span class="sc">{</span>info[<span class="st">'supports_import'</span>]<span class="sc">}</span><span class="ss">  export=</span><span class="sc">{</span>info[<span class="st">'supports_export'</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2141,7 +2141,7 @@ required_columns   import=True  export=False</code></pre>
 </div>
 </div>
 <p>And it can be used with <a href="../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a>, either by name or (since it implements <a href="../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a>) by letting the format be detected from the content.</p>
-<div id="9f181c8f" class="cell" data-execution_count="4">
+<div id="1818c694" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>imported <span class="op">=</span> pb.import_contract({<span class="st">"required_columns"</span>: [<span class="st">"id"</span>, <span class="st">"email"</span>]})</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>imported.constraints</span></code></pre></div>
@@ -2151,7 +2151,7 @@ required_columns   import=True  export=False</code></pre>
 </div>
 </div>
 <p>Exporting to this format isn’t possible, so <a href="../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a> raises an error that says so.</p>
-<div id="15637996" class="cell" data-execution_count="5">
+<div id="f86f0cdc" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>contract <span class="op">=</span> pb.Contract(name<span class="op">=</span><span class="st">"users"</span>, steps<span class="op">=</span>[pb.Step(<span class="st">"col_vals_not_null"</span>, columns<span class="op">=</span><span class="st">"id"</span>)])</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
