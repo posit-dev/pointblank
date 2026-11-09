@@ -204,6 +204,63 @@ class AblationVariant:
     checked_by
         For a variant of `inject()`, the step that checks for the defect, given as its `step=`
         (otherwise `None`).
+
+    Examples
+    --------
+    Here's a table of temperature readings, some of them recorded in tenths of a degree (so
+    they're ten times too high). The `evaluate()` function takes the `variant=` argument and keeps
+    a log of each call, as a real function might do to name the files that its models are saved
+    to.
+
+    ```{python}
+    import pointblank as pb
+    import polars as pl
+
+    temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+    for k in range(0, 300, 25):
+        temps[k] *= 10
+    readings = pl.DataFrame({"temp": temps})
+
+    calls = []
+
+    def evaluate(train, *, seed, variant):
+        calls.append(
+            {
+                "id": variant.id,
+                "strategy": variant.strategy,
+                "n_removed": variant.n_removed,
+                "is_control": variant.is_control,
+                "seed": seed,
+                "n_rows": train.height,
+            }
+        )
+        sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+        return abs(sample["temp"].mean() - 20)
+
+    validation = (
+        pb.Validate(data=readings)
+        .col_vals_between(columns="temp", left=-10, right=45)
+        .interrogate()
+    )
+
+    ablation = pb.Ablation(
+        validation, evaluate=evaluate, metric="error", higher_is_better=False, repeats=3
+    ).drop_each()
+    ablation.run()
+
+    pl.DataFrame(calls)
+    ```
+
+    The function was called three times (once for each repeat, with the seeds `0`, `1`, and `2`)
+    for each of the three versions of the table: the full table (`"full"`), the variant of
+    `drop_each()` that removes the 12 rows failing step 1 (`"step_1"`), and its control, which
+    removes 12 random rows (`"control_12"`). The variant and its control both train on 288 rows,
+    so the training table alone can't tell them apart, but `variant=` can. The variant always
+    removes the same rows, while the control draws a new set of random rows for each repeat.
+
+    See Also
+    --------
+    Ablation : Measure how the rows that fail validation steps affect a model trained on the data.
     """
 
     id: str
@@ -375,44 +432,91 @@ class Stratified:
     pb.config(report_incl_header=False, report_incl_footer_timings=False)
     ```
 
-    Here's a table of temperature readings from two sensors, where sensor `"b"` has a third of the
-    readings and some of its readings are out of range. The 'model' estimates the average
-    temperature, which is `20` degrees.
+    Here's a table of temperature readings from two sensors in different places: sensor `"a"` has
+    two thirds of the readings and reads about 20 degrees, while sensor `"b"` has the other third
+    and reads about 40 degrees. One reading in ten comes from a device that was never calibrated
+    (`calibrated_on` is missing), and those read 1.5 degrees too high. The 'model' estimates the
+    average temperature across both sensors, and it's evaluated by its error against the true
+    average of the calibrated readings. It's deterministic, so the only randomness in the ablation
+    is in the rows that the controls remove.
 
     ```{python}
     import pointblank as pb
     import polars as pl
 
-    temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
-    for k in range(2, 300, 24):
-        temps[k] *= 10
-    readings = pl.DataFrame(
-        {"sensor": ["a", "a", "b"] * 100, "temp": temps}
-    )
+    sensors = ["a", "a", "b"] * 100
+    calibrated_on = [None if k % 10 == 3 else "2026-03-01" for k in range(300)]
+    temps = [
+        (20 if s == "a" else 40) + (k * 37 % 11 - 5) * 0.6 + (1.5 if c is None else 0)
+        for k, (s, c) in enumerate(zip(sensors, calibrated_on))
+    ]
+    readings = pl.DataFrame({"sensor": sensors, "calibrated_on": calibrated_on, "temp": temps})
+    true_average = readings.drop_nulls()["temp"].mean()
 
     def evaluate(train, *, seed):
-        sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
-        return abs(sample["temp"].mean() - 20)
+        return abs(train["temp"].mean() - true_average)
 
     validation = (
         pb.Validate(data=readings)
-        .col_vals_between(columns="temp", left=-10, right=45)
+        .col_vals_not_null(columns="calibrated_on")
         .interrogate()
     )
 
-    ablation = pb.Ablation(
-        validation,
-        evaluate=evaluate,
-        metric="error",
-        higher_is_better=False,
-        control=pb.ablation.Stratified(by="sensor"),
-    ).drop_each()
+    def ablate(control):
+        return (
+            pb.Ablation(
+                validation,
+                evaluate=evaluate,
+                metric="error",
+                higher_is_better=False,
+                control=control,
+            )
+            .drop_each()
+            .run()
+        )
 
-    ablation.plan()
+    stratified = ablate(pb.ablation.Stratified(by="sensor"))
+    stratified
     ```
 
-    The control removes as many rows as the variant, two thirds of them from sensor `"a"` and one
-    third from sensor `"b"`, whatever the variant removes.
+    Removing the 30 uncalibrated readings helps. Each repeat of the control removes 30 random
+    readings, always 20 from sensor `"a"` and 10 from sensor `"b"`, so the control has the same
+    mix of sensors as the full table. Here's the same ablation with the default control, which
+    removes 30 readings from anywhere in the table:
+
+    ```{python}
+    pl.concat(
+        [
+            ablation.get_effects()
+            .filter(pl.col("variant") == "step_1")
+            .select(
+                pl.lit(name).alias("control"),
+                "control_mean",
+                "delta_vs_control",
+                "delta_vs_control_lower",
+                "delta_vs_control_upper",
+                "verdict",
+            )
+            for name, ablation in [
+                ("size_matched", ablate("size_matched")),
+                ("stratified", stratified),
+            ]
+        ]
+    )
+    ```
+
+    The default control's random draws take a different number of readings from each sensor in
+    each repeat, and since the sensors read 20 degrees apart, that alone moves the average. The
+    noise widens the interval to about [−0.23, +0.003], which includes zero, so the verdict is
+    inconclusive. The stratified control removes that source of noise, and its interval of about
+    [−0.19, −0.09] is narrow enough for the verdict to be that the step helps. Stratifying is
+    worth it when the groups differ in what the model learns from them: with groups that are much
+    alike, it makes little difference.
+
+    See Also
+    --------
+    Ablation : Measure how the rows that fail validation steps affect a model trained on the data.
+    Ablation.drop_groups : Remove the rows of each group, one group at a time.
     """
 
     by: str | list[str] | tuple[str, ...]
@@ -901,9 +1005,11 @@ class Ablation:
         pb.config(report_incl_header=False, report_incl_footer_timings=False)
         ```
 
-        Here's a table of temperature readings with some out-of-range values, checked against two
-        different ranges. The 'model' estimates the average temperature and is evaluated by its
-        error against the true average of `20`.
+        Here's a table of temperature readings with two kinds of bad readings: some were recorded
+        in tenths of a degree (so they're ten times too high), and some are the error code `-40`
+        that the sensor reports when it fails. Step 1 checks for readings that are too high, and
+        step 2 for readings that are too low. The 'model' estimates the average temperature and is
+        evaluated by its error against the true average of `20`.
 
         ```{python}
         import pointblank as pb
@@ -912,6 +1018,8 @@ class Ablation:
         temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
         for k in range(0, 300, 25):
             temps[k] *= 10
+        for k in range(7, 300, 40):
+            temps[k] = -40
         readings = pl.DataFrame({"temp": temps})
 
         def evaluate(train, *, seed, variant):
@@ -920,20 +1028,34 @@ class Ablation:
 
         validation = (
             pb.Validate(data=readings)
-            .col_vals_between(columns="temp", left=-10, right=45)
             .col_vals_lt(columns="temp", value=100)
+            .col_vals_gt(columns="temp", value=-30)
             .interrogate()
         )
 
-        ablation = pb.Ablation(
-            validation, evaluate=evaluate, metric="error", higher_is_better=False
-        ).drop_steps([1, 2], name="Range checks")
+        ablation = (
+            pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+            .drop_each()
+            .drop_steps([1, 2], name="Both range checks")
+            .run()
+        )
 
-        ablation.plan()
+        ablation
         ```
 
-        The plan has the full table, the one variant (removing the rows that failed either
-        step), and its control, which removes the same number of rows at random.
+        Removing the readings in tenths (step 1) helps, and removing them along with the error
+        codes (`"Both range checks"`) also helps, giving the lowest error: less than a tenth of a
+        degree, down from about 6 degrees. But removing only the error codes (step 2) is
+        inconclusive, with an interval that includes zero. The readings in tenths pull the average
+        up while the error codes pull it down, so they partly offset each other: without the error
+        codes, the readings in tenths pull the average up even more. The effect of a combination
+        of steps isn't the sum of the effects of its steps, which is why it's worth testing
+        combinations like this one.
+
+        See Also
+        --------
+        Ablation.drop_each : Remove the rows failing each step, one step at a time.
+        Ablation.drop_all : Remove the rows failing any step.
         """
         steps = self._check_steps(steps, method="drop_steps")
         text = None
@@ -980,9 +1102,11 @@ class Ablation:
         pb.config(report_incl_header=False, report_incl_footer_timings=False)
         ```
 
-        Here's a table of temperature readings with out-of-range and missing values. The 'model'
-        estimates the average temperature, ignoring missing readings, and is evaluated by its error
-        against the true average of `20`.
+        Here's a table of temperature readings with missing values and with readings that were
+        recorded in tenths of a degree (so they're ten times too high). The 'model' estimates the
+        average temperature, ignoring missing readings, and is evaluated by its error against the
+        true average of `20`. The validation has a step for each problem, and a third step that
+        flags readings below `19` degrees as suspect.
 
         ```{python}
         import pointblank as pb
@@ -1003,18 +1127,34 @@ class Ablation:
             pb.Validate(data=readings)
             .col_vals_not_null(columns="temp")
             .col_vals_between(columns="temp", left=-10, right=45, na_pass=True)
+            .col_vals_gt(columns="temp", value=19, na_pass=True)
             .interrogate()
         )
 
-        ablation = pb.Ablation(
-            validation, evaluate=evaluate, metric="error", higher_is_better=False
-        ).drop_each()
+        ablation = (
+            pb.Ablation(
+                validation, evaluate=evaluate, metric="error", higher_is_better=False, repeats=10
+            )
+            .drop_each()
+            .run()
+        )
 
-        ablation.plan()
+        ablation
         ```
 
-        There's a variant for each step. The two variants remove different numbers of rows, so
-        each has its own control.
+        Each step tells a different story. Removing the missing readings (step 1) is
+        inconclusive, since the model ignores them anyway. Removing the readings in tenths (step 2)
+        helps a lot. And removing the readings below `19` degrees (step 3) hurts: they're good
+        readings, and without them the estimate is too high. Step 3 is too strict for this model,
+        and it removes about a third of the rows. Each variant removes a different number of rows,
+        so each has its own control. With so few rows removed by steps 1 and 2, the ablation uses
+        `repeats=10` to measure the effects precisely enough.
+
+        See Also
+        --------
+        Ablation.drop_all_but_each : Remove the rows failing every step but one, for each step.
+        Ablation.drop_all : Remove the rows failing any step.
+        Ablation.shapley : Share the effect of the validation among its steps.
         """
         if steps is None:
             steps = self._all_steps(method="drop_each")
@@ -1057,8 +1197,12 @@ class Ablation:
         pb.config(report_incl_header=False, report_incl_footer_timings=False)
         ```
 
-        Here's a table of temperature readings with out-of-range and missing values, validated
-        with a step for each problem.
+        Here's a table of temperature readings with missing values and with readings that were
+        recorded in tenths of a degree (so they're ten times too high). The 'model' estimates the
+        average temperature, ignoring missing readings, and is evaluated by its error against the
+        true average of `20`. The validation has a step for each problem, and a third step that
+        flags readings below `19` degrees as suspect. The ablation tests the validation as a
+        whole, and then only its first two steps.
 
         ```{python}
         import pointblank as pb
@@ -1079,17 +1223,33 @@ class Ablation:
             pb.Validate(data=readings)
             .col_vals_not_null(columns="temp")
             .col_vals_between(columns="temp", left=-10, right=45, na_pass=True)
+            .col_vals_gt(columns="temp", value=19, na_pass=True)
             .interrogate()
         )
 
-        ablation = pb.Ablation(
-            validation, evaluate=evaluate, metric="error", higher_is_better=False
-        ).drop_all()
+        ablation = (
+            pb.Ablation(
+                validation, evaluate=evaluate, metric="error", higher_is_better=False, repeats=10
+            )
+            .drop_all()
+            .drop_all(steps=[1, 2])
+            .run()
+        )
 
-        ablation.plan()
+        ablation
         ```
 
-        The one variant removes the 20 rows that failed either step.
+        The validation as a whole helps: removing the 121 rows that failed any step lowers the
+        error from about 7.3 degrees to about 1.2. But the validation does even better without its
+        third step: removing only the 20 rows that failed steps 1 or 2 lowers the error to less
+        than a tenth of a degree. A validation that helps can still have steps that hurt, and
+        [`drop_each()`](`pointblank.Ablation.drop_each`) shows which ones they are.
+
+        See Also
+        --------
+        Ablation.drop_each : Remove the rows failing each step, one step at a time.
+        Ablation.drop_all_but_each : Remove the rows failing every step but one, for each step.
+        Ablation.drop_steps : Remove the rows failing any of the given steps.
         """
         if steps is None:
             steps = self._all_steps(method="drop_all")
@@ -1192,6 +1352,12 @@ class Ablation:
         Both steps help on their own. On top of step 2, step 1 still helps, since it removes the
         bad readings that step 2 misses. But step 2 is redundant: every row it finds also fails
         step 1, so leaving it out removes the same rows as using both steps.
+
+        See Also
+        --------
+        Ablation.drop_each : Remove the rows failing each step, one step at a time.
+        Ablation.drop_all : Remove the rows failing any step.
+        Ablation.shapley : Share the effect of the validation among its steps.
         """
         if steps is None:
             base = self._all_steps(method="drop_all_but_each")
@@ -1290,6 +1456,10 @@ class Ablation:
 
         Removing the readings of sensor `"c"` helps, while removing either of the other sensors
         hurts, since it leaves a larger share of the readings from sensor `"c"`.
+
+        See Also
+        --------
+        ablation.Stratified : Draw the rows of controls in proportion to groups of rows.
         """
         if not isinstance(column, str):
             raise TypeError(f"`column=` must be a column name, got {type(column).__name__}.")
@@ -1428,6 +1598,10 @@ class Ablation:
         Removing the lowest-scoring 4% of the rows takes out every bad reading, and the curve below
         the report shows the error dropping to near zero there. Removing more rows than that makes
         no further difference.
+
+        See Also
+        --------
+        Ablation.sweep_step : Vary a parameter of a step, removing the rows that fail it.
         """
         from pointblank.validate import _has_kept_scores
 
@@ -1618,6 +1792,16 @@ class Ablation:
         A limit of `50` removes every bad reading. A limit of `21` also removes many good readings
         (the warmer ones), which leaves the average too low, and the limits of `190` and `220` miss
         some of the bad readings.
+
+        Every limit gets the verdict that it helps, though, since each verdict compares a point of
+        the sweep with its own control (removing as many random rows), not with the other points.
+        Even the limit of `21` does better than removing 117 random rows, which would leave most of
+        the bad readings in. To pick a limit, compare the points' metrics with each other, as the
+        curve below the report does: the error is lowest at `50`.
+
+        See Also
+        --------
+        Ablation.sweep_score : Remove the rows on the wrong side of each cutoff of a score.
         """
         from pointblank.validate import Validate, _validation_info_to_step
 
@@ -1788,7 +1972,15 @@ class Ablation:
 
         Each missing reading pulls the estimate down, so the error grows with the share of
         missing readings, by about 0.2 degrees for each percent. That's the cost of a failing
-        test unit of step 1, which `suggest_thresholds()` uses.
+        test unit of step 1, which
+        [`suggest_thresholds()`](`pointblank.Ablation.suggest_thresholds`) uses. Making 5% or 10%
+        of the readings missing clearly hurts, but the verdict for 1% is inconclusive: its effect
+        (about 0.14 degrees) is small next to the noise of the bootstrapped estimate. A small
+        effect needs more `repeats=` to be measured.
+
+        See Also
+        --------
+        Ablation.suggest_thresholds : Suggest thresholds from what failing test units cost.
         """
         if isinstance(corruption, str):
             if corruption not in _CORRUPTIONS:
@@ -2067,6 +2259,11 @@ class Ablation:
         gets all the credit for the readings in tenths of a degree, which only it catches, so its
         Shapley value is the larger one. As the note at the bottom says, the two values add up to
         the effect of removing the rows of both steps.
+
+        See Also
+        --------
+        Ablation.get_shapley : Get the Shapley values of the steps as a table.
+        Ablation.drop_all_but_each : Remove the rows failing every step but one, for each step.
         """
         if seed is None:
             seed = self.seed
@@ -2842,6 +3039,10 @@ class Ablation:
 
         No row failed step 3, so it has no variant, as the note says. With 10 repeats of the full
         table, two variants, and two controls, the run will make 50 evaluations.
+
+        See Also
+        --------
+        Ablation.run : Evaluate the full table, each variant, and each control.
         """
         from great_tables import GT, google_font, html, loc, style
 
@@ -2987,9 +3188,10 @@ class Ablation:
         pb.config(report_incl_header=False, report_incl_footer_timings=False)
         ```
 
-        Here's an ablation of a table of temperature readings with some out-of-range values. The
-        `evaluate()` function also returns the number of rows it was given, which is a second
-        metric in the results.
+        Here's an ablation of a table of temperature readings, some of them recorded in tenths of
+        a degree. The `evaluate()` function also returns the number of rows it was given, which is
+        a second metric in the results. With `max_workers=4`, the run makes four evaluations at a
+        time.
 
         ```{python}
         import pointblank as pb
@@ -3019,8 +3221,40 @@ class Ablation:
         ablation
         ```
 
-        After the run, the `Ablation` object shows its report. The report shows the metric named
-        in `metric=`; the other metrics are in the results of `get_effects()`.
+        After the run, the `Ablation` object shows its report, for the metric named in `metric=`.
+        Removing the 12 readings in tenths helps. The other metric has a report of its own, from
+        `get_tabular_report(metric="n_train")`, and both are in the results of
+        [`get_effects()`](`pointblank.Ablation.get_effects`):
+
+        ```{python}
+        ablation.get_effects().select("variant", "metric", "mean", "delta_vs_control", "verdict")
+        ```
+
+        The full table has 300 rows, and the variant and its control have 288. There's no verdict
+        for `n_train`, since verdicts are only for the metric in `metric=`.
+
+        Making the evaluations at the same time doesn't change the results, since each evaluation
+        gets the same table and seed either way. Here's the same ablation, run one evaluation after
+        another:
+
+        ```{python}
+        serial = (
+            pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+            .drop_each()
+            .run()
+        )
+
+        serial.get_effects().equals(ablation.get_effects())
+        ```
+
+        The results are identical. Making evaluations at the same time pays off when each one
+        takes a while (e.g., training a real model), and when they don't already use every core.
+
+        See Also
+        --------
+        Ablation.plan : Show the versions of the table that the ablation will evaluate.
+        Ablation.check_determinism : Check that `evaluate=` gives the same result twice.
+        Ablation.get_effects : Get the results of the ablation as a table.
         """
         if self.evaluate is None:
             raise ValueError(
@@ -3113,6 +3347,10 @@ class Ablation:
         ```
 
         Passing `seed=seed` to `sample()` would fix it, and the check would then return `True`.
+
+        See Also
+        --------
+        Ablation.run : Evaluate the full table, each variant, and each control.
         """
         if self.evaluate is None:
             raise ValueError("There's no `evaluate=` function to check.")
@@ -3241,6 +3479,10 @@ class Ablation:
 
         The template has a row for each of the 15 evaluations (5 repeats of the full table, the
         variant, and its control), each with the seed to train with.
+
+        See Also
+        --------
+        Ablation.load_results : Read the results of evaluations made elsewhere.
         """
         if format not in _EXPORT_FORMATS:
             raise ValueError(
@@ -3415,6 +3657,10 @@ class Ablation:
 
         The results were found in the directory, next to the manifest, and the report is the same
         as a run with the same evaluations would give.
+
+        See Also
+        --------
+        Ablation.export : Write out the versions of the table, for training them elsewhere.
         """
         resolved = self._check_variants()
         tasks = self._tasks()
@@ -4051,6 +4297,10 @@ class Ablation:
 
         The validation report now has a note on each step, with the change in the error from
         removing its failing rows and the verdict.
+
+        See Also
+        --------
+        Ablation.get_tabular_report : Get a tabular report of the ablation's results.
         """
         from pointblank.validate import Validate
 
@@ -4238,6 +4488,11 @@ class Ablation:
 
         Removing the 12 rows that failed step 1 lowers the error by about 7 degrees compared
         with removing 12 random rows, so the verdict is that the step helps.
+
+        See Also
+        --------
+        Ablation.get_tabular_report : Get a tabular report of the ablation's results.
+        Ablation.get_shapley : Get the Shapley values of the steps as a table.
         """
         self._check_run()
         rows = self._effects
@@ -4343,6 +4598,11 @@ class Ablation:
 
         Both steps lower the error, and step 2 gets the larger share, since it also catches the
         readings that step 1 misses.
+
+        See Also
+        --------
+        Ablation.shapley : Split the effect of removing the steps' rows fairly among the steps.
+        Ablation.get_effects : Get the results of the ablation as a table.
         """
         self._check_run()
         if self._shapley_values is None:
@@ -4454,7 +4714,15 @@ class Ablation:
         ```
 
         Each percent of missing readings adds about 0.2 degrees to the error, so the error
-        threshold is the share of missing readings that adds 0.5 degrees: about 2.5%.
+        threshold is the share of missing readings that adds 0.5 degrees: about 2.5%. The warning
+        threshold is half of that. The verdict for the rate of 1% is inconclusive (its effect is
+        small next to the noise), but the slope is fitted over all three rates, and the other two
+        clearly hurt. A suggestion needs at least one rate that hurts, so for a defect with small
+        effects, use rates high enough to measure, or more `repeats=`.
+
+        See Also
+        --------
+        Ablation.inject : Add a variant for each rate of a defect, put into clean rows of the table.
         """
         from pointblank.thresholds import Thresholds
 
@@ -4623,6 +4891,10 @@ class Ablation:
 
         Each run records the version of the table, the repeat, the seed, the metrics, and whether
         the result came from the cache, so the runs can be stored and analyzed again later.
+
+        See Also
+        --------
+        Ablation.to_json : Get the settings and results of the ablation as a JSON string.
         """
         self._check_run()
         resolved = self._resolve()
@@ -4705,6 +4977,10 @@ class Ablation:
 
         The settings record everything needed to repeat the ablation with the same `evaluate()`
         function, including the seed.
+
+        See Also
+        --------
+        Ablation.to_dict : Get the settings and results of the ablation as a JSON-serializable dict.
         """
         return json.dumps(self.to_dict(), indent=indent)
 
@@ -4766,7 +5042,11 @@ class Ablation:
         pb.config(report_incl_header=False, report_incl_footer_timings=False)
         ```
 
-        Here's an ablation of a table of temperature readings with out-of-range and missing values.
+        Here's an ablation of a table of temperature readings with missing values and with
+        readings that were recorded in tenths of a degree (so they're ten times too high). The
+        'model' estimates the average temperature, ignoring missing readings. The `evaluate()`
+        function returns two metrics: the error against the true average of `20`, which the
+        verdicts are based on, and the estimate itself.
 
         ```{python}
         import pointblank as pb
@@ -4781,7 +5061,8 @@ class Ablation:
 
         def evaluate(train, *, seed, variant):
             sample = train.drop_nulls().sample(fraction=1.0, with_replacement=True, seed=seed)
-            return abs(sample["temp"].mean() - 20)
+            estimate = sample["temp"].mean()
+            return {"error": abs(estimate - 20), "estimate": estimate}
 
         validation = (
             pb.Validate(data=readings)
@@ -4799,8 +5080,23 @@ class Ablation:
         ablation.get_tabular_report(title="Which checks matter for the temperature model?")
         ```
 
-        Removing the readings that are out of range (step 2) helps, while removing the missing
-        readings (step 1) makes no clear difference.
+        Removing the readings in tenths (step 2) helps, while removing the missing readings
+        (step 1) makes no clear difference. The error doesn't say in which direction the model
+        was wrong, though. The report for the other metric does:
+
+        ```{python}
+        ablation.get_tabular_report(metric="estimate")
+        ```
+
+        The readings in tenths pull the estimate up, to about 27 degrees, and removing them brings
+        it back to about 20. There are no verdicts in this report, since they're based on the
+        error. The report can also be in another language, with `lang=` (e.g., `lang="fr"`), and
+        use the number formats of another locale, with `locale=`.
+
+        See Also
+        --------
+        Ablation.get_effects : Get the results of the ablation as a table.
+        Ablation.annotate : Add the results of the ablation to the validation, as notes.
         """
         from great_tables import GT, google_font, html, loc, style
 
@@ -6063,8 +6359,10 @@ def sklearn_evaluator(
     pb.config(report_incl_header=False, report_incl_footer_timings=False)
     ```
 
-    Here's a table of the temperatures of a process at different pressures, where some of the
-    temperatures were recorded in the wrong units. The held-out data is clean.
+    Here's a table of the temperatures of a process at different pressures, where one temperature
+    in ten was recorded in degrees Fahrenheit rather than Celsius. The held-out data is clean. The
+    model predicts the temperature from the pressure, and it's scored in two ways: with R² (which
+    the verdicts are based on) and with the mean absolute error.
 
     ```{python}
     import pointblank as pb
@@ -6087,17 +6385,55 @@ def sklearn_evaluator(
         .interrogate()
     )
 
-    ablation = pb.Ablation(
-        validation,
-        evaluate=pb.ablation.sklearn_evaluator(holdout, target="temp"),
-        metric="r2",
-    ).drop_each()
+    evaluate = pb.ablation.sklearn_evaluator(
+        holdout,
+        target="temp",
+        features=["pressure"],
+        scoring=["r2", "neg_mean_absolute_error"],
+    )
 
-    ablation.run()
+    ablation = pb.Ablation(validation, evaluate=evaluate, metric="r2").drop_each().run()
+
+    ablation
     ```
 
-    The model is scored with R² by default, for a regression. Removing the readings in the wrong
-    units improves it, compared with removing as many random readings.
+    The default model, a gradient boosting model, is badly thrown off by the readings in degrees
+    Fahrenheit: its R² on the held-out data is below zero, so it does worse than always predicting
+    the average temperature. Removing those readings brings its R² close to `1`. The report for
+    the other metric shows the same change in degrees:
+
+    ```{python}
+    ablation.get_tabular_report(metric="neg_mean_absolute_error")
+    ```
+
+    The mean absolute error drops from about 6 degrees to about 0.3 (the metric is negated, so
+    that higher is better, as for every scikit-learn scorer). Whether a problem in the data
+    matters depends on the model, though. Here's the same ablation with a robust linear model,
+    which gives less weight to the readings far from the line that it fits:
+
+    ```{python}
+    from sklearn.linear_model import HuberRegressor
+
+    evaluate = pb.ablation.sklearn_evaluator(
+        holdout,
+        target="temp",
+        features=["pressure"],
+        estimator=HuberRegressor(),
+        scoring=["r2", "neg_mean_absolute_error"],
+    )
+
+    pb.Ablation(validation, evaluate=evaluate, metric="r2").drop_each().run()
+    ```
+
+    This model is barely affected by the readings in degrees Fahrenheit, with an R² of about
+    0.999 either way. Removing them still helps, and the verdict says so, since the difference is
+    consistent across the repeats. But the difference is tiny (about 0.00005), and the mean absolute
+    error only drops from about 0.253 degrees to 0.245. A clear verdict doesn't mean that the
+    effect is large, so look at the size of the difference too.
+
+    See Also
+    --------
+    Ablation : Measure how the rows that fail validation steps affect a model trained on the data.
     """
     _import_sklearn()
 
