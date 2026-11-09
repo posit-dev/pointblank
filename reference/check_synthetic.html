@@ -2131,7 +2131,7 @@ The results, with a report from <a href="../reference/SyntheticCheck.get_tabular
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s a seed of product reviews, and synthetic reviews that a model made from it. The model copied two of the reviews (one with a different case and punctuation), wrote the rest from a few templates, gave fewer low ratings, and left out the product of many reviews.</p>
-<div id="9723753c" class="cell" data-execution_count="2">
+<div id="23396c4e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2286,7 +2286,7 @@ The results, with a report from <a href="../reference/SyntheticCheck.get_tabular
 </div>
 </div>
 <p>The report shows that the ratings and the products are distributed differently in the synthetic data, that a third of its products are missing, that its reviews repeat each other and use far fewer words, and that two of them copy a review of the seed. The copies can be had as a table:</p>
-<div id="611f278c" class="cell" data-execution_count="3">
+<div id="659474d6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>check.get_copies()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div><style>

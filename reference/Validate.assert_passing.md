@@ -48,14 +48,14 @@ validation.assert_passing()
 
     ---------------------------------------------------------------------------
     AssertionError                            Traceback (most recent call last)
-    Cell In[1], line 20
+    /var/folders/s8/bj_jsx3d7jqd2btw7bwm6yx80000gp/T/ipykernel_66143/137793627.py in ?()
          16     .col_vals_in_set(columns="c", set=["a", "b"])
          17 )
          18 
          19 # No need to call `interrogate()` explicitly
     ---> 20 validation.assert_passing()
 
-    File ~/work/pointblank/pointblank/pointblank/validate.py:20333, in Validate.assert_passing(self)
+    ~/py_projects/pointblank/pointblank/validate.py in ?(self)
       20329             ]
       20330             msg = "The following assertions failed:\n" + "\n".join(
       20331                 [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]

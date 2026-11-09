@@ -377,7 +377,7 @@ pb.preview(pandas_df)
 
 | PandasRows100Columns2 |                     |                    |
 |-----------------------|---------------------|--------------------|
-|                       | id *int64*          | name *str*         |
+|                       | id *int64*          | name *object*      |
 | 1                     | 5887552627537497772 | Doris Martin       |
 | 2                     | 410844076336018751  | Nancy Gonzalez     |
 | 3                     | 3891601934267714614 | Jessica Turner     |

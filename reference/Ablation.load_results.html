@@ -2094,7 +2094,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an ablation of a table of temperature readings, exported for training elsewhere.</p>
-<div id="d2c7a8f1" class="cell" data-execution_count="2">
+<div id="08ba6fcc" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -2114,7 +2114,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>directory <span class="op">=</span> ablation.export(tempfile.mkdtemp())</span></code></pre></div>
 </div>
 <p>Here, the ‘training’ happens in the same session, reading each table from the manifest and filling in the template, but it could be done anywhere.</p>
-<div id="cf2619b6" class="cell" data-execution_count="3">
+<div id="88cb5053" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>manifest <span class="op">=</span> json.loads((directory <span class="op">/</span> <span class="st">"manifest.json"</span>).read_text())</span>

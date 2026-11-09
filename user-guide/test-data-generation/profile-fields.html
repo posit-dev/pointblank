@@ -698,7 +698,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="basic-usage" class="level1">
 <h1>Basic Usage</h1>
 <p>With no arguments, <a href="../../reference/profile_fields.html#pointblank.profile_fields" class="gdls-link gdls-code">profile_fields()</a> returns the <strong>standard</strong> set of seven columns: <code>first_name</code>, <code>last_name</code>, <code>email</code>, <code>city</code>, <code>state</code>, <code>postcode</code>, and <code>phone_number</code>. All coherence rules apply automatically: emails are derived from names, and city/state/postcode/phone are internally consistent.</p>
-<div id="ba3061a7" class="cell" data-execution_count="2">
+<div id="e80c283a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    user_id<span class="op">=</span>pb.int_field(unique<span class="op">=</span><span class="va">True</span>, min_val<span class="op">=</span><span class="dv">1</span>),</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>pb.profile_fields(),</span>
@@ -946,7 +946,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<div id="167646b8" class="cell" data-execution_count="3">
+<div id="fcaa857e" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Minimal profile: just name, email, and phone</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>pb.preview(</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    pb.generate_dataset(</span>
@@ -1120,7 +1120,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="80025328" class="cell" data-execution_count="4">
+<div id="b380c95b" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Full profile: includes address, company, and job title</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>pb.preview(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    pb.generate_dataset(</span>
@@ -1370,7 +1370,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="combined-vs.-split-names" class="level1">
 <h1>Combined vs.&nbsp;Split Names</h1>
 <p>By default, names are split into <code>first_name</code> and <code>last_name</code> columns. Set <code>split_name=False</code> to get a single <code>name</code> column instead:</p>
-<div id="25068275" class="cell" data-execution_count="5">
+<div id="11999631" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pb.preview(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.generate_dataset(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        pb.Schema(<span class="op">**</span>pb.profile_fields(<span class="bu">set</span><span class="op">=</span><span class="st">"minimal"</span>, split_name<span class="op">=</span><span class="va">False</span>)),</span>
@@ -1535,7 +1535,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="adding-and-removing-columns" class="level1">
 <h1>Adding and Removing Columns</h1>
 <p>Use <code>include=</code> to add presets to the base set and <code>exclude=</code> to remove them. Both accept lists of preset names. The available profile presets are: <code>first_name</code>, <code>last_name</code>, <code>name</code>, <code>email</code>, <code>address</code>, <code>city</code>, <code>state</code>, <code>postcode</code>, <code>phone_number</code>, <code>company</code>, and <code>job</code>.</p>
-<div id="4f45b454" class="cell" data-execution_count="6">
+<div id="21cf12a0" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard set + company column</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>pb.preview(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    pb.generate_dataset(</span>
@@ -1757,7 +1757,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="ce3e9fb9" class="cell" data-execution_count="7">
+<div id="fff9060c" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard set without city and state</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>pb.preview(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    pb.generate_dataset(</span>
@@ -1948,7 +1948,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="column-prefixes" class="level1">
 <h1>Column Prefixes</h1>
 <p>The <code>prefix=</code> parameter prepends a string to every column name. This is especially useful when a schema needs two independent profiles (e.g., sender and recipient):</p>
-<div id="2a7613b5" class="cell" data-execution_count="8">
+<div id="1f9972bd" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>pb.profile_fields(<span class="bu">set</span><span class="op">=</span><span class="st">"minimal"</span>, prefix<span class="op">=</span><span class="st">"sender_"</span>),</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>pb.profile_fields(<span class="bu">set</span><span class="op">=</span><span class="st">"minimal"</span>, prefix<span class="op">=</span><span class="st">"recipient_"</span>),</span>
@@ -2174,7 +2174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="combining-with-other-field-types" class="level1">
 <h1>Combining with Other Field Types</h1>
 <p>Since <a href="../../reference/profile_fields.html#pointblank.profile_fields" class="gdls-link gdls-code">profile_fields()</a> returns a plain dictionary, it composes naturally with any other field types:</p>
-<div id="f7a939dc" class="cell" data-execution_count="9">
+<div id="53c94be6" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">id</span><span class="op">=</span>pb.int_field(unique<span class="op">=</span><span class="va">True</span>, min_val<span class="op">=</span><span class="dv">1000</span>),</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>pb.profile_fields(),</span>
