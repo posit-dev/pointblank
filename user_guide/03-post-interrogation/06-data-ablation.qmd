@@ -245,7 +245,10 @@ rows make no clear difference either way. Leaving out step 3 removes the same ro
 
 A step whose rows help on their own but add nothing on top of the other steps gets the verdict
 *redundant*: the other steps already remove the rows that matter. Such a step can be dropped from
-the cleaning without losing anything, even though its variant helps.
+the cleaning without losing anything, even though its variant helps. None of the steps here is
+redundant: step 2's rows make no clear difference on top of the others, but they make none on
+their own either. The example of [`Ablation.drop_all_but_each()`](`Ablation.drop_all_but_each`)
+has a step that is redundant.
 
 ## Removing Groups of Rows
 
@@ -541,6 +544,13 @@ on the model, which is why an ablation is worth running with the model that will
 data. Pass `estimator=` to use another model or pipeline: it's cloned for each evaluation, with its
 `random_state` set to the seed.
 
+Every value in this report has a standard deviation of `± 0.000`, since the gradient boosting model
+gives the same result whatever its seed. Its repeats differ only in the controls, which remove a
+new set of random rows each time. The repeats matter most with a model that's random itself, like
+the random forest, whose results vary from seed to seed. Either way, the
+[`Ablation.check_determinism()`](`Ablation.check_determinism`) method (see below) checks that the
+same seed gives the same result.
+
 ## Checking the Held-Out Data
 
 The held-out data is the yardstick of every comparison, so a problem in it is a problem in all of
@@ -818,4 +828,4 @@ ones that are redundant, the ones that remove good data, and where to set their 
 defects shows how much a problem would cost (and gives thresholds to match), and Shapley values
 share the effect of the whole cleaning fairly among the steps. It works with any model that you can
 wrap in an `evaluate` function (or train elsewhere, with `~~pointblank.Ablation.export()` and
-`load_results()`), and with any validation whose steps check rows.
+`~~pointblank.Ablation.load_results()`), and with any validation whose steps check rows.
