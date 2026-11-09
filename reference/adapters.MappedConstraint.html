@@ -2082,7 +2082,7 @@ A human-readable description of the rule as written in the source format.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s a constraint that requires values in the <code>age</code> column to be at least <code>0</code>, written the way an adapter would create it from a JSON Schema <code>minimum</code> keyword.</p>
-<div id="d20cb040" class="cell" data-execution_count="2">
+<div id="56c7f7fb" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.adapters <span class="im">import</span> MappedConstraint</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>constraint <span class="op">=</span> MappedConstraint(</span>
@@ -2097,7 +2097,7 @@ A human-readable description of the rule as written in the source format.
 </div>
 </div>
 <p>The printed form shows the method call that the constraint stands for. Constraints are what an imported definition is made of, as we can see by importing a small JSON Schema and looking at its <code>constraints</code> list.</p>
-<div id="3f4119be" class="cell" data-execution_count="3">
+<div id="c9f36de0" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>imported <span class="op">=</span> pb.import_contract(</span>

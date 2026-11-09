@@ -2083,7 +2083,7 @@ A restored <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose the profile of the <code>small_table</code> dataset was stored as JSON text some time ago.</p>
-<div id="6b090548" class="cell" data-execution_count="2">
+<div id="945d4d69" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2092,7 +2092,7 @@ A restored <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>stored_json <span class="op">=</span> pb.DataScan(small_table, tbl_name<span class="op">=</span><span class="st">"small_table"</span>).to_json()</span></code></pre></div>
 </div>
 <p>Restoring it gives a <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> that can be queried like the original one:</p>
-<div id="898129f7" class="cell" data-execution_count="3">
+<div id="39a7db3b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>restored <span class="op">=</span> pb.DataScan.from_json(stored_json)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>restored.summary_data.select(<span class="st">"colname"</span>, <span class="st">"n_missing"</span>, <span class="st">"n_unique"</span>)</span></code></pre></div>

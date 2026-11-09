@@ -2093,7 +2093,7 @@ If there is no template for the domain. The error message lists the domains that
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s get the template for the Vital Signs (VS) domain:</p>
-<div id="7b4fd19b" class="cell" data-execution_count="1">
+<div id="e9bb0df0" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>vs <span class="op">=</span> pb.get_sdtm_domain(<span class="st">"vs"</span>)</span>
@@ -2106,7 +2106,7 @@ If there is no template for the domain. The error message lists the domains that
 </div>
 </div>
 <p>VS is a Findings domain with many records per subject, one for each test at each time point, so its natural key includes the test code, the date-time and the time point number. The template’s properties list the variables by their core designation:</p>
-<div id="cb84954e" class="cell" data-execution_count="2">
+<div id="e476e5ce" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(vs.required_variables)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(vs.expected_variables)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">

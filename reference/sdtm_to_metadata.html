@@ -2100,7 +2100,7 @@ If there is no template for the domain. See <a href="../reference/list_sdtm_doma
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s convert the template for the Demographics (DM) domain:</p>
-<div id="40d4e205" class="cell" data-execution_count="1">
+<div id="6fdde891" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>dm_meta <span class="op">=</span> pb.sdtm_to_metadata(<span class="st">"DM"</span>, study_id<span class="op">=</span><span class="st">"STUDY01"</span>)</span>
@@ -2115,7 +2115,7 @@ IG 3.4
 </div>
 </div>
 <p>The metadata has all 26 variables of the template, in the template’s order. Each variable keeps what the template says about it:</p>
-<div id="9514ac75" class="cell" data-execution_count="2">
+<div id="e1884cfe" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sex <span class="op">=</span> dm_meta.get_variable(<span class="st">"SEX"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sex.dtype, sex.required, sex.max_length, sex.controlled_term)</span></code></pre></div>
@@ -2124,7 +2124,7 @@ IG 3.4
 </div>
 </div>
 <p><code>SEX</code> is a required character variable of at most two characters, with values from the <code>SEX</code> codelist of CDISC Controlled Terminology. The metadata can be turned into a <a href="../reference/Schema.html#pointblank.Schema" class="gdls-link"><code>Schema</code></a> for use in <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>Validate.col_schema_match()</code></a>:</p>
-<div id="7056e660" class="cell" data-execution_count="3">
+<div id="13ec0665" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> dm_meta.to_schema()</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>schema.columns[:<span class="dv">4</span>]</span></code></pre></div>

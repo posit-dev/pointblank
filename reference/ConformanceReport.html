@@ -2120,7 +2120,7 @@ The results of the rules, for a report of the built-in rules. The default is <co
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s check a small DM dataset with the built-in rules. It has a date that isn’t in the ISO 8601 format, a negative age and a <code>SEX</code> value that isn’t in its codelist:</p>
-<div id="495702b7" class="cell" data-execution_count="1">
+<div id="a72b3c52" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2146,7 +2146,7 @@ The results of the rules, for a report of the built-in rules. The default is <co
 </div>
 </div>
 <p>Ten of the 362 rules fail. Most of them are about what the dataset lacks, such as the DM variables <code>SUBJID</code> and <code>RACE</code> and the TS and TA datasets. The failing records are found by three of the rules:</p>
-<div id="5a9b7c15" class="cell" data-execution_count="2">
+<div id="cd90ca38" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>report.findings_df().select(<span class="st">"rule_id"</span>, <span class="st">"row_index"</span>, <span class="st">"checked_column"</span>, <span class="st">"checked_value"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div><style>
@@ -2216,7 +2216,7 @@ The results of the rules, for a report of the built-in rules. The default is <co
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
 <p>Let’s check a package of two datasets with the built-in rules:</p>
-<div id="09acba39" class="cell" data-execution_count="3">
+<div id="386238d9" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2247,7 +2247,7 @@ The results of the rules, for a report of the built-in rules. The default is <co
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
 <p>Let’s check a DM dataset with the built-in rules and look at the form of the report:</p>
-<div id="0fe3bff6" class="cell" data-execution_count="4">
+<div id="1b1b3f3d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2277,7 +2277,7 @@ The results of the rules, for a report of the built-in rules. The default is <co
 <section id="examples-3" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
 <p>Let’s check a package with each of the two Pointblank engines:</p>
-<div id="914068e0" class="cell" data-execution_count="5">
+<div id="1b27e429" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2389,7 +2389,7 @@ False</code></pre>
 <section id="examples-4" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
 <p>Let’s check a DM dataset with the built-in rules:</p>
-<div id="062594c6" class="cell" data-execution_count="6">
+<div id="7f156e59" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2436,7 +2436,7 @@ For a Validate-based report, a dict with an entry for each dataset. Each entry i
 <section id="examples-5" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-5">Examples</h4>
 <p>Let’s check a small DM dataset with the built-in rules and summarize the results:</p>
-<div id="c2b224a9" class="cell" data-execution_count="7">
+<div id="77699f06" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2509,7 +2509,7 @@ If the report isn’t of the built-in rules.
 <section id="examples-6" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-6">Examples</h4>
 <p>Let’s check a small DM dataset with the built-in rules and make the table:</p>
-<div id="38b7aae0" class="cell" data-execution_count="8">
+<div id="3673d2fb" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -5572,7 +5572,7 @@ If there are no failing records. This happens when no rule that checks values fa
 <section id="examples-7" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-7">Examples</h4>
 <p>Let’s check a small DM dataset with the built-in rules and make a table of its failing records:</p>
-<div id="79ab7a96" class="cell" data-execution_count="9">
+<div id="40942649" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -5591,73 +5591,73 @@ If there are no failing records. This happens when no rule that checks values fa
 <span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>report.get_findings_table()</span></code></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/great_tables/_render_checks.py:37: RenderWarning: Rendering table with .cols_width() in Quarto may result in unexpected behavior. This is because Quarto performs custom table processing. Either use all percentage widths, or set .tab_options(quarto_disable_processing=True) to disable Quarto table processing.
+<pre><code>/Users/riannone/py_projects/pointblank/.venv/lib/python3.11/site-packages/great_tables/_render_checks.py:37: RenderWarning: Rendering table with .cols_width() in Quarto may result in unexpected behavior. This is because Quarto performs custom table processing. Either use all percentage widths, or set .tab_options(quarto_disable_processing=True) to disable Quarto table processing.
   warnings.warn(</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="9">
-<div id="zjzkybnfuw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="gbsbmbqczw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#zjzkybnfuw table {
+#gbsbmbqczw table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#zjzkybnfuw thead, tbody, tfoot, tr, td, th { border-style: none; }
+#gbsbmbqczw thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#zjzkybnfuw p { margin: 0; padding: 0; }
- #zjzkybnfuw .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #zjzkybnfuw .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #zjzkybnfuw .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #zjzkybnfuw .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #zjzkybnfuw .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #zjzkybnfuw .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #zjzkybnfuw .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #zjzkybnfuw .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #zjzkybnfuw .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #zjzkybnfuw .gt_column_spanner_outer:first-child { padding-left: 0; }
- #zjzkybnfuw .gt_column_spanner_outer:last-child { padding-right: 0; }
- #zjzkybnfuw .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #zjzkybnfuw .gt_spanner_row { border-bottom-style: hidden; }
- #zjzkybnfuw .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #zjzkybnfuw .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #zjzkybnfuw .gt_from_md> :first-child { margin-top: 0; }
- #zjzkybnfuw .gt_from_md> :last-child { margin-bottom: 0; }
- #zjzkybnfuw .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #zjzkybnfuw .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #zjzkybnfuw .gt_indent_1 { text-indent: 5px; }
- #zjzkybnfuw .gt_indent_2 { text-indent: calc(5px * 2); }
- #zjzkybnfuw .gt_indent_3 { text-indent: calc(5px * 3); }
- #zjzkybnfuw .gt_indent_4 { text-indent: calc(5px * 4); }
- #zjzkybnfuw .gt_indent_5 { text-indent: calc(5px * 5); }
- #zjzkybnfuw .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #zjzkybnfuw .gt_row_group_first td { border-top-width: 2px; }
- #zjzkybnfuw .gt_row_group_first th { border-top-width: 2px; }
- #zjzkybnfuw .gt_striped { color: #333333; background-color: #F4F4F4; }
- #zjzkybnfuw .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #zjzkybnfuw .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #zjzkybnfuw .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #zjzkybnfuw .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #zjzkybnfuw .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #zjzkybnfuw .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #zjzkybnfuw .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #zjzkybnfuw .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #zjzkybnfuw .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #zjzkybnfuw .gt_left { text-align: left; }
- #zjzkybnfuw .gt_center { text-align: center; }
- #zjzkybnfuw .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #zjzkybnfuw .gt_font_normal { font-weight: normal; }
- #zjzkybnfuw .gt_font_bold { font-weight: bold; }
- #zjzkybnfuw .gt_font_italic { font-style: italic; }
- #zjzkybnfuw .gt_super { font-size: 65%; }
- #zjzkybnfuw .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #zjzkybnfuw .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #zjzkybnfuw .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #zjzkybnfuw .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #zjzkybnfuw .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #zjzkybnfuw .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#gbsbmbqczw p { margin: 0; padding: 0; }
+ #gbsbmbqczw .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #gbsbmbqczw .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #gbsbmbqczw .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #gbsbmbqczw .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #gbsbmbqczw .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #gbsbmbqczw .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #gbsbmbqczw .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #gbsbmbqczw .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #gbsbmbqczw .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #gbsbmbqczw .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #gbsbmbqczw .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #gbsbmbqczw .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #gbsbmbqczw .gt_spanner_row { border-bottom-style: hidden; }
+ #gbsbmbqczw .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #gbsbmbqczw .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #gbsbmbqczw .gt_from_md> :first-child { margin-top: 0; }
+ #gbsbmbqczw .gt_from_md> :last-child { margin-bottom: 0; }
+ #gbsbmbqczw .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #gbsbmbqczw .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #gbsbmbqczw .gt_indent_1 { text-indent: 5px; }
+ #gbsbmbqczw .gt_indent_2 { text-indent: calc(5px * 2); }
+ #gbsbmbqczw .gt_indent_3 { text-indent: calc(5px * 3); }
+ #gbsbmbqczw .gt_indent_4 { text-indent: calc(5px * 4); }
+ #gbsbmbqczw .gt_indent_5 { text-indent: calc(5px * 5); }
+ #gbsbmbqczw .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #gbsbmbqczw .gt_row_group_first td { border-top-width: 2px; }
+ #gbsbmbqczw .gt_row_group_first th { border-top-width: 2px; }
+ #gbsbmbqczw .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #gbsbmbqczw .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #gbsbmbqczw .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #gbsbmbqczw .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #gbsbmbqczw .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #gbsbmbqczw .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #gbsbmbqczw .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #gbsbmbqczw .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #gbsbmbqczw .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #gbsbmbqczw .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #gbsbmbqczw .gt_left { text-align: left; }
+ #gbsbmbqczw .gt_center { text-align: center; }
+ #gbsbmbqczw .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #gbsbmbqczw .gt_font_normal { font-weight: normal; }
+ #gbsbmbqczw .gt_font_bold { font-weight: bold; }
+ #gbsbmbqczw .gt_font_italic { font-style: italic; }
+ #gbsbmbqczw .gt_super { font-size: 65%; }
+ #gbsbmbqczw .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #gbsbmbqczw .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #gbsbmbqczw .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #gbsbmbqczw .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #gbsbmbqczw .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #gbsbmbqczw .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" aria-labelledby="title" aria-describedby="subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
@@ -5782,7 +5782,7 @@ For a Validate-based report, an empty list.
 <section id="examples-8" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-8">Examples</h4>
 <p>Let’s check a small DM dataset with the built-in rules and look at the rules that are not applicable:</p>
-<div id="4fc37c72" class="cell" data-execution_count="10">
+<div id="e8f5f993" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -5858,7 +5858,7 @@ For a Validate-based report, a dict for each step with failing test units, with 
 <section id="examples-9" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-9">Examples</h4>
 <p>Let’s check a small DM dataset with the built-in rules and list the issues as a DataFrame:</p>
-<div id="25321e25" class="cell" data-execution_count="11">
+<div id="42c7d2a1" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -5888,7 +5888,7 @@ For a Validate-based report, a dict for each step with failing test units, with 
 </div>
 </div>
 <p>The missing TS and TA datasets are given as the datasets of SDTM-121 and SDTM-122. Only SDTM-122 is of <code>"Warning"</code> sensitivity. A Validate-based report gives the severity of each step instead, when thresholds are set:</p>
-<div id="c8672047" class="cell" data-execution_count="12">
+<div id="71663896" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>ae <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"STUDY01-001"</span>, <span class="st">"STUDY01-009"</span>], <span class="st">"AESEQ"</span>: [<span class="dv">1</span>, <span class="dv">1</span>]})</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage(datasets<span class="op">=</span>{<span class="st">"DM"</span>: dm, <span class="st">"AE"</span>: ae})</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -5953,7 +5953,7 @@ For a Validate-based report, an empty list.
 <section id="examples-10" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-10">Examples</h4>
 <p>Let’s check a small DM dataset with the built-in rules:</p>
-<div id="6bf1a2f7" class="cell" data-execution_count="13">
+<div id="cbe7c56e" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -6031,7 +6031,7 @@ If the report isn’t of the built-in rules. For a CDISC CORE report, use <a hre
 <section id="examples-11" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-11">Examples</h4>
 <p>Let’s check a small DM dataset with the built-in rules and get its failing records:</p>
-<div id="4cc832d5" class="cell" data-execution_count="14">
+<div id="55cb66ca" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -6063,7 +6063,7 @@ If the report isn’t of the built-in rules. For a CDISC CORE report, use <a hre
 </div>
 </div>
 <p>Since <code>row_index</code> is 0-based, it can be used to get the failing records from the dataset:</p>
-<div id="18fd231d" class="cell" data-execution_count="15">
+<div id="72a1983d" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>dm[findings[<span class="st">"row_index"</span>].unique().sort().to_list()]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
 <div><style>
@@ -6130,7 +6130,7 @@ If the report has no validation for that dataset. The error message lists the da
 <section id="examples-12" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-12">Examples</h4>
 <p>Let’s check a package where the AE dataset has a subject, <code>STUDY01-009</code>, who isn’t in DM:</p>
-<div id="103585ad" class="cell" data-execution_count="17">
+<div id="ddd43517" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -6640,7 +6640,7 @@ The path of the file that was written.
 <section id="examples-13" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-13">Examples</h4>
 <p>Let’s check a small DM dataset with the built-in rules and save the report in a temporary directory:</p>
-<div id="b41bc51c" class="cell" data-execution_count="18">
+<div id="5a125084" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -6730,7 +6730,7 @@ If <code>openpyxl</code> or <code>pandas</code> isn’t installed.
 <section id="examples-14" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-14">Examples</h4>
 <p>Let’s check a small DM dataset with the built-in rules and save the report in a temporary directory:</p>
-<div id="fa6b9a90" class="cell" data-execution_count="19">
+<div id="56a230a4" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -6757,7 +6757,7 @@ If <code>openpyxl</code> or <code>pandas</code> isn’t installed.
 </div>
 </div>
 <p>Here’s the start of the <code>Rules_Report</code> sheet, whose rows are in the order of the rules catalog:</p>
-<div id="fef94c34" class="cell" data-execution_count="20">
+<div id="a65ee3b7" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>pd.read_excel(path, sheet_name<span class="op">=</span><span class="st">"Rules_Report"</span>).head(<span class="dv">3</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="20">
 <div>
@@ -6866,7 +6866,7 @@ A report of CORE’s results, whose <a href="../reference/ConformanceReport.html
 <section id="examples-15" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-15">Examples</h4>
 <p>Let’s write a short report by hand in CORE’s format, for three rules on a DM and an AE dataset. One rule found an AE record whose subject isn’t in DM, one rule passed and one was skipped:</p>
-<div id="63149dd0" class="cell" data-execution_count="21">
+<div id="199246f4" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>core_json <span class="op">=</span> {</span>
@@ -6918,7 +6918,7 @@ A report of CORE’s results, whose <a href="../reference/ConformanceReport.html
 </div>
 </div>
 <p>The rule statuses are CORE’s own. A real report would usually be read from a file, with <code>json.load()</code>. The failing record is in <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.findings" class="gdls-link"><code>findings()</code></a>:</p>
-<div id="de7fc3e5" class="cell" data-execution_count="22">
+<div id="af5e7347" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>report.findings()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="22">
 <pre><code>[CoreFinding(rule_id='CORE-000201', message='USUBJID is not found in DM.USUBJID', dataset='ae.xpt', executability=None, usubjid='STUDY01-009', row=2, seq=1, variables=['USUBJID'], values=['STUDY01-009'])]</code></pre>

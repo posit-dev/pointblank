@@ -2095,7 +2095,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an ablation of a table of temperature readings, some of them recorded in tenths of a degree. The <code>evaluate()</code> function also returns the number of rows it was given, which is a second metric in the results. With <code>max_workers=4</code>, the run makes four evaluations at a time.</p>
-<div id="d5497037" class="cell" data-execution_count="2">
+<div id="a4270a81" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2224,7 +2224,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 </div>
 </div>
 <p>After the run, the <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> object shows its report, for the metric named in <code>metric=</code>. Removing the 12 readings in tenths helps. The other metric has a report of its own, from <code>get_tabular_report(metric="n_train")</code>, and both are in the results of <a href="../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link"><code>get_effects()</code></a>:</p>
-<div id="d2f75598" class="cell" data-execution_count="3">
+<div id="c6460b56" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ablation.get_effects().select(<span class="st">"variant"</span>, <span class="st">"metric"</span>, <span class="st">"mean"</span>, <span class="st">"delta_vs_control"</span>, <span class="st">"verdict"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div><style>
@@ -2239,7 +2239,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 </div>
 <p>The full table has 300 rows, and the variant and its control have 288. There’s no verdict for <code>n_train</code>, since verdicts are only for the metric in <code>metric=</code>.</p>
 <p>Making the evaluations at the same time doesn’t change the results, since each evaluation gets the same table and seed either way. Here’s the same ablation, run one evaluation after another:</p>
-<div id="bf2b1970" class="cell" data-execution_count="4">
+<div id="712a578e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>serial <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(validation, evaluate<span class="op">=</span>evaluate, metric<span class="op">=</span><span class="st">"error"</span>, higher_is_better<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .drop_each()</span>

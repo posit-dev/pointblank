@@ -2095,7 +2095,7 @@ Whether the entry is a sponsor extension to an extensible codelist: a value that
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Each codelist imported from a file holds its entries in <code>codes</code>. Here are the entries of the <code>Sex</code> codelist in the bundled CDISC Controlled Terminology file:</p>
-<div id="cf5e551a" class="cell" data-execution_count="1">
+<div id="5e9fea46" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ct <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"sdtm_ct.xml"</span>), codelist<span class="op">=</span><span class="st">"Sex"</span>)</span>
@@ -2111,7 +2111,7 @@ UNDIFFERENTIATED -&gt; Undifferentiated</code></pre>
 </div>
 </div>
 <p>The values are the codes used in the data, and the labels say what they mean. An entry can also be created directly, for example to build a codelist that isn’t in any file:</p>
-<div id="017196da" class="cell" data-execution_count="2">
+<div id="705f773b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>entry <span class="op">=</span> pb.CodelistEntry(value<span class="op">=</span><span class="st">"NASOGASTRIC TUBE"</span>, label<span class="op">=</span><span class="st">"Nasogastric tube"</span>, is_extended<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>entry</span></code></pre></div>

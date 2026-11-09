@@ -2088,7 +2088,7 @@ A <a href="../reference/ablation.Stratified.html#pointblank.ablation.Stratified"
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s a table of temperature readings from two sensors in different places: sensor <code>"a"</code> has two thirds of the readings and reads about 20 degrees, while sensor <code>"b"</code> has the other third and reads about 40 degrees. One reading in ten comes from a device that was never calibrated (<code>calibrated_on</code> is missing), and those read 1.5 degrees too high. The ‘model’ estimates the average temperature across both sensors, and it’s evaluated by its error against the true average of the calibrated readings. It’s deterministic, so the only randomness in the ablation is in the rows that the controls remove.</p>
-<div id="d321a36a" class="cell" data-execution_count="2">
+<div id="ea81cfee" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2228,7 +2228,7 @@ A <a href="../reference/ablation.Stratified.html#pointblank.ablation.Stratified"
 </div>
 </div>
 <p>Removing the 30 uncalibrated readings helps. Each repeat of the control removes 30 random readings, always 20 from sensor <code>"a"</code> and 10 from sensor <code>"b"</code>, so the control has the same mix of sensors as the full table. Here’s the same ablation with the default control, which removes 30 readings from anywhere in the table:</p>
-<div id="8174f589" class="cell" data-execution_count="3">
+<div id="e94af952" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pl.concat(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    [</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        ablation.get_effects()</span>

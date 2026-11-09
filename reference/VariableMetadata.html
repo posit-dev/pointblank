@@ -2210,7 +2210,7 @@ The system of units, such as <code>"SI"</code>. The default is <code>None</code>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s look up a variable in the bundled Frictionless Data Package with <a href="../reference/MetadataImport.html#pointblank.MetadataImport.get_variable" class="gdls-link"><code>get_variable()</code></a>:</p>
-<div id="0eda3e00" class="cell" data-execution_count="1">
+<div id="ce840f91" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"datapackage.json"</span>))</span>
@@ -2224,7 +2224,7 @@ The system of units, such as <code>"SI"</code>. The default is <code>None</code>
 </div>
 </div>
 <p>The <code>transaction_id</code> field is a required and unique string of 5 to 20 characters, and the package declares <code>"NA"</code> and <code>"N/A"</code> as its missing-value markers. The CDISC fields are filled in for variables read from a Define-XML document:</p>
-<div id="5e6a0cea" class="cell" data-execution_count="2">
+<div id="90eeb1c9" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>), dataset<span class="op">=</span><span class="st">"DM"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sex <span class="op">=</span> dm.get_variable(<span class="st">"SEX"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2238,7 +2238,7 @@ DM Record Qualifier
 </div>
 </div>
 <p>The <code>SEX</code> variable uses the <code>Sex</code> codelist, whose values were copied into <code>allowed_values</code>. <a href="../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link gdls-code">VariableMetadata</a> objects can also be created directly, which is how a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport</code></a> can be built for data that doesn’t come with a metadata file:</p>
-<div id="889af865" class="cell" data-execution_count="3">
+<div id="a0b8be30" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pb.VariableMetadata(name<span class="op">=</span><span class="st">"age"</span>, label<span class="op">=</span><span class="st">"Age in years"</span>, dtype<span class="op">=</span><span class="st">"Int64"</span>, min_val<span class="op">=</span><span class="dv">18</span>, max_val<span class="op">=</span><span class="dv">99</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>VariableMetadata(name='age', label='Age in years', description=None, dtype='Int64', role=None, required=False, unique=False, min_val=18, max_val=99, min_length=None, max_length=None, pattern=None, allowed_values=None, codelist_ref=None, display_format=None, value_labels=None, missing_values=None, missing_value_labels=None, origin=None, computational_method=None, controlled_term=None, significant_digits=None, cdisc_domain=None, cdisc_role=None, adam_derivation=None, traceability_ref=None, unit=None, unit_system=None)</code></pre>
@@ -2303,7 +2303,7 @@ A <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-lin
 </section>
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="c9679be3" class="cell" data-execution_count="4">
+<div id="02d5f9ba" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>income <span class="op">=</span> pb.VariableMetadata(</span>
@@ -2319,7 +2319,7 @@ A <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-lin
 </div>
 </div>
 <p>The two labels became the reasons <code>"not_asked"</code> and <code>"refused"</code>. The spec can be given to the <code>missing=</code> parameter of a validation method so that these codes are reported as missing data rather than as failing values. For a variable without missing values the method returns <code>None</code>:</p>
-<div id="3bb54ecf" class="cell" data-execution_count="5">
+<div id="1e6a42a7" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pb.VariableMetadata(name<span class="op">=</span><span class="st">"age"</span>, dtype<span class="op">=</span><span class="st">"Int64"</span>).to_missing_spec())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>None</code></pre>

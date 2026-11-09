@@ -2100,7 +2100,7 @@ A Great Tables object.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an ablation of a table of temperature readings with missing values and with readings that were recorded in tenths of a degree (so they’re ten times too high). The ‘model’ estimates the average temperature, ignoring missing readings. The <code>evaluate()</code> function returns two metrics: the error against the true average of <code>20</code>, which the verdicts are based on, and the estimate itself.</p>
-<div id="7fc66a76" class="cell" data-execution_count="2">
+<div id="5c4d0b95" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2239,7 +2239,7 @@ A Great Tables object.
 </div>
 </div>
 <p>Removing the readings in tenths (step 2) helps, while removing the missing readings (step 1) makes no clear difference. The error doesn’t say in which direction the model was wrong, though. The report for the other metric does:</p>
-<div id="c044cb62" class="cell" data-execution_count="3">
+<div id="9e4c3bc2" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ablation.get_tabular_report(metric<span class="op">=</span><span class="st">"estimate"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_ablation_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

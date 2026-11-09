@@ -2128,7 +2128,7 @@ If <code>validation_or_contract</code> is neither a <a href="../reference/Contra
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s start with a <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> for a table of orders. It has a schema with column types, a description, and a mix of checks.</p>
-<div id="2772e038" class="cell" data-execution_count="2">
+<div id="f178697d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2145,7 +2145,7 @@ If <code>validation_or_contract</code> is neither a <a href="../reference/Contra
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Exporting it as a JSON Schema gives us a dictionary, which we can print with <code>json.dumps()</code>.</p>
-<div id="9e080964" class="cell" data-execution_count="3">
+<div id="516458dc" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>orders_json_schema <span class="op">=</span> pb.export_contract(orders_contract, <span class="bu">format</span><span class="op">=</span><span class="st">"json_schema"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json.dumps(orders_json_schema, indent<span class="op">=</span><span class="dv">2</span>))</span></code></pre></div>
@@ -2182,7 +2182,7 @@ If <code>validation_or_contract</code> is neither a <a href="../reference/Contra
 </div>
 <p>The Pointblank types became JSON types, the not-null check filled the <code>required</code> list, the set of statuses became an <code>enum</code>, and the range check became <code>minimum</code> and <code>maximum</code> values. The <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> step was left out because JSON Schema has no way to say that a value must be unique across records.</p>
 <p>The same contract can be written out as a dbt <code>schema.yml</code> file. Here we write it to a <code>models</code> directory (which is created if it doesn’t exist) and print the file’s contents.</p>
-<div id="0118e60f" class="cell" data-execution_count="4">
+<div id="3294e03a" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>pb.export_contract(orders_contract, <span class="st">"models/schema.yml"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">"dbt"</span>)</span>
@@ -2216,7 +2216,7 @@ models:
 </div>
 <p>This time the uniqueness check is kept (as dbt’s <code>unique</code> test) but the range check is not, since dbt has no generic test for it. The <code>amount</code> column is still listed, with its type and an empty list of tests.</p>
 <p>An exported document can be imported again with <a href="../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a>. Doing so is a quick way to see which rules survive the round trip.</p>
-<div id="6d078ca2" class="cell" data-execution_count="5">
+<div id="aa23e7d6" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pb.import_contract(orders_json_schema).summary())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Contract Import Summary

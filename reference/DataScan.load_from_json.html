@@ -2080,7 +2080,7 @@ A restored <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s save a profile of a table of orders as a baseline.</p>
-<div id="eb23eee2" class="cell" data-execution_count="2">
+<div id="bd83e0c2" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -2095,7 +2095,7 @@ A restored <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>pb.DataScan(orders, tbl_name<span class="op">=</span><span class="st">"orders"</span>).save_to_json(baseline_path)</span></code></pre></div>
 </div>
 <p>Later, the table has grown and a refund (a negative amount) has appeared. The baseline is loaded from the file and compared with a scan of the current table:</p>
-<div id="d56e7ed4" class="cell" data-execution_count="3">
+<div id="e5353388" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>orders_now <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"order_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>], <span class="st">"amount"</span>: [<span class="fl">25.0</span>, <span class="fl">40.0</span>, <span class="fl">15.5</span>, <span class="fl">60.0</span>, <span class="op">-</span><span class="fl">15.5</span>]}</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>)</span>

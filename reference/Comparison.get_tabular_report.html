@@ -2100,7 +2100,7 @@ A Great Tables object.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s compare two months of a payroll table. Naming the tables with <code>source_name=</code> and <code>target_name=</code> makes the report easier to read.</p>
-<div id="23328169" class="cell" data-execution_count="2">
+<div id="468301c3" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2248,7 +2248,7 @@ A Great Tables object.
 </div>
 <p>The verdict and counts are at the top, and below them are the sections that have something to show: the mismatches in <code>salary</code>, the changed row for employee 102, and the employees who left and joined.</p>
 <p>The title can be replaced, and the labels can be shown in any of Pointblank’s reporting languages. Here’s the same report in French:</p>
-<div id="a84c6e9d" class="cell" data-execution_count="3">
+<div id="d4a421a5" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison.get_tabular_report(title<span class="op">=</span><span class="st">"Paie : janvier et février"</span>, lang<span class="op">=</span><span class="st">"fr"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

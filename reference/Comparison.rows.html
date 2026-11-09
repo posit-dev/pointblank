@@ -2109,7 +2109,7 @@ If <code>status=</code> isn’t one of the five row statuses.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s compare two versions of an employee table, where one salary changed, one employee left, and one joined.</p>
-<div id="50c58314" class="cell" data-execution_count="2">
+<div id="95aba312" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2143,7 +2143,7 @@ If <code>status=</code> isn’t one of the five row statuses.
 </div>
 </div>
 <p>Each changed row has both versions of every compared column side by side. Here, <code>dept</code> is the same on both sides and <code>salary</code> is the column that changed. The departed employee is a <code>"missing"</code> row, and it’s shown as it was in the source table:</p>
-<div id="42b5fc4c" class="cell" data-execution_count="3">
+<div id="338cf303" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"missing"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div><style>
@@ -2157,7 +2157,7 @@ If <code>status=</code> isn’t one of the five row statuses.
 </div>
 </div>
 <p>The new employee is an <code>"extra"</code> row, shown as it is in the target table:</p>
-<div id="f2424dee" class="cell" data-execution_count="4">
+<div id="021ac29b" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"extra"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div><style>
@@ -2171,7 +2171,7 @@ If <code>status=</code> isn’t one of the five row statuses.
 </div>
 </div>
 <p>In multiset mode, rows have no identity apart from their values. So <code>"missing"</code> and <code>"extra"</code> rows are listed once each, with the number of times they occur in each table. Here, the target table has one fewer copy of a row than the source:</p>
-<div id="1de8cf32" class="cell" data-execution_count="5">
+<div id="3a5f3566" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>scans_source <span class="op">=</span> pl.DataFrame({<span class="st">"badge"</span>: [<span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">9</span>], <span class="st">"door"</span>: [<span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"B"</span>]})</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>scans_target <span class="op">=</span> pl.DataFrame({<span class="st">"badge"</span>: [<span class="dv">7</span>, <span class="dv">9</span>], <span class="st">"door"</span>: [<span class="st">"A"</span>, <span class="st">"B"</span>]})</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>

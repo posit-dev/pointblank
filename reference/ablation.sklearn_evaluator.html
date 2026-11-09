@@ -2116,7 +2116,7 @@ A function for the <code>evaluate=</code> parameter of <a href="../reference/Abl
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s a table of the temperatures of a process at different pressures, where one temperature in ten was recorded in degrees Fahrenheit rather than Celsius. The held-out data is clean. The model predicts the temperature from the pressure, and it’s scored in two ways: with R² (which the verdicts are based on) and with the mean absolute error.</p>
-<div id="46025bef" class="cell" data-execution_count="2">
+<div id="4c2d8e6e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2250,7 +2250,7 @@ A function for the <code>evaluate=</code> parameter of <a href="../reference/Abl
 </div>
 </div>
 <p>The default model, a gradient boosting model, is badly thrown off by the readings in degrees Fahrenheit: its R² on the held-out data is below zero, so it does worse than always predicting the average temperature. Removing those readings brings its R² close to <code>1</code>. The report for the other metric shows the same change in degrees:</p>
-<div id="4bff95c7" class="cell" data-execution_count="3">
+<div id="6d6a0fa7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ablation.get_tabular_report(metric<span class="op">=</span><span class="st">"neg_mean_absolute_error"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_ablation_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2355,7 +2355,7 @@ A function for the <code>evaluate=</code> parameter of <a href="../reference/Abl
 </div>
 </div>
 <p>The mean absolute error drops from about 6 degrees to about 0.3 (the metric is negated, so that higher is better, as for every scikit-learn scorer). Whether a problem in the data matters depends on the model, though. Here’s the same ablation with a robust linear model, which gives less weight to the readings far from the line that it fits:</p>
-<div id="f66b4e13" class="cell" data-execution_count="4">
+<div id="8504821a" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> HuberRegressor</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>evaluate <span class="op">=</span> pb.ablation.sklearn_evaluator(</span>

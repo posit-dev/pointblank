@@ -2141,7 +2141,7 @@ If <code>source</code> is a path to a file that doesn’t exist.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose an API team publishes a JSON Schema for user profiles and we want to check a table of profiles against it. The schema can be passed as a dictionary (here it’s written inline, but it would usually come from <code>json.load()</code>). Because it has a <code>$schema</code> key, the format is detected without needing <code>format=</code>.</p>
-<div id="86830f37" class="cell" data-execution_count="2">
+<div id="9c143582" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2167,7 +2167,7 @@ If <code>source</code> is a path to a file that doesn’t exist.
 </div>
 </div>
 <p>The printed form gives the counts at a glance: four columns, six constraints, and nothing left untranslated. The <a href="../reference/ContractImport.html#pointblank.ContractImport.summary" class="gdls-link"><code>summary()</code></a> method gives a little more detail, including the version of the source specification.</p>
-<div id="7ed9ab88" class="cell" data-execution_count="3">
+<div id="c57a00b4" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(imported.summary())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Contract Import Summary
@@ -2179,7 +2179,7 @@ If <code>source</code> is a path to a file that doesn’t exist.
 </div>
 </div>
 <p>Now let’s validate some data. The <a href="../reference/ContractImport.html#pointblank.ContractImport.to_validate" class="gdls-link"><code>to_validate()</code></a> method builds a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with a schema check followed by one step per constraint, and it accepts the usual <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> arguments such as <code>tbl_name=</code> and <code>label=</code>.</p>
-<div id="4a009bd6" class="cell" data-execution_count="4">
+<div id="9b9e4b31" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>users <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"user_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">0</span>],</span>
@@ -2760,7 +2760,7 @@ tr { background-color: transparent; }
 </div>
 <p>The table has the right columns and types, so the schema check passes. The remaining failures come straight from the JSON Schema rules: a <code>user_id</code> of <code>0</code> (below the minimum of <code>1</code>), a missing email (which fails both the <code>required</code> check and the <code>email</code> format check), an email without a valid domain, a lowercase country code, and a plan that isn’t in the <code>enum</code>.</p>
 <p>Files work the same way. In this next example a dbt <code>schema.yml</code> file with two models is written to the working directory. The <code>.yml</code> extension identifies it as a dbt file, and <code>model=</code> picks the model to import (without it, the first model would be used).</p>
-<div id="c61b0618" class="cell" data-execution_count="5">
+<div id="7a88b7c0" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>dbt_yml <span class="op">=</span> <span class="st">'''</span></span>
@@ -2808,7 +2808,7 @@ tr { background-color: transparent; }
 </div>
 <p>Four of the five tests were translated. The <code>relationships</code> test checks values against another model, which a single-table validation can’t do, so it was reported as a warning and the coverage is 80%. Note also that the dbt type <code>varchar(20)</code> was read as Pointblank’s <code>String</code> type.</p>
 <p>The import can also be turned into a <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> with <a href="../reference/ContractImport.html#pointblank.ContractImport.to_contract" class="gdls-link"><code>to_contract()</code></a>, which accepts any <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> argument. Printing the contract as YAML shows that the schema, the steps, and the model’s description were all carried over.</p>
-<div id="742d2518" class="cell" data-execution_count="6">
+<div id="a14befae" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>orders_contract <span class="op">=</span> orders_import.to_contract(name<span class="op">=</span><span class="st">"orders"</span>, owner<span class="op">=</span><span class="st">"analytics"</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(orders_contract.to_yaml())</span></code></pre></div>

@@ -2110,7 +2110,7 @@ If the format isn’t supported.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s import the bundled CSVW metadata for a table of weather observations and export it as a Frictionless Table Schema:</p>
-<div id="d6d30391" class="cell" data-execution_count="1">
+<div id="da185111" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2153,7 +2153,7 @@ If the format isn’t supported.
 </div>
 </div>
 <p>The first three fields show how the CSVW column definitions were carried over: the titles, the types (a CSVW <code>decimal</code> is a Frictionless <code>number</code>), and the constraints. The remaining keys of the schema describe the table as a whole:</p>
-<div id="caa61558" class="cell" data-execution_count="2">
+<div id="655a329a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(schema[<span class="st">"primaryKey"</span>])</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(schema[<span class="st">"title"</span>])</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2163,7 +2163,7 @@ Weather Station Observations</code></pre>
 </div>
 <p>The two required and unique columns form the primary key, and the title comes from the dataset label in the CSVW file.</p>
 <p>Give a <code>destination=</code> to write the schema to a file. Here it’s written to a temporary directory and then imported again:</p>
-<div id="be893e76" class="cell" data-execution_count="3">
+<div id="3c463005" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>

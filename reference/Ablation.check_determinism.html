@@ -2087,7 +2087,7 @@ The largest difference in a metric that still counts as the same. Differences fr
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an <code>evaluate()</code> function that forgets to use its seed, so that its bootstrap sample is different every time.</p>
-<div id="7892b227" class="cell" data-execution_count="1">
+<div id="1bd55834" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -2115,7 +2115,7 @@ The largest difference in a metric that still counts as the same. Differences fr
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(caught[<span class="dv">0</span>].message)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>False
-`evaluate=` isn't deterministic: given the full table and the seed 0 twice, it returned different results (score: 0.16199999999999903 and 0.08600000000000207). Use the seed for every source of randomness in training, or the ablation's comparisons will be noisier than they need to be.</code></pre>
+`evaluate=` isn't deterministic: given the full table and the seed 0 twice, it returned different results (score: 0.20599999999999952 and 0.01600000000000179). Use the seed for every source of randomness in training, or the ablation's comparisons will be noisier than they need to be.</code></pre>
 </div>
 </div>
 <p>Passing <code>seed=seed</code> to <code>sample()</code> would fix it, and the check would then return <code>True</code>.</p>

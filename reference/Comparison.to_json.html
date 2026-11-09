@@ -2091,7 +2091,7 @@ The comparison results as a JSON string.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here, a new version of a price list has one changed price.</p>
-<div id="814f4570" class="cell" data-execution_count="2">
+<div id="b34c5129" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2154,7 +2154,7 @@ The comparison results as a JSON string.
 </div>
 </div>
 <p>For a compact record without row samples, set <code>samples=False</code> and <code>indent=None</code>:</p>
-<div id="7c922089" class="cell" data-execution_count="3">
+<div id="c75830a0" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(comparison.to_json(samples<span class="op">=</span><span class="va">False</span>, indent<span class="op">=</span><span class="va">None</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>{"source_name": "source", "target_name": "target", "mode": "keyed", "keys": ["sku"], "compared_columns": ["price"], "column_map": {}, "schema_mode": "strict", "null_equal": true, "partitions": 1, "n_source_rows": 3, "n_target_rows": 3, "n": 3, "n_passed": 2, "n_failed": 1, "identical": false, "status_counts": {"match": 2, "changed": 1, "missing": 0, "extra": 0, "dup_key": 0}, "column_mismatches": {"price": 1}, "schema_diff": {"matches": true, "only_in_source": [], "only_in_target": [], "dtype_changed": [], "renamed": [], "case_only": [], "reordered": false}}</code></pre>

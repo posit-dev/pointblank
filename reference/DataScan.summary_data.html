@@ -2055,7 +2055,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s the summary for the numeric columns of the <code>small_table</code> dataset.</p>
-<div id="bb2c8a51" class="cell" data-execution_count="2">
+<div id="9add8049" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2081,7 +2081,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Column <code>c</code> is the only one with missing values. The <code>min</code> and <code>max</code> columns are strings, because they also hold the dates from the date columns.</p>
 <p>Since this is an ordinary DataFrame, the profile can lead to further checks. This finds the columns with one distinct value fewer than the table has rows:</p>
-<div id="71c65094" class="cell" data-execution_count="3">
+<div id="662db1cd" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>summary.<span class="bu">filter</span>(pl.col(<span class="st">"n_unique"</span>) <span class="op">==</span> small_table.height <span class="op">-</span> <span class="dv">1</span>).get_column(<span class="st">"colname"</span>).to_list()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>['date_time', 'b', 'd']</code></pre>

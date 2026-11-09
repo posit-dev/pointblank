@@ -2052,7 +2052,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here, a reporting table stores the readings rounded to one decimal place.</p>
-<div id="6980150f" class="cell" data-execution_count="2">
+<div id="04b51597" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2065,7 +2065,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>An exact comparison finds every row changed. Allowing for the rounding with <code>tolerance=</code> makes the tables match:</p>
-<div id="2fa08a47" class="cell" data-execution_count="3">
+<div id="e6d4704c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(raw, rounded, keys<span class="op">=</span><span class="st">"station"</span>, tolerance<span class="op">=</span>{<span class="st">"temp"</span>: <span class="fl">0.05</span>})</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>comparison.identical</span></code></pre></div>
@@ -2074,7 +2074,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Since a comparison has the same truth value, it can be used directly in a condition:</p>
-<div id="3995c3bd" class="cell" data-execution_count="4">
+<div id="11dfed13" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> comparison:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"The rounded table matches the raw readings."</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">

@@ -2110,7 +2110,7 @@ The names of the variables that together identify a record. The default is an em
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s look at the template for the Adverse Events (AE) domain:</p>
-<div id="d6bb03fb" class="cell" data-execution_count="1">
+<div id="81975382" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ae <span class="op">=</span> pb.get_sdtm_domain(<span class="st">"AE"</span>)</span>
@@ -2125,7 +2125,7 @@ Adverse events reported during the study.
 </div>
 </div>
 <p>The variables are in the <code>variables</code> list. Here are the first eight, with their type, role and core designation:</p>
-<div id="361fe163" class="cell" data-execution_count="2">
+<div id="cc4b0f64" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> var <span class="kw">in</span> ae.variables[:<span class="dv">8</span>]:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>var<span class="sc">.</span>name<span class="sc">:9}{</span>var<span class="sc">.</span>dtype<span class="sc">:5}{</span>var<span class="sc">.</span>role<span class="sc">:12}{</span>var<span class="sc">.</span>core<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2195,7 +2195,7 @@ AETERM   Char Topic       Req</code></pre>
 </div>
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="25949c0d" class="cell" data-execution_count="3">
+<div id="10a7401e" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>pb.get_sdtm_domain(<span class="st">"DM"</span>).required_variables</span></code></pre></div>
@@ -2227,7 +2227,7 @@ AETERM   Char Topic       Req</code></pre>
 </div>
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="d56faa5d" class="cell" data-execution_count="4">
+<div id="13d165f3" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>pb.get_sdtm_domain(<span class="st">"DM"</span>).expected_variables</span></code></pre></div>
@@ -2259,7 +2259,7 @@ AETERM   Char Topic       Req</code></pre>
 </div>
 <section id="examples-3" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
-<div id="3d289d3e" class="cell" data-execution_count="5">
+<div id="755f720c" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>pb.get_sdtm_domain(<span class="st">"AE"</span>).identifier_variables</span></code></pre></div>
@@ -2323,7 +2323,7 @@ The specification of the variable, or <code>None</code> if the template has no v
 </section>
 <section id="examples-4" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
-<div id="e70f7189" class="cell" data-execution_count="6">
+<div id="ec4f66a4" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pb.get_sdtm_domain(<span class="st">"DM"</span>)</span>
@@ -2334,7 +2334,7 @@ The specification of the variable, or <code>None</code> if the template has no v
 </div>
 </div>
 <p><code>AGE</code> is an expected numeric variable, so it has no maximum length. A name that isn’t in the template gives <code>None</code>:</p>
-<div id="67b94500" class="cell" data-execution_count="7">
+<div id="b80054f6" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dm.get_variable(<span class="st">"age"</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>None</code></pre>

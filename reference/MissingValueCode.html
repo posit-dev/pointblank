@@ -2086,7 +2086,7 @@ Why the data is missing, if known. The default is <code>None</code>.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>The bundled Frictionless Data Package declares <code>"NA"</code> and <code>"N/A"</code> as missing-value markers for every field. Let’s look at the codes recorded for the <code>amount</code> column:</p>
-<div id="b574b1c3" class="cell" data-execution_count="1">
+<div id="474044bb" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"datapackage.json"</span>))</span>
@@ -2099,7 +2099,7 @@ N/A | Missing value marker: 'N/A' | user_missing</code></pre>
 </div>
 </div>
 <p>Each marker is recorded with a generated label and the <code>"user_missing"</code> category, since it was declared in the file. A code can also be created directly:</p>
-<div id="d6ccd04b" class="cell" data-execution_count="2">
+<div id="5020f096" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pb.MissingValueCode(value<span class="op">=-</span><span class="dv">99</span>, label<span class="op">=</span><span class="st">"Refused"</span>, category<span class="op">=</span><span class="st">"user_missing"</span>, reason<span class="op">=</span><span class="st">"refused"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>MissingValueCode(value=-99, label='Refused', category='user_missing', reason='refused')</code></pre>

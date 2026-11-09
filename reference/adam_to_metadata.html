@@ -2100,7 +2100,7 @@ If there is no template with that name.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s convert the template for the subject-level analysis dataset, ADSL:</p>
-<div id="a323d68b" class="cell" data-execution_count="1">
+<div id="f4eeeb89" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>adsl_meta <span class="op">=</span> pb.adam_to_metadata(<span class="st">"ADSL"</span>, study_id<span class="op">=</span><span class="st">"STUDY01"</span>)</span>
@@ -2113,7 +2113,7 @@ If there is no template with that name.
 </div>
 </div>
 <p>Each variable keeps what the template says about it, with the ADaM core designation in <code>cdisc_role</code>:</p>
-<div id="cfdafad4" class="cell" data-execution_count="2">
+<div id="ea578d03" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> [<span class="st">"USUBJID"</span>, <span class="st">"TRT01P"</span>, <span class="st">"SAFFL"</span>, <span class="st">"TRTSDT"</span>]:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    var <span class="op">=</span> adsl_meta.get_variable(name)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:8}{</span>var<span class="sc">.</span>dtype<span class="sc">:8}{</span>var<span class="sc">.</span>cdisc_role<span class="sc">:5}{</span>var<span class="sc">.</span>adam_derivation<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>

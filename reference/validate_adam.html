@@ -2146,7 +2146,7 @@ If there is no template with that name.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here is a small subject-level analysis dataset (ADSL) with two problems in its population flags: the fourth subject has no safety flag (<code>SAFFL</code>) and an intent-to-treat flag (<code>ITTFL</code>) of <code>"U"</code>:</p>
-<div id="8482a832" class="cell" data-execution_count="2">
+<div id="afeef143" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2575,7 +2575,7 @@ If there is no template with that name.
 </div>
 <p>The five required ADSL variables get null checks, which all pass. The two population flags are checked for <code>"Y"</code> and <code>"N"</code>, and each of those steps has one failing test unit.</p>
 <p>For a time-to-event dataset (ADTTE), the plan also checks the censoring indicator and the time to the event. Here the second subject has a negative time, and the third has a <code>CNSR</code> of <code>2</code>:</p>
-<div id="3269448d" class="cell" data-execution_count="3">
+<div id="a8d0002c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>adtte <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"STUDYID"</span>: [<span class="st">"STUDY01"</span>] <span class="op">*</span> <span class="dv">3</span>,</span>

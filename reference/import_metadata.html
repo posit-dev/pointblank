@@ -2178,7 +2178,7 @@ If the format needs an optional package that isn’t installed.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Pointblank bundles a few metadata files to experiment with, which can be found with <a href="../reference/load_metadata_example.html#pointblank.load_metadata_example" class="gdls-link"><code>load_metadata_example()</code></a>. Let’s import a Frictionless Data Package that describes a table of sales transactions:</p>
-<div id="22adffc3" class="cell" data-execution_count="2">
+<div id="cd05579f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"datapackage.json"</span>))</span>
@@ -2189,7 +2189,7 @@ If the format needs an optional package that isn’t installed.
 </div>
 </div>
 <p>The format was detected from the file’s contents. The metadata describes eight variables and one codelist (the allowed values of <code>category</code>). Each variable’s metadata can be looked up by name:</p>
-<div id="876cc9c9" class="cell" data-execution_count="3">
+<div id="0f584458" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>amount <span class="op">=</span> meta.get_variable(<span class="st">"amount"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(amount.dtype, amount.required, amount.min_val, amount.max_val)</span></code></pre></div>
@@ -2198,7 +2198,7 @@ If the format needs an optional package that isn’t installed.
 </div>
 </div>
 <p>The <code>amount</code> variable must be a non-null float from <code>0.01</code> to <code>99999.99</code>. Constraints like these can be checked against a table with <a href="../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a>, which builds a validation plan from the metadata:</p>
-<div id="10d8d389" class="cell" data-execution_count="4">
+<div id="52e12b23" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datetime</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -3248,7 +3248,7 @@ tr { background-color: transparent; }
 </div>
 <p>The table has the declared column types, so the schema check in step 1 passes. Three later steps find a failing row each: the <code>amount</code> of <code>0.00</code> is below the minimum, <code>"toys"</code> isn’t one of the allowed categories, and <code>"not-an-email"</code> doesn’t match the pattern given for <code>email</code>.</p>
 <p>A Define-XML document usually describes all the datasets in a study, so importing one gives a <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>:</p>
-<div id="341f0fea" class="cell" data-execution_count="5">
+<div id="214bffa1" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>package <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>package</span></code></pre></div>
@@ -3257,7 +3257,7 @@ tr { background-color: transparent; }
 </div>
 </div>
 <p>The package holds the Demographics (<code>DM</code>) and Adverse Events (<code>AE</code>) datasets, and <code>package["DM"]</code> gives the <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> for one of them. If only one dataset is needed, the <code>dataset=</code> option of the Define-XML reader returns it directly:</p>
-<div id="2bf60ae5" class="cell" data-execution_count="6">
+<div id="2376b04d" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>), dataset<span class="op">=</span><span class="st">"DM"</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dm.dataset_label)</span>

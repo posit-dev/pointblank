@@ -2129,7 +2129,7 @@ A missing-value specification that can be passed to validation methods (via <cod
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose a survey records the respondent’s age, with three codes for an age that wasn’t given: <code>-99</code> when the question wasn’t asked, <code>-98</code> when the respondent refused, and <code>-97</code> when they didn’t know. The last two are both <em>item nonresponse</em> (the question was asked but not answered), so we’ll group them in a category:</p>
-<div id="d867de19" class="cell" data-execution_count="2">
+<div id="b6dc4ad5" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2148,7 +2148,7 @@ refused
 </div>
 </div>
 <p>The spec lists its sentinel values, gives the reason for any of them, and finds the values in a category. Here’s some survey data that uses these codes, along with a null and an age of <code>150</code> that’s a genuine error:</p>
-<div id="ff42a528" class="cell" data-execution_count="3">
+<div id="91c3100f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>survey <span class="op">=</span> pl.DataFrame({<span class="st">"age"</span>: [<span class="dv">34</span>, <span class="op">-</span><span class="dv">98</span>, <span class="dv">51</span>, <span class="op">-</span><span class="dv">99</span>, <span class="va">None</span>, <span class="dv">27</span>, <span class="dv">150</span>, <span class="op">-</span><span class="dv">97</span>, <span class="dv">45</span>, <span class="dv">62</span>]})</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>pb.preview(survey)</span></code></pre></div>
@@ -2280,7 +2280,7 @@ refused
 </div>
 </div>
 <p>We’ll check the ages with and without the spec, and then limit the item nonresponse to 10% of the rows:</p>
-<div id="92901ddb" class="cell" data-execution_count="4">
+<div id="9f8bd097" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>survey)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"age"</span>, left<span class="op">=</span><span class="dv">0</span>, right<span class="op">=</span><span class="dv">120</span>)</span>
@@ -2667,7 +2667,7 @@ A spec with the standard null flavor codes.
 </section>
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="5a45a3fe" class="cell" data-execution_count="5">
+<div id="12cee94e" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>cdisc_missing <span class="op">=</span> pb.MissingSpec.from_cdisc_null_flavors()</span>
@@ -2732,7 +2732,7 @@ A spec with the standard null flavor codes.
 </section>
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="31f7da11" class="cell" data-execution_count="6">
+<div id="09a27cbc" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>cdisc_missing <span class="op">=</span> pb.MissingSpec.from_cdisc(null_reason<span class="op">=</span><span class="st">"unknown"</span>)</span>
@@ -2806,7 +2806,7 @@ A spec covering the SAS special missing values.
 </section>
 <section id="examples-3" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
-<div id="49f603cc" class="cell" data-execution_count="7">
+<div id="55b8545c" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>sas_missing <span class="op">=</span> pb.MissingSpec.from_sas(</span>
@@ -2888,7 +2888,7 @@ A spec built from the SPSS missing values.
 </section>
 <section id="examples-4" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
-<div id="976a0ff6" class="cell" data-execution_count="8">
+<div id="11ac9c72" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>spss_missing <span class="op">=</span> pb.MissingSpec.from_spss(</span>
@@ -2956,7 +2956,7 @@ A spec built from the variable’s missing values, or <code>None</code> if the v
 <section id="examples-5" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-5">Examples</h4>
 <p>In practice the variable comes from an imported file, but we’ll build one here to show how it’s read:</p>
-<div id="9559cd69" class="cell" data-execution_count="9">
+<div id="850d5c9b" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>q5 <span class="op">=</span> pb.VariableMetadata(</span>
@@ -3016,7 +3016,7 @@ A value from the data.
 </section>
 <section id="examples-6" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-6">Examples</h4>
-<div id="7c73f226" class="cell" data-execution_count="10">
+<div id="7381feb5" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> pb.MissingSpec(reasons<span class="op">=</span>{<span class="op">-</span><span class="dv">99</span>: <span class="st">"not_asked"</span>}, null_is_missing<span class="op">=</span><span class="va">False</span>)</span>
@@ -3069,7 +3069,7 @@ The reason label if <code>value</code> is a declared sentinel value, <code>null_
 </section>
 <section id="examples-7" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-7">Examples</h4>
-<div id="be301022" class="cell" data-execution_count="11">
+<div id="6d432aeb" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> pb.MissingSpec(reasons<span class="op">=</span>{<span class="op">-</span><span class="dv">99</span>: <span class="st">"not_asked"</span>, <span class="op">-</span><span class="dv">98</span>: <span class="st">"refused"</span>})</span>
@@ -3114,7 +3114,7 @@ The keys of <code>reasons</code> (the actual values in the data that represent m
 </section>
 <section id="examples-8" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-8">Examples</h4>
-<div id="f45c0074" class="cell" data-execution_count="12">
+<div id="6fa43481" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> pb.MissingSpec(reasons<span class="op">=</span>{<span class="op">-</span><span class="dv">99</span>: <span class="st">"not_asked"</span>, <span class="op">-</span><span class="dv">98</span>: <span class="st">"refused"</span>, <span class="op">-</span><span class="dv">97</span>: <span class="st">"refused"</span>})</span>
@@ -3152,7 +3152,7 @@ The distinct reason labels (in first-seen order), including <code>null_reason</c
 </section>
 <section id="examples-9" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-9">Examples</h4>
-<div id="3b5dca16" class="cell" data-execution_count="13">
+<div id="153ee402" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> pb.MissingSpec(reasons<span class="op">=</span>{<span class="op">-</span><span class="dv">99</span>: <span class="st">"not_asked"</span>, <span class="op">-</span><span class="dv">98</span>: <span class="st">"refused"</span>, <span class="op">-</span><span class="dv">97</span>: <span class="st">"refused"</span>})</span>
@@ -3201,7 +3201,7 @@ All sentinel values mapped to <code>reason</code>, or an empty list if no sentin
 </section>
 <section id="examples-10" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-10">Examples</h4>
-<div id="6906a7dc" class="cell" data-execution_count="14">
+<div id="11973eaf" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> pb.MissingSpec(</span>
@@ -3252,7 +3252,7 @@ All sentinel values whose reason label is in the given category. Returns an empt
 </section>
 <section id="examples-11" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-11">Examples</h4>
-<div id="69d9406b" class="cell" data-execution_count="15">
+<div id="9fa6ea31" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> pb.MissingSpec(</span>

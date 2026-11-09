@@ -2119,7 +2119,7 @@ A scorer for <a href="../reference/Validate.col_vals_scored.html#pointblank.Vali
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>A real check would use the <a href="../reference/scorers.langid.html#pointblank.scorers.langid" class="gdls-link gdls-code">langid</a> package or a fastText model. To keep this example self-contained, the backend is a toy function that guesses the language from a few words.</p>
-<div id="ebe51ce5" class="cell" data-execution_count="2">
+<div id="8e56ac1e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2301,7 +2301,7 @@ A scorer for <a href="../reference/Validate.col_vals_scored.html#pointblank.Vali
 </div>
 </div>
 <p>The review in French fails, and so does <code>"ok"</code>, which can’t be told apart. In a corpus with documents in several languages, the expected language of each row can come from a column, with <code>expected_column=</code>:</p>
-<div id="69a99289" class="cell" data-execution_count="3">
+<div id="c03410ce" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"review"</span>: [<span class="st">"the soup is good"</span>, <span class="st">"le pain est bon"</span>, <span class="st">"le vin est bon"</span>],</span>

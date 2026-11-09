@@ -2086,7 +2086,7 @@ A dictionary with the comparison settings (<code>"source_name"</code>, <code>"ta
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s compare two months of an employee table and turn the result into a dictionary.</p>
-<div id="32fb92da" class="cell" data-execution_count="2">
+<div id="28bbad48" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2109,7 +2109,7 @@ A dictionary with the comparison settings (<code>"source_name"</code>, <code>"ta
 </div>
 </div>
 <p>The samples hold the actual rows, keyed by status:</p>
-<div id="d13d6bd8" class="cell" data-execution_count="3">
+<div id="2b93f282" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>result[<span class="st">"samples"</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>{'changed': [{'emp_id': 102, 'salary_source': 61000, 'salary_target': 63500}],
@@ -2118,7 +2118,7 @@ A dictionary with the comparison settings (<code>"source_name"</code>, <code>"ta
 </div>
 </div>
 <p>Salaries are sensitive, so a record that’s kept in a shared log might leave the samples out. With <code>samples=False</code>, only counts, settings, and schema details remain:</p>
-<div id="8c7e386e" class="cell" data-execution_count="4">
+<div id="8fe90ac0" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>record <span class="op">=</span> comparison.to_dict(samples<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>{k: record[k] <span class="cf">for</span> k <span class="kw">in</span> [<span class="st">"source_name"</span>, <span class="st">"target_name"</span>, <span class="st">"n_failed"</span>, <span class="st">"identical"</span>]}</span></code></pre></div>
