@@ -1533,6 +1533,11 @@ def yaml_ablation(
 
     The `tbl:` of the configuration is replaced with the table in `set_tbl=`, and the ablation
     was set up from the block, ready to run.
+
+    See Also
+    --------
+    Ablation : Measure how the rows that fail validation steps affect a model trained on the data.
+    yaml_interrogate : Execute a YAML-based validation workflow.
     """
     from pointblank.ablation import Ablation
 
