@@ -1,6 +1,6 @@
 # Overhauling Pointblank's User Guide
 
-The Pointblank documentation just got a major upgrade! We've completely overhauled our [**User Guide**](../../user-guide/index.md). Our goal was to enable readers to start fast on validation and work through the many pieces needed in realistic situations.
+The Pointblank documentation just got a major upgrade! We've completely overhauled our [**User Guide**](../../user-guide/getting-started/quickstart.md). Our goal was to enable readers to start fast on validation and work through the many pieces needed in realistic situations.
 
 We realized that at the core of Pointblank is the validation plan. Its made up of rules, results, and steps.
 
@@ -15,11 +15,11 @@ In this post, we'll cover:
 - rounding out API coverage for cross-linking
 - surfacing advanced topics
 
-Let us walk you through the key improvements in our refreshed [**User Guide**](../../user-guide/index.md)!
+Let us walk you through the key improvements in our refreshed [**User Guide**](../../user-guide/getting-started/quickstart.md)!
 
 ## Introduction: Embracing the Spiral Sequence
 
-We chose to use a spiral sequence for our [Introduction](../../user-guide/index.md) and *Validation Plan* section. The [Introduction](../../user-guide/index.md) quickly covers parts of validation plan, while each article of the *Validation Plan* section dives deeper into different aspects of defining validation rules.
+We chose to use a spiral sequence for our [Introduction](../../user-guide/getting-started/quickstart.md) and *Validation Plan* section. The [Introduction](../../user-guide/getting-started/quickstart.md) quickly covers parts of validation plan, while each article of the *Validation Plan* section dives deeper into different aspects of defining validation rules.
 
 ![](breadth-and-depth.png)
 
@@ -27,7 +27,7 @@ The introduction does a broad pass on the validation plan table diagram, identif
 
 ## Improving Examples
 
-Examples are everywhere in the [**User Guide**](../../user-guide/index.md). We've tightened up our approach to examples by:
+Examples are everywhere in the [**User Guide**](../../user-guide/getting-started/quickstart.md). We've tightened up our approach to examples by:
 
 - presenting example code, output, or both, early in each section
 - showing the actual output you'll see in your environment
@@ -46,18 +46,18 @@ Documentation has to balance jobs between a user guide and an API Reference:
 - User Guide: explains concepts that cut across functions (like common arguments across [validation methods](../../user-guide/validation-plan/validation-methods.md))
 - API Reference: explains each individual function
 
-Importantly, user guides often link to the API reference so, as part of this work, we made sure that all individual API entries are well-documented and linked to from the guide. Here's an excerpt from the [**User Guide**](../../user-guide/index.md) that shows links marked:
+Importantly, user guides often link to the API reference so, as part of this work, we made sure that all individual API entries are well-documented and linked to from the guide. Here's an excerpt from the [**User Guide**](../../user-guide/getting-started/quickstart.md) that shows links marked:
 
 ![](links-in-guide.png)
 
 ## Surfacing Advanced Topics
 
-There's a lot of potential slicing and dicing involved in validation, as well as work after validation (post interrogation) to make sense of the results. We added pages to the [**User Guide**](../../user-guide/index.md) for some core situations. In this section, I'll highlight two advanced topics we added pages for:
+There's a lot of potential slicing and dicing involved in validation, as well as work after validation (post interrogation) to make sense of the results. We added pages to the [**User Guide**](../../user-guide/getting-started/quickstart.md) for some core situations. In this section, I'll highlight two advanced topics we added pages for:
 
 - segmentation: splitting a column into groups, and validating each group
 - step reports: view failing cases (e.g., view rows of data that failed validation)
 
-These are marked in the [**User Guide**](../../user-guide/index.md) sidebar screenshot below:
+These are marked in the [**User Guide**](../../user-guide/getting-started/quickstart.md) sidebar screenshot below:
 
 ![](advanced-in-sidebar.png)
 
@@ -81,7 +81,7 @@ Step reports display failing cases (e.g., rows) for a validation step, so you ca
 
 Notice the arrow pointing to 'Step 2' in the title. Failing values are highlighted in red. Once we know we have failures, it's important to take action and discover *why* data is failing. Looking at failing cases in step reports often uncovers obvious causes behind failures.
 
-The [get_step_report()](../../reference/Validate.get_step_report.md#pointblank.Validate.get_step_report) entry is one of 50 in the API Reference. Here it is listed the API Reference, in the [Interrogation and Reporting section](../../reference/index.md#interrogation-and-reporting). Critically, it's only one of 20 entries in the [User Guide](../../user-guide/index.md), which emphasizes its importance in validation workflows.
+The [get_step_report()](../../reference/Validate.get_step_report.md#pointblank.Validate.get_step_report) entry is one of 50 in the API Reference. Here it is listed the API Reference, in the [Interrogation and Reporting section](../../reference/index.md#interrogation-and-reporting). Critically, it's only one of 20 entries in the [User Guide](../../user-guide/getting-started/quickstart.md), which emphasizes its importance in validation workflows.
 
 ## Looking Forward
 

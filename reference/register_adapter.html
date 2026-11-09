@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-c17ba41ba6215283560c22479a3a4e8f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -166,7 +166,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../user-guide/index.html"> 
+    <a class="nav-link" href="../user-guide/getting-started/quickstart.html"> 
 <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
@@ -189,7 +189,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="503" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2103,7 +2103,7 @@ If no name is given and the class has an empty <code>format_name</code> attribut
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose a team keeps a simple list of required columns in a dictionary with a <code>required_columns</code> key. A minimal adapter for this format only needs to say how to recognize it and how to turn it into a <a href="../reference/ContractImport.html#pointblank.ContractImport" class="gdls-link"><code>ContractImport</code></a>. Since this adapter can’t export, it sets <code>supports_export = False</code>.</p>
-<div id="bca9b298" class="cell" data-execution_count="2">
+<div id="bc9a90c7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.adapters <span class="im">import</span> MappedConstraint</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2129,7 +2129,7 @@ If no name is given and the class has an empty <code>format_name</code> attribut
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        )</span></code></pre></div>
 </div>
 <p>The new format now appears next to the built-in ones in <a href="../reference/list_adapters.html#pointblank.list_adapters" class="gdls-link gdls-code">list_adapters()</a>.</p>
-<div id="f154c482" class="cell" data-execution_count="3">
+<div id="9be2137d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, info <span class="kw">in</span> pb.list_adapters().items():</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:&lt;18}</span><span class="ss"> import=</span><span class="sc">{</span>info[<span class="st">'supports_import'</span>]<span class="sc">}</span><span class="ss">  export=</span><span class="sc">{</span>info[<span class="st">'supports_export'</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2141,7 +2141,7 @@ required_columns   import=True  export=False</code></pre>
 </div>
 </div>
 <p>And it can be used with <a href="../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a>, either by name or (since it implements <a href="../reference/ContractAdapter.html#pointblank.ContractAdapter.detect" class="gdls-link gdls-code">detect()</a>) by letting the format be detected from the content.</p>
-<div id="1818c694" class="cell" data-execution_count="4">
+<div id="d10af164" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>imported <span class="op">=</span> pb.import_contract({<span class="st">"required_columns"</span>: [<span class="st">"id"</span>, <span class="st">"email"</span>]})</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>imported.constraints</span></code></pre></div>
@@ -2151,7 +2151,7 @@ required_columns   import=True  export=False</code></pre>
 </div>
 </div>
 <p>Exporting to this format isn’t possible, so <a href="../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a> raises an error that says so.</p>
-<div id="f86f0cdc" class="cell" data-execution_count="5">
+<div id="fb879e88" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>contract <span class="op">=</span> pb.Contract(name<span class="op">=</span><span class="st">"users"</span>, steps<span class="op">=</span>[pb.Step(<span class="st">"col_vals_not_null"</span>, columns<span class="op">=</span><span class="st">"id"</span>)])</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>

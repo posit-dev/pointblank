@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-c17ba41ba6215283560c22479a3a4e8f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -166,7 +166,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../user-guide/index.html"> 
+    <a class="nav-link" href="../user-guide/getting-started/quickstart.html"> 
 <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
@@ -189,7 +189,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="503" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2092,7 +2092,7 @@ If the YAML is invalid, malformed, or contains unknown validation methods.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Convert a basic YAML configuration to Python code:</p>
-<div id="5e12ccf5" class="cell" data-execution_count="2">
+<div id="cfa10615" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a YAML validation workflow</span></span>
@@ -2128,7 +2128,7 @@ import pointblank as pb
 </div>
 <p>The generated Python code shows exactly how to replicate the YAML workflow programmatically. This is particularly useful when transitioning from YAML-based workflows to code-based workflows, or when generating documentation that shows both YAML and Python approaches.</p>
 <p>For more complex workflows with thresholds and metadata:</p>
-<div id="d1decbb2" class="cell" data-execution_count="3">
+<div id="c6030eed" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Advanced YAML configuration</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
@@ -2172,7 +2172,7 @@ import pointblank as pb
 <p>The <code>tbl</code> and <code>reference</code> data sources are loaded as <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a> loads them: a dataset name becomes a <code>pb.load_dataset()</code> call, a CSV file is read with the <code>df_library</code> library (e.g., <code>pl.read_csv()</code>), and other file paths and connection strings are passed to <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> as strings.</p>
 <p>Python code in the configuration (<code>python:</code> blocks, and the <code>expr:</code>, <code>pre:</code>, and <code>active:</code> shortcuts) is copied into the generated code as written, without being run. So, unlike <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a>, this function doesn’t need <code>allow_python=True</code>, though you should still read the generated code before running it.</p>
 <p>Governance metadata (<code>owner</code>, <code>consumers</code>, <code>version</code>) and <code>reference</code> are also rendered in the generated Python code:</p>
-<div id="6f45321a" class="cell" data-execution_count="4">
+<div id="5a6193bf" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: Sales Pipeline</span></span>

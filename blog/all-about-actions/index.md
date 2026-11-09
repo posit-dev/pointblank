@@ -416,4 +416,4 @@ Explore our documentation to learn more about Pointblank's action capabilities:
 
 - [Actions documentation](../../reference/Actions.md)
 - [FinalActions documentation](../../reference/FinalActions.md)
-- [User Guide on Triggering Actions](../../user-guide/actions.md)
+- [User Guide on Triggering Actions](../../user-guide/validation-plan/actions.md)

@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-c17ba41ba6215283560c22479a3a4e8f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -169,7 +169,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../user-guide/index.html"> 
+    <a class="nav-link" href="../user-guide/getting-started/quickstart.html"> 
 <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="503" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2178,7 +2178,7 @@ The result of the comparison.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s compare two versions of a product catalog. In the newer version, one product was discontinued, one was added, one had its price lowered, and one went out of stock.</p>
-<div id="831b9850" class="cell" data-execution_count="2">
+<div id="6d2cd1d3" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2201,7 +2201,7 @@ The result of the comparison.
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Every product has a unique <code>sku</code>, so we’ll use it as the key that lines up the rows. Naming the two tables makes the report easier to read.</p>
-<div id="dc3a4aa5" class="cell" data-execution_count="3">
+<div id="59ba9ddd" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    catalog_v1, catalog_v2, keys<span class="op">=</span><span class="st">"sku"</span>, source_name<span class="op">=</span><span class="st">"catalog_v1"</span>, target_name<span class="op">=</span><span class="st">"catalog_v2"</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -2335,14 +2335,14 @@ The result of the comparison.
 </div>
 <p>The report’s header gives the verdict and a breakdown of the six aligned rows. Below it are the columns with mismatched values, then samples of the changed, missing, and extra rows. For changed rows, only the differing values are shown.</p>
 <p>The same information is available programmatically. The status counts add up to the number of test units (aligned rows):</p>
-<div id="bfb53cf0" class="cell" data-execution_count="4">
+<div id="43c28f59" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>comparison.status_counts</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>{'match': 2, 'changed': 2, 'missing': 1, 'extra': 1, 'dup_key': 0}</code></pre>
 </div>
 </div>
 <p>To work with the differing rows, get them by status with <a href="../reference/Comparison.rows.html#pointblank.Comparison.rows" class="gdls-link"><code>rows()</code></a>. Changed rows have a <code>&lt;column&gt;_source</code> and a <code>&lt;column&gt;_target</code> column for each compared column.</p>
-<div id="4305f272" class="cell" data-execution_count="5">
+<div id="a34dcd18" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"changed"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div><style>
@@ -2356,21 +2356,21 @@ The result of the comparison.
 </div>
 </div>
 <p><code>A-102</code> changed price and <code>A-105</code> changed its stock status. If only prices matter, list the columns to compare with <code>columns=</code>. The stock change is then ignored and <code>A-105</code> matches:</p>
-<div id="e94eec5f" class="cell" data-execution_count="6">
+<div id="838c992b" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pb.compare(catalog_v1, catalog_v2, keys<span class="op">=</span><span class="st">"sku"</span>, columns<span class="op">=</span><span class="st">"price"</span>).status_counts</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>{'match': 3, 'changed': 1, 'missing': 1, 'extra': 1, 'dup_key': 0}</code></pre>
 </div>
 </div>
 <p>Without <code>keys=</code>, rows are compared by position. Since a product was removed from the middle of the catalog, most rows no longer line up, and four of the five rows count as changed. This is why a key gives a much more useful answer when the data has one.</p>
-<div id="68670d97" class="cell" data-execution_count="7">
+<div id="1df12498" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pb.compare(catalog_v1, catalog_v2).status_counts</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>{'match': 1, 'changed': 4, 'missing': 0, 'extra': 0, 'dup_key': 0}</code></pre>
 </div>
 </div>
 <p>Schema changes are found too. Suppose the next version renames <code>price</code> to <code>unit_price</code>. With the default <code>schema="strict"</code>, the comparison fails every row until the schemas agree. <code>column_map=</code> pairs up the renamed column, after which the values are compared as before:</p>
-<div id="c4a01bbe" class="cell" data-execution_count="8">
+<div id="3786b230" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>catalog_v3 <span class="op">=</span> catalog_v2.rename({<span class="st">"price"</span>: <span class="st">"unit_price"</span>})</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>pb.compare(catalog_v1, catalog_v3, keys<span class="op">=</span><span class="st">"sku"</span>, column_map<span class="op">=</span>{<span class="st">"price"</span>: <span class="st">"unit_price"</span>})</span></code></pre></div>

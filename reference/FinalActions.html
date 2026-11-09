@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-c17ba41ba6215283560c22479a3a4e8f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -166,7 +166,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../user-guide/index.html"> 
+    <a class="nav-link" href="../user-guide/getting-started/quickstart.html"> 
 <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
@@ -189,7 +189,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="503" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2096,7 +2096,7 @@ An <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Final actions provide a powerful way to respond to the overall results of a validation workflow. They’re especially useful for sending notifications, generating reports, or taking corrective actions based on the complete validation outcome.</p>
 <p>The following example shows how to create a final action that checks for critical failures and sends an alert. The <code>d</code> column of the <code>small_table</code> dataset has many values that aren’t greater than <code>1000</code>, so the step reaches the ‘critical’ threshold:</p>
-<div id="440a61b5" class="cell" data-execution_count="1">
+<div id="a5a596a9" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> send_alert():</span>
@@ -2120,7 +2120,7 @@ An <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-
 </div>
 <p>In this example, the <code>send_alert()</code> function is defined to check the validation summary for critical failures. Since some were found, the alert message was printed. The function is passed to the <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> class, which ensures it will be executed after all validation steps are complete. Note that we used the <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function to retrieve the summary of the validation results to help craft the alert message.</p>
 <p>Multiple final actions can be provided in a sequence. They will be executed in the order they are specified after all validation steps have completed. Here, a string message is followed by the <code>send_alert()</code> function and a second function that prints a count of the failing steps:</p>
-<div id="080c0cfb" class="cell" data-execution_count="2">
+<div id="cfb8daee" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_counts():</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>summary[<span class="st">'n_failing_steps'</span>]<span class="sc">}</span><span class="ss"> of </span><span class="sc">{</span>summary[<span class="st">'n_steps'</span>]<span class="sc">}</span><span class="ss"> steps had failures"</span>)</span>

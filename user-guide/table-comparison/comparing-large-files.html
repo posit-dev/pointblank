@@ -88,7 +88,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-c17ba41ba6215283560c22479a3a4e8f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -170,7 +170,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../../user-guide/index.html" aria-current="page"> 
+    <a class="nav-link active" href="../../user-guide/getting-started/quickstart.html" aria-current="page"> 
 <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
@@ -193,7 +193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="503" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -219,12 +219,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Section">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../user-guide/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Index</span></a>
-  </div>
-</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true">
@@ -717,7 +711,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Chunking done correctly.</strong> With <code>partitions=N</code>, the comparison runs in N passes, each covering the keys whose hash falls into one bucket, on <em>both</em> tables. A key’s rows always land in the same pass, so the results are exactly those of a single-pass comparison, while each pass only joins about <code>1/N</code> of the rows.</li>
 </ol>
 <p>Let’s try it on a pair of CSV files. We’ll generate a source file with 200,000 orders and a target file in which some orders are missing, some amounts changed, a few orders were added, and the rows were shuffled:</p>
-<div id="5952a805" class="cell" data-execution_count="2">
+<div id="76cea000" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -751,7 +745,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>target.write_csv(data_dir <span class="op">/</span> <span class="st">"target.csv"</span>)</span></code></pre></div>
 </div>
 <p>Now we compare the two files by giving <a href="../../reference/compare.html#pointblank.compare" class="gdls-link gdls-code">compare()</a> their paths:</p>
-<div id="2e75adf4" class="cell" data-execution_count="3">
+<div id="9fcc696c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(</span>
@@ -839,7 +833,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td colspan="2" class="gt_heading gt_title gt_font_normal" id="pb_comparison_tbl-title">Table Comparison</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_comparison_tbl-subtitle"><div style="font-size:13px; line-height:1.9;"><strong>/tmp/tmpue70sch3/source.csv</strong> (200,000 rows) → <strong>/tmp/tmpue70sch3/target.csv</strong> (199,850 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 650 of 200,050 rows fail (0.3%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 199,400" style="width:99.675%; background:#4CA64C; height:100%;"></div><div title="changed: 400" style="width:0.500%; background:#E8A33D; height:100%;"></div><div title="missing: 200" style="width:0.500%; background:#CF142B; height:100%;"></div><div title="extra: 50" style="width:0.500%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>199,400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>200</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>50</strong></span></div></td>
+    <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_comparison_tbl-subtitle"><div style="font-size:13px; line-height:1.9;"><strong>/tmp/tmpkblql1_w/source.csv</strong> (200,000 rows) → <strong>/tmp/tmpkblql1_w/target.csv</strong> (199,850 rows), aligned by key <code>order_id</code><br><span style="background:#CF142B; color:white; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:bold; letter-spacing:0.3px;">DIFFERENT</span> 650 of 200,050 rows fail (0.3%)<br><div style="display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; overflow:hidden; background:#EEE; margin-top:4px;"><div title="match: 199,400" style="width:99.675%; background:#4CA64C; height:100%;"></div><div title="changed: 400" style="width:0.500%; background:#E8A33D; height:100%;"></div><div title="missing: 200" style="width:0.500%; background:#CF142B; height:100%;"></div><div title="extra: 50" style="width:0.500%; background:#3D7CC9; height:100%;"></div></div><br><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#4CA64C; margin-right:4px; margin-left:4px;"></span>match <strong>199,400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#E8A33D; margin-right:4px; margin-left:4px;"></span>changed <strong>400</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#CF142B; margin-right:4px; margin-left:4px;"></span>missing <strong>200</strong></span><span style="white-space:nowrap; margin-right:12px;"><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#3D7CC9; margin-right:4px; margin-left:4px;"></span>extra <strong>50</strong></span></div></td>
   </tr>
 
 </thead>
@@ -989,7 +983,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>All four questions are answered in one place: missing and extra rows, changed rows (with the <code>amount</code> column identified as the one that differs), and the schema check in the header.</p>
 <p>The same comparison in four partitions gives identical results:</p>
-<div id="189a4635" class="cell" data-execution_count="4">
+<div id="aa775af5" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>partitioned <span class="op">=</span> pb.compare(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    data_dir <span class="op">/</span> <span class="st">"source.csv"</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    data_dir <span class="op">/</span> <span class="st">"target.csv"</span>,</span>

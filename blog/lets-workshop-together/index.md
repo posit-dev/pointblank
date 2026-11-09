@@ -2,9 +2,9 @@
 
 Recently, I've been giving free workshops to data teams on Pointblank. These sorts of engagements energize me, and I truly enjoy hearing what people are concerned with when it comes to data validation. If *your* team is interested, I would love to schedule something with y'all! Please reach out at rich@posit.co or message me on the ([Pointblank Discord](https://discord.com/invite/YH7CybCNCQ)).
 
-Workshops have been especially helpful for understanding how people use and share Pointblank's [validation results table](../../user-guide/index.md). For example, I learned that people like to email or pull up the table for stakeholders so they can walk through problem cases (it's a great conversation starter for getting to the heart of data quality issues).
+Workshops have been especially helpful for understanding how people use and share Pointblank's [validation results table](../../user-guide/post-interrogation/validation-reports.md). For example, I learned that people like to email or pull up the table for stakeholders so they can walk through problem cases (it's a great conversation starter for getting to the heart of data quality issues).
 
-A couple of months ago, I gave a workshop to one of Apple's data teams. During the Q&A afterwards, someone asked whether you can perform the same validation on different chunks of table rows. This was a very helpful nudge for me to add a [`segments=` argument](../../user-guide/segmentation.md) to all of Pointblank's validation methods!
+A couple of months ago, I gave a workshop to one of Apple's data teams. During the Q&A afterwards, someone asked whether you can perform the same validation on different chunks of table rows. This was a very helpful nudge for me to add a [`segments=` argument](../../user-guide/validation-plan/segmentation.md) to all of Pointblank's validation methods!
 
 We are excited about how things are going with the Pointblank project and are *always up* for providing a workshop to your data team (at no cost). If this sounds interesting to you please feel free to contact me through email or via Discord. Don't be shy. Just know that if you have a need for data validation, we're here to help!
 

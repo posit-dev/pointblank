@@ -205,6 +205,6 @@ The convenience of this step report means we only have to look at one display of
 
 Pointblank tries really hard to make it easy for you to test your data. All sorts of input tables are supported since we integrate with the brilliant [Narwhals](https://narwhals-dev.github.io/narwhals/) and [Ibis](https://ibis-project.org) libraries. And even through the project has only started four months ago, we already have an extensive catalog of well-tested validation methods.
 
-We care a great deal about documentation so much recent effort has been placed on getting the [**User Guide**](../../user-guide/index.md) written. We hope it provides for gentle introduction to the major features of the library. If you want some quick examples to get your imagination going, check out our [gallery of examples](../../examples/index.md).
+We care a great deal about documentation so much recent effort has been placed on getting the [**User Guide**](../../user-guide/getting-started/quickstart.md) written. We hope it provides for gentle introduction to the major features of the library. If you want some quick examples to get your imagination going, check out our [gallery of examples](../../examples/index.md).
 
 We really care about what **you** want in a validation package, so talk to us :) We just started a [Discord](https://discord.com/invite/YH7CybCNCQ) so feel free to hop on and ask us anything. Alternatively, we always like to get [issues](https://github.com/posit-dev/pointblank/issues) so don't be shy in letting us know how we could improve!

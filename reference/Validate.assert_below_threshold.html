@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-c17ba41ba6215283560c22479a3a4e8f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -169,7 +169,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../user-guide/index.html"> 
+    <a class="nav-link" href="../user-guide/getting-started/quickstart.html"> 
 <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="498" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="503" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2112,7 +2112,7 @@ If an invalid threshold level is provided.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Below are some examples of how to use the <a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="gdls-link gdls-code">assert_below_threshold()</a> method. First, we’ll create a simple Polars DataFrame with two columns (<code>a</code> and <code>b</code>).</p>
-<div id="9ce219b7" class="cell" data-execution_count="2">
+<div id="19ef8769" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame({</span>
@@ -2121,7 +2121,7 @@ If an invalid threshold level is provided.
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
 </div>
 <p>Then a validation plan will be created with thresholds (<code>warning=0.1</code>, <code>error=0.2</code>, <code>critical=0.3</code>). After interrogating, we display the validation report table:</p>
-<div id="deb8ddf0" class="cell" data-execution_count="3">
+<div id="8b2d7750" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -2326,7 +2326,7 @@ If an invalid threshold level is provided.
 </div>
 </div>
 <p>Using <code>assert_below_threshold(level="warning")</code> will raise an <code>AssertionError</code> if any step exceeds the ‘warning’ threshold:</p>
-<div id="96f17a6a" class="cell" data-execution_count="4">
+<div id="ed0905bc" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    validation.assert_below_threshold(level<span class="op">=</span><span class="st">"warning"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">AssertionError</span> <span class="im">as</span> e:</span>
@@ -2338,12 +2338,12 @@ Step 2: Expect that values in `b` should be &lt; `10`.</code></pre>
 </div>
 </div>
 <p>Check a specific step against the ‘critical’ threshold using the <code>i=</code> parameter:</p>
-<div id="be933beb" class="cell" data-execution_count="5">
+<div id="572ceb16" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation.assert_below_threshold(level<span class="op">=</span><span class="st">"critical"</span>, i<span class="op">=</span><span class="dv">1</span>)  <span class="co"># Won't raise an error</span></span></code></pre></div>
 </div>
 <p>As the first step is below the ‘critical’ threshold (it exceeds the ‘warning’ and ‘error’ thresholds), no error is raised and nothing is printed.</p>
 <p>We can also provide a custom error message with the <code>message=</code> parameter. Let’s try that here:</p>
-<div id="25791b91" class="cell" data-execution_count="6">
+<div id="9da88140" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    validation.assert_below_threshold(</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        level<span class="op">=</span><span class="st">"error"</span>,</span>

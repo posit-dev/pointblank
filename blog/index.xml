@@ -1896,8 +1896,8 @@ font-style: inherit;">"Failed data:"</span>, failed_rows)</span></code></pre></d
 
 
 <p>Recently, I’ve been giving free workshops to data teams on Pointblank. These sorts of engagements energize me, and I truly enjoy hearing what people are concerned with when it comes to data validation. If <em>your</em> team is interested, I would love to schedule something with y’all! Please reach out at rich@posit.co or message me on the (<a href="https://discord.com/invite/YH7CybCNCQ">Pointblank Discord</a>).</p>
-<p>Workshops have been especially helpful for understanding how people use and share Pointblank’s <a href="../../user-guide/index.html">validation results table</a>. For example, I learned that people like to email or pull up the table for stakeholders so they can walk through problem cases (it’s a great conversation starter for getting to the heart of data quality issues).</p>
-<p>A couple of months ago, I gave a workshop to one of Apple’s data teams. During the Q&amp;A afterwards, someone asked whether you can perform the same validation on different chunks of table rows. This was a very helpful nudge for me to add a <a href="../../user-guide/segmentation.qmd"><code>segments=</code> argument</a> to all of Pointblank’s validation methods!</p>
+<p>Workshops have been especially helpful for understanding how people use and share Pointblank’s <a href="../../user-guide/post-interrogation/validation-reports.html">validation results table</a>. For example, I learned that people like to email or pull up the table for stakeholders so they can walk through problem cases (it’s a great conversation starter for getting to the heart of data quality issues).</p>
+<p>A couple of months ago, I gave a workshop to one of Apple’s data teams. During the Q&amp;A afterwards, someone asked whether you can perform the same validation on different chunks of table rows. This was a very helpful nudge for me to add a <a href="../../user-guide/validation-plan/segmentation.html"><code>segments=</code> argument</a> to all of Pointblank’s validation methods!</p>
 <p>We are excited about how things are going with the Pointblank project and are <em>always up</em> for providing a workshop to your data team (at no cost). If this sounds interesting to you please feel free to contact me through email or via Discord. Don’t be shy. Just know that if you have a need for data validation, we’re here to help!</p>
 <section id="acknowledgment" class="level1">
 <h1>Acknowledgment</h1>
@@ -1919,7 +1919,7 @@ font-style: inherit;">"Failed data:"</span>, failed_rows)</span></code></pre></d
 
 
 
-<p>The Pointblank documentation just got a major upgrade! We’ve completely overhauled our <a href="../../user-guide/index.html"><strong>User Guide</strong></a>. Our goal was to enable readers to start fast on validation and work through the many pieces needed in realistic situations.</p>
+<p>The Pointblank documentation just got a major upgrade! We’ve completely overhauled our <a href="../../user-guide/getting-started/quickstart.html"><strong>User Guide</strong></a>. Our goal was to enable readers to start fast on validation and work through the many pieces needed in realistic situations.</p>
 <p>We realized that at the core of Pointblank is the validation plan. Its made up of rules, results, and steps.</p>
 <p><img src="https://posit-dev.github.io/pointblank/blog/overhauled-user-guide/validation-three-things.png" class="img-fluid" style="width:80.0%"></p>
 <p>For example, the first row is a step that checks whether values in column ‘a’ are less than <code>10</code>. The <code>COLUMNS</code> and <code>VALUES</code> column contain the rules used to configure the step. The <code>PASS</code> column for the first row indicates that all 13 values in the column passed.</p>
@@ -1930,10 +1930,10 @@ font-style: inherit;">"Failed data:"</span>, failed_rows)</span></code></pre></d
 <li>rounding out API coverage for cross-linking</li>
 <li>surfacing advanced topics</li>
 </ul>
-<p>Let us walk you through the key improvements in our refreshed <a href="../../user-guide/index.html"><strong>User Guide</strong></a>!</p>
+<p>Let us walk you through the key improvements in our refreshed <a href="../../user-guide/getting-started/quickstart.html"><strong>User Guide</strong></a>!</p>
 <section id="introduction-embracing-the-spiral-sequence" class="level1">
 <h1>Introduction: Embracing the Spiral Sequence</h1>
-<p>We chose to use a spiral sequence for our <a href="../../user-guide/index.html">Introduction</a> and <em>Validation Plan</em> section. The <a href="../../user-guide/index.html">Introduction</a> quickly covers parts of validation plan, while each article of the <em>Validation Plan</em> section dives deeper into different aspects of defining validation rules.</p>
+<p>We chose to use a spiral sequence for our <a href="../../user-guide/getting-started/quickstart.html">Introduction</a> and <em>Validation Plan</em> section. The <a href="../../user-guide/getting-started/quickstart.html">Introduction</a> quickly covers parts of validation plan, while each article of the <em>Validation Plan</em> section dives deeper into different aspects of defining validation rules.</p>
 <div style="text-align: center;">
 <p><img src="https://posit-dev.github.io/pointblank/blog/overhauled-user-guide/breadth-and-depth.png" class="img-fluid" style="width:50.0%"></p>
 </div>
@@ -1941,7 +1941,7 @@ font-style: inherit;">"Failed data:"</span>, failed_rows)</span></code></pre></d
 </section>
 <section id="improving-examples" class="level1">
 <h1>Improving Examples</h1>
-<p>Examples are everywhere in the <a href="../../user-guide/index.html"><strong>User Guide</strong></a>. We’ve tightened up our approach to examples by:</p>
+<p>Examples are everywhere in the <a href="../../user-guide/getting-started/quickstart.html"><strong>User Guide</strong></a>. We’ve tightened up our approach to examples by:</p>
 <ul>
 <li>presenting example code, output, or both, early in each section</li>
 <li>showing the actual output you’ll see in your environment</li>
@@ -1958,17 +1958,17 @@ font-style: inherit;">"Failed data:"</span>, failed_rows)</span></code></pre></d
 <li>User Guide: explains concepts that cut across functions (like common arguments across <a href="../../user-guide/validation-plan/validation-methods.html">validation methods</a>)</li>
 <li>API Reference: explains each individual function</li>
 </ul>
-<p>Importantly, user guides often link to the API reference so, as part of this work, we made sure that all individual API entries are well-documented and linked to from the guide. Here’s an excerpt from the <a href="../../user-guide/index.html"><strong>User Guide</strong></a> that shows links marked:</p>
+<p>Importantly, user guides often link to the API reference so, as part of this work, we made sure that all individual API entries are well-documented and linked to from the guide. Here’s an excerpt from the <a href="../../user-guide/getting-started/quickstart.html"><strong>User Guide</strong></a> that shows links marked:</p>
 <p><img src="https://posit-dev.github.io/pointblank/blog/overhauled-user-guide/links-in-guide.png" class="img-fluid" style="width:80.0%"></p>
 </section>
 <section id="surfacing-advanced-topics" class="level1">
 <h1>Surfacing Advanced Topics</h1>
-<p>There’s a lot of potential slicing and dicing involved in validation, as well as work after validation (post interrogation) to make sense of the results. We added pages to the <a href="../../user-guide/index.html"><strong>User Guide</strong></a> for some core situations. In this section, I’ll highlight two advanced topics we added pages for:</p>
+<p>There’s a lot of potential slicing and dicing involved in validation, as well as work after validation (post interrogation) to make sense of the results. We added pages to the <a href="../../user-guide/getting-started/quickstart.html"><strong>User Guide</strong></a> for some core situations. In this section, I’ll highlight two advanced topics we added pages for:</p>
 <ul>
 <li>segmentation: splitting a column into groups, and validating each group</li>
 <li>step reports: view failing cases (e.g., view rows of data that failed validation)</li>
 </ul>
-<p>These are marked in the <a href="../../user-guide/index.html"><strong>User Guide</strong></a> sidebar screenshot below:</p>
+<p>These are marked in the <a href="../../user-guide/getting-started/quickstart.html"><strong>User Guide</strong></a> sidebar screenshot below:</p>
 <div style="text-align: center;">
 <p><img src="https://posit-dev.github.io/pointblank/blog/overhauled-user-guide/advanced-in-sidebar.png" class="img-fluid" style="width:35.0%"></p>
 </div>
@@ -1985,7 +1985,7 @@ font-style: inherit;">"Failed data:"</span>, failed_rows)</span></code></pre></d
 <p>Step reports display failing cases (e.g., rows) for a validation step, so you can dig deeper into validation failures. Here’s a screenshot of a step report for some validation step 2:</p>
 <p><img src="https://posit-dev.github.io/pointblank/blog/overhauled-user-guide/step-report.png" class="img-fluid" style="width:80.0%"></p>
 <p>Notice the arrow pointing to ‘Step 2’ in the title. Failing values are highlighted in red. Once we know we have failures, it’s important to take action and discover <em>why</em> data is failing. Looking at failing cases in step reports often uncovers obvious causes behind failures.</p>
-<p>The <a href="../../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link gdls-code">get_step_report()</a> entry is one of 50 in the API Reference. Here it is listed the API Reference, in the <a href="../../reference/index.html#interrogation-and-reporting">Interrogation and Reporting section</a>. Critically, it’s only one of 20 entries in the <a href="../../user-guide/index.html">User Guide</a>, which emphasizes its importance in validation workflows.</p>
+<p>The <a href="../../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link gdls-code">get_step_report()</a> entry is one of 50 in the API Reference. Here it is listed the API Reference, in the <a href="../../reference/index.html#interrogation-and-reporting">Interrogation and Reporting section</a>. Critically, it’s only one of 20 entries in the <a href="../../user-guide/getting-started/quickstart.html">User Guide</a>, which emphasizes its importance in validation workflows.</p>
 </section>
 </section>
 <section id="looking-forward" class="level1">
@@ -4501,7 +4501,7 @@ Failing steps: 2 of 3
 <ul>
 <li><a href="../../reference/Actions.html">Actions documentation</a></li>
 <li><a href="../../reference/FinalActions.html">FinalActions documentation</a></li>
-<li><a href="../../user-guide/actions.qmd">User Guide on Triggering Actions</a></li>
+<li><a href="../../user-guide/validation-plan/actions.html">User Guide on Triggering Actions</a></li>
 </ul>
 
 
@@ -6597,7 +6597,7 @@ font-style: inherit;">1</span>)</span></code></pre></div>
 <section id="much-more-in-store" class="level1">
 <h1>Much More in Store</h1>
 <p>Pointblank tries really hard to make it easy for you to test your data. All sorts of input tables are supported since we integrate with the brilliant <a href="https://narwhals-dev.github.io/narwhals/">Narwhals</a> and <a href="https://ibis-project.org">Ibis</a> libraries. And even through the project has only started four months ago, we already have an extensive catalog of well-tested validation methods.</p>
-<p>We care a great deal about documentation so much recent effort has been placed on getting the <a href="../../user-guide/index.html"><strong>User Guide</strong></a> written. We hope it provides for gentle introduction to the major features of the library. If you want some quick examples to get your imagination going, check out our <a href="../../examples/index.html">gallery of examples</a>.</p>
+<p>We care a great deal about documentation so much recent effort has been placed on getting the <a href="../../user-guide/getting-started/quickstart.html"><strong>User Guide</strong></a> written. We hope it provides for gentle introduction to the major features of the library. If you want some quick examples to get your imagination going, check out our <a href="../../examples/index.html">gallery of examples</a>.</p>
 <p>We really care about what <strong>you</strong> want in a validation package, so talk to us :) We just started a <a href="https://discord.com/invite/YH7CybCNCQ">Discord</a> so feel free to hop on and ask us anything. Alternatively, we always like to get <a href="https://github.com/posit-dev/pointblank/issues">issues</a> so don’t be shy in letting us know how we could improve!</p>
 
 
