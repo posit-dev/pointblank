@@ -113,15 +113,17 @@ def corpus_checks(
     that says who can see it), and documents that haven't been updated in a long time. This
     function makes a validation step for each of them:
 
-    - every chunk has text (not missing, and not only whitespace): a `col_vals_regex()` step
-    - the chunk ids are unique, with `chunk_id=`: a `rows_distinct()` step
-    - every chunk has a value of each column of `metadata=`: a `col_vals_not_null()` step for each
+    -  every chunk has text (not missing, and not only whitespace): a
+      `~~pointblank.Validate.col_vals_regex()` step
+    - the chunk ids are unique, with `chunk_id=`: a `~~pointblank.Validate.rows_distinct()` step
+    -  every chunk has a value of each column of `metadata=`: a
+      `~~pointblank.Validate.col_vals_not_null()` step for each
     - the chunks have between `min_tokens=` and `max_tokens=` tokens, with either: a step of
       [`pb.text.token_length()`](`pointblank.text.token_length`)
     - no chunk is a near duplicate of another, unless `near_duplicates=False`: a
-      `rows_near_distinct()` step
+      `~~pointblank.Validate.rows_near_distinct()` step
     - every chunk was updated in the `max_age=` before the reference time, with `updated_at=`: a
-      `col_vals_ge()` step
+      `~~pointblank.Validate.col_vals_ge()` step
 
     Checks of the metadata of access control (like a column of the groups that can see a chunk)
     matter for security as much as for quality: a chunk without one may be shown to anyone, or
@@ -147,7 +149,7 @@ def corpus_checks(
     near_duplicates
         Whether to check for near duplicates (`True` by default), or the threshold of the
         similarity of two chunks for them to be near duplicates (the `threshold=` of
-        `rows_near_distinct()`, `0.85` with `True`).
+        `~~pointblank.Validate.rows_near_distinct()`, `0.85` with `True`).
     updated_at
         The column with the time each chunk (or its document) was last updated, for the check of
         freshness. It needs `max_age=`.
@@ -330,13 +332,16 @@ def eval_checks(
     document was removed or renamed can never be answered), and each gold passage is relevant to
     its query. This function makes a validation step for each:
 
-    - every query has text (not missing, and not only whitespace): a `col_vals_regex()` step
+    -  every query has text (not missing, and not only whitespace): a
+      `~~pointblank.Validate.col_vals_regex()` step
     - no query is a near duplicate of another, unless `near_duplicates=False`: a
-      `rows_near_distinct()` step
-    - every query has a gold document, with `gold_doc_id=`: a `col_vals_not_null()` step
-    - every gold document is in the corpus, with `corpus=`: a `col_vals_in_table()` step
+      `~~pointblank.Validate.rows_near_distinct()` step
+    -  every query has a gold document, with `gold_doc_id=`: a
+      `~~pointblank.Validate.col_vals_not_null()` step
+    -  every gold document is in the corpus, with `corpus=`: a
+      `~~pointblank.Validate.col_vals_in_table()` step
     - every passage is relevant to its query, with `passage=`, `scorer=`, and `min_relevance=`: a
-      `col_vals_scored()` step (with a reranker, like
+      `~~pointblank.Validate.col_vals_scored()` step (with a reranker, like
       [`pb.scorers.reranker()`](`pointblank.scorers.reranker`), or another scorer of a query and
       a passage)
 
@@ -347,8 +352,9 @@ def eval_checks(
     gold_doc_id
         The column with the id of the gold document of each query.
     corpus
-        The corpus (any table that `col_vals_in_table()` takes, such as a DataFrame, a database
-        table, or the path of a file) to look up the gold documents in. It needs `gold_doc_id=`.
+        The corpus (any table that `~~pointblank.Validate.col_vals_in_table()` takes, such as a
+        DataFrame, a database table, or the path of a file) to look up the gold documents in. It
+        needs `gold_doc_id=`.
     corpus_id
         The column of the corpus with the document ids (by default, the same name as
         `gold_doc_id=`).
@@ -362,7 +368,7 @@ def eval_checks(
     near_duplicates
         Whether to check for near-duplicate queries (`True` by default), or the threshold of the
         similarity of two queries for them to be near duplicates (the `threshold=` of
-        `rows_near_distinct()`, `0.85` with `True`).
+        `~~pointblank.Validate.rows_near_distinct()`, `0.85` with `True`).
     pre
         A function that transforms the table before each step, as in the validation methods.
     thresholds

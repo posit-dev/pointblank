@@ -3139,8 +3139,8 @@ def reference_texts(
     reference: Any, reference_columns: list[str] | None, columns: list[str]
 ) -> tuple[list[str], list[str]]:
     """
-    Get the texts of the reference of `rows_not_contaminated()` and the name of the reference that
-    each comes from.
+    Get the texts of the reference of `~~pointblank.Validate.rows_not_contaminated()` and the name
+    of the reference that each comes from.
 
     The reference is a table (or the path of a file, read like the data of a validation), a list
     of them (named `1`, `2`, ...), a dictionary of them by name, or a list of texts. The text of a

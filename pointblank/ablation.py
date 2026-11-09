@@ -517,8 +517,8 @@ class Ablation:
         How the duplicate rows found by [`rows_distinct()`](`pointblank.Validate.rows_distinct`)
         steps are removed. With `"keep_first"` (the default) or `"keep_last"`, one copy of each
         group of duplicates is kept and the others are removed. `"flag_all"` removes every copy,
-        and `None` leaves `rows_distinct()` steps out of the ablation. These are the same options as
-        in [`get_row_flags()`](`pointblank.Validate.get_row_flags`).
+        and `None` leaves `~~pointblank.Validate.rows_distinct()` steps out of the ablation. These
+        are the same options as in [`get_row_flags()`](`pointblank.Validate.get_row_flags`).
     duplicates_order_by
         One or more columns that order the copies of a duplicated row, to decide which copy is
         kept (e.g., `"updated_at"` with `duplicates="keep_last"` keeps the newest record).
@@ -1033,7 +1033,7 @@ class Ablation:
         Add a variant that removes the rows failing any step.
 
         This variant answers the question 'does the validation as a whole help?' Without
-        `rows_distinct()` steps, its training table is the one that
+        `~~pointblank.Validate.rows_distinct()` steps, its training table is the one that
         [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`) gives: the rows that
         passed every step.
 
@@ -1567,11 +1567,12 @@ class Ablation:
         Details
         -------
         The step is run again as it was set up, with only `param=` changed, so a
-        `col_vals_scored()` step takes its scores from the score cache instead of scoring the rows
-        again. For a segmented step, only the step's own segment is checked. A value that the
-        validation method doesn't accept (e.g., a `min_val=` above the step's `max_val=`) gives an
-        error. As with any other variant, a value whose step fails no rows is left out, and a value
-        that removes the same rows as another version of the table isn't evaluated again.
+        `~~pointblank.Validate.col_vals_scored()` step takes its scores from the score cache instead
+        of scoring the rows again. For a segmented step, only the step's own segment is checked. A
+        value that the validation method doesn't accept (e.g., a `min_val=` above the step's
+        `max_val=`) gives an error. As with any other variant, a value whose step fails no rows is
+        left out, and a value that removes the same rows as another version of the table isn't
+        evaluated again.
 
         Examples
         --------
@@ -3333,15 +3334,15 @@ class Ablation:
         ----------
         results
             The metrics of the evaluations: the path of a CSV file, the path of a directory with a
-            `results.csv` file (e.g., the directory written by `export()`), or a table (e.g., a
-            Polars or pandas DataFrame). It needs a `variant` column (the id of the version of the
-            table), a `seed` column, and a column for each metric. A `repeat` column is checked if
-            it's there, and any other column is a metric.
+            `results.csv` file (e.g., the directory written by `~~pointblank.Ablation.export()`), or
+            a table (e.g., a Polars or pandas DataFrame). It needs a `variant` column (the id of the
+            version of the table), a `seed` column, and a column for each metric. A `repeat` column
+            is checked if it's there, and any other column is a metric.
         manifest
-            The path of the `manifest.json` file written by `export()` (or of its directory). By
-            default, a manifest in the same directory as the results file is used if there is one.
-            Its fingerprints are checked against the ablation, which makes sure that the results
-            are for the same data and the same versions of the table.
+            The path of the `manifest.json` file written by `~~pointblank.Ablation.export()` (or of
+            its directory). By default, a manifest in the same directory as the results file is used
+            if there is one. Its fingerprints are checked against the ablation, which makes sure
+            that the results are for the same data and the same versions of the table.
 
         Returns
         -------

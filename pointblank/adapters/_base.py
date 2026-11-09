@@ -128,9 +128,10 @@ class ContractImport:
     wasn't
 
     `ContractImport` is a dataclass, so its fields can be read and changed directly. For instance,
-    an unwanted constraint can be removed from `constraints` before calling `to_validate()`.
-    Custom adapters (see [`ContractAdapter`](`pointblank.ContractAdapter`)) create these objects
-    by calling the constructor with the parameters below.
+    an unwanted constraint can be removed from `constraints` before calling
+    `~~pointblank.ContractImport.to_validate()`. Custom adapters (see
+    [`ContractAdapter`](`pointblank.ContractAdapter`)) create these objects by calling the
+    constructor with the parameters below.
 
     Parameters
     ----------
@@ -216,7 +217,8 @@ class ContractImport:
     ```
 
     The constraints show how the temperature range became a pair of bounds, and how the primary
-    key was expressed as not-null checks plus a `rows_distinct()` check over both key columns.
+    key was expressed as not-null checks plus a `~~pointblank.Validate.rows_distinct()` check over
+    both key columns.
 
     ```{python}
     for c in readings.constraints:
@@ -248,8 +250,8 @@ class ContractImport:
     readings.to_validate(readings_tbl, tbl_name="readings").interrogate()
     ```
 
-    The duplicated `("S2", 1)` key is caught by the `rows_distinct()` step, while the `75.0` reading
-    no longer fails any step because the range check was removed.
+    The duplicated `("S2", 1)` key is caught by the `~~pointblank.Validate.rows_distinct()` step,
+    while the `75.0` reading no longer fails any step because the range check was removed.
 
     See Also
     --------
@@ -279,10 +281,11 @@ class ContractImport:
 
         The plan starts with a [`col_schema_match()`](`pointblank.Validate.col_schema_match`) step
         built from the columns that have a type, followed by one step for each entry in
-        `constraints`. The schema check uses the default settings of `col_schema_match()`, so the
-        table must have the same columns, in the same order, with the same types. Types are
-        compared exactly: a JSON Schema `integer` becomes `Int64`, so an `Int32` column fails the
-        check. If no column has a type, the schema step is left out.
+        `constraints`. The schema check uses the default settings of
+        `~~pointblank.Validate.col_schema_match()`, so the table must have the same columns, in the
+        same order, with the same types. Types are compared exactly: a JSON Schema `integer` becomes
+        `Int64`, so an `Int32` column fails the check. If no column has a type, the schema step is
+        left out.
 
         Parameters
         ----------
@@ -584,9 +587,10 @@ class ContractImport:
 
         YAML is easier to scan than Python for people who don't write code, so this method is handy
         for sharing what an import produced, such as in a code review or a ticket. The output has a
-        `validation:` key holding a `steps:` list. That list starts with a `col_schema_match` step
-        (when any column has a type) and then has one entry per constraint, each named after its
-        validation method and holding that method's arguments.
+        `validation:` key holding a `steps:` list. That list starts with a
+        `~~pointblank.Validate.col_schema_match` step (when any column has a type) and then has one
+        entry per constraint, each named after its validation method and holding that method's
+        arguments.
 
         This is a listing of the steps rather than a complete YAML validation configuration: it has
         no `tbl:` entry and its steps are nested under `validation:`, so it can't be passed to
@@ -738,7 +742,8 @@ class ContractAdapter:
     A subclass sets a few class attributes and implements up to three methods:
 
     - [`detect()`](`pointblank.ContractAdapter.detect`) decides whether a source is in this format,
-    which lets `import_contract()` find the adapter without being told `format=` (optional)
+    which lets `~~pointblank.import_contract()` find the adapter without being told `format=`
+    (optional)
     - [`import_contract()`](`pointblank.ContractAdapter.import_contract`) reads a source and
     returns a [`ContractImport`](`pointblank.ContractImport`) whose rules are expressed as
     [`MappedConstraint`](`pointblank.adapters.MappedConstraint`) objects (needed for import)
@@ -863,8 +868,8 @@ class ContractAdapter:
     ```
 
     The bare `@pb.register_adapter` decorator registered the class under its `format_name`. Now
-    a data dictionary can be imported with `import_contract()`, and its `detect()` method means
-    there's no need for `format=`.
+    a data dictionary can be imported with `~~pointblank.import_contract()`, and its `detect()`
+    method means there's no need for `format=`.
 
     ```{python}
     customers_dd = {
@@ -886,7 +891,7 @@ class ContractAdapter:
     validated against a table, turned into a contract, or written out as code.
 
     Exporting runs in the other direction. A contract written in Pointblank can be shared as a
-    data dictionary with `export_contract()`.
+    data dictionary with `~~pointblank.export_contract()`.
 
     ```{python}
     orders_contract = pb.Contract(
@@ -904,12 +909,13 @@ class ContractAdapter:
 
     The schema supplied the columns and their types, and the not-null and set-membership steps
     became `nullable` and `allowed` properties. The data dictionary format has nothing that
-    corresponds to `col_vals_ge()`, so that step was left out.
+    corresponds to `~~pointblank.Validate.col_vals_ge()`, so that step was left out.
 
     See Also
     --------
     register_adapter : Register an adapter so that it can be used by name.
-    ContractImport : The object an adapter's `import_contract()` method returns.
+    ContractImport : The object an adapter's `~~pointblank.ContractAdapter.import_contract()` method
+        returns.
     adapters.MappedConstraint : The objects that hold translated rules.
     list_adapters : List the registered adapters.
     """
@@ -942,8 +948,8 @@ class ContractAdapter:
         Parameters
         ----------
         source
-            The `source=` value given to `import_contract()`: usually a file path string or a
-            dictionary, but it could be any object.
+            The `source=` value given to `~~pointblank.import_contract()`: usually a file path
+            string or a dictionary, but it could be any object.
 
         Returns
         -------
@@ -1121,7 +1127,7 @@ class ContractAdapter:
         ```
 
         This adapter exports a contract as a list of column rules, writing a lower bound for each
-        `col_vals_ge()` step and leaving out every other kind of step.
+        `~~pointblank.Validate.col_vals_ge()` step and leaving out every other kind of step.
 
         ```{python}
         import pointblank as pb
@@ -1159,8 +1165,8 @@ class ContractAdapter:
         ColumnRulesAdapter().export_contract(contract)
         ```
 
-        Only the `col_vals_ge()` step was written, since the format has no way to express a
-        not-null rule. After registering the class with
+        Only the `~~pointblank.Validate.col_vals_ge()` step was written, since the format has no way
+        to express a not-null rule. After registering the class with
         [`register_adapter()`](`pointblank.register_adapter`), the same export is available as
         `pb.export_contract(contract, format="column_rules")`.
         """

@@ -181,8 +181,9 @@ class SubmissionPackage:
     standard_version
         The version of the standard, such as `"3.4"` for SDTMIG 3.4. The default is `"3.4"`.
     study_id
-        A study identifier. It is shown by `summary()` and used in the labels of the validations
-        made by `validate_conformance(engine="validate")`. The default is `None`.
+        A study identifier. It is shown by `~~pointblank.SubmissionPackage.summary()` and used in
+        the labels of the validations made by `validate_conformance(engine="validate")`. The default
+        is `None`.
 
     Examples
     --------

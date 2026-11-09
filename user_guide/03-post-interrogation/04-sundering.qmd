@@ -226,9 +226,10 @@ that segment, so rows outside all of a step's segments aren't affected by that s
 A [`Validate.rows_distinct()`](`Validate.rows_distinct`) step counts *every* copy of a duplicated
 row as a failing test unit, since there's no telling which of the copies is the 'wrong' one. That's
 the right count for a validation report, but it's rarely what you want when sundering: removing all
-copies of a duplicate would remove the record entirely. So by default, `rows_distinct()` steps are
-left out of sundering, and the `duplicates=` argument lets you bring them in by saying which copy to
-keep. The `small_table` dataset has one pair of duplicate rows, so let's check for that:
+copies of a duplicate would remove the record entirely. So by default,
+`~~pointblank.Validate.rows_distinct()` steps are left out of sundering, and the `duplicates=`
+argument lets you bring them in by saying which copy to keep. The `small_table` dataset has one pair
+of duplicate rows, so let's check for that:
 
 ```{python}
 validation_3 = (
@@ -246,7 +247,7 @@ copy goes to the failing set. The options for `duplicates=` are:
 - `"keep_first"`: the first copy of each group of duplicates passes and the others fail
 - `"keep_last"`: the last copy passes and the others fail
 - `"flag_all"`: every copy fails (just as the validation step counts them)
-- `None` (the default): `rows_distinct()` steps aren't used for sundering
+- `None` (the default): `~~pointblank.Validate.rows_distinct()` steps aren't used for sundering
 
 The 'first' and 'last' copies are those in row order, unless you use `duplicates_order_by=` to name
 one or more columns to order them by. For example, a check for duplicated customer IDs combined
@@ -270,8 +271,8 @@ The rows with a `pb_n_failed_` of `0` are exactly the passing set from sundering
 hand, though, you can filter on just the checks that matter for a particular use, look for problems
 that tend to occur together, or use `pb_row_score_` to weight rows rather than drop them. The same
 `duplicates=` and `duplicates_order_by=` options are available here, except that
-`get_row_flags()` uses `duplicates="keep_first"` by default, so that a `rows_distinct()` flag marks
-the copies that removing duplicates would remove.
+`get_row_flags()` uses `duplicates="keep_first"` by default, so that a
+`~~pointblank.Validate.rows_distinct()` flag marks the copies that removing duplicates would remove.
 
 ## Practical Applications of Sundering
 

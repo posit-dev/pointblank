@@ -240,8 +240,8 @@ ways (e.g., integers sometimes stored as floats).
 
 ## Schema Validation Options
 
-When using `col_schema_match()`, you can customize validation behavior with several important
-options:
+When using `~~pointblank.Validate.col_schema_match()`, you can customize validation behavior with
+several important options:
 
 | Option | Default | Description |
 |--------|---------|-------------|

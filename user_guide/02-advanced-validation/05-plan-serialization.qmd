@@ -61,8 +61,8 @@ A few things to notice in the output:
 of the variable your data lives in. Replace it with your actual data variable before running the
 code.
 - Adjacent steps that differ only by column are collapsed into a single call: the two
-`col_vals_not_null()` steps above become `col_vals_not_null(columns=["a", "b"])`. This keeps the
-output compact and diffs minimal.
+`~~pointblank.Validate.col_vals_not_null()` steps above become
+`col_vals_not_null(columns=["a", "b"])`. This keeps the output compact and diffs minimal.
 - Only non-default arguments are emitted. A step-level threshold that matches the table-level default
 is omitted, `na_pass=True` appears only where it was set, and so on.
 
@@ -91,8 +91,9 @@ validation.to_yaml(path="plans/small_table.yaml")
 
 ## Round-Tripping a Plan
 
-Because `to_yaml()` emits a `yaml_interrogate()`-compatible document, a plan round-trips through
-YAML. Here we serialize a plan, then rebuild and run it with `yaml_interrogate()`:
+Because `~~pointblank.Validate.to_yaml()` emits a `yaml_interrogate()`-compatible document, a plan
+round-trips through YAML. Here we serialize a plan, then rebuild and run it with
+`yaml_interrogate()`:
 
 ```{python}
 yaml_str = validation.to_yaml()
@@ -101,9 +102,9 @@ rebuilt = pb.yaml_interrogate(yaml_str)
 rebuilt
 ```
 
-The rebuilt plan carries the same steps as the original. The Python code from `to_code()`
-round-trips in the same way: executing it (after replacing `your_data`) reconstructs an equivalent
-plan.
+The rebuilt plan carries the same steps as the original. The Python code from
+`~~pointblank.Validate.to_code()` round-trips in the same way: executing it (after replacing
+`your_data`) reconstructs an equivalent plan.
 
 ## Fidelity and Limitations
 
@@ -157,11 +158,11 @@ configuration-driven workflow.
 
 ## Exporting a Plan as JSON Schema
 
-While `to_code()` and `to_yaml()` reproduce your plan as Pointblank-specific source,
-[`to_json_schema()`](`Validate.to_json_schema`) converts your validation rules into a
-[JSON Schema](https://json-schema.org/) document. JSON Schema is a widely adopted, language-neutral
-standard, so the exported schema can be consumed by validation libraries in JavaScript, Java, Go,
-and many other ecosystems.
+While `~~pointblank.Validate.to_code()` and `~~pointblank.Validate.to_yaml()` reproduce your plan as
+Pointblank-specific source, [`to_json_schema()`](`Validate.to_json_schema`) converts your validation
+rules into a [JSON Schema](https://json-schema.org/) document. JSON Schema is a widely adopted,
+language-neutral standard, so the exported schema can be consumed by validation libraries in
+JavaScript, Java, Go, and many other ecosystems.
 
 ```{python}
 import json
@@ -187,20 +188,21 @@ Each validation method is mapped to its closest JSON Schema keyword:
 
 | Pointblank method | JSON Schema keyword |
 |---|---|
-| `col_vals_not_null()` | `required` |
-| `col_vals_gt()` | `exclusiveMinimum` |
-| `col_vals_ge()` | `minimum` |
-| `col_vals_lt()` | `exclusiveMaximum` |
-| `col_vals_le()` | `maximum` |
-| `col_vals_eq()` | `const` |
-| `col_vals_between()` | `minimum` + `maximum` |
-| `col_vals_in_set()` | `enum` |
-| `col_vals_regex()` | `pattern` |
-| `col_vals_within_spec()` | `format` |
+| `~~pointblank.Validate.col_vals_not_null()` | `required` |
+| `~~pointblank.Validate.col_vals_gt()` | `exclusiveMinimum` |
+| `~~pointblank.Validate.col_vals_ge()` | `minimum` |
+| `~~pointblank.Validate.col_vals_lt()` | `exclusiveMaximum` |
+| `~~pointblank.Validate.col_vals_le()` | `maximum` |
+| `~~pointblank.Validate.col_vals_eq()` | `const` |
+| `~~pointblank.Validate.col_vals_between()` | `minimum` + `maximum` |
+| `~~pointblank.Validate.col_vals_in_set()` | `enum` |
+| `~~pointblank.Validate.col_vals_regex()` | `pattern` |
+| `~~pointblank.Validate.col_vals_within_spec()` | `format` |
 
 When the `Validate` object has data attached, the schema is automatically enriched with column type
 information (`"type": "integer"`, `"type": "string"`, etc.) inferred from the data. Steps that have
-no natural JSON Schema equivalent (e.g., `rows_distinct()`, `tbl_match()`) are silently skipped.
+no natural JSON Schema equivalent (e.g., `~~pointblank.Validate.rows_distinct()`,
+`~~pointblank.Validate.tbl_match()`) are silently skipped.
 
 ### Writing to a File
 
@@ -220,9 +222,9 @@ Under the hood, `to_json_schema()` delegates to the
 [`export_contract()`](`pointblank.export_contract`) function with `format="json_schema"`. The
 convenience method adds type enrichment from the data and handles file output. If you need the raw
 adapter behavior (for example, to export without type enrichment, or to work with a `Contract`
-object rather than a `Validate` object), use `export_contract()` directly. See the [Importing and
-Exporting Contracts](../08-contracts-and-pipelines/04-importing-contracts.qmd) guide for the full
-story on contract adapters.
+object rather than a `Validate` object), use `~~pointblank.export_contract()` directly. See the
+[Importing and Exporting Contracts](../08-contracts-and-pipelines/04-importing-contracts.qmd) guide
+for the full story on contract adapters.
 
 ## Conclusion
 

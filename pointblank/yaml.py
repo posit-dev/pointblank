@@ -1429,7 +1429,8 @@ def yaml_ablation(
         Whether to run Python code in the configuration. The `evaluate:` of the `ablation:` block
         is Python code (it imports a function and runs it on the training data), so it's only
         used with `allow_python=True`. Without it, either pass `evaluate=` or leave `evaluate:`
-        out (e.g., to `export()` the versions of the table for evaluation elsewhere).
+        out (e.g., to `~~pointblank.Ablation.export()` the versions of the table for evaluation
+        elsewhere).
 
     Returns
     -------
@@ -1688,7 +1689,7 @@ def yaml_interrogate(
     [`col()`](`pointblank.col`), [`ref()`](`pointblank.ref`),
     [`seg_group()`](`pointblank.seg_group`), [`has_columns()`](`pointblank.has_columns`),
     [`has_rows()`](`pointblank.has_rows`), and the column selectors (`starts_with()`, `ends_with()`,
-    `contains()`, `matches()`, `everything()`, `first_n()`, and `last_n()`). So can the
+    `contains()`, `~~pointblank.matches()`, `everything()`, `first_n()`, and `last_n()`). So can the
     constructors for values that YAML has no literal for: `Decimal()`, `ZoneInfo()`,
     `datetime.date()`, `datetime.time()`, `datetime.datetime()`, and `datetime.timedelta()`. These
     only load a bundled dataset or build an object, so `value: pb.col("b")`,
@@ -1793,8 +1794,8 @@ def yaml_interrogate(
     ```
 
     The validation table shows the results of our YAML-defined workflow. We can see that the
-    `rows_distinct()` validation failed (because there are duplicate rows in the table), while the
-    column existence checks passed.
+    `~~pointblank.Validate.rows_distinct()` validation failed (because there are duplicate rows in
+    the table), while the column existence checks passed.
 
     Now let's create a more comprehensive validation workflow with thresholds and metadata:
 
@@ -1912,7 +1913,7 @@ def yaml_interrogate(
 
     ### Data Freshness
 
-    Check that a date/datetime column has recent data using `data_freshness`:
+    Check that a date/datetime column has recent data using `~~pointblank.Validate.data_freshness`:
 
     ```yaml
     tbl: events.csv
@@ -1945,7 +1946,8 @@ def yaml_interrogate(
 
     ### Null Percentage Check
 
-    Use `col_pct_null` to validate that the percentage of null values in a column is within bounds:
+    Use `~~pointblank.Validate.col_pct_null` to validate that the percentage of null values in a
+    column is within bounds:
 
     ```yaml
     steps:
@@ -2211,11 +2213,12 @@ def validate_yaml(yaml: Union[str, Path]) -> None:
 
     Supported Validation Methods
     ----------------------------
-    In addition to all standard validation methods (e.g., `col_vals_gt`, `rows_distinct`,
-    `col_schema_match`), the following methods are also supported:
+    In addition to all standard validation methods (e.g., `~~pointblank.Validate.col_vals_gt`,
+    `~~pointblank.Validate.rows_distinct`, `~~pointblank.Validate.col_schema_match`), the following
+    methods are also supported:
 
-    - `col_pct_null`: check the percentage of null values in a column
-    - `data_freshness`: check that data is recent
+    - `~~pointblank.Validate.col_pct_null`: check the percentage of null values in a column
+    - `~~pointblank.Validate.data_freshness`: check that data is recent
     - aggregate methods: `col_sum_gt`, `col_sum_lt`, `col_sum_ge`, `col_sum_le`,
       `col_sum_eq`, `col_avg_gt`, `col_avg_lt`, `col_avg_ge`, `col_avg_le`,
       `col_avg_eq`, `col_sd_gt`, `col_sd_lt`, `col_sd_ge`, `col_sd_le`, `col_sd_eq`

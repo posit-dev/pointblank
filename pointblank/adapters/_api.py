@@ -11,10 +11,10 @@ def import_contract(source: Any, *, format: str | None = None, **kwargs: Any) ->
 
     Data is often already described somewhere outside of Pointblank: a JSON Schema for an API
     payload, a Frictionless Table Schema inside a Data Package, the `schema.yml` file of a dbt
-    project, or an Open Data Contract Standard (ODCS) document. `import_contract()` reads such a
-    definition and translates its rules into Pointblank validation steps. That way the existing
-    definition can be checked against real data without rewriting it by hand, and the rules stay
-    in the place where they're already maintained.
+    project, or an Open Data Contract Standard (ODCS) document. `~~pointblank.import_contract()`
+    reads such a definition and translates its rules into Pointblank validation steps. That way the
+    existing definition can be checked against real data without rewriting it by hand, and the rules
+    stay in the place where they're already maintained.
 
     The result is a [`ContractImport`](`pointblank.ContractImport`) object. It holds the column
     names and types, the mapped constraints, any metadata from the source (such as a title and a
@@ -73,16 +73,21 @@ def import_contract(source: Any, *, format: str | None = None, **kwargs: Any) ->
     Each built-in adapter reads the column names and types and the following rules:
 
     - **JSON Schema** (`"json_schema"`): the `properties` of an object schema become the columns.
-    `required` maps to `col_vals_not_null()`, `minimum`/`maximum` to `col_vals_ge()`/
-    `col_vals_le()`, `exclusiveMinimum`/`exclusiveMaximum` to `col_vals_gt()`/`col_vals_lt()`,
-    `enum` to `col_vals_in_set()`, `pattern` to `col_vals_regex()`, and `const` to
-    `col_vals_eq()`. The `format` values `email`, `uri`, `uri-reference`, `ipv4`, and `ipv6` map
-    to `col_vals_within_spec()`; other formats (such as `date`) produce a warning. The `title` and
-    `description` keywords are kept as metadata and `$schema` is recorded as the source version.
+    `required` maps to `~~pointblank.Validate.col_vals_not_null()`, `minimum`/`maximum` to
+    `~~pointblank.Validate.col_vals_ge()`/ `~~pointblank.Validate.col_vals_le()`,
+    `exclusiveMinimum`/`exclusiveMaximum` to
+    `~~pointblank.Validate.col_vals_gt()`/`~~pointblank.Validate.col_vals_lt()`, `enum` to
+    `~~pointblank.Validate.col_vals_in_set()`, `pattern` to
+    `~~pointblank.Validate.col_vals_regex()`, and `const` to `~~pointblank.Validate.col_vals_eq()`.
+    The `format` values `email`, `uri`, `uri-reference`, `ipv4`, and `ipv6` map to
+    `~~pointblank.Validate.col_vals_within_spec()`; other formats (such as `date`) produce a
+    warning. The `title` and `description` keywords are kept as metadata and `$schema` is recorded
+    as the source version.
     - **Frictionless Table Schema** (`"frictionless"`): a standalone Table Schema (with `fields`)
     or a Data Package (with `resources`). The field constraints `required`, `unique`, `minimum`,
-    `maximum`, `enum`, and `pattern` are mapped, and a `primaryKey` becomes `col_vals_not_null()`
-    on each key column plus `rows_distinct()` over all of them. Foreign keys produce a warning.
+    `maximum`, `enum`, and `pattern` are mapped, and a `primaryKey` becomes
+    `~~pointblank.Validate.col_vals_not_null()` on each key column plus
+    `~~pointblank.Validate.rows_distinct()` over all of them. Foreign keys produce a warning.
     - **dbt** (`"dbt"`): the models and source tables of a `schema.yml` file. The column tests
     `not_null`, `unique`, and `accepted_values` are mapped (from either `data_tests:` or the older
     `tests:` key), as is a model-level `unique` test with `combination_of_columns`.
@@ -281,7 +286,7 @@ def export_contract(
     Data quality rules written in Pointblank are often useful to tools that don't run Pointblank.
     An API team may want a JSON Schema, an analytics engineering team may want the tests in a dbt
     `schema.yml` file, and a data catalog may accept Open Data Contract Standard (ODCS) documents.
-    `export_contract()` translates a [`Contract`](`pointblank.Contract`) or a
+    `~~pointblank.export_contract()` translates a [`Contract`](`pointblank.Contract`) or a
     [`Validate`](`pointblank.Validate`) object into one of these formats, so a single set of rules
     can be published wherever it's needed.
 
@@ -327,23 +332,33 @@ def export_contract(
     checks:
 
     - **JSON Schema** (`"json_schema"`): a draft 2020-12 object schema whose `title` and
-    `description` come from the contract. `col_vals_not_null()` adds the column to `required`;
-    `col_vals_ge()`/`col_vals_le()` become `minimum`/`maximum`, `col_vals_gt()`/`col_vals_lt()`
-    become `exclusiveMinimum`/`exclusiveMaximum`, and `col_vals_between()` sets both `minimum` and
-    `maximum`. `col_vals_in_set()` becomes `enum`, `col_vals_regex()` becomes `pattern`,
-    `col_vals_eq()` becomes `const`, and `col_vals_within_spec()` becomes a `format` for the
-    `email`, `url`, `ipv4`, and `ipv6` specs.
+    `description` come from the contract. `~~pointblank.Validate.col_vals_not_null()` adds the
+    column to `required`;
+    `~~pointblank.Validate.col_vals_ge()`/`~~pointblank.Validate.col_vals_le()` become
+    `minimum`/`maximum`, `~~pointblank.Validate.col_vals_gt()`/`~~pointblank.Validate.col_vals_lt()`
+    become `exclusiveMinimum`/`exclusiveMaximum`, and `~~pointblank.Validate.col_vals_between()`
+    sets both `minimum` and `maximum`. `~~pointblank.Validate.col_vals_in_set()` becomes `enum`,
+    `~~pointblank.Validate.col_vals_regex()` becomes `pattern`,
+    `~~pointblank.Validate.col_vals_eq()` becomes `const`, and
+    `~~pointblank.Validate.col_vals_within_spec()` becomes a `format` for the `email`, `url`,
+    `ipv4`, and `ipv6` specs.
     - **Frictionless Table Schema** (`"frictionless"`): a `fields` list with field constraints.
-    `col_vals_not_null()` becomes `required`, `rows_distinct()` becomes `unique`,
-    `col_vals_ge()`/`col_vals_le()` become `minimum`/`maximum`, `col_vals_in_set()` becomes `enum`,
-    and `col_vals_regex()` becomes `pattern`.
+    `~~pointblank.Validate.col_vals_not_null()` becomes `required`,
+    `~~pointblank.Validate.rows_distinct()` becomes `unique`,
+    `~~pointblank.Validate.col_vals_ge()`/`~~pointblank.Validate.col_vals_le()` become
+    `minimum`/`maximum`, `~~pointblank.Validate.col_vals_in_set()` becomes `enum`, and
+    `~~pointblank.Validate.col_vals_regex()` becomes `pattern`.
     - **dbt** (`"dbt"`): a `version: 2` document with one model named after the contract.
-    `col_vals_not_null()`, `rows_distinct()`, and `col_vals_in_set()` become the generic tests
-    `not_null`, `unique`, and `accepted_values`.
+    `~~pointblank.Validate.col_vals_not_null()`, `~~pointblank.Validate.rows_distinct()`, and
+    `~~pointblank.Validate.col_vals_in_set()` become the generic tests `not_null`, `unique`, and
+    `accepted_values`.
     - **Open Data Contract Standard** (`"odcs"`): a `DataContract` document with an `info` block
-    and one dataset table. `col_vals_not_null()` sets `isNullable: false`, `rows_distinct()` sets
-    `isUnique`, `col_vals_in_set()` becomes `enum`, `col_vals_regex()` becomes `pattern`, and
-    `col_vals_ge()`/`col_vals_le()` become `minimum`/`maximum`.
+    and one dataset table. `~~pointblank.Validate.col_vals_not_null()` sets `isNullable: false`,
+    `~~pointblank.Validate.rows_distinct()` sets `isUnique`,
+    `~~pointblank.Validate.col_vals_in_set()` becomes `enum`,
+    `~~pointblank.Validate.col_vals_regex()` becomes `pattern`, and
+    `~~pointblank.Validate.col_vals_ge()`/`~~pointblank.Validate.col_vals_le()` become
+    `minimum`/`maximum`.
 
     Any other step, along with thresholds, actions, and owner information, isn't exported.
 
@@ -393,8 +408,8 @@ def export_contract(
 
     The Pointblank types became JSON types, the not-null check filled the `required` list, the set
     of statuses became an `enum`, and the range check became `minimum` and `maximum` values. The
-    `rows_distinct()` step was left out because JSON Schema has no way to say that a value must be
-    unique across records.
+    `~~pointblank.Validate.rows_distinct()` step was left out because JSON Schema has no way to say
+    that a value must be unique across records.
 
     The same contract can be written out as a dbt `schema.yml` file. Here we write it to a
     `models` directory (which is created if it doesn't exist) and print the file's contents.
@@ -411,8 +426,8 @@ def export_contract(
     since dbt has no generic test for it. The `amount` column is still listed, with its type and an
     empty list of tests.
 
-    An exported document can be imported again with `import_contract()`. Doing so is a quick way to
-    see which rules survive the round trip.
+    An exported document can be imported again with `~~pointblank.import_contract()`. Doing so is a
+    quick way to see which rules survive the round trip.
 
     ```{python}
     print(pb.import_contract(orders_json_schema).summary())

@@ -162,10 +162,11 @@ check.get_copies()
 ```
 
 The other attributes have the numbers behind the report (`fidelity`, `duplicates`, `diversity`, and
-`copies`), and `to_dict()` gives all of them as a dictionary that can be written as JSON.
+`copies`), and `~~pointblank.SyntheticCheck.to_dict()` gives all of them as a dictionary that can be
+written as JSON.
 
-The report is in English by default, and `get_tabular_report()` takes `lang=` and `locale=` for
-another language (the messages of `issues` stay in English):
+The report is in English by default, and `~~pointblank.SyntheticCheck.get_tabular_report()` takes
+`lang=` and `locale=` for another language (the messages of `issues` stay in English):
 
 ```{python}
 check.get_tabular_report(lang="es")

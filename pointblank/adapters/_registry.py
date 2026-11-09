@@ -100,7 +100,7 @@ def register_adapter(format_name: str | None = None):
         print(f"{name:<18} import={info['supports_import']}  export={info['supports_export']}")
     ```
 
-    And it can be used with `import_contract()`, either by name or (since it implements
+    And it can be used with `~~pointblank.import_contract()`, either by name or (since it implements
     `detect()`) by letting the format be detected from the content.
 
     ```{python}
@@ -109,7 +109,8 @@ def register_adapter(format_name: str | None = None):
     imported.constraints
     ```
 
-    Exporting to this format isn't possible, so `export_contract()` raises an error that says so.
+    Exporting to this format isn't possible, so `~~pointblank.export_contract()` raises an error
+    that says so.
 
     ```{python}
     contract = pb.Contract(name="users", steps=[pb.Step("col_vals_not_null", columns="id")])
@@ -128,7 +129,8 @@ def register_adapter(format_name: str | None = None):
     See Also
     --------
     ContractAdapter : The base class to subclass when writing an adapter.
-    ContractImport : What an adapter's `import_contract()` method returns.
+    ContractImport : What an adapter's `~~pointblank.ContractAdapter.import_contract()` method
+        returns.
     list_adapters : List the registered adapters.
     pointblank.import_contract : Import a definition using a registered adapter.
     pointblank.export_contract : Export a contract using a registered adapter.
@@ -198,8 +200,10 @@ def list_adapters() -> dict[str, dict[str, Any]]:
 
         - `"class"`: the name of the adapter class
         - `"file_extensions"`: the list of file extensions used to detect the format
-        - `"supports_import"`: whether the format can be imported with `import_contract()`
-        - `"supports_export"`: whether the format can be exported with `export_contract()`
+        -  `"supports_import"`: whether the format can be imported with
+          `~~pointblank.import_contract()`
+        -  `"supports_export"`: whether the format can be exported with
+          `~~pointblank.export_contract()`
 
     Examples
     --------

@@ -138,9 +138,9 @@ os.remove("small_table_profile.json")
 ```
 
 The `from_json()` classmethod works with JSON strings directly, and
-[`from_dict()`](`DataScan.from_dict`) accepts the dictionary format produced by `to_dict()`. All
-three approaches produce a fully restored `DataScan` that retains the column names, types,
-statistics, and sample data from the original scan.
+[`from_dict()`](`DataScan.from_dict`) accepts the dictionary format produced by
+`~~pointblank.DataScan.to_dict()`. All three approaches produce a fully restored `DataScan` that
+retains the column names, types, statistics, and sample data from the original scan.
 
 ## Comparing Profiles for Drift
 
@@ -242,7 +242,7 @@ for col_name, scores in drift.items():
 When a `DataScan` is loaded from a saved JSON file (with no original data attached), drift scores
 cannot be computed. The comparison still reports schema changes and raw stat differences, but the
 `drift_scores` field will be empty. If you need drift scores in a persist-and-compare workflow,
-keep the original data available when calling `compare()`.
+keep the original data available when calling `~~pointblank.DataScan.compare()`.
 
 ### A Typical Workflow
 
@@ -273,15 +273,15 @@ from it rather than loading from JSON.
 The `has_changes` property gives you a simple boolean for CI pipelines or alerting. So if anything
 shifted (schema or statistics) you can easily flag it. For more granular decisions, inspect
 `columns_added`, `columns_removed`, `columns_type_changed`, and the per-column `stat_diffs` and
-`drift_scores` in the object provided by `to_dict()`.
+`drift_scores` in the object provided by `~~pointblank.DataScanDiff.to_dict()`.
 
 ## Conclusion
 
 The `col_summary_tbl()` function and the `DataScan` class give you two levels of access to
 column-level profiling. The function is a quick, visual summary you can drop into a notebook to
 understand a dataset at a glance. The class provides the same statistics in a structured form that
-you can save, load, and compare over time. When your data evolves, `compare()` catches schema drift
-(columns added, removed, or retyped) and statistical drift (shifts in means, quantiles, null rates,
-and frequency distributions), optionally backed by formal measures like PSI and the KS test.
-Together, these tools make it straightforward to move from initial data discovery to ongoing data
-quality monitoring.
+you can save, load, and compare over time. When your data evolves, `~~pointblank.DataScan.compare()`
+catches schema drift (columns added, removed, or retyped) and statistical drift (shifts in means,
+quantiles, null rates, and frequency distributions), optionally backed by formal measures like PSI
+and the KS test. Together, these tools make it straightforward to move from initial data discovery
+to ongoing data quality monitoring.

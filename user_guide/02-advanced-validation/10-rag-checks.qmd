@@ -109,8 +109,8 @@ The steps check, in order (and the brief of each says what it checks):
   [`pb.text.token_length()`](`pointblank.text.token_length`)).
 - **Near duplicates.** No chunk is nearly the same as another, which would crowd the other chunks
   out of the results of a search. The two chunks about invoices differ only in their punctuation.
-  This is a `rows_near_distinct()` step, and `near_duplicates=` sets its threshold of similarity
-  (or turns it off).
+  This is a `~~pointblank.Validate.rows_near_distinct()` step, and `near_duplicates=` sets its
+  threshold of similarity (or turns it off).
 - **Freshness.** Every chunk was updated in the `max_age=` before the reference time. The article
   about holidays was last updated almost four years ago.
 
@@ -188,8 +188,9 @@ both fail step 2. The last question's gold document, `bill-9`, isn't in the corp
 passage is about something else (step 5). The second passage fails step 5 as well, since it shares
 only one word with its question (*invoices* and *downloaded* aren't the words *invoice* and
 *download*). That shows the limits of counting words: a reranker would see that a passage about
-downloading invoices answers it. The corpus can be any table that `col_vals_in_table()` takes, and
-`corpus_id=` names its column of ids if it's different from the column of the evaluation set.
+downloading invoices answers it. The corpus can be any table that
+`~~pointblank.Validate.col_vals_in_table()` takes, and `corpus_id=` names its column of ids if it's
+different from the column of the evaluation set.
 
 ## Which Checks Matter?
 

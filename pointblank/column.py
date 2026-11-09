@@ -263,8 +263,8 @@ def col(
     [`interrogate()`](`pointblank.Validate.interrogate`) is called), Pointblank will then check that
     the column exists in the input table.
 
-    For creating expressions to use with the `conjointly()` validation method, use the
-    [`expr_col()`](`pointblank.expr_col`) function instead.
+    For creating expressions to use with the `~~pointblank.Validate.conjointly()` validation method,
+    use the [`expr_col()`](`pointblank.expr_col`) function instead.
 
     Parameters
     ----------
@@ -362,7 +362,7 @@ def col(
     - `boolean()`
     - `by_dtype()`
     - `categorical()`
-    - `matches()`
+    - `~~pointblank.matches()`
     - `numeric()`
     - `string()`
 
@@ -533,7 +533,7 @@ def col(
 
     See Also
     --------
-    expr_col : Create a column expression for use in `conjointly()`.
+    expr_col : Create a column expression for use in `~~pointblank.Validate.conjointly()`.
     """
     if isinstance(exprs, str):
         return ColumnLiteral(exprs=exprs)
@@ -1122,9 +1122,9 @@ def matches(pattern: str, case_sensitive: bool = False) -> Matches:
 
     Many validation methods have a `columns=` argument that can be used to specify the columns for
     validation (e.g., [`col_vals_gt()`](`pointblank.Validate.col_vals_gt`),
-    [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`), etc.). The `matches()` selector
-    function can be used to select one or more columns matching a provided regular expression
-    pattern. So if the set of table columns consists of
+    [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`), etc.). The `~~pointblank.matches()`
+    selector function can be used to select one or more columns matching a provided regular
+    expression pattern. So if the set of table columns consists of
 
     `[rev_01, rev_02, profit_01, profit_02, age]`
 
@@ -1133,10 +1133,10 @@ def matches(pattern: str, case_sensitive: bool = False) -> Matches:
     `profit_02` columns.
 
     There will be a validation step created for every resolved column. Note that if there aren't any
-    columns resolved from using `matches()` (or any other expression using selector functions), the
-    validation step will fail to be evaluated during the interrogation process. Such a failure to
-    evaluate will be reported in the validation results but it won't affect the interrogation
-    process overall (i.e., the process won't be halted).
+    columns resolved from using `~~pointblank.matches()` (or any other expression using selector
+    functions), the validation step will fail to be evaluated during the interrogation process. Such
+    a failure to evaluate will be reported in the validation results but it won't affect the
+    interrogation process overall (i.e., the process won't be halted).
 
     Parameters
     ----------
@@ -1150,7 +1150,7 @@ def matches(pattern: str, case_sensitive: bool = False) -> Matches:
     Matches
         A `Matches` object, which can be used to select columns that match the specified pattern.
 
-    Relevant Validation Methods where `matches()` can be Used
+    Relevant Validation Methods where `~~pointblank.matches()` can be Used
     ---------------------------------------------------------
     This selector function can be used in the `columns=` argument of the following validation
     methods:
@@ -1173,17 +1173,17 @@ def matches(pattern: str, case_sensitive: bool = False) -> Matches:
     - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
-    The `matches()` selector function doesn't need to be used in isolation. Read the next section
-    for information on how to compose it with other column selectors for more refined ways to select
-    columns.
+    The `~~pointblank.matches()` selector function doesn't need to be used in isolation. Read the
+    next section for information on how to compose it with other column selectors for more refined
+    ways to select columns.
 
     Additional Flexibilty through Composition with Other Column Selectors
     ---------------------------------------------------------------------
-    The `matches()` function can be composed with other column selectors to create fine-grained
-    column selections. For example, to select columns that have the text starting with five digits
-    and end with `"_id"`, you can use the `matches()` and [`ends_with()`](`pointblank.ends_with`)
-    functions together. The only condition is that the expressions are wrapped in the
-    [`col()`](`pointblank.col`) function, like this:
+    The `~~pointblank.matches()` function can be composed with other column selectors to create
+    fine-grained column selections. For example, to select columns that have the text starting with
+    five digits and end with `"_id"`, you can use the `~~pointblank.matches()` and
+    [`ends_with()`](`pointblank.ends_with`) functions together. The only condition is that the
+    expressions are wrapped in the [`col()`](`pointblank.col`) function, like this:
 
     ```python
     col(matches(r"^[0-9]{5}") & ends_with("_id"))
@@ -1214,8 +1214,8 @@ def matches(pattern: str, case_sensitive: bool = False) -> Matches:
 
     Suppose we have a table with columns `name`, `id_old`, `new_identifier`, and `pay_2021` and we'd
     like to validate that text values in columns having `"id"` or `"identifier"` in the name have a
-    specific syntax. We can use the `matches()` column selector function to specify the columns that
-    match the pattern.
+    specific syntax. We can use the `~~pointblank.matches()` column selector function to specify the
+    columns that match the pattern.
 
     ```{python}
     import pointblank as pb
@@ -1242,10 +1242,10 @@ def matches(pattern: str, case_sensitive: bool = False) -> Matches:
     From the results of the validation table we get two validation steps, one for `id_old` and one
     for `new_identifier`. The values in both columns all match the pattern `"ID[0-9]{4}"`.
 
-    We can also use the `matches()` function in combination with other column selectors (within
-    [`col()`](`pointblank.col`)) to create more complex column selection criteria (i.e., to select
-    columns that satisfy multiple conditions). For example, to select columns that contain `"pay"`
-    and match the text `"2023"` or `"2024"`, we can use the `&` operator to combine column
+    We can also use the `~~pointblank.matches()` function in combination with other column selectors
+    (within [`col()`](`pointblank.col`)) to create more complex column selection criteria (i.e., to
+    select columns that satisfy multiple conditions). For example, to select columns that contain
+    `"pay"` and match the text `"2023"` or `"2024"`, we can use the `&` operator to combine column
     selectors.
 
     ```{python}
@@ -2021,7 +2021,7 @@ class ColumnExpression:
 
 def expr_col(column_name: str) -> ColumnExpression:
     """
-    Create a column expression for use in `conjointly()` validation.
+    Create a column expression for use in `Validate.conjointly()` validation.
 
     This function returns a ColumnExpression object that supports operations like `>`, `<`, `+`,
     etc. for use in [`conjointly()`](`pointblank.Validate.conjointly`) validation expressions.

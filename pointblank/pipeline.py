@@ -24,8 +24,9 @@ class PipelineResult:
     the code that runs a pipeline can decide what to do next (publish the output, stop the job, or
     alert someone) and still have the full reports at hand to explain the decision.
 
-    You don't normally create a `PipelineResult` yourself. Get one from `run()` and read its
-    attributes and properties. When `run()` raises a
+    You don't normally create a `PipelineResult` yourself. Get one from
+    `~~pointblank.Pipeline.run()` and read its attributes and properties. When
+    `~~pointblank.Pipeline.run()` raises a
     [`ContractViolationError`](`pointblank.ContractViolationError`) instead, the error's `result`
     attribute holds the `PipelineResult`.
 
@@ -346,8 +347,9 @@ class ContractViolationError(RuntimeError):
     failed_run.target_validation
     ```
 
-    The report shows the one failing test unit in the `col_vals_gt` step, the row for item
-    `"b"`. Nothing after the `run()` call was reached, so the prices weren't published.
+    The report shows the one failing test unit in the `~~pointblank.Validate.col_vals_gt` step, the
+    row for item `"b"`. Nothing after the `~~pointblank.Pipeline.run()` call was reached, so the
+    prices weren't published.
 
     See Also
     --------
@@ -479,7 +481,7 @@ class Pipeline:
     and `short_circuit=` setting under a `pipeline` key, plus the two contracts under `source` and
     `target`. Actions and final actions are functions or messages tied to your environment, so
     they aren't stored. Pass them again when you recreate the pipeline. The transformation isn't
-    part of the pipeline either: it's given to `run()` each time.
+    part of the pipeline either: it's given to `~~pointblank.Pipeline.run()` each time.
 
     Examples
     --------
@@ -612,7 +614,7 @@ class Pipeline:
 
     See Also
     --------
-    PipelineResult : The result of `run()`, holding both boundary validations.
+    PipelineResult : The result of `~~pointblank.Pipeline.run()`, holding both boundary validations.
     Contract : Define the source and target contracts.
     Step : A single validation rule within a contract.
     """
@@ -826,9 +828,9 @@ class Pipeline:
         validation
         ```
 
-        The `rows_distinct` step fails for both copies of `"2025-03-02"`, and a message is written
-        to the `"pointblank.contract"` logger. Because the method returns the validation, the job
-        can decide what to do with the result:
+        The `~~pointblank.Validate.rows_distinct` step fails for both copies of `"2025-03-02"`, and
+        a message is written to the `"pointblank.contract"` logger. Because the method returns the
+        validation, the job can decide what to do with the result:
 
         ```{python}
         validation.all_passed()
@@ -963,8 +965,8 @@ class Pipeline:
         ```
 
         The input was fine and the output wasn't, which points to the transformation. In the
-        target validation, the `rows_distinct` step flags both rows for customer 3. The default
-        `on_violation="warn"` setting also issued a warning.
+        target validation, the `~~pointblank.Validate.rows_distinct` step flags both rows for
+        customer 3. The default `on_violation="warn"` setting also issued a warning.
 
         ```{python}
         result.target_validation
@@ -1294,8 +1296,8 @@ class Pipeline:
         export_pipeline.validate_target(invoices)
         ```
 
-        The invoice with a total of `0.0` fails the `col_vals_gt` step and reaches the warning
-        threshold set in the pipeline definition.
+        The invoice with a total of `0.0` fails the `~~pointblank.Validate.col_vals_gt` step and
+        reaches the warning threshold set in the pipeline definition.
         """
         from pointblank.contract import Contract, _dict_to_thresholds
 

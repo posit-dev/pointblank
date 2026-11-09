@@ -192,9 +192,9 @@ class SchemaDiff:
         `only_in_source` and `only_in_target`. Note that column order matters here: the same
         columns in a different order don't match.
 
-        With `schema="strict"` (the default in `compare()`), a `False` value here means the
-        comparison fails as a whole, with no rows passing. With `schema="common"`, it's reported but
-        doesn't affect the result. [`Comparison.schema_ok`](`pointblank.Comparison.schema_ok`)
+        With `schema="strict"` (the default in `~~pointblank.compare()`), a `False` value here means
+        the comparison fails as a whole, with no rows passing. With `schema="common"`, it's reported
+        but doesn't affect the result. [`Comparison.schema_ok`](`pointblank.Comparison.schema_ok`)
         combines the two: it's this value under `"strict"` and always `True` under `"common"`.
 
         Returns
@@ -340,8 +340,8 @@ def compare(
     A common data question is *how do these two tables differ?* You may have refactored a
     pipeline and want to know whether its output changed, migrated a table from one database to
     another, or received a new extract of a data feed. Spot checks and row counts can tell you
-    *that* something changed. The `compare()` function tells you *which* rows changed, how, and in
-    which columns.
+    *that* something changed. The `~~pointblank.compare()` function tells you *which* rows changed,
+    how, and in which columns.
 
     It aligns the rows of a *source* table (the reference, or expected data) with those of a
     *target* table (the data being checked) and classifies every aligned row: rows that match,
@@ -892,7 +892,7 @@ class Comparison:
 
     Only `revenue` has a mismatch, in one of the four matched rows. From here, the full report is
     available with [`get_tabular_report()`](`pointblank.Comparison.get_tabular_report`), and the
-    result can be saved with `to_json()` to keep a record of the check.
+    result can be saved with `~~pointblank.Comparison.to_json()` to keep a record of the check.
 
     See Also
     --------

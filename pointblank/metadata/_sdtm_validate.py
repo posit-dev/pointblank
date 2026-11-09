@@ -302,9 +302,10 @@ def validate_sdtm(
     validation
     ```
 
-    The `col_vals_gt()` step on `AESEQ` fails for the third row, whose sequence number is `0`. The
-    `col_exists()` steps at the end show that `AEDECOD`, a required AE variable, is missing from
-    the dataset. The `tbl_name=` argument was passed on to `Validate`.
+    The `~~pointblank.Validate.col_vals_gt()` step on `AESEQ` fails for the third row, whose
+    sequence number is `0`. The `~~pointblank.Validate.col_exists()` steps at the end show that
+    `AEDECOD`, a required AE variable, is missing from the dataset. The `tbl_name=` argument was
+    passed on to `Validate`.
 
     See Also
     --------

@@ -79,8 +79,8 @@ result = pb.import_contract({"my_format_version": "1.0", "fields": []}, format="
 print(result)
 ```
 
-The adapter is now part of the Pointblank ecosystem. Any call to `import_contract()` with
-`format="my_format"` will route through this adapter, and the auto-detection system will call
+The adapter is now part of the Pointblank ecosystem. Any call to `~~pointblank.import_contract()`
+with `format="my_format"` will route through this adapter, and the auto-detection system will call
 `detect()` when no format is specified.
 
 ```{python}
@@ -99,8 +99,8 @@ Here are the class attributes and methods you can define:
 |---|---|---|
 | `format_name` | `str` | Short identifier (e.g., `"json_schema"`, `"my_format"`) |
 | `file_extensions` | `list[str]` | File extensions for auto-detection (e.g., `[".schema.json"]`) |
-| `supports_import` | `bool` | Whether `import_contract()` is implemented |
-| `supports_export` | `bool` | Whether `export_contract()` is implemented |
+| `supports_import` | `bool` | Whether `~~pointblank.ContractAdapter.import_contract()` is implemented |
+| `supports_export` | `bool` | Whether `~~pointblank.ContractAdapter.export_contract()` is implemented |
 
 | Method | Required? | Purpose |
 |---|---|---|
@@ -395,8 +395,8 @@ def detect(source) -> bool:
 Custom adapters let you extend Pointblank's import/export system to handle any schema format your
 organization uses. The plugin architecture is intentionally simple: subclass `ContractAdapter`,
 implement one or two methods, and register it with a decorator. From that point forward, your
-format participates in the same `import_contract()` and `export_contract()` workflow that the
-built-in adapters use.
+format participates in the same `~~pointblank.import_contract()` and
+`~~pointblank.export_contract()` workflow that the built-in adapters use.
 
 This extensibility means that Pointblank can serve as a universal validation layer regardless of
 where your data contracts originate. Whether your schemas live in a proprietary YAML format, an

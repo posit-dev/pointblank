@@ -1628,8 +1628,9 @@ def get_data_path(
     validation
     ```
 
-    The CSV file is read into a table during interrogation. The three `col_exists()` steps and the
-    `col_vals_gt()` step all pass.
+    The CSV file is read into a table during interrogation. The three
+    `~~pointblank.Validate.col_exists()` steps and the `~~pointblank.Validate.col_vals_gt()` step
+    all pass.
 
     We can also get a Parquet file path for validation examples:
 
@@ -9238,13 +9239,13 @@ class Validate:
         """
         Do column data lie outside of two specified values or data in other columns?
 
-        The `col_vals_between()` validation method checks whether column values in a table *do not*
-        fall within a certain range. The range is specified with three arguments: `left=`, `right=`,
-        and `inclusive=`. The `left=` and `right=` values specify the lower and upper bounds. These
-        bounds can be specified as literal values or as column names provided within
-        [`col()`](`pointblank.col`). The validation will operate over the number of test units that
-        is equal to the number of rows in the table (determined after any `pre=` mutation has been
-        applied).
+        The `~~pointblank.Validate.col_vals_between()` validation method checks whether column
+        values in a table *do not* fall within a certain range. The range is specified with three
+        arguments: `left=`, `right=`, and `inclusive=`. The `left=` and `right=` values specify the
+        lower and upper bounds. These bounds can be specified as literal values or as column names
+        provided within [`col()`](`pointblank.col`). The validation will operate over the number of
+        test units that is equal to the number of rows in the table (determined after any `pre=`
+        mutation has been applied).
 
         Parameters
         ----------
@@ -10175,7 +10176,8 @@ class Validate:
 
         **Using Python Enums**
 
-        Like `col_vals_in_set()`, this method also supports Python Enum classes and instances:
+        Like `~~pointblank.Validate.col_vals_in_set()`, this method also supports Python Enum
+        classes and instances:
 
         ```{python}
         from enum import Enum
@@ -14254,8 +14256,9 @@ class Validate:
 
         Like `col_vals_*()` methods, `prompt()` evaluates data against specific criteria, but
         instead of using programmatic rules, it uses natural language prompts interpreted by an LLM.
-        Like `rows_distinct()` and `rows_complete()`, it operates at the row level and allows you to
-        specify a subset of columns for evaluation using `columns_subset=`.
+        Like `~~pointblank.Validate.rows_distinct()` and `~~pointblank.Validate.rows_complete()`, it
+        operates at the row level and allows you to specify a subset of columns for evaluation using
+        `columns_subset=`.
 
         The system automatically combines your validation criteria from the `prompt=` parameter with
         the necessary technical context, data formatting instructions, and response structure
@@ -15217,11 +15220,12 @@ class Validate:
         failing rows and in the step report, where the rows of each group are shown together.
         The step's note says how many groups were found and how many rows are in them.
 
-        Every row of a group fails, as with `rows_distinct()`. When the rows of a validation are
-        used to clean a table (with [`get_row_flags()`](`pointblank.Validate.get_row_flags`), or
-        in an [`Ablation`](`pointblank.Ablation`)), `duplicates=` decides which rows of a group
-        are kept: `"keep_first"` keeps the first row of each group, `"keep_last"` the last, and
-        `"flag_all"` keeps none.
+        Every row of a group fails, as with `~~pointblank.Validate.rows_distinct()`. When the rows
+        of a validation are used to clean a table (with
+        [`get_row_flags()`](`pointblank.Validate.get_row_flags`), or in an
+        [`Ablation`](`pointblank.Ablation`)), `duplicates=` decides which rows of a group are kept:
+        `"keep_first"` keeps the first row of each group, `"keep_last"` the last, and `"flag_all"`
+        keeps none.
 
         Comparing texts runs in Python. A Polars or pandas table is compared as it is (a Polars
         LazyFrame is collected first). For a database table (through Ibis) or a PySpark
@@ -17764,11 +17768,11 @@ class Validate:
         )
         ```
 
-        The method chain ends with `all_passed()`, which returns `True`. The totals are `467.5` in
-        the source and `456.5` in the loaded table, a difference of `11` that falls within the
-        tolerance. A grand total can hide offsetting differences, though: the missing `west` orders
-        and the larger `east` total partly cancel out, which is why the per-region check above is
-        the stricter one.
+        The method chain ends with `~~pointblank.Validate.all_passed()`, which returns `True`. The
+        totals are `467.5` in the source and `456.5` in the loaded table, a difference of `11` that
+        falls within the tolerance. A grand total can hide offsetting differences, though: the
+        missing `west` orders and the larger `east` total partly cancel out, which is why the
+        per-region check above is the stricter one.
         """
 
         assertion_type = _get_fn_name()
@@ -21944,8 +21948,8 @@ class Validate:
         -----------------
         As with [`to_code()`](`pointblank.Validate.to_code`), steps carrying non-serializable
         Python objects (`pre=` callables, `actions=`, callable `active=`, and the expressions of
-        `col_vals_expr()`/`conjointly()`/`specially()`) cannot be represented in YAML; a
-        placeholder is emitted and a warning is raised.
+        `~~pointblank.Validate.col_vals_expr()`/`~~pointblank.Validate.conjointly()`/`specially()`)
+        cannot be represented in YAML; a placeholder is emitted and a warning is raised.
 
         Values that YAML has no literal for, such as `Decimal("2.2")`, `datetime.time(9, 30)`, or
         a datetime in a named time zone, are written as `python:` blocks. These are among the few
@@ -22093,19 +22097,20 @@ class Validate:
 
         | Pointblank method | JSON Schema keyword |
         |---|---|
-        | `col_vals_not_null()` | `required` |
-        | `col_vals_gt()` | `exclusiveMinimum` |
-        | `col_vals_ge()` | `minimum` |
-        | `col_vals_lt()` | `exclusiveMaximum` |
-        | `col_vals_le()` | `maximum` |
-        | `col_vals_eq()` | `const` |
-        | `col_vals_in_set()` | `enum` |
-        | `col_vals_between()` | `minimum` + `maximum` |
-        | `col_vals_regex()` | `pattern`  |
-        | `col_vals_within_spec()` | `format` |
+        | `~~pointblank.Validate.col_vals_not_null()` | `required` |
+        | `~~pointblank.Validate.col_vals_gt()` | `exclusiveMinimum` |
+        | `~~pointblank.Validate.col_vals_ge()` | `minimum` |
+        | `~~pointblank.Validate.col_vals_lt()` | `exclusiveMaximum` |
+        | `~~pointblank.Validate.col_vals_le()` | `maximum` |
+        | `~~pointblank.Validate.col_vals_eq()` | `const` |
+        | `~~pointblank.Validate.col_vals_in_set()` | `enum` |
+        | `~~pointblank.Validate.col_vals_between()` | `minimum` + `maximum` |
+        | `~~pointblank.Validate.col_vals_regex()` | `pattern`  |
+        | `~~pointblank.Validate.col_vals_within_spec()` | `format` |
 
-        Steps with no JSON Schema equivalent (e.g., `rows_distinct()`, `tbl_match()`,
-        `col_vals_outside()`) are silently skipped.
+        Steps with no JSON Schema equivalent (e.g., `~~pointblank.Validate.rows_distinct()`,
+        `~~pointblank.Validate.tbl_match()`, `~~pointblank.Validate.col_vals_outside()`) are
+        silently skipped.
 
         Examples
         --------
@@ -22660,8 +22665,8 @@ class Validate:
         ```
 
         The rows with `f` of `"low"` have no missing values in `c`, but only 2 of their 5 values
-        in `d` are above 1000. The `rows_distinct()` step isn't segmented, so it's not part of the
-        scores of any segment.
+        in `d` are above 1000. The `~~pointblank.Validate.rows_distinct()` step isn't segmented, so
+        it's not part of the scores of any segment.
 
         See Also
         --------
@@ -23371,7 +23376,7 @@ class Validate:
         only involve steps where:
 
         - of certain check types, where test units are rows or cells checked down a column (e.g.,
-        the `col_vals_*()` methods and `rows_complete()`)
+        the `col_vals_*()` methods and `~~pointblank.Validate.rows_complete()`)
         - `active=` is not set to `False`
         - `pre=` has not been given an expression for modifying the input table, unless it's
         marked with [`row_preserving()`](`pointblank.row_preserving`)
@@ -23398,11 +23403,11 @@ class Validate:
             latter returns a table only containing rows had test units that failed in at least one
             validation step.
         duplicates
-            How to treat the duplicate rows found by `rows_distinct()` (and
-            `rows_near_distinct()`) steps. The default `None` leaves those steps out of the
-            sundering. Use `"keep_first"` or `"keep_last"` to keep one
-            copy of each group of duplicates (the first or last one, in row order or in the order
-            given by `duplicates_order_by=`), or `"flag_all"` to treat every copy as failing.
+            How to treat the duplicate rows found by `~~pointblank.Validate.rows_distinct()` (and
+            `~~pointblank.Validate.rows_near_distinct()`) steps. The default `None` leaves those
+            steps out of the sundering. Use `"keep_first"` or `"keep_last"` to keep one copy of each
+            group of duplicates (the first or last one, in row order or in the order given by
+            `duplicates_order_by=`), or `"flag_all"` to treat every copy as failing.
         duplicates_order_by
             One or more columns that order the copies of a duplicated row, to decide which copy is
             kept with `duplicates="keep_first"` or `duplicates="keep_last"`. For example, use
@@ -23492,7 +23497,8 @@ class Validate:
         The validation report would count both copies of `id` `2` as failing, but with
         `duplicates="keep_last"` the copy with `version` `2` is kept in the 'pass' piece, and only
         the older copy would be in the 'fail' piece. Without `duplicates=`, the
-        `rows_distinct()` step would be left out and all four rows would be returned.
+        `~~pointblank.Validate.rows_distinct()` step would be left out and all four rows would be
+        returned.
 
         See Also
         --------
@@ -23600,24 +23606,24 @@ class Validate:
         Unlike `get_sundered_data()`, steps that use
         [`rows_distinct()`](`pointblank.Validate.rows_distinct`) are included by default: one copy
         of each group of duplicate rows (the first one) isn't flagged, and the other copies are. So
-        a `rows_distinct()` flag marks the rows that removing duplicates would remove. Use
-        `duplicates=` and `duplicates_order_by=` to choose which copy is kept. Steps that use
-        [`rows_near_distinct()`](`pointblank.Validate.rows_near_distinct`) are treated in the same
-        way, with a group of near duplicates in place of the copies of a row.
+        a `~~pointblank.Validate.rows_distinct()` flag marks the rows that removing duplicates would
+        remove. Use `duplicates=` and `duplicates_order_by=` to choose which copy is kept. Steps
+        that use [`rows_near_distinct()`](`pointblank.Validate.rows_near_distinct`) are treated in
+        the same way, with a group of near duplicates in place of the copies of a row.
 
         A row-level step that can't be used is reported in a warning: that's a step that uses an
         unmarked `pre=` function (it can change the rows, so its results may not line up with the
-        table's rows), a step that couldn't be evaluated, or a `rows_distinct()` step when
-        `duplicates=None`.
+        table's rows), a step that couldn't be evaluated, or a
+        `~~pointblank.Validate.rows_distinct()` step when `duplicates=None`.
 
         Parameters
         ----------
         duplicates
-            How to flag the duplicate rows found by `rows_distinct()` (and `rows_near_distinct()`)
-            steps. With `"keep_first"` (the default) or `"keep_last"`, one copy of each group of
-            duplicates (the first or last one, in row order or in the order given by
-            `duplicates_order_by=`) isn't flagged. `"flag_all"` flags every copy, as the step
-            itself counts them, and `None` leaves those steps out.
+            How to flag the duplicate rows found by `~~pointblank.Validate.rows_distinct()` (and
+            `~~pointblank.Validate.rows_near_distinct()`) steps. With `"keep_first"` (the default)
+            or `"keep_last"`, one copy of each group of duplicates (the first or last one, in row
+            order or in the order given by `duplicates_order_by=`) isn't flagged. `"flag_all"` flags
+            every copy, as the step itself counts them, and `None` leaves those steps out.
         duplicates_order_by
             One or more columns that order the copies of a duplicated row, to decide which copy
             isn't flagged. For example, use `duplicates="keep_last",
@@ -23670,8 +23676,8 @@ class Validate:
         Each step has a flag column. Both copies of order `2` have a negative amount, so both fail
         step 1, but only the second copy is flagged by step 3, since removing duplicates would keep
         the first one. Order `3` fails step 1 because its amount is missing (missing values fail
-        `col_vals_gt()` unless `na_pass=True`) and it also fails step 2. Order `1` passed every
-        check, so it has a `pb_row_score_` of `1`.
+        `~~pointblank.Validate.col_vals_gt()` unless `na_pass=True`) and it also fails step 2. Order
+        `1` passed every check, so it has a `pb_row_score_` of `1`.
 
         See Also
         --------

@@ -271,8 +271,8 @@ reference:
       desc: >
         Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into
         Pointblank validation workflows, or export Pointblank contracts to those formats. Use
-        `import_contract()` as the entry point, `export_contract()` for the reverse, and
-        `register_adapter()` to add support for custom formats.
+        `~~pointblank.import_contract()` as the entry point, `~~pointblank.export_contract()` for
+        the reverse, and `register_adapter()` to add support for custom formats.
       contents:
         - import_contract
         - export_contract
@@ -406,8 +406,8 @@ reference:
     - title: Column Selection
       desc: >
         Use the `col()` function along with column selection helpers to flexibly select columns for
-        validation. Combine `col()` with `starts_with()`, `matches()`, etc. for selecting multiple
-        target columns.
+        validation. Combine `col()` with `starts_with()`, `~~pointblank.matches()`, etc. for
+        selecting multiple target columns.
       contents:
         - col
         - starts_with
@@ -495,9 +495,9 @@ reference:
 
     - title: Table Comparison
       desc: >
-        Compare two tables row by row. `compare()` aligns the rows of a source and a target table
-        (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus
-        schema differences. The result is a `Comparison` object with counts, row samples, and a
+        Compare two tables row by row. `~~pointblank.compare()` aligns the rows of a source and a
+        target table (by key, by position, or as multisets) and reports missing, extra, and changed
+        rows, plus schema differences. The result is a `Comparison` object with counts, row samples, and a
         tabular report. The same comparison is available as a validation step through
         `Validate.tbl_match()`, and `Validate.tbl_reconcile()` compares aggregates (e.g., totals
         per group) instead of rows.

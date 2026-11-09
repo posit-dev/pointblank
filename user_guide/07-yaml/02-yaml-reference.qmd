@@ -217,7 +217,8 @@ missing_specs:
 
 Steps reference a named spec by name through the `missing:` parameter. This works both on the
 `col_vals_*` methods (to exclude sentinel values from a check) and on the dedicated missingness
-methods (`col_pct_missing`, `col_missing_coded`, `col_missing_only_coded`, `col_missing_consistent`):
+methods (`~~pointblank.Validate.col_pct_missing`, `~~pointblank.Validate.col_missing_coded`,
+`~~pointblank.Validate.col_missing_only_coded`, `~~pointblank.Validate.col_missing_consistent`):
 
 ```yaml
 missing_specs:
@@ -258,7 +259,8 @@ steps:
 
 #### Comparison Methods
 
-`col_vals_gt`: are column data greater than a fixed value or data in another column?
+`~~pointblank.Validate.col_vals_gt`: are column data greater than a fixed value or data in another
+column?
 
 ```yaml
 - col_vals_gt:
@@ -283,7 +285,8 @@ directly or in a `python:` block:
     value: pb.col("other_column")      # Same as `value: {python: pb.col("other_column")}`
 ```
 
-`col_vals_lt`: are column data less than a fixed value or data in another column?
+`~~pointblank.Validate.col_vals_lt`: are column data less than a fixed value or data in another
+column?
 
 ```yaml
 - col_vals_lt:
@@ -293,7 +296,8 @@ directly or in a `python:` block:
     # ... (same parameters as col_vals_gt)
 ```
 
-`col_vals_ge`: are column data greater than or equal to a fixed value or data in another column?
+`~~pointblank.Validate.col_vals_ge`: are column data greater than or equal to a fixed value or data
+in another column?
 
 ```yaml
 - col_vals_ge:
@@ -303,7 +307,8 @@ directly or in a `python:` block:
     # ... (same parameters as col_vals_gt)
 ```
 
-`col_vals_le`: are column data less than or equal to a fixed value or data in another column?
+`~~pointblank.Validate.col_vals_le`: are column data less than or equal to a fixed value or data in
+another column?
 
 ```yaml
 - col_vals_le:
@@ -313,7 +318,8 @@ directly or in a `python:` block:
     # ... (same parameters as col_vals_gt)
 ```
 
-`col_vals_eq`: are column data equal to a fixed value or data in another column?
+`~~pointblank.Validate.col_vals_eq`: are column data equal to a fixed value or data in another
+column?
 
 ```yaml
 - col_vals_eq:
@@ -323,7 +329,8 @@ directly or in a `python:` block:
     # ... (same parameters as col_vals_gt)
 ```
 
-`col_vals_ne`: are column data not equal to a fixed value or data in another column?
+`~~pointblank.Validate.col_vals_ne`: are column data not equal to a fixed value or data in another
+column?
 
 ```yaml
 - col_vals_ne:
@@ -335,7 +342,7 @@ directly or in a `python:` block:
 
 #### Range Methods
 
-`col_vals_between`: are column data between two specified values (inclusive)?
+`~~pointblank.Validate.col_vals_between`: are column data between two specified values (inclusive)?
 
 ```yaml
 - col_vals_between:
@@ -353,7 +360,7 @@ directly or in a `python:` block:
     brief: "Values between 0 and 100"  # OPTIONAL: Step description
 ```
 
-`col_vals_outside`: are column data outside of two specified values?
+`~~pointblank.Validate.col_vals_outside`: are column data outside of two specified values?
 
 ```yaml
 - col_vals_outside:
@@ -367,7 +374,7 @@ directly or in a `python:` block:
 
 #### Set Membership Methods
 
-`col_vals_in_set`: are column data part of a specified set of values?
+`~~pointblank.Validate.col_vals_in_set`: are column data part of a specified set of values?
 
 ```yaml
 - col_vals_in_set:
@@ -383,7 +390,7 @@ directly or in a `python:` block:
     brief: "Values in allowed set"     # OPTIONAL: Step description
 ```
 
-`col_vals_not_in_set`: are column data not part of a specified set of values?
+`~~pointblank.Validate.col_vals_not_in_set`: are column data not part of a specified set of values?
 
 ```yaml
 - col_vals_not_in_set:
@@ -395,7 +402,7 @@ directly or in a `python:` block:
 
 #### NULL Value Methods
 
-`col_vals_null`: are column data null (missing)?
+`~~pointblank.Validate.col_vals_null`: are column data null (missing)?
 
 ```yaml
 - col_vals_null:
@@ -409,7 +416,7 @@ directly or in a `python:` block:
     brief: "Values must be NULL"       # OPTIONAL: Step description
 ```
 
-`col_vals_not_null`: are column data not null (not missing)?
+`~~pointblank.Validate.col_vals_not_null`: are column data not null (not missing)?
 
 ```yaml
 - col_vals_not_null:
@@ -419,7 +426,7 @@ directly or in a `python:` block:
 
 #### Pattern Matching Methods
 
-`col_vals_regex`: do string-based column data match a regular expression?
+`~~pointblank.Validate.col_vals_regex`: do string-based column data match a regular expression?
 ```yaml
 - col_vals_regex:
     columns: [column_name]             # REQUIRED: Column(s) to validate
@@ -434,7 +441,8 @@ directly or in a `python:` block:
     brief: "Values match pattern"      # OPTIONAL: Step description
 ```
 
-`col_vals_within_spec`: do column data conform to a specification (email, URL, postal codes, etc.)?
+`~~pointblank.Validate.col_vals_within_spec`: do column data conform to a specification (email, URL,
+postal codes, etc.)?
 
 ```yaml
 - col_vals_within_spec:
@@ -485,7 +493,7 @@ Examples:
     spec: "iban[DE]"
 ```
 
-`col_vals_str_len`: are string lengths within a range?
+`~~pointblank.Validate.col_vals_str_len`: are string lengths within a range?
 
 ```yaml
 - col_vals_str_len:
@@ -497,7 +505,7 @@ Examples:
 
 #### Custom Expression Methods
 
-`col_vals_expr`: do column data agree with a predicate expression?
+`~~pointblank.Validate.col_vals_expr`: do column data agree with a predicate expression?
 
 ```yaml
 - col_vals_expr:
@@ -517,7 +525,7 @@ Examples:
 
 #### Trend Validation Methods
 
-`col_vals_increasing`: are column data increasing row-by-row?
+`~~pointblank.Validate.col_vals_increasing`: are column data increasing row-by-row?
 
 ```yaml
 - col_vals_increasing:
@@ -568,7 +576,7 @@ Examples:
     brief: "Temperature trend (small drops allowed)"
 ```
 
-`col_vals_decreasing`: are column data decreasing row-by-row?
+`~~pointblank.Validate.col_vals_decreasing`: are column data decreasing row-by-row?
 
 ```yaml
 - col_vals_decreasing:
@@ -619,7 +627,7 @@ Examples:
 
 #### Chat Format Methods
 
-`col_vals_chat_format`: is each value a well-formed chat conversation?
+`~~pointblank.Validate.col_vals_chat_format`: is each value a well-formed chat conversation?
 
 ```yaml
 - col_vals_chat_format:
@@ -640,7 +648,7 @@ as JSON text.
 
 ### Row-based Validations
 
-`rows_distinct`: are row data distinct?
+`~~pointblank.Validate.rows_distinct`: are row data distinct?
 
 ```yaml
 - rows_distinct                        # Simple form
@@ -656,7 +664,7 @@ as JSON text.
     brief: "No duplicate rows"         # OPTIONAL: Step description
 ```
 
-`rows_complete`: are row data complete?
+`~~pointblank.Validate.rows_complete`: are row data complete?
 
 ```yaml
 - rows_complete                        # Simple form
@@ -672,7 +680,7 @@ as JSON text.
     brief: "Complete rows only"        # OPTIONAL: Step description
 ```
 
-`rows_near_distinct`: are rows free of near duplicates?
+`~~pointblank.Validate.rows_near_distinct`: are rows free of near duplicates?
 
 ```yaml
 - rows_near_distinct:
@@ -686,7 +694,8 @@ as JSON text.
     brief: "No near-duplicate documents"  # OPTIONAL: Step description
 ```
 
-`rows_not_contaminated`: does the text of each row not overlap with a reference, like a benchmark?
+`~~pointblank.Validate.rows_not_contaminated`: does the text of each row not overlap with a
+reference, like a benchmark?
 
 ```yaml
 - rows_not_contaminated:
@@ -718,7 +727,7 @@ that makes a table (which needs `allow_python=True`):
 
 ### Structure Validations
 
-`col_exists`: does column exist in the table?
+`~~pointblank.Validate.col_exists`: does column exist in the table?
 
 ```yaml
 - col_exists:
@@ -730,7 +739,7 @@ that makes a table (which needs `allow_python=True`):
     brief: "Required columns exist"    # OPTIONAL: Step description
 ```
 
-`col_schema_match`: does the table have expected column names and data types?
+`~~pointblank.Validate.col_schema_match`: does the table have expected column names and data types?
 
 ```yaml
 - col_schema_match:
@@ -751,7 +760,7 @@ that makes a table (which needs `allow_python=True`):
     brief: "Schema validation"         # OPTIONAL: Step description
 ```
 
-`row_count_match`: does the table have n rows?
+`~~pointblank.Validate.row_count_match`: does the table have n rows?
 
 ```yaml
 - row_count_match:
@@ -763,7 +772,7 @@ that makes a table (which needs `allow_python=True`):
     brief: "Expected row count"        # OPTIONAL: Step description
 ```
 
-`col_count_match`: does the table have n columns?
+`~~pointblank.Validate.col_count_match`: does the table have n columns?
 
 ```yaml
 - col_count_match:
@@ -775,7 +784,7 @@ that makes a table (which needs `allow_python=True`):
     brief: "Expected column count"     # OPTIONAL: Step description
 ```
 
-`tbl_match`: does the table match a comparison table?
+`~~pointblank.Validate.tbl_match`: does the table match a comparison table?
 
 ```yaml
 - tbl_match:
@@ -804,9 +813,9 @@ using progressively stricter checks:
 The validation fails at the first check that doesn't pass, making it easy to diagnose mismatches.
 This operates over a single test unit (pass/fail for complete table match).
 
-**Cross-backend validation**: `tbl_match()` supports automatic backend coercion when comparing tables
-from different backends (e.g., Polars vs. Pandas, DuckDB vs. SQLite). The comparison table is
-automatically converted to match the target table's backend.
+**Cross-backend validation**: `~~pointblank.Validate.tbl_match()` supports automatic backend
+coercion when comparing tables from different backends (e.g., Polars vs. Pandas, DuckDB vs. SQLite).
+The comparison table is automatically converted to match the target table's backend.
 
 Examples:
 
@@ -837,7 +846,7 @@ Examples:
 
 ### Special Validation Methods
 
-`conjointly`: are multiple validations having a joint dependency?
+`~~pointblank.Validate.conjointly`: are multiple validations having a joint dependency?
 
 ```yaml
 - conjointly:
@@ -990,15 +999,16 @@ Examples:
 
 **When NOT to use AI validation:**
 
-- Simple numeric comparisons (use `col_vals_gt`, `col_vals_lt`, etc.)
-- Exact pattern matching (use `col_vals_regex`)
-- Schema validation (use `col_schema_match`)
+-  Simple numeric comparisons (use `~~pointblank.Validate.col_vals_gt`,
+  `~~pointblank.Validate.col_vals_lt`, etc.)
+- Exact pattern matching (use `~~pointblank.Validate.col_vals_regex`)
+- Schema validation (use `~~pointblank.Validate.col_schema_match`)
 - Performance-critical validations with large datasets
 - When deterministic results are required
 
 ### Model-Scored Validation
 
-`col_vals_scored`: are the scores that a model gives each row within bounds?
+`~~pointblank.Validate.col_vals_scored`: are the scores that a model gives each row within bounds?
 
 ```yaml
 - col_vals_scored:
@@ -1081,7 +1091,7 @@ scorers and the score cache.
 
 ### Data Quality Methods
 
-`col_pct_null`: is the percentage of null values in a column within bounds?
+`~~pointblank.Validate.col_pct_null`: is the percentage of null values in a column within bounds?
 
 ```yaml
 - col_pct_null:
@@ -1094,7 +1104,7 @@ scorers and the score cache.
     brief: "Null rate check"           # OPTIONAL: Step description
 ```
 
-`data_freshness`: is the data in a date/datetime column recent?
+`~~pointblank.Validate.data_freshness`: is the data in a date/datetime column recent?
 
 ```yaml
 - data_freshness:

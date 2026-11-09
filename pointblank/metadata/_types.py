@@ -824,9 +824,10 @@ class MetadataImport:
         print(meta.to_validate(data=transactions).to_code())
         ```
 
-        Each step can be traced back to the metadata. For instance, the `rows_distinct()` step
-        for `transaction_id` comes from its `unique` constraint, and the `col_vals_not_in_set()`
-        steps check the `"NA"` and `"N/A"` markers declared for the string columns.
+        Each step can be traced back to the metadata. For instance, the
+        `~~pointblank.Validate.rows_distinct()` step for `transaction_id` comes from its `unique`
+        constraint, and the `~~pointblank.Validate.col_vals_not_in_set()` steps check the `"NA"` and
+        `"N/A"` markers declared for the string columns.
         """
         from pointblank.metadata._convert import _metadata_to_validate
 

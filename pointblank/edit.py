@@ -228,9 +228,10 @@ class EditValidation:
     edit.review()
     ```
 
-    The review table lists one row per changed step: the `col_vals_gt()` step is modified (its
-    `value=` went from `100` to `50`), the `col_vals_not_null()` step is added, and the unchanged
-    `col_vals_regex()` step isn't shown. Once the changes look right,
+    The review table lists one row per changed step: the `~~pointblank.Validate.col_vals_gt()` step
+    is modified (its `value=` went from `100` to `50`), the
+    `~~pointblank.Validate.col_vals_not_null()` step is added, and the unchanged
+    `~~pointblank.Validate.col_vals_regex()` step isn't shown. Once the changes look right,
     [`accept()`](`pointblank.EditValidation.accept`) gives the revised plan as a `Validate` object
     that's ready to interrogate.
 
@@ -400,9 +401,9 @@ class EditValidation:
         comparison.changed_steps()
         ```
 
-        The only change is the `value=` of the `col_vals_gt()` step, reported as a single
-        modification. The plans can also be YAML configurations, which are converted to Python
-        code before they're compared:
+        The only change is the `value=` of the `~~pointblank.Validate.col_vals_gt()` step, reported
+        as a single modification. The plans can also be YAML configurations, which are converted to
+        Python code before they're compared:
 
         ```{python}
         v1_yaml = '''
@@ -426,8 +427,8 @@ class EditValidation:
         comparison.changed_steps()
         ```
 
-        The second version adds a `rows_distinct()` step. Since the inputs can be file paths too,
-        this works well for checking a change to a saved plan before it's merged.
+        The second version adds a `~~pointblank.Validate.rows_distinct()` step. Since the inputs can
+        be file paths too, this works well for checking a change to a saved plan before it's merged.
         """
         # Bypass __init__/__post_init__ (which would call the model) and populate directly
         obj = cls.__new__(cls)
@@ -547,9 +548,9 @@ class EditValidation:
         print(edit.diff())
         ```
 
-        The old `col_vals_gt()` line is replaced by one with `value=50`, and a
-        `col_vals_not_null()` line is added. The two files in the header (`original_plan.py` and
-        `edited_plan.py`) are only labels, and nothing is written to disk.
+        The old `~~pointblank.Validate.col_vals_gt()` line is replaced by one with `value=50`, and a
+        `~~pointblank.Validate.col_vals_not_null()` line is added. The two files in the header
+        (`original_plan.py` and `edited_plan.py`) are only labels, and nothing is written to disk.
         """
         original = self.original_code.splitlines(keepends=True)
         edited = self.edited_code.splitlines(keepends=True)
@@ -608,10 +609,11 @@ class EditValidation:
             print(change)
         ```
 
-        The `col_vals_gt()` step is modified, so its record has both the old and the new step text.
-        The `rows_distinct()` step was removed and has only `"old"`, and the new
-        `col_vals_not_null()` step has only `"new"`. The same records are behind the table that
-        [`review()`](`pointblank.EditValidation.review`) shows.
+        The `~~pointblank.Validate.col_vals_gt()` step is modified, so its record has both the old
+        and the new step text. The `~~pointblank.Validate.rows_distinct()` step was removed and has
+        only `"old"`, and the new `~~pointblank.Validate.col_vals_not_null()` step has only `"new"`.
+        The same records are behind the table that [`review()`](`pointblank.EditValidation.review`)
+        shows.
         """
         old_steps = _extract_chain_steps(self.original_code)
         new_steps = _extract_chain_steps(self.edited_code)
@@ -649,9 +651,10 @@ class EditValidation:
         edit.review()
         ```
 
-        The modified `col_vals_gt()` step shows its old and new text in the *Before* and *After*
-        columns, and the removed `rows_distinct()` step has only a *Before* entry. Because the
-        result is a GT object, it can be styled further or saved with the `great_tables` API.
+        The modified `~~pointblank.Validate.col_vals_gt()` step shows its old and new text in the
+        *Before* and *After* columns, and the removed `~~pointblank.Validate.rows_distinct()` step
+        has only a *Before* entry. Because the result is a GT object, it can be styled further or
+        saved with the `great_tables` API.
         """
         from great_tables import GT, loc, style
 

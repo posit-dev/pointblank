@@ -1465,7 +1465,7 @@ class DataScanDiff:
     Parameters
     ----------
     current
-        The newer `DataScan` (the one whose `compare()` method was called).
+        The newer `DataScan` (the one whose `~~pointblank.DataScan.compare()` method was called).
     baseline
         The older `DataScan` that `current` is compared against.
 

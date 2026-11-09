@@ -97,7 +97,7 @@ def heuristic_filters(
       that, have, and with)
     - no more than `max_repeated_lines=` of the lines repeat an earlier line (30%)
 
-    Each check is a `col_vals_scored()` step with a
+    Each check is a `~~pointblank.Validate.col_vals_scored()` step with a
     [`text_stat()`](`pointblank.scorers.text_stat`) scorer, so the report shows each one, with
     its own counts of the documents that fail, and a brief that says what it checks. Set a
     bound to `None` to leave its check out (a check with two bounds is left out when both are
@@ -313,11 +313,12 @@ def in_language(
     """
     Make a validation step that checks that text is in the expected language.
 
-    The step is a `col_vals_scored()` step with a [`langid()`](`pointblank.scorers.langid`)
-    scorer: a language identification model gives the probability that the text of each row is
-    in one of the expected languages, and a row fails if the probability is below
-    `min_confidence=`. The expected languages are the same for every row (`expected=`) or come
-    from a column (`expected_column=`), for a corpus with documents in several languages.
+    The step is a `~~pointblank.Validate.col_vals_scored()` step with a
+    [`langid()`](`pointblank.scorers.langid`) scorer: a language identification model gives the
+    probability that the text of each row is in one of the expected languages, and a row fails if
+    the probability is below `min_confidence=`. The expected languages are the same for every row
+    (`expected=`) or come from a column (`expected_column=`), for a corpus with documents in several
+    languages.
 
     Parameters
     ----------
@@ -443,8 +444,9 @@ def token_length(
 
     A language model reads text as tokens, and most have a limit on how many they can take in, so
     the documents of a corpus for training (or a set of prompts) need to be neither too short nor
-    too long, in the tokens of the model's tokenizer. The step is a `col_vals_scored()` step with
-    a [`token_count()`](`pointblank.scorers.token_count`) scorer, and a row fails if its number of
+    too long, in the tokens of the model's tokenizer. The step is a
+    `~~pointblank.Validate.col_vals_scored()` step with a
+    [`token_count()`](`pointblank.scorers.token_count`) scorer, and a row fails if its number of
     tokens is below `min_val=` or above `max_val=`.
 
     Parameters
@@ -541,14 +543,15 @@ def no_pii(
 
     Text collected for training or evaluating a model shouldn't have personal information in it,
     such as email addresses, phone numbers, or credit card numbers. This function makes a
-    `col_vals_regex()` step (with `inverse=True`) for each column and each kind of information:
-    a row fails if its text has something that looks like one. The patterns use only the features
-    of regular expressions that every backend has, so the checks run in the database (or in
-    PySpark) like any other `col_vals_regex()` step.
+    `~~pointblank.Validate.col_vals_regex()` step (with `inverse=True`) for each column and each
+    kind of information: a row fails if its text has something that looks like one. The patterns use
+    only the features of regular expressions that every backend has, so the checks run in the
+    database (or in PySpark) like any other `~~pointblank.Validate.col_vals_regex()` step.
 
     The patterns find likely matches, not certain ones: a number with the shape of a credit card
     number matches, with no checksum, and an unusual format of a phone number can be missed. For
-    a thorough check, use a model for named entities (e.g., with `col_vals_scored()`).
+    a thorough check, use a model for named entities (e.g., with
+    `~~pointblank.Validate.col_vals_scored()`).
 
     The entities are:
 

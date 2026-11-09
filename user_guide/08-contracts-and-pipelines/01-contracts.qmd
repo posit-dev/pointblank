@@ -92,9 +92,10 @@ order_contract = pb.Contract(
 )
 ```
 
-When a schema is defined, the contract automatically adds a `col_schema_match()` step before all
-other validation steps. This means the schema check runs first, and if the table doesn't have the
-right columns and types, you'll know immediately.
+When a schema is defined, the contract automatically adds a
+`~~pointblank.Validate.col_schema_match()` step before all other validation steps. This means the
+schema check runs first, and if the table doesn't have the right columns and types, you'll know
+immediately.
 
 ```{python}
 orders = pl.DataFrame(
@@ -140,17 +141,17 @@ contract is created. Here are the most common ones for contract definitions:
 
 | Method | Purpose |
 |--------|---------|
-| `col_vals_gt()`, `col_vals_lt()`, `col_vals_ge()`, `col_vals_le()` | Numeric bounds |
-| `col_vals_between()`, `col_vals_outside()` | Range checks |
-| `col_vals_eq()`, `col_vals_ne()` | Equality checks |
-| `col_vals_in_set()`, `col_vals_not_in_set()` | Categorical membership |
-| `col_vals_not_null()`, `col_vals_null()` | Null checks |
-| `col_vals_regex()` | Pattern matching |
-| `col_exists()` | Column presence |
-| `rows_distinct()` | Uniqueness (use `columns_subset=`) |
-| `rows_complete()` | No nulls in any column |
-| `row_count_match()` | Expected row count |
-| `col_count_match()` | Expected column count |
+| `~~pointblank.Validate.col_vals_gt()`, `~~pointblank.Validate.col_vals_lt()`, `~~pointblank.Validate.col_vals_ge()`, `~~pointblank.Validate.col_vals_le()` | Numeric bounds |
+| `~~pointblank.Validate.col_vals_between()`, `~~pointblank.Validate.col_vals_outside()` | Range checks |
+| `~~pointblank.Validate.col_vals_eq()`, `~~pointblank.Validate.col_vals_ne()` | Equality checks |
+| `~~pointblank.Validate.col_vals_in_set()`, `~~pointblank.Validate.col_vals_not_in_set()` | Categorical membership |
+| `~~pointblank.Validate.col_vals_not_null()`, `~~pointblank.Validate.col_vals_null()` | Null checks |
+| `~~pointblank.Validate.col_vals_regex()` | Pattern matching |
+| `~~pointblank.Validate.col_exists()` | Column presence |
+| `~~pointblank.Validate.rows_distinct()` | Uniqueness (use `columns_subset=`) |
+| `~~pointblank.Validate.rows_complete()` | No nulls in any column |
+| `~~pointblank.Validate.row_count_match()` | Expected row count |
+| `~~pointblank.Validate.col_count_match()` | Expected column count |
 
 ## Contract Metadata
 

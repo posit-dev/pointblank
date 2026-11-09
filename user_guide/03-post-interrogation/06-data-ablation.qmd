@@ -817,5 +817,5 @@ intervals, so you can find the checks that are worth enforcing, the ones that do
 ones that are redundant, the ones that remove good data, and where to set their limits. Injecting
 defects shows how much a problem would cost (and gives thresholds to match), and Shapley values
 share the effect of the whole cleaning fairly among the steps. It works with any model that you can
-wrap in an `evaluate` function (or train elsewhere, with `export()` and `load_results()`), and with
-any validation whose steps check rows.
+wrap in an `evaluate` function (or train elsewhere, with `~~pointblank.Ablation.export()` and
+`load_results()`), and with any validation whose steps check rows.

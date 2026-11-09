@@ -66,10 +66,11 @@ result.to_validate(data=users).interrogate()
 
 That's it. The JSON Schema `minimum`, `maximum`, `enum`, `format`, and `required` keywords were
 automatically translated into the appropriate Pointblank validation steps. Each keyword becomes a
-dedicated validation check: `minimum` becomes `col_vals_ge()`, `maximum` becomes `col_vals_le()`,
-`enum` becomes `col_vals_in_set()`, and so on. The schema's `required` array generates
-`col_vals_not_null()` steps for each listed field, ensuring that null values are caught at
-validation time.
+dedicated validation check: `minimum` becomes `~~pointblank.Validate.col_vals_ge()`, `maximum`
+becomes `~~pointblank.Validate.col_vals_le()`, `enum` becomes
+`~~pointblank.Validate.col_vals_in_set()`, and so on. The schema's `required` array generates
+`~~pointblank.Validate.col_vals_not_null()` steps for each listed field, ensuring that null values
+are caught at validation time.
 
 ## How It Works
 
@@ -96,8 +97,8 @@ for any warnings, and decide how to proceed before committing to a particular ou
 
 ## The `ContractImport` Object
 
-After calling `import_contract()`, you get back a `ContractImport` with these key attributes and
-methods:
+After calling `~~pointblank.import_contract()`, you get back a `ContractImport` with these key
+attributes and methods:
 
 | Attribute / Method | Description |
 |---|---|
@@ -166,17 +167,17 @@ natural fit for defining column-level constraints.
 | JSON Schema Keyword | Pointblank Method |
 |---|---|
 | `type: "integer"` / `"number"` / `"string"` / `"boolean"` | Schema dtype check |
-| `minimum` | `col_vals_ge()` |
-| `maximum` | `col_vals_le()` |
-| `exclusiveMinimum` | `col_vals_gt()` |
-| `exclusiveMaximum` | `col_vals_lt()` |
-| `enum` | `col_vals_in_set()` |
-| `pattern` | `col_vals_regex()` |
+| `minimum` | `~~pointblank.Validate.col_vals_ge()` |
+| `maximum` | `~~pointblank.Validate.col_vals_le()` |
+| `exclusiveMinimum` | `~~pointblank.Validate.col_vals_gt()` |
+| `exclusiveMaximum` | `~~pointblank.Validate.col_vals_lt()` |
+| `enum` | `~~pointblank.Validate.col_vals_in_set()` |
+| `pattern` | `~~pointblank.Validate.col_vals_regex()` |
 | `format: "email"` | `col_vals_within_spec(spec="email")` |
 | `format: "uri"` | `col_vals_within_spec(spec="url")` |
 | `format: "ipv4"` / `"ipv6"` | `col_vals_within_spec(spec="ipv4"/"ipv6")` |
-| `const` | `col_vals_eq()` |
-| `required` (array of field names) | `col_vals_not_null()` |
+| `const` | `~~pointblank.Validate.col_vals_eq()` |
+| `required` (array of field names) | `~~pointblank.Validate.col_vals_not_null()` |
 
 **Importing from a file:**
 
@@ -210,10 +211,11 @@ for c in result.constraints:
 ```
 
 Each constraint from the JSON Schema has been translated into the corresponding Pointblank method
-call. The `pattern` keyword on the `sku` field became a `col_vals_regex()` step, `exclusiveMinimum`
-became `col_vals_gt()` (note the strict inequality), and the three `required` fields each generated
-a `col_vals_not_null()` step. You can iterate over `result.constraints` like this to verify the
-translation before running any validation.
+call. The `pattern` keyword on the `sku` field became a `~~pointblank.Validate.col_vals_regex()`
+step, `exclusiveMinimum` became `~~pointblank.Validate.col_vals_gt()` (note the strict inequality),
+and the three `required` fields each generated a `~~pointblank.Validate.col_vals_not_null()` step.
+You can iterate over `result.constraints` like this to verify the translation before running any
+validation.
 
 ### Frictionless Data Table Schema
 
@@ -226,12 +228,12 @@ with explicit support for column types, constraints, and primary/foreign keys.
 | Frictionless Feature | Pointblank Method |
 |---|---|
 | `type` | Schema dtype check |
-| `constraints.required: true` | `col_vals_not_null()` |
-| `constraints.unique: true` | `rows_distinct()` |
-| `constraints.minimum` / `maximum` | `col_vals_ge()` / `col_vals_le()` |
-| `constraints.enum` | `col_vals_in_set()` |
-| `constraints.pattern` | `col_vals_regex()` |
-| `primaryKey` | `col_vals_not_null()` + `rows_distinct()` |
+| `constraints.required: true` | `~~pointblank.Validate.col_vals_not_null()` |
+| `constraints.unique: true` | `~~pointblank.Validate.rows_distinct()` |
+| `constraints.minimum` / `maximum` | `~~pointblank.Validate.col_vals_ge()` / `~~pointblank.Validate.col_vals_le()` |
+| `constraints.enum` | `~~pointblank.Validate.col_vals_in_set()` |
+| `constraints.pattern` | `~~pointblank.Validate.col_vals_regex()` |
+| `primaryKey` | `~~pointblank.Validate.col_vals_not_null()` + `~~pointblank.Validate.rows_distinct()` |
 | `foreignKeys` | ⚠ Warning (cross-table not yet supported) |
 
 **Importing a standalone Table Schema:**
@@ -309,9 +311,9 @@ can import these definitions directly.
 | dbt Feature | Pointblank Method |
 |---|---|
 | `data_type` | Schema dtype check |
-| `not_null` test | `col_vals_not_null()` |
-| `unique` test | `rows_distinct()` |
-| `accepted_values` test | `col_vals_in_set()` |
+| `not_null` test | `~~pointblank.Validate.col_vals_not_null()` |
+| `unique` test | `~~pointblank.Validate.rows_distinct()` |
+| `accepted_values` test | `~~pointblank.Validate.col_vals_in_set()` |
 | `relationships` test | Warning (cross-table not yet supported) |
 
 Both the newer `data_tests` key (dbt v1.8+) and the legacy `tests` key are supported.
@@ -394,12 +396,12 @@ supports both ODCS v2.x and v3.x documents.
 | ODCS Feature | Pointblank Method |
 |---|---|
 | `logicalType` | Schema dtype check |
-| `isNullable: false` | `col_vals_not_null()` |
-| `isUnique: true` | `rows_distinct()` |
-| `isPrimaryKey: true` | `col_vals_not_null()` + `rows_distinct()` |
-| `enum` / `values` | `col_vals_in_set()` |
-| `pattern` | `col_vals_regex()` |
-| `minimum` / `maximum` | `col_vals_ge()` / `col_vals_le()` |
+| `isNullable: false` | `~~pointblank.Validate.col_vals_not_null()` |
+| `isUnique: true` | `~~pointblank.Validate.rows_distinct()` |
+| `isPrimaryKey: true` | `~~pointblank.Validate.col_vals_not_null()` + `~~pointblank.Validate.rows_distinct()` |
+| `enum` / `values` | `~~pointblank.Validate.col_vals_in_set()` |
+| `pattern` | `~~pointblank.Validate.col_vals_regex()` |
+| `minimum` / `maximum` | `~~pointblank.Validate.col_vals_ge()` / `~~pointblank.Validate.col_vals_le()` |
 | `minLength` / `maxLength` | Warning (no direct equivalent) |
 | Custom checks / SodaCL | Warning (no automatic mapping) |
 
@@ -638,10 +640,10 @@ persist the output and inspect it in the same call.
 
 If you're working with a `Validate` object and want JSON Schema output specifically, you can use the
 [`to_json_schema()`](`Validate.to_json_schema`) convenience method directly on the `Validate`
-object. It delegates to `export_contract()` and additionally enriches the schema with column type
-information inferred from the data. See the
-[Serializing Validation Plans](../02-advanced-validation/05-plan-serialization.qmd#exporting-a-plan-as-json-schema)
-guide for details.
+object. It delegates to `~~pointblank.export_contract()` and additionally enriches the schema with
+column type information inferred from the data. See the [Serializing Validation
+Plans](../advanced-validation/plan-serialization.qmd#exporting-a-plan-as-json-schema) guide for
+details.
 :::
 
 ## Round-Trip Fidelity
@@ -737,8 +739,8 @@ entire Pointblank API for adding checks, setting thresholds, or attaching action
 
 ## Migration from Other Tools
 
-A key use case for `import_contract()` is **migration**: bringing existing validation definitions
-from other tools into Pointblank without manual rewriting.
+A key use case for `~~pointblank.import_contract()` is **migration**: bringing existing validation
+definitions from other tools into Pointblank without manual rewriting.
 
 ### Coming from JSON Schema
 

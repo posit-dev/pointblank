@@ -612,7 +612,7 @@ class FinalActions:
     The three outputs appear in the order the actions were given. A string action is printed as
     is, while the functions can use the summary to decide what to do. Two of the three steps have
     failures (`d` has values of `1000` or less and `c` has missing values), and only the
-    `col_exists()` step passes.
+    `~~pointblank.Validate.col_exists()` step passes.
 
     See Also
     --------

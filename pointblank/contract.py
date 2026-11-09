@@ -50,8 +50,8 @@ class Step:
         `value=0`). They're stored as given and passed to the method when the step is compiled, so
         a misspelled or missing argument raises a `TypeError` at that point rather than when the
         step is created. Positional arguments aren't supported. The one validation method that
-        takes positional arguments, `conjointly()`, receives its expressions as a list in `exprs=`
-        (e.g., `pb.Step("conjointly", exprs=[lambda df: pl.col("a") > 0])`).
+        takes positional arguments, `~~pointblank.Validate.conjointly()`, receives its expressions
+        as a list in `exprs=` (e.g., `pb.Step("conjointly", exprs=[lambda df: pl.col("a") > 0])`).
 
     Returns
     -------
@@ -70,7 +70,8 @@ class Step:
 
     - name columns with strings or lists of strings, rather than with selectors like
     `pb.starts_with()` or `pb.col()`
-    - steps that take an expression or a function, such as `col_vals_expr` and `conjointly`, can
+    -  steps that take an expression or a function, such as `~~pointblank.Validate.col_vals_expr`
+      and `~~pointblank.Validate.conjointly`, can
     only be used in contracts kept in Python
 
     All of these work when the step is used directly in Python.
@@ -114,8 +115,8 @@ class Step:
 
     Steps are normally used in groups. Here are three more rules for a table of patients: each
     patient ID must appear only once, IDs must follow a pattern, and the `visit` column must be
-    present. Note that `rows_distinct` takes `columns_subset=` rather than `columns=`, because
-    each step's arguments are exactly those of its `Validate` method.
+    present. Note that `~~pointblank.Validate.rows_distinct` takes `columns_subset=` rather than
+    `columns=`, because each step's arguments are exactly those of its `Validate` method.
 
     ```{python}
     patient_steps = [
@@ -311,7 +312,7 @@ class Step:
         ```
 
         The `rows_complete:` entry has no value, so its step has no arguments. A step converted
-        with `to_dict()` and back is equal to the original:
+        with `~~pointblank.Step.to_dict()` and back is equal to the original:
 
         ```{python}
         step = pb.Step("col_vals_in_set", columns="status", set=["open", "closed"])
@@ -468,7 +469,8 @@ class Contract:
     1. a `Validate` is created for the table, with `tbl_name=` set to the contract name, a label of
     the form `"Contract: <name> v<version>"`, and the contract's `thresholds=`, `owner=`,
     `consumers=`, and `version=`
-    2. if the contract has a schema, a `col_schema_match()` step is added first
+    2.  if the contract has a schema, a `~~pointblank.Validate.col_schema_match()` step is added
+       first
     3. each [`Step`](`pointblank.Step`) is added in order, by calling the validation method it
     names with its stored arguments
 
@@ -480,14 +482,23 @@ class Contract:
     ----------------------
     These validation methods can be used in a contract's steps:
 
-    - column value checks: `col_vals_gt`, `col_vals_lt`, `col_vals_ge`, `col_vals_le`,
-    `col_vals_eq`, `col_vals_ne`, `col_vals_between`, `col_vals_outside`, `col_vals_in_set`,
-    `col_vals_not_in_set`, `col_vals_increasing`, `col_vals_decreasing`, `col_vals_null`,
-    `col_vals_not_null`, `col_vals_regex`, `col_vals_within_spec`, and `col_vals_expr`
-    - column-level checks: `col_exists` and `col_pct_null`
-    - table-level checks: `col_schema_match`, `col_count_match`, `row_count_match`,
-    `rows_distinct`, and `rows_complete`
-    - multi-condition checks: `conjointly`, with its expressions given as a list in `exprs=`
+    -  column value checks: `~~pointblank.Validate.col_vals_gt`,
+      `~~pointblank.Validate.col_vals_lt`, `~~pointblank.Validate.col_vals_ge`,
+      `~~pointblank.Validate.col_vals_le`,
+    `~~pointblank.Validate.col_vals_eq`, `~~pointblank.Validate.col_vals_ne`,
+    `~~pointblank.Validate.col_vals_between`, `~~pointblank.Validate.col_vals_outside`,
+    `~~pointblank.Validate.col_vals_in_set`, `~~pointblank.Validate.col_vals_not_in_set`,
+    `~~pointblank.Validate.col_vals_increasing`, `~~pointblank.Validate.col_vals_decreasing`,
+    `~~pointblank.Validate.col_vals_null`, `~~pointblank.Validate.col_vals_not_null`,
+    `~~pointblank.Validate.col_vals_regex`, `~~pointblank.Validate.col_vals_within_spec`, and
+    `~~pointblank.Validate.col_vals_expr`
+    -  column-level checks: `~~pointblank.Validate.col_exists` and
+      `~~pointblank.Validate.col_pct_null`
+    -  table-level checks: `~~pointblank.Validate.col_schema_match`,
+      `~~pointblank.Validate.col_count_match`, `~~pointblank.Validate.row_count_match`,
+    `~~pointblank.Validate.rows_distinct`, and `~~pointblank.Validate.rows_complete`
+    -  multi-condition checks: `~~pointblank.Validate.conjointly`, with its expressions given as a
+      list in `exprs=`
 
     Each takes the same arguments as the [`Validate`](`pointblank.Validate`) method of the same
     name. A step that names any other method is rejected with a `ValueError` when the contract is
@@ -508,8 +519,8 @@ class Contract:
     lists, and dictionaries) for a contract to be written to YAML, although step-level
     `Thresholds` objects and tuples are converted to dictionaries automatically. A contract with
     other objects in its steps, such as a column selector (e.g., `pb.starts_with("amt_")`), a
-    Polars expression, or a function, can't be written: `to_yaml()` raises a `ValueError` that
-    says where the object is. Keep contracts like that in Python.
+    Polars expression, or a function, can't be written: `~~pointblank.Contract.to_yaml()` raises a
+    `ValueError` that says where the object is. Keep contracts like that in Python.
 
     Working With Other Pointblank Tools
     -----------------------------------
@@ -594,8 +605,8 @@ class Contract:
 
     The report header shows the label built from the contract (`Contract: orders v1.2.0`) along
     with the owner, consumers, and version. The first step is the schema check, followed by one step
-    per contract rule. The `col_vals_not_null` step names two columns, so it becomes two validation
-    steps. All six steps pass.
+    per contract rule. The `~~pointblank.Validate.col_vals_not_null` step names two columns, so it
+    becomes two validation steps. All six steps pass.
 
     The next day's extract has problems: a missing customer ID, a repeated order ID, a negative
     amount, and a status the contract doesn't allow. The same contract catches all of them.
@@ -617,9 +628,9 @@ class Contract:
 
     The schema still matches, but four of the rule steps have failing test units. With only four
     rows, one failure is already 25% of the table, so those steps exceed both the warning and the
-    error thresholds. The `rows_distinct` step counts two failures because both rows with order
-    `"A6"` are duplicates. Since the result is an ordinary `Validate` object, you can check it in
-    code, for example to stop a scheduled job:
+    error thresholds. The `~~pointblank.Validate.rows_distinct` step counts two failures because
+    both rows with order `"A6"` are duplicates. Since the result is an ordinary `Validate` object,
+    you can check it in code, for example to stop a scheduled job:
 
     ```{python}
     validation.all_passed()
@@ -1242,7 +1253,8 @@ class Contract:
         ```
 
         The report label, `Contract: payments v1.0.0`, comes from the file. The payment with an
-        amount of `0.0` fails the `col_vals_gt` step and triggers the warning threshold.
+        amount of `0.0` fails the `~~pointblank.Validate.col_vals_gt` step and triggers the warning
+        threshold.
         """
         from pathlib import Path
 
@@ -1277,8 +1289,9 @@ class Contract:
         Fields that aren't set, and the default `direction=` and `on_violation=` values, are left
         out of the YAML (see [`to_dict()`](`pointblank.Contract.to_dict`)). Step arguments must be
         plain data (strings, numbers, booleans, dates, lists, and dictionaries) so that
-        `from_yaml()` can read them back. Step-level thresholds are converted to dictionaries
-        automatically, but column selectors, expressions, and functions can't be written.
+        `~~pointblank.Contract.from_yaml()` can read them back. Step-level thresholds are converted
+        to dictionaries automatically, but column selectors, expressions, and functions can't be
+        written.
 
         Parameters
         ----------

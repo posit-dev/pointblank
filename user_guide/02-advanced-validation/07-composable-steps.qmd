@@ -51,8 +51,9 @@ called on.
 
 The `Steps` class lets you record validation steps without binding them to data, thresholds, or any
 other `Validate` configuration. You use the same method names and parameters you already know from
-`Validate` (`col_vals_gt()`, `col_vals_not_null()`, `col_vals_regex()`, etc.), but instead of
-running the checks, `Steps` stores them for later use.
+`Validate` (`~~pointblank.Validate.col_vals_gt()`, `~~pointblank.Validate.col_vals_not_null()`,
+`~~pointblank.Validate.col_vals_regex()`, etc.), but instead of running the checks, `Steps` stores
+them for later use.
 
 The key benefit is **portability**: a `Steps` object can live in a shared Python module and be
 imported into any number of validation pipelines. The step definitions stay the same and only the

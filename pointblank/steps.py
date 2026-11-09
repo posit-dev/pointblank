@@ -24,10 +24,10 @@ class Steps:
 
     A `Steps` object is a list of validation steps that isn't attached to any table. You build it
     with the same methods you'd call on a [`Validate`](`pointblank.Validate`) object
-    (`col_vals_not_null()`, `rows_distinct()`, `col_vals_regex()`, and so on), but each call only
-    records the step. Nothing is checked until the collection is added to a validation with
-    [`Validate.add_steps()`](`pointblank.Validate.add_steps`) and that validation is
-    interrogated.
+    (`~~pointblank.Steps.col_vals_not_null()`, `~~pointblank.Steps.rows_distinct()`,
+    `~~pointblank.Steps.col_vals_regex()`, and so on), but each call only records the step. Nothing
+    is checked until the collection is added to a validation with
+    [`Validate.add_steps()`](`pointblank.Validate.add_steps`) and that validation is interrogated.
 
     This makes it possible to write a group of checks once and use it in many places. Many tables
     share the same rules: every table with a customer ID needs that ID to be present and unique,
@@ -58,9 +58,10 @@ class Steps:
     ---------------
     Each validation method records one step and returns the same `Steps` object, so calls can be
     chained. All of the row-based and table-level validation methods are available, from
-    `col_vals_gt()` to `tbl_reconcile()`, including `col_vals_scored()`. The aggregation methods
-    (`col_sum_*()`, `col_avg_*()`, and `col_sd_*()`), `specially()`, and `prompt()` aren't, so add
-    those directly to the validation.
+    `~~pointblank.Steps.col_vals_gt()` to `~~pointblank.Steps.tbl_reconcile()`, including
+    `~~pointblank.Steps.col_vals_scored()`. The aggregation methods (`col_sum_*()`, `col_avg_*()`,
+    and `col_sd_*()`), `specially()`, and `prompt()` aren't, so add those directly to the
+    validation.
 
     Because each method adds to the object it's called on, a collection isn't copied when you add
     to it. Calling a method on a shared collection (e.g., `extended = id_checks.col_exists(...)`)
@@ -147,8 +148,8 @@ class Steps:
     ```
 
     The report has one step per recorded step, in the order they were added. Customer ID `3`
-    appears twice, so both of its rows fail the `rows_distinct` step. The address `"c-at-z.com"`
-    fails the email pattern, and the country `"BR"` isn't in the allowed set.
+    appears twice, so both of its rows fail the `~~pointblank.Steps.rows_distinct` step. The address
+    `"c-at-z.com"` fails the email pattern, and the country `"BR"` isn't in the allowed set.
 
     The same collections can check a table from a billing system, where the ID column is called
     `cust_id`. The `columns_map=` argument renames the column in the added steps, and

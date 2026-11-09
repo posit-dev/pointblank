@@ -86,7 +86,7 @@ The key attributes are:
 
 Each `VariableMetadata` object describes a single column, including its name, data type, label,
 and any constraints that were defined in the source file. Constraints are automatically mapped
-to Pointblank validation methods when you call `to_validate()`.
+to Pointblank validation methods when you call `~~pointblank.MetadataImport.to_validate()`.
 
 ## Converting to a Schema
 
@@ -120,13 +120,13 @@ validation steps. Each constraint type maps to a specific Pointblank method:
 
 | Metadata Constraint | Generated Validation Step |
 |---------------------|--------------------------|
-| `required=True` | `col_vals_not_null()` |
-| `unique=True` | `rows_distinct()` |
-| `min_val` / `max_val` | `col_vals_between()` |
-| `max_length` | `col_vals_expr()` (string length check) |
-| `pattern` | `col_vals_regex()` |
-| `allowed_values` or codelist | `col_vals_in_set()` |
-| Schema (column names + types) | `col_schema_match()` |
+| `required=True` | `~~pointblank.Validate.col_vals_not_null()` |
+| `unique=True` | `~~pointblank.Validate.rows_distinct()` |
+| `min_val` / `max_val` | `~~pointblank.Validate.col_vals_between()` |
+| `max_length` | `~~pointblank.Validate.col_vals_expr()` (string length check) |
+| `pattern` | `~~pointblank.Validate.col_vals_regex()` |
+| `allowed_values` or codelist | `~~pointblank.Validate.col_vals_in_set()` |
+| Schema (column names + types) | `~~pointblank.Validate.col_schema_match()` |
 
 The generated workflow covers everything the metadata specifies. You can run it as-is for
 comprehensive validation, or add your own steps on top for business rules that go beyond
@@ -207,10 +207,11 @@ sex_labels = meta.codelists["C66731"].to_dict()
 # e.g., {"M": "Male", "F": "Female", "U": "Unknown", ...}
 ```
 
-When `to_validate()` encounters a variable with a `codelist_ref`, it generates a
-`col_vals_in_set()` step using the codelist's values. For non-extensible codelists, any value
-outside the set is a failure. For extensible codelists, additional values are permitted (the
-check still runs but serves as documentation of expected values).
+When `~~pointblank.MetadataImport.to_validate()` encounters a variable with a `codelist_ref`, it
+generates a `~~pointblank.Validate.col_vals_in_set()` step using the codelist's values. For
+non-extensible codelists, any value outside the set is a failure. For extensible codelists,
+additional values are permitted (the check still runs but serves as documentation of expected
+values).
 
 ## Handling Missing Value Codes
 

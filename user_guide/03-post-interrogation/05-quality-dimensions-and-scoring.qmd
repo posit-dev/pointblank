@@ -28,12 +28,12 @@ Each validation step belongs to one of six data quality dimensions:
 
 | Dimension | What it measures | Example methods |
 |---|---|---|
-| **Completeness** | Presence of required values | `col_vals_not_null()`, `col_pct_null()`, `rows_complete()` |
-| **Validity** | Values conform to rules, ranges, formats, or schema | `col_vals_gt()`, `col_vals_regex()`, `col_vals_in_set()`, `col_schema_match()` |
-| **Uniqueness** | Absence of duplicate rows | `rows_distinct()` |
-| **Consistency** | Internal agreement across columns, rows, or tables | `conjointly()`, `col_missing_consistent()`, `col_vals_in_table()`, `tbl_match()` |
-| **Timeliness** | Data recency / freshness | `data_freshness()` |
-| **Volume** | Expected row and column counts | `row_count_match()`, `col_count_match()` |
+| **Completeness** | Presence of required values | `~~pointblank.Validate.col_vals_not_null()`, `~~pointblank.Validate.col_pct_null()`, `~~pointblank.Validate.rows_complete()` |
+| **Validity** | Values conform to rules, ranges, formats, or schema | `~~pointblank.Validate.col_vals_gt()`, `~~pointblank.Validate.col_vals_regex()`, `~~pointblank.Validate.col_vals_in_set()`, `~~pointblank.Validate.col_schema_match()` |
+| **Uniqueness** | Absence of duplicate rows | `~~pointblank.Validate.rows_distinct()` |
+| **Consistency** | Internal agreement across columns, rows, or tables | `~~pointblank.Validate.conjointly()`, `~~pointblank.Validate.col_missing_consistent()`, `~~pointblank.Validate.col_vals_in_table()`, `~~pointblank.Validate.tbl_match()` |
+| **Timeliness** | Data recency / freshness | `~~pointblank.Validate.data_freshness()` |
+| **Volume** | Expected row and column counts | `~~pointblank.Validate.row_count_match()`, `~~pointblank.Validate.col_count_match()` |
 
 The dimension for each step is inferred from its assertion type, so existing validations gain
 dimensions with no changes on your part.
