@@ -216,7 +216,7 @@ validation.to_json_schema(path="schemas/small_table.schema.json")
 This is useful for checking schemas into version control or feeding them into downstream tooling
 that consumes JSON Schema files.
 
-### Relationship to `export_contract()`
+### Relationship to `~~pointblank.export_contract()` {#relationship-to-export_contract}
 
 Under the hood, `to_json_schema()` delegates to the
 [`export_contract()`](`pointblank.export_contract`) function with `format="json_schema"`. The

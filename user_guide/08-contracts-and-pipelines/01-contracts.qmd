@@ -201,7 +201,7 @@ class, covered in the next guide page):
 - `"raise"`: raise a `RuntimeError` (halts execution)
 - `"log"`: log via the `pointblank.contract` logger
 
-## Using `to_validate()` for Custom Workflows
+## Using `~~pointblank.Contract.to_validate()` for Custom Workflows {#using-to_validate-for-custom-workflows}
 
 If you need more control, [`to_validate()`](`Contract.to_validate`) gives you back an
 un-interrogated `Validate` object that you can extend with additional checks:

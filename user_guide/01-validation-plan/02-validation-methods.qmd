@@ -373,7 +373,7 @@ validation
 specs via [`MetadataImport.missing_specs()`](`pointblank.MetadataImport`). For a fuller treatment of
 structured-missingness *reporting*, see the *Missing Values Reporting* article.
 
-### Referential Integrity with `col_vals_in_table()`
+### Referential Integrity with `~~pointblank.Validate.col_vals_in_table()` {#referential-integrity-with-col_vals_in_table}
 
 When your data spans multiple tables, you often need to verify that foreign key values in one table
 actually exist in another. The [`col_vals_in_table()`](`Validate.col_vals_in_table`) method handles
@@ -603,7 +603,7 @@ These parameters all default to `True`, providing strict schema validation. Sett
 relaxes the validation requirements, making the checks more flexible when exact matching isn't
 necessary or practical for your use case.
 
-### Comparing Tables with `tbl_match()`
+### Comparing Tables with `~~pointblank.Validate.tbl_match()` {#comparing-tables-with-tbl_match}
 
 The [`Validate.tbl_match()`](`Validate.tbl_match`) validation method provides a comprehensive way to verify that two
 tables are identical. It performs a progressive series of checks, from least to most stringent:

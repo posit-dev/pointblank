@@ -155,7 +155,7 @@ include this step when using assertions directly.
 In addition to assertion methods that raise exceptions, Pointblank provides status check methods
 that return boolean values:
 
-### `all_passed()`
+### `~~pointblank.Validate.all_passed()` {#all_passed}
 
 The [`Validate.all_passed()`](`Validate.all_passed`) method will return `True` only if every single test unit in every
 validation step passed:
