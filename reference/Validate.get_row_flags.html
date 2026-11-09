@@ -2051,7 +2051,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L23563-L23816" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L23569-L23822" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">get_row_flags</span>(</span>
@@ -2072,8 +2072,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="details" class="level2 doc-details">
 <h2 class="doc-details anchored" data-anchor-id="details">Details</h2>
 <p>The steps that get flag columns are the same ones used by <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link gdls-code">get_sundered_data()</a>: steps that check rows or cells down a column, that are active, and that don’t use <code>pre=</code> (unless the <code>pre=</code> function is marked with <a href="../reference/row_preserving.html#pointblank.row_preserving" class="gdls-link"><code>row_preserving()</code></a>). A row that a step didn’t check (e.g., a row outside the segment of a step that uses <code>segments=</code>, or a row that a row-preserving <code>pre=</code> function filtered out) isn’t flagged by it, and isn’t counted in its <code>pb_row_score_</code>. A row that no step checked has a missing <code>pb_row_score_</code>.</p>
-<p>Unlike <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link gdls-code">get_sundered_data()</a>, steps that use <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link"><code>rows_distinct()</code></a> are included by default: one copy of each group of duplicate rows (the first one) isn’t flagged, and the other copies are. So a <code>rows_distinct()</code> flag marks the rows that removing duplicates would remove. Use <code>duplicates=</code> and <code>duplicates_order_by=</code> to choose which copy is kept. Steps that use <a href="../reference/Validate.rows_near_distinct.html#pointblank.Validate.rows_near_distinct" class="gdls-link"><code>rows_near_distinct()</code></a> are treated in the same way, with a group of near duplicates in place of the copies of a row.</p>
-<p>A row-level step that can’t be used is reported in a warning: that’s a step that uses an unmarked <code>pre=</code> function (it can change the rows, so its results may not line up with the table’s rows), a step that couldn’t be evaluated, or a <code>rows_distinct()</code> step when <code>duplicates=None</code>.</p>
+<p>Unlike <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link gdls-code">get_sundered_data()</a>, steps that use <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link"><code>rows_distinct()</code></a> are included by default: one copy of each group of duplicate rows (the first one) isn’t flagged, and the other copies are. So a <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> flag marks the rows that removing duplicates would remove. Use <code>duplicates=</code> and <code>duplicates_order_by=</code> to choose which copy is kept. Steps that use <a href="../reference/Validate.rows_near_distinct.html#pointblank.Validate.rows_near_distinct" class="gdls-link"><code>rows_near_distinct()</code></a> are treated in the same way, with a group of near duplicates in place of the copies of a row.</p>
+<p>A row-level step that can’t be used is reported in a warning: that’s a step that uses an unmarked <code>pre=</code> function (it can change the rows, so its results may not line up with the table’s rows), a step that couldn’t be evaluated, or a <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> step when <code>duplicates=None</code>.</p>
 </section>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -2081,7 +2081,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">duplicates</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"keep_first"</span></span></code></dt>
 <dd>
-<p>How to flag the duplicate rows found by <code>rows_distinct()</code> (and <code>rows_near_distinct()</code>) steps. With <code>"keep_first"</code> (the default) or <code>"keep_last"</code>, one copy of each group of duplicates (the first or last one, in row order or in the order given by <code>duplicates_order_by=</code>) isn’t flagged. <code>"flag_all"</code> flags every copy, as the step itself counts them, and <code>None</code> leaves those steps out.</p>
+<p>How to flag the duplicate rows found by <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> (and <a href="../reference/Validate.rows_near_distinct.html#pointblank.Validate.rows_near_distinct" class="gdls-link gdls-code">rows_near_distinct()</a>) steps. With <code>"keep_first"</code> (the default) or <code>"keep_last"</code>, one copy of each group of duplicates (the first or last one, in row order or in the order given by <code>duplicates_order_by=</code>) isn’t flagged. <code>"flag_all"</code> flags every copy, as the step itself counts them, and <code>None</code> leaves those steps out.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">duplicates_order_by</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | list[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -2104,7 +2104,7 @@ The target table, of the same type, with the flag and summary columns added.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s validate a table of orders with a check on the amounts, a check for missing values, and a check for duplicated order IDs.</p>
-<div id="81aebbcb" class="cell" data-execution_count="2">
+<div id="ac584695" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2281,7 +2281,7 @@ The target table, of the same type, with the flag and summary columns added.
 </div>
 </div>
 </div>
-<p>Each step has a flag column. Both copies of order <code>2</code> have a negative amount, so both fail step 1, but only the second copy is flagged by step 3, since removing duplicates would keep the first one. Order <code>3</code> fails step 1 because its amount is missing (missing values fail <code>col_vals_gt()</code> unless <code>na_pass=True</code>) and it also fails step 2. Order <code>1</code> passed every check, so it has a <code>pb_row_score_</code> of <code>1</code>.</p>
+<p>Each step has a flag column. Both copies of order <code>2</code> have a negative amount, so both fail step 1, but only the second copy is flagged by step 3, since removing duplicates would keep the first one. Order <code>3</code> fails step 1 because its amount is missing (missing values fail <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a> unless <code>na_pass=True</code>) and it also fails step 2. Order <code>1</code> passed every check, so it has a <code>pb_row_score_</code> of <code>1</code>.</p>
 </section>
 <section id="see-also" class="level2 doc-see-also">
 <h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>

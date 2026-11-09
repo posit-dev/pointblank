@@ -4,7 +4,7 @@ Make validation steps that check the evaluation set of a RAG system.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L309-L477)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L311-L483)
 
 ``` python
 rag.eval_checks(
@@ -25,11 +25,11 @@ rag.eval_checks(
 
 A RAG system is evaluated with a set of queries, each with the document that has its answer (the *gold* document) and often the passage of it. The scores of the evaluation can only be trusted if the set itself is sound: every query has text, no query is asked twice (a near duplicate counts twice in the scores), every gold document is in the corpus (a query whose document was removed or renamed can never be answered), and each gold passage is relevant to its query. This function makes a validation step for each:
 
-- every query has text (not missing, and not only whitespace): a `col_vals_regex()` step
-- no query is a near duplicate of another, unless `near_duplicates=False`: a `rows_near_distinct()` step
-- every query has a gold document, with `gold_doc_id=`: a `col_vals_not_null()` step
-- every gold document is in the corpus, with `corpus=`: a `col_vals_in_table()` step
-- every passage is relevant to its query, with `passage=`, `scorer=`, and `min_relevance=`: a `col_vals_scored()` step (with a reranker, like [`pb.scorers.reranker()`](../reference/scorers.reranker.md#pointblank.scorers.reranker), or another scorer of a query and a passage)
+- every query has text (not missing, and not only whitespace): a [col_vals_regex()](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) step
+- no query is a near duplicate of another, unless `near_duplicates=False`: a [rows_near_distinct()](../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct) step
+- every query has a gold document, with `gold_doc_id=`: a [col_vals_not_null()](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) step
+- every gold document is in the corpus, with `corpus=`: a [col_vals_in_table()](../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table) step
+- every passage is relevant to its query, with `passage=`, `scorer=`, and `min_relevance=`: a [col_vals_scored()](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) step (with a reranker, like [`pb.scorers.reranker()`](../reference/scorers.reranker.md#pointblank.scorers.reranker), or another scorer of a query and a passage)
 
 ## Parameters
 
@@ -40,7 +40,7 @@ The column with the queries.
 The column with the id of the gold document of each query.
 
 `corpus: Any = None`  
-The corpus (any table that `col_vals_in_table()` takes, such as a DataFrame, a database table, or the path of a file) to look up the gold documents in. It needs `gold_doc_id=`.
+The corpus (any table that [col_vals_in_table()](../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table) takes, such as a DataFrame, a database table, or the path of a file) to look up the gold documents in. It needs `gold_doc_id=`.
 
 `corpus_id: str | None = None`  
 The column of the corpus with the document ids (by default, the same name as `gold_doc_id=`).
@@ -55,7 +55,7 @@ The scorer of the relevance of a passage to its query, given the values of `quer
 The lowest score of relevance that a passage can have.
 
 `near_duplicates: bool | float = True`  
-Whether to check for near-duplicate queries (`True` by default), or the threshold of the similarity of two queries for them to be near duplicates (the `threshold=` of `rows_near_distinct()`, `0.85` with `True`).
+Whether to check for near-duplicate queries (`True` by default), or the threshold of the similarity of two queries for them to be near duplicates (the `threshold=` of [rows_near_distinct()](../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct), `0.85` with `True`).
 
 `pre: Callable | None = None`  
 A function that transforms the table before each step, as in the validation methods.

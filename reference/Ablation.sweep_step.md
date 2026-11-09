@@ -4,7 +4,7 @@ Add a variant for each value of a step's parameter, removing the rows that fail 
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1537-L1676)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1537-L1677)
 
 ``` python
 Ablation.sweep_step(
@@ -34,7 +34,7 @@ The [Ablation](../reference/Ablation.md#pointblank.Ablation) object, with the va
 
 ## Details
 
-The step is run again as it was set up, with only `param=` changed, so a `col_vals_scored()` step takes its scores from the score cache instead of scoring the rows again. For a segmented step, only the step's own segment is checked. A value that the validation method doesn't accept (e.g., a `min_val=` above the step's `max_val=`) gives an error. As with any other variant, a value whose step fails no rows is left out, and a value that removes the same rows as another version of the table isn't evaluated again.
+The step is run again as it was set up, with only `param=` changed, so a [col_vals_scored()](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) step takes its scores from the score cache instead of scoring the rows again. For a segmented step, only the step's own segment is checked. A value that the validation method doesn't accept (e.g., a `min_val=` above the step's `max_val=`) gives an error. As with any other variant, a value whose step fails no rows is left out, and a value that removes the same rows as another version of the table isn't evaluated again.
 
 ## Examples
 

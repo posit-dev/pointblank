@@ -4,7 +4,7 @@ Measure how the rows that fail validation steps affect a model trained on the da
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L437-L5066)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L437-L5067)
 
 ``` python
 Ablation(
@@ -59,7 +59,7 @@ The seed of the first repeat: repeat `r` (counting from `0`) passes `seed + r` t
 The control that variants are compared to. With `"size_matched"` (the default), each variant is compared to the full table with the same number of rows removed at random (drawn anew for each repeat). Variants that remove the same number of rows share their control. A [`Stratified`](../reference/ablation.Stratified.md#pointblank.ablation.Stratified) control (e.g., `pb.ablation.Stratified(by="source")`) removes the random rows in proportion to the groups of one or more columns. Use `None` to compare variants to the full table only.
 
 `duplicates: str | None = "keep_first"`  
-How the duplicate rows found by [`rows_distinct()`](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) steps are removed. With `"keep_first"` (the default) or `"keep_last"`, one copy of each group of duplicates is kept and the others are removed. `"flag_all"` removes every copy, and `None` leaves `rows_distinct()` steps out of the ablation. These are the same options as in [`get_row_flags()`](../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags).
+How the duplicate rows found by [`rows_distinct()`](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) steps are removed. With `"keep_first"` (the default) or `"keep_last"`, one copy of each group of duplicates is kept and the others are removed. `"flag_all"` removes every copy, and `None` leaves [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) steps out of the ablation. These are the same options as in [`get_row_flags()`](../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags).
 
 `duplicates_order_by: str | list[str] | None = None`  
 One or more columns that order the copies of a duplicated row, to decide which copy is kept (e.g., `"updated_at"` with `duplicates="keep_last"` keeps the newest record).

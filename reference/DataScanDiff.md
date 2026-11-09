@@ -20,7 +20,7 @@ The results can be used in three ways. The attributes and the [`has_changes`](..
 ## Parameters
 
 `current: DataScan`  
-The newer [DataScan](../reference/DataScan.md#pointblank.DataScan) (the one whose `compare()` method was called).
+The newer [DataScan](../reference/DataScan.md#pointblank.DataScan) (the one whose [compare()](../reference/DataScan.compare.md#pointblank.DataScan.compare) method was called).
 
 `baseline: DataScan`  
 The older [DataScan](../reference/DataScan.md#pointblank.DataScan) that `current` is compared against.

@@ -10,7 +10,7 @@ Usage
 Ablation.drop_all(steps=None)
 ```
 
-This variant answers the question 'does the validation as a whole help?' Without `rows_distinct()` steps, its training table is the one that [`get_sundered_data()`](../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data) gives: the rows that passed every step.
+This variant answers the question 'does the validation as a whole help?' Without [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) steps, its training table is the one that [`get_sundered_data()`](../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data) gives: the rows that passed every step.
 
 ## Parameters
 

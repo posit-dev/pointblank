@@ -4,7 +4,7 @@ Get the settings and results of the ablation as a JSON string.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4644-L4708)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4645-L4709)
 
 ``` python
 Ablation.to_json(indent=2)

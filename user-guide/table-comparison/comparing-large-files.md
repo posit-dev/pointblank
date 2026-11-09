@@ -63,7 +63,7 @@ source.write_csv(data_dir / "source.csv")
 target.write_csv(data_dir / "target.csv")
 ```
 
-Now we compare the two files by giving `compare()` their paths:
+Now we compare the two files by giving [compare()](../../reference/compare.md#pointblank.compare) their paths:
 
 ``` python
 import pointblank as pb
@@ -98,7 +98,7 @@ partitioned.status_counts == comparison.status_counts
 
 ## Choosing an Engine and a Number of Partitions
 
-When given file paths, `compare()` scans them with Polars, which is the fastest option. DuckDB uses less memory, and combined with partitions it uses the least. To use DuckDB, read the files as DuckDB relations and pass those to `compare()`:
+When given file paths, [compare()](../../reference/compare.md#pointblank.compare) scans them with Polars, which is the fastest option. DuckDB uses less memory, and combined with partitions it uses the least. To use DuckDB, read the files as DuckDB relations and pass those to [compare()](../../reference/compare.md#pointblank.compare):
 
 ``` python
 import duckdb
@@ -118,19 +118,19 @@ Here's how the options compare on two CSV files with 10 million rows and 10 colu
 | Approach | Wall time | Peak memory |
 |----|----|----|
 | Polars: read both files, then a full join (for reference) | 2.1 s | 5.7 GB |
-| `compare()` on file paths (Polars) | 5.7 s | 4.2 GB |
-| `compare()` on file paths (Polars), `partitions=4` | 6.8 s | 1.6 GB |
-| `compare()` on file paths (Polars), `partitions=8` | 10.2 s | 1.1 GB |
-| `compare()` on DuckDB relations | 6.8 s | 1.6 GB |
-| `compare()` on DuckDB relations, `partitions=8` | 19.0 s | 0.8 GB |
+| [compare()](../../reference/compare.md#pointblank.compare) on file paths (Polars) | 5.7 s | 4.2 GB |
+| [compare()](../../reference/compare.md#pointblank.compare) on file paths (Polars), `partitions=4` | 6.8 s | 1.6 GB |
+| [compare()](../../reference/compare.md#pointblank.compare) on file paths (Polars), `partitions=8` | 10.2 s | 1.1 GB |
+| [compare()](../../reference/compare.md#pointblank.compare) on DuckDB relations | 6.8 s | 1.6 GB |
+| [compare()](../../reference/compare.md#pointblank.compare) on DuckDB relations, `partitions=8` | 19.0 s | 0.8 GB |
 
 And with 100 million rows (about 7.4 GB per file), where comparing without partitions needs more memory than most machines have:
 
-| Approach                                            | Wall time | Peak memory |
-|-----------------------------------------------------|-----------|-------------|
-| `compare()` on file paths (Polars), `partitions=8`  | 139 s     | 6.6 GB      |
-| `compare()` on file paths (Polars), `partitions=16` | 217 s     | 4.4 GB      |
-| `compare()` on DuckDB relations, `partitions=8`     | 166 s     | 2.0 GB      |
+| Approach | Wall time | Peak memory |
+|----|----|----|
+| [compare()](../../reference/compare.md#pointblank.compare) on file paths (Polars), `partitions=8` | 139 s | 6.6 GB |
+| [compare()](../../reference/compare.md#pointblank.compare) on file paths (Polars), `partitions=16` | 217 s | 4.4 GB |
+| [compare()](../../reference/compare.md#pointblank.compare) on DuckDB relations, `partitions=8` | 166 s | 2.0 GB |
 
 Every approach found exactly the expected differences. The numbers will vary with your machine and data, but the pattern is consistent: partitions trade time (each pass reads the files again) for memory, Polars is the faster engine, and DuckDB the more memory-efficient one. Some practical guidance:
 

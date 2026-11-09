@@ -4,13 +4,13 @@ A reusable collection of validation step definitions.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L22-L1955)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L22-L1956)
 
 ``` python
 Steps(steps=None)
 ```
 
-A [Steps](../reference/Steps.md#pointblank.Steps) object is a list of validation steps that isn't attached to any table. You build it with the same methods you'd call on a [`Validate`](../reference/Validate.md#pointblank.Validate) object (`col_vals_not_null()`, `rows_distinct()`, `col_vals_regex()`, and so on), but each call only records the step. Nothing is checked until the collection is added to a validation with [`Validate.add_steps()`](../reference/Validate.add_steps.md#pointblank.Validate.add_steps) and that validation is interrogated.
+A [Steps](../reference/Steps.md#pointblank.Steps) object is a list of validation steps that isn't attached to any table. You build it with the same methods you'd call on a [`Validate`](../reference/Validate.md#pointblank.Validate) object ([col_vals_not_null()](../reference/Steps.md#pointblank.Steps.col_vals_not_null), [rows_distinct()](../reference/Steps.md#pointblank.Steps.rows_distinct), [col_vals_regex()](../reference/Steps.md#pointblank.Steps.col_vals_regex), and so on), but each call only records the step. Nothing is checked until the collection is added to a validation with [`Validate.add_steps()`](../reference/Validate.add_steps.md#pointblank.Validate.add_steps) and that validation is interrogated.
 
 This makes it possible to write a group of checks once and use it in many places. Many tables share the same rules: every table with a customer ID needs that ID to be present and unique, and every table with an email column needs valid addresses. Without [Steps](../reference/Steps.md#pointblank.Steps), those rules get copied into each validation and drift apart over time. With [Steps](../reference/Steps.md#pointblank.Steps), you define them in one place (a shared module, for example), name them for what they check (`id_checks`, `contact_checks`), and add them to whichever validations need them. Each validation keeps its own table, thresholds, actions, and metadata, and can mix shared steps with its own.
 
@@ -28,7 +28,7 @@ A [Steps](../reference/Steps.md#pointblank.Steps) object. Add steps to it with i
 
 ## Recording Steps
 
-Each validation method records one step and returns the same [Steps](../reference/Steps.md#pointblank.Steps) object, so calls can be chained. All of the row-based and table-level validation methods are available, from `col_vals_gt()` to `tbl_reconcile()`, including `col_vals_scored()`. The aggregation methods (`col_sum_*()`, `col_avg_*()`, and `col_sd_*()`), [specially()](../reference/Validate.specially.md#pointblank.Validate.specially), and [prompt()](../reference/Validate.prompt.md#pointblank.Validate.prompt) aren't, so add those directly to the validation.
+Each validation method records one step and returns the same [Steps](../reference/Steps.md#pointblank.Steps) object, so calls can be chained. All of the row-based and table-level validation methods are available, from [col_vals_gt()](../reference/Steps.md#pointblank.Steps.col_vals_gt) to [tbl_reconcile()](../reference/Steps.md#pointblank.Steps.tbl_reconcile), including [col_vals_scored()](../reference/Steps.md#pointblank.Steps.col_vals_scored). The aggregation methods (`col_sum_*()`, `col_avg_*()`, and `col_sd_*()`), [specially()](../reference/Validate.specially.md#pointblank.Validate.specially), and [prompt()](../reference/Validate.prompt.md#pointblank.Validate.prompt) aren't, so add those directly to the validation.
 
 Because each method adds to the object it's called on, a collection isn't copied when you add to it. Calling a method on a shared collection (e.g., `extended = id_checks.col_exists(...)`) adds the step to `id_checks` itself, and `extended` is the same object. To build variations, keep the shared parts in separate collections and add several of them to a validation.
 
@@ -97,7 +97,7 @@ crm_customers = pl.DataFrame(
 
 [TABLE]
 
-The report has one step per recorded step, in the order they were added. Customer ID `3` appears twice, so both of its rows fail the `rows_distinct` step. The address `"c-at-z.com"` fails the email pattern, and the country `"BR"` isn't in the allowed set.
+The report has one step per recorded step, in the order they were added. Customer ID `3` appears twice, so both of its rows fail the [rows_distinct](../reference/Steps.md#pointblank.Steps.rows_distinct) step. The address `"c-at-z.com"` fails the email pattern, and the country `"BR"` isn't in the allowed set.
 
 The same collections can check a table from a billing system, where the ID column is called `cust_id`. The `columns_map=` argument renames the column in the added steps, and `thresholds=` gives every added step a warning threshold of one failing test unit.
 
@@ -186,7 +186,7 @@ Add a `col_vals_gt()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L262-L304)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L263-L305)
 
 ``` python
 col_vals_gt(
@@ -217,7 +217,7 @@ Add a `col_vals_lt()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L306-L348)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L307-L349)
 
 ``` python
 col_vals_lt(
@@ -248,7 +248,7 @@ Add a `col_vals_ge()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L438-L481)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L439-L482)
 
 ``` python
 col_vals_ge(
@@ -279,7 +279,7 @@ Add a `col_vals_le()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L483-L526)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L484-L527)
 
 ``` python
 col_vals_le(
@@ -310,7 +310,7 @@ Add a `col_vals_eq()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L350-L392)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L351-L393)
 
 ``` python
 col_vals_eq(
@@ -341,7 +341,7 @@ Add a `col_vals_ne()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L394-L436)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L395-L437)
 
 ``` python
 col_vals_ne(
@@ -372,7 +372,7 @@ Add a `col_vals_between()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L528-L575)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L529-L576)
 
 ``` python
 col_vals_between(
@@ -405,7 +405,7 @@ Add a `col_vals_outside()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L577-L624)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L578-L625)
 
 ``` python
 col_vals_outside(
@@ -438,7 +438,7 @@ Add a `col_vals_in_set()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L626-L667)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L627-L668)
 
 ``` python
 col_vals_in_set(
@@ -468,7 +468,7 @@ Add a `col_vals_not_in_set()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L669-L712)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L670-L713)
 
 ``` python
 col_vals_not_in_set(
@@ -499,7 +499,7 @@ Add a `col_vals_increasing()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L714-L761)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L715-L762)
 
 ``` python
 col_vals_increasing(
@@ -532,7 +532,7 @@ Add a `col_vals_decreasing()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L763-L810)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L764-L811)
 
 ``` python
 col_vals_decreasing(
@@ -565,7 +565,7 @@ Add a `col_vals_null()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L812-L849)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L813-L850)
 
 ``` python
 col_vals_null(
@@ -593,7 +593,7 @@ Add a `col_vals_not_null()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L851-L888)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L852-L889)
 
 ``` python
 col_vals_not_null(
@@ -621,7 +621,7 @@ Add a `col_vals_regex()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L890-L935)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L891-L936)
 
 ``` python
 col_vals_regex(
@@ -653,7 +653,7 @@ Add a `col_vals_within_spec()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L937-L980)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L938-L981)
 
 ``` python
 col_vals_within_spec(
@@ -684,7 +684,7 @@ Add a `col_vals_str_len()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L982-L1027)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L983-L1028)
 
 ``` python
 col_vals_str_len(
@@ -716,7 +716,7 @@ Add a `col_vals_scored()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1029-L1078)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1030-L1079)
 
 ``` python
 col_vals_scored(
@@ -750,7 +750,7 @@ Add a `col_vals_chat_format()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1080-L1133)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1081-L1134)
 
 ``` python
 col_vals_chat_format(
@@ -786,7 +786,7 @@ Add a `col_vals_in_table()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1770-L1811)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1771-L1812)
 
 ``` python
 col_vals_in_table(
@@ -816,7 +816,7 @@ Add a `col_vals_expr()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1135-L1172)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1136-L1173)
 
 ``` python
 col_vals_expr(
@@ -844,7 +844,7 @@ Add a `col_exists()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1174-L1206)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1175-L1207)
 
 ``` python
 col_exists(
@@ -870,7 +870,7 @@ Add a `col_pct_null()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1208-L1244)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1209-L1245)
 
 ``` python
 col_pct_null(
@@ -898,7 +898,7 @@ Add a `col_pct_missing()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1246-L1287)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1247-L1288)
 
 ``` python
 col_pct_missing(
@@ -928,7 +928,7 @@ Add a `col_missing_coded()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1289-L1328)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1290-L1329)
 
 ``` python
 col_missing_coded(
@@ -957,7 +957,7 @@ Add a `col_missing_only_coded()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1330-L1375)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1331-L1376)
 
 ``` python
 col_missing_only_coded(
@@ -989,7 +989,7 @@ Add a `col_missing_consistent()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1553-L1594)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1554-L1595)
 
 ``` python
 col_missing_consistent(
@@ -1019,7 +1019,7 @@ Add a `rows_distinct()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1377-L1414)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1378-L1415)
 
 ``` python
 rows_distinct(
@@ -1047,7 +1047,7 @@ Add a `rows_near_distinct()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1416-L1461)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1417-L1462)
 
 ``` python
 rows_near_distinct(
@@ -1079,7 +1079,7 @@ Add a `rows_not_contaminated()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1463-L1512)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1464-L1513)
 
 ``` python
 rows_not_contaminated(
@@ -1113,7 +1113,7 @@ Add a `rows_complete()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1514-L1551)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1515-L1552)
 
 ``` python
 rows_complete(
@@ -1141,7 +1141,7 @@ Add a `col_schema_match()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1596-L1641)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1597-L1642)
 
 ``` python
 col_schema_match(
@@ -1173,7 +1173,7 @@ Add a `row_count_match()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1643-L1682)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1644-L1683)
 
 ``` python
 row_count_match(
@@ -1202,7 +1202,7 @@ Add a `col_count_match()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1731-L1768)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1732-L1769)
 
 ``` python
 col_count_match(
@@ -1230,7 +1230,7 @@ Add a `data_freshness()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1684-L1729)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1685-L1730)
 
 ``` python
 data_freshness(
@@ -1262,7 +1262,7 @@ Add a `tbl_match()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1813-L1867)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1814-L1868)
 
 ``` python
 tbl_match(
@@ -1299,7 +1299,7 @@ Add a `tbl_reconcile()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1869-L1916)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1870-L1917)
 
 ``` python
 tbl_reconcile(
@@ -1332,7 +1332,7 @@ Add a `conjointly()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1918-L1955)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1919-L1956)
 
 ``` python
 conjointly(

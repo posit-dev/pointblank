@@ -4,7 +4,7 @@ Validate whether the text of rows has no near duplicates.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15101-L15330)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15104-L15334)
 
 ``` python
 Validate.rows_near_distinct(
@@ -84,7 +84,7 @@ Groups of near duplicates are connected: if text A is a near duplicate of text B
 
 The group of each failing row (numbered from 1, in the order of the first row of each group) is in a column of the results called `pb_cluster_`, which is in the extracts of failing rows and in the step report, where the rows of each group are shown together. The step's note says how many groups were found and how many rows are in them.
 
-Every row of a group fails, as with `rows_distinct()`. When the rows of a validation are used to clean a table (with [`get_row_flags()`](../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags), or in an [`Ablation`](../reference/Ablation.md#pointblank.Ablation)), `duplicates=` decides which rows of a group are kept: `"keep_first"` keeps the first row of each group, `"keep_last"` the last, and `"flag_all"` keeps none.
+Every row of a group fails, as with [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct). When the rows of a validation are used to clean a table (with [`get_row_flags()`](../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags), or in an [`Ablation`](../reference/Ablation.md#pointblank.Ablation)), `duplicates=` decides which rows of a group are kept: `"keep_first"` keeps the first row of each group, `"keep_last"` the last, and `"flag_all"` keeps none.
 
 Comparing texts runs in Python. A Polars or pandas table is compared as it is (a Polars LazyFrame is collected first). For a database table (through Ibis) or a PySpark DataFrame, the distinct rows of `columns=` are collected and compared, and the groups are joined back to the table on its own backend.
 

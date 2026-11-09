@@ -2094,13 +2094,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L22-L1955" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L22-L1956" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Steps</span>(<span class="va">steps</span><span class="op">=</span><span class="cn">None</span>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>A <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object is a list of validation steps that isn’t attached to any table. You build it with the same methods you’d call on a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object (<code>col_vals_not_null()</code>, <code>rows_distinct()</code>, <code>col_vals_regex()</code>, and so on), but each call only records the step. Nothing is checked until the collection is added to a validation with <a href="../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link"><code>Validate.add_steps()</code></a> and that validation is interrogated.</p>
+<p>A <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object is a list of validation steps that isn’t attached to any table. You build it with the same methods you’d call on a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object (<a href="../reference/Steps.html#pointblank.Steps.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a>, <a href="../reference/Steps.html#pointblank.Steps.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a>, <a href="../reference/Steps.html#pointblank.Steps.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a>, and so on), but each call only records the step. Nothing is checked until the collection is added to a validation with <a href="../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link"><code>Validate.add_steps()</code></a> and that validation is interrogated.</p>
 <p>This makes it possible to write a group of checks once and use it in many places. Many tables share the same rules: every table with a customer ID needs that ID to be present and unique, and every table with an email column needs valid addresses. Without <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a>, those rules get copied into each validation and drift apart over time. With <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a>, you define them in one place (a shared module, for example), name them for what they check (<code>id_checks</code>, <code>contact_checks</code>), and add them to whichever validations need them. Each validation keeps its own table, thresholds, actions, and metadata, and can mix shared steps with its own.</p>
 <p>Since the methods have the same signatures as the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> methods they mirror, you get the same argument names, defaults, and editor completion, and a misspelled argument raises a <code>TypeError</code> as soon as the step is recorded.</p>
 </div>
@@ -2128,7 +2128,7 @@ A <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code"
 </section>
 <section id="recording-steps" class="level2 doc-recording-steps">
 <h2 class="doc-recording-steps anchored" data-anchor-id="recording-steps">Recording Steps</h2>
-<p>Each validation method records one step and returns the same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object, so calls can be chained. All of the row-based and table-level validation methods are available, from <code>col_vals_gt()</code> to <code>tbl_reconcile()</code>, including <code>col_vals_scored()</code>. The aggregation methods (<code>col_sum_*()</code>, <code>col_avg_*()</code>, and <code>col_sd_*()</code>), <a href="../reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link gdls-code">specially()</a>, and <a href="../reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt()</a> aren’t, so add those directly to the validation.</p>
+<p>Each validation method records one step and returns the same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object, so calls can be chained. All of the row-based and table-level validation methods are available, from <a href="../reference/Steps.html#pointblank.Steps.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a> to <a href="../reference/Steps.html#pointblank.Steps.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a>, including <a href="../reference/Steps.html#pointblank.Steps.col_vals_scored" class="gdls-link gdls-code">col_vals_scored()</a>. The aggregation methods (<code>col_sum_*()</code>, <code>col_avg_*()</code>, and <code>col_sd_*()</code>), <a href="../reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link gdls-code">specially()</a>, and <a href="../reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt()</a> aren’t, so add those directly to the validation.</p>
 <p>Because each method adds to the object it’s called on, a collection isn’t copied when you add to it. Calling a method on a shared collection (e.g., <code>extended = id_checks.col_exists(...)</code>) adds the step to <code>id_checks</code> itself, and <code>extended</code> is the same object. To build variations, keep the shared parts in separate collections and add several of them to a validation.</p>
 <p>Printing a <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> object lists its steps with the arguments that differ from the defaults, and <code>len()</code> gives the number of steps.</p>
 </section>
@@ -2148,7 +2148,7 @@ A <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code"
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s build two collections of checks for customer data. The first covers identifiers (each customer ID must be present and appear only once), and the second covers contact details (email addresses must look valid, and the country must be one of three codes).</p>
-<div id="67a926ce" class="cell" data-execution_count="2">
+<div id="08742b1f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2171,7 +2171,7 @@ A <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code"
 </div>
 <p>Displaying a collection lists its steps and their arguments. No table is involved yet.</p>
 <p>Now let’s apply both collections to a table of customers from a CRM system. The validation is created as usual, and <a href="../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a> appends the four recorded steps before interrogation.</p>
-<div id="76c70c97" class="cell" data-execution_count="3">
+<div id="fac2c871" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>crm_customers <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"customer_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">5</span>],</span>
@@ -2275,7 +2275,7 @@ A <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code"
     <td colspan="14" class="gt_heading gt_title gt_font_normal" id="pb_tbl-title" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-08|23:55:42</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">crm_customers</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-09|00:54:58</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">crm_customers</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -2475,9 +2475,9 @@ A <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code"
 </div>
 </div>
 </div>
-<p>The report has one step per recorded step, in the order they were added. Customer ID <code>3</code> appears twice, so both of its rows fail the <code>rows_distinct</code> step. The address <code>"c-at-z.com"</code> fails the email pattern, and the country <code>"BR"</code> isn’t in the allowed set.</p>
+<p>The report has one step per recorded step, in the order they were added. Customer ID <code>3</code> appears twice, so both of its rows fail the <a href="../reference/Steps.html#pointblank.Steps.rows_distinct" class="gdls-link gdls-code">rows_distinct</a> step. The address <code>"c-at-z.com"</code> fails the email pattern, and the country <code>"BR"</code> isn’t in the allowed set.</p>
 <p>The same collections can check a table from a billing system, where the ID column is called <code>cust_id</code>. The <code>columns_map=</code> argument renames the column in the added steps, and <code>thresholds=</code> gives every added step a warning threshold of one failing test unit.</p>
-<div id="eeb8dc07" class="cell" data-execution_count="4">
+<div id="5b47739e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>billing_accounts <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"cust_id"</span>: [<span class="dv">10</span>, <span class="dv">11</span>, <span class="va">None</span>, <span class="dv">13</span>],</span>
@@ -2586,7 +2586,7 @@ A <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code"
     <td colspan="14" class="gt_heading gt_title gt_font_normal" id="pb_tbl-title" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-08|23:55:42</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">billing_accounts</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-09|00:54:58</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">billing_accounts</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -2981,7 +2981,7 @@ A <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code"
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L262-L304" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L263-L305" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb5"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_gt</span>(</span>
@@ -3020,7 +3020,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L306-L348" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L307-L349" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb6"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_lt</span>(</span>
@@ -3059,7 +3059,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L438-L481" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L439-L482" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb7"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_ge</span>(</span>
@@ -3098,7 +3098,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L483-L526" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L484-L527" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb8"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_le</span>(</span>
@@ -3137,7 +3137,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L350-L392" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L351-L393" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb9"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_eq</span>(</span>
@@ -3176,7 +3176,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L394-L436" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L395-L437" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb10"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_ne</span>(</span>
@@ -3215,7 +3215,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L528-L575" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L529-L576" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb11"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_between</span>(</span>
@@ -3256,7 +3256,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L577-L624" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L578-L625" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb12"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_outside</span>(</span>
@@ -3297,7 +3297,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L626-L667" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L627-L668" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb13"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_in_set</span>(</span>
@@ -3335,7 +3335,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L669-L712" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L670-L713" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb14"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_not_in_set</span>(</span>
@@ -3374,7 +3374,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L714-L761" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L715-L762" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb15"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_increasing</span>(</span>
@@ -3415,7 +3415,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L763-L810" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L764-L811" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb16"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_decreasing</span>(</span>
@@ -3456,7 +3456,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L812-L849" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L813-L850" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb17"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_null</span>(</span>
@@ -3492,7 +3492,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L851-L888" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L852-L889" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb18"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_not_null</span>(</span>
@@ -3528,7 +3528,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L890-L935" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L891-L936" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb19"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_regex</span>(</span>
@@ -3568,7 +3568,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L937-L980" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L938-L981" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb20"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_within_spec</span>(</span>
@@ -3607,7 +3607,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L982-L1027" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L983-L1028" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb21"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_str_len</span>(</span>
@@ -3647,7 +3647,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1029-L1078" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1030-L1079" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb22"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_scored</span>(</span>
@@ -3689,7 +3689,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1080-L1133" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1081-L1134" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb23"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_chat_format</span>(</span>
@@ -3733,7 +3733,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1770-L1811" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1771-L1812" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb24"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_in_table</span>(</span>
@@ -3771,7 +3771,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1135-L1172" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1136-L1173" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb25"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_vals_expr</span>(</span>
@@ -3807,7 +3807,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1174-L1206" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1175-L1207" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb26"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_exists</span>(</span>
@@ -3841,7 +3841,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1208-L1244" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1209-L1245" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb27"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_pct_null</span>(</span>
@@ -3877,7 +3877,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1246-L1287" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1247-L1288" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb28"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_pct_missing</span>(</span>
@@ -3915,7 +3915,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1289-L1328" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1290-L1329" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb29"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_missing_coded</span>(</span>
@@ -3952,7 +3952,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1330-L1375" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1331-L1376" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb30"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_missing_only_coded</span>(</span>
@@ -3992,7 +3992,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1553-L1594" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1554-L1595" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb31"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_missing_consistent</span>(</span>
@@ -4030,7 +4030,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1377-L1414" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1378-L1415" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb32"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rows_distinct</span>(</span>
@@ -4066,7 +4066,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1416-L1461" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1417-L1462" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb33"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rows_near_distinct</span>(</span>
@@ -4106,7 +4106,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1463-L1512" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1464-L1513" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb34"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rows_not_contaminated</span>(</span>
@@ -4148,7 +4148,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1514-L1551" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1515-L1552" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb35"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rows_complete</span>(</span>
@@ -4184,7 +4184,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1596-L1641" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1597-L1642" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb36"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_schema_match</span>(</span>
@@ -4224,7 +4224,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1643-L1682" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1644-L1683" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb37"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">row_count_match</span>(</span>
@@ -4261,7 +4261,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1731-L1768" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1732-L1769" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb38"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col_count_match</span>(</span>
@@ -4297,7 +4297,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1684-L1729" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1685-L1730" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb39"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data_freshness</span>(</span>
@@ -4337,7 +4337,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1813-L1867" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1814-L1868" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb40"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_match</span>(</span>
@@ -4382,7 +4382,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1869-L1916" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1870-L1917" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb41"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_reconcile</span>(</span>
@@ -4423,7 +4423,7 @@ This same <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link gd
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1918-L1955" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1919-L1956" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb42"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conjointly</span>(</span>

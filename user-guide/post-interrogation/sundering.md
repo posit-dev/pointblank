@@ -231,7 +231,7 @@ Steps that use `segments=` are used for sundering. Each segment's results apply 
 
 ## Sundering with Duplicate Rows
 
-A [`Validate.rows_distinct()`](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step counts *every* copy of a duplicated row as a failing test unit, since there's no telling which of the copies is the 'wrong' one. That's the right count for a validation report, but it's rarely what you want when sundering: removing all copies of a duplicate would remove the record entirely. So by default, `rows_distinct()` steps are left out of sundering, and the `duplicates=` argument lets you bring them in by saying which copy to keep. The `small_table` dataset has one pair of duplicate rows, so let's check for that:
+A [`Validate.rows_distinct()`](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step counts *every* copy of a duplicated row as a failing test unit, since there's no telling which of the copies is the 'wrong' one. That's the right count for a validation report, but it's rarely what you want when sundering: removing all copies of a duplicate would remove the record entirely. So by default, [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) steps are left out of sundering, and the `duplicates=` argument lets you bring them in by saying which copy to keep. The `small_table` dataset has one pair of duplicate rows, so let's check for that:
 
 ``` python
 validation_3 = (
@@ -265,7 +265,7 @@ That's 12 of the 13 rows: the first copy of the duplicate stays in the passing s
 - `"keep_first"`: the first copy of each group of duplicates passes and the others fail
 - `"keep_last"`: the last copy passes and the others fail
 - `"flag_all"`: every copy fails (just as the validation step counts them)
-- `None` (the default): `rows_distinct()` steps aren't used for sundering
+- `None` (the default): [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) steps aren't used for sundering
 
 The 'first' and 'last' copies are those in row order, unless you use `duplicates_order_by=` to name one or more columns to order them by. For example, a check for duplicated customer IDs combined with `duplicates="keep_last", duplicates_order_by="updated_at"` keeps the most recently updated record for each customer.
 
@@ -294,7 +294,7 @@ shape: (13, 13)
 | 2016-01-28 02:51:00 | 2016-01-28 | 2 | "7-dmx-010" | 8 | 108.34 | false | "low" | true | false | true | 2 | 0.333333 |
 | 2016-01-30 11:23:00 | 2016-01-30 | 1 | "3-dka-303" | null | 2230.09 | true | "high" | false | true | true | 2 | 0.333333 |
 
-The rows with a `pb_n_failed_` of `0` are exactly the passing set from sundering. With the flags in hand, though, you can filter on just the checks that matter for a particular use, look for problems that tend to occur together, or use `pb_row_score_` to weight rows rather than drop them. The same `duplicates=` and `duplicates_order_by=` options are available here, except that [get_row_flags()](../../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags) uses `duplicates="keep_first"` by default, so that a `rows_distinct()` flag marks the copies that removing duplicates would remove.
+The rows with a `pb_n_failed_` of `0` are exactly the passing set from sundering. With the flags in hand, though, you can filter on just the checks that matter for a particular use, look for problems that tend to occur together, or use `pb_row_score_` to weight rows rather than drop them. The same `duplicates=` and `duplicates_order_by=` options are available here, except that [get_row_flags()](../../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags) uses `duplicates="keep_first"` by default, so that a [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) flag marks the copies that removing duplicates would remove.
 
 ## Practical Applications of Sundering
 

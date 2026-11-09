@@ -4,7 +4,7 @@ Do column data lie outside of two specified values or data in other columns?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9222-L9569)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9223-L9570)
 
 ``` python
 Validate.col_vals_outside(
@@ -24,7 +24,7 @@ Validate.col_vals_outside(
 )
 ```
 
-The `col_vals_between()` validation method checks whether column values in a table *do not* fall within a certain range. The range is specified with three arguments: `left=`, `right=`, and `inclusive=`. The `left=` and `right=` values specify the lower and upper bounds. These bounds can be specified as literal values or as column names provided within [`col()`](../reference/col.md#pointblank.col). The validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
+The [col_vals_between()](../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between) validation method checks whether column values in a table *do not* fall within a certain range. The range is specified with three arguments: `left=`, `right=`, and `inclusive=`. The `left=` and `right=` values specify the lower and upper bounds. These bounds can be specified as literal values or as column names provided within [`col()`](../reference/col.md#pointblank.col). The validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied).
 
 ## Parameters
 

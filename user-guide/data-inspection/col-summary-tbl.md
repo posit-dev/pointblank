@@ -76,7 +76,7 @@ scan.save_to_json("small_table_profile.json")
 loaded = pb.DataScan.load_from_json("small_table_profile.json")
 ```
 
-The [from_json()](../../reference/DataScan.from_json.md#pointblank.DataScan.from_json) classmethod works with JSON strings directly, and [`from_dict()`](../../reference/DataScan.from_dict.md#pointblank.DataScan.from_dict) accepts the dictionary format produced by `to_dict()`. All three approaches produce a fully restored [DataScan](../../reference/DataScan.md#pointblank.DataScan) that retains the column names, types, statistics, and sample data from the original scan.
+The [from_json()](../../reference/DataScan.from_json.md#pointblank.DataScan.from_json) classmethod works with JSON strings directly, and [`from_dict()`](../../reference/DataScan.from_dict.md#pointblank.DataScan.from_dict) accepts the dictionary format produced by [to_dict()](../../reference/DataScan.to_dict.md#pointblank.DataScan.to_dict). All three approaches produce a fully restored [DataScan](../../reference/DataScan.md#pointblank.DataScan) that retains the column names, types, statistics, and sample data from the original scan.
 
 ## Comparing Profiles for Drift
 
@@ -171,7 +171,7 @@ for col_name, scores in drift.items():
     amount: {'psi': 2.941363, 'ks_statistic': np.float64(0.55), 'ks_p_value': np.float64(0.003967)}
     category: {'psi': 0.250553}
 
-When a [DataScan](../../reference/DataScan.md#pointblank.DataScan) is loaded from a saved JSON file (with no original data attached), drift scores cannot be computed. The comparison still reports schema changes and raw stat differences, but the `drift_scores` field will be empty. If you need drift scores in a persist-and-compare workflow, keep the original data available when calling `compare()`.
+When a [DataScan](../../reference/DataScan.md#pointblank.DataScan) is loaded from a saved JSON file (with no original data attached), drift scores cannot be computed. The comparison still reports schema changes and raw stat differences, but the `drift_scores` field will be empty. If you need drift scores in a persist-and-compare workflow, keep the original data available when calling [compare()](../../reference/DataScan.compare.md#pointblank.DataScan.compare).
 
 ### A Typical Workflow
 
@@ -194,8 +194,8 @@ if diff.has_changes:
 
 The key thing to notice is that the baseline is loaded from a saved JSON file, so it won't have original data attached. This means drift scores (PSI and KS) won't be computed for the loaded baseline. If you need those scores, keep the baseline data accessible and create a fresh [DataScan](../../reference/DataScan.md#pointblank.DataScan) from it rather than loading from JSON.
 
-The [has_changes](../../reference/DataScanDiff.md#pointblank.DataScanDiff.has_changes) property gives you a simple boolean for CI pipelines or alerting. So if anything shifted (schema or statistics) you can easily flag it. For more granular decisions, inspect `columns_added`, `columns_removed`, `columns_type_changed`, and the per-column `stat_diffs` and `drift_scores` in the object provided by `to_dict()`.
+The [has_changes](../../reference/DataScanDiff.md#pointblank.DataScanDiff.has_changes) property gives you a simple boolean for CI pipelines or alerting. So if anything shifted (schema or statistics) you can easily flag it. For more granular decisions, inspect `columns_added`, `columns_removed`, `columns_type_changed`, and the per-column `stat_diffs` and `drift_scores` in the object provided by [to_dict()](../../reference/DataScanDiff.md#pointblank.DataScanDiff.to_dict).
 
 ## Conclusion
 
-The [col_summary_tbl()](../../reference/col_summary_tbl.md#pointblank.col_summary_tbl) function and the [DataScan](../../reference/DataScan.md#pointblank.DataScan) class give you two levels of access to column-level profiling. The function is a quick, visual summary you can drop into a notebook to understand a dataset at a glance. The class provides the same statistics in a structured form that you can save, load, and compare over time. When your data evolves, `compare()` catches schema drift (columns added, removed, or retyped) and statistical drift (shifts in means, quantiles, null rates, and frequency distributions), optionally backed by formal measures like PSI and the KS test. Together, these tools make it straightforward to move from initial data discovery to ongoing data quality monitoring.
+The [col_summary_tbl()](../../reference/col_summary_tbl.md#pointblank.col_summary_tbl) function and the [DataScan](../../reference/DataScan.md#pointblank.DataScan) class give you two levels of access to column-level profiling. The function is a quick, visual summary you can drop into a notebook to understand a dataset at a glance. The class provides the same statistics in a structured form that you can save, load, and compare over time. When your data evolves, [compare()](../../reference/DataScan.compare.md#pointblank.DataScan.compare) catches schema drift (columns added, removed, or retyped) and statistical drift (shifts in means, quantiles, null rates, and frequency distributions), optionally backed by formal measures like PSI and the KS test. Together, these tools make it straightforward to move from initial data discovery to ongoing data quality monitoring.

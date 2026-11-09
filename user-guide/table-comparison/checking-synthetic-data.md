@@ -156,9 +156,9 @@ shape: (3, 7)
 | 42 | 499 | "near" | 27 | "business" | 50.06 | "MY PIN IS TAKING TOO LONG AGAI… |
 | 98 | 500 | "near" | 44 | "business" | 39.35 | "My statement needs to be chang… |
 
-The other attributes have the numbers behind the report (`fidelity`, `duplicates`, `diversity`, and `copies`), and `to_dict()` gives all of them as a dictionary that can be written as JSON.
+The other attributes have the numbers behind the report (`fidelity`, `duplicates`, `diversity`, and `copies`), and [to_dict()](../../reference/SyntheticCheck.to_dict.md#pointblank.SyntheticCheck.to_dict) gives all of them as a dictionary that can be written as JSON.
 
-The report is in English by default, and `get_tabular_report()` takes `lang=` and `locale=` for another language (the messages of [issues](../../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) stay in English):
+The report is in English by default, and [get_tabular_report()](../../reference/SyntheticCheck.get_tabular_report.md#pointblank.SyntheticCheck.get_tabular_report) takes `lang=` and `locale=` for another language (the messages of [issues](../../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) stay in English):
 
 ``` python
 check.get_tabular_report(lang="es")

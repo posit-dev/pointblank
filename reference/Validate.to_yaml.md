@@ -4,7 +4,7 @@ Serialize this validation plan to a [yaml_interrogate()](../reference/yaml_inter
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21918-L22065)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21922-L22069)
 
 ``` python
 Validate.to_yaml(path=None)
@@ -24,7 +24,7 @@ The validation plan as a YAML string. The `tbl` field is set from `tbl_name` whe
 
 ## Notes On Fidelity
 
-As with [`to_code()`](../reference/Validate.to_code.md#pointblank.Validate.to_code), steps carrying non-serializable Python objects (`pre=` callables, `actions=`, callable `active=`, and the expressions of `col_vals_expr()`/`conjointly()`/[specially()](../reference/Validate.specially.md#pointblank.Validate.specially)) cannot be represented in YAML; a placeholder is emitted and a warning is raised.
+As with [`to_code()`](../reference/Validate.to_code.md#pointblank.Validate.to_code), steps carrying non-serializable Python objects (`pre=` callables, `actions=`, callable `active=`, and the expressions of [col_vals_expr()](../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr)/[conjointly()](../reference/Validate.conjointly.md#pointblank.Validate.conjointly)/[specially()](../reference/Validate.specially.md#pointblank.Validate.specially)) cannot be represented in YAML; a placeholder is emitted and a warning is raised.
 
 Values that YAML has no literal for, such as `Decimal("2.2")`, `datetime.time(9, 30)`, or a datetime in a named time zone, are written as `python:` blocks. These are among the few calls that [`yaml_interrogate()`](../reference/yaml_interrogate.md#pointblank.yaml_interrogate) runs without `allow_python=True`, so the YAML still loads as is.
 

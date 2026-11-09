@@ -2049,7 +2049,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L309-L477" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L311-L483" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">rag</span><span class="op">.</span><span class="fu">eval_checks</span>(</span>
@@ -2070,11 +2070,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="doc-text">
 <p>A RAG system is evaluated with a set of queries, each with the document that has its answer (the <em>gold</em> document) and often the passage of it. The scores of the evaluation can only be trusted if the set itself is sound: every query has text, no query is asked twice (a near duplicate counts twice in the scores), every gold document is in the corpus (a query whose document was removed or renamed can never be answered), and each gold passage is relevant to its query. This function makes a validation step for each:</p>
 <ul>
-<li>every query has text (not missing, and not only whitespace): a <code>col_vals_regex()</code> step</li>
-<li>no query is a near duplicate of another, unless <code>near_duplicates=False</code>: a <code>rows_near_distinct()</code> step</li>
-<li>every query has a gold document, with <code>gold_doc_id=</code>: a <code>col_vals_not_null()</code> step</li>
-<li>every gold document is in the corpus, with <code>corpus=</code>: a <code>col_vals_in_table()</code> step</li>
-<li>every passage is relevant to its query, with <code>passage=</code>, <code>scorer=</code>, and <code>min_relevance=</code>: a <code>col_vals_scored()</code> step (with a reranker, like <a href="../reference/scorers.reranker.html#pointblank.scorers.reranker" class="gdls-link"><code>pb.scorers.reranker()</code></a>, or another scorer of a query and a passage)</li>
+<li>every query has text (not missing, and not only whitespace): a <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a> step</li>
+<li>no query is a near duplicate of another, unless <code>near_duplicates=False</code>: a <a href="../reference/Validate.rows_near_distinct.html#pointblank.Validate.rows_near_distinct" class="gdls-link gdls-code">rows_near_distinct()</a> step</li>
+<li>every query has a gold document, with <code>gold_doc_id=</code>: a <a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a> step</li>
+<li>every gold document is in the corpus, with <code>corpus=</code>: a <a href="../reference/Validate.col_vals_in_table.html#pointblank.Validate.col_vals_in_table" class="gdls-link gdls-code">col_vals_in_table()</a> step</li>
+<li>every passage is relevant to its query, with <code>passage=</code>, <code>scorer=</code>, and <code>min_relevance=</code>: a <a href="../reference/Validate.col_vals_scored.html#pointblank.Validate.col_vals_scored" class="gdls-link gdls-code">col_vals_scored()</a> step (with a reranker, like <a href="../reference/scorers.reranker.html#pointblank.scorers.reranker" class="gdls-link"><code>pb.scorers.reranker()</code></a>, or another scorer of a query and a passage)</li>
 </ul>
 </div>
 <section id="parameters" class="level2 doc-parameters">
@@ -2091,7 +2091,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">corpus</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>The corpus (any table that <code>col_vals_in_table()</code> takes, such as a DataFrame, a database table, or the path of a file) to look up the gold documents in. It needs <code>gold_doc_id=</code>.</p>
+<p>The corpus (any table that <a href="../reference/Validate.col_vals_in_table.html#pointblank.Validate.col_vals_in_table" class="gdls-link gdls-code">col_vals_in_table()</a> takes, such as a DataFrame, a database table, or the path of a file) to look up the gold documents in. It needs <code>gold_doc_id=</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">corpus_id</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -2111,7 +2111,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">near_duplicates</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool | float</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-<p>Whether to check for near-duplicate queries (<code>True</code> by default), or the threshold of the similarity of two queries for them to be near duplicates (the <code>threshold=</code> of <code>rows_near_distinct()</code>, <code>0.85</code> with <code>True</code>).</p>
+<p>Whether to check for near-duplicate queries (<code>True</code> by default), or the threshold of the similarity of two queries for them to be near duplicates (the <code>threshold=</code> of <a href="../reference/Validate.rows_near_distinct.html#pointblank.Validate.rows_near_distinct" class="gdls-link gdls-code">rows_near_distinct()</a>, <code>0.85</code> with <code>True</code>).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">pre</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -2146,7 +2146,7 @@ The steps, to be added to a validation with <a href="../reference/Validate.add_s
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s check an evaluation set of three queries against a corpus of three documents.</p>
-<div id="d9e2d9f8" class="cell" data-execution_count="2">
+<div id="a1bbd5a8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>

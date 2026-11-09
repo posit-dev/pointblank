@@ -67,11 +67,11 @@ validation
 
 [TABLE]
 
-Each rule is a `col_vals_scored()` step with a [`text_stat()`](../../reference/scorers.text_stat.md#pointblank.scorers.text_stat) scorer, so the report shows what each one checks and how many documents fail it. The menu has too few words, repeats its lines, and has too few common words, and the list of hashtags has too many symbols for its words. The document in French fails the check of common words too, since the default stop words are English (use `stop_words=` for other languages). Any rule can be turned off by setting its bound to `None`, and since each is an ordinary step, it can be changed like any other.
+Each rule is a [col_vals_scored()](../../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) step with a [`text_stat()`](../../reference/scorers.text_stat.md#pointblank.scorers.text_stat) scorer, so the report shows what each one checks and how many documents fail it. The menu has too few words, repeats its lines, and has too few common words, and the list of hashtags has too many symbols for its words. The document in French fails the check of common words too, since the default stop words are English (use `stop_words=` for other languages). Any rule can be turned off by setting its bound to `None`, and since each is an ordinary step, it can be changed like any other.
 
 ## Near Duplicates
 
-A document that's in a corpus many times gets too much weight in training. The `rows_distinct()` method finds rows that are exactly the same, but most duplicates in text differ a little: a changed date, a different footer, or a name filled into a template. The `rows_near_distinct()` method finds those too. It normalizes the text (in lower case, without punctuation), and with the default `method="minhash"`, it finds texts whose sequences of words are mostly the same.
+A document that's in a corpus many times gets too much weight in training. The [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) method finds rows that are exactly the same, but most duplicates in text differ a little: a changed date, a different footer, or a name filled into a template. The [rows_near_distinct()](../../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct) method finds those too. It normalizes the text (in lower case, without punctuation), and with the default `method="minhash"`, it finds texts whose sequences of words are mostly the same.
 
 ``` python
 validation = (
@@ -89,7 +89,7 @@ validation.get_step_report(i=1)
 | 1 | 1 | The museum opens at nine and closes at five on weekdays, and entry is free for children under twelve. | 1 |
 | 2 | 2 | The museum opens at nine and closes at five on weekdays, and entry is free for children under 12! | 1 |
 
-The first two documents differ only in *twelve* and *12!*, so both fail, and the step report shows them together as one group (in the `pb_cluster_` column). Every row of a group fails, as with `rows_distinct()`, since the validation can't know which copy we'd want to keep. That's decided when the results are used to clean the table: [get_row_flags()](../../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags) and [get_sundered_data()](../../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data) keep the first row of each group by default (`duplicates="keep_first"`).
+The first two documents differ only in *twelve* and *12!*, so both fail, and the step report shows them together as one group (in the `pb_cluster_` column). Every row of a group fails, as with [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct), since the validation can't know which copy we'd want to keep. That's decided when the results are used to clean the table: [get_row_flags()](../../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags) and [get_sundered_data()](../../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data) keep the first row of each group by default (`duplicates="keep_first"`).
 
 ## Language, Length, and Personal Information
 
@@ -138,11 +138,11 @@ validation
 
 [TABLE]
 
-The document in French fails step 1, the menu is too short for step 2, and the email address fails step 3. The checks of personal information are `col_vals_regex()` steps, so they run on any backend, including in a database. Their patterns find likely matches rather than certain ones (a number with the shape of a credit card number matches, with no checksum), so for a thorough check, a model of named entities can be used with `col_vals_scored()`.
+The document in French fails step 1, the menu is too short for step 2, and the email address fails step 3. The checks of personal information are [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) steps, so they run on any backend, including in a database. Their patterns find likely matches rather than certain ones (a number with the shape of a credit card number matches, with no checksum), so for a thorough check, a model of named entities can be used with [col_vals_scored()](../../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored).
 
 ## Chat Conversations
 
-Data for fine-tuning a chat model is a list of messages for each example, each with a role and some content. Data converted from other formats often has conversations with roles out of order, an unknown role, or an empty message, and a training run can fail on them (or quietly learn from them). The `col_vals_chat_format()` method checks each conversation, given as a list of messages or as JSON text.
+Data for fine-tuning a chat model is a list of messages for each example, each with a role and some content. Data converted from other formats often has conversations with roles out of order, an unknown role, or an empty message, and a training run can fail on them (or quietly learn from them). The [col_vals_chat_format()](../../reference/Validate.col_vals_chat_format.md#pointblank.Validate.col_vals_chat_format) method checks each conversation, given as a list of messages or as JSON text.
 
 ``` python
 chats = pl.DataFrame(
@@ -179,7 +179,7 @@ The second conversation has two user messages in a row, and the last one ends wi
 
 ## Benchmark Contamination
 
-A model is often judged by its score on a benchmark, a set of questions with known answers. If the training data contains those questions, the score no longer says how well the model does on questions it hasn't seen: the benchmark is *contaminated*. The `rows_not_contaminated()` method checks the text of each row against a reference, such as the questions of a benchmark or the rows of a test set.
+A model is often judged by its score on a benchmark, a set of questions with known answers. If the training data contains those questions, the score no longer says how well the model does on questions it hasn't seen: the benchmark is *contaminated*. The [rows_not_contaminated()](../../reference/Validate.rows_not_contaminated.md#pointblank.Validate.rows_not_contaminated) method checks the text of each row against a reference, such as the questions of a benchmark or the rows of a test set.
 
 ``` python
 benchmark = pl.DataFrame(
@@ -217,8 +217,8 @@ Each of these checks removes some documents, and it isn't always clear which of 
 
 ## Databases and PySpark
 
-The checks of `pb.text.no_pii()` are regular expressions, so they run on any backend. The other checks run in Python: a Polars or pandas table is checked as it is, and for a database table (through Ibis) or a PySpark DataFrame, the distinct values of the step's columns are collected, checked, and the results are joined back to the table on its own backend. With a large table, a `pre=` function that takes a sample of the rows keeps the cost down. For `col_vals_chat_format()`, the conversations in a database table must be JSON text.
+The checks of `pb.text.no_pii()` are regular expressions, so they run on any backend. The other checks run in Python: a Polars or pandas table is checked as it is, and for a database table (through Ibis) or a PySpark DataFrame, the distinct values of the step's columns are collected, checked, and the results are joined back to the table on its own backend. With a large table, a `pre=` function that takes a sample of the rows keeps the cost down. For [col_vals_chat_format()](../../reference/Validate.col_vals_chat_format.md#pointblank.Validate.col_vals_chat_format), the conversations in a database table must be JSON text.
 
 ## Conclusion
 
-Text data has its own kinds of problems, and Pointblank checks them with the same reports, thresholds, and actions as any other validation. The `pb.text` functions make bundles of steps for the heuristic quality filters, the language and length of the text, and personal information; `rows_near_distinct()` finds near duplicates; `col_vals_chat_format()` checks conversations for fine-tuning; and `rows_not_contaminated()` keeps benchmark questions out of the training data.
+Text data has its own kinds of problems, and Pointblank checks them with the same reports, thresholds, and actions as any other validation. The `pb.text` functions make bundles of steps for the heuristic quality filters, the language and length of the text, and personal information; [rows_near_distinct()](../../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct) finds near duplicates; [col_vals_chat_format()](../../reference/Validate.col_vals_chat_format.md#pointblank.Validate.col_vals_chat_format) checks conversations for fine-tuning; and [rows_not_contaminated()](../../reference/Validate.rows_not_contaminated.md#pointblank.Validate.rows_not_contaminated) keeps benchmark questions out of the training data.

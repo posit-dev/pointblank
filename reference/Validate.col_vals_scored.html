@@ -2053,7 +2053,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14798-L15099" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14801-L15102" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">col_vals_scored</span>(</span>
@@ -2184,7 +2184,7 @@ If neither <code>min_val=</code> nor <code>max_val=</code> is given, if <code>mi
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a table of product reviews and a scorer that stands in for a model: it scores a review by the share of its words that are on a list of positive words. A real scorer would be a classifier, such as <code>pb.scorers.classifier(hf_model=..., label="POSITIVE")</code>.</p>
-<div id="4b605208" class="cell" data-execution_count="2">
+<div id="bdc69705" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2331,7 +2331,7 @@ If neither <code>min_val=</code> nor <code>max_val=</code> is given, if <code>mi
 </div>
 </div>
 <p>Let’s validate that each review scores at least <code>0.25</code>.</p>
-<div id="34679c1c" class="cell" data-execution_count="3">
+<div id="593c7e60" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_scored(columns<span class="op">=</span><span class="st">"review"</span>, scorer<span class="op">=</span>positivity, min_val<span class="op">=</span><span class="fl">0.25</span>)</span>
@@ -2502,7 +2502,7 @@ If neither <code>min_val=</code> nor <code>max_val=</code> is given, if <code>mi
 </div>
 </div>
 <p>The step has six test units, one for each row, and three fail: two reviews have no positive words, and the missing review isn’t scored (use <code>na_pass=True</code> to let such rows pass). The step’s note gives the range of the scores. The failing rows can be seen with their scores, in the <code>pb_score_</code> column, with <a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link"><code>get_step_report()</code></a>.</p>
-<div id="2e7a94d1" class="cell" data-execution_count="4">
+<div id="d87db7c0" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

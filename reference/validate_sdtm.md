@@ -4,7 +4,7 @@ Build a validation plan for a dataset from an SDTM domain template.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_validate.py#L159-L374)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_sdtm_validate.py#L159-L375)
 
 ``` python
 validate_sdtm(
@@ -120,7 +120,7 @@ validation
 
 [TABLE]
 
-The `col_vals_gt()` step on `AESEQ` fails for the third row, whose sequence number is `0`. The `col_exists()` steps at the end show that `AEDECOD`, a required AE variable, is missing from the dataset. The `tbl_name=` argument was passed on to [Validate](../reference/Validate.md#pointblank.Validate).
+The [col_vals_gt()](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) step on `AESEQ` fails for the third row, whose sequence number is `0`. The [col_exists()](../reference/Validate.col_exists.md#pointblank.Validate.col_exists) steps at the end show that `AEDECOD`, a required AE variable, is missing from the dataset. The `tbl_name=` argument was passed on to [Validate](../reference/Validate.md#pointblank.Validate).
 
 ## See Also
 

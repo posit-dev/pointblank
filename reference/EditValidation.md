@@ -4,7 +4,7 @@ Edit an existing validation plan with a plain-English instruction using an LLM.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L102-L798)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L102-L801)
 
 ``` python
 EditValidation(
@@ -115,7 +115,7 @@ edit.review()
 | ~ modified | col_vals_gt | col_vals_gt(columns='d', value=100) | col_vals_gt(columns='d', value=50) |
 | \+ added | col_vals_not_null |  | col_vals_not_null(columns='a') |
 
-The review table lists one row per changed step: the `col_vals_gt()` step is modified (its `value=` went from `100` to `50`), the `col_vals_not_null()` step is added, and the unchanged `col_vals_regex()` step isn't shown. Once the changes look right, [`accept()`](../reference/EditValidation.md#pointblank.EditValidation.accept) gives the revised plan as a [Validate](../reference/Validate.md#pointblank.Validate) object that's ready to interrogate.
+The review table lists one row per changed step: the [col_vals_gt()](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) step is modified (its `value=` went from `100` to `50`), the [col_vals_not_null()](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) step is added, and the unchanged [col_vals_regex()](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) step isn't shown. Once the changes look right, [`accept()`](../reference/EditValidation.md#pointblank.EditValidation.accept) gives the revised plan as a [Validate](../reference/Validate.md#pointblank.Validate) object that's ready to interrogate.
 
 ## See Also
 
@@ -143,7 +143,7 @@ Return a `great_tables` GT object summarizing the step-level changes.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L620-L692)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L622-L695)
 
 ``` python
 review()
@@ -179,7 +179,7 @@ edit.review()
 | ~ modified | col_vals_gt | col_vals_gt(columns='d', value=100) | col_vals_gt(columns='d', value=50) |
 | − removed | rows_distinct | rows_distinct() |  |
 
-The modified `col_vals_gt()` step shows its old and new text in the *Before* and *After* columns, and the removed `rows_distinct()` step has only a *Before* entry. Because the result is a GT object, it can be styled further or saved with the `great_tables` API.
+The modified [col_vals_gt()](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) step shows its old and new text in the *Before* and *After* columns, and the removed [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step has only a *Before* entry. Because the result is a GT object, it can be styled further or saved with the `great_tables` API.
 
 ### accept()
 
@@ -187,7 +187,7 @@ Execute the revised plan and return the resulting [Validate](../reference/Valida
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L694-L792)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L697-L795)
 
 ``` python
 accept(data=None)
@@ -240,7 +240,7 @@ Return a unified textual diff of the original plan versus the revised plan.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L516-L567)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L517-L568)
 
 ``` python
 diff()
@@ -285,7 +285,7 @@ print(edit.diff())
      
      validation
 
-The old `col_vals_gt()` line is replaced by one with `value=50`, and a `col_vals_not_null()` line is added. The two files in the header (`original_plan.py` and `edited_plan.py`) are only labels, and nothing is written to disk.
+The old [col_vals_gt()](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) line is replaced by one with `value=50`, and a [col_vals_not_null()](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) line is added. The two files in the header (`original_plan.py` and `edited_plan.py`) are only labels, and nothing is written to disk.
 
 ### changed_steps()
 
@@ -293,7 +293,7 @@ Return a structured, step-level list of the changes between the plans.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L569-L618)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L570-L620)
 
 ``` python
 changed_steps()
@@ -334,7 +334,7 @@ for change in edit.changed_steps():
     {'action': 'remove', 'method': 'rows_distinct', 'old': 'rows_distinct()'}
     {'action': 'add', 'method': 'col_vals_not_null', 'new': "col_vals_not_null(columns='a')"}
 
-The `col_vals_gt()` step is modified, so its record has both the old and the new step text. The `rows_distinct()` step was removed and has only `"old"`, and the new `col_vals_not_null()` step has only `"new"`. The same records are behind the table that [`review()`](../reference/EditValidation.md#pointblank.EditValidation.review) shows.
+The [col_vals_gt()](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) step is modified, so its record has both the old and the new step text. The [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step was removed and has only `"old"`, and the new [col_vals_not_null()](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) step has only `"new"`. The same records are behind the table that [`review()`](../reference/EditValidation.md#pointblank.EditValidation.review) shows.
 
 ### to_code()
 
@@ -342,7 +342,7 @@ Return the revised validation plan as Python code.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L446-L479)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L447-L480)
 
 ``` python
 to_code()
@@ -389,7 +389,7 @@ Check whether the revised plan parses and uses only known validation methods.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L481-L514)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L482-L515)
 
 ``` python
 validate_syntax()
@@ -425,7 +425,7 @@ Build an [EditValidation](../reference/EditValidation.md#pointblank.EditValidati
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L347-L444)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L348-L445)
 
 ``` python
 from_plans(
@@ -475,7 +475,7 @@ comparison.changed_steps()
       'old': "col_vals_gt(columns='d', value=100)",
       'new': "col_vals_gt(columns='d', value=50)"}]
 
-The only change is the `value=` of the `col_vals_gt()` step, reported as a single modification. The plans can also be YAML configurations, which are converted to Python code before they're compared:
+The only change is the `value=` of the [col_vals_gt()](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) step, reported as a single modification. The plans can also be YAML configurations, which are converted to Python code before they're compared:
 
 ``` python
 v1_yaml = '''
@@ -501,4 +501,4 @@ comparison.changed_steps()
 
     [{'action': 'add', 'method': 'rows_distinct', 'new': 'rows_distinct()'}]
 
-The second version adds a `rows_distinct()` step. Since the inputs can be file paths too, this works well for checking a change to a saved plan before it's merged.
+The second version adds a [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step. Since the inputs can be file paths too, this works well for checking a change to a saved plan before it's merged.

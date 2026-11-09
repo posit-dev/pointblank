@@ -2118,7 +2118,7 @@ A dict mapping each compared source column to the number of matched rows where i
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s compare the output of a reporting job with the output of a new version of the job. The new version should produce exactly the same daily totals.</p>
-<div id="19bbd852" class="cell" data-execution_count="2">
+<div id="ca1e5921" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2146,7 +2146,7 @@ A dict mapping each compared source column to the number of matched rows where i
 </div>
 </div>
 <p>The printed form is a one-line summary: one day changed and the schemas agree, so the tables aren’t identical. In a test or a deployment script, the comparison can be used as a condition directly. Here, when the tables differ, we look at the rows that changed:</p>
-<div id="b3a21824" class="cell" data-execution_count="3">
+<div id="959bfefa" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> comparison:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"The new job reproduces the old totals."</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -2165,7 +2165,7 @@ shape: (1, 5)
 </div>
 </div>
 <p>The revenue for June 3 has two digits swapped. To see where the mismatches are concentrated, which matters more when there are many columns, use <a href="../reference/Comparison.column_summary.html#pointblank.Comparison.column_summary" class="gdls-link gdls-code">column_summary()</a>:</p>
-<div id="3a894a3e" class="cell" data-execution_count="4">
+<div id="ad687006" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>comparison.column_summary()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div><style>
@@ -2178,7 +2178,7 @@ shape: (1, 5)
 <small>shape: (2, 6)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>column</th><th>target_column</th><th>dtype_source</th><th>dtype_target</th><th>n_mismatch</th><th>f_mismatch</th></tr><tr><td>str</td><td>str</td><td>str</td><td>str</td><td>i64</td><td>f64</td></tr></thead><tbody><tr><td>"orders"</td><td>"orders"</td><td>"Int64"</td><td>"Int64"</td><td>0</td><td>0.0</td></tr><tr><td>"revenue"</td><td>"revenue"</td><td>"Float64"</td><td>"Float64"</td><td>1</td><td>0.25</td></tr></tbody></table></div>
 </div>
 </div>
-<p>Only <code>revenue</code> has a mismatch, in one of the four matched rows. From here, the full report is available with <a href="../reference/Comparison.get_tabular_report.html#pointblank.Comparison.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>, and the result can be saved with <code>to_json()</code> to keep a record of the check.</p>
+<p>Only <code>revenue</code> has a mismatch, in one of the four matched rows. From here, the full report is available with <a href="../reference/Comparison.get_tabular_report.html#pointblank.Comparison.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>, and the result can be saved with <a href="../reference/Comparison.to_json.html#pointblank.Comparison.to_json" class="gdls-link gdls-code">to_json()</a> to keep a record of the check.</p>
 </section>
 <section id="see-also" class="level2 doc-see-also">
 <h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>

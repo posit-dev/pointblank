@@ -32,7 +32,7 @@
 - [ContractViolationError](https://posit-dev.github.io/pointblank/reference/ContractViolationError.html): The error raised when data fails a contract with `on_violation="raise"`
 
 #### Contract Import/Export
-> Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use `import_contract()` as the entry point, `export_contract()` for the reverse, and `register_adapter()` to add support for custom formats.
+> Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use `~~pointblank.import_contract()` as the entry point, `~~pointblank.export_contract()` for the reverse, and `register_adapter()` to add support for custom formats.
 
 
 - [import_contract](https://posit-dev.github.io/pointblank/reference/import_contract.html): Import a contract or schema written in another format
@@ -140,7 +140,7 @@
 - [rag.eval_checks](https://posit-dev.github.io/pointblank/reference/rag.eval_checks.html)
 
 #### Column Selection
-> Use the `col()` function along with column selection helpers to flexibly select columns for validation. Combine `col()` with `starts_with()`, `matches()`, etc. for selecting multiple target columns.
+> Use the `col()` function along with column selection helpers to flexibly select columns for validation. Combine `col()` with `starts_with()`, `~~pointblank.matches()`, etc. for selecting multiple target columns.
 
 
 - [col](https://posit-dev.github.io/pointblank/reference/col.html): Helper function for referencing a column in the input table
@@ -151,7 +151,7 @@
 - [everything](https://posit-dev.github.io/pointblank/reference/everything.html): Select all columns
 - [first_n](https://posit-dev.github.io/pointblank/reference/first_n.html): Select the first `n` columns in the column list
 - [last_n](https://posit-dev.github.io/pointblank/reference/last_n.html): Select the last `n` columns in the column list
-- [expr_col](https://posit-dev.github.io/pointblank/reference/expr_col.html): Create a column expression for use in `conjointly()` validation
+- [expr_col](https://posit-dev.github.io/pointblank/reference/expr_col.html): Create a column expression for use in `Validate.conjointly()` validation
 
 #### Segment Groups
 > Combine multiple values into a single segment using `seg_*()` helper functions.
@@ -224,7 +224,7 @@
 - [DataScan.from_dict](https://posit-dev.github.io/pointblank/reference/DataScan.from_dict.html)
 
 #### Table Comparison
-> Compare two tables row by row. `compare()` aligns the rows of a source and a target table (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus schema differences. The result is a `Comparison` object with counts, row samples, and a tabular report. The same comparison is available as a validation step through `Validate.tbl_match()`, and `Validate.tbl_reconcile()` compares aggregates (e.g., totals per group) instead of rows.
+> Compare two tables row by row. `~~pointblank.compare()` aligns the rows of a source and a target table (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus schema differences. The result is a `Comparison` object with counts, row samples, and a tabular report. The same comparison is available as a validation step through `Validate.tbl_match()`, and `Validate.tbl_reconcile()` compares aggregates (e.g., totals per group) instead of rows.
 
 
 - [compare](https://posit-dev.github.io/pointblank/reference/compare.html): Compare two tables row by row and report how they differ

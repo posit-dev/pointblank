@@ -883,7 +883,7 @@ One powerful use case for [specially()](../../reference/Validate.specially.md#po
 
 #### Foreign Key Validation
 
-Verify that all keys in one dataset exist in another (this is equivalent to using `col_vals_in_table()` but shown here for completeness):
+Verify that all keys in one dataset exist in another (this is equivalent to using [col_vals_in_table()](../../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table) but shown here for completeness):
 
 ``` python
 # Create related datasets: Orders and OrderDetails

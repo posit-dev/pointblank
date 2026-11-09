@@ -2048,7 +2048,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L3148-L3332" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L3149-L3333" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_sdtmig</span>(</span>
@@ -2129,7 +2129,7 @@ If one of the <code>ct_packages</code> isn’t bundled with Pointblank.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here is a DM dataset with all the variables that SDTMIG requires for DM, but with three problems: the second subject’s <code>RFSTDTC</code> isn’t an ISO 8601 date, and the third subject has a negative <code>AGE</code> and a <code>SEX</code> of <code>"FEMALE"</code> (the SEX codelist has <code>"F"</code>):</p>
-<div id="09b96476" class="cell" data-execution_count="1">
+<div id="9cbd66ac" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2165,7 +2165,7 @@ If one of the <code>ct_packages</code> isn’t bundled with Pointblank.
 </div>
 </div>
 <p>Five rules fail, and the 12 Define-XML rules are not applicable. Let’s see which rules failed:</p>
-<div id="ad81af39" class="cell" data-execution_count="2">
+<div id="06f0cf78" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule <span class="kw">in</span> report.rules(status<span class="op">=</span><span class="st">"fail"</span>):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(rule.rule_id, rule.sensitivity, rule.message)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2178,7 +2178,7 @@ SDTM-195 Error AGE must not be negative in DM.</code></pre>
 </div>
 <p>The three problems are each found by a rule. The other two failures are for the TS and TA datasets, which every SDTM submission needs. The failing records can be had as a DataFrame with <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link"><code>findings_df()</code></a> or as a table with <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link"><code>get_findings_table()</code></a>.</p>
 <p>With a Define-XML, the Define-XML rules are run as well. Pointblank comes with a DM dataset as an XPT file and a Define-XML for it:</p>
-<div id="ff2ea766" class="cell" data-execution_count="3">
+<div id="7c42f85a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyreadstat</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>dm, _ <span class="op">=</span> pyreadstat.read_xport(pb.load_metadata_example(<span class="st">"dm.xpt"</span>))</span>

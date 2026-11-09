@@ -62,7 +62,7 @@ print(result)
 
     ContractImport(format='my_format', columns=2, constraints=1, coverage=100%)
 
-The adapter is now part of the Pointblank ecosystem. Any call to `import_contract()` with `format="my_format"` will route through this adapter, and the auto-detection system will call [detect()](../../reference/ContractAdapter.md#pointblank.ContractAdapter.detect) when no format is specified.
+The adapter is now part of the Pointblank ecosystem. Any call to [import_contract()](../../reference/import_contract.md#pointblank.import_contract) with `format="my_format"` will route through this adapter, and the auto-detection system will call [detect()](../../reference/ContractAdapter.md#pointblank.ContractAdapter.detect) when no format is specified.
 
 ``` python
 # And it shows up in the adapter list
@@ -100,8 +100,8 @@ Here are the class attributes and methods you can define:
 |----|----|----|
 | `format_name` | `str` | Short identifier (e.g., `"json_schema"`, `"my_format"`) |
 | `file_extensions` | `list[str]` | File extensions for auto-detection (e.g., `[".schema.json"]`) |
-| `supports_import` | `bool` | Whether `import_contract()` is implemented |
-| `supports_export` | `bool` | Whether `export_contract()` is implemented |
+| `supports_import` | `bool` | Whether [import_contract()](../../reference/ContractAdapter.md#pointblank.ContractAdapter.import_contract) is implemented |
+| `supports_export` | `bool` | Whether [export_contract()](../../reference/ContractAdapter.md#pointblank.ContractAdapter.export_contract) is implemented |
 
 | Method | Required? | Purpose |
 |----|----|----|
@@ -380,6 +380,6 @@ def detect(source) -> bool:
 
 ## Conclusion
 
-Custom adapters let you extend Pointblank's import/export system to handle any schema format your organization uses. The plugin architecture is intentionally simple: subclass [ContractAdapter](../../reference/ContractAdapter.md#pointblank.ContractAdapter), implement one or two methods, and register it with a decorator. From that point forward, your format participates in the same `import_contract()` and `export_contract()` workflow that the built-in adapters use.
+Custom adapters let you extend Pointblank's import/export system to handle any schema format your organization uses. The plugin architecture is intentionally simple: subclass [ContractAdapter](../../reference/ContractAdapter.md#pointblank.ContractAdapter), implement one or two methods, and register it with a decorator. From that point forward, your format participates in the same [import_contract()](../../reference/import_contract.md#pointblank.import_contract) and [export_contract()](../../reference/export_contract.md#pointblank.export_contract) workflow that the built-in adapters use.
 
 This extensibility means that Pointblank can serve as a universal validation layer regardless of where your data contracts originate. Whether your schemas live in a proprietary YAML format, an internal data catalog API, or a custom metadata store, a short adapter class is all you need to bring them into the Pointblank ecosystem and benefit from its validation reporting, threshold system, and pipeline integration.

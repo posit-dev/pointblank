@@ -714,7 +714,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>create pipelines that handle good and bad data differently</li>
 </ul>
 <p>Let’s use the <code>small_table</code> in our examples to show just how sundering is done. Here’s that table:</p>
-<div id="cd982bd9" class="cell" data-execution_count="2">
+<div id="bda332db" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -965,7 +965,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="a-simple-example-where-data-is-torn-asunder" class="level1">
 <h1>A Simple Example Where Data is Torn Asunder</h1>
 <p>We’ll begin with a very simple validation plan, having only a single step. There <em>will be</em> failing test units here.</p>
-<div id="7dc75522" class="cell" data-execution_count="3">
+<div id="c5ef7137" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -1128,7 +1128,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>We see six failing test units in <code>FAIL</code> column of the above validation report table. There is a data extract (collection of failing rows) available. Let’s use the <a href="../../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" class="gdls-link"><code>Validate.get_data_extracts()</code></a> method to have a look at it.</p>
-<div id="4079170f" class="cell" data-execution_count="4">
+<div id="b1953500" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div><style>
@@ -1142,7 +1142,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>This is six rows of data that had failing test units in column <code>d</code>. Indeed we can see that all values in that column are less than <code>1000</code> (and we asserted that values should be greater than or equal to <code>1000</code>). This is the ‘bad’ data, if you will. Using the <a href="../../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>Validate.get_sundered_data()</code></a> method, we get the ‘good’ part:</p>
-<div id="23f8d41d" class="cell" data-execution_count="5">
+<div id="d0ad4a2f" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.get_sundered_data()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div><style>
@@ -1157,7 +1157,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>This is a Polars DataFrame of seven rows. All values in <code>d</code> were passing test units (i.e., fulfilled the expectation outlined in the validation step) and, in many ways, this is like a ‘good extract’.</p>
 <p>You can always collect the failing rows with <a href="../../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>Validate.get_sundered_data()</code></a> by using the <code>type="fail"</code> option. Let’s try that here:</p>
-<div id="2870faa0" class="cell" data-execution_count="6">
+<div id="cc5fdcc4" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.get_sundered_data(<span class="bu">type</span><span class="op">=</span><span class="st">"fail"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div><style>
@@ -1180,7 +1180,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="using-get_sundered_data-with-a-more-comprehensive-validation" class="level1">
 <h1>Using <a href="../../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link gdls-code">get_sundered_data()</a> with a More Comprehensive Validation</h1>
 <p>The previous example used exactly one validation step. You’re likely to use more than that in standard practice so let’s see how <a href="../../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>Validate.get_sundered_data()</code></a> works in those common situations. Here’s a validation with three steps:</p>
-<div id="f55a4f34" class="cell" data-execution_count="7">
+<div id="404ebf86" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation_2 <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>))</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_ge(</span>
@@ -1433,7 +1433,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>There are quite a few failures here across the three validation steps. In the <code>FAIL</code> column of the validation report table, there are 12 failing test units if we were to tally them up. So if the input table has 13 rows in total, does this mean there would be one row in the table returned by <a href="../../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>Validate.get_sundered_data()</code></a>? Not so:</p>
-<div id="e7701a68" class="cell" data-execution_count="8">
+<div id="f9dfe6c1" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation_2.get_sundered_data()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div><style>
@@ -1490,7 +1490,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>The first one makes intuitive sense (you decided to skip this validation step entirely), the second one requires some explanation. Using <code>pre=</code> allows you to modify the target table, there’s no easy or practical way to compare rows in a mutated table compared to the original table (e.g., a mutation may drastically reduce the number of rows, or aggregate them into entirely new ones).</p>
 <p>Many <code>pre=</code> functions only filter rows or change their values though, and for these you can say so by wrapping the function in <a href="../../reference/row_preserving.html#pointblank.row_preserving" class="gdls-link"><code>row_preserving()</code></a>. Pointblank then adds a row number column (<code>pb_index_</code>) to the table before calling the function, checks that the rows it returns all come from different rows of the table, and uses the row numbers to match the step’s results to the table’s rows:</p>
-<div id="9e7a4815" class="cell" data-execution_count="9">
+<div id="88c5bddf" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>validation_high <span class="op">=</span> (</span>
@@ -1520,8 +1520,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="sundering-with-duplicate-rows" class="level1">
 <h1>Sundering with Duplicate Rows</h1>
-<p>A <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link"><code>Validate.rows_distinct()</code></a> step counts <em>every</em> copy of a duplicated row as a failing test unit, since there’s no telling which of the copies is the ‘wrong’ one. That’s the right count for a validation report, but it’s rarely what you want when sundering: removing all copies of a duplicate would remove the record entirely. So by default, <code>rows_distinct()</code> steps are left out of sundering, and the <code>duplicates=</code> argument lets you bring them in by saying which copy to keep. The <code>small_table</code> dataset has one pair of duplicate rows, so let’s check for that:</p>
-<div id="ca33d9da" class="cell" data-execution_count="10">
+<p>A <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link"><code>Validate.rows_distinct()</code></a> step counts <em>every</em> copy of a duplicated row as a failing test unit, since there’s no telling which of the copies is the ‘wrong’ one. That’s the right count for a validation report, but it’s rarely what you want when sundering: removing all copies of a duplicate would remove the record entirely. So by default, <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> steps are left out of sundering, and the <code>duplicates=</code> argument lets you bring them in by saying which copy to keep. The <code>small_table</code> dataset has one pair of duplicate rows, so let’s check for that:</p>
+<div id="f742e42c" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>validation_3 <span class="op">=</span> (</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>))</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    .rows_distinct()</span>
@@ -1545,14 +1545,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>"keep_first"</code>: the first copy of each group of duplicates passes and the others fail</li>
 <li><code>"keep_last"</code>: the last copy passes and the others fail</li>
 <li><code>"flag_all"</code>: every copy fails (just as the validation step counts them)</li>
-<li><code>None</code> (the default): <code>rows_distinct()</code> steps aren’t used for sundering</li>
+<li><code>None</code> (the default): <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> steps aren’t used for sundering</li>
 </ul>
 <p>The ‘first’ and ‘last’ copies are those in row order, unless you use <code>duplicates_order_by=</code> to name one or more columns to order them by. For example, a check for duplicated customer IDs combined with <code>duplicates="keep_last", duplicates_order_by="updated_at"</code> keeps the most recently updated record for each customer.</p>
 </section>
 <section id="flagging-rows-instead-of-splitting-them" class="level1">
 <h1>Flagging Rows Instead of Splitting Them</h1>
 <p>Sundering gives a yes-or-no answer for each row: it passed every step, or it didn’t. Sometimes you want to know <em>which</em> steps a row failed, so you can decide what to do with it later. The <a href="../../reference/Validate.get_row_flags.html#pointblank.Validate.get_row_flags" class="gdls-link"><code>Validate.get_row_flags()</code></a> method returns the whole table with a <code>True</code>/<code>False</code> column for each row-level step (<code>pb_failed_1_</code>, <code>pb_failed_2_</code>, and so on), along with the number of steps each row failed (<code>pb_n_failed_</code>) and the share of its checks that it passed (<code>pb_row_score_</code>):</p>
-<div id="cb7b5f9a" class="cell" data-execution_count="11">
+<div id="d7c8fde4" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>validation_2.get_row_flags()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <div><style>
@@ -1565,14 +1565,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <small>shape: (13, 13)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>date_time</th><th>date</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th><th>pb_failed_1_</th><th>pb_failed_2_</th><th>pb_failed_3_</th><th>pb_n_failed_</th><th>pb_row_score_</th></tr><tr><td>datetime[μs]</td><td>date</td><td>i64</td><td>str</td><td>i64</td><td>f64</td><td>bool</td><td>str</td><td>bool</td><td>bool</td><td>bool</td><td>i64</td><td>f64</td></tr></thead><tbody><tr><td>2016-01-04 11:00:00</td><td>2016-01-04</td><td>2</td><td>"1-bcd-345"</td><td>3</td><td>3423.29</td><td>true</td><td>"high"</td><td>false</td><td>false</td><td>true</td><td>1</td><td>0.666667</td></tr><tr><td>2016-01-04 00:32:00</td><td>2016-01-04</td><td>3</td><td>"5-egh-163"</td><td>8</td><td>9999.99</td><td>true</td><td>"low"</td><td>false</td><td>false</td><td>false</td><td>0</td><td>1.0</td></tr><tr><td>2016-01-05 13:32:00</td><td>2016-01-05</td><td>6</td><td>"8-kdg-938"</td><td>3</td><td>2343.23</td><td>true</td><td>"high"</td><td>false</td><td>false</td><td>false</td><td>0</td><td>1.0</td></tr><tr><td>2016-01-06 17:23:00</td><td>2016-01-06</td><td>2</td><td>"5-jdo-903"</td><td>null</td><td>3892.4</td><td>false</td><td>"mid"</td><td>false</td><td>true</td><td>true</td><td>2</td><td>0.333333</td></tr><tr><td>2016-01-09 12:36:00</td><td>2016-01-09</td><td>8</td><td>"3-ldm-038"</td><td>7</td><td>283.94</td><td>true</td><td>"low"</td><td>true</td><td>false</td><td>false</td><td>1</td><td>0.666667</td></tr><tr><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr><tr><td>2016-01-20 04:30:00</td><td>2016-01-20</td><td>3</td><td>"5-bce-642"</td><td>9</td><td>837.93</td><td>false</td><td>"high"</td><td>true</td><td>false</td><td>false</td><td>1</td><td>0.666667</td></tr><tr><td>2016-01-20 04:30:00</td><td>2016-01-20</td><td>3</td><td>"5-bce-642"</td><td>9</td><td>837.93</td><td>false</td><td>"high"</td><td>true</td><td>false</td><td>false</td><td>1</td><td>0.666667</td></tr><tr><td>2016-01-26 20:07:00</td><td>2016-01-26</td><td>4</td><td>"2-dmx-010"</td><td>7</td><td>833.98</td><td>true</td><td>"low"</td><td>true</td><td>false</td><td>false</td><td>1</td><td>0.666667</td></tr><tr><td>2016-01-28 02:51:00</td><td>2016-01-28</td><td>2</td><td>"7-dmx-010"</td><td>8</td><td>108.34</td><td>false</td><td>"low"</td><td>true</td><td>false</td><td>true</td><td>2</td><td>0.333333</td></tr><tr><td>2016-01-30 11:23:00</td><td>2016-01-30</td><td>1</td><td>"3-dka-303"</td><td>null</td><td>2230.09</td><td>true</td><td>"high"</td><td>false</td><td>true</td><td>true</td><td>2</td><td>0.333333</td></tr></tbody></table></div>
 </div>
 </div>
-<p>The rows with a <code>pb_n_failed_</code> of <code>0</code> are exactly the passing set from sundering. With the flags in hand, though, you can filter on just the checks that matter for a particular use, look for problems that tend to occur together, or use <code>pb_row_score_</code> to weight rows rather than drop them. The same <code>duplicates=</code> and <code>duplicates_order_by=</code> options are available here, except that <a href="../../reference/Validate.get_row_flags.html#pointblank.Validate.get_row_flags" class="gdls-link gdls-code">get_row_flags()</a> uses <code>duplicates="keep_first"</code> by default, so that a <code>rows_distinct()</code> flag marks the copies that removing duplicates would remove.</p>
+<p>The rows with a <code>pb_n_failed_</code> of <code>0</code> are exactly the passing set from sundering. With the flags in hand, though, you can filter on just the checks that matter for a particular use, look for problems that tend to occur together, or use <code>pb_row_score_</code> to weight rows rather than drop them. The same <code>duplicates=</code> and <code>duplicates_order_by=</code> options are available here, except that <a href="../../reference/Validate.get_row_flags.html#pointblank.Validate.get_row_flags" class="gdls-link gdls-code">get_row_flags()</a> uses <code>duplicates="keep_first"</code> by default, so that a <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> flag marks the copies that removing duplicates would remove.</p>
 </section>
 <section id="practical-applications-of-sundering" class="level1">
 <h1>Practical Applications of Sundering</h1>
 <section id="creating-clean-datasets-for-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="creating-clean-datasets-for-analysis">1. Creating Clean Datasets for Analysis</h2>
 <p>One of the most common use cases for sundering is preparing validated data for downstream analysis:</p>
-<div id="abf3f283" class="cell" data-execution_count="12">
+<div id="232ae415" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Comprehensive validation for analysis-ready data</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>analysis_validation <span class="op">=</span> (</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>))</span>
@@ -1806,7 +1806,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="creating-parallel-workflows-for-clean-and-problematic-data" class="level2">
 <h2 class="anchored" data-anchor-id="creating-parallel-workflows-for-clean-and-problematic-data">2. Creating Parallel Workflows for Clean and Problematic Data</h2>
 <p>You can use sundering to create parallel processing paths:</p>
-<div id="a30d28cd" class="cell" data-execution_count="13">
+<div id="a55bbebc" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get both clean and problematic data</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>clean_data <span class="op">=</span> analysis_validation.get_sundered_data(<span class="bu">type</span><span class="op">=</span><span class="st">"pass"</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>problem_data <span class="op">=</span> analysis_validation.get_sundered_data(<span class="bu">type</span><span class="op">=</span><span class="st">"fail"</span>)</span>
@@ -1826,7 +1826,7 @@ Problematic data size: 2 rows</code></pre>
 <section id="data-quality-monitoring-and-improvement" class="level2">
 <h2 class="anchored" data-anchor-id="data-quality-monitoring-and-improvement">3. Data Quality Monitoring and Improvement</h2>
 <p>Tracking the ratio of passing to failing rows over time can help monitor data quality trends:</p>
-<div id="ddf80a54" class="cell" data-execution_count="14">
+<div id="06c6af2b" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate data quality metrics</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>total_rows <span class="op">=</span> <span class="bu">len</span>(pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>))</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>passing_rows <span class="op">=</span> <span class="bu">len</span>(clean_data)</span>

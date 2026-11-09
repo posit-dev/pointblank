@@ -2054,7 +2054,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_api.py#L9-L269" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_api.py#L9-L274" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">import_contract</span>(</span>
@@ -2065,7 +2065,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Data is often already described somewhere outside of Pointblank: a JSON Schema for an API payload, a Frictionless Table Schema inside a Data Package, the <code>schema.yml</code> file of a dbt project, or an Open Data Contract Standard (ODCS) document. <code>import_contract()</code> reads such a definition and translates its rules into Pointblank validation steps. That way the existing definition can be checked against real data without rewriting it by hand, and the rules stay in the place where they’re already maintained.</p>
+<p>Data is often already described somewhere outside of Pointblank: a JSON Schema for an API payload, a Frictionless Table Schema inside a Data Package, the <code>schema.yml</code> file of a dbt project, or an Open Data Contract Standard (ODCS) document. <a href="../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a> reads such a definition and translates its rules into Pointblank validation steps. That way the existing definition can be checked against real data without rewriting it by hand, and the rules stay in the place where they’re already maintained.</p>
 <p>The result is a <a href="../reference/ContractImport.html#pointblank.ContractImport" class="gdls-link"><code>ContractImport</code></a> object. It holds the column names and types, the mapped constraints, any metadata from the source (such as a title and a description), and a warning for every rule that has no Pointblank equivalent. From there you can:</p>
 <ul>
 <li>get a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> object, ready to interrogate, with <a href="../reference/ContractImport.html#pointblank.ContractImport.to_validate" class="gdls-link"><code>to_validate()</code></a></li>
@@ -2124,8 +2124,8 @@ If <code>source</code> is a path to a file that doesn’t exist.
 <h2 class="doc-supported-formats anchored" data-anchor-id="supported-formats">Supported Formats</h2>
 <p>Each built-in adapter reads the column names and types and the following rules:</p>
 <ul>
-<li><strong>JSON Schema</strong> (<code>"json_schema"</code>): the <code>properties</code> of an object schema become the columns. <code>required</code> maps to <code>col_vals_not_null()</code>, <code>minimum</code>/<code>maximum</code> to <code>col_vals_ge()</code>/ <code>col_vals_le()</code>, <code>exclusiveMinimum</code>/<code>exclusiveMaximum</code> to <code>col_vals_gt()</code>/<code>col_vals_lt()</code>, <code>enum</code> to <code>col_vals_in_set()</code>, <code>pattern</code> to <code>col_vals_regex()</code>, and <code>const</code> to <code>col_vals_eq()</code>. The <code>format</code> values <code>email</code>, <code>uri</code>, <code>uri-reference</code>, <code>ipv4</code>, and <code>ipv6</code> map to <code>col_vals_within_spec()</code>; other formats (such as <code>date</code>) produce a warning. The <code>title</code> and <code>description</code> keywords are kept as metadata and <code>$schema</code> is recorded as the source version.</li>
-<li><strong>Frictionless Table Schema</strong> (<code>"frictionless"</code>): a standalone Table Schema (with <code>fields</code>) or a Data Package (with <code>resources</code>). The field constraints <code>required</code>, <code>unique</code>, <code>minimum</code>, <code>maximum</code>, <code>enum</code>, and <code>pattern</code> are mapped, and a <code>primaryKey</code> becomes <code>col_vals_not_null()</code> on each key column plus <code>rows_distinct()</code> over all of them. Foreign keys produce a warning.</li>
+<li><strong>JSON Schema</strong> (<code>"json_schema"</code>): the <code>properties</code> of an object schema become the columns. <code>required</code> maps to <a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a>, <code>minimum</code>/<code>maximum</code> to <a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link gdls-code">col_vals_ge()</a>/ <a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link gdls-code">col_vals_le()</a>, <code>exclusiveMinimum</code>/<code>exclusiveMaximum</code> to <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a>/<a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link gdls-code">col_vals_lt()</a>, <code>enum</code> to <a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a>, <code>pattern</code> to <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a>, and <code>const</code> to <a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a>. The <code>format</code> values <code>email</code>, <code>uri</code>, <code>uri-reference</code>, <code>ipv4</code>, and <code>ipv6</code> map to <a href="../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link gdls-code">col_vals_within_spec()</a>; other formats (such as <code>date</code>) produce a warning. The <code>title</code> and <code>description</code> keywords are kept as metadata and <code>$schema</code> is recorded as the source version.</li>
+<li><strong>Frictionless Table Schema</strong> (<code>"frictionless"</code>): a standalone Table Schema (with <code>fields</code>) or a Data Package (with <code>resources</code>). The field constraints <code>required</code>, <code>unique</code>, <code>minimum</code>, <code>maximum</code>, <code>enum</code>, and <code>pattern</code> are mapped, and a <code>primaryKey</code> becomes <a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a> on each key column plus <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> over all of them. Foreign keys produce a warning.</li>
 <li><strong>dbt</strong> (<code>"dbt"</code>): the models and source tables of a <code>schema.yml</code> file. The column tests <code>not_null</code>, <code>unique</code>, and <code>accepted_values</code> are mapped (from either <code>data_tests:</code> or the older <code>tests:</code> key), as is a model-level <code>unique</code> test with <code>combination_of_columns</code>. <code>relationships</code> and any other tests produce a warning. The model name becomes the title.</li>
 <li><strong>Open Data Contract Standard</strong> (<code>"odcs"</code>): documents with a <code>dataset:</code> list of tables and their columns. <code>isNullable: false</code>, <code>isUnique</code>, <code>isPrimaryKey</code>, <code>enum</code> (or <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage.values" class="gdls-link gdls-code">values</a>), <code>pattern</code>, and <code>minimum</code>/<code>maximum</code> are mapped. Length limits and <code>checks</code>/<code>quality</code> entries produce a warning.</li>
 </ul>
@@ -2141,7 +2141,7 @@ If <code>source</code> is a path to a file that doesn’t exist.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose an API team publishes a JSON Schema for user profiles and we want to check a table of profiles against it. The schema can be passed as a dictionary (here it’s written inline, but it would usually come from <code>json.load()</code>). Because it has a <code>$schema</code> key, the format is detected without needing <code>format=</code>.</p>
-<div id="6c9e0c16" class="cell" data-execution_count="2">
+<div id="9a63fc09" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2167,7 +2167,7 @@ If <code>source</code> is a path to a file that doesn’t exist.
 </div>
 </div>
 <p>The printed form gives the counts at a glance: four columns, six constraints, and nothing left untranslated. The <a href="../reference/ContractImport.html#pointblank.ContractImport.summary" class="gdls-link"><code>summary()</code></a> method gives a little more detail, including the version of the source specification.</p>
-<div id="d806f831" class="cell" data-execution_count="3">
+<div id="bdd5598a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(imported.summary())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Contract Import Summary
@@ -2179,7 +2179,7 @@ If <code>source</code> is a path to a file that doesn’t exist.
 </div>
 </div>
 <p>Now let’s validate some data. The <a href="../reference/ContractImport.html#pointblank.ContractImport.to_validate" class="gdls-link"><code>to_validate()</code></a> method builds a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with a schema check followed by one step per constraint, and it accepts the usual <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> arguments such as <code>tbl_name=</code> and <code>label=</code>.</p>
-<div id="67145131" class="cell" data-execution_count="4">
+<div id="0f350d4e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>users <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"user_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">0</span>],</span>
@@ -2760,7 +2760,7 @@ tr { background-color: transparent; }
 </div>
 <p>The table has the right columns and types, so the schema check passes. The remaining failures come straight from the JSON Schema rules: a <code>user_id</code> of <code>0</code> (below the minimum of <code>1</code>), a missing email (which fails both the <code>required</code> check and the <code>email</code> format check), an email without a valid domain, a lowercase country code, and a plan that isn’t in the <code>enum</code>.</p>
 <p>Files work the same way. In this next example a dbt <code>schema.yml</code> file with two models is written to the working directory. The <code>.yml</code> extension identifies it as a dbt file, and <code>model=</code> picks the model to import (without it, the first model would be used).</p>
-<div id="c0a8c433" class="cell" data-execution_count="5">
+<div id="6bd17fa3" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>dbt_yml <span class="op">=</span> <span class="st">'''</span></span>
@@ -2808,7 +2808,7 @@ tr { background-color: transparent; }
 </div>
 <p>Four of the five tests were translated. The <code>relationships</code> test checks values against another model, which a single-table validation can’t do, so it was reported as a warning and the coverage is 80%. Note also that the dbt type <code>varchar(20)</code> was read as Pointblank’s <code>String</code> type.</p>
 <p>The import can also be turned into a <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> with <a href="../reference/ContractImport.html#pointblank.ContractImport.to_contract" class="gdls-link"><code>to_contract()</code></a>, which accepts any <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> argument. Printing the contract as YAML shows that the schema, the steps, and the model’s description were all carried over.</p>
-<div id="ad993cc1" class="cell" data-execution_count="6">
+<div id="1e171b32" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>orders_contract <span class="op">=</span> orders_import.to_contract(name<span class="op">=</span><span class="st">"orders"</span>, owner<span class="op">=</span><span class="st">"analytics"</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(orders_contract.to_yaml())</span></code></pre></div>

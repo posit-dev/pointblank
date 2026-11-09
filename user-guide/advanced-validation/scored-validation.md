@@ -1,6 +1,6 @@
 # Scored Validation
 
-Most validation checks are about the form of the data: whether a value is in a range, matches a pattern, or isn't missing. Some of the checks that matter most for text are about its meaning instead. Does a passage answer the query it was retrieved for? Is a document of good quality, or toxic? Is it in the expected language? Is it fluent, or garbled? These checks are made with a model that gives each row a score, and the `col_vals_scored()` validation method is for them: it scores each row with a *scorer* and checks that the score is within bounds.
+Most validation checks are about the form of the data: whether a value is in a range, matches a pattern, or isn't missing. Some of the checks that matter most for text are about its meaning instead. Does a passage answer the query it was retrieved for? Is a document of good quality, or toxic? Is it in the expected language? Is it fluent, or garbled? These checks are made with a model that gives each row a score, and the [col_vals_scored()](../../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) validation method is for them: it scores each row with a *scorer* and checks that the score is within bounds.
 
 This page covers how to write a scorer, the adapters of `pb.scorers` for common kinds of models, how scores are cached so that rows aren't scored twice, and how to use the scores once the validation is done.
 
@@ -280,8 +280,8 @@ print(pb.yaml_to_python(config))
     )
     ```
 
-A scorer that's a function of your own can be written as a `python:` block, which needs `allow_python=True` (see the [YAML Reference](../yaml/yaml-reference.md)). A validation with an adapter is written in this form by `to_yaml()`, so it can be saved and run again.
+A scorer that's a function of your own can be written as a `python:` block, which needs `allow_python=True` (see the [YAML Reference](../yaml/yaml-reference.md)). A validation with an adapter is written in this form by [to_yaml()](../../reference/Validate.to_yaml.md#pointblank.Validate.to_yaml), so it can be saved and run again.
 
 ## Conclusion
 
-The `col_vals_scored()` validation method brings checks of meaning into a validation plan, with the same reports, thresholds, and actions as any other step. A scorer is any function of a batch of rows, and the adapters of `pb.scorers` use rerankers, classifiers, language identification, embeddings, perplexity, statistics of text, and tokenizers. Scores are cached, so that rows aren't scored again, and they're kept with the results, where they can be seen in the step report and used to choose the bounds with an [`Ablation`](../post-interrogation/data-ablation.md).
+The [col_vals_scored()](../../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) validation method brings checks of meaning into a validation plan, with the same reports, thresholds, and actions as any other step. A scorer is any function of a batch of rows, and the adapters of `pb.scorers` use rerankers, classifiers, language identification, embeddings, perplexity, statistics of text, and tokenizers. Scores are cached, so that rows aren't scored again, and they're kept with the results, where they can be seen in the step report and used to choose the bounds with an [`Ablation`](../post-interrogation/data-ablation.md).

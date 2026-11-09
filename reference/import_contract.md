@@ -4,7 +4,7 @@ Import a contract or schema written in another format.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_api.py#L9-L269)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_api.py#L9-L274)
 
 ``` python
 import_contract(
@@ -15,7 +15,7 @@ import_contract(
 )
 ```
 
-Data is often already described somewhere outside of Pointblank: a JSON Schema for an API payload, a Frictionless Table Schema inside a Data Package, the `schema.yml` file of a dbt project, or an Open Data Contract Standard (ODCS) document. `import_contract()` reads such a definition and translates its rules into Pointblank validation steps. That way the existing definition can be checked against real data without rewriting it by hand, and the rules stay in the place where they're already maintained.
+Data is often already described somewhere outside of Pointblank: a JSON Schema for an API payload, a Frictionless Table Schema inside a Data Package, the `schema.yml` file of a dbt project, or an Open Data Contract Standard (ODCS) document. [import_contract()](../reference/import_contract.md#pointblank.import_contract) reads such a definition and translates its rules into Pointblank validation steps. That way the existing definition can be checked against real data without rewriting it by hand, and the rules stay in the place where they're already maintained.
 
 The result is a [`ContractImport`](../reference/ContractImport.md#pointblank.ContractImport) object. It holds the column names and types, the mapped constraints, any metadata from the source (such as a title and a description), and a warning for every rule that has no Pointblank equivalent. From there you can:
 
@@ -54,8 +54,8 @@ If `source` is a path to a file that doesn't exist.
 
 Each built-in adapter reads the column names and types and the following rules:
 
-- **JSON Schema** (`"json_schema"`): the `properties` of an object schema become the columns. `required` maps to `col_vals_not_null()`, `minimum`/`maximum` to `col_vals_ge()`/ `col_vals_le()`, `exclusiveMinimum`/`exclusiveMaximum` to `col_vals_gt()`/`col_vals_lt()`, `enum` to `col_vals_in_set()`, `pattern` to `col_vals_regex()`, and `const` to `col_vals_eq()`. The `format` values `email`, `uri`, `uri-reference`, `ipv4`, and `ipv6` map to `col_vals_within_spec()`; other formats (such as `date`) produce a warning. The `title` and `description` keywords are kept as metadata and `$schema` is recorded as the source version.
-- **Frictionless Table Schema** (`"frictionless"`): a standalone Table Schema (with `fields`) or a Data Package (with `resources`). The field constraints `required`, `unique`, `minimum`, `maximum`, `enum`, and `pattern` are mapped, and a `primaryKey` becomes `col_vals_not_null()` on each key column plus `rows_distinct()` over all of them. Foreign keys produce a warning.
+- **JSON Schema** (`"json_schema"`): the `properties` of an object schema become the columns. `required` maps to [col_vals_not_null()](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null), `minimum`/`maximum` to [col_vals_ge()](../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge)/ [col_vals_le()](../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le), `exclusiveMinimum`/`exclusiveMaximum` to [col_vals_gt()](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt)/[col_vals_lt()](../reference/Validate.col_vals_lt.md#pointblank.Validate.col_vals_lt), `enum` to [col_vals_in_set()](../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set), `pattern` to [col_vals_regex()](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex), and `const` to [col_vals_eq()](../reference/Validate.col_vals_eq.md#pointblank.Validate.col_vals_eq). The `format` values `email`, `uri`, `uri-reference`, `ipv4`, and `ipv6` map to [col_vals_within_spec()](../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec); other formats (such as `date`) produce a warning. The `title` and `description` keywords are kept as metadata and `$schema` is recorded as the source version.
+- **Frictionless Table Schema** (`"frictionless"`): a standalone Table Schema (with `fields`) or a Data Package (with `resources`). The field constraints `required`, `unique`, `minimum`, `maximum`, `enum`, and `pattern` are mapped, and a `primaryKey` becomes [col_vals_not_null()](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) on each key column plus [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) over all of them. Foreign keys produce a warning.
 - **dbt** (`"dbt"`): the models and source tables of a `schema.yml` file. The column tests `not_null`, `unique`, and `accepted_values` are mapped (from either `data_tests:` or the older `tests:` key), as is a model-level `unique` test with `combination_of_columns`. `relationships` and any other tests produce a warning. The model name becomes the title.
 - **Open Data Contract Standard** (`"odcs"`): documents with a `dataset:` list of tables and their columns. `isNullable: false`, `isUnique`, `isPrimaryKey`, `enum` (or [values](../reference/MetadataPackage.md#pointblank.MetadataPackage.values)), `pattern`, and `minimum`/`maximum` are mapped. Length limits and `checks`/`quality` entries produce a warning.
 

@@ -13,13 +13,13 @@ matches(
 )
 ```
 
-Many validation methods have a `columns=` argument that can be used to specify the columns for validation (e.g., [`col_vals_gt()`](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), [`col_vals_regex()`](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex), etc.). The `matches()` selector function can be used to select one or more columns matching a provided regular expression pattern. So if the set of table columns consists of
+Many validation methods have a `columns=` argument that can be used to specify the columns for validation (e.g., [`col_vals_gt()`](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), [`col_vals_regex()`](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex), etc.). The [matches()](../reference/matches.md#pointblank.matches) selector function can be used to select one or more columns matching a provided regular expression pattern. So if the set of table columns consists of
 
 `[rev_01, rev_02, profit_01, profit_02, age]`
 
 and you want to validate columns that have two digits at the end of the name, you can use `columns=matches(r"[0-9]{2}$")`. This will select the `rev_01`, `rev_02`, `profit_01`, and `profit_02` columns.
 
-There will be a validation step created for every resolved column. Note that if there aren't any columns resolved from using `matches()` (or any other expression using selector functions), the validation step will fail to be evaluated during the interrogation process. Such a failure to evaluate will be reported in the validation results but it won't affect the interrogation process overall (i.e., the process won't be halted).
+There will be a validation step created for every resolved column. Note that if there aren't any columns resolved from using [matches()](../reference/matches.md#pointblank.matches) (or any other expression using selector functions), the validation step will fail to be evaluated during the interrogation process. Such a failure to evaluate will be reported in the validation results but it won't affect the interrogation process overall (i.e., the process won't be halted).
 
 ## Parameters
 
@@ -34,7 +34,7 @@ Whether column names should be treated as case-sensitive. The default is `False`
 `Matches`  
 A `Matches` object, which can be used to select columns that match the specified pattern.
 
-## Relevant Validation Methods Where `matches()` Can Be Used
+## Relevant Validation Methods Where [matches()](../reference/matches.md#pointblank.matches) Can Be Used
 
 This selector function can be used in the `columns=` argument of the following validation methods:
 
@@ -56,11 +56,11 @@ This selector function can be used in the `columns=` argument of the following v
 - [`col_vals_within_spec()`](../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec)
 - [`col_exists()`](../reference/Validate.col_exists.md#pointblank.Validate.col_exists)
 
-The `matches()` selector function doesn't need to be used in isolation. Read the next section for information on how to compose it with other column selectors for more refined ways to select columns.
+The [matches()](../reference/matches.md#pointblank.matches) selector function doesn't need to be used in isolation. Read the next section for information on how to compose it with other column selectors for more refined ways to select columns.
 
 ## Additional Flexibilty Through Composition With Other Column Selectors
 
-The `matches()` function can be composed with other column selectors to create fine-grained column selections. For example, to select columns that have the text starting with five digits and end with `"_id"`, you can use the `matches()` and [`ends_with()`](../reference/ends_with.md#pointblank.ends_with) functions together. The only condition is that the expressions are wrapped in the [`col()`](../reference/col.md#pointblank.col) function, like this:
+The [matches()](../reference/matches.md#pointblank.matches) function can be composed with other column selectors to create fine-grained column selections. For example, to select columns that have the text starting with five digits and end with `"_id"`, you can use the [matches()](../reference/matches.md#pointblank.matches) and [`ends_with()`](../reference/ends_with.md#pointblank.ends_with) functions together. The only condition is that the expressions are wrapped in the [`col()`](../reference/col.md#pointblank.col) function, like this:
 
 ``` python
 col(matches(r"^[0-9]{5}") & ends_with("_id"))
@@ -77,7 +77,7 @@ The `&` operator is used to select columns that satisfy both conditions. The `|`
 
 ## Examples
 
-Suppose we have a table with columns `name`, `id_old`, `new_identifier`, and `pay_2021` and we'd like to validate that text values in columns having `"id"` or `"identifier"` in the name have a specific syntax. We can use the `matches()` column selector function to specify the columns that match the pattern.
+Suppose we have a table with columns `name`, `id_old`, `new_identifier`, and `pay_2021` and we'd like to validate that text values in columns having `"id"` or `"identifier"` in the name have a specific syntax. We can use the [matches()](../reference/matches.md#pointblank.matches) column selector function to specify the columns that match the pattern.
 
 ``` python
 import pointblank as pb
@@ -105,7 +105,7 @@ validation
 
 From the results of the validation table we get two validation steps, one for `id_old` and one for `new_identifier`. The values in both columns all match the pattern `"ID[0-9]{4}"`.
 
-We can also use the `matches()` function in combination with other column selectors (within [`col()`](../reference/col.md#pointblank.col)) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select columns that contain `"pay"` and match the text `"2023"` or `"2024"`, we can use the `&` operator to combine column selectors.
+We can also use the [matches()](../reference/matches.md#pointblank.matches) function in combination with other column selectors (within [`col()`](../reference/col.md#pointblank.col)) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select columns that contain `"pay"` and match the text `"2023"` or `"2024"`, we can use the `&` operator to combine column selectors.
 
 ``` python
 tbl = pl.DataFrame(

@@ -4,7 +4,7 @@ A study's datasets, gathered for CDISC conformance validation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L141-L1263)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L141-L1264)
 
 ``` python
 SubmissionPackage(
@@ -39,7 +39,7 @@ The data standard that the datasets follow, `"sdtmig"` or `"adamig"`. The defaul
 The version of the standard, such as `"3.4"` for SDTMIG 3.4. The default is `"3.4"`.
 
 `study_id: str | None = None`  
-A study identifier. It is shown by `summary()` and used in the labels of the validations made by `validate_conformance(engine="validate")`. The default is `None`.
+A study identifier. It is shown by [summary()](../reference/SubmissionPackage.md#pointblank.SubmissionPackage.summary) and used in the labels of the validations made by `validate_conformance(engine="validate")`. The default is `None`.
 
 ## Examples
 
@@ -215,7 +215,7 @@ Build a [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.Submiss
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L267-L403)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L268-L404)
 
 ``` python
 from_folder(
@@ -325,7 +325,7 @@ Check the whole package for conformance to its CDISC standard.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L684-L912)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L685-L913)
 
 ``` python
 validate_conformance(
@@ -502,7 +502,7 @@ Get one of the package's datasets by name.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L446-L500)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L447-L501)
 
 ``` python
 get_dataset(name)
@@ -567,7 +567,7 @@ Get the unique subject identifiers in a dataset.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L563-L613)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L564-L614)
 
 ``` python
 subject_ids(dataset="DM")
@@ -619,7 +619,7 @@ Find the key values in one dataset that are missing from another.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L615-L680)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L616-L681)
 
 ``` python
 orphan_ids(
@@ -691,7 +691,7 @@ Summarize the package's contents as text.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1209-L1254)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1210-L1255)
 
 ``` python
 summary()

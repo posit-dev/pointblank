@@ -2051,7 +2051,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15101-L15330" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15104-L15334" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">rows_near_distinct</span>(</span>
@@ -2158,13 +2158,13 @@ If <code>method=</code> isn’t <code>"minhash"</code> or <code>"exact"</code>, 
 <p>Texts are first normalized: in lower case (with Unicode compatibility forms folded), with punctuation replaced by spaces, and with runs of whitespace made one space. Texts that are the same once normalized are always near duplicates. With <code>method="minhash"</code>, each text is also split into its overlapping n-grams of <code>ngram=</code> words, and two texts whose sets of n-grams have a Jaccard similarity of at least <code>threshold=</code> (the share of their n-grams that they have in common) are near duplicates. Comparing every pair of texts would take too long for a large table, so candidate pairs are found with MinHash signatures and locality-sensitive hashing (the way that corpora for language models are deduplicated), and each candidate pair is confirmed with its exact Jaccard similarity. No pair below the threshold is ever grouped, and a pair just above it is missed only rarely.</p>
 <p>Groups of near duplicates are connected: if text A is a near duplicate of text B, and B of C, then A, B, and C are one group, even if A and C are less alike. A row with a missing value in any of <code>columns=</code> passes.</p>
 <p>The group of each failing row (numbered from 1, in the order of the first row of each group) is in a column of the results called <code>pb_cluster_</code>, which is in the extracts of failing rows and in the step report, where the rows of each group are shown together. The step’s note says how many groups were found and how many rows are in them.</p>
-<p>Every row of a group fails, as with <code>rows_distinct()</code>. When the rows of a validation are used to clean a table (with <a href="../reference/Validate.get_row_flags.html#pointblank.Validate.get_row_flags" class="gdls-link"><code>get_row_flags()</code></a>, or in an <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link"><code>Ablation</code></a>), <code>duplicates=</code> decides which rows of a group are kept: <code>"keep_first"</code> keeps the first row of each group, <code>"keep_last"</code> the last, and <code>"flag_all"</code> keeps none.</p>
+<p>Every row of a group fails, as with <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a>. When the rows of a validation are used to clean a table (with <a href="../reference/Validate.get_row_flags.html#pointblank.Validate.get_row_flags" class="gdls-link"><code>get_row_flags()</code></a>, or in an <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link"><code>Ablation</code></a>), <code>duplicates=</code> decides which rows of a group are kept: <code>"keep_first"</code> keeps the first row of each group, <code>"keep_last"</code> the last, and <code>"flag_all"</code> keeps none.</p>
 <p>Comparing texts runs in Python. A Polars or pandas table is compared as it is (a Polars LazyFrame is collected first). For a database table (through Ibis) or a PySpark DataFrame, the distinct rows of <code>columns=</code> are collected and compared, and the groups are joined back to the table on its own backend.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a small table of documents, some of which are near duplicates of others.</p>
-<div id="62e97a13" class="cell" data-execution_count="2">
+<div id="2a37603c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2303,7 +2303,7 @@ If <code>method=</code> isn’t <code>"minhash"</code> or <code>"exact"</code>, 
 </div>
 </div>
 <p>Let’s validate that the documents have no near duplicates.</p>
-<div id="7c88f1b8" class="cell" data-execution_count="3">
+<div id="0e60837f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .rows_near_distinct(columns<span class="op">=</span><span class="st">"text"</span>)</span>
@@ -2475,7 +2475,7 @@ If <code>method=</code> isn’t <code>"minhash"</code> or <code>"exact"</code>, 
 </div>
 </div>
 <p>Three of the six rows fail: documents 1, 3, and 5 differ only in their punctuation and letter case, so they’re one group. Documents 2 and 6 differ by a word, which leaves fewer than 85% of their 5-word n-grams in common, so they pass. A lower <code>threshold=</code> (or a smaller <code>ngram=</code>) finds them too:</p>
-<div id="202474d0" class="cell" data-execution_count="4">
+<div id="799e6757" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .rows_near_distinct(columns<span class="op">=</span><span class="st">"text"</span>, threshold<span class="op">=</span><span class="fl">0.5</span>)</span>

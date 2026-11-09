@@ -57,7 +57,7 @@ A few things to notice in the output:
 
 - The table-level configuration (`tbl_name`, `label`, `thresholds`) is reproduced on the `pb.Validate(...)` call.
 - The data source is rendered as the placeholder `your_data`, since the plan doesn't know the name of the variable your data lives in. Replace it with your actual data variable before running the code.
-- Adjacent steps that differ only by column are collapsed into a single call: the two `col_vals_not_null()` steps above become `col_vals_not_null(columns=["a", "b"])`. This keeps the output compact and diffs minimal.
+- Adjacent steps that differ only by column are collapsed into a single call: the two [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) steps above become `col_vals_not_null(columns=["a", "b"])`. This keeps the output compact and diffs minimal.
 - Only non-default arguments are emitted. A step-level threshold that matches the table-level default is omitted, `na_pass=True` appears only where it was set, and so on.
 
 The result is regular source you can paste into a script or notebook, commit to version control, or share with a colleague.
@@ -104,7 +104,7 @@ validation.to_yaml(path="plans/small_table.yaml")
 
 ## Round-Tripping a Plan
 
-Because `to_yaml()` emits a [yaml_interrogate()](../../reference/yaml_interrogate.md#pointblank.yaml_interrogate)-compatible document, a plan round-trips through YAML. Here we serialize a plan, then rebuild and run it with [yaml_interrogate()](../../reference/yaml_interrogate.md#pointblank.yaml_interrogate):
+Because [to_yaml()](../../reference/Validate.to_yaml.md#pointblank.Validate.to_yaml) emits a [yaml_interrogate()](../../reference/yaml_interrogate.md#pointblank.yaml_interrogate)-compatible document, a plan round-trips through YAML. Here we serialize a plan, then rebuild and run it with [yaml_interrogate()](../../reference/yaml_interrogate.md#pointblank.yaml_interrogate):
 
 ``` python
 yaml_str = validation.to_yaml()
@@ -115,7 +115,7 @@ rebuilt
 
 [TABLE]
 
-The rebuilt plan carries the same steps as the original. The Python code from `to_code()` round-trips in the same way: executing it (after replacing `your_data`) reconstructs an equivalent plan.
+The rebuilt plan carries the same steps as the original. The Python code from [to_code()](../../reference/Validate.to_code.md#pointblank.Validate.to_code) round-trips in the same way: executing it (after replacing `your_data`) reconstructs an equivalent plan.
 
 ## Fidelity and Limitations
 
@@ -158,7 +158,7 @@ Rendering a plan back to source is helpful whenever you want the plan to leave t
 
 ## Exporting a Plan as JSON Schema
 
-While `to_code()` and `to_yaml()` reproduce your plan as Pointblank-specific source, [`to_json_schema()`](../../reference/Validate.to_json_schema.md#pointblank.Validate.to_json_schema) converts your validation rules into a [JSON Schema](https://json-schema.org/) document. JSON Schema is a widely adopted, language-neutral standard, so the exported schema can be consumed by validation libraries in JavaScript, Java, Go, and many other ecosystems.
+While [to_code()](../../reference/Validate.to_code.md#pointblank.Validate.to_code) and [to_yaml()](../../reference/Validate.to_yaml.md#pointblank.Validate.to_yaml) reproduce your plan as Pointblank-specific source, [`to_json_schema()`](../../reference/Validate.to_json_schema.md#pointblank.Validate.to_json_schema) converts your validation rules into a [JSON Schema](https://json-schema.org/) document. JSON Schema is a widely adopted, language-neutral standard, so the exported schema can be consumed by validation libraries in JavaScript, Java, Go, and many other ecosystems.
 
 ``` python
 import json
@@ -214,20 +214,20 @@ print(json.dumps(schema, indent=2))
 
 Each validation method is mapped to its closest JSON Schema keyword:
 
-| Pointblank method        | JSON Schema keyword   |
-|--------------------------|-----------------------|
-| `col_vals_not_null()`    | `required`            |
-| `col_vals_gt()`          | `exclusiveMinimum`    |
-| `col_vals_ge()`          | `minimum`             |
-| `col_vals_lt()`          | `exclusiveMaximum`    |
-| `col_vals_le()`          | `maximum`             |
-| `col_vals_eq()`          | `const`               |
-| `col_vals_between()`     | `minimum` + `maximum` |
-| `col_vals_in_set()`      | `enum`                |
-| `col_vals_regex()`       | `pattern`             |
-| `col_vals_within_spec()` | `format`              |
+| Pointblank method | JSON Schema keyword |
+|----|----|
+| [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) | `required` |
+| [col_vals_gt()](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) | `exclusiveMinimum` |
+| [col_vals_ge()](../../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge) | `minimum` |
+| [col_vals_lt()](../../reference/Validate.col_vals_lt.md#pointblank.Validate.col_vals_lt) | `exclusiveMaximum` |
+| [col_vals_le()](../../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le) | `maximum` |
+| [col_vals_eq()](../../reference/Validate.col_vals_eq.md#pointblank.Validate.col_vals_eq) | `const` |
+| [col_vals_between()](../../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between) | `minimum` + `maximum` |
+| [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) | `enum` |
+| [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) | `pattern` |
+| [col_vals_within_spec()](../../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec) | `format` |
 
-When the [Validate](../../reference/Validate.md#pointblank.Validate) object has data attached, the schema is automatically enriched with column type information (`"type": "integer"`, `"type": "string"`, etc.) inferred from the data. Steps that have no natural JSON Schema equivalent (e.g., `rows_distinct()`, `tbl_match()`) are silently skipped.
+When the [Validate](../../reference/Validate.md#pointblank.Validate) object has data attached, the schema is automatically enriched with column type information (`"type": "integer"`, `"type": "string"`, etc.) inferred from the data. Steps that have no natural JSON Schema equivalent (e.g., [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct), [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match)) are silently skipped.
 
 ### Writing to a File
 
@@ -241,7 +241,7 @@ This is useful for checking schemas into version control or feeding them into do
 
 ### Relationship to `export_contract()`
 
-Under the hood, [to_json_schema()](../../reference/Validate.to_json_schema.md#pointblank.Validate.to_json_schema) delegates to the [`export_contract()`](../../reference/export_contract.md#pointblank.export_contract) function with `format="json_schema"`. The convenience method adds type enrichment from the data and handles file output. If you need the raw adapter behavior (for example, to export without type enrichment, or to work with a [Contract](../../reference/Contract.md#pointblank.Contract) object rather than a [Validate](../../reference/Validate.md#pointblank.Validate) object), use `export_contract()` directly. See the [Importing and Exporting Contracts](../08-contracts-and-pipelines/04-importing-contracts.md) guide for the full story on contract adapters.
+Under the hood, [to_json_schema()](../../reference/Validate.to_json_schema.md#pointblank.Validate.to_json_schema) delegates to the [`export_contract()`](../../reference/export_contract.md#pointblank.export_contract) function with `format="json_schema"`. The convenience method adds type enrichment from the data and handles file output. If you need the raw adapter behavior (for example, to export without type enrichment, or to work with a [Contract](../../reference/Contract.md#pointblank.Contract) object rather than a [Validate](../../reference/Validate.md#pointblank.Validate) object), use [export_contract()](../../reference/export_contract.md#pointblank.export_contract) directly. See the [Importing and Exporting Contracts](../contracts-and-pipelines/importing-contracts.md) guide for the full story on contract adapters.
 
 ## Conclusion
 

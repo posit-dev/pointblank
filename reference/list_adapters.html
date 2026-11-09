@@ -2046,7 +2046,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_registry.py#L182-L256" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_registry.py#L184-L260" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list_adapters</span>()</span></code></pre></div>
@@ -2064,8 +2064,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li><code>"class"</code>: the name of the adapter class</li>
 <li><code>"file_extensions"</code>: the list of file extensions used to detect the format</li>
-<li><code>"supports_import"</code>: whether the format can be imported with <code>import_contract()</code></li>
-<li><code>"supports_export"</code>: whether the format can be exported with <code>export_contract()</code></li>
+<li><code>"supports_import"</code>: whether the format can be imported with <a href="../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a></li>
+<li><code>"supports_export"</code>: whether the format can be exported with <a href="../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a></li>
 </ul>
 </dd>
 </dl>
@@ -2074,7 +2074,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>With no custom adapters registered, the result lists the four built-in formats.</p>
-<div id="12c69bbe" class="cell" data-execution_count="2">
+<div id="ce8a0cc3" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>adapters <span class="op">=</span> pb.list_adapters()</span>
@@ -2085,7 +2085,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Each entry describes one adapter. Here’s the entry for the dbt adapter, which claims the <code>.yml</code> and <code>.yaml</code> file extensions and supports both directions.</p>
-<div id="2622e776" class="cell" data-execution_count="3">
+<div id="0527461a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>adapters[<span class="st">"dbt"</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>{'class': 'DbtAdapter',
@@ -2095,7 +2095,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Since the result is an ordinary dictionary, it’s easy to filter. This finds the formats that a contract can be exported to.</p>
-<div id="680d71c0" class="cell" data-execution_count="4">
+<div id="c51ab914" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>[name <span class="cf">for</span> name, info <span class="kw">in</span> adapters.items() <span class="cf">if</span> info[<span class="st">"supports_export"</span>]]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>['dbt', 'frictionless', 'json_schema', 'odcs']</code></pre>

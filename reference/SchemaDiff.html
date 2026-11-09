@@ -2105,7 +2105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s compare a table of customers with a version written by a migrated job. The new version stores the signup date as a string, capitalizes one column name, and adds a column.</p>
-<div id="b879b5f5" class="cell" data-execution_count="2">
+<div id="2da0004d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date</span>
@@ -2136,14 +2136,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Each kind of difference has its own field. <code>email</code> and <code>Email</code> appear in <code>only_in_source</code> and <code>only_in_target</code>, since column names are case-sensitive, and <code>case_only</code> points out that the two names differ only in case. <code>signup</code> is in <code>dtype_changed</code> with both data types, and <code>loaded_at</code> is new in the target.</p>
 <p>Because the schemas differ and <code>schema="strict"</code> is the default, no row passes:</p>
-<div id="fee8f358" class="cell" data-execution_count="3">
+<div id="d35168e0" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>comparison.schema_diff.matches, comparison.n_passed</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>(False, 0)</code></pre>
 </div>
 </div>
 <p>Pairing up the renamed column with <code>column_map=</code> resolves the case change, and <code>schema="common"</code> reports the other two differences without failing any rows:</p>
-<div id="03ed743d" class="cell" data-execution_count="4">
+<div id="942ba5a4" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>relaxed <span class="op">=</span> pb.compare(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    customers,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    customers_migrated,</span>
@@ -2158,7 +2158,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The rename now appears in <code>renamed</code>, and <code>case_only</code> is empty. The retyped <code>signup</code> column is still listed, but it no longer fails the comparison. When a column’s two data types can’t be compared directly (here, a date and a string), both sides are compared as strings, so the three dates still match:</p>
-<div id="edb6aaa0" class="cell" data-execution_count="5">
+<div id="6d963825" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>relaxed.status_counts</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>{'match': 3, 'changed': 0, 'missing': 0, 'extra': 0, 'dup_key': 0}</code></pre>
@@ -2209,12 +2209,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-text">
 <p>This is the yes-or-no answer behind the schema check in <a href="../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a>. It’s <code>False</code> if any of <code>only_in_source</code>, <code>only_in_target</code>, or <code>dtype_changed</code> is non-empty, or if <code>reordered</code> is <code>True</code>. Renames listed in <code>renamed</code> don’t count against it, because they were declared with <code>column_map=</code>. Names that differ only in case do count, since they also appear in <code>only_in_source</code> and <code>only_in_target</code>. Note that column order matters here: the same columns in a different order don’t match.</p>
-<p>With <code>schema="strict"</code> (the default in <code>compare()</code>), a <code>False</code> value here means the comparison fails as a whole, with no rows passing. With <code>schema="common"</code>, it’s reported but doesn’t affect the result. <a href="../reference/Comparison.schema_ok.html#pointblank.Comparison.schema_ok" class="gdls-link"><code>Comparison.schema_ok</code></a> combines the two: it’s this value under <code>"strict"</code> and always <code>True</code> under <code>"common"</code>.</p>
+<p>With <code>schema="strict"</code> (the default in <a href="../reference/compare.html#pointblank.compare" class="gdls-link gdls-code">compare()</a>), a <code>False</code> value here means the comparison fails as a whole, with no rows passing. With <code>schema="common"</code>, it’s reported but doesn’t affect the result. <a href="../reference/Comparison.schema_ok.html#pointblank.Comparison.schema_ok" class="gdls-link"><code>Comparison.schema_ok</code></a> combines the two: it’s this value under <code>"strict"</code> and always <code>True</code> under <code>"common"</code>.</p>
 </div>
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
 <p>Two tables with the same columns in a different order have different schemas, even though every value matches:</p>
-<div id="53804c6b" class="cell" data-execution_count="7">
+<div id="b015e363" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2229,7 +2229,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Since the default is <code>schema="strict"</code>, the comparison as a whole fails:</p>
-<div id="7a04fc3f" class="cell" data-execution_count="8">
+<div id="bcdf3376" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>comparison.schema_ok, comparison.n_passed</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>(False, 0)</code></pre>
@@ -2284,7 +2284,7 @@ A dictionary with the key <code>"matches"</code> (the value of <a href="../refer
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
 <p>Here, a new version of a table has changed the type of <code>amount</code> and added a column.</p>
-<div id="a9534590" class="cell" data-execution_count="10">
+<div id="f2c210b1" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2307,7 +2307,7 @@ A dictionary with the key <code>"matches"</code> (the value of <a href="../refer
 </div>
 </div>
 <p>Each data type change is a <code>[column, source dtype, target dtype]</code> list, and the result converts directly to JSON:</p>
-<div id="346ab228" class="cell" data-execution_count="11">
+<div id="93f479c3" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json.dumps(diff.to_dict()))</span></code></pre></div>

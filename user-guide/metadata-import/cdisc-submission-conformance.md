@@ -428,7 +428,7 @@ Rules are sorted by severity: failures first, then errors, then passes, then not
 
 The header shows a `PASS` or `FAIL` badge alongside the standard, version, and a full status breakdown (e.g., `SDTMIG 3-4 · 346 passed · 4 failed · 12 n/a`).
 
-Call `get_tabular_report()` to get the `GT` object directly if you need to embed it in a report pipeline:
+Call [get_tabular_report()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_tabular_report) to get the `GT` object directly if you need to embed it in a report pipeline:
 
 ``` python
 gt = report.get_tabular_report()
@@ -467,7 +467,7 @@ report_with_issues = pb.validate_sdtmig({"DM": dm_with_issues})
 report_with_issues.get_findings_table()
 ```
 
-    /Users/riannone/py_projects/pointblank/.venv/lib/python3.11/site-packages/great_tables/_render_checks.py:37: RenderWarning: Rendering table with .cols_width() in Quarto may result in unexpected behavior. This is because Quarto performs custom table processing. Either use all percentage widths, or set .tab_options(quarto_disable_processing=True) to disable Quarto table processing.
+    /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/great_tables/_render_checks.py:37: RenderWarning: Rendering table with .cols_width() in Quarto may result in unexpected behavior. This is because Quarto performs custom table processing. Either use all percentage widths, or set .tab_options(quarto_disable_processing=True) to disable Quarto table processing.
       warnings.warn(
 
 | Findings Report for CDISC Conformance |  |  |  |  |  |  |  |
@@ -484,7 +484,7 @@ The findings table groups its columns into two spanners:
 - **SDTM Rule Definition**: `Rule`, `Domain` and `Description` identify which rule fired and where.
 - **Finding**: `USUBJID` identifies the subject; `Column` and `Value` show exactly what was wrong; `Row` is the 1-based row number in the source dataset for quick lookup.
 
-At most 100 findings per rule are shown in the table. The true total for each rule is always visible in `get_tabular_report()`. To export findings to a spreadsheet or join them back to your source data, use [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) instead.
+At most 100 findings per rule are shown in the table. The true total for each rule is always visible in [get_tabular_report()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_tabular_report). To export findings to a spreadsheet or join them back to your source data, use [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) instead.
 
 ### Programmatic Access with findings_df()
 
@@ -540,9 +540,9 @@ shape: (3, 2)
 | rule_id    | n_violations |
 |------------|--------------|
 | str        | u32          |
-| "SDTM-007" | 1            |
 | "SDTM-195" | 1            |
 | "SDTM-010" | 1            |
+| "SDTM-007" | 1            |
 
 The DataFrame is empty (with the same schema) when all rules pass, so it is safe to call unconditionally in a script. Use it to triage failures before running the more time-intensive CDISC CORE engine, or to generate a custom summary report tailored to your team's workflow.
 
@@ -560,7 +560,7 @@ The bundled SDTMIG 3.4 catalog contains 362 rules across seven types:
 | `DEFINE_ITEM_METADATA_CHECK` | Variable declarations against Define-XML | Activated when `define_xml` is supplied |
 | `DEFINE_CODELIST_CHECK` | Codelist values against Define-XML | Activated when `define_xml` is supplied |
 
-Only `RECORD_CHECK`, `DATASET_CONTENTS_CHECK` and `DEFINE_CODELIST_CHECK` rules produce row-level findings accessible via [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) and [get_findings_table()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table). The other types report a violation count in `get_tabular_report()` but do not have individual record detail.
+Only `RECORD_CHECK`, `DATASET_CONTENTS_CHECK` and `DEFINE_CODELIST_CHECK` rules produce row-level findings accessible via [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) and [get_findings_table()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table). The other types report a violation count in [get_tabular_report()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_tabular_report) but do not have individual record detail.
 
 Rules that target a domain not present in your datasets have nothing to check, so they are reported as `pass`. For example, a rule that checks `AESTDTC` in the AE domain passes when no AE dataset is supplied. A `pass` therefore doesn't mean that a domain was checked: adding more domains to the dictionary passed to [validate_sdtmig()](../../reference/validate_sdtmig.md#pointblank.validate_sdtmig) gives the rules for those domains something to evaluate, giving a more complete conformance picture. Only rules that need an input that wasn't supplied (such as a Define-XML) are marked `not_applicable`.
 

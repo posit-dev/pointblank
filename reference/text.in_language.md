@@ -4,7 +4,7 @@ Make a validation step that checks that text is in the expected language.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/text.py#L297-L424)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/text.py#L297-L425)
 
 ``` python
 text.in_language(
@@ -25,7 +25,7 @@ text.in_language(
 )
 ```
 
-The step is a `col_vals_scored()` step with a [`langid()`](../reference/scorers.langid.md#pointblank.scorers.langid) scorer: a language identification model gives the probability that the text of each row is in one of the expected languages, and a row fails if the probability is below `min_confidence=`. The expected languages are the same for every row (`expected=`) or come from a column (`expected_column=`), for a corpus with documents in several languages.
+The step is a [col_vals_scored()](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) step with a [`langid()`](../reference/scorers.langid.md#pointblank.scorers.langid) scorer: a language identification model gives the probability that the text of each row is in one of the expected languages, and a row fails if the probability is below `min_confidence=`. The expected languages are the same for every row (`expected=`) or come from a column (`expected_column=`), for a corpus with documents in several languages.
 
 ## Parameters
 

@@ -4,7 +4,7 @@ Check a CDISC submission with the CDISC CORE engine.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2973-L3145)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2974-L3146)
 
 ``` python
 validate_cdisc_submission(

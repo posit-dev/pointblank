@@ -4,7 +4,7 @@ The base class for adapters that translate contracts to and from other formats.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L726-L1167)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L730-L1173)
 
 ``` python
 ContractAdapter()
@@ -14,7 +14,7 @@ An adapter is what connects an external format to [`import_contract()`](../refer
 
 A subclass sets a few class attributes and implements up to three methods:
 
-- [`detect()`](../reference/ContractAdapter.md#pointblank.ContractAdapter.detect) decides whether a source is in this format, which lets `import_contract()` find the adapter without being told `format=` (optional)
+- [`detect()`](../reference/ContractAdapter.md#pointblank.ContractAdapter.detect) decides whether a source is in this format, which lets [import_contract()](../reference/import_contract.md#pointblank.import_contract) find the adapter without being told `format=` (optional)
 - [`import_contract()`](../reference/ContractAdapter.md#pointblank.ContractAdapter.import_contract) reads a source and returns a [`ContractImport`](../reference/ContractImport.md#pointblank.ContractImport) whose rules are expressed as [`MappedConstraint`](../reference/adapters.MappedConstraint.md#pointblank.adapters.MappedConstraint) objects (needed for import)
 - [`export_contract()`](../reference/ContractAdapter.md#pointblank.ContractAdapter.export_contract) translates a [`Contract`](../reference/Contract.md#pointblank.Contract) or [`Validate`](../reference/Validate.md#pointblank.Validate) object into the format (needed for export)
 
@@ -121,7 +121,7 @@ class DataDictionaryAdapter(pb.ContractAdapter):
         return doc
 ```
 
-The bare `@pb.register_adapter` decorator registered the class under its `format_name`. Now a data dictionary can be imported with `import_contract()`, and its [detect()](../reference/ContractAdapter.md#pointblank.ContractAdapter.detect) method means there's no need for `format=`.
+The bare `@pb.register_adapter` decorator registered the class under its `format_name`. Now a data dictionary can be imported with [import_contract()](../reference/import_contract.md#pointblank.import_contract), and its [detect()](../reference/ContractAdapter.md#pointblank.ContractAdapter.detect) method means there's no need for `format=`.
 
 ``` python
 customers_dd = {
@@ -148,7 +148,7 @@ print(imported.summary())
 
 Four of the five column properties became constraints and the `pii` flag became a warning, which the coverage figure reflects. From here the import behaves like any other: it can be validated against a table, turned into a contract, or written out as code.
 
-Exporting runs in the other direction. A contract written in Pointblank can be shared as a data dictionary with `export_contract()`.
+Exporting runs in the other direction. A contract written in Pointblank can be shared as a data dictionary with [export_contract()](../reference/export_contract.md#pointblank.export_contract).
 
 ``` python
 orders_contract = pb.Contract(
@@ -188,7 +188,7 @@ print(json.dumps(pb.export_contract(orders_contract, format="data_dictionary"), 
       ]
     }
 
-The schema supplied the columns and their types, and the not-null and set-membership steps became `nullable` and `allowed` properties. The data dictionary format has nothing that corresponds to `col_vals_ge()`, so that step was left out.
+The schema supplied the columns and their types, and the not-null and set-membership steps became `nullable` and `allowed` properties. The data dictionary format has nothing that corresponds to [col_vals_ge()](../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge), so that step was left out.
 
 ## See Also
 
@@ -196,7 +196,7 @@ The schema supplied the columns and their types, and the not-null and set-member
 Register an adapter so that it can be used by name.
 
 [ContractImport](../reference/ContractImport.md#pointblank.ContractImport)  
-The object an adapter's `import_contract()` method returns.
+The object an adapter's [import_contract()](../reference/ContractAdapter.md#pointblank.ContractAdapter.import_contract) method returns.
 
 [MappedConstraint](../reference/adapters.MappedConstraint.md#pointblank.adapters.MappedConstraint)  
 The objects that hold translated rules.
@@ -218,7 +218,7 @@ Decide whether a source is in this adapter's format.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L922-L984)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L928-L990)
 
 ``` python
 detect(source)
@@ -233,7 +233,7 @@ Implementing this method is optional. The base class version raises `NotImplemen
 #### Parameters
 
 `source: Any`  
-The `source=` value given to `import_contract()`: usually a file path string or a dictionary, but it could be any object.
+The `source=` value given to [import_contract()](../reference/import_contract.md#pointblank.import_contract): usually a file path string or a dictionary, but it could be any object.
 
 #### Returns
 
@@ -273,7 +273,7 @@ Read a source in this format and translate it into Pointblank terms.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L986-L1073)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L992-L1079)
 
 ``` python
 import_contract(
@@ -352,7 +352,7 @@ Translate a Pointblank contract or validation into this format.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L1075-L1167)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L1081-L1173)
 
 ``` python
 export_contract(
@@ -386,7 +386,7 @@ The exported document.
 
 #### Examples
 
-This adapter exports a contract as a list of column rules, writing a lower bound for each `col_vals_ge()` step and leaving out every other kind of step.
+This adapter exports a contract as a list of column rules, writing a lower bound for each [col_vals_ge()](../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge) step and leaving out every other kind of step.
 
 ``` python
 import pointblank as pb
@@ -426,4 +426,4 @@ ColumnRulesAdapter().export_contract(contract)
 
     {'column_rules': [{'column': 'age', 'min': 0}]}
 
-Only the `col_vals_ge()` step was written, since the format has no way to express a not-null rule. After registering the class with [`register_adapter()`](../reference/register_adapter.md#pointblank.register_adapter), the same export is available as `pb.export_contract(contract, format="column_rules")`.
+Only the [col_vals_ge()](../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge) step was written, since the format has no way to express a not-null rule. After registering the class with [`register_adapter()`](../reference/register_adapter.md#pointblank.register_adapter), the same export is available as `pb.export_contract(contract, format="column_rules")`.

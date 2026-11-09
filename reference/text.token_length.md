@@ -4,7 +4,7 @@ Make a validation step that checks the length of text in tokens.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/text.py#L427-L526)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/text.py#L428-L528)
 
 ``` python
 text.token_length(
@@ -23,7 +23,7 @@ text.token_length(
 )
 ```
 
-A language model reads text as tokens, and most have a limit on how many they can take in, so the documents of a corpus for training (or a set of prompts) need to be neither too short nor too long, in the tokens of the model's tokenizer. The step is a `col_vals_scored()` step with a [`token_count()`](../reference/scorers.token_count.md#pointblank.scorers.token_count) scorer, and a row fails if its number of tokens is below `min_val=` or above `max_val=`.
+A language model reads text as tokens, and most have a limit on how many they can take in, so the documents of a corpus for training (or a set of prompts) need to be neither too short nor too long, in the tokens of the model's tokenizer. The step is a [col_vals_scored()](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) step with a [`token_count()`](../reference/scorers.token_count.md#pointblank.scorers.token_count) scorer, and a row fails if its number of tokens is below `min_val=` or above `max_val=`.
 
 ## Parameters
 

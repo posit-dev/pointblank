@@ -4,7 +4,7 @@ Get per-dimension health scores from the validation results.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22569-L22678)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22574-L22683)
 
 ``` python
 Validate.get_dimension_scores(by=None)
@@ -70,7 +70,7 @@ validation.get_dimension_scores(by="f")
      'low': {'completeness': 100.0, 'validity': 40.0},
      'mid': {'completeness': 50.0, 'validity': 100.0}}
 
-The rows with `f` of `"low"` have no missing values in `c`, but only 2 of their 5 values in `d` are above 1000. The `rows_distinct()` step isn't segmented, so it's not part of the scores of any segment.
+The rows with `f` of `"low"` have no missing values in `c`, but only 2 of their 5 values in `d` are above 1000. The [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step isn't segmented, so it's not part of the scores of any segment.
 
 ## See Also
 

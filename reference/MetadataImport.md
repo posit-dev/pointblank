@@ -4,7 +4,7 @@ The metadata for a single dataset.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L585-L1107)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L585-L1108)
 
 ``` python
 MetadataImport(
@@ -165,7 +165,7 @@ Build a validation plan for a table from the metadata.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L740-L833)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L740-L834)
 
 ``` python
 to_validate(
@@ -263,7 +263,7 @@ print(meta.to_validate(data=transactions).to_code())
 
     validation
 
-Each step can be traced back to the metadata. For instance, the `rows_distinct()` step for `transaction_id` comes from its `unique` constraint, and the `col_vals_not_in_set()` steps check the `"NA"` and `"N/A"` markers declared for the string columns.
+Each step can be traced back to the metadata. For instance, the [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step for `transaction_id` comes from its `unique` constraint, and the [col_vals_not_in_set()](../reference/Validate.col_vals_not_in_set.md#pointblank.Validate.col_vals_not_in_set) steps check the `"NA"` and `"N/A"` markers declared for the string columns.
 
 ### to_schema()
 
@@ -304,7 +304,7 @@ Get the metadata of a variable by name.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L835-L871)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L836-L872)
 
 ``` python
 get_variable(name)
@@ -346,7 +346,7 @@ Get a codelist by name.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L951-L988)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L952-L989)
 
 ``` python
 get_codelist(name)
@@ -394,7 +394,7 @@ Build a [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) for 
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L873-L949)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L874-L950)
 
 ``` python
 missing_specs()
@@ -457,7 +457,7 @@ Get a text summary of the metadata.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1009-L1094)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1010-L1095)
 
 ``` python
 summary()

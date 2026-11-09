@@ -130,9 +130,9 @@ shape: (2, 4)
 | 6         | 299      | "exact" | "Order 1005: the fan I bought h… |
 | 18        | 300      | "near"  | "ORDER 1017 - THE HEATER I BOUG… |
 
-The other attributes have the numbers behind the report (`overlap`, `labels`, and `drift`), and `to_dict()` gives all of them as a dictionary that can be written as JSON.
+The other attributes have the numbers behind the report (`overlap`, `labels`, and `drift`), and [to_dict()](../../reference/SplitCheck.to_dict.md#pointblank.SplitCheck.to_dict) gives all of them as a dictionary that can be written as JSON.
 
-The report is in English by default, and `get_tabular_report()` takes `lang=` and `locale=` for another language (the messages of [issues](../../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) stay in English):
+The report is in English by default, and [get_tabular_report()](../../reference/SplitCheck.get_tabular_report.md#pointblank.SplitCheck.get_tabular_report) takes `lang=` and `locale=` for another language (the messages of [issues](../../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) stay in English):
 
 ``` python
 check.get_tabular_report(lang="es")
@@ -158,7 +158,7 @@ check.get_tabular_report(lang="es")
 
 ## Contamination by Other Data
 
-[check_splits()](../../reference/check_splits.md#pointblank.check_splits) checks a dataset's own splits. To check that training data doesn't contain the questions of a benchmark that the model will be judged on (or any other text that shouldn't be in it), use the `rows_not_contaminated()` validation method, which is a step of a validation like any other (see the [Checking Text Data](../advanced-validation/text-checks.md) article).
+[check_splits()](../../reference/check_splits.md#pointblank.check_splits) checks a dataset's own splits. To check that training data doesn't contain the questions of a benchmark that the model will be judged on (or any other text that shouldn't be in it), use the [rows_not_contaminated()](../../reference/Validate.rows_not_contaminated.md#pointblank.Validate.rows_not_contaminated) validation method, which is a step of a validation like any other (see the [Checking Text Data](../advanced-validation/text-checks.md) article).
 
 ## Conclusion
 

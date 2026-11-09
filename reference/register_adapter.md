@@ -4,7 +4,7 @@ Register a contract adapter so that it can be used for import and export.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_registry.py#L11-L153)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_registry.py#L11-L155)
 
 ``` python
 register_adapter(format_name=None)
@@ -80,7 +80,7 @@ for name, info in pb.list_adapters().items():
     odcs               import=True  export=True
     required_columns   import=True  export=False
 
-And it can be used with `import_contract()`, either by name or (since it implements [detect()](../reference/ContractAdapter.md#pointblank.ContractAdapter.detect)) by letting the format be detected from the content.
+And it can be used with [import_contract()](../reference/import_contract.md#pointblank.import_contract), either by name or (since it implements [detect()](../reference/ContractAdapter.md#pointblank.ContractAdapter.detect)) by letting the format be detected from the content.
 
 ``` python
 imported = pb.import_contract({"required_columns": ["id", "email"]})
@@ -91,7 +91,7 @@ imported.constraints
     [MappedConstraint('col_vals_not_null', columns='id'),
      MappedConstraint('col_vals_not_null', columns='email')]
 
-Exporting to this format isn't possible, so `export_contract()` raises an error that says so.
+Exporting to this format isn't possible, so [export_contract()](../reference/export_contract.md#pointblank.export_contract) raises an error that says so.
 
 ``` python
 contract = pb.Contract(name="users", steps=[pb.Step("col_vals_not_null", columns="id")])
@@ -112,7 +112,7 @@ The error is about the adapter, not the contract. To make the format work in bot
 The base class to subclass when writing an adapter.
 
 [ContractImport](../reference/ContractImport.md#pointblank.ContractImport)  
-What an adapter's `import_contract()` method returns.
+What an adapter's [import_contract()](../reference/ContractAdapter.md#pointblank.ContractAdapter.import_contract) method returns.
 
 [list_adapters()](../reference/list_adapters.md#pointblank.list_adapters)  
 List the registered adapters.

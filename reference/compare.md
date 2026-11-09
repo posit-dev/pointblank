@@ -25,7 +25,7 @@ compare(
 )
 ```
 
-A common data question is *how do these two tables differ?* You may have refactored a pipeline and want to know whether its output changed, migrated a table from one database to another, or received a new extract of a data feed. Spot checks and row counts can tell you *that* something changed. The `compare()` function tells you *which* rows changed, how, and in which columns.
+A common data question is *how do these two tables differ?* You may have refactored a pipeline and want to know whether its output changed, migrated a table from one database to another, or received a new extract of a data feed. Spot checks and row counts can tell you *that* something changed. The [compare()](../reference/compare.md#pointblank.compare) function tells you *which* rows changed, how, and in which columns.
 
 It aligns the rows of a *source* table (the reference, or expected data) with those of a *target* table (the data being checked) and classifies every aligned row: rows that match, rows whose values changed, rows missing from the target, and extra rows in the target. It also reports schema differences (columns added, removed, retyped, or reordered). The result is a [`Comparison`](../reference/Comparison.md#pointblank.Comparison) object. It holds the counts, gives samples of the differing rows on request, and displays as a tabular report in a notebook.
 

@@ -4,7 +4,7 @@ A single validation step, stored as data.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L18-L340)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L18-L341)
 
 ``` python
 Step(
@@ -26,7 +26,7 @@ The step's parts are available as the `method` attribute (the method name) and t
 The name of the validation method to call, such as `"col_vals_gt"` or `"rows_distinct"`. A [Step](../reference/Step.md#pointblank.Step) doesn't check the name itself. A [`Contract`](../reference/Contract.md#pointblank.Contract) accepts only its supported methods (listed in its *Supported Step Methods* section) and raises a `ValueError` for any other name. Steps used through [`Steps`](../reference/Steps.md#pointblank.Steps) and [`Validate.add_steps()`](../reference/Validate.add_steps.md#pointblank.Validate.add_steps) can name any validation method.
 
 `**kwargs: Any`  
-The arguments for the validation method, given by keyword (e.g., `columns="amount"`, `value=0`). They're stored as given and passed to the method when the step is compiled, so a misspelled or missing argument raises a `TypeError` at that point rather than when the step is created. Positional arguments aren't supported. The one validation method that takes positional arguments, `conjointly()`, receives its expressions as a list in `exprs=` (e.g., `pb.Step("conjointly", exprs=[lambda df: pl.col("a") > 0])`).
+The arguments for the validation method, given by keyword (e.g., `columns="amount"`, `value=0`). They're stored as given and passed to the method when the step is compiled, so a misspelled or missing argument raises a `TypeError` at that point rather than when the step is created. Positional arguments aren't supported. The one validation method that takes positional arguments, [conjointly()](../reference/Validate.conjointly.md#pointblank.Validate.conjointly), receives its expressions as a list in `exprs=` (e.g., `pb.Step("conjointly", exprs=[lambda df: pl.col("a") > 0])`).
 
 ## Returns
 
@@ -38,7 +38,7 @@ A [Step](../reference/Step.md#pointblank.Step) object.
 A contract's steps are written to YAML as a mapping from the method name to its arguments, so a step can be saved only if its arguments are plain data: strings, numbers, booleans, dates, lists, and dictionaries. Step-level thresholds are the exception, since a [`Thresholds`](../reference/Thresholds.md#pointblank.Thresholds) object or a tuple is converted to a dictionary of levels automatically. Other objects can't be saved, and [`Contract.to_yaml()`](../reference/Contract.md#pointblank.Contract.to_yaml) raises a `ValueError` that names the step and argument holding one. Keep these in mind for steps you plan to save:
 
 - name columns with strings or lists of strings, rather than with selectors like `pb.starts_with()` or `pb.col()`
-- steps that take an expression or a function, such as `col_vals_expr` and `conjointly`, can only be used in contracts kept in Python
+- steps that take an expression or a function, such as [col_vals_expr](../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) and [conjointly](../reference/Validate.conjointly.md#pointblank.Validate.conjointly), can only be used in contracts kept in Python
 
 All of these work when the step is used directly in Python.
 
@@ -70,7 +70,7 @@ print(age_step.kwargs)
     col_vals_between
     {'columns': 'age', 'left': 0, 'right': 120}
 
-Steps are normally used in groups. Here are three more rules for a table of patients: each patient ID must appear only once, IDs must follow a pattern, and the `visit` column must be present. Note that `rows_distinct` takes `columns_subset=` rather than `columns=`, because each step's arguments are exactly those of its [Validate](../reference/Validate.md#pointblank.Validate) method.
+Steps are normally used in groups. Here are three more rules for a table of patients: each patient ID must appear only once, IDs must follow a pattern, and the `visit` column must be present. Note that [rows_distinct](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) takes `columns_subset=` rather than `columns=`, because each step's arguments are exactly those of its [Validate](../reference/Validate.md#pointblank.Validate) method.
 
 ``` python
 patient_steps = [
@@ -143,7 +143,7 @@ Convert the step to a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L197-L255)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L198-L256)
 
 ``` python
 to_dict()
@@ -199,7 +199,7 @@ Create a step from a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L257-L340)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L258-L341)
 
 ``` python
 from_dict(data)
@@ -253,7 +253,7 @@ steps
      Step('col_vals_gt', columns='amount', value=0),
      Step('rows_complete')]
 
-The `rows_complete:` entry has no value, so its step has no arguments. A step converted with `to_dict()` and back is equal to the original:
+The `rows_complete:` entry has no value, so its step has no arguments. A step converted with [to_dict()](../reference/Step.md#pointblank.Step.to_dict) and back is equal to the original:
 
 ``` python
 step = pb.Step("col_vals_in_set", columns="status", set=["open", "closed"])

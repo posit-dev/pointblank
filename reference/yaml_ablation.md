@@ -4,7 +4,7 @@ Set up an ablation from a YAML configuration.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1394-L1568)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1394-L1569)
 
 ``` python
 yaml_ablation(
@@ -37,7 +37,7 @@ A table to use in place of the block's `holdout:` (the holdout set that the vali
 Modules to make available to Python code in the configuration (as in [yaml_interrogate()](../reference/yaml_interrogate.md#pointblank.yaml_interrogate)). This only has an effect with `allow_python=True`.
 
 `allow_python: bool = False`  
-Whether to run Python code in the configuration. The `evaluate:` of the `ablation:` block is Python code (it imports a function and runs it on the training data), so it's only used with `allow_python=True`. Without it, either pass `evaluate=` or leave `evaluate:` out (e.g., to `export()` the versions of the table for evaluation elsewhere).
+Whether to run Python code in the configuration. The `evaluate:` of the `ablation:` block is Python code (it imports a function and runs it on the training data), so it's only used with `allow_python=True`. Without it, either pass `evaluate=` or leave `evaluate:` out (e.g., to [export()](../reference/Ablation.export.md#pointblank.Ablation.export) the versions of the table for evaluation elsewhere).
 
 ## Returns
 

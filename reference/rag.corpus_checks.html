@@ -2049,7 +2049,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L88-L306" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L88-L308" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">rag</span><span class="op">.</span><span class="fu">corpus_checks</span>(</span>
@@ -2073,12 +2073,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="doc-text">
 <p>The answers of a retrieval-augmented generation (RAG) system are only as good as the chunks of text it retrieves. Common problems of a corpus are chunks with no text (from a failed extraction of a PDF, say), chunks too short to be useful or too long for the model, the same text in many chunks (which crowds out the others in the results of a search), chunks without the metadata that the system needs (such as the source to cite, or the access control list that says who can see it), and documents that haven’t been updated in a long time. This function makes a validation step for each of them:</p>
 <ul>
-<li>every chunk has text (not missing, and not only whitespace): a <code>col_vals_regex()</code> step</li>
-<li>the chunk ids are unique, with <code>chunk_id=</code>: a <code>rows_distinct()</code> step</li>
-<li>every chunk has a value of each column of <code>metadata=</code>: a <code>col_vals_not_null()</code> step for each</li>
+<li>every chunk has text (not missing, and not only whitespace): a <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a> step</li>
+<li>the chunk ids are unique, with <code>chunk_id=</code>: a <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> step</li>
+<li>every chunk has a value of each column of <code>metadata=</code>: a <a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a> step for each</li>
 <li>the chunks have between <code>min_tokens=</code> and <code>max_tokens=</code> tokens, with either: a step of <a href="../reference/text.token_length.html#pointblank.text.token_length" class="gdls-link"><code>pb.text.token_length()</code></a></li>
-<li>no chunk is a near duplicate of another, unless <code>near_duplicates=False</code>: a <code>rows_near_distinct()</code> step</li>
-<li>every chunk was updated in the <code>max_age=</code> before the reference time, with <code>updated_at=</code>: a <code>col_vals_ge()</code> step</li>
+<li>no chunk is a near duplicate of another, unless <code>near_duplicates=False</code>: a <a href="../reference/Validate.rows_near_distinct.html#pointblank.Validate.rows_near_distinct" class="gdls-link gdls-code">rows_near_distinct()</a> step</li>
+<li>every chunk was updated in the <code>max_age=</code> before the reference time, with <code>updated_at=</code>: a <a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link gdls-code">col_vals_ge()</a> step</li>
 </ul>
 <p>Checks of the metadata of access control (like a column of the groups that can see a chunk) matter for security as much as for quality: a chunk without one may be shown to anyone, or to no one, depending on how the system treats a missing value.</p>
 </div>
@@ -2112,7 +2112,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">near_duplicates</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool | float</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-<p>Whether to check for near duplicates (<code>True</code> by default), or the threshold of the similarity of two chunks for them to be near duplicates (the <code>threshold=</code> of <code>rows_near_distinct()</code>, <code>0.85</code> with <code>True</code>).</p>
+<p>Whether to check for near duplicates (<code>True</code> by default), or the threshold of the similarity of two chunks for them to be near duplicates (the <code>threshold=</code> of <a href="../reference/Validate.rows_near_distinct.html#pointblank.Validate.rows_near_distinct" class="gdls-link gdls-code">rows_near_distinct()</a>, <code>0.85</code> with <code>True</code>).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">updated_at</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -2163,7 +2163,7 @@ The steps, to be added to a validation with <a href="../reference/Validate.add_s
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s check a small corpus of chunks of help articles, each with an id, a source, and the groups that can see it.</p>
-<div id="017d0549" class="cell" data-execution_count="2">
+<div id="37ea0dd5" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datetime</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>

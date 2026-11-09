@@ -4,7 +4,7 @@ Validate whether rows have a score from a model within bounds.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14798-L15099)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14801-L15102)
 
 ``` python
 Validate.col_vals_scored(

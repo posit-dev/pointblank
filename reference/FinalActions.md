@@ -94,7 +94,7 @@ validation = (
     ALERT: Critical validation failures found in small_table
     2 of 3 steps had failures
 
-The three outputs appear in the order the actions were given. A string action is printed as is, while the functions can use the summary to decide what to do. Two of the three steps have failures (`d` has values of `1000` or less and `c` has missing values), and only the `col_exists()` step passes.
+The three outputs appear in the order the actions were given. A string action is printed as is, while the functions can use the summary to decide what to do. Two of the three steps have failures (`d` has values of `1000` or less and `c` has missing values), and only the [col_exists()](../reference/Validate.col_exists.md#pointblank.Validate.col_exists) step passes.
 
 ## See Also
 

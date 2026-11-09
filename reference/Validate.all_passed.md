@@ -4,7 +4,7 @@ Determine if every validation step passed perfectly, with no failing test units.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20207-L20260)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20211-L20264)
 
 ``` python
 Validate.all_passed()

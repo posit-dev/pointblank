@@ -4,7 +4,7 @@ Enforce data contracts at both ends of a data transformation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L371-L1555)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L373-L1557)
 
 ``` python
 Pipeline(
@@ -77,7 +77,7 @@ When a boundary fails, the pipeline applies that contract's `on_violation=` sett
 
 ## Serialization
 
-A pipeline can be stored as YAML with [`to_yaml()`](../reference/Pipeline.md#pointblank.Pipeline.to_yaml) and read back with [`from_yaml()`](../reference/Pipeline.md#pointblank.Pipeline.from_yaml), or converted to and from a dictionary with [`to_dict()`](../reference/Pipeline.md#pointblank.Pipeline.to_dict) and [`from_dict()`](../reference/Pipeline.md#pointblank.Pipeline.from_dict). The stored form holds the label, thresholds, and `short_circuit=` setting under a `pipeline` key, plus the two contracts under `source` and `target`. Actions and final actions are functions or messages tied to your environment, so they aren't stored. Pass them again when you recreate the pipeline. The transformation isn't part of the pipeline either: it's given to `run()` each time.
+A pipeline can be stored as YAML with [`to_yaml()`](../reference/Pipeline.md#pointblank.Pipeline.to_yaml) and read back with [`from_yaml()`](../reference/Pipeline.md#pointblank.Pipeline.from_yaml), or converted to and from a dictionary with [`to_dict()`](../reference/Pipeline.md#pointblank.Pipeline.to_dict) and [`from_dict()`](../reference/Pipeline.md#pointblank.Pipeline.from_dict). The stored form holds the label, thresholds, and `short_circuit=` setting under a `pipeline` key, plus the two contracts under `source` and `target`. Actions and final actions are functions or messages tied to your environment, so they aren't stored. Pass them again when you recreate the pipeline. The transformation isn't part of the pipeline either: it's given to [run()](../reference/Pipeline.md#pointblank.Pipeline.run) each time.
 
 ## Examples
 
@@ -214,7 +214,7 @@ The batch was caught at the source boundary, so nothing reached the target table
 ## See Also
 
 [PipelineResult](../reference/PipelineResult.md#pointblank.PipelineResult)  
-The result of `run()`, holding both boundary validations.
+The result of [run()](../reference/Pipeline.md#pointblank.Pipeline.run), holding both boundary validations.
 
 [Contract](../reference/Contract.md#pointblank.Contract)  
 Define the source and target contracts.
@@ -240,7 +240,7 @@ Validate the input, transform it, and validate the output.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L851-L1048)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L853-L1050)
 
 ``` python
 run(
@@ -322,7 +322,7 @@ print(f"target passed: {result.target_passed}")
 
     UserWarning: Contract 'customers' (target) violated: validation has failing steps.
 
-The input was fine and the output wasn't, which points to the transformation. In the target validation, the `rows_distinct` step flags both rows for customer 3. The default `on_violation="warn"` setting also issued a warning.
+The input was fine and the output wasn't, which points to the transformation. In the target validation, the [rows_distinct](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step flags both rows for customer 3. The default `on_violation="warn"` setting also issued a warning.
 
 ``` python
 result.target_validation
@@ -380,7 +380,7 @@ Check incoming data against the source contract.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L642-L742)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L644-L744)
 
 ``` python
 validate_source(data)
@@ -459,7 +459,7 @@ Check transformed data against the target contract.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L744-L849)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L746-L851)
 
 ``` python
 validate_target(data)
@@ -527,7 +527,7 @@ validation
 
 [TABLE]
 
-The `rows_distinct` step fails for both copies of `"2025-03-02"`, and a message is written to the `"pointblank.contract"` logger. Because the method returns the validation, the job can decide what to do with the result:
+The [rows_distinct](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step fails for both copies of `"2025-03-02"`, and a message is written to the `"pointblank.contract"` logger. Because the method returns the validation, the job can decide what to do with the result:
 
 ``` python
 validation.all_passed()
@@ -543,7 +543,7 @@ Write the pipeline as YAML.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1466-L1543)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1468-L1545)
 
 ``` python
 to_yaml(path=None)
@@ -625,7 +625,7 @@ Read a pipeline from a YAML file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1336-L1464)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1338-L1466)
 
 ``` python
 from_yaml(path)
@@ -737,7 +737,7 @@ Convert the pipeline to a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1142-L1212)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1144-L1214)
 
 ``` python
 to_dict()
@@ -793,7 +793,7 @@ Create a pipeline from a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1214-L1334)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1216-L1336)
 
 ``` python
 from_dict(data)
@@ -863,4 +863,4 @@ export_pipeline.validate_target(invoices)
 
 [TABLE]
 
-The invoice with a total of `0.0` fails the `col_vals_gt` step and reaches the warning threshold set in the pipeline definition.
+The invoice with a total of `0.0` fails the [col_vals_gt](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) step and reaches the warning threshold set in the pipeline definition.

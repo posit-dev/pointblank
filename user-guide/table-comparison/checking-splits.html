@@ -698,7 +698,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-splits" class="level1">
 <h1>The Splits</h1>
 <p>Let’s make three splits of a dataset of support tickets, labelled with their topic, for a model that sorts new tickets by topic. Each ticket also records how many days the customer waited. The test split was collected later than the others, and it shows: there are no tickets about returns, the waits are longer, and two tickets were copied from the training split (one as it is, and one in capital letters with different punctuation).</p>
-<div id="90d2959c" class="cell" data-execution_count="2">
+<div id="ade3267a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -897,7 +897,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-the-splits" class="level1">
 <h1>Checking the Splits</h1>
 <p>The splits are given in order, as <code>train=</code>, <code>valid=</code>, and <code>test=</code> (or as a dictionary of splits by name, with <code>splits=</code>). We’ll say which column identifies a ticket (its text) and which has the labels, and ask for rows that are nearly the same as well as rows that are the same.</p>
-<div id="e535a285" class="cell" data-execution_count="3">
+<div id="7bde7019" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>check <span class="op">=</span> pb.check_splits(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    train<span class="op">=</span>train, valid<span class="op">=</span>valid, test<span class="op">=</span>test, columns<span class="op">=</span><span class="st">"text"</span>, label<span class="op">=</span><span class="st">"topic"</span>, near<span class="op">=</span><span class="va">True</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1047,7 +1047,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-results" class="level1">
 <h1>The Results</h1>
 <p>The problems found are also in the <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> attribute, as messages, and <code>ok</code> is <code>True</code> when there are none, which makes a check of the splits easy to put in a test or a pipeline.</p>
-<div id="1a03f3cd" class="cell" data-execution_count="4">
+<div id="6af6c25e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>check.issues</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>["2 rows of 'test' (0.7%) are also in 'train' (1 the same and 1 nearly the same).",
@@ -1057,7 +1057,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The <a href="../../reference/SplitCheck.get_overlap.html#pointblank.SplitCheck.get_overlap" class="gdls-link gdls-code">get_overlap()</a> method gives the overlapping rows of a pair of splits, with the row number of each in its own split.</p>
-<div id="1549ab09" class="cell" data-execution_count="5">
+<div id="01bb2b7a" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>check.get_overlap(<span class="st">"train"</span>, <span class="st">"test"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div><style>
@@ -1070,9 +1070,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <small>shape: (2, 4)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>train_row</th><th>test_row</th><th>overlap</th><th>text</th></tr><tr><td>i64</td><td>i64</td><td>str</td><td>str</td></tr></thead><tbody><tr><td>6</td><td>299</td><td>"exact"</td><td>"Order 1005: the fan I bought h…</td></tr><tr><td>18</td><td>300</td><td>"near"</td><td>"ORDER 1017 - THE HEATER I BOUG…</td></tr></tbody></table></div>
 </div>
 </div>
-<p>The other attributes have the numbers behind the report (<code>overlap</code>, <code>labels</code>, and <code>drift</code>), and <code>to_dict()</code> gives all of them as a dictionary that can be written as JSON.</p>
-<p>The report is in English by default, and <code>get_tabular_report()</code> takes <code>lang=</code> and <code>locale=</code> for another language (the messages of <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> stay in English):</p>
-<div id="e755a7e9" class="cell" data-execution_count="6">
+<p>The other attributes have the numbers behind the report (<code>overlap</code>, <code>labels</code>, and <code>drift</code>), and <a href="../../reference/SplitCheck.to_dict.html#pointblank.SplitCheck.to_dict" class="gdls-link gdls-code">to_dict()</a> gives all of them as a dictionary that can be written as JSON.</p>
+<p>The report is in English by default, and <a href="../../reference/SplitCheck.get_tabular_report.html#pointblank.SplitCheck.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a> takes <code>lang=</code> and <code>locale=</code> for another language (the messages of <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> stay in English):</p>
+<div id="1fe84bbe" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>check.get_tabular_report(lang<span class="op">=</span><span class="st">"es"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_split_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1210,7 +1210,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="contamination-by-other-data" class="level1">
 <h1>Contamination by Other Data</h1>
-<p><a href="../../reference/check_splits.html#pointblank.check_splits" class="gdls-link gdls-code">check_splits()</a> checks a dataset’s own splits. To check that training data doesn’t contain the questions of a benchmark that the model will be judged on (or any other text that shouldn’t be in it), use the <code>rows_not_contaminated()</code> validation method, which is a step of a validation like any other (see the <a href="../../user-guide/advanced-validation/text-checks.html">Checking Text Data</a> article).</p>
+<p><a href="../../reference/check_splits.html#pointblank.check_splits" class="gdls-link gdls-code">check_splits()</a> checks a dataset’s own splits. To check that training data doesn’t contain the questions of a benchmark that the model will be judged on (or any other text that shouldn’t be in it), use the <a href="../../reference/Validate.rows_not_contaminated.html#pointblank.Validate.rows_not_contaminated" class="gdls-link gdls-code">rows_not_contaminated()</a> validation method, which is a step of a validation like any other (see the <a href="../../user-guide/advanced-validation/text-checks.html">Checking Text Data</a> article).</p>
 </section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>

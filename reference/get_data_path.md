@@ -4,7 +4,7 @@ Get the file path to a dataset included with the Pointblank package.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1562-L1727)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1562-L1728)
 
 ``` python
 get_data_path(
@@ -70,7 +70,7 @@ validation
 
 [TABLE]
 
-The CSV file is read into a table during interrogation. The three `col_exists()` steps and the `col_vals_gt()` step all pass.
+The CSV file is read into a table during interrogation. The three [col_exists()](../reference/Validate.col_exists.md#pointblank.Validate.col_exists) steps and the [col_vals_gt()](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) step all pass.
 
 We can also get a Parquet file path for validation examples:
 

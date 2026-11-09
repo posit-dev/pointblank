@@ -4,7 +4,7 @@ Read the results of evaluations made elsewhere, and compute the effects.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3320-L3502)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3321-L3503)
 
 ``` python
 Ablation.load_results(
@@ -18,10 +18,10 @@ This is the second half of an ablation split with [`export()`](../reference/Abla
 ## Parameters
 
 `results: Any`  
-The metrics of the evaluations: the path of a CSV file, the path of a directory with a `results.csv` file (e.g., the directory written by `export()`), or a table (e.g., a Polars or pandas DataFrame). It needs a `variant` column (the id of the version of the table), a `seed` column, and a column for each metric. A `repeat` column is checked if it's there, and any other column is a metric.
+The metrics of the evaluations: the path of a CSV file, the path of a directory with a `results.csv` file (e.g., the directory written by [export()](../reference/Ablation.export.md#pointblank.Ablation.export)), or a table (e.g., a Polars or pandas DataFrame). It needs a `variant` column (the id of the version of the table), a `seed` column, and a column for each metric. A `repeat` column is checked if it's there, and any other column is a metric.
 
 `manifest: str | os.PathLike[str] | None = None`  
-The path of the `manifest.json` file written by `export()` (or of its directory). By default, a manifest in the same directory as the results file is used if there is one. Its fingerprints are checked against the ablation, which makes sure that the results are for the same data and the same versions of the table.
+The path of the `manifest.json` file written by [export()](../reference/Ablation.export.md#pointblank.Ablation.export) (or of its directory). By default, a manifest in the same directory as the results file is used if there is one. Its fingerprints are checked against the ablation, which makes sure that the results are for the same data and the same versions of the table.
 
 ## Returns
 

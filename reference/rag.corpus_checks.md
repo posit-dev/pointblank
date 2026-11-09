@@ -4,7 +4,7 @@ Make validation steps that check the corpus of a RAG system.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L88-L306)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L88-L308)
 
 ``` python
 rag.corpus_checks(
@@ -28,12 +28,12 @@ rag.corpus_checks(
 
 The answers of a retrieval-augmented generation (RAG) system are only as good as the chunks of text it retrieves. Common problems of a corpus are chunks with no text (from a failed extraction of a PDF, say), chunks too short to be useful or too long for the model, the same text in many chunks (which crowds out the others in the results of a search), chunks without the metadata that the system needs (such as the source to cite, or the access control list that says who can see it), and documents that haven't been updated in a long time. This function makes a validation step for each of them:
 
-- every chunk has text (not missing, and not only whitespace): a `col_vals_regex()` step
-- the chunk ids are unique, with `chunk_id=`: a `rows_distinct()` step
-- every chunk has a value of each column of `metadata=`: a `col_vals_not_null()` step for each
+- every chunk has text (not missing, and not only whitespace): a [col_vals_regex()](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) step
+- the chunk ids are unique, with `chunk_id=`: a [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step
+- every chunk has a value of each column of `metadata=`: a [col_vals_not_null()](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) step for each
 - the chunks have between `min_tokens=` and `max_tokens=` tokens, with either: a step of [`pb.text.token_length()`](../reference/text.token_length.md#pointblank.text.token_length)
-- no chunk is a near duplicate of another, unless `near_duplicates=False`: a `rows_near_distinct()` step
-- every chunk was updated in the `max_age=` before the reference time, with `updated_at=`: a `col_vals_ge()` step
+- no chunk is a near duplicate of another, unless `near_duplicates=False`: a [rows_near_distinct()](../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct) step
+- every chunk was updated in the `max_age=` before the reference time, with `updated_at=`: a [col_vals_ge()](../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge) step
 
 Checks of the metadata of access control (like a column of the groups that can see a chunk) matter for security as much as for quality: a chunk without one may be shown to anyone, or to no one, depending on how the system treats a missing value.
 
@@ -58,7 +58,7 @@ The fewest and the most tokens that a chunk can have. The check is left out if b
 The tokenizer of the check of the number of tokens, as in [`pb.text.token_length()`](../reference/text.token_length.md#pointblank.text.token_length) (by default, `"whitespace"`, which counts words). Use the tokenizer of the embedding model or the language model of the system for an accurate count.
 
 `near_duplicates: bool | float = True`  
-Whether to check for near duplicates (`True` by default), or the threshold of the similarity of two chunks for them to be near duplicates (the `threshold=` of `rows_near_distinct()`, `0.85` with `True`).
+Whether to check for near duplicates (`True` by default), or the threshold of the similarity of two chunks for them to be near duplicates (the `threshold=` of [rows_near_distinct()](../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct), `0.85` with `True`).
 
 `updated_at: str | None = None`  
 The column with the time each chunk (or its document) was last updated, for the check of freshness. It needs `max_age=`.

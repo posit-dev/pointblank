@@ -85,7 +85,7 @@ The steps check, in order (and the brief of each says what it checks):
 - **Unique ids.** No two chunks have the same id. The id `bill-2` is used for two different chunks, so a citation of `bill-2` could mean either.
 - **Metadata.** Every chunk has a value of each column of `metadata=`, with a step for each. The chunk about holidays has no source to cite and no access control list. A chunk without an access control list is a problem of security as much as of quality: it may be shown to anyone, or to no one, depending on how the system treats a missing value.
 - **Length.** Every chunk has from `min_tokens=` to `max_tokens=` tokens. The chunk of the shipping article has none, so it fails this step too. The tokens are words by default; with `tokenizer=`, they're the tokens of a model (as in [`pb.text.token_length()`](../../reference/text.token_length.md#pointblank.text.token_length)).
-- **Near duplicates.** No chunk is nearly the same as another, which would crowd the other chunks out of the results of a search. The two chunks about invoices differ only in their punctuation. This is a `rows_near_distinct()` step, and `near_duplicates=` sets its threshold of similarity (or turns it off).
+- **Near duplicates.** No chunk is nearly the same as another, which would crowd the other chunks out of the results of a search. The two chunks about invoices differ only in their punctuation. This is a [rows_near_distinct()](../../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct) step, and `near_duplicates=` sets its threshold of similarity (or turns it off).
 - **Freshness.** Every chunk was updated in the `max_age=` before the reference time. The article about holidays was last updated almost four years ago.
 
 The checks of the ids, the length, and freshness are left out unless their columns or bounds are given. By default, the reference time is the time the steps are made, so that the cutoff of the check of freshness is fixed in the steps.
@@ -150,7 +150,7 @@ validation
 
 [TABLE]
 
-The first and third questions are the same once they're in lower case and without punctuation, so both fail step 2. The last question's gold document, `bill-9`, isn't in the corpus (step 4), and its passage is about something else (step 5). The second passage fails step 5 as well, since it shares only one word with its question (*invoices* and *downloaded* aren't the words *invoice* and *download*). That shows the limits of counting words: a reranker would see that a passage about downloading invoices answers it. The corpus can be any table that `col_vals_in_table()` takes, and `corpus_id=` names its column of ids if it's different from the column of the evaluation set.
+The first and third questions are the same once they're in lower case and without punctuation, so both fail step 2. The last question's gold document, `bill-9`, isn't in the corpus (step 4), and its passage is about something else (step 5). The second passage fails step 5 as well, since it shares only one word with its question (*invoices* and *downloaded* aren't the words *invoice* and *download*). That shows the limits of counting words: a reranker would see that a passage about downloading invoices answers it. The corpus can be any table that [col_vals_in_table()](../../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table) takes, and `corpus_id=` names its column of ids if it's different from the column of the evaluation set.
 
 ## Which Checks Matter?
 

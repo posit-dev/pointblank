@@ -2050,7 +2050,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1537-L1676" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1537-L1677" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Ablation</span><span class="op">.</span><span class="fu">sweep_step</span>(</span>
@@ -2094,12 +2094,12 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 </section>
 <section id="details" class="level2 doc-details">
 <h2 class="doc-details anchored" data-anchor-id="details">Details</h2>
-<p>The step is run again as it was set up, with only <code>param=</code> changed, so a <code>col_vals_scored()</code> step takes its scores from the score cache instead of scoring the rows again. For a segmented step, only the step’s own segment is checked. A value that the validation method doesn’t accept (e.g., a <code>min_val=</code> above the step’s <code>max_val=</code>) gives an error. As with any other variant, a value whose step fails no rows is left out, and a value that removes the same rows as another version of the table isn’t evaluated again.</p>
+<p>The step is run again as it was set up, with only <code>param=</code> changed, so a <a href="../reference/Validate.col_vals_scored.html#pointblank.Validate.col_vals_scored" class="gdls-link gdls-code">col_vals_scored()</a> step takes its scores from the score cache instead of scoring the rows again. For a segmented step, only the step’s own segment is checked. A value that the validation method doesn’t accept (e.g., a <code>min_val=</code> above the step’s <code>max_val=</code>) gives an error. As with any other variant, a value whose step fails no rows is left out, and a value that removes the same rows as another version of the table isn’t evaluated again.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s a table of temperature readings, some of them recorded in tenths of a degree, with a check that the readings are below an upper limit. The ‘model’ estimates the average temperature and is evaluated by its error against the true average of <code>20</code>.</p>
-<div id="a4797d7c" class="cell" data-execution_count="2">
+<div id="d9ca03b9" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>

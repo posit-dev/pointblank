@@ -39,7 +39,7 @@ Text collected from the web for training language models has a lot that isn't pr
 - the text has at least `min_stop_words=` distinct stop words (2 of the, be, to, of, and, that, have, and with)
 - no more than `max_repeated_lines=` of the lines repeat an earlier line (30%)
 
-Each check is a `col_vals_scored()` step with a [`text_stat()`](../reference/scorers.text_stat.md#pointblank.scorers.text_stat) scorer, so the report shows each one, with its own counts of the documents that fail, and a brief that says what it checks. Set a bound to `None` to leave its check out (a check with two bounds is left out when both are `None`). A document with a missing value passes, as do documents without the words or lines that a check needs (the check of the number of words catches them).
+Each check is a [col_vals_scored()](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) step with a [`text_stat()`](../reference/scorers.text_stat.md#pointblank.scorers.text_stat) scorer, so the report shows each one, with its own counts of the documents that fail, and a brief that says what it checks. Set a bound to `None` to leave its check out (a check with two bounds is left out when both are `None`). A document with a missing value passes, as do documents without the words or lines that a check needs (the check of the number of words catches them).
 
 The defaults are for English web text. Text in other languages needs other stop words (and perhaps other bounds), and short texts (like titles or chat messages) need a lower `min_words=`.
 

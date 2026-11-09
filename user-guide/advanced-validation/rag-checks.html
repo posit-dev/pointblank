@@ -698,7 +698,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-corpus" class="level1">
 <h1>The Corpus</h1>
 <p>Let’s make a small corpus of chunks of help articles. Each chunk has an id, its text, the article it’s from, the groups of users that can see it (its access control list), and the date the article was last updated.</p>
-<div id="d7cfefea" class="cell" data-execution_count="2">
+<div id="4b0ff835" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datetime</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -888,7 +888,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-the-corpus" class="level1">
 <h1>Checking the Corpus</h1>
 <p>The <a href="../../reference/rag.corpus_checks.html#pointblank.rag.corpus_checks" class="gdls-link"><code>pb.rag.corpus_checks()</code></a> function makes a step for each check of the chunks. It returns a <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link"><code>Steps</code></a> collection, which is added to a validation with <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a>. We’ll give it the column of the text and the other columns it needs for each check: the ids, the metadata that every chunk must have, and the dates of update (with how old a chunk can be). We’ll also ask for chunks of at least five words.</p>
-<div id="83e65359" class="cell" data-execution_count="3">
+<div id="1c51737f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>chunks, tbl_name<span class="op">=</span><span class="st">"chunks"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .add_steps(</span>
@@ -1348,7 +1348,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Unique ids.</strong> No two chunks have the same id. The id <code>bill-2</code> is used for two different chunks, so a citation of <code>bill-2</code> could mean either.</li>
 <li><strong>Metadata.</strong> Every chunk has a value of each column of <code>metadata=</code>, with a step for each. The chunk about holidays has no source to cite and no access control list. A chunk without an access control list is a problem of security as much as of quality: it may be shown to anyone, or to no one, depending on how the system treats a missing value.</li>
 <li><strong>Length.</strong> Every chunk has from <code>min_tokens=</code> to <code>max_tokens=</code> tokens. The chunk of the shipping article has none, so it fails this step too. The tokens are words by default; with <code>tokenizer=</code>, they’re the tokens of a model (as in <a href="../../reference/text.token_length.html#pointblank.text.token_length" class="gdls-link"><code>pb.text.token_length()</code></a>).</li>
-<li><strong>Near duplicates.</strong> No chunk is nearly the same as another, which would crowd the other chunks out of the results of a search. The two chunks about invoices differ only in their punctuation. This is a <code>rows_near_distinct()</code> step, and <code>near_duplicates=</code> sets its threshold of similarity (or turns it off).</li>
+<li><strong>Near duplicates.</strong> No chunk is nearly the same as another, which would crowd the other chunks out of the results of a search. The two chunks about invoices differ only in their punctuation. This is a <a href="../../reference/Validate.rows_near_distinct.html#pointblank.Validate.rows_near_distinct" class="gdls-link gdls-code">rows_near_distinct()</a> step, and <code>near_duplicates=</code> sets its threshold of similarity (or turns it off).</li>
 <li><strong>Freshness.</strong> Every chunk was updated in the <code>max_age=</code> before the reference time. The article about holidays was last updated almost four years ago.</li>
 </ul>
 <p>The checks of the ids, the length, and freshness are left out unless their columns or bounds are given. By default, the reference time is the time the steps are made, so that the cutoff of the check of freshness is fixed in the steps.</p>
@@ -1357,7 +1357,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Checking the Evaluation Set</h1>
 <p>An evaluation set has questions, each with the id of the document that answers it (its <em>gold</em> document) and often the passage of that document with the answer. The <a href="../../reference/rag.eval_checks.html#pointblank.rag.eval_checks" class="gdls-link"><code>pb.rag.eval_checks()</code></a> function checks that every question has text, that no question is a near duplicate of another, that every question has a gold document, and that every gold document is in the corpus.</p>
 <p>It can also check that each gold passage is relevant to its question, with a scorer of the two. A reranker, like <a href="../../reference/scorers.reranker.html#pointblank.scorers.reranker" class="gdls-link"><code>pb.scorers.reranker()</code></a>, is made for this. To keep this page self-contained, we’ll use a scorer that gives the share of the words of a passage that are in its question.</p>
-<div id="47bf08de" class="cell" data-execution_count="4">
+<div id="5dc31077" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>questions <span class="op">=</span> pl.DataFrame(</span>
@@ -1766,7 +1766,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>The first and third questions are the same once they’re in lower case and without punctuation, so both fail step 2. The last question’s gold document, <code>bill-9</code>, isn’t in the corpus (step 4), and its passage is about something else (step 5). The second passage fails step 5 as well, since it shares only one word with its question (<em>invoices</em> and <em>downloaded</em> aren’t the words <em>invoice</em> and <em>download</em>). That shows the limits of counting words: a reranker would see that a passage about downloading invoices answers it. The corpus can be any table that <code>col_vals_in_table()</code> takes, and <code>corpus_id=</code> names its column of ids if it’s different from the column of the evaluation set.</p>
+<p>The first and third questions are the same once they’re in lower case and without punctuation, so both fail step 2. The last question’s gold document, <code>bill-9</code>, isn’t in the corpus (step 4), and its passage is about something else (step 5). The second passage fails step 5 as well, since it shares only one word with its question (<em>invoices</em> and <em>downloaded</em> aren’t the words <em>invoice</em> and <em>download</em>). That shows the limits of counting words: a reranker would see that a passage about downloading invoices answers it. The corpus can be any table that <a href="../../reference/Validate.col_vals_in_table.html#pointblank.Validate.col_vals_in_table" class="gdls-link gdls-code">col_vals_in_table()</a> takes, and <code>corpus_id=</code> names its column of ids if it’s different from the column of the evaluation set.</p>
 </section>
 <section id="which-checks-matter" class="level1">
 <h1>Which Checks Matter?</h1>

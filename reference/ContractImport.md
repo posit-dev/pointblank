@@ -4,7 +4,7 @@ The result of importing a contract or schema from another format.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L103-L723)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L103-L727)
 
 ``` python
 ContractImport(
@@ -29,7 +29,7 @@ The object holds what the adapter found: the columns and their types, the rules 
 - [`to_yaml()`](../reference/ContractImport.md#pointblank.ContractImport.to_yaml) lists the steps as YAML
 - [`summary()`](../reference/ContractImport.md#pointblank.ContractImport.summary) describes what was imported and what wasn't
 
-[ContractImport](../reference/ContractImport.md#pointblank.ContractImport) is a dataclass, so its fields can be read and changed directly. For instance, an unwanted constraint can be removed from `constraints` before calling `to_validate()`. Custom adapters (see [`ContractAdapter`](../reference/ContractAdapter.md#pointblank.ContractAdapter)) create these objects by calling the constructor with the parameters below.
+[ContractImport](../reference/ContractImport.md#pointblank.ContractImport) is a dataclass, so its fields can be read and changed directly. For instance, an unwanted constraint can be removed from `constraints` before calling [to_validate()](../reference/ContractImport.md#pointblank.ContractImport.to_validate). Custom adapters (see [`ContractAdapter`](../reference/ContractAdapter.md#pointblank.ContractAdapter)) create these objects by calling the constructor with the parameters below.
 
 ## Parameters
 
@@ -111,7 +111,7 @@ readings.columns
 
     [('station_id', 'String'), ('reading_no', 'Int64'), ('temp_c', 'Float64')]
 
-The constraints show how the temperature range became a pair of bounds, and how the primary key was expressed as not-null checks plus a `rows_distinct()` check over both key columns.
+The constraints show how the temperature range became a pair of bounds, and how the primary key was expressed as not-null checks plus a [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) check over both key columns.
 
 ``` python
 for c in readings.constraints:
@@ -150,7 +150,7 @@ readings.to_validate(readings_tbl, tbl_name="readings").interrogate()
 
 [TABLE]
 
-The duplicated `("S2", 1)` key is caught by the `rows_distinct()` step, while the `75.0` reading no longer fails any step because the range check was removed.
+The duplicated `("S2", 1)` key is caught by the [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step, while the `75.0` reading no longer fails any step because the range check was removed.
 
 ## See Also
 
@@ -182,7 +182,7 @@ Build a validation plan for a table from the imported rules.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L271-L389)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L273-L392)
 
 ``` python
 to_validate(
@@ -193,7 +193,7 @@ to_validate(
 
 This is the most direct way to put an imported definition to work: give it a table and get back a [`Validate`](../reference/Validate.md#pointblank.Validate) object that checks the table against the definition. The object isn't interrogated yet, so further validation steps can be chained on before calling [`interrogate()`](../reference/Validate.interrogate.md#pointblank.Validate.interrogate). That makes it easy to treat the external definition as a baseline and add checks that it can't express.
 
-The plan starts with a [`col_schema_match()`](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) step built from the columns that have a type, followed by one step for each entry in `constraints`. The schema check uses the default settings of `col_schema_match()`, so the table must have the same columns, in the same order, with the same types. Types are compared exactly: a JSON Schema `integer` becomes `Int64`, so an `Int32` column fails the check. If no column has a type, the schema step is left out.
+The plan starts with a [`col_schema_match()`](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) step built from the columns that have a type, followed by one step for each entry in `constraints`. The schema check uses the default settings of [col_schema_match()](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match), so the table must have the same columns, in the same order, with the same types. Types are compared exactly: a JSON Schema `integer` becomes `Int64`, so an `Int32` column fails the check. If no column has a type, the schema step is left out.
 
 #### Parameters
 
@@ -273,7 +273,7 @@ Turn the imported rules into a reusable contract.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L391-L498)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L394-L501)
 
 ``` python
 to_contract(
@@ -354,7 +354,7 @@ Write the imported rules as Pointblank Python code.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L500-L580)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L503-L583)
 
 ``` python
 to_python()
@@ -422,13 +422,13 @@ List the imported validation steps as YAML.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L582-L646)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L585-L650)
 
 ``` python
 to_yaml()
 ```
 
-YAML is easier to scan than Python for people who don't write code, so this method is handy for sharing what an import produced, such as in a code review or a ticket. The output has a `validation:` key holding a `steps:` list. That list starts with a `col_schema_match` step (when any column has a type) and then has one entry per constraint, each named after its validation method and holding that method's arguments.
+YAML is easier to scan than Python for people who don't write code, so this method is handy for sharing what an import produced, such as in a code review or a ticket. The output has a `validation:` key holding a `steps:` list. That list starts with a [col_schema_match](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) step (when any column has a type) and then has one entry per constraint, each named after its validation method and holding that method's arguments.
 
 This is a listing of the steps rather than a complete YAML validation configuration: it has no `tbl:` entry and its steps are nested under `validation:`, so it can't be passed to [`yaml_interrogate()`](../reference/yaml_interrogate.md#pointblank.yaml_interrogate) as is. To keep the imported rules in a YAML file that Pointblank can read back, convert them to a contract with [`to_contract()`](../reference/ContractImport.md#pointblank.ContractImport.to_contract) and write that with [`Contract.to_yaml()`](../reference/Contract.md#pointblank.Contract.to_yaml).
 
@@ -476,7 +476,7 @@ Describe what was imported and what was left out.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L648-L715)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_base.py#L652-L719)
 
 ``` python
 summary()

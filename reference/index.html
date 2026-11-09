@@ -2112,7 +2112,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="contract-importexport" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="contract-importexport">Contract Import/Export</h2>
 <div class="doc-description">
-<p>Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use <code>import_contract()</code> as the entry point, <code>export_contract()</code> for the reverse, and <a href="../reference/register_adapter.html#pointblank.register_adapter" class="gdls-link gdls-code">register_adapter()</a> to add support for custom formats.</p>
+<p>Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use <a href="../reference/import_contract.html#pointblank.import_contract" class="gdls-link gdls-code">import_contract()</a> as the entry point, <a href="../reference/export_contract.html#pointblank.export_contract" class="gdls-link gdls-code">export_contract()</a> for the reverse, and <a href="../reference/register_adapter.html#pointblank.register_adapter" class="gdls-link gdls-code">register_adapter()</a> to add support for custom formats.</p>
 </div>
 <dl>
 <dt><a href="../reference/import_contract.html#pointblank.import_contract" class="doc-function doc-label doc-label-function">import_contract()</a></dt>
@@ -2472,7 +2472,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="column-selection" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="column-selection">Column Selection</h2>
 <div class="doc-description">
-<p>Use the <a href="../reference/col.html#pointblank.col" class="gdls-link gdls-code">col()</a> function along with column selection helpers to flexibly select columns for validation. Combine <a href="../reference/col.html#pointblank.col" class="gdls-link gdls-code">col()</a> with <a href="../reference/starts_with.html#pointblank.starts_with" class="gdls-link gdls-code">starts_with()</a>, <code>matches()</code>, etc. for selecting multiple target columns.</p>
+<p>Use the <a href="../reference/col.html#pointblank.col" class="gdls-link gdls-code">col()</a> function along with column selection helpers to flexibly select columns for validation. Combine <a href="../reference/col.html#pointblank.col" class="gdls-link gdls-code">col()</a> with <a href="../reference/starts_with.html#pointblank.starts_with" class="gdls-link gdls-code">starts_with()</a>, <a href="../reference/matches.html#pointblank.matches" class="gdls-link gdls-code">matches()</a>, etc. for selecting multiple target columns.</p>
 </div>
 <dl>
 <dt><a href="../reference/col.html#pointblank.col" class="doc-function doc-label doc-label-function">col()</a></dt>
@@ -2509,7 +2509,7 @@ ul.task-list li input[type="checkbox"] {
 </dd>
 <dt><a href="../reference/expr_col.html#pointblank.expr_col" class="doc-function doc-label doc-label-function">expr_col()</a></dt>
 <dd>
-<p>Create a column expression for use in <code>conjointly()</code> validation.</p>
+<p>Create a column expression for use in <a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link gdls-code">Validate.conjointly()</a> validation.</p>
 </dd>
 </dl>
 </section>
@@ -2752,7 +2752,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="table-comparison" class="level2 doc-group">
 <h2 class="doc-group anchored" data-anchor-id="table-comparison">Table Comparison</h2>
 <div class="doc-description">
-<p>Compare two tables row by row. <code>compare()</code> aligns the rows of a source and a target table (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus schema differences. The result is a <a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> object with counts, row samples, and a tabular report. The same comparison is available as a validation step through <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">Validate.tbl_match()</a>, and <a href="../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">Validate.tbl_reconcile()</a> compares aggregates (e.g., totals per group) instead of rows.</p>
+<p>Compare two tables row by row. <a href="../reference/compare.html#pointblank.compare" class="gdls-link gdls-code">compare()</a> aligns the rows of a source and a target table (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus schema differences. The result is a <a href="../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> object with counts, row samples, and a tabular report. The same comparison is available as a validation step through <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">Validate.tbl_match()</a>, and <a href="../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">Validate.tbl_reconcile()</a> compares aggregates (e.g., totals per group) instead of rows.</p>
 </div>
 <dl>
 <dt><a href="../reference/compare.html#pointblank.compare" class="doc-function doc-label doc-label-function">compare()</a></dt>

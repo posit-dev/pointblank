@@ -2051,7 +2051,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">scorers</span><span class="op">.</span><span class="fu">clear_cache</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>With <code>cache=True</code> (the default of <code>col_vals_scored()</code>), the scores of a scorer are kept in memory for the rest of the session, so that interrogating the same data again (as in an ablation, or after a change to another step) doesn’t score it again. This clears them, for all the scorers. A cache on disk (<code>cache=</code> as a directory) isn’t changed: delete its directory to clear it.</p>
+<p>With <code>cache=True</code> (the default of <a href="../reference/Validate.col_vals_scored.html#pointblank.Validate.col_vals_scored" class="gdls-link gdls-code">col_vals_scored()</a>), the scores of a scorer are kept in memory for the rest of the session, so that interrogating the same data again (as in an ablation, or after a change to another step) doesn’t score it again. This clears them, for all the scorers. A cache on disk (<code>cache=</code> as a directory) isn’t changed: delete its directory to clear it.</p>
 </div>
 <section id="returns" class="level2 doc-returns">
 <h2 class="doc-returns anchored" data-anchor-id="returns">Returns</h2>
@@ -2067,7 +2067,7 @@ Nothing; the scores in memory are deleted.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>After this, the next interrogation of a scored step scores its rows again.</p>
-<div id="dd851fba" class="cell" data-execution_count="2">
+<div id="3308809f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>pb.scorers.clear_cache()</span></code></pre></div>

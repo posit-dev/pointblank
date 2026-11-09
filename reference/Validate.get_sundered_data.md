@@ -4,7 +4,7 @@ Get the data that passed or failed the validation steps.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L23351-L23561)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L23356-L23567)
 
 ``` python
 Validate.get_sundered_data(
@@ -20,7 +20,7 @@ Validation of the data is one thing but, sometimes, you want to use the best par
 
 There are some caveats to sundering. The validation steps considered for this splitting will only involve steps where:
 
-- of certain check types, where test units are rows or cells checked down a column (e.g., the `col_vals_*()` methods and `rows_complete()`)
+- of certain check types, where test units are rows or cells checked down a column (e.g., the `col_vals_*()` methods and [rows_complete()](../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete))
 - `active=` is not set to `False`
 - `pre=` has not been given an expression for modifying the input table, unless it's marked with [`row_preserving()`](../reference/row_preserving.md#pointblank.row_preserving)
 
@@ -34,7 +34,7 @@ Steps that use [`rows_distinct()`](../reference/Validate.rows_distinct.md#pointb
 The type of data to return. Options are `"pass"` or `"fail"`, where the former returns a table only containing rows where test units always passed validation steps, and the latter returns a table only containing rows had test units that failed in at least one validation step.
 
 `duplicates: str | None = None`  
-How to treat the duplicate rows found by `rows_distinct()` (and `rows_near_distinct()`) steps. The default `None` leaves those steps out of the sundering. Use `"keep_first"` or `"keep_last"` to keep one copy of each group of duplicates (the first or last one, in row order or in the order given by `duplicates_order_by=`), or `"flag_all"` to treat every copy as failing.
+How to treat the duplicate rows found by [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) (and [rows_near_distinct()](../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct)) steps. The default `None` leaves those steps out of the sundering. Use `"keep_first"` or `"keep_last"` to keep one copy of each group of duplicates (the first or last one, in row order or in the order given by `duplicates_order_by=`), or `"flag_all"` to treat every copy as failing.
 
 `duplicates_order_by: str | list[str] | None = None`  
 One or more columns that order the copies of a duplicated row, to decide which copy is kept with `duplicates="keep_first"` or `duplicates="keep_last"`. For example, use `duplicates="keep_last", duplicates_order_by="updated_at"` to keep the newest record. Ties are broken by row order, and a copy with a missing value in one of these columns is kept only if every copy is missing that value. Without this, the copies are taken in row order (for a database table, which has no row order of its own, rows are ordered by their values, so the choice is arbitrary but the same from run to run).
@@ -114,7 +114,7 @@ pb.preview(
 | 2   | 2          | 2               |
 | 3   | 3          | 1               |
 
-The validation report would count both copies of `id` `2` as failing, but with `duplicates="keep_last"` the copy with `version` `2` is kept in the 'pass' piece, and only the older copy would be in the 'fail' piece. Without `duplicates=`, the `rows_distinct()` step would be left out and all four rows would be returned.
+The validation report would count both copies of `id` `2` as failing, but with `duplicates="keep_last"` the copy with `version` `2` is kept in the 'pass' piece, and only the older copy would be in the 'fail' piece. Without `duplicates=`, the [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step would be left out and all four rows would be returned.
 
 ## See Also
 

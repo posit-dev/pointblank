@@ -137,7 +137,7 @@ Whether the two schemas match.
 
 This is the yes-or-no answer behind the schema check in [`compare()`](../reference/compare.md#pointblank.compare). It's `False` if any of `only_in_source`, `only_in_target`, or `dtype_changed` is non-empty, or if `reordered` is `True`. Renames listed in `renamed` don't count against it, because they were declared with `column_map=`. Names that differ only in case do count, since they also appear in `only_in_source` and `only_in_target`. Note that column order matters here: the same columns in a different order don't match.
 
-With `schema="strict"` (the default in `compare()`), a `False` value here means the comparison fails as a whole, with no rows passing. With `schema="common"`, it's reported but doesn't affect the result. [`Comparison.schema_ok`](../reference/Comparison.schema_ok.md#pointblank.Comparison.schema_ok) combines the two: it's this value under `"strict"` and always `True` under `"common"`.
+With `schema="strict"` (the default in [compare()](../reference/compare.md#pointblank.compare)), a `False` value here means the comparison fails as a whole, with no rows passing. With `schema="common"`, it's reported but doesn't affect the result. [`Comparison.schema_ok`](../reference/Comparison.schema_ok.md#pointblank.Comparison.schema_ok) combines the two: it's this value under `"strict"` and always `True` under `"common"`.
 
 #### Examples
 

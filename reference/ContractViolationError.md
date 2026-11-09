@@ -4,7 +4,7 @@ The error raised when data fails a contract with `on_violation="raise"`.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L282-L368)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L283-L370)
 
 ``` python
 ContractViolationError(
@@ -66,7 +66,7 @@ failed_run.target_validation
 
 [TABLE]
 
-The report shows the one failing test unit in the `col_vals_gt` step, the row for item `"b"`. Nothing after the `run()` call was reached, so the prices weren't published.
+The report shows the one failing test unit in the [col_vals_gt](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) step, the row for item `"b"`. Nothing after the [run()](../reference/Pipeline.md#pointblank.Pipeline.run) call was reached, so the prices weren't published.
 
 ## See Also
 

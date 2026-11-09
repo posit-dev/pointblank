@@ -14,7 +14,7 @@ Many of the validation methods (i.e., `col_vals_*()` methods) in Pointblank have
 
 The [col()](../reference/col.md#pointblank.col) doesn't check that the column exists in the input table. It acts to signal that the value being compared is a column value. During validation (i.e., when [`interrogate()`](../reference/Validate.interrogate.md#pointblank.Validate.interrogate) is called), Pointblank will then check that the column exists in the input table.
 
-For creating expressions to use with the `conjointly()` validation method, use the [`expr_col()`](../reference/expr_col.md#pointblank.expr_col) function instead.
+For creating expressions to use with the [conjointly()](../reference/Validate.conjointly.md#pointblank.Validate.conjointly) validation method, use the [`expr_col()`](../reference/expr_col.md#pointblank.expr_col) function instead.
 
 ## Parameters
 
@@ -97,7 +97,7 @@ Alternatively, we support selectors from the Narwhals library! Those selectors c
 - `boolean()`
 - `by_dtype()`
 - `categorical()`
-- `matches()`
+- [matches()](../reference/matches.md#pointblank.matches)
 - `numeric()`
 - `string()`
 
@@ -246,4 +246,4 @@ In the above example the [col()](../reference/col.md#pointblank.col) function co
 ## See Also
 
 [expr_col()](../reference/expr_col.md#pointblank.expr_col)  
-Create a column expression for use in `conjointly()`.
+Create a column expression for use in [conjointly()](../reference/Validate.conjointly.md#pointblank.Validate.conjointly).

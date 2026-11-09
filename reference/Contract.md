@@ -4,7 +4,7 @@ A declarative boundary contract for pipeline data.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L375-L1371)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L376-L1384)
 
 ``` python
 Contract(
@@ -71,7 +71,7 @@ A [Contract](../reference/Contract.md#pointblank.Contract) object. Apply it to d
 A contract holds no data and runs nothing until it's applied to a table. Calling [`to_validate()`](../reference/Contract.md#pointblank.Contract.to_validate) (or [`validate()`](../reference/Contract.md#pointblank.Contract.validate), which also interrogates) compiles the contract into a [Validate](../reference/Validate.md#pointblank.Validate) object:
 
 1.  a [Validate](../reference/Validate.md#pointblank.Validate) is created for the table, with `tbl_name=` set to the contract name, a label of the form `"Contract: <name> v<version>"`, and the contract's `thresholds=`, `owner=`, `consumers=`, and `version=`
-2.  if the contract has a schema, a `col_schema_match()` step is added first
+2.  if the contract has a schema, a [col_schema_match()](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) step is added first
 3.  each [`Step`](../reference/Step.md#pointblank.Step) is added in order, by calling the validation method it names with its stored arguments
 
 A step that lists several columns expands into one validation step per column, just as it would in a [Validate](../reference/Validate.md#pointblank.Validate) chain. Mistakes in a step's arguments (a misspelled parameter name, for example) surface when the contract is compiled, not when it's created.
@@ -80,16 +80,16 @@ A step that lists several columns expands into one validation step per column, j
 
 These validation methods can be used in a contract's steps:
 
-- column value checks: `col_vals_gt`, `col_vals_lt`, `col_vals_ge`, `col_vals_le`, `col_vals_eq`, `col_vals_ne`, `col_vals_between`, `col_vals_outside`, `col_vals_in_set`, `col_vals_not_in_set`, `col_vals_increasing`, `col_vals_decreasing`, `col_vals_null`, `col_vals_not_null`, `col_vals_regex`, `col_vals_within_spec`, and `col_vals_expr`
-- column-level checks: `col_exists` and `col_pct_null`
-- table-level checks: `col_schema_match`, `col_count_match`, `row_count_match`, `rows_distinct`, and `rows_complete`
-- multi-condition checks: `conjointly`, with its expressions given as a list in `exprs=`
+- column value checks: [col_vals_gt](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), [col_vals_lt](../reference/Validate.col_vals_lt.md#pointblank.Validate.col_vals_lt), [col_vals_ge](../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge), [col_vals_le](../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le), [col_vals_eq](../reference/Validate.col_vals_eq.md#pointblank.Validate.col_vals_eq), [col_vals_ne](../reference/Validate.col_vals_ne.md#pointblank.Validate.col_vals_ne), [col_vals_between](../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between), [col_vals_outside](../reference/Validate.col_vals_outside.md#pointblank.Validate.col_vals_outside), [col_vals_in_set](../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set), [col_vals_not_in_set](../reference/Validate.col_vals_not_in_set.md#pointblank.Validate.col_vals_not_in_set), [col_vals_increasing](../reference/Validate.col_vals_increasing.md#pointblank.Validate.col_vals_increasing), [col_vals_decreasing](../reference/Validate.col_vals_decreasing.md#pointblank.Validate.col_vals_decreasing), [col_vals_null](../reference/Validate.col_vals_null.md#pointblank.Validate.col_vals_null), [col_vals_not_null](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null), [col_vals_regex](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex), [col_vals_within_spec](../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec), and [col_vals_expr](../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr)
+- column-level checks: [col_exists](../reference/Validate.col_exists.md#pointblank.Validate.col_exists) and [col_pct_null](../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null)
+- table-level checks: [col_schema_match](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match), [col_count_match](../reference/Validate.col_count_match.md#pointblank.Validate.col_count_match), [row_count_match](../reference/Validate.row_count_match.md#pointblank.Validate.row_count_match), [rows_distinct](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct), and [rows_complete](../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete)
+- multi-condition checks: [conjointly](../reference/Validate.conjointly.md#pointblank.Validate.conjointly), with its expressions given as a list in `exprs=`
 
 Each takes the same arguments as the [`Validate`](../reference/Validate.md#pointblank.Validate) method of the same name. A step that names any other method is rejected with a `ValueError` when the contract is created. For steps that a contract can't express, compile the contract with [`to_validate()`](../reference/Contract.md#pointblank.Contract.to_validate) and chain the extra methods onto the result.
 
 ## Serialization
 
-Contracts are meant to live outside your code, so they round-trip through YAML and plain dictionaries. [`to_yaml()`](../reference/Contract.md#pointblank.Contract.to_yaml) and [`from_yaml()`](../reference/Contract.md#pointblank.Contract.from_yaml) work with YAML files, and [`to_dict()`](../reference/Contract.md#pointblank.Contract.to_dict) and [`from_dict()`](../reference/Contract.md#pointblank.Contract.from_dict) work with dictionaries (useful for JSON or a configuration system). The schema is stored as a mapping of column names to type strings, the thresholds as a mapping of levels to values, and each step as a single-key mapping from method name to arguments. Step arguments must be plain data (strings, numbers, booleans, dates, lists, and dictionaries) for a contract to be written to YAML, although step-level [Thresholds](../reference/Thresholds.md#pointblank.Thresholds) objects and tuples are converted to dictionaries automatically. A contract with other objects in its steps, such as a column selector (e.g., `pb.starts_with("amt_")`), a Polars expression, or a function, can't be written: `to_yaml()` raises a `ValueError` that says where the object is. Keep contracts like that in Python.
+Contracts are meant to live outside your code, so they round-trip through YAML and plain dictionaries. [`to_yaml()`](../reference/Contract.md#pointblank.Contract.to_yaml) and [`from_yaml()`](../reference/Contract.md#pointblank.Contract.from_yaml) work with YAML files, and [`to_dict()`](../reference/Contract.md#pointblank.Contract.to_dict) and [`from_dict()`](../reference/Contract.md#pointblank.Contract.from_dict) work with dictionaries (useful for JSON or a configuration system). The schema is stored as a mapping of column names to type strings, the thresholds as a mapping of levels to values, and each step as a single-key mapping from method name to arguments. Step arguments must be plain data (strings, numbers, booleans, dates, lists, and dictionaries) for a contract to be written to YAML, although step-level [Thresholds](../reference/Thresholds.md#pointblank.Thresholds) objects and tuples are converted to dictionaries automatically. A contract with other objects in its steps, such as a column selector (e.g., `pb.starts_with("amt_")`), a Polars expression, or a function, can't be written: [to_yaml()](../reference/Contract.md#pointblank.Contract.to_yaml) raises a `ValueError` that says where the object is. Keep contracts like that in Python.
 
 ## Working With Other Pointblank Tools
 
@@ -152,7 +152,7 @@ orders_contract.validate(orders_day_1)
 
 [TABLE]
 
-The report header shows the label built from the contract (`Contract: orders v1.2.0`) along with the owner, consumers, and version. The first step is the schema check, followed by one step per contract rule. The `col_vals_not_null` step names two columns, so it becomes two validation steps. All six steps pass.
+The report header shows the label built from the contract (`Contract: orders v1.2.0`) along with the owner, consumers, and version. The first step is the schema check, followed by one step per contract rule. The [col_vals_not_null](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) step names two columns, so it becomes two validation steps. All six steps pass.
 
 The next day's extract has problems: a missing customer ID, a repeated order ID, a negative amount, and a status the contract doesn't allow. The same contract catches all of them.
 
@@ -173,7 +173,7 @@ validation
 
 [TABLE]
 
-The schema still matches, but four of the rule steps have failing test units. With only four rows, one failure is already 25% of the table, so those steps exceed both the warning and the error thresholds. The `rows_distinct` step counts two failures because both rows with order `"A6"` are duplicates. Since the result is an ordinary [Validate](../reference/Validate.md#pointblank.Validate) object, you can check it in code, for example to stop a scheduled job:
+The schema still matches, but four of the rule steps have failing test units. With only four rows, one failure is already 25% of the table, so those steps exceed both the warning and the error thresholds. The [rows_distinct](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step counts two failures because both rows with order `"A6"` are duplicates. Since the result is an ordinary [Validate](../reference/Validate.md#pointblank.Validate) object, you can check it in code, for example to stop a scheduled job:
 
 ``` python
 validation.all_passed()
@@ -271,7 +271,7 @@ Check a table against the contract.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L827-L919)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L838-L930)
 
 ``` python
 validate(data)
@@ -345,7 +345,7 @@ Compile the contract into a validation plan for a table, without running it.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L708-L825)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L719-L836)
 
 ``` python
 to_validate(data)
@@ -416,7 +416,7 @@ Write the contract as YAML.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1267-L1361)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1279-L1374)
 
 ``` python
 to_yaml(path=None)
@@ -424,7 +424,7 @@ to_yaml(path=None)
 
 YAML is the natural way to store and share a contract. It can sit in version control next to the pipeline code, so changes to the rules go through review, and other teams can read it without running Python. This method writes the contract under a top-level `contract:` key, with the fields in a fixed order (name and metadata first, then the schema, steps, and thresholds). [`from_yaml()`](../reference/Contract.md#pointblank.Contract.from_yaml) reads the file back into an equivalent [Contract](../reference/Contract.md#pointblank.Contract).
 
-Fields that aren't set, and the default `direction=` and `on_violation=` values, are left out of the YAML (see [`to_dict()`](../reference/Contract.md#pointblank.Contract.to_dict)). Step arguments must be plain data (strings, numbers, booleans, dates, lists, and dictionaries) so that `from_yaml()` can read them back. Step-level thresholds are converted to dictionaries automatically, but column selectors, expressions, and functions can't be written.
+Fields that aren't set, and the default `direction=` and `on_violation=` values, are left out of the YAML (see [`to_dict()`](../reference/Contract.md#pointblank.Contract.to_dict)). Step arguments must be plain data (strings, numbers, booleans, dates, lists, and dictionaries) so that [from_yaml()](../reference/Contract.md#pointblank.Contract.from_yaml) can read them back. Step-level thresholds are converted to dictionaries automatically, but column selectors, expressions, and functions can't be written.
 
 #### Parameters
 
@@ -512,7 +512,7 @@ Read a contract from a YAML file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1140-L1265)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1151-L1277)
 
 ``` python
 from_yaml(path)
@@ -606,7 +606,7 @@ payments_contract.validate(payments)
 
 [TABLE]
 
-The report label, `Contract: payments v1.0.0`, comes from the file. The payment with an amount of `0.0` fails the `col_vals_gt` step and triggers the warning threshold.
+The report label, `Contract: payments v1.0.0`, comes from the file. The payment with an amount of `0.0` fails the [col_vals_gt](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) step and triggers the warning threshold.
 
 ### to_dict()
 
@@ -614,7 +614,7 @@ Convert the contract to a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L921-L1008)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L932-L1019)
 
 ``` python
 to_dict()
@@ -703,7 +703,7 @@ Create a contract from a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1010-L1138)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1021-L1149)
 
 ``` python
 from_dict(data)

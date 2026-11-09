@@ -4,7 +4,7 @@ Validate whether column values are not in a set of values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9933-L10263)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L9934-L10265)
 
 ``` python
 Validate.col_vals_not_in_set(
@@ -175,7 +175,7 @@ The validation table reports two failing test units. The specific failing cases 
 
 **Using Python Enums**
 
-Like `col_vals_in_set()`, this method also supports Python Enum classes and instances:
+Like [col_vals_in_set()](../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set), this method also supports Python Enum classes and instances:
 
 ``` python
 from enum import Enum

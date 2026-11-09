@@ -4,7 +4,7 @@ List the formats available for contract import and export.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_registry.py#L182-L256)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/adapters/_registry.py#L184-L260)
 
 ``` python
 list_adapters()
@@ -19,8 +19,8 @@ A dictionary, sorted by format name, that maps each format name to a dictionary 
 
 - `"class"`: the name of the adapter class
 - `"file_extensions"`: the list of file extensions used to detect the format
-- `"supports_import"`: whether the format can be imported with `import_contract()`
-- `"supports_export"`: whether the format can be exported with `export_contract()`
+- `"supports_import"`: whether the format can be imported with [import_contract()](../reference/import_contract.md#pointblank.import_contract)
+- `"supports_export"`: whether the format can be exported with [export_contract()](../reference/export_contract.md#pointblank.export_contract)
 
 ## Examples
 

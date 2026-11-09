@@ -30,7 +30,7 @@ This works but reads *inside-out*. With more than two or three groups, the nesti
 
 ## Building Step Libraries with [Steps](../../reference/Steps.md#pointblank.Steps)
 
-The [Steps](../../reference/Steps.md#pointblank.Steps) class lets you record validation steps without binding them to data, thresholds, or any other [Validate](../../reference/Validate.md#pointblank.Validate) configuration. You use the same method names and parameters you already know from [Validate](../../reference/Validate.md#pointblank.Validate) (`col_vals_gt()`, `col_vals_not_null()`, `col_vals_regex()`, etc.), but instead of running the checks, [Steps](../../reference/Steps.md#pointblank.Steps) stores them for later use.
+The [Steps](../../reference/Steps.md#pointblank.Steps) class lets you record validation steps without binding them to data, thresholds, or any other [Validate](../../reference/Validate.md#pointblank.Validate) configuration. You use the same method names and parameters you already know from [Validate](../../reference/Validate.md#pointblank.Validate) ([col_vals_gt()](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null), [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex), etc.), but instead of running the checks, [Steps](../../reference/Steps.md#pointblank.Steps) stores them for later use.
 
 The key benefit is **portability**: a [Steps](../../reference/Steps.md#pointblank.Steps) object can live in a shared Python module and be imported into any number of validation pipelines. The step definitions stay the same and only the data and configuration change at the point of use.
 

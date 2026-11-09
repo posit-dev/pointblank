@@ -714,7 +714,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="creating-your-first-contract" class="level1">
 <h1>Creating Your First Contract</h1>
 <p>The simplest contract just names a set of validation steps:</p>
-<div id="4e0617bc" class="cell" data-execution_count="2">
+<div id="6d17ac3a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -730,7 +730,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>This contract essentially says: “Any data calling itself <code>customer_records</code> must have non-null IDs and emails, valid email formats, and unique customer IDs.”</p>
 <p>Now validate some data against it:</p>
-<div id="c8cbff91" class="cell" data-execution_count="3">
+<div id="568c5e9a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>customers <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"customer_id"</span>: [<span class="st">"C001"</span>, <span class="st">"C002"</span>, <span class="st">"C003"</span>, <span class="st">"C004"</span>],</span>
@@ -1038,7 +1038,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="adding-a-schema" class="level1">
 <h1>Adding a Schema</h1>
 <p>Contracts can include a <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> to enforce structural expectations (column names and data types):</p>
-<div id="212e2cac" class="cell" data-execution_count="4">
+<div id="cb5d2581" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>order_contract <span class="op">=</span> pb.Contract(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"order_data"</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    direction<span class="op">=</span><span class="st">"source"</span>,</span>
@@ -1060,8 +1060,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    owner<span class="op">=</span><span class="st">"data-platform-team"</span>,</span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<p>When a schema is defined, the contract automatically adds a <code>col_schema_match()</code> step before all other validation steps. This means the schema check runs first, and if the table doesn’t have the right columns and types, you’ll know immediately.</p>
-<div id="fd3329a9" class="cell" data-execution_count="5">
+<p>When a schema is defined, the contract automatically adds a <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match()</a> step before all other validation steps. This means the schema check runs first, and if the table doesn’t have the right columns and types, you’ll know immediately.</p>
+<div id="c2612192" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>orders <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="st">"ORD-001"</span>, <span class="st">"ORD-002"</span>, <span class="st">"ORD-003"</span>, <span class="st">"ORD-004"</span>, <span class="st">"ORD-005"</span>],</span>
@@ -1697,7 +1697,7 @@ tr { background-color: transparent; }
 <section id="the-step-class" class="level1">
 <h1>The <a href="../../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">Step</a> Class</h1>
 <p>Each validation rule in a contract is represented by a <a href="../../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">Step</a>, which is a declarative description of a single validation method call. Steps store the method name and its arguments as plain data:</p>
-<div id="2e4b80ab" class="cell" data-execution_count="6">
+<div id="2d3f7825" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># These are equivalent ways to express a validation rule:</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>step1 <span class="op">=</span> pb.Step(<span class="st">"col_vals_gt"</span>, columns<span class="op">=</span><span class="st">"revenue"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>step2 <span class="op">=</span> pb.Step(<span class="st">"col_vals_between"</span>, columns<span class="op">=</span><span class="st">"age"</span>, left<span class="op">=</span><span class="dv">0</span>, right<span class="op">=</span><span class="dv">150</span>)</span>
@@ -1727,47 +1727,47 @@ col_vals_gt
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>col_vals_gt()</code>, <code>col_vals_lt()</code>, <code>col_vals_ge()</code>, <code>col_vals_le()</code></td>
+<td><a href="../../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a>, <a href="../../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" class="gdls-link gdls-code">col_vals_lt()</a>, <a href="../../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" class="gdls-link gdls-code">col_vals_ge()</a>, <a href="../../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" class="gdls-link gdls-code">col_vals_le()</a></td>
 <td>Numeric bounds</td>
 </tr>
 <tr class="even">
-<td><code>col_vals_between()</code>, <code>col_vals_outside()</code></td>
+<td><a href="../../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link gdls-code">col_vals_between()</a>, <a href="../../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" class="gdls-link gdls-code">col_vals_outside()</a></td>
 <td>Range checks</td>
 </tr>
 <tr class="odd">
-<td><code>col_vals_eq()</code>, <code>col_vals_ne()</code></td>
+<td><a href="../../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" class="gdls-link gdls-code">col_vals_eq()</a>, <a href="../../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" class="gdls-link gdls-code">col_vals_ne()</a></td>
 <td>Equality checks</td>
 </tr>
 <tr class="even">
-<td><code>col_vals_in_set()</code>, <code>col_vals_not_in_set()</code></td>
+<td><a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a>, <a href="../../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" class="gdls-link gdls-code">col_vals_not_in_set()</a></td>
 <td>Categorical membership</td>
 </tr>
 <tr class="odd">
-<td><code>col_vals_not_null()</code>, <code>col_vals_null()</code></td>
+<td><a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a>, <a href="../../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null" class="gdls-link gdls-code">col_vals_null()</a></td>
 <td>Null checks</td>
 </tr>
 <tr class="even">
-<td><code>col_vals_regex()</code></td>
+<td><a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a></td>
 <td>Pattern matching</td>
 </tr>
 <tr class="odd">
-<td><code>col_exists()</code></td>
+<td><a href="../../reference/Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link gdls-code">col_exists()</a></td>
 <td>Column presence</td>
 </tr>
 <tr class="even">
-<td><code>rows_distinct()</code></td>
+<td><a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a></td>
 <td>Uniqueness (use <code>columns_subset=</code>)</td>
 </tr>
 <tr class="odd">
-<td><code>rows_complete()</code></td>
+<td><a href="../../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" class="gdls-link gdls-code">rows_complete()</a></td>
 <td>No nulls in any column</td>
 </tr>
 <tr class="even">
-<td><code>row_count_match()</code></td>
+<td><a href="../../reference/Validate.row_count_match.html#pointblank.Validate.row_count_match" class="gdls-link gdls-code">row_count_match()</a></td>
 <td>Expected row count</td>
 </tr>
 <tr class="odd">
-<td><code>col_count_match()</code></td>
+<td><a href="../../reference/Validate.col_count_match.html#pointblank.Validate.col_count_match" class="gdls-link gdls-code">col_count_match()</a></td>
 <td>Expected column count</td>
 </tr>
 </tbody>
@@ -1777,7 +1777,7 @@ col_vals_gt
 <section id="contract-metadata" class="level1">
 <h1>Contract Metadata</h1>
 <p>Contracts support rich metadata that makes them self-documenting and suitable for team workflows:</p>
-<div id="f7603746" class="cell" data-execution_count="7">
+<div id="48fbdb5c" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>production_contract <span class="op">=</span> pb.Contract(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"clean_sales_report"</span>,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    direction<span class="op">=</span><span class="st">"target"</span>,              <span class="co"># "source" or "target" boundary</span></span>
@@ -1826,7 +1826,7 @@ col_vals_gt
 <section id="using-to_validate-for-custom-workflows" class="level1">
 <h1>Using <code>to_validate()</code> for Custom Workflows</h1>
 <p>If you need more control, <a href="../../reference/Contract.html#pointblank.Contract.to_validate" class="gdls-link"><code>to_validate()</code></a> gives you back an un-interrogated <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object that you can extend with additional checks:</p>
-<div id="dc05c490" class="cell" data-execution_count="8">
+<div id="7e8cbcc6" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Start from the contract, then add ad-hoc checks</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    order_contract</span>
@@ -2502,7 +2502,7 @@ tr { background-color: transparent; }
 <section id="contract-equality-and-composition" class="level1">
 <h1>Contract Equality and Composition</h1>
 <p>Steps support equality comparison, making it easy to verify contracts:</p>
-<div id="cbbd615c" class="cell" data-execution_count="9">
+<div id="891bee71" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Steps are equal if they have the same method and kwargs</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>s1 <span class="op">=</span> pb.Step(<span class="st">"col_vals_gt"</span>, columns<span class="op">=</span><span class="st">"x"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>s2 <span class="op">=</span> pb.Step(<span class="st">"col_vals_gt"</span>, columns<span class="op">=</span><span class="st">"x"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
@@ -2516,7 +2516,7 @@ s1 == s3: False</code></pre>
 </div>
 </div>
 <p>You can compose contracts by combining steps from multiple sources:</p>
-<div id="0cdc87f0" class="cell" data-execution_count="10">
+<div id="451ed4cc" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Common checks shared across all tables</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>common_steps <span class="op">=</span> [</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    pb.Step(<span class="st">"col_vals_not_null"</span>, columns<span class="op">=</span>[<span class="st">"id"</span>]),</span>
@@ -2545,7 +2545,7 @@ s1 == s3: False</code></pre>
 <section id="example-validating-with-failures" class="level1">
 <h1>Example: Validating with Failures</h1>
 <p>Let’s see what happens when data doesn’t meet the contract:</p>
-<div id="c8d88a99" class="cell" data-execution_count="11">
+<div id="3ebc9b39" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data with quality issues</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>bad_orders <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    {</span>

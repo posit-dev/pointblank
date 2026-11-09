@@ -2049,7 +2049,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/text.py#L427-L526" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/text.py#L428-L528" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">text</span><span class="op">.</span><span class="fu">token_length</span>(</span>
@@ -2068,7 +2068,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>A language model reads text as tokens, and most have a limit on how many they can take in, so the documents of a corpus for training (or a set of prompts) need to be neither too short nor too long, in the tokens of the model’s tokenizer. The step is a <code>col_vals_scored()</code> step with a <a href="../reference/scorers.token_count.html#pointblank.scorers.token_count" class="gdls-link"><code>token_count()</code></a> scorer, and a row fails if its number of tokens is below <code>min_val=</code> or above <code>max_val=</code>.</p>
+<p>A language model reads text as tokens, and most have a limit on how many they can take in, so the documents of a corpus for training (or a set of prompts) need to be neither too short nor too long, in the tokens of the model’s tokenizer. The step is a <a href="../reference/Validate.col_vals_scored.html#pointblank.Validate.col_vals_scored" class="gdls-link gdls-code">col_vals_scored()</a> step with a <a href="../reference/scorers.token_count.html#pointblank.scorers.token_count" class="gdls-link"><code>token_count()</code></a> scorer, and a row fails if its number of tokens is below <code>min_val=</code> or above <code>max_val=</code>.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -2139,7 +2139,7 @@ The step, to be added to a validation with <a href="../reference/Validate.add_st
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>A real check would use the tokenizer of a model (e.g., <code>"tiktoken:cl100k_base"</code>). Here, the tokens are the words, split on whitespace.</p>
-<div id="d15feaf5" class="cell" data-execution_count="2">
+<div id="78bec5fd" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>

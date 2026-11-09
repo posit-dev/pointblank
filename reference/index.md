@@ -55,7 +55,7 @@ The error raised when data fails a contract with `on_violation="raise"`.
 
 ## Contract Import/Export
 
-Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use `import_contract()` as the entry point, `export_contract()` for the reverse, and [register_adapter()](../reference/register_adapter.md#pointblank.register_adapter) to add support for custom formats.
+Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use [import_contract()](../reference/import_contract.md#pointblank.import_contract) as the entry point, [export_contract()](../reference/export_contract.md#pointblank.export_contract) for the reverse, and [register_adapter()](../reference/register_adapter.md#pointblank.register_adapter) to add support for custom formats.
 
 [import_contract()](import_contract.md#pointblank.import_contract)  
 Import a contract or schema written in another format.
@@ -313,7 +313,7 @@ Make validation steps that check the evaluation set of a RAG system.
 
 ## Column Selection
 
-Use the [col()](../reference/col.md#pointblank.col) function along with column selection helpers to flexibly select columns for validation. Combine [col()](../reference/col.md#pointblank.col) with [starts_with()](../reference/starts_with.md#pointblank.starts_with), `matches()`, etc. for selecting multiple target columns.
+Use the [col()](../reference/col.md#pointblank.col) function along with column selection helpers to flexibly select columns for validation. Combine [col()](../reference/col.md#pointblank.col) with [starts_with()](../reference/starts_with.md#pointblank.starts_with), [matches()](../reference/matches.md#pointblank.matches), etc. for selecting multiple target columns.
 
 [col()](col.md#pointblank.col)  
 Helper function for referencing a column in the input table.
@@ -340,7 +340,7 @@ Select the first `n` columns in the column list.
 Select the last `n` columns in the column list.
 
 [expr_col()](expr_col.md#pointblank.expr_col)  
-Create a column expression for use in `conjointly()` validation.
+Create a column expression for use in [Validate.conjointly()](../reference/Validate.conjointly.md#pointblank.Validate.conjointly) validation.
 
 ## Segment Groups
 
@@ -513,7 +513,7 @@ Restore a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a dictio
 
 ## Table Comparison
 
-Compare two tables row by row. `compare()` aligns the rows of a source and a target table (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus schema differences. The result is a [Comparison](../reference/Comparison.md#pointblank.Comparison) object with counts, row samples, and a tabular report. The same comparison is available as a validation step through [Validate.tbl_match()](../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match), and [Validate.tbl_reconcile()](../reference/Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile) compares aggregates (e.g., totals per group) instead of rows.
+Compare two tables row by row. [compare()](../reference/compare.md#pointblank.compare) aligns the rows of a source and a target table (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus schema differences. The result is a [Comparison](../reference/Comparison.md#pointblank.Comparison) object with counts, row samples, and a tabular report. The same comparison is available as a validation step through [Validate.tbl_match()](../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match), and [Validate.tbl_reconcile()](../reference/Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile) compares aggregates (e.g., totals per group) instead of rows.
 
 [compare()](compare.md#pointblank.compare)  
 Compare two tables row by row and report how they differ.

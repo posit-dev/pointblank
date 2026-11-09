@@ -2049,7 +2049,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/text.py#L529-L666" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/text.py#L531-L669" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">text</span><span class="op">.</span><span class="fu">no_pii</span>(</span>
@@ -2064,8 +2064,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Text collected for training or evaluating a model shouldn’t have personal information in it, such as email addresses, phone numbers, or credit card numbers. This function makes a <code>col_vals_regex()</code> step (with <code>inverse=True</code>) for each column and each kind of information: a row fails if its text has something that looks like one. The patterns use only the features of regular expressions that every backend has, so the checks run in the database (or in PySpark) like any other <code>col_vals_regex()</code> step.</p>
-<p>The patterns find likely matches, not certain ones: a number with the shape of a credit card number matches, with no checksum, and an unusual format of a phone number can be missed. For a thorough check, use a model for named entities (e.g., with <code>col_vals_scored()</code>).</p>
+<p>Text collected for training or evaluating a model shouldn’t have personal information in it, such as email addresses, phone numbers, or credit card numbers. This function makes a <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a> step (with <code>inverse=True</code>) for each column and each kind of information: a row fails if its text has something that looks like one. The patterns use only the features of regular expressions that every backend has, so the checks run in the database (or in PySpark) like any other <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a> step.</p>
+<p>The patterns find likely matches, not certain ones: a number with the shape of a credit card number matches, with no checksum, and an unusual format of a phone number can be missed. For a thorough check, use a model for named entities (e.g., with <a href="../reference/Validate.col_vals_scored.html#pointblank.Validate.col_vals_scored" class="gdls-link gdls-code">col_vals_scored()</a>).</p>
 <p>The entities are:</p>
 <ul>
 <li><code>"email"</code>: email addresses</li>
@@ -2129,7 +2129,7 @@ The steps, to be added to a validation with <a href="../reference/Validate.add_s
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s check a table of support tickets for personal information.</p>
-<div id="460f4184" class="cell" data-execution_count="2">
+<div id="f9bd3b45" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>

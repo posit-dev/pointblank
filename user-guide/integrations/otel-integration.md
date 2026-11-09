@@ -63,7 +63,7 @@ Pointblank offers two ways to export OTel signals, matching how different teams 
 
 ### Pattern A: Explicit Export
 
-Import [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter), run your validation, then call `export()`. This gives you full control over when and how signals are emitted.
+Import [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter), run your validation, then call [export()](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter.export). This gives you full control over when and how signals are emitted.
 
 ``` python
 from pointblank.integrations.otel import OTelExporter
@@ -203,7 +203,7 @@ otel = OTelExporter(
 otel.export(validation)
 ```
 
-The `export()` call is instantaneous as the in-memory providers simply store the data. In production, this is where the SDK would batch and send signals to your collector.
+The [export()](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter.export) call is instantaneous as the in-memory providers simply store the data. In production, this is where the SDK would batch and send signals to your collector.
 
 ### Inspect the Emitted Metrics
 

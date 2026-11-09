@@ -4,7 +4,7 @@ Validate that aggregates of the target table reconcile with a comparison table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L17537-L17835)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L17541-L17839)
 
 ``` python
 Validate.tbl_reconcile(
@@ -167,4 +167,4 @@ Grand totals don't need any keys. Here, the total amount matches within a tolera
 
     True
 
-The method chain ends with `all_passed()`, which returns `True`. The totals are `467.5` in the source and `456.5` in the loaded table, a difference of `11` that falls within the tolerance. A grand total can hide offsetting differences, though: the missing `west` orders and the larger `east` total partly cancel out, which is why the per-region check above is the stricter one.
+The method chain ends with [all_passed()](../reference/Validate.all_passed.md#pointblank.Validate.all_passed), which returns `True`. The totals are `467.5` in the source and `456.5` in the loaded table, a difference of `11` that falls within the tolerance. A grand total can hide offsetting differences, though: the missing `west` orders and the larger `east` total partly cancel out, which is why the per-region check above is the stricter one.

@@ -4,7 +4,7 @@ The results of a CDISC conformance check.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1336-L2967)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1337-L2968)
 
 ``` python
 ConformanceReport(
@@ -212,7 +212,7 @@ Check whether the datasets conform, with nothing failing.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1608-L1649)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1609-L1650)
 
 ``` python
 all_passed()
@@ -254,7 +254,7 @@ Summarize the results of the conformance check as a dict.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1722-L1813)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1723-L1814)
 
 ``` python
 summary()
@@ -312,7 +312,7 @@ Make a table of the results of the built-in rules.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2659-L2885)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2660-L2886)
 
 ``` python
 get_tabular_report()
@@ -732,7 +732,7 @@ Make a table of the failing records found by the built-in rules.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2487-L2657)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2488-L2658)
 
 ``` python
 get_findings_table()
@@ -779,7 +779,7 @@ report = pb.validate_sdtmig({"DM": dm})
 report.get_findings_table()
 ```
 
-    /Users/riannone/py_projects/pointblank/.venv/lib/python3.11/site-packages/great_tables/_render_checks.py:37: RenderWarning: Rendering table with .cols_width() in Quarto may result in unexpected behavior. This is because Quarto performs custom table processing. Either use all percentage widths, or set .tab_options(quarto_disable_processing=True) to disable Quarto table processing.
+    /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/great_tables/_render_checks.py:37: RenderWarning: Rendering table with .cols_width() in Quarto may result in unexpected behavior. This is because Quarto performs custom table processing. Either use all percentage widths, or set .tab_options(quarto_disable_processing=True) to disable Quarto table processing.
       warnings.warn(
 
 | Findings Report for CDISC Conformance |  |  |  |  |  |  |  |
@@ -799,7 +799,7 @@ Get the result of each rule.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1999-L2063)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2000-L2064)
 
 ``` python
 rules(status=None)
@@ -857,7 +857,7 @@ List the issues that the conformance check found.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1815-L1939)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1816-L1940)
 
 ``` python
 issues(
@@ -966,7 +966,7 @@ Get the failing records that the conformance check found.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1941-L1997)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1942-L1998)
 
 ``` python
 findings()
@@ -1020,7 +1020,7 @@ Get the failing records found by the built-in rules, as a DataFrame.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2383-L2485)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2384-L2486)
 
 ``` python
 findings_df()
@@ -1105,7 +1105,7 @@ Get the validation of one dataset from a Validate-based report.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1654-L1720)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1655-L1721)
 
 ``` python
 get_validation(name)
@@ -1161,7 +1161,7 @@ Save the report as a JSON file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2100-L2208)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2101-L2209)
 
 ``` python
 to_json(path)
@@ -1221,7 +1221,7 @@ Save the report as an Excel workbook.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2210-L2381)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2211-L2382)
 
 ``` python
 to_excel(path)
@@ -1300,7 +1300,7 @@ Make a report from the JSON report of a CDISC CORE run.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1439-L1542)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1440-L1543)
 
 ``` python
 from_core_report(

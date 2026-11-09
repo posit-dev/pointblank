@@ -4,7 +4,7 @@ Make validation steps that check that text has no personal information.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/text.py#L529-L666)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/text.py#L531-L669)
 
 ``` python
 text.no_pii(
@@ -19,9 +19,9 @@ text.no_pii(
 )
 ```
 
-Text collected for training or evaluating a model shouldn't have personal information in it, such as email addresses, phone numbers, or credit card numbers. This function makes a `col_vals_regex()` step (with `inverse=True`) for each column and each kind of information: a row fails if its text has something that looks like one. The patterns use only the features of regular expressions that every backend has, so the checks run in the database (or in PySpark) like any other `col_vals_regex()` step.
+Text collected for training or evaluating a model shouldn't have personal information in it, such as email addresses, phone numbers, or credit card numbers. This function makes a [col_vals_regex()](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) step (with `inverse=True`) for each column and each kind of information: a row fails if its text has something that looks like one. The patterns use only the features of regular expressions that every backend has, so the checks run in the database (or in PySpark) like any other [col_vals_regex()](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) step.
 
-The patterns find likely matches, not certain ones: a number with the shape of a credit card number matches, with no checksum, and an unusual format of a phone number can be missed. For a thorough check, use a model for named entities (e.g., with `col_vals_scored()`).
+The patterns find likely matches, not certain ones: a number with the shape of a credit card number matches, with no checksum, and an unusual format of a phone number can be missed. For a thorough check, use a model for named entities (e.g., with [col_vals_scored()](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored)).
 
 The entities are:
 

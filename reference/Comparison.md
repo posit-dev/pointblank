@@ -119,7 +119,7 @@ shape: (2, 6)
 | "orders"  | "orders"      | "Int64"      | "Int64"      | 0          | 0.0        |
 | "revenue" | "revenue"     | "Float64"    | "Float64"    | 1          | 0.25       |
 
-Only `revenue` has a mismatch, in one of the four matched rows. From here, the full report is available with [`get_tabular_report()`](../reference/Comparison.get_tabular_report.md#pointblank.Comparison.get_tabular_report), and the result can be saved with `to_json()` to keep a record of the check.
+Only `revenue` has a mismatch, in one of the four matched rows. From here, the full report is available with [`get_tabular_report()`](../reference/Comparison.get_tabular_report.md#pointblank.Comparison.get_tabular_report), and the result can be saved with [to_json()](../reference/Comparison.to_json.md#pointblank.Comparison.to_json) to keep a record of the check.
 
 ## See Also
 

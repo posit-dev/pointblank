@@ -955,7 +955,7 @@ validation = (
 The three outputs appear in the order the actions were given. A string action is printed as
 is, while the functions can use the summary to decide what to do. Two of the three steps have
 failures (`d` has values of `1000` or less and `c` has missing values), and only the
-`col_exists()` step passes.
+`~~pointblank.Validate.col_exists()` step passes.
 
 See Also
 --------
@@ -1570,9 +1570,10 @@ edit = pb.EditValidation.from_plans(original, revised, instruction="Loosen d; re
 edit.review()
 ```
 
-The review table lists one row per changed step: the `col_vals_gt()` step is modified (its
-`value=` went from `100` to `50`), the `col_vals_not_null()` step is added, and the unchanged
-`col_vals_regex()` step isn't shown. Once the changes look right,
+The review table lists one row per changed step: the `~~pointblank.Validate.col_vals_gt()` step
+is modified (its `value=` went from `100` to `50`), the
+`~~pointblank.Validate.col_vals_not_null()` step is added, and the unchanged
+`~~pointblank.Validate.col_vals_regex()` step isn't shown. Once the changes look right,
 [`accept()`](`pointblank.EditValidation.accept`) gives the revised plan as a `Validate` object
 that's ready to interrogate.
 
@@ -1821,7 +1822,8 @@ contract into a `Validate` object:
 1. a `Validate` is created for the table, with `tbl_name=` set to the contract name, a label of
 the form `"Contract: <name> v<version>"`, and the contract's `thresholds=`, `owner=`,
 `consumers=`, and `version=`
-2. if the contract has a schema, a `col_schema_match()` step is added first
+2.  if the contract has a schema, a `~~pointblank.Validate.col_schema_match()` step is added
+   first
 3. each [`Step`](`pointblank.Step`) is added in order, by calling the validation method it
 names with its stored arguments
 
@@ -1833,14 +1835,23 @@ Supported Step Methods
 ----------------------
 These validation methods can be used in a contract's steps:
 
-- column value checks: `col_vals_gt`, `col_vals_lt`, `col_vals_ge`, `col_vals_le`,
-`col_vals_eq`, `col_vals_ne`, `col_vals_between`, `col_vals_outside`, `col_vals_in_set`,
-`col_vals_not_in_set`, `col_vals_increasing`, `col_vals_decreasing`, `col_vals_null`,
-`col_vals_not_null`, `col_vals_regex`, `col_vals_within_spec`, and `col_vals_expr`
-- column-level checks: `col_exists` and `col_pct_null`
-- table-level checks: `col_schema_match`, `col_count_match`, `row_count_match`,
-`rows_distinct`, and `rows_complete`
-- multi-condition checks: `conjointly`, with its expressions given as a list in `exprs=`
+-  column value checks: `~~pointblank.Validate.col_vals_gt`,
+  `~~pointblank.Validate.col_vals_lt`, `~~pointblank.Validate.col_vals_ge`,
+  `~~pointblank.Validate.col_vals_le`,
+`~~pointblank.Validate.col_vals_eq`, `~~pointblank.Validate.col_vals_ne`,
+`~~pointblank.Validate.col_vals_between`, `~~pointblank.Validate.col_vals_outside`,
+`~~pointblank.Validate.col_vals_in_set`, `~~pointblank.Validate.col_vals_not_in_set`,
+`~~pointblank.Validate.col_vals_increasing`, `~~pointblank.Validate.col_vals_decreasing`,
+`~~pointblank.Validate.col_vals_null`, `~~pointblank.Validate.col_vals_not_null`,
+`~~pointblank.Validate.col_vals_regex`, `~~pointblank.Validate.col_vals_within_spec`, and
+`~~pointblank.Validate.col_vals_expr`
+-  column-level checks: `~~pointblank.Validate.col_exists` and
+  `~~pointblank.Validate.col_pct_null`
+-  table-level checks: `~~pointblank.Validate.col_schema_match`,
+  `~~pointblank.Validate.col_count_match`, `~~pointblank.Validate.row_count_match`,
+`~~pointblank.Validate.rows_distinct`, and `~~pointblank.Validate.rows_complete`
+-  multi-condition checks: `~~pointblank.Validate.conjointly`, with its expressions given as a
+  list in `exprs=`
 
 Each takes the same arguments as the [`Validate`](`pointblank.Validate`) method of the same
 name. A step that names any other method is rejected with a `ValueError` when the contract is
@@ -1861,8 +1872,8 @@ name to arguments. Step arguments must be plain data (strings, numbers, booleans
 lists, and dictionaries) for a contract to be written to YAML, although step-level
 `Thresholds` objects and tuples are converted to dictionaries automatically. A contract with
 other objects in its steps, such as a column selector (e.g., `pb.starts_with("amt_")`), a
-Polars expression, or a function, can't be written: `to_yaml()` raises a `ValueError` that
-says where the object is. Keep contracts like that in Python.
+Polars expression, or a function, can't be written: `~~pointblank.Contract.to_yaml()` raises a
+`ValueError` that says where the object is. Keep contracts like that in Python.
 
 Working With Other Pointblank Tools
 -----------------------------------
@@ -1947,8 +1958,8 @@ orders_contract.validate(orders_day_1)
 
 The report header shows the label built from the contract (`Contract: orders v1.2.0`) along
 with the owner, consumers, and version. The first step is the schema check, followed by one step
-per contract rule. The `col_vals_not_null` step names two columns, so it becomes two validation
-steps. All six steps pass.
+per contract rule. The `~~pointblank.Validate.col_vals_not_null` step names two columns, so it
+becomes two validation steps. All six steps pass.
 
 The next day's extract has problems: a missing customer ID, a repeated order ID, a negative
 amount, and a status the contract doesn't allow. The same contract catches all of them.
@@ -1970,9 +1981,9 @@ validation
 
 The schema still matches, but four of the rule steps have failing test units. With only four
 rows, one failure is already 25% of the table, so those steps exceed both the warning and the
-error thresholds. The `rows_distinct` step counts two failures because both rows with order
-`"A6"` are duplicates. Since the result is an ordinary `Validate` object, you can check it in
-code, for example to stop a scheduled job:
+error thresholds. The `~~pointblank.Validate.rows_distinct` step counts two failures because
+both rows with order `"A6"` are duplicates. Since the result is an ordinary `Validate` object,
+you can check it in code, for example to stop a scheduled job:
 
 ```{python}
 validation.all_passed()
@@ -2048,8 +2059,8 @@ method
     `value=0`). They're stored as given and passed to the method when the step is compiled, so
     a misspelled or missing argument raises a `TypeError` at that point rather than when the
     step is created. Positional arguments aren't supported. The one validation method that
-    takes positional arguments, `conjointly()`, receives its expressions as a list in `exprs=`
-    (e.g., `pb.Step("conjointly", exprs=[lambda df: pl.col("a") > 0])`).
+    takes positional arguments, `~~pointblank.Validate.conjointly()`, receives its expressions
+    as a list in `exprs=` (e.g., `pb.Step("conjointly", exprs=[lambda df: pl.col("a") > 0])`).
 
 Returns
 -------
@@ -2068,7 +2079,8 @@ step and argument holding one. Keep these in mind for steps you plan to save:
 
 - name columns with strings or lists of strings, rather than with selectors like
 `pb.starts_with()` or `pb.col()`
-- steps that take an expression or a function, such as `col_vals_expr` and `conjointly`, can
+-  steps that take an expression or a function, such as `~~pointblank.Validate.col_vals_expr`
+  and `~~pointblank.Validate.conjointly`, can
 only be used in contracts kept in Python
 
 All of these work when the step is used directly in Python.
@@ -2112,8 +2124,8 @@ print(age_step.kwargs)
 
 Steps are normally used in groups. Here are three more rules for a table of patients: each
 patient ID must appear only once, IDs must follow a pattern, and the `visit` column must be
-present. Note that `rows_distinct` takes `columns_subset=` rather than `columns=`, because
-each step's arguments are exactly those of its `Validate` method.
+present. Note that `~~pointblank.Validate.rows_distinct` takes `columns_subset=` rather than
+`columns=`, because each step's arguments are exactly those of its `Validate` method.
 
 ```{python}
 patient_steps = [
@@ -2177,10 +2189,10 @@ A reusable collection of validation step definitions.
 
 A `Steps` object is a list of validation steps that isn't attached to any table. You build it
 with the same methods you'd call on a [`Validate`](`pointblank.Validate`) object
-(`col_vals_not_null()`, `rows_distinct()`, `col_vals_regex()`, and so on), but each call only
-records the step. Nothing is checked until the collection is added to a validation with
-[`Validate.add_steps()`](`pointblank.Validate.add_steps`) and that validation is
-interrogated.
+(`~~pointblank.Steps.col_vals_not_null()`, `~~pointblank.Steps.rows_distinct()`,
+`~~pointblank.Steps.col_vals_regex()`, and so on), but each call only records the step. Nothing
+is checked until the collection is added to a validation with
+[`Validate.add_steps()`](`pointblank.Validate.add_steps`) and that validation is interrogated.
 
 This makes it possible to write a group of checks once and use it in many places. Many tables
 share the same rules: every table with a customer ID needs that ID to be present and unique,
@@ -2211,9 +2223,10 @@ Recording Steps
 ---------------
 Each validation method records one step and returns the same `Steps` object, so calls can be
 chained. All of the row-based and table-level validation methods are available, from
-`col_vals_gt()` to `tbl_reconcile()`, including `col_vals_scored()`. The aggregation methods
-(`col_sum_*()`, `col_avg_*()`, and `col_sd_*()`), `specially()`, and `prompt()` aren't, so add
-those directly to the validation.
+`~~pointblank.Steps.col_vals_gt()` to `~~pointblank.Steps.tbl_reconcile()`, including
+`~~pointblank.Steps.col_vals_scored()`. The aggregation methods (`col_sum_*()`, `col_avg_*()`,
+and `col_sd_*()`), `specially()`, and `prompt()` aren't, so add those directly to the
+validation.
 
 Because each method adds to the object it's called on, a collection isn't copied when you add
 to it. Calling a method on a shared collection (e.g., `extended = id_checks.col_exists(...)`)
@@ -2300,8 +2313,8 @@ crm_customers = pl.DataFrame(
 ```
 
 The report has one step per recorded step, in the order they were added. Customer ID `3`
-appears twice, so both of its rows fail the `rows_distinct` step. The address `"c-at-z.com"`
-fails the email pattern, and the country `"BR"` isn't in the allowed set.
+appears twice, so both of its rows fail the `~~pointblank.Steps.rows_distinct` step. The address
+`"c-at-z.com"` fails the email pattern, and the country `"BR"` isn't in the allowed set.
 
 The same collections can check a table from a billing system, where the ID column is called
 `cust_id`. The `columns_map=` argument renames the column in the added steps, and
@@ -2587,7 +2600,7 @@ dictionary with [`to_dict()`](`pointblank.Pipeline.to_dict`) and
 and `short_circuit=` setting under a `pipeline` key, plus the two contracts under `source` and
 `target`. Actions and final actions are functions or messages tied to your environment, so
 they aren't stored. Pass them again when you recreate the pipeline. The transformation isn't
-part of the pipeline either: it's given to `run()` each time.
+part of the pipeline either: it's given to `~~pointblank.Pipeline.run()` each time.
 
 Examples
 --------
@@ -2720,7 +2733,7 @@ upstream data is fixed, the same pipeline can be run again on it without any cha
 
 See Also
 --------
-PipelineResult : The result of `run()`, holding both boundary validations.
+PipelineResult : The result of `~~pointblank.Pipeline.run()`, holding both boundary validations.
 Contract : Define the source and target contracts.
 Step : A single validation rule within a contract.
 
@@ -2734,8 +2747,9 @@ and pass/fail properties for a quick go/no-go decision. Keeping all of it in one
 the code that runs a pipeline can decide what to do next (publish the output, stop the job, or
 alert someone) and still have the full reports at hand to explain the decision.
 
-You don't normally create a `PipelineResult` yourself. Get one from `run()` and read its
-attributes and properties. When `run()` raises a
+You don't normally create a `PipelineResult` yourself. Get one from
+`~~pointblank.Pipeline.run()` and read its attributes and properties. When
+`~~pointblank.Pipeline.run()` raises a
 [`ContractViolationError`](`pointblank.ContractViolationError`) instead, the error's `result`
 attribute holds the `PipelineResult`.
 
@@ -2912,8 +2926,9 @@ except pb.ContractViolationError as e:
 failed_run.target_validation
 ```
 
-The report shows the one failing test unit in the `col_vals_gt` step, the row for item
-`"b"`. Nothing after the `run()` call was reached, so the prices weren't published.
+The report shows the one failing test unit in the `~~pointblank.Validate.col_vals_gt` step, the
+row for item `"b"`. Nothing after the `~~pointblank.Pipeline.run()` call was reached, so the
+prices weren't published.
 
 See Also
 --------
@@ -2923,7 +2938,7 @@ Contract : Set `on_violation=` to choose what happens when data fails.
 
 ## Contract Import/Export
 
-Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use `import_contract()` as the entry point, `export_contract()` for the reverse, and `register_adapter()` to add support for custom formats.
+Import external schema definitions (JSON Schema, Frictionless Table Schema, and more) into Pointblank validation workflows, or export Pointblank contracts to those formats. Use `~~pointblank.import_contract()` as the entry point, `~~pointblank.export_contract()` for the reverse, and `register_adapter()` to add support for custom formats.
 
 
 
@@ -2933,10 +2948,10 @@ Import a contract or schema written in another format.
 
 Data is often already described somewhere outside of Pointblank: a JSON Schema for an API
 payload, a Frictionless Table Schema inside a Data Package, the `schema.yml` file of a dbt
-project, or an Open Data Contract Standard (ODCS) document. `import_contract()` reads such a
-definition and translates its rules into Pointblank validation steps. That way the existing
-definition can be checked against real data without rewriting it by hand, and the rules stay
-in the place where they're already maintained.
+project, or an Open Data Contract Standard (ODCS) document. `~~pointblank.import_contract()`
+reads such a definition and translates its rules into Pointblank validation steps. That way the
+existing definition can be checked against real data without rewriting it by hand, and the rules
+stay in the place where they're already maintained.
 
 The result is a [`ContractImport`](`pointblank.ContractImport`) object. It holds the column
 names and types, the mapped constraints, any metadata from the source (such as a title and a
@@ -2995,16 +3010,21 @@ Supported Formats
 Each built-in adapter reads the column names and types and the following rules:
 
 - **JSON Schema** (`"json_schema"`): the `properties` of an object schema become the columns.
-`required` maps to `col_vals_not_null()`, `minimum`/`maximum` to `col_vals_ge()`/
-`col_vals_le()`, `exclusiveMinimum`/`exclusiveMaximum` to `col_vals_gt()`/`col_vals_lt()`,
-`enum` to `col_vals_in_set()`, `pattern` to `col_vals_regex()`, and `const` to
-`col_vals_eq()`. The `format` values `email`, `uri`, `uri-reference`, `ipv4`, and `ipv6` map
-to `col_vals_within_spec()`; other formats (such as `date`) produce a warning. The `title` and
-`description` keywords are kept as metadata and `$schema` is recorded as the source version.
+`required` maps to `~~pointblank.Validate.col_vals_not_null()`, `minimum`/`maximum` to
+`~~pointblank.Validate.col_vals_ge()`/ `~~pointblank.Validate.col_vals_le()`,
+`exclusiveMinimum`/`exclusiveMaximum` to
+`~~pointblank.Validate.col_vals_gt()`/`~~pointblank.Validate.col_vals_lt()`, `enum` to
+`~~pointblank.Validate.col_vals_in_set()`, `pattern` to
+`~~pointblank.Validate.col_vals_regex()`, and `const` to `~~pointblank.Validate.col_vals_eq()`.
+The `format` values `email`, `uri`, `uri-reference`, `ipv4`, and `ipv6` map to
+`~~pointblank.Validate.col_vals_within_spec()`; other formats (such as `date`) produce a
+warning. The `title` and `description` keywords are kept as metadata and `$schema` is recorded
+as the source version.
 - **Frictionless Table Schema** (`"frictionless"`): a standalone Table Schema (with `fields`)
 or a Data Package (with `resources`). The field constraints `required`, `unique`, `minimum`,
-`maximum`, `enum`, and `pattern` are mapped, and a `primaryKey` becomes `col_vals_not_null()`
-on each key column plus `rows_distinct()` over all of them. Foreign keys produce a warning.
+`maximum`, `enum`, and `pattern` are mapped, and a `primaryKey` becomes
+`~~pointblank.Validate.col_vals_not_null()` on each key column plus
+`~~pointblank.Validate.rows_distinct()` over all of them. Foreign keys produce a warning.
 - **dbt** (`"dbt"`): the models and source tables of a `schema.yml` file. The column tests
 `not_null`, `unique`, and `accepted_values` are mapped (from either `data_tests:` or the older
 `tests:` key), as is a model-level `unique` test with `combination_of_columns`.
@@ -3182,7 +3202,7 @@ Export a Pointblank validation or contract to another format.
 Data quality rules written in Pointblank are often useful to tools that don't run Pointblank.
 An API team may want a JSON Schema, an analytics engineering team may want the tests in a dbt
 `schema.yml` file, and a data catalog may accept Open Data Contract Standard (ODCS) documents.
-`export_contract()` translates a [`Contract`](`pointblank.Contract`) or a
+`~~pointblank.export_contract()` translates a [`Contract`](`pointblank.Contract`) or a
 [`Validate`](`pointblank.Validate`) object into one of these formats, so a single set of rules
 can be published wherever it's needed.
 
@@ -3228,23 +3248,33 @@ The column types come from the contract's schema, and each built-in adapter tran
 checks:
 
 - **JSON Schema** (`"json_schema"`): a draft 2020-12 object schema whose `title` and
-`description` come from the contract. `col_vals_not_null()` adds the column to `required`;
-`col_vals_ge()`/`col_vals_le()` become `minimum`/`maximum`, `col_vals_gt()`/`col_vals_lt()`
-become `exclusiveMinimum`/`exclusiveMaximum`, and `col_vals_between()` sets both `minimum` and
-`maximum`. `col_vals_in_set()` becomes `enum`, `col_vals_regex()` becomes `pattern`,
-`col_vals_eq()` becomes `const`, and `col_vals_within_spec()` becomes a `format` for the
-`email`, `url`, `ipv4`, and `ipv6` specs.
+`description` come from the contract. `~~pointblank.Validate.col_vals_not_null()` adds the
+column to `required`;
+`~~pointblank.Validate.col_vals_ge()`/`~~pointblank.Validate.col_vals_le()` become
+`minimum`/`maximum`, `~~pointblank.Validate.col_vals_gt()`/`~~pointblank.Validate.col_vals_lt()`
+become `exclusiveMinimum`/`exclusiveMaximum`, and `~~pointblank.Validate.col_vals_between()`
+sets both `minimum` and `maximum`. `~~pointblank.Validate.col_vals_in_set()` becomes `enum`,
+`~~pointblank.Validate.col_vals_regex()` becomes `pattern`,
+`~~pointblank.Validate.col_vals_eq()` becomes `const`, and
+`~~pointblank.Validate.col_vals_within_spec()` becomes a `format` for the `email`, `url`,
+`ipv4`, and `ipv6` specs.
 - **Frictionless Table Schema** (`"frictionless"`): a `fields` list with field constraints.
-`col_vals_not_null()` becomes `required`, `rows_distinct()` becomes `unique`,
-`col_vals_ge()`/`col_vals_le()` become `minimum`/`maximum`, `col_vals_in_set()` becomes `enum`,
-and `col_vals_regex()` becomes `pattern`.
+`~~pointblank.Validate.col_vals_not_null()` becomes `required`,
+`~~pointblank.Validate.rows_distinct()` becomes `unique`,
+`~~pointblank.Validate.col_vals_ge()`/`~~pointblank.Validate.col_vals_le()` become
+`minimum`/`maximum`, `~~pointblank.Validate.col_vals_in_set()` becomes `enum`, and
+`~~pointblank.Validate.col_vals_regex()` becomes `pattern`.
 - **dbt** (`"dbt"`): a `version: 2` document with one model named after the contract.
-`col_vals_not_null()`, `rows_distinct()`, and `col_vals_in_set()` become the generic tests
-`not_null`, `unique`, and `accepted_values`.
+`~~pointblank.Validate.col_vals_not_null()`, `~~pointblank.Validate.rows_distinct()`, and
+`~~pointblank.Validate.col_vals_in_set()` become the generic tests `not_null`, `unique`, and
+`accepted_values`.
 - **Open Data Contract Standard** (`"odcs"`): a `DataContract` document with an `info` block
-and one dataset table. `col_vals_not_null()` sets `isNullable: false`, `rows_distinct()` sets
-`isUnique`, `col_vals_in_set()` becomes `enum`, `col_vals_regex()` becomes `pattern`, and
-`col_vals_ge()`/`col_vals_le()` become `minimum`/`maximum`.
+and one dataset table. `~~pointblank.Validate.col_vals_not_null()` sets `isNullable: false`,
+`~~pointblank.Validate.rows_distinct()` sets `isUnique`,
+`~~pointblank.Validate.col_vals_in_set()` becomes `enum`,
+`~~pointblank.Validate.col_vals_regex()` becomes `pattern`, and
+`~~pointblank.Validate.col_vals_ge()`/`~~pointblank.Validate.col_vals_le()` become
+`minimum`/`maximum`.
 
 Any other step, along with thresholds, actions, and owner information, isn't exported.
 
@@ -3294,8 +3324,8 @@ print(json.dumps(orders_json_schema, indent=2))
 
 The Pointblank types became JSON types, the not-null check filled the `required` list, the set
 of statuses became an `enum`, and the range check became `minimum` and `maximum` values. The
-`rows_distinct()` step was left out because JSON Schema has no way to say that a value must be
-unique across records.
+`~~pointblank.Validate.rows_distinct()` step was left out because JSON Schema has no way to say
+that a value must be unique across records.
 
 The same contract can be written out as a dbt `schema.yml` file. Here we write it to a
 `models` directory (which is created if it doesn't exist) and print the file's contents.
@@ -3312,8 +3342,8 @@ This time the uniqueness check is kept (as dbt's `unique` test) but the range ch
 since dbt has no generic test for it. The `amount` column is still listed, with its type and an
 empty list of tests.
 
-An exported document can be imported again with `import_contract()`. Doing so is a quick way to
-see which rules survive the round trip.
+An exported document can be imported again with `~~pointblank.import_contract()`. Doing so is a
+quick way to see which rules survive the round trip.
 
 ```{python}
 print(pb.import_contract(orders_json_schema).summary())
@@ -3352,8 +3382,10 @@ dict[str, dict]
 
     - `"class"`: the name of the adapter class
     - `"file_extensions"`: the list of file extensions used to detect the format
-    - `"supports_import"`: whether the format can be imported with `import_contract()`
-    - `"supports_export"`: whether the format can be exported with `export_contract()`
+    -  `"supports_import"`: whether the format can be imported with
+      `~~pointblank.import_contract()`
+    -  `"supports_export"`: whether the format can be exported with
+      `~~pointblank.export_contract()`
 
 Examples
 --------
@@ -3492,7 +3524,7 @@ for name, info in pb.list_adapters().items():
     print(f"{name:<18} import={info['supports_import']}  export={info['supports_export']}")
 ```
 
-And it can be used with `import_contract()`, either by name or (since it implements
+And it can be used with `~~pointblank.import_contract()`, either by name or (since it implements
 `detect()`) by letting the format be detected from the content.
 
 ```{python}
@@ -3501,7 +3533,8 @@ imported = pb.import_contract({"required_columns": ["id", "email"]})
 imported.constraints
 ```
 
-Exporting to this format isn't possible, so `export_contract()` raises an error that says so.
+Exporting to this format isn't possible, so `~~pointblank.export_contract()` raises an error
+that says so.
 
 ```{python}
 contract = pb.Contract(name="users", steps=[pb.Step("col_vals_not_null", columns="id")])
@@ -3520,7 +3553,8 @@ the adapter class would also implement
 See Also
 --------
 ContractAdapter : The base class to subclass when writing an adapter.
-ContractImport : What an adapter's `import_contract()` method returns.
+ContractImport : What an adapter's `~~pointblank.ContractAdapter.import_contract()` method
+    returns.
 list_adapters : List the registered adapters.
 pointblank.import_contract : Import a definition using a registered adapter.
 pointblank.export_contract : Export a contract using a registered adapter.
@@ -3553,9 +3587,10 @@ when the imported rules should become a starting point that's edited by hand
 wasn't
 
 `ContractImport` is a dataclass, so its fields can be read and changed directly. For instance,
-an unwanted constraint can be removed from `constraints` before calling `to_validate()`.
-Custom adapters (see [`ContractAdapter`](`pointblank.ContractAdapter`)) create these objects
-by calling the constructor with the parameters below.
+an unwanted constraint can be removed from `constraints` before calling
+`~~pointblank.ContractImport.to_validate()`. Custom adapters (see
+[`ContractAdapter`](`pointblank.ContractAdapter`)) create these objects by calling the
+constructor with the parameters below.
 
 Parameters
 ----------
@@ -3641,7 +3676,8 @@ readings.columns
 ```
 
 The constraints show how the temperature range became a pair of bounds, and how the primary
-key was expressed as not-null checks plus a `rows_distinct()` check over both key columns.
+key was expressed as not-null checks plus a `~~pointblank.Validate.rows_distinct()` check over
+both key columns.
 
 ```{python}
 for c in readings.constraints:
@@ -3673,8 +3709,8 @@ readings_tbl = pl.DataFrame(
 readings.to_validate(readings_tbl, tbl_name="readings").interrogate()
 ```
 
-The duplicated `("S2", 1)` key is caught by the `rows_distinct()` step, while the `75.0` reading
-no longer fails any step because the range check was removed.
+The duplicated `("S2", 1)` key is caught by the `~~pointblank.Validate.rows_distinct()` step,
+while the `75.0` reading no longer fails any step because the range check was removed.
 
 See Also
 --------
@@ -3699,7 +3735,8 @@ built-in ones do.
 A subclass sets a few class attributes and implements up to three methods:
 
 - [`detect()`](`pointblank.ContractAdapter.detect`) decides whether a source is in this format,
-which lets `import_contract()` find the adapter without being told `format=` (optional)
+which lets `~~pointblank.import_contract()` find the adapter without being told `format=`
+(optional)
 - [`import_contract()`](`pointblank.ContractAdapter.import_contract`) reads a source and
 returns a [`ContractImport`](`pointblank.ContractImport`) whose rules are expressed as
 [`MappedConstraint`](`pointblank.adapters.MappedConstraint`) objects (needed for import)
@@ -3824,8 +3861,8 @@ class DataDictionaryAdapter(pb.ContractAdapter):
 ```
 
 The bare `@pb.register_adapter` decorator registered the class under its `format_name`. Now
-a data dictionary can be imported with `import_contract()`, and its `detect()` method means
-there's no need for `format=`.
+a data dictionary can be imported with `~~pointblank.import_contract()`, and its `detect()`
+method means there's no need for `format=`.
 
 ```{python}
 customers_dd = {
@@ -3847,7 +3884,7 @@ which the coverage figure reflects. From here the import behaves like any other:
 validated against a table, turned into a contract, or written out as code.
 
 Exporting runs in the other direction. A contract written in Pointblank can be shared as a
-data dictionary with `export_contract()`.
+data dictionary with `~~pointblank.export_contract()`.
 
 ```{python}
 orders_contract = pb.Contract(
@@ -3865,12 +3902,13 @@ print(json.dumps(pb.export_contract(orders_contract, format="data_dictionary"), 
 
 The schema supplied the columns and their types, and the not-null and set-membership steps
 became `nullable` and `allowed` properties. The data dictionary format has nothing that
-corresponds to `col_vals_ge()`, so that step was left out.
+corresponds to `~~pointblank.Validate.col_vals_ge()`, so that step was left out.
 
 See Also
 --------
 register_adapter : Register an adapter so that it can be used by name.
-ContractImport : The object an adapter's `import_contract()` method returns.
+ContractImport : The object an adapter's `~~pointblank.ContractAdapter.import_contract()` method
+    returns.
 adapters.MappedConstraint : The objects that hold translated rules.
 list_adapters : List the registered adapters.
 
@@ -5766,13 +5804,13 @@ col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | Col
 
 Do column data lie outside of two specified values or data in other columns?
 
-The `col_vals_between()` validation method checks whether column values in a table *do not*
-fall within a certain range. The range is specified with three arguments: `left=`, `right=`,
-and `inclusive=`. The `left=` and `right=` values specify the lower and upper bounds. These
-bounds can be specified as literal values or as column names provided within
-[`col()`](`pointblank.col`). The validation will operate over the number of test units that
-is equal to the number of rows in the table (determined after any `pre=` mutation has been
-applied).
+The `~~pointblank.Validate.col_vals_between()` validation method checks whether column
+values in a table *do not* fall within a certain range. The range is specified with three
+arguments: `left=`, `right=`, and `inclusive=`. The `left=` and `right=` values specify the
+lower and upper bounds. These bounds can be specified as literal values or as column names
+provided within [`col()`](`pointblank.col`). The validation will operate over the number of
+test units that is equal to the number of rows in the table (determined after any `pre=`
+mutation has been applied).
 
 Parameters
 ----------
@@ -6562,7 +6600,8 @@ column `b` values of `2` and `6`, both of which are in the set of `[2, 3, 4, 5, 
 
 **Using Python Enums**
 
-Like `col_vals_in_set()`, this method also supports Python Enum classes and instances:
+Like `~~pointblank.Validate.col_vals_in_set()`, this method also supports Python Enum
+classes and instances:
 
 ```{python}
 from enum import Enum
@@ -11126,11 +11165,11 @@ Grand totals don't need any keys. Here, the total amount matches within a tolera
 )
 ```
 
-The method chain ends with `all_passed()`, which returns `True`. The totals are `467.5` in
-the source and `456.5` in the loaded table, a difference of `11` that falls within the
-tolerance. A grand total can hide offsetting differences, though: the missing `west` orders
-and the larger `east` total partly cancel out, which is why the per-region check above is
-the stricter one.
+The method chain ends with `~~pointblank.Validate.all_passed()`, which returns `True`. The
+totals are `467.5` in the source and `456.5` in the loaded table, a difference of `11` that
+falls within the tolerance. A grand total can hide offsetting differences, though: the
+missing `west` orders and the larger `east` total partly cancel out, which is why the
+per-region check above is the stricter one.
 
 conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
@@ -11683,8 +11722,9 @@ reporting framework.
 
 Like `col_vals_*()` methods, `prompt()` evaluates data against specific criteria, but
 instead of using programmatic rules, it uses natural language prompts interpreted by an LLM.
-Like `rows_distinct()` and `rows_complete()`, it operates at the row level and allows you to
-specify a subset of columns for evaluation using `columns_subset=`.
+Like `~~pointblank.Validate.rows_distinct()` and `~~pointblank.Validate.rows_complete()`, it
+operates at the row level and allows you to specify a subset of columns for evaluation using
+`columns_subset=`.
 
 The system automatically combines your validation criteria from the `prompt=` parameter with
 the necessary technical context, data formatting instructions, and response structure
@@ -12441,11 +12481,12 @@ group) is in a column of the results called `pb_cluster_`, which is in the extra
 failing rows and in the step report, where the rows of each group are shown together.
 The step's note says how many groups were found and how many rows are in them.
 
-Every row of a group fails, as with `rows_distinct()`. When the rows of a validation are
-used to clean a table (with [`get_row_flags()`](`pointblank.Validate.get_row_flags`), or
-in an [`Ablation`](`pointblank.Ablation`)), `duplicates=` decides which rows of a group
-are kept: `"keep_first"` keeps the first row of each group, `"keep_last"` the last, and
-`"flag_all"` keeps none.
+Every row of a group fails, as with `~~pointblank.Validate.rows_distinct()`. When the rows
+of a validation are used to clean a table (with
+[`get_row_flags()`](`pointblank.Validate.get_row_flags`), or in an
+[`Ablation`](`pointblank.Ablation`)), `duplicates=` decides which rows of a group are kept:
+`"keep_first"` keeps the first row of each group, `"keep_last"` the last, and `"flag_all"`
+keeps none.
 
 Comparing texts runs in Python. A Polars or pandas table is compared as it is (a Polars
 LazyFrame is collected first). For a database table (through Ibis) or a PySpark
@@ -17247,10 +17288,10 @@ clear_cache() -> 'None'
 
 Clear the scores that `Validate.col_vals_scored()` keeps in memory.
 
-With `cache=True` (the default of `col_vals_scored()`), the scores of a scorer are kept in
-memory for the rest of the session, so that interrogating the same data again (as in an
-ablation, or after a change to another step) doesn't score it again. This clears them, for
-all the scorers. A cache on disk (`cache=` as a directory) isn't changed: delete its
+With `cache=True` (the default of `~~pointblank.Validate.col_vals_scored()`), the scores of a
+scorer are kept in memory for the rest of the session, so that interrogating the same data again
+(as in an ablation, or after a change to another step) doesn't score it again. This clears them,
+for all the scorers. A cache on disk (`cache=` as a directory) isn't changed: delete its
 directory to clear it.
 
 Returns
@@ -17304,7 +17345,7 @@ with the bounds used for Gopher as the defaults:
   that, have, and with)
 - no more than `max_repeated_lines=` of the lines repeat an earlier line (30%)
 
-Each check is a `col_vals_scored()` step with a
+Each check is a `~~pointblank.Validate.col_vals_scored()` step with a
 [`text_stat()`](`pointblank.scorers.text_stat`) scorer, so the report shows each one, with
 its own counts of the documents that fail, and a brief that says what it checks. Set a
 bound to `None` to leave its check out (a check with two bounds is left out when both are
@@ -17399,11 +17440,12 @@ in_language(column: 'str', expected: 'str | list[str] | None' = None, expected_c
 
 Make a validation step that checks that text is in the expected language.
 
-The step is a `col_vals_scored()` step with a [`langid()`](`pointblank.scorers.langid`)
-scorer: a language identification model gives the probability that the text of each row is
-in one of the expected languages, and a row fails if the probability is below
-`min_confidence=`. The expected languages are the same for every row (`expected=`) or come
-from a column (`expected_column=`), for a corpus with documents in several languages.
+The step is a `~~pointblank.Validate.col_vals_scored()` step with a
+[`langid()`](`pointblank.scorers.langid`) scorer: a language identification model gives the
+probability that the text of each row is in one of the expected languages, and a row fails if
+the probability is below `min_confidence=`. The expected languages are the same for every row
+(`expected=`) or come from a column (`expected_column=`), for a corpus with documents in several
+languages.
 
 Parameters
 ----------
@@ -17493,8 +17535,9 @@ Make a validation step that checks the length of text in tokens.
 
 A language model reads text as tokens, and most have a limit on how many they can take in, so
 the documents of a corpus for training (or a set of prompts) need to be neither too short nor
-too long, in the tokens of the model's tokenizer. The step is a `col_vals_scored()` step with
-a [`token_count()`](`pointblank.scorers.token_count`) scorer, and a row fails if its number of
+too long, in the tokens of the model's tokenizer. The step is a
+`~~pointblank.Validate.col_vals_scored()` step with a
+[`token_count()`](`pointblank.scorers.token_count`) scorer, and a row fails if its number of
 tokens is below `min_val=` or above `max_val=`.
 
 Parameters
@@ -17565,14 +17608,15 @@ Make validation steps that check that text has no personal information.
 
 Text collected for training or evaluating a model shouldn't have personal information in it,
 such as email addresses, phone numbers, or credit card numbers. This function makes a
-`col_vals_regex()` step (with `inverse=True`) for each column and each kind of information:
-a row fails if its text has something that looks like one. The patterns use only the features
-of regular expressions that every backend has, so the checks run in the database (or in
-PySpark) like any other `col_vals_regex()` step.
+`~~pointblank.Validate.col_vals_regex()` step (with `inverse=True`) for each column and each
+kind of information: a row fails if its text has something that looks like one. The patterns use
+only the features of regular expressions that every backend has, so the checks run in the
+database (or in PySpark) like any other `~~pointblank.Validate.col_vals_regex()` step.
 
 The patterns find likely matches, not certain ones: a number with the shape of a credit card
 number matches, with no checksum, and an unusual format of a phone number can be missed. For
-a thorough check, use a model for named entities (e.g., with `col_vals_scored()`).
+a thorough check, use a model for named entities (e.g., with
+`~~pointblank.Validate.col_vals_scored()`).
 
 The entities are:
 
@@ -17665,15 +17709,17 @@ the metadata that the system needs (such as the source to cite, or the access co
 that says who can see it), and documents that haven't been updated in a long time. This
 function makes a validation step for each of them:
 
-- every chunk has text (not missing, and not only whitespace): a `col_vals_regex()` step
-- the chunk ids are unique, with `chunk_id=`: a `rows_distinct()` step
-- every chunk has a value of each column of `metadata=`: a `col_vals_not_null()` step for each
+-  every chunk has text (not missing, and not only whitespace): a
+  `~~pointblank.Validate.col_vals_regex()` step
+- the chunk ids are unique, with `chunk_id=`: a `~~pointblank.Validate.rows_distinct()` step
+-  every chunk has a value of each column of `metadata=`: a
+  `~~pointblank.Validate.col_vals_not_null()` step for each
 - the chunks have between `min_tokens=` and `max_tokens=` tokens, with either: a step of
   [`pb.text.token_length()`](`pointblank.text.token_length`)
 - no chunk is a near duplicate of another, unless `near_duplicates=False`: a
-  `rows_near_distinct()` step
+  `~~pointblank.Validate.rows_near_distinct()` step
 - every chunk was updated in the `max_age=` before the reference time, with `updated_at=`: a
-  `col_vals_ge()` step
+  `~~pointblank.Validate.col_vals_ge()` step
 
 Checks of the metadata of access control (like a column of the groups that can see a chunk)
 matter for security as much as for quality: a chunk without one may be shown to anyone, or
@@ -17699,7 +17745,7 @@ tokenizer
 near_duplicates
     Whether to check for near duplicates (`True` by default), or the threshold of the
     similarity of two chunks for them to be near duplicates (the `threshold=` of
-    `rows_near_distinct()`, `0.85` with `True`).
+    `~~pointblank.Validate.rows_near_distinct()`, `0.85` with `True`).
 updated_at
     The column with the time each chunk (or its document) was last updated, for the check of
     freshness. It needs `max_age=`.
@@ -17795,13 +17841,16 @@ duplicate counts twice in the scores), every gold document is in the corpus (a q
 document was removed or renamed can never be answered), and each gold passage is relevant to
 its query. This function makes a validation step for each:
 
-- every query has text (not missing, and not only whitespace): a `col_vals_regex()` step
+-  every query has text (not missing, and not only whitespace): a
+  `~~pointblank.Validate.col_vals_regex()` step
 - no query is a near duplicate of another, unless `near_duplicates=False`: a
-  `rows_near_distinct()` step
-- every query has a gold document, with `gold_doc_id=`: a `col_vals_not_null()` step
-- every gold document is in the corpus, with `corpus=`: a `col_vals_in_table()` step
+  `~~pointblank.Validate.rows_near_distinct()` step
+-  every query has a gold document, with `gold_doc_id=`: a
+  `~~pointblank.Validate.col_vals_not_null()` step
+-  every gold document is in the corpus, with `corpus=`: a
+  `~~pointblank.Validate.col_vals_in_table()` step
 - every passage is relevant to its query, with `passage=`, `scorer=`, and `min_relevance=`: a
-  `col_vals_scored()` step (with a reranker, like
+  `~~pointblank.Validate.col_vals_scored()` step (with a reranker, like
   [`pb.scorers.reranker()`](`pointblank.scorers.reranker`), or another scorer of a query and
   a passage)
 
@@ -17812,8 +17861,9 @@ query
 gold_doc_id
     The column with the id of the gold document of each query.
 corpus
-    The corpus (any table that `col_vals_in_table()` takes, such as a DataFrame, a database
-    table, or the path of a file) to look up the gold documents in. It needs `gold_doc_id=`.
+    The corpus (any table that `~~pointblank.Validate.col_vals_in_table()` takes, such as a
+    DataFrame, a database table, or the path of a file) to look up the gold documents in. It
+    needs `gold_doc_id=`.
 corpus_id
     The column of the corpus with the document ids (by default, the same name as
     `gold_doc_id=`).
@@ -17827,7 +17877,7 @@ min_relevance
 near_duplicates
     Whether to check for near-duplicate queries (`True` by default), or the threshold of the
     similarity of two queries for them to be near duplicates (the `threshold=` of
-    `rows_near_distinct()`, `0.85` with `True`).
+    `~~pointblank.Validate.rows_near_distinct()`, `0.85` with `True`).
 pre
     A function that transforms the table before each step, as in the validation methods.
 thresholds
@@ -17886,7 +17936,7 @@ such as `scorer=pb.scorers.reranker(provider="cohere")` with `passage=` and
 
 ## Column Selection
 
-Use the `col()` function along with column selection helpers to flexibly select columns for validation. Combine `col()` with `starts_with()`, `matches()`, etc. for selecting multiple target columns.
+Use the `col()` function along with column selection helpers to flexibly select columns for validation. Combine `col()` with `starts_with()`, `~~pointblank.matches()`, etc. for selecting multiple target columns.
 
 
 
@@ -17904,8 +17954,8 @@ value being compared is a column value. During validation (i.e., when
 [`interrogate()`](`pointblank.Validate.interrogate`) is called), Pointblank will then check that
 the column exists in the input table.
 
-For creating expressions to use with the `conjointly()` validation method, use the
-[`expr_col()`](`pointblank.expr_col`) function instead.
+For creating expressions to use with the `~~pointblank.Validate.conjointly()` validation method,
+use the [`expr_col()`](`pointblank.expr_col`) function instead.
 
 Parameters
 ----------
@@ -18003,7 +18053,7 @@ take advantage of the data types of the columns. The selectors are:
 - `boolean()`
 - `by_dtype()`
 - `categorical()`
-- `matches()`
+- `~~pointblank.matches()`
 - `numeric()`
 - `string()`
 
@@ -18174,7 +18224,7 @@ text `"2023"` or `"2024"`.
 
 See Also
 --------
-expr_col : Create a column expression for use in `conjointly()`.
+expr_col : Create a column expression for use in `~~pointblank.Validate.conjointly()`.
 
 starts_with(text: 'str', case_sensitive: 'bool' = False) -> 'StartsWith'
 
@@ -18661,9 +18711,9 @@ Select columns that match a specified regular expression pattern.
 
 Many validation methods have a `columns=` argument that can be used to specify the columns for
 validation (e.g., [`col_vals_gt()`](`pointblank.Validate.col_vals_gt`),
-[`col_vals_regex()`](`pointblank.Validate.col_vals_regex`), etc.). The `matches()` selector
-function can be used to select one or more columns matching a provided regular expression
-pattern. So if the set of table columns consists of
+[`col_vals_regex()`](`pointblank.Validate.col_vals_regex`), etc.). The `~~pointblank.matches()`
+selector function can be used to select one or more columns matching a provided regular
+expression pattern. So if the set of table columns consists of
 
 `[rev_01, rev_02, profit_01, profit_02, age]`
 
@@ -18672,10 +18722,10 @@ and you want to validate columns that have two digits at the end of the name, yo
 `profit_02` columns.
 
 There will be a validation step created for every resolved column. Note that if there aren't any
-columns resolved from using `matches()` (or any other expression using selector functions), the
-validation step will fail to be evaluated during the interrogation process. Such a failure to
-evaluate will be reported in the validation results but it won't affect the interrogation
-process overall (i.e., the process won't be halted).
+columns resolved from using `~~pointblank.matches()` (or any other expression using selector
+functions), the validation step will fail to be evaluated during the interrogation process. Such
+a failure to evaluate will be reported in the validation results but it won't affect the
+interrogation process overall (i.e., the process won't be halted).
 
 Parameters
 ----------
@@ -18689,7 +18739,7 @@ Returns
 Matches
     A `Matches` object, which can be used to select columns that match the specified pattern.
 
-Relevant Validation Methods where `matches()` can be Used
+Relevant Validation Methods where `~~pointblank.matches()` can be Used
 ---------------------------------------------------------
 This selector function can be used in the `columns=` argument of the following validation
 methods:
@@ -18712,17 +18762,17 @@ methods:
 - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
 - [`col_exists()`](`pointblank.Validate.col_exists`)
 
-The `matches()` selector function doesn't need to be used in isolation. Read the next section
-for information on how to compose it with other column selectors for more refined ways to select
-columns.
+The `~~pointblank.matches()` selector function doesn't need to be used in isolation. Read the
+next section for information on how to compose it with other column selectors for more refined
+ways to select columns.
 
 Additional Flexibilty through Composition with Other Column Selectors
 ---------------------------------------------------------------------
-The `matches()` function can be composed with other column selectors to create fine-grained
-column selections. For example, to select columns that have the text starting with five digits
-and end with `"_id"`, you can use the `matches()` and [`ends_with()`](`pointblank.ends_with`)
-functions together. The only condition is that the expressions are wrapped in the
-[`col()`](`pointblank.col`) function, like this:
+The `~~pointblank.matches()` function can be composed with other column selectors to create
+fine-grained column selections. For example, to select columns that have the text starting with
+five digits and end with `"_id"`, you can use the `~~pointblank.matches()` and
+[`ends_with()`](`pointblank.ends_with`) functions together. The only condition is that the
+expressions are wrapped in the [`col()`](`pointblank.col`) function, like this:
 
 ```python
 col(matches(r"^[0-9]{5}") & ends_with("_id"))
@@ -18753,8 +18803,8 @@ pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_in
 
 Suppose we have a table with columns `name`, `id_old`, `new_identifier`, and `pay_2021` and we'd
 like to validate that text values in columns having `"id"` or `"identifier"` in the name have a
-specific syntax. We can use the `matches()` column selector function to specify the columns that
-match the pattern.
+specific syntax. We can use the `~~pointblank.matches()` column selector function to specify the
+columns that match the pattern.
 
 ```{python}
 import pointblank as pb
@@ -18781,10 +18831,10 @@ validation
 From the results of the validation table we get two validation steps, one for `id_old` and one
 for `new_identifier`. The values in both columns all match the pattern `"ID[0-9]{4}"`.
 
-We can also use the `matches()` function in combination with other column selectors (within
-[`col()`](`pointblank.col`)) to create more complex column selection criteria (i.e., to select
-columns that satisfy multiple conditions). For example, to select columns that contain `"pay"`
-and match the text `"2023"` or `"2024"`, we can use the `&` operator to combine column
+We can also use the `~~pointblank.matches()` function in combination with other column selectors
+(within [`col()`](`pointblank.col`)) to create more complex column selection criteria (i.e., to
+select columns that satisfy multiple conditions). For example, to select columns that contain
+`"pay"` and match the text `"2023"` or `"2024"`, we can use the `&` operator to combine column
 selectors.
 
 ```{python}
@@ -19263,7 +19313,7 @@ From the results of the validation table we get three validation steps, one for 
 
 expr_col(column_name: 'str') -> 'ColumnExpression'
 
-Create a column expression for use in `conjointly()` validation.
+Create a column expression for use in `Validate.conjointly()` validation.
 
 This function returns a ColumnExpression object that supports operations like `>`, `<`, `+`,
 etc. for use in [`conjointly()`](`pointblank.Validate.conjointly`) validation expressions.
@@ -20333,8 +20383,8 @@ Notes on Fidelity
 -----------------
 As with [`to_code()`](`pointblank.Validate.to_code`), steps carrying non-serializable
 Python objects (`pre=` callables, `actions=`, callable `active=`, and the expressions of
-`col_vals_expr()`/`conjointly()`/`specially()`) cannot be represented in YAML; a
-placeholder is emitted and a warning is raised.
+`~~pointblank.Validate.col_vals_expr()`/`~~pointblank.Validate.conjointly()`/`specially()`)
+cannot be represented in YAML; a placeholder is emitted and a warning is raised.
 
 Values that YAML has no literal for, such as `Decimal("2.2")`, `datetime.time(9, 30)`, or
 a datetime in a named time zone, are written as `python:` blocks. These are among the few
@@ -20411,19 +20461,20 @@ The following validation methods have direct JSON Schema equivalents:
 
 | Pointblank method | JSON Schema keyword |
 |---|---|
-| `col_vals_not_null()` | `required` |
-| `col_vals_gt()` | `exclusiveMinimum` |
-| `col_vals_ge()` | `minimum` |
-| `col_vals_lt()` | `exclusiveMaximum` |
-| `col_vals_le()` | `maximum` |
-| `col_vals_eq()` | `const` |
-| `col_vals_in_set()` | `enum` |
-| `col_vals_between()` | `minimum` + `maximum` |
-| `col_vals_regex()` | `pattern`  |
-| `col_vals_within_spec()` | `format` |
+| `~~pointblank.Validate.col_vals_not_null()` | `required` |
+| `~~pointblank.Validate.col_vals_gt()` | `exclusiveMinimum` |
+| `~~pointblank.Validate.col_vals_ge()` | `minimum` |
+| `~~pointblank.Validate.col_vals_lt()` | `exclusiveMaximum` |
+| `~~pointblank.Validate.col_vals_le()` | `maximum` |
+| `~~pointblank.Validate.col_vals_eq()` | `const` |
+| `~~pointblank.Validate.col_vals_in_set()` | `enum` |
+| `~~pointblank.Validate.col_vals_between()` | `minimum` + `maximum` |
+| `~~pointblank.Validate.col_vals_regex()` | `pattern`  |
+| `~~pointblank.Validate.col_vals_within_spec()` | `format` |
 
-Steps with no JSON Schema equivalent (e.g., `rows_distinct()`, `tbl_match()`,
-`col_vals_outside()`) are silently skipped.
+Steps with no JSON Schema equivalent (e.g., `~~pointblank.Validate.rows_distinct()`,
+`~~pointblank.Validate.tbl_match()`, `~~pointblank.Validate.col_vals_outside()`) are
+silently skipped.
 
 Examples
 --------
@@ -20727,7 +20778,7 @@ There are some caveats to sundering. The validation steps considered for this sp
 only involve steps where:
 
 - of certain check types, where test units are rows or cells checked down a column (e.g.,
-the `col_vals_*()` methods and `rows_complete()`)
+the `col_vals_*()` methods and `~~pointblank.Validate.rows_complete()`)
 - `active=` is not set to `False`
 - `pre=` has not been given an expression for modifying the input table, unless it's
 marked with [`row_preserving()`](`pointblank.row_preserving`)
@@ -20754,11 +20805,11 @@ type
     latter returns a table only containing rows had test units that failed in at least one
     validation step.
 duplicates
-    How to treat the duplicate rows found by `rows_distinct()` (and
-    `rows_near_distinct()`) steps. The default `None` leaves those steps out of the
-    sundering. Use `"keep_first"` or `"keep_last"` to keep one
-    copy of each group of duplicates (the first or last one, in row order or in the order
-    given by `duplicates_order_by=`), or `"flag_all"` to treat every copy as failing.
+    How to treat the duplicate rows found by `~~pointblank.Validate.rows_distinct()` (and
+    `~~pointblank.Validate.rows_near_distinct()`) steps. The default `None` leaves those
+    steps out of the sundering. Use `"keep_first"` or `"keep_last"` to keep one copy of each
+    group of duplicates (the first or last one, in row order or in the order given by
+    `duplicates_order_by=`), or `"flag_all"` to treat every copy as failing.
 duplicates_order_by
     One or more columns that order the copies of a duplicated row, to decide which copy is
     kept with `duplicates="keep_first"` or `duplicates="keep_last"`. For example, use
@@ -20848,7 +20899,8 @@ pb.preview(
 The validation report would count both copies of `id` `2` as failing, but with
 `duplicates="keep_last"` the copy with `version` `2` is kept in the 'pass' piece, and only
 the older copy would be in the 'fail' piece. Without `duplicates=`, the
-`rows_distinct()` step would be left out and all four rows would be returned.
+`~~pointblank.Validate.rows_distinct()` step would be left out and all four rows would be
+returned.
 
 See Also
 --------
@@ -20891,24 +20943,24 @@ counted in its `pb_row_score_`. A row that no step checked has a missing `pb_row
 Unlike `get_sundered_data()`, steps that use
 [`rows_distinct()`](`pointblank.Validate.rows_distinct`) are included by default: one copy
 of each group of duplicate rows (the first one) isn't flagged, and the other copies are. So
-a `rows_distinct()` flag marks the rows that removing duplicates would remove. Use
-`duplicates=` and `duplicates_order_by=` to choose which copy is kept. Steps that use
-[`rows_near_distinct()`](`pointblank.Validate.rows_near_distinct`) are treated in the same
-way, with a group of near duplicates in place of the copies of a row.
+a `~~pointblank.Validate.rows_distinct()` flag marks the rows that removing duplicates would
+remove. Use `duplicates=` and `duplicates_order_by=` to choose which copy is kept. Steps
+that use [`rows_near_distinct()`](`pointblank.Validate.rows_near_distinct`) are treated in
+the same way, with a group of near duplicates in place of the copies of a row.
 
 A row-level step that can't be used is reported in a warning: that's a step that uses an
 unmarked `pre=` function (it can change the rows, so its results may not line up with the
-table's rows), a step that couldn't be evaluated, or a `rows_distinct()` step when
-`duplicates=None`.
+table's rows), a step that couldn't be evaluated, or a
+`~~pointblank.Validate.rows_distinct()` step when `duplicates=None`.
 
 Parameters
 ----------
 duplicates
-    How to flag the duplicate rows found by `rows_distinct()` (and `rows_near_distinct()`)
-    steps. With `"keep_first"` (the default) or `"keep_last"`, one copy of each group of
-    duplicates (the first or last one, in row order or in the order given by
-    `duplicates_order_by=`) isn't flagged. `"flag_all"` flags every copy, as the step
-    itself counts them, and `None` leaves those steps out.
+    How to flag the duplicate rows found by `~~pointblank.Validate.rows_distinct()` (and
+    `~~pointblank.Validate.rows_near_distinct()`) steps. With `"keep_first"` (the default)
+    or `"keep_last"`, one copy of each group of duplicates (the first or last one, in row
+    order or in the order given by `duplicates_order_by=`) isn't flagged. `"flag_all"` flags
+    every copy, as the step itself counts them, and `None` leaves those steps out.
 duplicates_order_by
     One or more columns that order the copies of a duplicated row, to decide which copy
     isn't flagged. For example, use `duplicates="keep_last",
@@ -20961,8 +21013,8 @@ pb.preview(validation.get_row_flags())
 Each step has a flag column. Both copies of order `2` have a negative amount, so both fail
 step 1, but only the second copy is flagged by step 3, since removing duplicates would keep
 the first one. Order `3` fails step 1 because its amount is missing (missing values fail
-`col_vals_gt()` unless `na_pass=True`) and it also fails step 2. Order `1` passed every
-check, so it has a `pb_row_score_` of `1`.
+`~~pointblank.Validate.col_vals_gt()` unless `na_pass=True`) and it also fails step 2. Order
+`1` passed every check, so it has a `pb_row_score_` of `1`.
 
 See Also
 --------
@@ -21729,8 +21781,8 @@ validation.get_dimension_scores(by="f")
 ```
 
 The rows with `f` of `"low"` have no missing values in `c`, but only 2 of their 5 values
-in `d` are above 1000. The `rows_distinct()` step isn't segmented, so it's not part of the
-scores of any segment.
+in `d` are above 1000. The `~~pointblank.Validate.rows_distinct()` step isn't segmented, so
+it's not part of the scores of any segment.
 
 See Also
 --------
@@ -22798,7 +22850,7 @@ shows the differences as a table, for a person to review.
 Parameters
 ----------
 current
-    The newer `DataScan` (the one whose `compare()` method was called).
+    The newer `DataScan` (the one whose `~~pointblank.DataScan.compare()` method was called).
 baseline
     The older `DataScan` that `current` is compared against.
 
@@ -23473,8 +23525,9 @@ validation = (
 validation
 ```
 
-The CSV file is read into a table during interrogation. The three `col_exists()` steps and the
-`col_vals_gt()` step all pass.
+The CSV file is read into a table during interrogation. The three
+`~~pointblank.Validate.col_exists()` steps and the `~~pointblank.Validate.col_vals_gt()` step
+all pass.
 
 We can also get a Parquet file path for validation examples:
 
@@ -24234,7 +24287,7 @@ information.
 
 ## Table Comparison
 
-Compare two tables row by row. `compare()` aligns the rows of a source and a target table (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus schema differences. The result is a `Comparison` object with counts, row samples, and a tabular report. The same comparison is available as a validation step through `Validate.tbl_match()`, and `Validate.tbl_reconcile()` compares aggregates (e.g., totals per group) instead of rows.
+Compare two tables row by row. `~~pointblank.compare()` aligns the rows of a source and a target table (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus schema differences. The result is a `Comparison` object with counts, row samples, and a tabular report. The same comparison is available as a validation step through `Validate.tbl_match()`, and `Validate.tbl_reconcile()` compares aggregates (e.g., totals per group) instead of rows.
 
 
 
@@ -24245,8 +24298,8 @@ Compare two tables row by row and report how they differ.
 A common data question is *how do these two tables differ?* You may have refactored a
 pipeline and want to know whether its output changed, migrated a table from one database to
 another, or received a new extract of a data feed. Spot checks and row counts can tell you
-*that* something changed. The `compare()` function tells you *which* rows changed, how, and in
-which columns.
+*that* something changed. The `~~pointblank.compare()` function tells you *which* rows changed,
+how, and in which columns.
 
 It aligns the rows of a *source* table (the reference, or expected data) with those of a
 *target* table (the data being checked) and classifies every aligned row: rows that match,
@@ -24583,7 +24636,7 @@ comparison.column_summary()
 
 Only `revenue` has a mismatch, in one of the four matched rows. From here, the full report is
 available with [`get_tabular_report()`](`pointblank.Comparison.get_tabular_report`), and the
-result can be saved with `to_json()` to keep a record of the check.
+result can be saved with `~~pointblank.Comparison.to_json()` to keep a record of the check.
 
 See Also
 --------
@@ -26324,8 +26377,8 @@ duplicates
     How the duplicate rows found by [`rows_distinct()`](`pointblank.Validate.rows_distinct`)
     steps are removed. With `"keep_first"` (the default) or `"keep_last"`, one copy of each
     group of duplicates is kept and the others are removed. `"flag_all"` removes every copy,
-    and `None` leaves `rows_distinct()` steps out of the ablation. These are the same options as
-    in [`get_row_flags()`](`pointblank.Validate.get_row_flags`).
+    and `None` leaves `~~pointblank.Validate.rows_distinct()` steps out of the ablation. These
+    are the same options as in [`get_row_flags()`](`pointblank.Validate.get_row_flags`).
 duplicates_order_by
     One or more columns that order the copies of a duplicated row, to decide which copy is
     kept (e.g., `"updated_at"` with `duplicates="keep_last"` keeps the newest record).
@@ -26880,7 +26933,7 @@ drop_all(self, steps: 'list[int] | None' = None) -> 'Ablation'
 Add a variant that removes the rows failing any step.
 
 This variant answers the question 'does the validation as a whole help?' Without
-`rows_distinct()` steps, its training table is the one that
+`~~pointblank.Validate.rows_distinct()` steps, its training table is the one that
 [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`) gives: the rows that
 passed every step.
 
@@ -27226,11 +27279,12 @@ Ablation
 Details
 -------
 The step is run again as it was set up, with only `param=` changed, so a
-`col_vals_scored()` step takes its scores from the score cache instead of scoring the rows
-again. For a segmented step, only the step's own segment is checked. A value that the
-validation method doesn't accept (e.g., a `min_val=` above the step's `max_val=`) gives an
-error. As with any other variant, a value whose step fails no rows is left out, and a value
-that removes the same rows as another version of the table isn't evaluated again.
+`~~pointblank.Validate.col_vals_scored()` step takes its scores from the score cache instead
+of scoring the rows again. For a segmented step, only the step's own segment is checked. A
+value that the validation method doesn't accept (e.g., a `min_val=` above the step's
+`max_val=`) gives an error. As with any other variant, a value whose step fails no rows is
+left out, and a value that removes the same rows as another version of the table isn't
+evaluated again.
 
 Examples
 --------
@@ -27808,15 +27862,15 @@ Parameters
 ----------
 results
     The metrics of the evaluations: the path of a CSV file, the path of a directory with a
-    `results.csv` file (e.g., the directory written by `export()`), or a table (e.g., a
-    Polars or pandas DataFrame). It needs a `variant` column (the id of the version of the
-    table), a `seed` column, and a column for each metric. A `repeat` column is checked if
-    it's there, and any other column is a metric.
+    `results.csv` file (e.g., the directory written by `~~pointblank.Ablation.export()`), or
+    a table (e.g., a Polars or pandas DataFrame). It needs a `variant` column (the id of the
+    version of the table), a `seed` column, and a column for each metric. A `repeat` column
+    is checked if it's there, and any other column is a metric.
 manifest
-    The path of the `manifest.json` file written by `export()` (or of its directory). By
-    default, a manifest in the same directory as the results file is used if there is one.
-    Its fingerprints are checked against the ablation, which makes sure that the results
-    are for the same data and the same versions of the table.
+    The path of the `manifest.json` file written by `~~pointblank.Ablation.export()` (or of
+    its directory). By default, a manifest in the same directory as the results file is used
+    if there is one. Its fingerprints are checked against the ablation, which makes sure
+    that the results are for the same data and the same versions of the table.
 
 Returns
 -------
@@ -28525,7 +28579,7 @@ numbers, lists, and so on): [`load_dataset()`](`pointblank.load_dataset`),
 [`col()`](`pointblank.col`), [`ref()`](`pointblank.ref`),
 [`seg_group()`](`pointblank.seg_group`), [`has_columns()`](`pointblank.has_columns`),
 [`has_rows()`](`pointblank.has_rows`), and the column selectors (`starts_with()`, `ends_with()`,
-`contains()`, `matches()`, `everything()`, `first_n()`, and `last_n()`). So can the
+`contains()`, `~~pointblank.matches()`, `everything()`, `first_n()`, and `last_n()`). So can the
 constructors for values that YAML has no literal for: `Decimal()`, `ZoneInfo()`,
 `datetime.date()`, `datetime.time()`, `datetime.datetime()`, and `datetime.timedelta()`. These
 only load a bundled dataset or build an object, so `value: pb.col("b")`,
@@ -28630,8 +28684,8 @@ result
 ```
 
 The validation table shows the results of our YAML-defined workflow. We can see that the
-`rows_distinct()` validation failed (because there are duplicate rows in the table), while the
-column existence checks passed.
+`~~pointblank.Validate.rows_distinct()` validation failed (because there are duplicate rows in
+the table), while the column existence checks passed.
 
 Now let's create a more comprehensive validation workflow with thresholds and metadata:
 
@@ -28749,7 +28803,7 @@ The 15 available aggregate methods follow the pattern `col_{stat}_{comparator}` 
 
 ### Data Freshness
 
-Check that a date/datetime column has recent data using `data_freshness`:
+Check that a date/datetime column has recent data using `~~pointblank.Validate.data_freshness`:
 
 ```yaml
 tbl: events.csv
@@ -28782,7 +28836,8 @@ steps:
 
 ### Null Percentage Check
 
-Use `col_pct_null` to validate that the percentage of null values in a column is within bounds:
+Use `~~pointblank.Validate.col_pct_null` to validate that the percentage of null values in a
+column is within bounds:
 
 ```yaml
 steps:
@@ -29012,11 +29067,12 @@ Unknown top-level keys are rejected, which catches typos like `tbl_nmae` or `ste
 
 Supported Validation Methods
 ----------------------------
-In addition to all standard validation methods (e.g., `col_vals_gt`, `rows_distinct`,
-`col_schema_match`), the following methods are also supported:
+In addition to all standard validation methods (e.g., `~~pointblank.Validate.col_vals_gt`,
+`~~pointblank.Validate.rows_distinct`, `~~pointblank.Validate.col_schema_match`), the following
+methods are also supported:
 
-- `col_pct_null`: check the percentage of null values in a column
-- `data_freshness`: check that data is recent
+- `~~pointblank.Validate.col_pct_null`: check the percentage of null values in a column
+- `~~pointblank.Validate.data_freshness`: check that data is recent
 - aggregate methods: `col_sum_gt`, `col_sum_lt`, `col_sum_ge`, `col_sum_le`,
   `col_sum_eq`, `col_avg_gt`, `col_avg_lt`, `col_avg_ge`, `col_avg_le`,
   `col_avg_eq`, `col_sd_gt`, `col_sd_lt`, `col_sd_ge`, `col_sd_le`, `col_sd_eq`
@@ -29185,7 +29241,8 @@ allow_python
     Whether to run Python code in the configuration. The `evaluate:` of the `ablation:` block
     is Python code (it imports a function and runs it on the training data), so it's only
     used with `allow_python=True`. Without it, either pass `evaluate=` or leave `evaluate:`
-    out (e.g., to `export()` the versions of the table for evaluation elsewhere).
+    out (e.g., to `~~pointblank.Ablation.export()` the versions of the table for evaluation
+    elsewhere).
 
 Returns
 -------
@@ -33029,9 +33086,10 @@ validation = (
 validation
 ```
 
-The `col_vals_gt()` step on `AESEQ` fails for the third row, whose sequence number is `0`. The
-`col_exists()` steps at the end show that `AEDECOD`, a required AE variable, is missing from
-the dataset. The `tbl_name=` argument was passed on to `Validate`.
+The `~~pointblank.Validate.col_vals_gt()` step on `AESEQ` fails for the third row, whose
+sequence number is `0`. The `~~pointblank.Validate.col_exists()` steps at the end show that
+`AEDECOD`, a required AE variable, is missing from the dataset. The `tbl_name=` argument was
+passed on to `Validate`.
 
 See Also
 --------
@@ -34318,8 +34376,9 @@ standard
 standard_version
     The version of the standard, such as `"3.4"` for SDTMIG 3.4. The default is `"3.4"`.
 study_id
-    A study identifier. It is shown by `summary()` and used in the labels of the validations
-    made by `validate_conformance(engine="validate")`. The default is `None`.
+    A study identifier. It is shown by `~~pointblank.SubmissionPackage.summary()` and used in
+    the labels of the validations made by `validate_conformance(engine="validate")`. The default
+    is `None`.
 
 Examples
 --------
@@ -37150,7 +37209,7 @@ multiple tables.
 #### Foreign Key Validation
 
 Verify that all keys in one dataset exist in another (this is equivalent to using
-`col_vals_in_table()` but shown here for completeness):
+`~~pointblank.Validate.col_vals_in_table()` but shown here for completeness):
 
 ```{python}
 # Create related datasets: Orders and OrderDetails
@@ -39897,8 +39956,8 @@ ways (e.g., integers sometimes stored as floats).
 
 ## Schema Validation Options
 
-When using `col_schema_match()`, you can customize validation behavior with several important
-options:
+When using `~~pointblank.Validate.col_schema_match()`, you can customize validation behavior with
+several important options:
 
 | Option | Default | Description |
 |--------|---------|-------------|
@@ -41075,8 +41134,8 @@ A few things to notice in the output:
 of the variable your data lives in. Replace it with your actual data variable before running the
 code.
 - Adjacent steps that differ only by column are collapsed into a single call: the two
-`col_vals_not_null()` steps above become `col_vals_not_null(columns=["a", "b"])`. This keeps the
-output compact and diffs minimal.
+`~~pointblank.Validate.col_vals_not_null()` steps above become
+`col_vals_not_null(columns=["a", "b"])`. This keeps the output compact and diffs minimal.
 - Only non-default arguments are emitted. A step-level threshold that matches the table-level default
 is omitted, `na_pass=True` appears only where it was set, and so on.
 
@@ -41105,8 +41164,9 @@ validation.to_yaml(path="plans/small_table.yaml")
 
 ## Round-Tripping a Plan
 
-Because `to_yaml()` emits a `yaml_interrogate()`-compatible document, a plan round-trips through
-YAML. Here we serialize a plan, then rebuild and run it with `yaml_interrogate()`:
+Because `~~pointblank.Validate.to_yaml()` emits a `yaml_interrogate()`-compatible document, a plan
+round-trips through YAML. Here we serialize a plan, then rebuild and run it with
+`yaml_interrogate()`:
 
 ```{python}
 yaml_str = validation.to_yaml()
@@ -41115,9 +41175,9 @@ rebuilt = pb.yaml_interrogate(yaml_str)
 rebuilt
 ```
 
-The rebuilt plan carries the same steps as the original. The Python code from `to_code()`
-round-trips in the same way: executing it (after replacing `your_data`) reconstructs an equivalent
-plan.
+The rebuilt plan carries the same steps as the original. The Python code from
+`~~pointblank.Validate.to_code()` round-trips in the same way: executing it (after replacing
+`your_data`) reconstructs an equivalent plan.
 
 ## Fidelity and Limitations
 
@@ -41171,11 +41231,11 @@ configuration-driven workflow.
 
 ## Exporting a Plan as JSON Schema
 
-While `to_code()` and `to_yaml()` reproduce your plan as Pointblank-specific source,
-[`to_json_schema()`](`Validate.to_json_schema`) converts your validation rules into a
-[JSON Schema](https://json-schema.org/) document. JSON Schema is a widely adopted, language-neutral
-standard, so the exported schema can be consumed by validation libraries in JavaScript, Java, Go,
-and many other ecosystems.
+While `~~pointblank.Validate.to_code()` and `~~pointblank.Validate.to_yaml()` reproduce your plan as
+Pointblank-specific source, [`to_json_schema()`](`Validate.to_json_schema`) converts your validation
+rules into a [JSON Schema](https://json-schema.org/) document. JSON Schema is a widely adopted,
+language-neutral standard, so the exported schema can be consumed by validation libraries in
+JavaScript, Java, Go, and many other ecosystems.
 
 ```{python}
 import json
@@ -41201,20 +41261,21 @@ Each validation method is mapped to its closest JSON Schema keyword:
 
 | Pointblank method | JSON Schema keyword |
 |---|---|
-| `col_vals_not_null()` | `required` |
-| `col_vals_gt()` | `exclusiveMinimum` |
-| `col_vals_ge()` | `minimum` |
-| `col_vals_lt()` | `exclusiveMaximum` |
-| `col_vals_le()` | `maximum` |
-| `col_vals_eq()` | `const` |
-| `col_vals_between()` | `minimum` + `maximum` |
-| `col_vals_in_set()` | `enum` |
-| `col_vals_regex()` | `pattern` |
-| `col_vals_within_spec()` | `format` |
+| `~~pointblank.Validate.col_vals_not_null()` | `required` |
+| `~~pointblank.Validate.col_vals_gt()` | `exclusiveMinimum` |
+| `~~pointblank.Validate.col_vals_ge()` | `minimum` |
+| `~~pointblank.Validate.col_vals_lt()` | `exclusiveMaximum` |
+| `~~pointblank.Validate.col_vals_le()` | `maximum` |
+| `~~pointblank.Validate.col_vals_eq()` | `const` |
+| `~~pointblank.Validate.col_vals_between()` | `minimum` + `maximum` |
+| `~~pointblank.Validate.col_vals_in_set()` | `enum` |
+| `~~pointblank.Validate.col_vals_regex()` | `pattern` |
+| `~~pointblank.Validate.col_vals_within_spec()` | `format` |
 
 When the `Validate` object has data attached, the schema is automatically enriched with column type
 information (`"type": "integer"`, `"type": "string"`, etc.) inferred from the data. Steps that have
-no natural JSON Schema equivalent (e.g., `rows_distinct()`, `tbl_match()`) are silently skipped.
+no natural JSON Schema equivalent (e.g., `~~pointblank.Validate.rows_distinct()`,
+`~~pointblank.Validate.tbl_match()`) are silently skipped.
 
 ### Writing to a File
 
@@ -41234,9 +41295,9 @@ Under the hood, `to_json_schema()` delegates to the
 [`export_contract()`](`pointblank.export_contract`) function with `format="json_schema"`. The
 convenience method adds type enrichment from the data and handles file output. If you need the raw
 adapter behavior (for example, to export without type enrichment, or to work with a `Contract`
-object rather than a `Validate` object), use `export_contract()` directly. See the [Importing and
-Exporting Contracts](../08-contracts-and-pipelines/04-importing-contracts.qmd) guide for the full
-story on contract adapters.
+object rather than a `Validate` object), use `~~pointblank.export_contract()` directly. See the
+[Importing and Exporting Contracts](../08-contracts-and-pipelines/04-importing-contracts.qmd) guide
+for the full story on contract adapters.
 
 ## Conclusion
 
@@ -41664,8 +41725,9 @@ called on.
 
 The `Steps` class lets you record validation steps without binding them to data, thresholds, or any
 other `Validate` configuration. You use the same method names and parameters you already know from
-`Validate` (`col_vals_gt()`, `col_vals_not_null()`, `col_vals_regex()`, etc.), but instead of
-running the checks, `Steps` stores them for later use.
+`Validate` (`~~pointblank.Validate.col_vals_gt()`, `~~pointblank.Validate.col_vals_not_null()`,
+`~~pointblank.Validate.col_vals_regex()`, etc.), but instead of running the checks, `Steps` stores
+them for later use.
 
 The key benefit is **portability**: a `Steps` object can live in a shared Python module and be
 imported into any number of validation pipelines. The step definitions stay the same and only the
@@ -42064,8 +42126,8 @@ Most validation checks are about the form of the data: whether a value is in a r
 pattern, or isn't missing. Some of the checks that matter most for text are about its meaning
 instead. Does a passage answer the query it was retrieved for? Is a document of good quality, or
 toxic? Is it in the expected language? Is it fluent, or garbled? These checks are made with a model
-that gives each row a score, and the `col_vals_scored()` validation method is for them: it scores
-each row with a *scorer* and checks that the score is within bounds.
+that gives each row a score, and the `~~pointblank.Validate.col_vals_scored()` validation method is
+for them: it scores each row with a *scorer* and checks that the score is within bounds.
 
 This page covers how to write a scorer, the adapters of `pb.scorers` for common kinds of models, how
 scores are cached so that rows aren't scored twice, and how to use the scores once the validation is
@@ -42356,16 +42418,17 @@ print(pb.yaml_to_python(config))
 
 A scorer that's a function of your own can be written as a `python:` block, which needs
 `allow_python=True` (see the [YAML Reference](../yaml/yaml-reference.qmd)). A validation with an
-adapter is written in this form by `to_yaml()`, so it can be saved and run again.
+adapter is written in this form by `~~pointblank.Validate.to_yaml()`, so it can be saved and run
+again.
 
 ## Conclusion
 
-The `col_vals_scored()` validation method brings checks of meaning into a validation plan, with the
-same reports, thresholds, and actions as any other step. A scorer is any function of a batch of
-rows, and the adapters of `pb.scorers` use rerankers, classifiers, language identification,
-embeddings, perplexity, statistics of text, and tokenizers. Scores are cached, so that rows aren't scored again, and they're kept
-with the results, where they can be seen in the step report and used to choose the bounds with an
-[`Ablation`](../post-interrogation/data-ablation.qmd).
+The `~~pointblank.Validate.col_vals_scored()` validation method brings checks of meaning into a
+validation plan, with the same reports, thresholds, and actions as any other step. A scorer is any
+function of a batch of rows, and the adapters of `pb.scorers` use rerankers, classifiers, language
+identification, embeddings, perplexity, statistics of text, and tokenizers. Scores are cached, so
+that rows aren't scored again, and they're kept with the results, where they can be seen in the step
+report and used to choose the bounds with an [`Ablation`](../post-interrogation/data-ablation.qmd).
 
 
 ### Checking Text Data
@@ -42443,21 +42506,22 @@ validation = (
 validation
 ```
 
-Each rule is a `col_vals_scored()` step with a [`text_stat()`](`pointblank.scorers.text_stat`)
-scorer, so the report shows what each one checks and how many documents fail it. The menu has too
-few words, repeats its lines, and has too few common words, and the list of hashtags has too many
-symbols for its words. The document in French fails the check of common words too, since the
-default stop words are English (use `stop_words=` for other languages). Any rule can be turned off
-by setting its bound to `None`, and since each is an ordinary step, it can be changed like any
-other.
+Each rule is a `~~pointblank.Validate.col_vals_scored()` step with a
+[`text_stat()`](`pointblank.scorers.text_stat`) scorer, so the report shows what each one checks and
+how many documents fail it. The menu has too few words, repeats its lines, and has too few common
+words, and the list of hashtags has too many symbols for its words. The document in French fails the
+check of common words too, since the default stop words are English (use `stop_words=` for other
+languages). Any rule can be turned off by setting its bound to `None`, and since each is an ordinary
+step, it can be changed like any other.
 
 ## Near Duplicates
 
-A document that's in a corpus many times gets too much weight in training. The `rows_distinct()`
-method finds rows that are exactly the same, but most duplicates in text differ a little: a changed
-date, a different footer, or a name filled into a template. The `rows_near_distinct()` method finds
-those too. It normalizes the text (in lower case, without punctuation), and with the default
-`method="minhash"`, it finds texts whose sequences of words are mostly the same.
+A document that's in a corpus many times gets too much weight in training. The
+`~~pointblank.Validate.rows_distinct()` method finds rows that are exactly the same, but most
+duplicates in text differ a little: a changed date, a different footer, or a name filled into a
+template. The `~~pointblank.Validate.rows_near_distinct()` method finds those too. It normalizes the
+text (in lower case, without punctuation), and with the default `method="minhash"`, it finds texts
+whose sequences of words are mostly the same.
 
 ```{python}
 validation = (
@@ -42471,9 +42535,9 @@ validation.get_step_report(i=1)
 
 The first two documents differ only in *twelve* and *12!*, so both fail, and the step report shows
 them together as one group (in the `pb_cluster_` column). Every row of a group fails, as with
-`rows_distinct()`, since the validation can't know which copy we'd want to keep. That's decided when
-the results are used to clean the table: `get_row_flags()` and `get_sundered_data()` keep the first
-row of each group by default (`duplicates="keep_first"`).
+`~~pointblank.Validate.rows_distinct()`, since the validation can't know which copy we'd want to
+keep. That's decided when the results are used to clean the table: `get_row_flags()` and
+`get_sundered_data()` keep the first row of each group by default (`duplicates="keep_first"`).
 
 ## Language, Length, and Personal Information
 
@@ -42529,18 +42593,19 @@ validation
 ```
 
 The document in French fails step 1, the menu is too short for step 2, and the email address fails
-step 3. The checks of personal information are `col_vals_regex()` steps, so they run on any backend,
-including in a database. Their patterns find likely matches rather than certain ones (a number with
-the shape of a credit card number matches, with no checksum), so for a thorough check, a model of
-named entities can be used with `col_vals_scored()`.
+step 3. The checks of personal information are `~~pointblank.Validate.col_vals_regex()` steps, so
+they run on any backend, including in a database. Their patterns find likely matches rather than
+certain ones (a number with the shape of a credit card number matches, with no checksum), so for a
+thorough check, a model of named entities can be used with
+`~~pointblank.Validate.col_vals_scored()`.
 
 ## Chat Conversations
 
 Data for fine-tuning a chat model is a list of messages for each example, each with a role and some
 content. Data converted from other formats often has conversations with roles out of order, an
 unknown role, or an empty message, and a training run can fail on them (or quietly learn from them).
-The `col_vals_chat_format()` method checks each conversation, given as a list of messages or as JSON
-text.
+The `~~pointblank.Validate.col_vals_chat_format()` method checks each conversation, given as a list
+of messages or as JSON text.
 
 ```{python}
 chats = pl.DataFrame(
@@ -42576,9 +42641,9 @@ first, before the turns of the user and the assistant.
 
 A model is often judged by its score on a benchmark, a set of questions with known answers. If the
 training data contains those questions, the score no longer says how well the model does on
-questions it hasn't seen: the benchmark is *contaminated*. The `rows_not_contaminated()` method
-checks the text of each row against a reference, such as the questions of a benchmark or the rows of
-a test set.
+questions it hasn't seen: the benchmark is *contaminated*. The
+`~~pointblank.Validate.rows_not_contaminated()` method checks the text of each row against a
+reference, such as the questions of a benchmark or the rows of a test set.
 
 ```{python}
 benchmark = pl.DataFrame(
@@ -42627,16 +42692,18 @@ The checks of `pb.text.no_pii()` are regular expressions, so they run on any bac
 checks run in Python: a Polars or pandas table is checked as it is, and for a database table
 (through Ibis) or a PySpark DataFrame, the distinct values of the step's columns are collected,
 checked, and the results are joined back to the table on its own backend. With a large table, a
-`pre=` function that takes a sample of the rows keeps the cost down. For `col_vals_chat_format()`,
-the conversations in a database table must be JSON text.
+`pre=` function that takes a sample of the rows keeps the cost down. For
+`~~pointblank.Validate.col_vals_chat_format()`, the conversations in a database table must be JSON
+text.
 
 ## Conclusion
 
 Text data has its own kinds of problems, and Pointblank checks them with the same reports,
 thresholds, and actions as any other validation. The `pb.text` functions make bundles of steps for
 the heuristic quality filters, the language and length of the text, and personal information;
-`rows_near_distinct()` finds near duplicates; `col_vals_chat_format()` checks conversations for
-fine-tuning; and `rows_not_contaminated()` keeps benchmark questions out of the training data.
+`~~pointblank.Validate.rows_near_distinct()` finds near duplicates;
+`~~pointblank.Validate.col_vals_chat_format()` checks conversations for fine-tuning; and
+`~~pointblank.Validate.rows_not_contaminated()` keeps benchmark questions out of the training data.
 
 
 ### Checking RAG Data
@@ -42744,8 +42811,8 @@ The steps check, in order (and the brief of each says what it checks):
   [`pb.text.token_length()`](`pointblank.text.token_length`)).
 - **Near duplicates.** No chunk is nearly the same as another, which would crowd the other chunks
   out of the results of a search. The two chunks about invoices differ only in their punctuation.
-  This is a `rows_near_distinct()` step, and `near_duplicates=` sets its threshold of similarity
-  (or turns it off).
+  This is a `~~pointblank.Validate.rows_near_distinct()` step, and `near_duplicates=` sets its
+  threshold of similarity (or turns it off).
 - **Freshness.** Every chunk was updated in the `max_age=` before the reference time. The article
   about holidays was last updated almost four years ago.
 
@@ -42823,8 +42890,9 @@ both fail step 2. The last question's gold document, `bill-9`, isn't in the corp
 passage is about something else (step 5). The second passage fails step 5 as well, since it shares
 only one word with its question (*invoices* and *downloaded* aren't the words *invoice* and
 *download*). That shows the limits of counting words: a reranker would see that a passage about
-downloading invoices answers it. The corpus can be any table that `col_vals_in_table()` takes, and
-`corpus_id=` names its column of ids if it's different from the column of the evaluation set.
+downloading invoices answers it. The corpus can be any table that
+`~~pointblank.Validate.col_vals_in_table()` takes, and `corpus_id=` names its column of ids if it's
+different from the column of the evaluation set.
 
 ## Which Checks Matter?
 
@@ -43003,10 +43071,10 @@ The STEP column displays the validation method name along with an icon that visu
 type of validation being performed. The validation method indicates what aspect of data quality is
 being checked, such as:
 
-- `col_vals_gt()`: column values greater than
-- `col_vals_in_set()`: column values in a set
-- `col_exists()`: column existence check
-- `rows_distinct()`: row uniqueness check
+- `~~pointblank.Validate.col_vals_gt()`: column values greater than
+- `~~pointblank.Validate.col_vals_in_set()`: column values in a set
+- `~~pointblank.Validate.col_exists()`: column existence check
+- `~~pointblank.Validate.rows_distinct()`: row uniqueness check
 - and many others...
 
 When you provide a brief message (via `brief=True` for auto-generated briefs or `brief="custom
@@ -43034,13 +43102,14 @@ validation_with_briefs = (
 validation_with_briefs
 ```
 
-In the above report, you'll see the custom brief message appear below the `col_vals_gt` method name
-in the first step, and an automatically generated brief below `col_vals_in_set` in the second step.
+In the above report, you'll see the custom brief message appear below the
+`~~pointblank.Validate.col_vals_gt` method name in the first step, and an automatically generated
+brief below `~~pointblank.Validate.col_vals_in_set` in the second step.
 
 #### COLUMNS
 
 The column(s) being validated in this step. For validation methods that don't target specific
-columns (like `row_count_match`), this will show an em dash (—).
+columns (like `~~pointblank.Validate.row_count_match`), this will show an em dash (—).
 
 #### VALUES
 
@@ -44594,9 +44663,10 @@ that segment, so rows outside all of a step's segments aren't affected by that s
 A [`Validate.rows_distinct()`](`Validate.rows_distinct`) step counts *every* copy of a duplicated
 row as a failing test unit, since there's no telling which of the copies is the 'wrong' one. That's
 the right count for a validation report, but it's rarely what you want when sundering: removing all
-copies of a duplicate would remove the record entirely. So by default, `rows_distinct()` steps are
-left out of sundering, and the `duplicates=` argument lets you bring them in by saying which copy to
-keep. The `small_table` dataset has one pair of duplicate rows, so let's check for that:
+copies of a duplicate would remove the record entirely. So by default,
+`~~pointblank.Validate.rows_distinct()` steps are left out of sundering, and the `duplicates=`
+argument lets you bring them in by saying which copy to keep. The `small_table` dataset has one pair
+of duplicate rows, so let's check for that:
 
 ```{python}
 validation_3 = (
@@ -44614,7 +44684,7 @@ copy goes to the failing set. The options for `duplicates=` are:
 - `"keep_first"`: the first copy of each group of duplicates passes and the others fail
 - `"keep_last"`: the last copy passes and the others fail
 - `"flag_all"`: every copy fails (just as the validation step counts them)
-- `None` (the default): `rows_distinct()` steps aren't used for sundering
+- `None` (the default): `~~pointblank.Validate.rows_distinct()` steps aren't used for sundering
 
 The 'first' and 'last' copies are those in row order, unless you use `duplicates_order_by=` to name
 one or more columns to order them by. For example, a check for duplicated customer IDs combined
@@ -44638,8 +44708,8 @@ The rows with a `pb_n_failed_` of `0` are exactly the passing set from sundering
 hand, though, you can filter on just the checks that matter for a particular use, look for problems
 that tend to occur together, or use `pb_row_score_` to weight rows rather than drop them. The same
 `duplicates=` and `duplicates_order_by=` options are available here, except that
-`get_row_flags()` uses `duplicates="keep_first"` by default, so that a `rows_distinct()` flag marks
-the copies that removing duplicates would remove.
+`get_row_flags()` uses `duplicates="keep_first"` by default, so that a
+`~~pointblank.Validate.rows_distinct()` flag marks the copies that removing duplicates would remove.
 
 ## Practical Applications of Sundering
 
@@ -44784,12 +44854,12 @@ Each validation step belongs to one of six data quality dimensions:
 
 | Dimension | What it measures | Example methods |
 |---|---|---|
-| **Completeness** | Presence of required values | `col_vals_not_null()`, `col_pct_null()`, `rows_complete()` |
-| **Validity** | Values conform to rules, ranges, formats, or schema | `col_vals_gt()`, `col_vals_regex()`, `col_vals_in_set()`, `col_schema_match()` |
-| **Uniqueness** | Absence of duplicate rows | `rows_distinct()` |
-| **Consistency** | Internal agreement across columns, rows, or tables | `conjointly()`, `col_missing_consistent()`, `col_vals_in_table()`, `tbl_match()` |
-| **Timeliness** | Data recency / freshness | `data_freshness()` |
-| **Volume** | Expected row and column counts | `row_count_match()`, `col_count_match()` |
+| **Completeness** | Presence of required values | `~~pointblank.Validate.col_vals_not_null()`, `~~pointblank.Validate.col_pct_null()`, `~~pointblank.Validate.rows_complete()` |
+| **Validity** | Values conform to rules, ranges, formats, or schema | `~~pointblank.Validate.col_vals_gt()`, `~~pointblank.Validate.col_vals_regex()`, `~~pointblank.Validate.col_vals_in_set()`, `~~pointblank.Validate.col_schema_match()` |
+| **Uniqueness** | Absence of duplicate rows | `~~pointblank.Validate.rows_distinct()` |
+| **Consistency** | Internal agreement across columns, rows, or tables | `~~pointblank.Validate.conjointly()`, `~~pointblank.Validate.col_missing_consistent()`, `~~pointblank.Validate.col_vals_in_table()`, `~~pointblank.Validate.tbl_match()` |
+| **Timeliness** | Data recency / freshness | `~~pointblank.Validate.data_freshness()` |
+| **Volume** | Expected row and column counts | `~~pointblank.Validate.row_count_match()`, `~~pointblank.Validate.col_count_match()` |
 
 The dimension for each step is inferred from its assertion type, so existing validations gain
 dimensions with no changes on your part.
@@ -45849,8 +45919,8 @@ intervals, so you can find the checks that are worth enforcing, the ones that do
 ones that are redundant, the ones that remove good data, and where to set their limits. Injecting
 defects shows how much a problem would cost (and gives thresholds to match), and Shapley values
 share the effect of the whole cleaning fairly among the steps. It works with any model that you can
-wrap in an `evaluate` function (or train elsewhere, with `export()` and `load_results()`), and with
-any validation whose steps check rows.
+wrap in an `evaluate` function (or train elsewhere, with `~~pointblank.Ablation.export()` and
+`load_results()`), and with any validation whose steps check rows.
 
 
 ### Data Cards
@@ -46281,9 +46351,9 @@ os.remove("small_table_profile.json")
 ```
 
 The `from_json()` classmethod works with JSON strings directly, and
-[`from_dict()`](`DataScan.from_dict`) accepts the dictionary format produced by `to_dict()`. All
-three approaches produce a fully restored `DataScan` that retains the column names, types,
-statistics, and sample data from the original scan.
+[`from_dict()`](`DataScan.from_dict`) accepts the dictionary format produced by
+`~~pointblank.DataScan.to_dict()`. All three approaches produce a fully restored `DataScan` that
+retains the column names, types, statistics, and sample data from the original scan.
 
 ## Comparing Profiles for Drift
 
@@ -46385,7 +46455,7 @@ for col_name, scores in drift.items():
 When a `DataScan` is loaded from a saved JSON file (with no original data attached), drift scores
 cannot be computed. The comparison still reports schema changes and raw stat differences, but the
 `drift_scores` field will be empty. If you need drift scores in a persist-and-compare workflow,
-keep the original data available when calling `compare()`.
+keep the original data available when calling `~~pointblank.DataScan.compare()`.
 
 ### A Typical Workflow
 
@@ -46416,18 +46486,18 @@ from it rather than loading from JSON.
 The `has_changes` property gives you a simple boolean for CI pipelines or alerting. So if anything
 shifted (schema or statistics) you can easily flag it. For more granular decisions, inspect
 `columns_added`, `columns_removed`, `columns_type_changed`, and the per-column `stat_diffs` and
-`drift_scores` in the object provided by `to_dict()`.
+`drift_scores` in the object provided by `~~pointblank.DataScanDiff.to_dict()`.
 
 ## Conclusion
 
 The `col_summary_tbl()` function and the `DataScan` class give you two levels of access to
 column-level profiling. The function is a quick, visual summary you can drop into a notebook to
 understand a dataset at a glance. The class provides the same statistics in a structured form that
-you can save, load, and compare over time. When your data evolves, `compare()` catches schema drift
-(columns added, removed, or retyped) and statistical drift (shifts in means, quantiles, null rates,
-and frequency distributions), optionally backed by formal measures like PSI and the KS test.
-Together, these tools make it straightforward to move from initial data discovery to ongoing data
-quality monitoring.
+you can save, load, and compare over time. When your data evolves, `~~pointblank.DataScan.compare()`
+catches schema drift (columns added, removed, or retyped) and statistical drift (shifts in means,
+quantiles, null rates, and frequency distributions), optionally backed by formal measures like PSI
+and the KS test. Together, these tools make it straightforward to move from initial data discovery
+to ongoing data quality monitoring.
 
 
 ### Missing Values Reporting
@@ -46800,10 +46870,10 @@ the duplicated rows pairwise to show which columns differ between them.
 
 ## Table Comparison as a Validation Step
 
-The `tbl_match()` validation method uses the same comparison, which makes it a validation step like
-any other: it can have thresholds and actions, and it shows up in the validation report. The table
-being validated is the target, and `tbl_compare=` is the source. Every aligned row is a *test
-unit*, so thresholds can be set as a proportion of rows:
+The `~~pointblank.Validate.tbl_match()` validation method uses the same comparison, which makes it a
+validation step like any other: it can have thresholds and actions, and it shows up in the
+validation report. The table being validated is the target, and `tbl_compare=` is the source. Every
+aligned row is a *test unit*, so thresholds can be set as a proportion of rows:
 
 ```{python}
 validation = (
@@ -46816,9 +46886,10 @@ validation
 ```
 
 :::{.callout-note}
-In Pointblank `v1.0.1` and earlier, `tbl_match()` had a single test unit for the whole table. Steps
-still pass or fail in the same situations, but fractional thresholds now refer to the share of
-differing rows. To react to *any* difference, as before, use an absolute threshold of `1`.
+In Pointblank `v1.0.1` and earlier, `~~pointblank.Validate.tbl_match()` had a single test unit for
+the whole table. Steps still pass or fail in the same situations, but fractional thresholds now
+refer to the share of differing rows. To react to *any* difference, as before, use an absolute
+threshold of `1`.
 :::
 
 Three of the six aligned rows differ, exceeding both the 'warning' and 'error' thresholds. The step
@@ -46836,7 +46907,7 @@ validation.get_data_extracts(i=1, frame=True)
 ```
 
 All the comparison arguments (`keys=`, `tolerance=`, `schema=`, and so on) are available in
-`tbl_match()`, and they can be written in YAML too:
+`~~pointblank.Validate.tbl_match()`, and they can be written in YAML too:
 
 ```yaml
 tbl: orders_target.csv
@@ -46853,9 +46924,10 @@ steps:
 Sometimes two tables shouldn't have the same rows but should add up to the same numbers: a
 warehouse table loaded from a source system, a summary table built from detailed transactions, or
 two systems that record the same activity at different levels of detail. For these, the
-`tbl_reconcile()` validation method compares *aggregates* instead of rows. It groups both tables by
-the `keys=` columns, aggregates the `measures=` columns (with `agg="sum"` by default, or `"count"`,
-`"mean"`, `"min"`, or `"max"`), and compares the results group by group. Each group is a test unit.
+`~~pointblank.Validate.tbl_reconcile()` validation method compares *aggregates* instead of rows. It
+groups both tables by the `keys=` columns, aggregates the `measures=` columns (with `agg="sum"` by
+default, or `"count"`, `"mean"`, `"min"`, or `"max"`), and compares the results group by group. Each
+group is a test unit.
 
 Here, the orders in the target have been loaded at a finer grain than in the source, so we
 reconcile the total amount per customer:
@@ -46879,10 +46951,10 @@ validation.get_step_report(i=1)
 ```
 
 `Ben`'s two order lines add up to more than his order in the source, `Cho` is missing, and `Fay` is
-new. Without `keys=`, `tbl_reconcile()` compares grand totals (a single test unit), and
-`agg="count"` without `measures=` compares the number of rows in each group. Tolerances,
-`column_map=`, and `partitions=` work as they do in `tbl_match()`. Rows with a null key form a group
-of their own, which is matched with the other table's null-key group.
+new. Without `keys=`, `~~pointblank.Validate.tbl_reconcile()` compares grand totals (a single test
+unit), and `agg="count"` without `measures=` compares the number of rows in each group. Tolerances,
+`column_map=`, and `partitions=` work as they do in `~~pointblank.Validate.tbl_match()`. Rows with a
+null key form a group of their own, which is matched with the other table's null-key group.
 
 ## Exporting the Results
 
@@ -47013,7 +47085,7 @@ source.write_csv(data_dir / "source.csv")
 target.write_csv(data_dir / "target.csv")
 ```
 
-Now we compare the two files by giving `compare()` their paths:
+Now we compare the two files by giving `~~pointblank.compare()` their paths:
 
 ```{python}
 import pointblank as pb
@@ -47045,9 +47117,9 @@ partitioned.status_counts == comparison.status_counts
 
 ## Choosing an Engine and a Number of Partitions
 
-When given file paths, `compare()` scans them with Polars, which is the fastest option. DuckDB uses
-less memory, and combined with partitions it uses the least. To use DuckDB, read the files as DuckDB
-relations and pass those to `compare()`:
+When given file paths, `~~pointblank.compare()` scans them with Polars, which is the fastest option.
+DuckDB uses less memory, and combined with partitions it uses the least. To use DuckDB, read the
+files as DuckDB relations and pass those to `~~pointblank.compare()`:
 
 ```python
 import duckdb
@@ -47069,20 +47141,20 @@ actually owns (its physical footprint):
 | Approach | Wall time | Peak memory |
 |---|---|---|
 | Polars: read both files, then a full join (for reference) | 2.1 s | 5.7 GB |
-| `compare()` on file paths (Polars) | 5.7 s | 4.2 GB |
-| `compare()` on file paths (Polars), `partitions=4` | 6.8 s | 1.6 GB |
-| `compare()` on file paths (Polars), `partitions=8` | 10.2 s | 1.1 GB |
-| `compare()` on DuckDB relations | 6.8 s | 1.6 GB |
-| `compare()` on DuckDB relations, `partitions=8` | 19.0 s | 0.8 GB |
+| `~~pointblank.compare()` on file paths (Polars) | 5.7 s | 4.2 GB |
+| `~~pointblank.compare()` on file paths (Polars), `partitions=4` | 6.8 s | 1.6 GB |
+| `~~pointblank.compare()` on file paths (Polars), `partitions=8` | 10.2 s | 1.1 GB |
+| `~~pointblank.compare()` on DuckDB relations | 6.8 s | 1.6 GB |
+| `~~pointblank.compare()` on DuckDB relations, `partitions=8` | 19.0 s | 0.8 GB |
 
 And with 100 million rows (about 7.4 GB per file), where comparing without partitions needs more
 memory than most machines have:
 
 | Approach | Wall time | Peak memory |
 |---|---|---|
-| `compare()` on file paths (Polars), `partitions=8` | 139 s | 6.6 GB |
-| `compare()` on file paths (Polars), `partitions=16` | 217 s | 4.4 GB |
-| `compare()` on DuckDB relations, `partitions=8` | 166 s | 2.0 GB |
+| `~~pointblank.compare()` on file paths (Polars), `partitions=8` | 139 s | 6.6 GB |
+| `~~pointblank.compare()` on file paths (Polars), `partitions=16` | 217 s | 4.4 GB |
+| `~~pointblank.compare()` on DuckDB relations, `partitions=8` | 166 s | 2.0 GB |
 
 Every approach found exactly the expected differences. The numbers will vary with your machine and
 data, but the pattern is consistent: partitions trade time (each pass reads the files again) for
@@ -47247,10 +47319,10 @@ check.get_overlap("train", "test")
 ```
 
 The other attributes have the numbers behind the report (`overlap`, `labels`, and `drift`), and
-`to_dict()` gives all of them as a dictionary that can be written as JSON.
+`~~pointblank.SplitCheck.to_dict()` gives all of them as a dictionary that can be written as JSON.
 
-The report is in English by default, and `get_tabular_report()` takes `lang=` and `locale=` for
-another language (the messages of `issues` stay in English):
+The report is in English by default, and `~~pointblank.SplitCheck.get_tabular_report()` takes
+`lang=` and `locale=` for another language (the messages of `issues` stay in English):
 
 ```{python}
 check.get_tabular_report(lang="es")
@@ -47260,8 +47332,9 @@ check.get_tabular_report(lang="es")
 
 `check_splits()` checks a dataset's own splits. To check that training data doesn't contain the
 questions of a benchmark that the model will be judged on (or any other text that shouldn't be in
-it), use the `rows_not_contaminated()` validation method, which is a step of a validation like any
-other (see the [Checking Text Data](../advanced-validation/text-checks.qmd) article).
+it), use the `~~pointblank.Validate.rows_not_contaminated()` validation method, which is a step of a
+validation like any other (see the [Checking Text Data](../advanced-validation/text-checks.qmd)
+article).
 
 ## Conclusion
 
@@ -47429,10 +47502,11 @@ check.get_copies()
 ```
 
 The other attributes have the numbers behind the report (`fidelity`, `duplicates`, `diversity`, and
-`copies`), and `to_dict()` gives all of them as a dictionary that can be written as JSON.
+`copies`), and `~~pointblank.SyntheticCheck.to_dict()` gives all of them as a dictionary that can be
+written as JSON.
 
-The report is in English by default, and `get_tabular_report()` takes `lang=` and `locale=` for
-another language (the messages of `issues` stay in English):
+The report is in English by default, and `~~pointblank.SyntheticCheck.get_tabular_report()` takes
+`lang=` and `locale=` for another language (the messages of `issues` stay in English):
 
 ```{python}
 check.get_tabular_report(lang="es")
@@ -48473,7 +48547,7 @@ For more complex data loading, use the `python:` block syntax. This syntax can b
 parameters throughout your YAML configuration:
 
 - `tbl`: For complex data source loading (as shown below)
-- `expr`: For custom validation expressions in `col_vals_expr`
+- `expr`: For custom validation expressions in `~~pointblank.Validate.col_vals_expr`
 - `pre`: For data preprocessing before validation steps
 - `actions`: For callable action functions (`warning`, `error`, `critical`, and `default`)
 
@@ -48704,8 +48778,9 @@ steps:
 ### Schema Validations
 
 Schema validation ensures your data has the expected structure and column types. The
-`col_schema_match` validation method uses a `schema` key that contains a `columns` list, where each
-item in the list can specify a column name alone or a column name with its expected data type.
+`~~pointblank.Validate.col_schema_match` validation method uses a `schema` key that contains a
+`columns` list, where each item in the list can specify a column name alone or a column name with
+its expected data type.
 
 Each `column` entry can be specified as:
 
@@ -48834,9 +48909,9 @@ steps:
       brief: "Output matches expected results"
 ```
 
-The `tbl_match()` validation performs comprehensive comparison including column count, row count,
-schema, and data values. It supports cross-backend validation (e.g., comparing Polars vs. Pandas
-DataFrames).
+The `~~pointblank.Validate.tbl_match()` validation performs comprehensive comparison including
+column count, row count, schema, and data values. It supports cross-backend validation (e.g.,
+comparing Polars vs. Pandas DataFrames).
 
 ### AI-Powered Validation
 
@@ -49015,7 +49090,8 @@ Note that you can use either the explicit `python:` block syntax or the shortcut
 
 ### Complex Expressions
 
-For advanced validation logic, use a `col_vals_expr` step with custom expressions:
+For advanced validation logic, use a `~~pointblank.Validate.col_vals_expr` step with custom
+expressions:
 
 ```yaml
 tbl: sales_data.csv
@@ -49107,7 +49183,7 @@ behavior.
 
 Two additional validation methods support common data quality checks:
 
-**`data_freshness`**: Validate that a date/datetime column has recent data:
+**`~~pointblank.Validate.data_freshness`**: Validate that a date/datetime column has recent data:
 
 ```yaml
 steps:
@@ -49116,7 +49192,8 @@ steps:
       max_age: "24h"
 ```
 
-**`col_pct_null`**: Validate that the percentage of null values is within bounds:
+**`~~pointblank.Validate.col_pct_null`**: Validate that the percentage of null values is within
+bounds:
 
 ```yaml
 steps:
@@ -49620,7 +49697,8 @@ missing_specs:
 
 Steps reference a named spec by name through the `missing:` parameter. This works both on the
 `col_vals_*` methods (to exclude sentinel values from a check) and on the dedicated missingness
-methods (`col_pct_missing`, `col_missing_coded`, `col_missing_only_coded`, `col_missing_consistent`):
+methods (`~~pointblank.Validate.col_pct_missing`, `~~pointblank.Validate.col_missing_coded`,
+`~~pointblank.Validate.col_missing_only_coded`, `~~pointblank.Validate.col_missing_consistent`):
 
 ```yaml
 missing_specs:
@@ -49661,7 +49739,8 @@ steps:
 
 #### Comparison Methods
 
-`col_vals_gt`: are column data greater than a fixed value or data in another column?
+`~~pointblank.Validate.col_vals_gt`: are column data greater than a fixed value or data in another
+column?
 
 ```yaml
 - col_vals_gt:
@@ -49686,7 +49765,8 @@ directly or in a `python:` block:
     value: pb.col("other_column")      # Same as `value: {python: pb.col("other_column")}`
 ```
 
-`col_vals_lt`: are column data less than a fixed value or data in another column?
+`~~pointblank.Validate.col_vals_lt`: are column data less than a fixed value or data in another
+column?
 
 ```yaml
 - col_vals_lt:
@@ -49696,7 +49776,8 @@ directly or in a `python:` block:
     # ... (same parameters as col_vals_gt)
 ```
 
-`col_vals_ge`: are column data greater than or equal to a fixed value or data in another column?
+`~~pointblank.Validate.col_vals_ge`: are column data greater than or equal to a fixed value or data
+in another column?
 
 ```yaml
 - col_vals_ge:
@@ -49706,7 +49787,8 @@ directly or in a `python:` block:
     # ... (same parameters as col_vals_gt)
 ```
 
-`col_vals_le`: are column data less than or equal to a fixed value or data in another column?
+`~~pointblank.Validate.col_vals_le`: are column data less than or equal to a fixed value or data in
+another column?
 
 ```yaml
 - col_vals_le:
@@ -49716,7 +49798,8 @@ directly or in a `python:` block:
     # ... (same parameters as col_vals_gt)
 ```
 
-`col_vals_eq`: are column data equal to a fixed value or data in another column?
+`~~pointblank.Validate.col_vals_eq`: are column data equal to a fixed value or data in another
+column?
 
 ```yaml
 - col_vals_eq:
@@ -49726,7 +49809,8 @@ directly or in a `python:` block:
     # ... (same parameters as col_vals_gt)
 ```
 
-`col_vals_ne`: are column data not equal to a fixed value or data in another column?
+`~~pointblank.Validate.col_vals_ne`: are column data not equal to a fixed value or data in another
+column?
 
 ```yaml
 - col_vals_ne:
@@ -49738,7 +49822,7 @@ directly or in a `python:` block:
 
 #### Range Methods
 
-`col_vals_between`: are column data between two specified values (inclusive)?
+`~~pointblank.Validate.col_vals_between`: are column data between two specified values (inclusive)?
 
 ```yaml
 - col_vals_between:
@@ -49756,7 +49840,7 @@ directly or in a `python:` block:
     brief: "Values between 0 and 100"  # OPTIONAL: Step description
 ```
 
-`col_vals_outside`: are column data outside of two specified values?
+`~~pointblank.Validate.col_vals_outside`: are column data outside of two specified values?
 
 ```yaml
 - col_vals_outside:
@@ -49770,7 +49854,7 @@ directly or in a `python:` block:
 
 #### Set Membership Methods
 
-`col_vals_in_set`: are column data part of a specified set of values?
+`~~pointblank.Validate.col_vals_in_set`: are column data part of a specified set of values?
 
 ```yaml
 - col_vals_in_set:
@@ -49786,7 +49870,7 @@ directly or in a `python:` block:
     brief: "Values in allowed set"     # OPTIONAL: Step description
 ```
 
-`col_vals_not_in_set`: are column data not part of a specified set of values?
+`~~pointblank.Validate.col_vals_not_in_set`: are column data not part of a specified set of values?
 
 ```yaml
 - col_vals_not_in_set:
@@ -49798,7 +49882,7 @@ directly or in a `python:` block:
 
 #### NULL Value Methods
 
-`col_vals_null`: are column data null (missing)?
+`~~pointblank.Validate.col_vals_null`: are column data null (missing)?
 
 ```yaml
 - col_vals_null:
@@ -49812,7 +49896,7 @@ directly or in a `python:` block:
     brief: "Values must be NULL"       # OPTIONAL: Step description
 ```
 
-`col_vals_not_null`: are column data not null (not missing)?
+`~~pointblank.Validate.col_vals_not_null`: are column data not null (not missing)?
 
 ```yaml
 - col_vals_not_null:
@@ -49822,7 +49906,7 @@ directly or in a `python:` block:
 
 #### Pattern Matching Methods
 
-`col_vals_regex`: do string-based column data match a regular expression?
+`~~pointblank.Validate.col_vals_regex`: do string-based column data match a regular expression?
 ```yaml
 - col_vals_regex:
     columns: [column_name]             # REQUIRED: Column(s) to validate
@@ -49837,7 +49921,8 @@ directly or in a `python:` block:
     brief: "Values match pattern"      # OPTIONAL: Step description
 ```
 
-`col_vals_within_spec`: do column data conform to a specification (email, URL, postal codes, etc.)?
+`~~pointblank.Validate.col_vals_within_spec`: do column data conform to a specification (email, URL,
+postal codes, etc.)?
 
 ```yaml
 - col_vals_within_spec:
@@ -49888,7 +49973,7 @@ Examples:
     spec: "iban[DE]"
 ```
 
-`col_vals_str_len`: are string lengths within a range?
+`~~pointblank.Validate.col_vals_str_len`: are string lengths within a range?
 
 ```yaml
 - col_vals_str_len:
@@ -49900,7 +49985,7 @@ Examples:
 
 #### Custom Expression Methods
 
-`col_vals_expr`: do column data agree with a predicate expression?
+`~~pointblank.Validate.col_vals_expr`: do column data agree with a predicate expression?
 
 ```yaml
 - col_vals_expr:
@@ -49920,7 +50005,7 @@ Examples:
 
 #### Trend Validation Methods
 
-`col_vals_increasing`: are column data increasing row-by-row?
+`~~pointblank.Validate.col_vals_increasing`: are column data increasing row-by-row?
 
 ```yaml
 - col_vals_increasing:
@@ -49971,7 +50056,7 @@ Examples:
     brief: "Temperature trend (small drops allowed)"
 ```
 
-`col_vals_decreasing`: are column data decreasing row-by-row?
+`~~pointblank.Validate.col_vals_decreasing`: are column data decreasing row-by-row?
 
 ```yaml
 - col_vals_decreasing:
@@ -50022,7 +50107,7 @@ Examples:
 
 #### Chat Format Methods
 
-`col_vals_chat_format`: is each value a well-formed chat conversation?
+`~~pointblank.Validate.col_vals_chat_format`: is each value a well-formed chat conversation?
 
 ```yaml
 - col_vals_chat_format:
@@ -50043,7 +50128,7 @@ as JSON text.
 
 ### Row-based Validations
 
-`rows_distinct`: are row data distinct?
+`~~pointblank.Validate.rows_distinct`: are row data distinct?
 
 ```yaml
 - rows_distinct                        # Simple form
@@ -50059,7 +50144,7 @@ as JSON text.
     brief: "No duplicate rows"         # OPTIONAL: Step description
 ```
 
-`rows_complete`: are row data complete?
+`~~pointblank.Validate.rows_complete`: are row data complete?
 
 ```yaml
 - rows_complete                        # Simple form
@@ -50075,7 +50160,7 @@ as JSON text.
     brief: "Complete rows only"        # OPTIONAL: Step description
 ```
 
-`rows_near_distinct`: are rows free of near duplicates?
+`~~pointblank.Validate.rows_near_distinct`: are rows free of near duplicates?
 
 ```yaml
 - rows_near_distinct:
@@ -50089,7 +50174,8 @@ as JSON text.
     brief: "No near-duplicate documents"  # OPTIONAL: Step description
 ```
 
-`rows_not_contaminated`: does the text of each row not overlap with a reference, like a benchmark?
+`~~pointblank.Validate.rows_not_contaminated`: does the text of each row not overlap with a
+reference, like a benchmark?
 
 ```yaml
 - rows_not_contaminated:
@@ -50121,7 +50207,7 @@ that makes a table (which needs `allow_python=True`):
 
 ### Structure Validations
 
-`col_exists`: does column exist in the table?
+`~~pointblank.Validate.col_exists`: does column exist in the table?
 
 ```yaml
 - col_exists:
@@ -50133,7 +50219,7 @@ that makes a table (which needs `allow_python=True`):
     brief: "Required columns exist"    # OPTIONAL: Step description
 ```
 
-`col_schema_match`: does the table have expected column names and data types?
+`~~pointblank.Validate.col_schema_match`: does the table have expected column names and data types?
 
 ```yaml
 - col_schema_match:
@@ -50154,7 +50240,7 @@ that makes a table (which needs `allow_python=True`):
     brief: "Schema validation"         # OPTIONAL: Step description
 ```
 
-`row_count_match`: does the table have n rows?
+`~~pointblank.Validate.row_count_match`: does the table have n rows?
 
 ```yaml
 - row_count_match:
@@ -50166,7 +50252,7 @@ that makes a table (which needs `allow_python=True`):
     brief: "Expected row count"        # OPTIONAL: Step description
 ```
 
-`col_count_match`: does the table have n columns?
+`~~pointblank.Validate.col_count_match`: does the table have n columns?
 
 ```yaml
 - col_count_match:
@@ -50178,7 +50264,7 @@ that makes a table (which needs `allow_python=True`):
     brief: "Expected column count"     # OPTIONAL: Step description
 ```
 
-`tbl_match`: does the table match a comparison table?
+`~~pointblank.Validate.tbl_match`: does the table match a comparison table?
 
 ```yaml
 - tbl_match:
@@ -50207,9 +50293,9 @@ using progressively stricter checks:
 The validation fails at the first check that doesn't pass, making it easy to diagnose mismatches.
 This operates over a single test unit (pass/fail for complete table match).
 
-**Cross-backend validation**: `tbl_match()` supports automatic backend coercion when comparing tables
-from different backends (e.g., Polars vs. Pandas, DuckDB vs. SQLite). The comparison table is
-automatically converted to match the target table's backend.
+**Cross-backend validation**: `~~pointblank.Validate.tbl_match()` supports automatic backend
+coercion when comparing tables from different backends (e.g., Polars vs. Pandas, DuckDB vs. SQLite).
+The comparison table is automatically converted to match the target table's backend.
 
 Examples:
 
@@ -50240,7 +50326,7 @@ Examples:
 
 ### Special Validation Methods
 
-`conjointly`: are multiple validations having a joint dependency?
+`~~pointblank.Validate.conjointly`: are multiple validations having a joint dependency?
 
 ```yaml
 - conjointly:
@@ -50393,15 +50479,16 @@ Examples:
 
 **When NOT to use AI validation:**
 
-- Simple numeric comparisons (use `col_vals_gt`, `col_vals_lt`, etc.)
-- Exact pattern matching (use `col_vals_regex`)
-- Schema validation (use `col_schema_match`)
+-  Simple numeric comparisons (use `~~pointblank.Validate.col_vals_gt`,
+  `~~pointblank.Validate.col_vals_lt`, etc.)
+- Exact pattern matching (use `~~pointblank.Validate.col_vals_regex`)
+- Schema validation (use `~~pointblank.Validate.col_schema_match`)
 - Performance-critical validations with large datasets
 - When deterministic results are required
 
 ### Model-Scored Validation
 
-`col_vals_scored`: are the scores that a model gives each row within bounds?
+`~~pointblank.Validate.col_vals_scored`: are the scores that a model gives each row within bounds?
 
 ```yaml
 - col_vals_scored:
@@ -50484,7 +50571,7 @@ scorers and the score cache.
 
 ### Data Quality Methods
 
-`col_pct_null`: is the percentage of null values in a column within bounds?
+`~~pointblank.Validate.col_pct_null`: is the percentage of null values in a column within bounds?
 
 ```yaml
 - col_pct_null:
@@ -50497,7 +50584,7 @@ scorers and the score cache.
     brief: "Null rate check"           # OPTIONAL: Step description
 ```
 
-`data_freshness`: is the data in a date/datetime column recent?
+`~~pointblank.Validate.data_freshness`: is the data in a date/datetime column recent?
 
 ```yaml
 - data_freshness:
@@ -50864,9 +50951,10 @@ order_contract = pb.Contract(
 )
 ```
 
-When a schema is defined, the contract automatically adds a `col_schema_match()` step before all
-other validation steps. This means the schema check runs first, and if the table doesn't have the
-right columns and types, you'll know immediately.
+When a schema is defined, the contract automatically adds a
+`~~pointblank.Validate.col_schema_match()` step before all other validation steps. This means the
+schema check runs first, and if the table doesn't have the right columns and types, you'll know
+immediately.
 
 ```{python}
 orders = pl.DataFrame(
@@ -50912,17 +51000,17 @@ contract is created. Here are the most common ones for contract definitions:
 
 | Method | Purpose |
 |--------|---------|
-| `col_vals_gt()`, `col_vals_lt()`, `col_vals_ge()`, `col_vals_le()` | Numeric bounds |
-| `col_vals_between()`, `col_vals_outside()` | Range checks |
-| `col_vals_eq()`, `col_vals_ne()` | Equality checks |
-| `col_vals_in_set()`, `col_vals_not_in_set()` | Categorical membership |
-| `col_vals_not_null()`, `col_vals_null()` | Null checks |
-| `col_vals_regex()` | Pattern matching |
-| `col_exists()` | Column presence |
-| `rows_distinct()` | Uniqueness (use `columns_subset=`) |
-| `rows_complete()` | No nulls in any column |
-| `row_count_match()` | Expected row count |
-| `col_count_match()` | Expected column count |
+| `~~pointblank.Validate.col_vals_gt()`, `~~pointblank.Validate.col_vals_lt()`, `~~pointblank.Validate.col_vals_ge()`, `~~pointblank.Validate.col_vals_le()` | Numeric bounds |
+| `~~pointblank.Validate.col_vals_between()`, `~~pointblank.Validate.col_vals_outside()` | Range checks |
+| `~~pointblank.Validate.col_vals_eq()`, `~~pointblank.Validate.col_vals_ne()` | Equality checks |
+| `~~pointblank.Validate.col_vals_in_set()`, `~~pointblank.Validate.col_vals_not_in_set()` | Categorical membership |
+| `~~pointblank.Validate.col_vals_not_null()`, `~~pointblank.Validate.col_vals_null()` | Null checks |
+| `~~pointblank.Validate.col_vals_regex()` | Pattern matching |
+| `~~pointblank.Validate.col_exists()` | Column presence |
+| `~~pointblank.Validate.rows_distinct()` | Uniqueness (use `columns_subset=`) |
+| `~~pointblank.Validate.rows_complete()` | No nulls in any column |
+| `~~pointblank.Validate.row_count_match()` | Expected row count |
+| `~~pointblank.Validate.col_count_match()` | Expected column count |
 
 ## Contract Metadata
 
@@ -51265,9 +51353,9 @@ print(result.get_report())
 
 ## Validating Boundaries Independently
 
-You don't have to use `run()`. You can validate each boundary separately when you need more
-control over the workflow. The `validate_source()` and `validate_target()` methods each return
-a standard `Validate` object (not a `PipelineResult`), giving you direct access to the
+You don't have to use `~~pointblank.Pipeline.run()`. You can validate each boundary separately when
+you need more control over the workflow. The `validate_source()` and `validate_target()` methods
+each return a standard `Validate` object (not a `PipelineResult`), giving you direct access to the
 interrogation results.
 
 This pattern is particularly useful when:
@@ -51410,8 +51498,8 @@ Use `on_violation="raise"` to halt execution immediately when data is invalid. T
 mode and the right choice for production pipelines where bad data must never reach downstream
 systems. When a validation fails with this mode, a `ContractViolationError` (a subclass of
 `RuntimeError`) is raised with a message identifying which contract failed. This applies to
-`run()` as well as to `validate_source()` and `validate_target()`. The error keeps the results, so
-the code that catches it can still look at what went wrong:
+`~~pointblank.Pipeline.run()` as well as to `validate_source()` and `validate_target()`. The error
+keeps the results, so the code that catches it can still look at what went wrong:
 
 ```{python}
 strict_contract = pb.Contract(
@@ -51429,10 +51517,10 @@ except pb.ContractViolationError as e:
     print(f"Source passed: {e.result.source_passed}")
 ```
 
-The error's `validation` attribute holds the failing validation, and when it comes from `run()`,
-its `result` attribute holds the `PipelineResult` of the run. With `short_circuit=False`, a failing
-source contract with `"raise"` doesn't stop the run right away: the transformation runs and the
-target is validated first, and then the error is raised.
+The error's `validation` attribute holds the failing validation, and when it comes from
+`~~pointblank.Pipeline.run()`, its `result` attribute holds the `PipelineResult` of the run. With
+`short_circuit=False`, a failing source contract with `"raise"` doesn't stop the run right away: the
+transformation runs and the target is validated first, and then the error is raised.
 
 ### Log Mode
 
@@ -51566,17 +51654,19 @@ print(f"  Overall passed: {result.passed}")
 result.target_validation
 ```
 
-The target validation report above pinpoints the failure: the `col_vals_not_null` step on the
-`amount` column fails because the buggy transform introduced nulls. This makes the root cause
-obvious and you can see exactly which contract step failed and trace it back to the transformation
-logic. Without the target contract, this bug would silently produce a table with missing values.
+The target validation report above pinpoints the failure: the
+`~~pointblank.Validate.col_vals_not_null` step on the `amount` column fails because the buggy
+transform introduced nulls. This makes the root cause obvious and you can see exactly which contract
+step failed and trace it back to the transformation logic. Without the target contract, this bug
+would silently produce a table with missing values.
 
 ## Working with Pandas
 
 Pipelines work with any DataFrame library supported by Pointblank, including Pandas. The interface
-is identical: you pass a Pandas DataFrame to `run()` or `validate_source()`, and Pointblank handles
-the rest. This means your contracts are portable across DataFrame backends and you can define a
-contract once and use it to validate both Polars and Pandas data without modification.
+is identical: you pass a Pandas DataFrame to `~~pointblank.Pipeline.run()` or `validate_source()`,
+and Pointblank handles the rest. This means your contracts are portable across DataFrame backends
+and you can define a contract once and use it to validate both Polars and Pandas data without
+modification.
 
 Here's the same transaction-processing workflow using Pandas DataFrames:
 
@@ -51624,10 +51714,10 @@ print(f"Pandas pipeline passed: {result.passed}")
 
 ## Multiple Pipeline Runs
 
-Pipelines are stateless and can be run multiple times with different data. Each call to `run()`
-produces an independent `PipelineResult` with no side effects on the pipeline object itself. This
-makes pipelines safe to reuse in loops, parallel processing, or long-running services where the same
-validation logic applies to many batches of data.
+Pipelines are stateless and can be run multiple times with different data. Each call to
+`~~pointblank.Pipeline.run()` produces an independent `PipelineResult` with no side effects on the
+pipeline object itself. This makes pipelines safe to reuse in loops, parallel processing, or
+long-running services where the same validation logic applies to many batches of data.
 
 The example below demonstrates running a single pipeline against multiple data batches (a common
 pattern in batch-processing systems where data arrives in chunks):
@@ -51772,7 +51862,7 @@ case.
 | `consumers` | No | List of teams or systems that depend on data conforming to this contract |
 | `description` | No | Longer prose describing the contract's purpose and context |
 | `on_violation` | No | Behavior when validation fails: `"warn"` (default), `"raise"`, or `"log"` |
-| `schema` | No | Column name -> data type mapping; triggers a `col_schema_match()` check |
+| `schema` | No | Column name -> data type mapping; triggers a `~~pointblank.Validate.col_schema_match()` check |
 | `steps` | No | Ordered list of validation steps to execute |
 | `thresholds` | No | Threshold levels (`warning`, `error`, `critical`) as fractions or absolute counts |
 
@@ -51780,8 +51870,9 @@ case.
 
 Steps are the heart of a contract. They define the actual validation rules that will be checked
 against your data. In YAML, each step is a list item whose key is the name of a Pointblank
-validation method (like `col_vals_gt` or `rows_distinct`), and whose value is a dictionary of the
-arguments to pass to that method.
+validation method (like `~~pointblank.Validate.col_vals_gt` or
+`~~pointblank.Validate.rows_distinct`), and whose value is a dictionary of the arguments to pass to
+that method.
 
 This mapping is direct: the YAML step `col_vals_gt: {columns: amount, value: 0}` is exactly
 equivalent to calling `.col_vals_gt(columns="amount", value=0)` in Python. Here are examples
@@ -52321,10 +52412,11 @@ result.to_validate(data=users).interrogate()
 
 That's it. The JSON Schema `minimum`, `maximum`, `enum`, `format`, and `required` keywords were
 automatically translated into the appropriate Pointblank validation steps. Each keyword becomes a
-dedicated validation check: `minimum` becomes `col_vals_ge()`, `maximum` becomes `col_vals_le()`,
-`enum` becomes `col_vals_in_set()`, and so on. The schema's `required` array generates
-`col_vals_not_null()` steps for each listed field, ensuring that null values are caught at
-validation time.
+dedicated validation check: `minimum` becomes `~~pointblank.Validate.col_vals_ge()`, `maximum`
+becomes `~~pointblank.Validate.col_vals_le()`, `enum` becomes
+`~~pointblank.Validate.col_vals_in_set()`, and so on. The schema's `required` array generates
+`~~pointblank.Validate.col_vals_not_null()` steps for each listed field, ensuring that null values
+are caught at validation time.
 
 ## How It Works
 
@@ -52351,8 +52443,8 @@ for any warnings, and decide how to proceed before committing to a particular ou
 
 ## The `ContractImport` Object
 
-After calling `import_contract()`, you get back a `ContractImport` with these key attributes and
-methods:
+After calling `~~pointblank.import_contract()`, you get back a `ContractImport` with these key
+attributes and methods:
 
 | Attribute / Method | Description |
 |---|---|
@@ -52421,17 +52513,17 @@ natural fit for defining column-level constraints.
 | JSON Schema Keyword | Pointblank Method |
 |---|---|
 | `type: "integer"` / `"number"` / `"string"` / `"boolean"` | Schema dtype check |
-| `minimum` | `col_vals_ge()` |
-| `maximum` | `col_vals_le()` |
-| `exclusiveMinimum` | `col_vals_gt()` |
-| `exclusiveMaximum` | `col_vals_lt()` |
-| `enum` | `col_vals_in_set()` |
-| `pattern` | `col_vals_regex()` |
+| `minimum` | `~~pointblank.Validate.col_vals_ge()` |
+| `maximum` | `~~pointblank.Validate.col_vals_le()` |
+| `exclusiveMinimum` | `~~pointblank.Validate.col_vals_gt()` |
+| `exclusiveMaximum` | `~~pointblank.Validate.col_vals_lt()` |
+| `enum` | `~~pointblank.Validate.col_vals_in_set()` |
+| `pattern` | `~~pointblank.Validate.col_vals_regex()` |
 | `format: "email"` | `col_vals_within_spec(spec="email")` |
 | `format: "uri"` | `col_vals_within_spec(spec="url")` |
 | `format: "ipv4"` / `"ipv6"` | `col_vals_within_spec(spec="ipv4"/"ipv6")` |
-| `const` | `col_vals_eq()` |
-| `required` (array of field names) | `col_vals_not_null()` |
+| `const` | `~~pointblank.Validate.col_vals_eq()` |
+| `required` (array of field names) | `~~pointblank.Validate.col_vals_not_null()` |
 
 **Importing from a file:**
 
@@ -52465,10 +52557,11 @@ for c in result.constraints:
 ```
 
 Each constraint from the JSON Schema has been translated into the corresponding Pointblank method
-call. The `pattern` keyword on the `sku` field became a `col_vals_regex()` step, `exclusiveMinimum`
-became `col_vals_gt()` (note the strict inequality), and the three `required` fields each generated
-a `col_vals_not_null()` step. You can iterate over `result.constraints` like this to verify the
-translation before running any validation.
+call. The `pattern` keyword on the `sku` field became a `~~pointblank.Validate.col_vals_regex()`
+step, `exclusiveMinimum` became `~~pointblank.Validate.col_vals_gt()` (note the strict inequality),
+and the three `required` fields each generated a `~~pointblank.Validate.col_vals_not_null()` step.
+You can iterate over `result.constraints` like this to verify the translation before running any
+validation.
 
 ### Frictionless Data Table Schema
 
@@ -52481,12 +52574,12 @@ with explicit support for column types, constraints, and primary/foreign keys.
 | Frictionless Feature | Pointblank Method |
 |---|---|
 | `type` | Schema dtype check |
-| `constraints.required: true` | `col_vals_not_null()` |
-| `constraints.unique: true` | `rows_distinct()` |
-| `constraints.minimum` / `maximum` | `col_vals_ge()` / `col_vals_le()` |
-| `constraints.enum` | `col_vals_in_set()` |
-| `constraints.pattern` | `col_vals_regex()` |
-| `primaryKey` | `col_vals_not_null()` + `rows_distinct()` |
+| `constraints.required: true` | `~~pointblank.Validate.col_vals_not_null()` |
+| `constraints.unique: true` | `~~pointblank.Validate.rows_distinct()` |
+| `constraints.minimum` / `maximum` | `~~pointblank.Validate.col_vals_ge()` / `~~pointblank.Validate.col_vals_le()` |
+| `constraints.enum` | `~~pointblank.Validate.col_vals_in_set()` |
+| `constraints.pattern` | `~~pointblank.Validate.col_vals_regex()` |
+| `primaryKey` | `~~pointblank.Validate.col_vals_not_null()` + `~~pointblank.Validate.rows_distinct()` |
 | `foreignKeys` | ⚠ Warning (cross-table not yet supported) |
 
 **Importing a standalone Table Schema:**
@@ -52564,9 +52657,9 @@ can import these definitions directly.
 | dbt Feature | Pointblank Method |
 |---|---|
 | `data_type` | Schema dtype check |
-| `not_null` test | `col_vals_not_null()` |
-| `unique` test | `rows_distinct()` |
-| `accepted_values` test | `col_vals_in_set()` |
+| `not_null` test | `~~pointblank.Validate.col_vals_not_null()` |
+| `unique` test | `~~pointblank.Validate.rows_distinct()` |
+| `accepted_values` test | `~~pointblank.Validate.col_vals_in_set()` |
 | `relationships` test | Warning (cross-table not yet supported) |
 
 Both the newer `data_tests` key (dbt v1.8+) and the legacy `tests` key are supported.
@@ -52649,12 +52742,12 @@ supports both ODCS v2.x and v3.x documents.
 | ODCS Feature | Pointblank Method |
 |---|---|
 | `logicalType` | Schema dtype check |
-| `isNullable: false` | `col_vals_not_null()` |
-| `isUnique: true` | `rows_distinct()` |
-| `isPrimaryKey: true` | `col_vals_not_null()` + `rows_distinct()` |
-| `enum` / `values` | `col_vals_in_set()` |
-| `pattern` | `col_vals_regex()` |
-| `minimum` / `maximum` | `col_vals_ge()` / `col_vals_le()` |
+| `isNullable: false` | `~~pointblank.Validate.col_vals_not_null()` |
+| `isUnique: true` | `~~pointblank.Validate.rows_distinct()` |
+| `isPrimaryKey: true` | `~~pointblank.Validate.col_vals_not_null()` + `~~pointblank.Validate.rows_distinct()` |
+| `enum` / `values` | `~~pointblank.Validate.col_vals_in_set()` |
+| `pattern` | `~~pointblank.Validate.col_vals_regex()` |
+| `minimum` / `maximum` | `~~pointblank.Validate.col_vals_ge()` / `~~pointblank.Validate.col_vals_le()` |
 | `minLength` / `maxLength` | Warning (no direct equivalent) |
 | Custom checks / SodaCL | Warning (no automatic mapping) |
 
@@ -52893,10 +52986,10 @@ persist the output and inspect it in the same call.
 
 If you're working with a `Validate` object and want JSON Schema output specifically, you can use the
 [`to_json_schema()`](`Validate.to_json_schema`) convenience method directly on the `Validate`
-object. It delegates to `export_contract()` and additionally enriches the schema with column type
-information inferred from the data. See the
-[Serializing Validation Plans](../02-advanced-validation/05-plan-serialization.qmd#exporting-a-plan-as-json-schema)
-guide for details.
+object. It delegates to `~~pointblank.export_contract()` and additionally enriches the schema with
+column type information inferred from the data. See the [Serializing Validation
+Plans](../advanced-validation/plan-serialization.qmd#exporting-a-plan-as-json-schema) guide for
+details.
 :::
 
 ## Round-Trip Fidelity
@@ -52992,8 +53085,8 @@ entire Pointblank API for adding checks, setting thresholds, or attaching action
 
 ## Migration from Other Tools
 
-A key use case for `import_contract()` is **migration**: bringing existing validation definitions
-from other tools into Pointblank without manual rewriting.
+A key use case for `~~pointblank.import_contract()` is **migration**: bringing existing validation
+definitions from other tools into Pointblank without manual rewriting.
 
 ### Coming from JSON Schema
 
@@ -53183,8 +53276,8 @@ result = pb.import_contract({"my_format_version": "1.0", "fields": []}, format="
 print(result)
 ```
 
-The adapter is now part of the Pointblank ecosystem. Any call to `import_contract()` with
-`format="my_format"` will route through this adapter, and the auto-detection system will call
+The adapter is now part of the Pointblank ecosystem. Any call to `~~pointblank.import_contract()`
+with `format="my_format"` will route through this adapter, and the auto-detection system will call
 `detect()` when no format is specified.
 
 ```{python}
@@ -53203,8 +53296,8 @@ Here are the class attributes and methods you can define:
 |---|---|---|
 | `format_name` | `str` | Short identifier (e.g., `"json_schema"`, `"my_format"`) |
 | `file_extensions` | `list[str]` | File extensions for auto-detection (e.g., `[".schema.json"]`) |
-| `supports_import` | `bool` | Whether `import_contract()` is implemented |
-| `supports_export` | `bool` | Whether `export_contract()` is implemented |
+| `supports_import` | `bool` | Whether `~~pointblank.ContractAdapter.import_contract()` is implemented |
+| `supports_export` | `bool` | Whether `~~pointblank.ContractAdapter.export_contract()` is implemented |
 
 | Method | Required? | Purpose |
 |---|---|---|
@@ -53499,8 +53592,8 @@ def detect(source) -> bool:
 Custom adapters let you extend Pointblank's import/export system to handle any schema format your
 organization uses. The plugin architecture is intentionally simple: subclass `ContractAdapter`,
 implement one or two methods, and register it with a decorator. From that point forward, your
-format participates in the same `import_contract()` and `export_contract()` workflow that the
-built-in adapters use.
+format participates in the same `~~pointblank.import_contract()` and
+`~~pointblank.export_contract()` workflow that the built-in adapters use.
 
 This extensibility means that Pointblank can serve as a universal validation layer regardless of
 where your data contracts originate. Whether your schemas live in a proprietary YAML format, an
@@ -54380,8 +54473,9 @@ Pointblank offers two ways to export OTel signals, matching how different teams 
 
 ### Pattern A: Explicit Export
 
-Import `OTelExporter`, run your validation, then call `export()`. This gives you full control over
-when and how signals are emitted.
+Import `OTelExporter`, run your validation, then call
+`~~pointblank.integrations.otel.OTelExporter.export()`. This gives you full control over when and
+how signals are emitted.
 
 ```{python}
 #| eval: false
@@ -54542,8 +54636,9 @@ otel = OTelExporter(
 otel.export(validation)
 ```
 
-The `export()` call is instantaneous as the in-memory providers simply store the data. In production,
-this is where the SDK would batch and send signals to your collector.
+The `~~pointblank.integrations.otel.OTelExporter.export()` call is instantaneous as the in-memory
+providers simply store the data. In production, this is where the SDK would batch and send signals
+to your collector.
 
 ### Inspect the Emitted Metrics
 
@@ -54819,7 +54914,7 @@ The key attributes are:
 
 Each `VariableMetadata` object describes a single column, including its name, data type, label,
 and any constraints that were defined in the source file. Constraints are automatically mapped
-to Pointblank validation methods when you call `to_validate()`.
+to Pointblank validation methods when you call `~~pointblank.MetadataImport.to_validate()`.
 
 ## Converting to a Schema
 
@@ -54853,13 +54948,13 @@ validation steps. Each constraint type maps to a specific Pointblank method:
 
 | Metadata Constraint | Generated Validation Step |
 |---------------------|--------------------------|
-| `required=True` | `col_vals_not_null()` |
-| `unique=True` | `rows_distinct()` |
-| `min_val` / `max_val` | `col_vals_between()` |
-| `max_length` | `col_vals_expr()` (string length check) |
-| `pattern` | `col_vals_regex()` |
-| `allowed_values` or codelist | `col_vals_in_set()` |
-| Schema (column names + types) | `col_schema_match()` |
+| `required=True` | `~~pointblank.Validate.col_vals_not_null()` |
+| `unique=True` | `~~pointblank.Validate.rows_distinct()` |
+| `min_val` / `max_val` | `~~pointblank.Validate.col_vals_between()` |
+| `max_length` | `~~pointblank.Validate.col_vals_expr()` (string length check) |
+| `pattern` | `~~pointblank.Validate.col_vals_regex()` |
+| `allowed_values` or codelist | `~~pointblank.Validate.col_vals_in_set()` |
+| Schema (column names + types) | `~~pointblank.Validate.col_schema_match()` |
 
 The generated workflow covers everything the metadata specifies. You can run it as-is for
 comprehensive validation, or add your own steps on top for business rules that go beyond
@@ -54940,10 +55035,11 @@ sex_labels = meta.codelists["C66731"].to_dict()
 # e.g., {"M": "Male", "F": "Female", "U": "Unknown", ...}
 ```
 
-When `to_validate()` encounters a variable with a `codelist_ref`, it generates a
-`col_vals_in_set()` step using the codelist's values. For non-extensible codelists, any value
-outside the set is a failure. For extensible codelists, additional values are permitted (the
-check still runs but serves as documentation of expected values).
+When `~~pointblank.MetadataImport.to_validate()` encounters a variable with a `codelist_ref`, it
+generates a `~~pointblank.Validate.col_vals_in_set()` step using the codelist's values. For
+non-extensible codelists, any value outside the set is a failure. For extensible codelists,
+additional values are permitted (the check still runs but serves as documentation of expected
+values).
 
 ## Handling Missing Value Codes
 
@@ -54994,9 +55090,9 @@ years of survey design and data management work.
 
 Pointblank can read this embedded metadata and translate it directly into validation rules. When
 you import a `.sav`, `.xpt`, or `.dta` file, Pointblank extracts the full metadata catalog and
-maps each element to the appropriate validation method. Value labels become `col_vals_in_set()`
-checks, data types become schema constraints, and missing value codes inform how validation
-handles sentinel values.
+maps each element to the appropriate validation method. Value labels become
+`~~pointblank.Validate.col_vals_in_set()` checks, data types become schema constraints, and missing
+value codes inform how validation handles sentinel values.
 
 ## Prerequisites
 
@@ -55064,7 +55160,7 @@ their extension.
 
 SPSS value labels define the permitted values for categorical variables. For example, a variable
 `GENDER` might have labels `{1: "Male", 2: "Female", 3: "Non-binary"}`. Pointblank converts
-these into `Codelist` objects and generates `col_vals_in_set()` checks:
+these into `Codelist` objects and generates `~~pointblank.Validate.col_vals_in_set()` checks:
 
 ```python
 meta = pb.import_metadata("demographics.sav")
@@ -55081,9 +55177,9 @@ for cl_name, codelist in meta.codelists.items():
     print(f"{cl_name}: {labels}")
 ```
 
-When validation is generated, each variable with value labels gets a `col_vals_in_set()` step
-that ensures all data values appear in the labeled set. Values outside the set are flagged as
-failures in the validation report.
+When validation is generated, each variable with value labels gets a
+`~~pointblank.Validate.col_vals_in_set()` step that ensures all data values appear in the labeled
+set. Values outside the set are flagged as failures in the validation report.
 
 ### Missing Value Codes
 
@@ -55201,7 +55297,8 @@ for var in meta.variables:
 Character variables in SAS Transport files have defined maximum lengths. Pointblank captures these
 as `max_length` constraints on the `VariableMetadata` object. When you call
 [`to_validate()`](`MetadataImport.to_validate`), variables with length constraints get a
-`col_vals_expr()` step that checks string length does not exceed the specified maximum.
+`~~pointblank.Validate.col_vals_expr()` step that checks string length does not exceed the specified
+maximum.
 
 This is particularly important for CDISC submissions where variable lengths are strictly defined
 in the submission specification. A variable defined as `$200.` (200 characters) must not contain
@@ -55274,10 +55371,11 @@ variable's constraints and creates the appropriate validation steps.
 
 For a typical SPSS file with value labels and types defined, the generated validation includes:
 
-1. A `col_schema_match()` step verifying column names and data types
-2. `col_vals_in_set()` steps for every variable with value labels
-3. `col_vals_not_null()` steps for variables marked as required
-4. `col_vals_expr()` steps for variables with length constraints (from SAS Transport)
+1. A `~~pointblank.Validate.col_schema_match()` step verifying column names and data types
+2. `~~pointblank.Validate.col_vals_in_set()` steps for every variable with value labels
+3. `~~pointblank.Validate.col_vals_not_null()` steps for variables marked as required
+4.  `~~pointblank.Validate.col_vals_expr()` steps for variables with length constraints (from SAS
+   Transport)
 
 ```python
 import pointblank as pb
@@ -55295,9 +55393,9 @@ lightweight = (
 )
 ```
 
-You can also combine metadata-generated validation with your own custom steps. The `to_validate()`
-method returns an un-interrogated `Validate` object, so you can chain additional methods before
-calling `.interrogate()`:
+You can also combine metadata-generated validation with your own custom steps. The
+`~~pointblank.MetadataImport.to_validate()` method returns an un-interrogated `Validate` object, so
+you can chain additional methods before calling `.interrogate()`:
 
 ```python
 meta = pb.import_metadata("survey.sav")
@@ -55451,8 +55549,8 @@ Define-XML documents contain rich structural metadata. Pointblank extracts the f
 
 Define-XML documents embed the codelists that constrain variable values. When Pointblank parses a
 Define-XML, all codelists are extracted and linked to their respective variables. The
-[`to_validate()`](`MetadataImport.to_validate`) method then generates `col_vals_in_set()` checks for
-each variable that references a codelist:
+[`to_validate()`](`MetadataImport.to_validate`) method then generates
+`~~pointblank.Validate.col_vals_in_set()` checks for each variable that references a codelist:
 
 ```{python}
 # Inspect codelists referenced by the Demographics domain
@@ -55465,10 +55563,10 @@ The `extensible` flag records an important distinction. Non-extensible codelists
 adherence: any value not in the codelist is a conformance issue. Extensible codelists permit
 sponsor-defined additions, so a value outside the published set is not necessarily an error.
 
-Pointblank currently generates the same `col_vals_in_set()` check for both kinds of codelist. For
-extensible codelists you will typically want to relax that step to reflect that additions are
-allowed, for example by attaching a warning-level threshold to the step rather than treating every
-out-of-set value as a hard failure.
+Pointblank currently generates the same `~~pointblank.Validate.col_vals_in_set()` check for both
+kinds of codelist. For extensible codelists you will typically want to relax that step to reflect
+that additions are allowed, for example by attaching a warning-level threshold to the step rather
+than treating every out-of-set value as a hard failure.
 
 ## CDISC Controlled Terminology Import
 
@@ -55493,7 +55591,8 @@ print(f"SEX values: {sex_codelist.to_set()}")
 print(f"Extensible: {sex_codelist.extensible}")
 ```
 
-Once you have a codelist, its permitted values feed directly into a `col_vals_in_set()` check:
+Once you have a codelist, its permitted values feed directly into a
+`~~pointblank.Validate.col_vals_in_set()` check:
 
 ```{python}
 # Use the CT-derived value set in a validation
@@ -55667,10 +55766,10 @@ validation = validate_sdtm(data=dm_data_with_issues, domain="DM").interrogate()
 validation
 ```
 
-Three steps now report a failing unit: the `col_vals_not_null()` check on `USUBJID`, the
-`col_vals_in_set()` check on `DOMAIN`, and the ISO 8601 `col_vals_regex()` check on `RFSTDTC`. Each
-failing step links to the specific rows so you can trace a conformance issue back to the offending
-records.
+Three steps now report a failing unit: the `~~pointblank.Validate.col_vals_not_null()` check on
+`USUBJID`, the `~~pointblank.Validate.col_vals_in_set()` check on `DOMAIN`, and the ISO 8601
+`~~pointblank.Validate.col_vals_regex()` check on `RFSTDTC`. Each failing step links to the specific
+rows so you can trace a conformance issue back to the offending records.
 
 ### Converting SDTM Templates to MetadataImport
 
@@ -55863,8 +55962,8 @@ Frictionless constraints map directly onto Pointblank validation steps:
 
 | Frictionless constraint | Pointblank step |
 |-------------------------|-----------------|
-| `"required": true` | `col_vals_not_null()` |
-| `"unique": true` | `rows_distinct()` |
+| `"required": true` | `~~pointblank.Validate.col_vals_not_null()` |
+| `"unique": true` | `~~pointblank.Validate.rows_distinct()` |
 | `"minimum": 0` | `col_vals_ge(value=0)` |
 | `"maximum": 100` | `col_vals_le(value=100)` |
 | `"pattern": "..."` | `col_vals_regex(pattern="...")` |
@@ -55967,10 +56066,11 @@ print("boundary codes:", cdisc.values_for_category("boundary"))
 ```
 
 This spec can be passed to `missing_vals_tbl()` for a reason-by-reason breakdown, or to the
-`col_vals_*()` and dedicated missingness validation methods (`col_pct_missing()`,
-`col_missing_coded()`, `col_missing_only_coded()`, `col_missing_consistent()`) to validate data
-while accounting for the null flavor codes. See the *Missing Values Reporting* and *Validation
-Methods* articles for the full set of capabilities.
+`col_vals_*()` and dedicated missingness validation methods
+(`~~pointblank.Validate.col_pct_missing()`, `~~pointblank.Validate.col_missing_coded()`,
+`~~pointblank.Validate.col_missing_only_coded()`, `~~pointblank.Validate.col_missing_consistent()`)
+to validate data while accounting for the null flavor codes. See the *Missing Values Reporting* and
+*Validation Methods* articles for the full set of capabilities.
 
 ## Conclusion
 
@@ -56072,8 +56172,8 @@ Rules are sorted by severity: failures first, then errors, then passes, then not
 The header shows a `PASS` or `FAIL` badge alongside the standard, version, and a full status
 breakdown (e.g., `SDTMIG 3-4 · 346 passed · 4 failed · 12 n/a`).
 
-Call `get_tabular_report()` to get the `GT` object directly if you need to embed it in a report
-pipeline:
+Call `~~pointblank.ConformanceReport.get_tabular_report()` to get the `GT` object directly if you
+need to embed it in a report pipeline:
 
 ```{python}
 #| eval: false
@@ -56126,8 +56226,8 @@ The findings table groups its columns into two spanners:
 `Row` is the 1-based row number in the source dataset for quick lookup.
 
 At most 100 findings per rule are shown in the table. The true total for each rule is always visible
-in `get_tabular_report()`. To export findings to a spreadsheet or join them back to your source
-data, use `findings_df()` instead.
+in `~~pointblank.ConformanceReport.get_tabular_report()`. To export findings to a spreadsheet or
+join them back to your source data, use `findings_df()` instead.
 
 ### Programmatic Access with findings_df()
 
@@ -56184,7 +56284,7 @@ The bundled SDTMIG 3.4 catalog contains 362 rules across seven types:
 
 Only `RECORD_CHECK`, `DATASET_CONTENTS_CHECK` and `DEFINE_CODELIST_CHECK` rules produce row-level
 findings accessible via `findings_df()` and `get_findings_table()`. The other types report a violation count in
-`get_tabular_report()` but do not have individual record detail.
+`~~pointblank.ConformanceReport.get_tabular_report()` but do not have individual record detail.
 
 Rules that target a domain not present in your datasets have nothing to check, so they are reported
 as `pass`. For example, a rule that checks `AESTDTC` in the AE domain passes when no AE dataset is
@@ -56719,9 +56819,10 @@ CLI (command-line interface)
 Coded missing value
 : A stand-in value, such as `-99` or `"UNK"`, that means a value is missing for a known reason (for
   example, the person refused to answer or wasn't asked). The `MissingSpec` class lists which codes
-  a column uses and what each one means. Validation methods like `col_missing_coded()` and the
-  **missing values table** can then treat these codes as missing data. See also **null flavor**.
-  [Learn more](../data-inspection/missing-vals-tbl.qmd).
+  a column uses and what each one means. Validation methods like
+  `~~pointblank.Validate.col_missing_coded()` and the **missing values table** can then treat these
+  codes as missing data. See also **null flavor**. [Learn
+  more](../data-inspection/missing-vals-tbl.qmd).
 
 Codelist
 : A named list of allowed values, often with a label for each (for example, `"M"` means Male and
@@ -56768,8 +56869,8 @@ Conformance report
 Conjointly
 : A single **validation step** that checks several conditions on each row at once. A row passes
   only if every condition is true for that row. This is different from adding one step per
-  condition, where each condition is judged on its own. Added with `conjointly()`. [Learn
-  more](../validation-plan/validation-methods.qmd).
+  condition, where each condition is judged on its own. Added with
+  `~~pointblank.Validate.conjointly()`. [Learn more](../validation-plan/validation-methods.qmd).
 
 Connection string
 : A piece of text that points to a database table, such as
@@ -56842,7 +56943,8 @@ Data extract
   many rows are kept. See also **sundering**. [Learn more](../post-interrogation/extracts.qmd).
 
 Data freshness
-: Whether a table has recent data. `data_freshness()` checks that the latest date or time in a
+: Whether a table has recent data. `~~pointblank.Validate.data_freshness()` checks that the latest
+date or time in a
   column is no older than `max_age=`, given as text like `"6h"`, `"2d"`, or `"1d 12h"`. The
   **validation report** shows how old the data was, which helps tell a small delay from a pipeline
   that has stopped. [Learn more](../validation-plan/validation-methods.qmd).
@@ -56900,7 +57002,8 @@ Exit code
 Expression check
 : A **validation step** that checks each row against a condition written in your table library's
   own syntax. For example, with Polars you might check `pl.col("end") > pl.col("start")`. Added
-  with `col_vals_expr()`. [Learn more](../advanced-validation/expressions.qmd).
+  with `~~pointblank.Validate.col_vals_expr()`. [Learn
+  more](../advanced-validation/expressions.qmd).
 
 Field
 : A description of one column for **test data generation**, made with a helper such as
@@ -56997,11 +57100,11 @@ OpenTelemetry integration
 
 Partitions
 : A way to compare tables that are too large to fit in memory. With `partitions=N`,
-  [`compare()`](`pointblank.compare`) (and `tbl_match()` and `tbl_reconcile()`) works through the
-  tables in N passes, each covering a share of the keys from both tables. The results are the same
-  as in a single pass, but less memory is needed at once. More partitions use less memory but take
-  longer. See also **table comparison**. [Learn
-  more](../table-comparison/comparing-large-files.qmd).
+  [`compare()`](`pointblank.compare`) (and `~~pointblank.Validate.tbl_match()` and
+  `~~pointblank.Validate.tbl_reconcile()`) works through the tables in N passes, each covering a
+  share of the keys from both tables. The results are the same as in a single pass, but less memory
+  is needed at once. More partitions use less memory but take longer. See also **table comparison**.
+  [Learn more](../table-comparison/comparing-large-files.qmd).
 
 Pipeline
 : A data-processing step with **contracts** on both sides. A `Pipeline` checks the incoming data
@@ -57047,18 +57150,18 @@ Preview
 Quality dimension
 : A category describing what kind of data quality a step measures. The categories are
   *completeness*, *validity*, *uniqueness*, *consistency*, *timeliness*, and *volume*. Each
-  validation method has a default category (for example, `col_vals_not_null()` measures
-  completeness), and you can change it with `dimension=`. Each dimension gets its own score, and
-  together they make up the **health score**. [Learn
+  validation method has a default category (for example, `~~pointblank.Validate.col_vals_not_null()`
+  measures completeness), and you can change it with `dimension=`. Each dimension gets its own
+  score, and together they make up the **health score**. [Learn
   more](../post-interrogation/quality-dimensions-and-scoring.qmd).
 
 Reconciliation
 : Checking that two tables add up to the same numbers even though their rows differ, for example
-  that a summary table agrees with the detailed records it was built from. `tbl_reconcile()`
-  groups both tables by the `keys=` columns, totals the `measures=` columns (with `agg="sum"` by
-  default, or `"count"`, `"mean"`, `"min"`, or `"max"`), and compares the results group by group.
-  Each group is one **test unit**. See also **table comparison**. [Learn
-  more](../table-comparison/comparing-tables.qmd).
+  that a summary table agrees with the detailed records it was built from.
+  `~~pointblank.Validate.tbl_reconcile()` groups both tables by the `keys=` columns, totals the
+  `measures=` columns (with `agg="sum"` by default, or `"count"`, `"mean"`, `"min"`, or `"max"`),
+  and compares the results group by group. Each group is one **test unit**. See also **table
+  comparison**. [Learn more](../table-comparison/comparing-tables.qmd).
 
 Reference data
 : A second table, such as last month's data, that **aggregate checks** can compare with. You set it
@@ -57071,7 +57174,8 @@ Reference data
 Referential check
 : A check that every value in a column also appears in a column of another table, for example that
   every `customer_id` in an orders table exists in the customers table. Added with
-  `col_vals_in_table()`. [Learn more](../validation-plan/validation-methods.qmd).
+  `~~pointblank.Validate.col_vals_in_table()`. [Learn
+  more](../validation-plan/validation-methods.qmd).
 
 Report language
 : The language used for the text in reports and in generated **briefs**, set with
@@ -57088,9 +57192,10 @@ Round trip
   more](../advanced-validation/plan-serialization.qmd).
 
 Row-based check
-: A check on whole rows rather than on single values. `rows_distinct()` checks that no row appears
-  more than once, and `rows_complete()` checks that no row has missing values. Both can look at
-  just some of the columns with `columns_subset=`. [Learn
+: A check on whole rows rather than on single values. `~~pointblank.Validate.rows_distinct()` checks
+that no row appears
+  more than once, and `~~pointblank.Validate.rows_complete()` checks that no row has missing values.
+  Both can look at just some of the columns with `columns_subset=`. [Learn
   more](../validation-plan/validation-methods.qmd).
 
 Row status
@@ -57102,9 +57207,9 @@ Row status
 
 Schema
 : A description of the columns a table should have: their names and, optionally, their types. You
-  write one with the `Schema` class and check a table against it with `col_schema_match()`, with
-  options for how strict to be about column order, capital letters, and types. `schema_from_tbl()`
-  builds a schema from an existing table. [Learn
+  write one with the `Schema` class and check a table against it with
+  `~~pointblank.Validate.col_schema_match()`, with options for how strict to be about column order,
+  capital letters, and types. `schema_from_tbl()` builds a schema from an existing table. [Learn
   more](../advanced-validation/schema-validation.qmd).
 
 Scorecard
@@ -57144,17 +57249,18 @@ Severity level
 
 Source and target
 : The two sides of a **table comparison** or a **pipeline**. In a table comparison, the source is
-  the table you start from and the target is the one checked against it. With `tbl_match()`, the
-  table being validated is the target, and `tbl_compare=` is the source. In a pipeline, the source
-  is the data going into your transformation and the target is what comes out, and each can have
-  its own **contract**. A contract's `direction=` (`"source"` or `"target"`) records which side
-  it's meant for. [Learn more](../contracts-and-pipelines/pipelines.qmd).
+  the table you start from and the target is the one checked against it. With
+  `~~pointblank.Validate.tbl_match()`, the table being validated is the target, and `tbl_compare=`
+  is the source. In a pipeline, the source is the data going into your transformation and the target
+  is what comes out, and each can have its own **contract**. A contract's `direction=` (`"source"`
+  or `"target"`) records which side it's meant for. [Learn
+  more](../contracts-and-pipelines/pipelines.qmd).
 
 Specification check
 : A check that text values follow a well-known format, such as email addresses, URLs, postal
-  codes, credit card numbers, ISBNs, VINs, or IBANs. Added with `col_vals_within_spec()`, for
-  example with `spec="email"` or `spec="postal_code[USA]"`. [Learn
-  more](../validation-plan/validation-methods.qmd).
+  codes, credit card numbers, ISBNs, VINs, or IBANs. Added with
+  `~~pointblank.Validate.col_vals_within_spec()`, for example with `spec="email"` or
+  `spec="postal_code[USA]"`. [Learn more](../validation-plan/validation-methods.qmd).
 
 Status check
 : A method that tells you how a validation went, as `True` or `False`, without stopping your code.
@@ -57189,11 +57295,12 @@ Table comparison
   counts as `True` only if the tables match. Rows can be matched by key columns (`keys="id"`), by
   position (the default), or regardless of order (`keys="*"`), and small differences can be allowed
   with `tolerance=` or ignored with `normalize=` (for example, letter case). As a **validation
-  step**, `tbl_match()` runs the same comparison with each row as a **test unit**, and
-  `tbl_reconcile()` compares totals instead (see **reconciliation**). From the **CLI**, use
-  `pb compare`. To check only the number of rows or columns, use `row_count_match()` or
-  `col_count_match()`. See also **source and target** and **partitions**. [Learn
-  more](../table-comparison/comparing-tables.qmd).
+  step**, `~~pointblank.Validate.tbl_match()` runs the same comparison with each row as a **test
+  unit**, and `~~pointblank.Validate.tbl_reconcile()` compares totals instead (see
+  **reconciliation**). From the **CLI**, use `pb compare`. To check only the number of rows or
+  columns, use `~~pointblank.Validate.row_count_match()` or
+  `~~pointblank.Validate.col_count_match()`. See also **source and target** and **partitions**.
+  [Learn more](../table-comparison/comparing-tables.qmd).
 
 Test data generation
 : Making realistic fake tables for testing and demos. You describe each column in a `Schema` with
@@ -57213,9 +57320,9 @@ Test dataset
 Test unit
 : A single thing that passes or fails in a **validation step**. When a step checks the values in a
   column, each value is one test unit, so checking a column in a 100-row table gives 100 test units.
-  When a step checks the table or column as a whole (like `col_exists()` or `col_sum_gt()`), there
-  is just one test unit. The pass and fail counts in the **validation report** are counts of test
-  units. [Learn more](../getting-started/quickstart.qmd).
+  When a step checks the table or column as a whole (like `~~pointblank.Validate.col_exists()` or
+  `col_sum_gt()`), there is just one test unit. The pass and fail counts in the **validation
+  report** are counts of test units. [Learn more](../getting-started/quickstart.qmd).
 
 Threshold
 : A limit on how many failing **test units** a step can have before it's flagged. A threshold can
@@ -57228,14 +57335,15 @@ Threshold
 
 Tolerance
 : How far a result can be from the expected one and still pass. **Aggregate checks** and
-  `col_pct_null()` take `tol=`: for example, `col_avg_eq(columns="x", value=10, tol=0.5)` passes
-  for any average from 9.5 to 10.5. In a **table comparison**, `tolerance=` sets how much two
-  values may differ, as an absolute amount (`atol`), as a share of the source value (`rtol`), or,
-  for dates and times, as a length of time like `"1s"`. [Learn
-  more](../validation-plan/validation-methods.qmd).
+  `~~pointblank.Validate.col_pct_null()` take `tol=`: for example,
+  `col_avg_eq(columns="x", value=10, tol=0.5)` passes for any average from 9.5 to 10.5. In a **table
+  comparison**, `tolerance=` sets how much two values may differ, as an absolute amount (`atol`), as
+  a share of the source value (`rtol`), or, for dates and times, as a length of time like `"1s"`.
+  [Learn more](../validation-plan/validation-methods.qmd).
 
 Trend check
-: A check that a column's values go up (`col_vals_increasing()`) or down (`col_vals_decreasing()`)
+: A check that a column's values go up (`~~pointblank.Validate.col_vals_increasing()`) or down
+(`~~pointblank.Validate.col_vals_decreasing()`)
   from one row to the next, as in a time series. Repeated values fail unless
   `allow_stationary=True`. Rows are compared in the table's own order, or in the order given by
   `order_by=`, which database tables need since their rows have no fixed order. [Learn
@@ -57249,9 +57357,11 @@ Validate
   more](../validation-plan/validation-overview.qmd).
 
 Validation method
-: A method of `Validate` that adds a check to the **validation plan**, such as `col_vals_gt()`
-  (values are greater than some number) or `rows_distinct()` (no duplicate rows). Each call adds
-  one or more **validation steps**. [Learn more](../validation-plan/validation-methods.qmd).
+: A method of `Validate` that adds a check to the **validation plan**, such as
+`~~pointblank.Validate.col_vals_gt()`
+  (values are greater than some number) or `~~pointblank.Validate.rows_distinct()` (no duplicate
+  rows). Each call adds one or more **validation steps**. [Learn
+  more](../validation-plan/validation-methods.qmd).
 
 Validation plan
 : The list of checks you've added to a `Validate` object. Building the plan doesn't check anything

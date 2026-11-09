@@ -2050,7 +2050,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3320-L3502" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3321-L3503" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Ablation</span><span class="op">.</span><span class="fu">load_results</span>(</span>
@@ -2067,11 +2067,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">results</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>The metrics of the evaluations: the path of a CSV file, the path of a directory with a <code>results.csv</code> file (e.g., the directory written by <code>export()</code>), or a table (e.g., a Polars or pandas DataFrame). It needs a <code>variant</code> column (the id of the version of the table), a <code>seed</code> column, and a column for each metric. A <code>repeat</code> column is checked if it’s there, and any other column is a metric.</p>
+<p>The metrics of the evaluations: the path of a CSV file, the path of a directory with a <code>results.csv</code> file (e.g., the directory written by <a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link gdls-code">export()</a>), or a table (e.g., a Polars or pandas DataFrame). It needs a <code>variant</code> column (the id of the version of the table), a <code>seed</code> column, and a column for each metric. A <code>repeat</code> column is checked if it’s there, and any other column is a metric.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">manifest</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | os.PathLike[str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-The path of the <code>manifest.json</code> file written by <code>export()</code> (or of its directory). By default, a manifest in the same directory as the results file is used if there is one. Its fingerprints are checked against the ablation, which makes sure that the results are for the same data and the same versions of the table.
+The path of the <code>manifest.json</code> file written by <a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link gdls-code">export()</a> (or of its directory). By default, a manifest in the same directory as the results file is used if there is one. Its fingerprints are checked against the ablation, which makes sure that the results are for the same data and the same versions of the table.
 </dd>
 </dl>
 </div>
@@ -2094,7 +2094,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an ablation of a table of temperature readings, exported for training elsewhere.</p>
-<div id="08ba6fcc" class="cell" data-execution_count="2">
+<div id="d6978664" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -2114,7 +2114,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>directory <span class="op">=</span> ablation.export(tempfile.mkdtemp())</span></code></pre></div>
 </div>
 <p>Here, the ‘training’ happens in the same session, reading each table from the manifest and filling in the template, but it could be done anywhere.</p>
-<div id="88cb5053" class="cell" data-execution_count="3">
+<div id="10505445" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>manifest <span class="op">=</span> json.loads((directory <span class="op">/</span> <span class="st">"manifest.json"</span>).read_text())</span>

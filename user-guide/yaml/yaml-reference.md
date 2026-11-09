@@ -199,7 +199,7 @@ missing_specs:
     null_reason: unknown         # OPTIONAL (default "unknown")
 ```
 
-Steps reference a named spec by name through the `missing:` parameter. This works both on the `col_vals_*` methods (to exclude sentinel values from a check) and on the dedicated missingness methods (`col_pct_missing`, `col_missing_coded`, `col_missing_only_coded`, `col_missing_consistent`):
+Steps reference a named spec by name through the `missing:` parameter. This works both on the `col_vals_*` methods (to exclude sentinel values from a check) and on the dedicated missingness methods ([col_pct_missing](../../reference/Validate.col_pct_missing.md#pointblank.Validate.col_pct_missing), [col_missing_coded](../../reference/Validate.col_missing_coded.md#pointblank.Validate.col_missing_coded), [col_missing_only_coded](../../reference/Validate.col_missing_only_coded.md#pointblank.Validate.col_missing_only_coded), [col_missing_consistent](../../reference/Validate.col_missing_consistent.md#pointblank.Validate.col_missing_consistent)):
 
 ``` yaml
 missing_specs:
@@ -240,7 +240,7 @@ steps:
 
 #### Comparison Methods
 
-`col_vals_gt`: are column data greater than a fixed value or data in another column?
+[col_vals_gt](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt): are column data greater than a fixed value or data in another column?
 
 ``` yaml
 - col_vals_gt:
@@ -264,7 +264,7 @@ To compare against the data in another column, give the column as the value. It 
     value: pb.col("other_column")      # Same as `value: {python: pb.col("other_column")}`
 ```
 
-`col_vals_lt`: are column data less than a fixed value or data in another column?
+[col_vals_lt](../../reference/Validate.col_vals_lt.md#pointblank.Validate.col_vals_lt): are column data less than a fixed value or data in another column?
 
 ``` yaml
 - col_vals_lt:
@@ -274,7 +274,7 @@ To compare against the data in another column, give the column as the value. It 
     # ... (same parameters as col_vals_gt)
 ```
 
-`col_vals_ge`: are column data greater than or equal to a fixed value or data in another column?
+[col_vals_ge](../../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge): are column data greater than or equal to a fixed value or data in another column?
 
 ``` yaml
 - col_vals_ge:
@@ -284,7 +284,7 @@ To compare against the data in another column, give the column as the value. It 
     # ... (same parameters as col_vals_gt)
 ```
 
-`col_vals_le`: are column data less than or equal to a fixed value or data in another column?
+[col_vals_le](../../reference/Validate.col_vals_le.md#pointblank.Validate.col_vals_le): are column data less than or equal to a fixed value or data in another column?
 
 ``` yaml
 - col_vals_le:
@@ -294,7 +294,7 @@ To compare against the data in another column, give the column as the value. It 
     # ... (same parameters as col_vals_gt)
 ```
 
-`col_vals_eq`: are column data equal to a fixed value or data in another column?
+[col_vals_eq](../../reference/Validate.col_vals_eq.md#pointblank.Validate.col_vals_eq): are column data equal to a fixed value or data in another column?
 
 ``` yaml
 - col_vals_eq:
@@ -304,7 +304,7 @@ To compare against the data in another column, give the column as the value. It 
     # ... (same parameters as col_vals_gt)
 ```
 
-`col_vals_ne`: are column data not equal to a fixed value or data in another column?
+[col_vals_ne](../../reference/Validate.col_vals_ne.md#pointblank.Validate.col_vals_ne): are column data not equal to a fixed value or data in another column?
 
 ``` yaml
 - col_vals_ne:
@@ -316,7 +316,7 @@ To compare against the data in another column, give the column as the value. It 
 
 #### Range Methods
 
-`col_vals_between`: are column data between two specified values (inclusive)?
+[col_vals_between](../../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between): are column data between two specified values (inclusive)?
 
 ``` yaml
 - col_vals_between:
@@ -334,7 +334,7 @@ To compare against the data in another column, give the column as the value. It 
     brief: "Values between 0 and 100"  # OPTIONAL: Step description
 ```
 
-`col_vals_outside`: are column data outside of two specified values?
+[col_vals_outside](../../reference/Validate.col_vals_outside.md#pointblank.Validate.col_vals_outside): are column data outside of two specified values?
 
 ``` yaml
 - col_vals_outside:
@@ -348,7 +348,7 @@ To compare against the data in another column, give the column as the value. It 
 
 #### Set Membership Methods
 
-`col_vals_in_set`: are column data part of a specified set of values?
+[col_vals_in_set](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set): are column data part of a specified set of values?
 
 ``` yaml
 - col_vals_in_set:
@@ -364,7 +364,7 @@ To compare against the data in another column, give the column as the value. It 
     brief: "Values in allowed set"     # OPTIONAL: Step description
 ```
 
-`col_vals_not_in_set`: are column data not part of a specified set of values?
+[col_vals_not_in_set](../../reference/Validate.col_vals_not_in_set.md#pointblank.Validate.col_vals_not_in_set): are column data not part of a specified set of values?
 
 ``` yaml
 - col_vals_not_in_set:
@@ -376,7 +376,7 @@ To compare against the data in another column, give the column as the value. It 
 
 #### NULL Value Methods
 
-`col_vals_null`: are column data null (missing)?
+[col_vals_null](../../reference/Validate.col_vals_null.md#pointblank.Validate.col_vals_null): are column data null (missing)?
 
 ``` yaml
 - col_vals_null:
@@ -390,7 +390,7 @@ To compare against the data in another column, give the column as the value. It 
     brief: "Values must be NULL"       # OPTIONAL: Step description
 ```
 
-`col_vals_not_null`: are column data not null (not missing)?
+[col_vals_not_null](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null): are column data not null (not missing)?
 
 ``` yaml
 - col_vals_not_null:
@@ -400,7 +400,7 @@ To compare against the data in another column, give the column as the value. It 
 
 #### Pattern Matching Methods
 
-`col_vals_regex`: do string-based column data match a regular expression?
+[col_vals_regex](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex): do string-based column data match a regular expression?
 
 ``` yaml
 - col_vals_regex:
@@ -416,7 +416,7 @@ To compare against the data in another column, give the column as the value. It 
     brief: "Values match pattern"      # OPTIONAL: Step description
 ```
 
-`col_vals_within_spec`: do column data conform to a specification (email, URL, postal codes, etc.)?
+[col_vals_within_spec](../../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec): do column data conform to a specification (email, URL, postal codes, etc.)?
 
 ``` yaml
 - col_vals_within_spec:
@@ -467,7 +467,7 @@ Examples:
     spec: "iban[DE]"
 ```
 
-`col_vals_str_len`: are string lengths within a range?
+[col_vals_str_len](../../reference/Validate.col_vals_str_len.md#pointblank.Validate.col_vals_str_len): are string lengths within a range?
 
 ``` yaml
 - col_vals_str_len:
@@ -479,7 +479,7 @@ Examples:
 
 #### Custom Expression Methods
 
-`col_vals_expr`: do column data agree with a predicate expression?
+[col_vals_expr](../../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr): do column data agree with a predicate expression?
 
 ``` yaml
 - col_vals_expr:
@@ -499,7 +499,7 @@ Examples:
 
 #### Trend Validation Methods
 
-`col_vals_increasing`: are column data increasing row-by-row?
+[col_vals_increasing](../../reference/Validate.col_vals_increasing.md#pointblank.Validate.col_vals_increasing): are column data increasing row-by-row?
 
 ``` yaml
 - col_vals_increasing:
@@ -546,7 +546,7 @@ Examples:
     brief: "Temperature trend (small drops allowed)"
 ```
 
-`col_vals_decreasing`: are column data decreasing row-by-row?
+[col_vals_decreasing](../../reference/Validate.col_vals_decreasing.md#pointblank.Validate.col_vals_decreasing): are column data decreasing row-by-row?
 
 ``` yaml
 - col_vals_decreasing:
@@ -594,7 +594,7 @@ Examples:
 
 #### Chat Format Methods
 
-`col_vals_chat_format`: is each value a well-formed chat conversation?
+[col_vals_chat_format](../../reference/Validate.col_vals_chat_format.md#pointblank.Validate.col_vals_chat_format): is each value a well-formed chat conversation?
 
 ``` yaml
 - col_vals_chat_format:
@@ -614,7 +614,7 @@ A conversation is a list of messages (each a dictionary with a role and some con
 
 ### Row-based Validations
 
-`rows_distinct`: are row data distinct?
+[rows_distinct](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct): are row data distinct?
 
 ``` yaml
 - rows_distinct                        # Simple form
@@ -630,7 +630,7 @@ A conversation is a list of messages (each a dictionary with a role and some con
     brief: "No duplicate rows"         # OPTIONAL: Step description
 ```
 
-`rows_complete`: are row data complete?
+[rows_complete](../../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete): are row data complete?
 
 ``` yaml
 - rows_complete                        # Simple form
@@ -646,7 +646,7 @@ A conversation is a list of messages (each a dictionary with a role and some con
     brief: "Complete rows only"        # OPTIONAL: Step description
 ```
 
-`rows_near_distinct`: are rows free of near duplicates?
+[rows_near_distinct](../../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct): are rows free of near duplicates?
 
 ``` yaml
 - rows_near_distinct:
@@ -660,7 +660,7 @@ A conversation is a list of messages (each a dictionary with a role and some con
     brief: "No near-duplicate documents"  # OPTIONAL: Step description
 ```
 
-`rows_not_contaminated`: does the text of each row not overlap with a reference, like a benchmark?
+[rows_not_contaminated](../../reference/Validate.rows_not_contaminated.md#pointblank.Validate.rows_not_contaminated): does the text of each row not overlap with a reference, like a benchmark?
 
 ``` yaml
 - rows_not_contaminated:
@@ -690,7 +690,7 @@ The `reference` can be the path of a CSV or Parquet file, a list of texts, a dic
 
 ### Structure Validations
 
-`col_exists`: does column exist in the table?
+[col_exists](../../reference/Validate.col_exists.md#pointblank.Validate.col_exists): does column exist in the table?
 
 ``` yaml
 - col_exists:
@@ -702,7 +702,7 @@ The `reference` can be the path of a CSV or Parquet file, a list of texts, a dic
     brief: "Required columns exist"    # OPTIONAL: Step description
 ```
 
-`col_schema_match`: does the table have expected column names and data types?
+[col_schema_match](../../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match): does the table have expected column names and data types?
 
 ``` yaml
 - col_schema_match:
@@ -723,7 +723,7 @@ The `reference` can be the path of a CSV or Parquet file, a list of texts, a dic
     brief: "Schema validation"         # OPTIONAL: Step description
 ```
 
-`row_count_match`: does the table have n rows?
+[row_count_match](../../reference/Validate.row_count_match.md#pointblank.Validate.row_count_match): does the table have n rows?
 
 ``` yaml
 - row_count_match:
@@ -735,7 +735,7 @@ The `reference` can be the path of a CSV or Parquet file, a list of texts, a dic
     brief: "Expected row count"        # OPTIONAL: Step description
 ```
 
-`col_count_match`: does the table have n columns?
+[col_count_match](../../reference/Validate.col_count_match.md#pointblank.Validate.col_count_match): does the table have n columns?
 
 ``` yaml
 - col_count_match:
@@ -747,7 +747,7 @@ The `reference` can be the path of a CSV or Parquet file, a list of texts, a dic
     brief: "Expected column count"     # OPTIONAL: Step description
 ```
 
-`tbl_match`: does the table match a comparison table?
+[tbl_match](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match): does the table match a comparison table?
 
 ``` yaml
 - tbl_match:
@@ -774,7 +774,7 @@ This validation performs a comprehensive comparison between the target table and
 
 The validation fails at the first check that doesn't pass, making it easy to diagnose mismatches. This operates over a single test unit (pass/fail for complete table match).
 
-**Cross-backend validation**: `tbl_match()` supports automatic backend coercion when comparing tables from different backends (e.g., Polars vs. Pandas, DuckDB vs. SQLite). The comparison table is automatically converted to match the target table's backend.
+**Cross-backend validation**: [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) supports automatic backend coercion when comparing tables from different backends (e.g., Polars vs. Pandas, DuckDB vs. SQLite). The comparison table is automatically converted to match the target table's backend.
 
 Examples:
 
@@ -805,7 +805,7 @@ Examples:
 
 ### Special Validation Methods
 
-`conjointly`: are multiple validations having a joint dependency?
+[conjointly](../../reference/Validate.conjointly.md#pointblank.Validate.conjointly): are multiple validations having a joint dependency?
 
 ``` yaml
 - conjointly:
@@ -953,15 +953,15 @@ Examples:
 
 **When NOT to use AI validation:**
 
-- Simple numeric comparisons (use `col_vals_gt`, `col_vals_lt`, etc.)
-- Exact pattern matching (use `col_vals_regex`)
-- Schema validation (use `col_schema_match`)
+- Simple numeric comparisons (use [col_vals_gt](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), [col_vals_lt](../../reference/Validate.col_vals_lt.md#pointblank.Validate.col_vals_lt), etc.)
+- Exact pattern matching (use [col_vals_regex](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex))
+- Schema validation (use [col_schema_match](../../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match))
 - Performance-critical validations with large datasets
 - When deterministic results are required
 
 ### Model-Scored Validation
 
-`col_vals_scored`: are the scores that a model gives each row within bounds?
+[col_vals_scored](../../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored): are the scores that a model gives each row within bounds?
 
 ``` yaml
 - col_vals_scored:
@@ -1039,7 +1039,7 @@ See the [Scored Validation](../advanced-validation/scored-validation.md) article
 
 ### Data Quality Methods
 
-`col_pct_null`: is the percentage of null values in a column within bounds?
+[col_pct_null](../../reference/Validate.col_pct_null.md#pointblank.Validate.col_pct_null): is the percentage of null values in a column within bounds?
 
 ``` yaml
 - col_pct_null:
@@ -1052,7 +1052,7 @@ See the [Scored Validation](../advanced-validation/scored-validation.md) article
     brief: "Null rate check"           # OPTIONAL: Step description
 ```
 
-`data_freshness`: is the data in a date/datetime column recent?
+[data_freshness](../../reference/Validate.data_freshness.md#pointblank.Validate.data_freshness): is the data in a date/datetime column recent?
 
 ``` yaml
 - data_freshness:

@@ -2051,7 +2051,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1394-L1568" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1394-L1569" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">yaml_ablation</span>(</span>
@@ -2092,7 +2092,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">allow_python</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
-Whether to run Python code in the configuration. The <code>evaluate:</code> of the <code>ablation:</code> block is Python code (it imports a function and runs it on the training data), so it’s only used with <code>allow_python=True</code>. Without it, either pass <code>evaluate=</code> or leave <code>evaluate:</code> out (e.g., to <code>export()</code> the versions of the table for evaluation elsewhere).
+Whether to run Python code in the configuration. The <code>evaluate:</code> of the <code>ablation:</code> block is Python code (it imports a function and runs it on the training data), so it’s only used with <code>allow_python=True</code>. Without it, either pass <code>evaluate=</code> or leave <code>evaluate:</code> out (e.g., to <a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link gdls-code">export()</a> the versions of the table for evaluation elsewhere).
 </dd>
 </dl>
 </div>
@@ -2146,7 +2146,7 @@ If the configuration is invalid, has no <code>ablation:</code> block, or has Pyt
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s a table of temperature readings with some out-of-range values, and a YAML configuration with a validation step and an <code>ablation:</code> block. The <code>evaluate()</code> function is passed from Python, so the configuration doesn’t need <code>allow_python=True</code>.</p>
-<div id="fbabaa0d" class="cell" data-execution_count="2">
+<div id="b72a68d8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
