@@ -241,7 +241,7 @@ ablation.drop_all_but_each().run()
 
 These variants have a group of their own in the report, and their **Δ** is what the left-out step's rows add, compared with removing as many random rows on top of the other steps' rows. Step 1's rows help on top of the others and step 3's rows hurt, as they do on their own, while step 2's rows make no clear difference either way. Leaving out step 3 removes the same rows as the `"Without step 3"` variant, so that version of the table isn't evaluated again.
 
-A step whose rows help on their own but add nothing on top of the other steps gets the verdict *redundant*: the other steps already remove the rows that matter. Such a step can be dropped from the cleaning without losing anything, even though its variant helps.
+A step whose rows help on their own but add nothing on top of the other steps gets the verdict *redundant*: the other steps already remove the rows that matter. Such a step can be dropped from the cleaning without losing anything, even though its variant helps. None of the steps here is redundant: step 2's rows make no clear difference on top of the others, but they make none on their own either. The example of [`Ablation.drop_all_but_each()`](../../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each) has a step that is redundant.
 
 ## Removing Groups of Rows
 
@@ -569,6 +569,8 @@ boosting
 | Intervals are 95% paired t-intervals, not adjusted for multiple comparisons; verdicts use Holm-adjusted p-values. |  |  |  |
 
 The scorers of scikit-learn are such that higher is better (which is why the mean absolute error is negated), so the default `higher_is_better=True` is the right one here. With this model, removing the flights with a zero distance helps too. Whether a problem in the data matters depends on the model, which is why an ablation is worth running with the model that will be trained on the data. Pass `estimator=` to use another model or pipeline: it's cloned for each evaluation, with its `random_state` set to the seed.
+
+Every value in this report has a standard deviation of `± 0.000`, since the gradient boosting model gives the same result whatever its seed. Its repeats differ only in the controls, which remove a new set of random rows each time. The repeats matter most with a model that's random itself, like the random forest, whose results vary from seed to seed. Either way, the [`Ablation.check_determinism()`](../../reference/Ablation.check_determinism.md#pointblank.Ablation.check_determinism) method (see below) checks that the same seed gives the same result.
 
 ## Checking the Held-Out Data
 

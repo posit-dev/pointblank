@@ -2096,7 +2096,7 @@ An <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Final actions provide a powerful way to respond to the overall results of a validation workflow. They’re especially useful for sending notifications, generating reports, or taking corrective actions based on the complete validation outcome.</p>
 <p>The following example shows how to create a final action that checks for critical failures and sends an alert. The <code>d</code> column of the <code>small_table</code> dataset has many values that aren’t greater than <code>1000</code>, so the step reaches the ‘critical’ threshold:</p>
-<div id="a5a596a9" class="cell" data-execution_count="1">
+<div id="67e12900" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> send_alert():</span>
@@ -2120,7 +2120,7 @@ An <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-
 </div>
 <p>In this example, the <code>send_alert()</code> function is defined to check the validation summary for critical failures. Since some were found, the alert message was printed. The function is passed to the <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> class, which ensures it will be executed after all validation steps are complete. Note that we used the <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function to retrieve the summary of the validation results to help craft the alert message.</p>
 <p>Multiple final actions can be provided in a sequence. They will be executed in the order they are specified after all validation steps have completed. Here, a string message is followed by the <code>send_alert()</code> function and a second function that prints a count of the failing steps:</p>
-<div id="cfb8daee" class="cell" data-execution_count="2">
+<div id="6dcb1e08" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_counts():</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>summary[<span class="st">'n_failing_steps'</span>]<span class="sc">}</span><span class="ss"> of </span><span class="sc">{</span>summary[<span class="st">'n_steps'</span>]<span class="sc">}</span><span class="ss"> steps had failures"</span>)</span>

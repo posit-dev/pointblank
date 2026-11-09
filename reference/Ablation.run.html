@@ -2020,6 +2020,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -2050,7 +2051,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2940-L3054" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3141-L3288" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Ablation</span><span class="op">.</span><span class="fu">run</span>(</span>
@@ -2093,8 +2094,8 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Here’s an ablation of a table of temperature readings with some out-of-range values. The <code>evaluate()</code> function also returns the number of rows it was given, which is a second metric in the results.</p>
-<div id="11ee5f8a" class="cell" data-execution_count="2">
+<p>Here’s an ablation of a table of temperature readings, some of them recorded in tenths of a degree. The <code>evaluate()</code> function also returns the number of rows it was given, which is a second metric in the results. With <code>max_workers=4</code>, the run makes four evaluations at a time.</p>
+<div id="d5497037" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2222,7 +2223,52 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 </div>
 </div>
 </div>
-<p>After the run, the <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> object shows its report. The report shows the metric named in <code>metric=</code>; the other metrics are in the results of <a href="../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link gdls-code">get_effects()</a>.</p>
+<p>After the run, the <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> object shows its report, for the metric named in <code>metric=</code>. Removing the 12 readings in tenths helps. The other metric has a report of its own, from <code>get_tabular_report(metric="n_train")</code>, and both are in the results of <a href="../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link"><code>get_effects()</code></a>:</p>
+<div id="d2f75598" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ablation.get_effects().select(<span class="st">"variant"</span>, <span class="st">"metric"</span>, <span class="st">"mean"</span>, <span class="st">"delta_vs_control"</span>, <span class="st">"verdict"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (4, 5)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>variant</th><th>metric</th><th>mean</th><th>delta_vs_control</th><th>verdict</th></tr><tr><td>str</td><td>str</td><td>f64</td><td>f64</td><td>str</td></tr></thead><tbody><tr><td>"full"</td><td>"error"</td><td>7.392</td><td>null</td><td>null</td></tr><tr><td>"step_1"</td><td>"error"</td><td>0.10875</td><td>-6.90125</td><td>"helps"</td></tr><tr><td>"full"</td><td>"n_train"</td><td>300.0</td><td>null</td><td>null</td></tr><tr><td>"step_1"</td><td>"n_train"</td><td>288.0</td><td>0.0</td><td>null</td></tr></tbody></table></div>
+</div>
+</div>
+<p>The full table has 300 rows, and the variant and its control have 288. There’s no verdict for <code>n_train</code>, since verdicts are only for the metric in <code>metric=</code>.</p>
+<p>Making the evaluations at the same time doesn’t change the results, since each evaluation gets the same table and seed either way. Here’s the same ablation, run one evaluation after another:</p>
+<div id="bf2b1970" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>serial <span class="op">=</span> (</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(validation, evaluate<span class="op">=</span>evaluate, metric<span class="op">=</span><span class="st">"error"</span>, higher_is_better<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .drop_each()</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    .run()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>serial.get_effects().equals(ablation.get_effects())</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>True</code></pre>
+</div>
+</div>
+<p>The results are identical. Making evaluations at the same time pays off when each one takes a while (e.g., training a real model), and when they don’t already use every core.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/Ablation.plan.html#pointblank.Ablation.plan" class="gdls-link gdls-code">plan()</a></dt>
+<dd>
+<p>Show the versions of the table that the ablation will evaluate.</p>
+</dd>
+<dt><a href="../reference/Ablation.check_determinism.html#pointblank.Ablation.check_determinism" class="gdls-link gdls-code">check_determinism()</a></dt>
+<dd>
+<p>Check that <code>evaluate=</code> gives the same result twice.</p>
+</dd>
+<dt><a href="../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link gdls-code">get_effects()</a></dt>
+<dd>
+<p>Get the results of the ablation as a table.</p>
+</dd>
+</dl>
 
 
 </section>

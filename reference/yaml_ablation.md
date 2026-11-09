@@ -4,7 +4,7 @@ Set up an ablation from a YAML configuration.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1394-L1569)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1394-L1574)
 
 ``` python
 yaml_ablation(
@@ -124,3 +124,11 @@ ablation.run()
 | Intervals are 95% paired t-intervals, not adjusted for multiple comparisons; verdicts use Holm-adjusted p-values. |  |  |  |
 
 The `tbl:` of the configuration is replaced with the table in `set_tbl=`, and the ablation was set up from the block, ready to run.
+
+## See Also
+
+[Ablation](../reference/Ablation.md#pointblank.Ablation)  
+Measure how the rows that fail validation steps affect a model trained on the data.
+
+[yaml_interrogate()](../reference/yaml_interrogate.md#pointblank.yaml_interrogate)  
+Execute a YAML-based validation workflow.

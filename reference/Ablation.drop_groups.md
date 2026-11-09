@@ -4,7 +4,7 @@ Add a variant for each group of rows, removing the rows of that group.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1219-L1332)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1385-L1502)
 
 ``` python
 Ablation.drop_groups(
@@ -74,3 +74,8 @@ ablation
 | Intervals are 95% paired t-intervals, not adjusted for multiple comparisons; verdicts use Holm-adjusted p-values. |  |  |  |
 
 Removing the readings of sensor `"c"` helps, while removing either of the other sensors hurts, since it leaves a larger share of the readings from sensor `"c"`.
+
+## See Also
+
+[Stratified](../reference/ablation.Stratified.md#pointblank.ablation.Stratified)  
+Draw the rows of controls in proportion to groups of rows.

@@ -4,7 +4,7 @@ Evaluate the full table, each variant, and each control.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2940-L3054)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3141-L3288)
 
 ``` python
 Ablation.run(
@@ -34,7 +34,7 @@ The results are the same whatever `max_workers=` is: the evaluations are made in
 
 ## Examples
 
-Here's an ablation of a table of temperature readings with some out-of-range values. The `evaluate()` function also returns the number of rows it was given, which is a second metric in the results.
+Here's an ablation of a table of temperature readings, some of them recorded in tenths of a degree. The `evaluate()` function also returns the number of rows it was given, which is a second metric in the results. With `max_workers=4`, the run makes four evaluations at a time.
 
 ``` python
 import pointblank as pb
@@ -71,4 +71,47 @@ ablation
 | **Step 1** Expect that values in `temp` should be between `-10` and `45`. | 12 4.0% | 0.109 ± 0.080 Δ vs full −7.283 | −6.901 \[−8.634, −5.168\] ![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyIiB2aWV3Ym94PSIwIDAgMTAwIDEyIiBzdHlsZT0idmVydGljYWwtYWxpZ246IG1pZGRsZTsiPjxsaW5lIHgxPSI1MC4wIiB5MT0iMCIgeDI9IjUwLjAiIHkyPSIxMiIgc3Ryb2tlPSIjQkJCQkJCIiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT48bGluZSB4MT0iNC4wIiB5MT0iNi4wIiB4Mj0iMjIuNSIgeTI9IjYuMCIgc3Ryb2tlPSIjNENBNjRDIiBzdHJva2Utd2lkdGg9IjIiPjwvbGluZT48Y2lyY2xlIGN4PSIxMy4yIiBjeT0iNi4wIiByPSIzIiBmaWxsPSIjNENBNjRDIj48L2NpcmNsZT48L3N2Zz4=) helps |
 | Intervals are 95% paired t-intervals, not adjusted for multiple comparisons; verdicts use Holm-adjusted p-values. |  |  |  |
 
-After the run, the [Ablation](../reference/Ablation.md#pointblank.Ablation) object shows its report. The report shows the metric named in `metric=`; the other metrics are in the results of [get_effects()](../reference/Ablation.get_effects.md#pointblank.Ablation.get_effects).
+After the run, the [Ablation](../reference/Ablation.md#pointblank.Ablation) object shows its report, for the metric named in `metric=`. Removing the 12 readings in tenths helps. The other metric has a report of its own, from `get_tabular_report(metric="n_train")`, and both are in the results of [`get_effects()`](../reference/Ablation.get_effects.md#pointblank.Ablation.get_effects):
+
+``` python
+ablation.get_effects().select("variant", "metric", "mean", "delta_vs_control", "verdict")
+```
+
+shape: (4, 5)
+
+| variant  | metric    | mean    | delta_vs_control | verdict |
+|----------|-----------|---------|------------------|---------|
+| str      | str       | f64     | f64              | str     |
+| "full"   | "error"   | 7.392   | null             | null    |
+| "step_1" | "error"   | 0.10875 | -6.90125         | "helps" |
+| "full"   | "n_train" | 300.0   | null             | null    |
+| "step_1" | "n_train" | 288.0   | 0.0              | null    |
+
+The full table has 300 rows, and the variant and its control have 288. There's no verdict for `n_train`, since verdicts are only for the metric in `metric=`.
+
+Making the evaluations at the same time doesn't change the results, since each evaluation gets the same table and seed either way. Here's the same ablation, run one evaluation after another:
+
+``` python
+serial = (
+    pb.Ablation(validation, evaluate=evaluate, metric="error", higher_is_better=False)
+    .drop_each()
+    .run()
+)
+
+serial.get_effects().equals(ablation.get_effects())
+```
+
+    True
+
+The results are identical. Making evaluations at the same time pays off when each one takes a while (e.g., training a real model), and when they don't already use every core.
+
+## See Also
+
+[plan()](../reference/Ablation.plan.md#pointblank.Ablation.plan)  
+Show the versions of the table that the ablation will evaluate.
+
+[check_determinism()](../reference/Ablation.check_determinism.md#pointblank.Ablation.check_determinism)  
+Check that `evaluate=` gives the same result twice.
+
+[get_effects()](../reference/Ablation.get_effects.md#pointblank.Ablation.get_effects)  
+Get the results of the ablation as a table.

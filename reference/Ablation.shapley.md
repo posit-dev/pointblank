@@ -4,7 +4,7 @@ Split the effect of removing the steps' rows fairly among the steps (Shapley val
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1960-L2121)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2152-L2318)
 
 ``` python
 Ablation.shapley(
@@ -86,3 +86,11 @@ ablation
 | The Shapley values are exact, from every order of the 2 steps. They add up to −23.58, the effect of removing the rows of every step compared with removing as many random rows. |  |  |  |
 
 Both steps remove the sentinels, so they share the credit for them equally. Step 2 also gets all the credit for the readings in tenths of a degree, which only it catches, so its Shapley value is the larger one. As the note at the bottom says, the two values add up to the effect of removing the rows of both steps.
+
+## See Also
+
+[get_shapley()](../reference/Ablation.get_shapley.md#pointblank.Ablation.get_shapley)  
+Get the Shapley values of the steps as a table.
+
+[drop_all_but_each()](../reference/Ablation.drop_all_but_each.md#pointblank.Ablation.drop_all_but_each)  
+Remove the rows failing every step but one, for each step.

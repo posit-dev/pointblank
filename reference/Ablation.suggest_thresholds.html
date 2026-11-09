@@ -2017,6 +2017,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -2047,7 +2048,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4375-L4528" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4635-L4796" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Ablation</span><span class="op">.</span><span class="fu">suggest_thresholds</span>(<span class="va">tolerance</span>)</span></code></pre></div>
@@ -2085,7 +2086,7 @@ The suggested thresholds, by step number, as <a href="../reference/Thresholds.ht
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s a table of temperature readings with no missing values, and a ‘model’ that estimates the average temperature, filling in a missing reading with <code>0</code>. Missing readings are injected at three rates.</p>
-<div id="25e289bb" class="cell" data-execution_count="2">
+<div id="ec1ef77e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2113,7 +2114,16 @@ The suggested thresholds, by step number, as <a href="../reference/Thresholds.ht
 <pre><code>{1: Thresholds(warning=0.013, error=0.025, critical=None)}</code></pre>
 </div>
 </div>
-<p>Each percent of missing readings adds about 0.2 degrees to the error, so the error threshold is the share of missing readings that adds 0.5 degrees: about 2.5%.</p>
+<p>Each percent of missing readings adds about 0.2 degrees to the error, so the error threshold is the share of missing readings that adds 0.5 degrees: about 2.5%. The warning threshold is half of that. The verdict for the rate of 1% is inconclusive (its effect is small next to the noise), but the slope is fitted over all three rates, and the other two clearly hurt. A suggestion needs at least one rate that hurts, so for a defect with small effects, use rates high enough to measure, or more <code>repeats=</code>.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/Ablation.inject.html#pointblank.Ablation.inject" class="gdls-link gdls-code">inject()</a></dt>
+<dd>
+<p>Add a variant for each rate of a defect, put into clean rows of the table.</p>
+</dd>
+</dl>
 
 
 </section>

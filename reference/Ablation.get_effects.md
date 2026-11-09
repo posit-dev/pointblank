@@ -4,7 +4,7 @@ Get the results of the ablation as a table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4139-L4267)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4389-L4522)
 
 ``` python
 Ablation.get_effects()
@@ -75,3 +75,11 @@ shape: (2, 4)
 | "step_1" | 0.10875 | -6.90125         | "helps" |
 
 Removing the 12 rows that failed step 1 lowers the error by about 7 degrees compared with removing 12 random rows, so the verdict is that the step helps.
+
+## See Also
+
+[get_tabular_report()](../reference/Ablation.get_tabular_report.md#pointblank.Ablation.get_tabular_report)  
+Get a tabular report of the ablation's results.
+
+[get_shapley()](../reference/Ablation.get_shapley.md#pointblank.Ablation.get_shapley)  
+Get the Shapley values of the steps as a table.

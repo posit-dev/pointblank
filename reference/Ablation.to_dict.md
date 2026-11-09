@@ -4,7 +4,7 @@ Get the settings and results of the ablation as a JSON-serializable dict.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4560-L4643)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4828-L4915)
 
 ``` python
 Ablation.to_dict()
@@ -71,3 +71,8 @@ ablation.to_dict()["runs"][:4]
       'cached': False}]
 
 Each run records the version of the table, the repeat, the seed, the metrics, and whether the result came from the cache, so the runs can be stored and analyzed again later.
+
+## See Also
+
+[to_json()](../reference/Ablation.to_json.md#pointblank.Ablation.to_json)  
+Get the settings and results of the ablation as a JSON string.

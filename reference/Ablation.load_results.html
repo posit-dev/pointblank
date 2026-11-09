@@ -2020,6 +2020,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -2050,7 +2051,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3321-L3503" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3563-L3749" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Ablation</span><span class="op">.</span><span class="fu">load_results</span>(</span>
@@ -2094,7 +2095,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an ablation of a table of temperature readings, exported for training elsewhere.</p>
-<div id="8f5d2f25" class="cell" data-execution_count="2">
+<div id="b0825433" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -2114,7 +2115,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>directory <span class="op">=</span> ablation.export(tempfile.mkdtemp())</span></code></pre></div>
 </div>
 <p>Here, the ‘training’ happens in the same session, reading each table from the manifest and filling in the template, but it could be done anywhere.</p>
-<div id="6a0abadd" class="cell" data-execution_count="3">
+<div id="4c4ab0e6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>manifest <span class="op">=</span> json.loads((directory <span class="op">/</span> <span class="st">"manifest.json"</span>).read_text())</span>
@@ -2239,6 +2240,15 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 </div>
 </div>
 <p>The results were found in the directory, next to the manifest, and the report is the same as a run with the same evaluations would give.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link gdls-code">export()</a></dt>
+<dd>
+<p>Write out the versions of the table, for training them elsewhere.</p>
+</dd>
+</dl>
 
 
 </section>

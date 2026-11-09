@@ -4,7 +4,7 @@ Read the results of evaluations made elsewhere, and compute the effects.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3321-L3503)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3563-L3749)
 
 ``` python
 Ablation.load_results(
@@ -91,3 +91,8 @@ ablation.load_results(directory)
 | The results were read with `load_results()`, from evaluations made elsewhere. |  |  |  |
 
 The results were found in the directory, next to the manifest, and the report is the same as a run with the same evaluations would give.
+
+## See Also
+
+[export()](../reference/Ablation.export.md#pointblank.Ablation.export)  
+Write out the versions of the table, for training them elsewhere.

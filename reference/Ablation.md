@@ -4,7 +4,7 @@ Measure how the rows that fail validation steps affect a model trained on the da
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L437-L5067)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L541-L5363)
 
 ``` python
 Ablation(

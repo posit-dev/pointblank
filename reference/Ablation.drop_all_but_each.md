@@ -4,7 +4,7 @@ Add a variant for each step, removing the rows that failed every other step.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1108-L1217)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1268-L1383)
 
 ``` python
 Ablation.drop_all_but_each(steps=None)
@@ -78,3 +78,14 @@ ablation
 | Intervals are 95% paired t-intervals, not adjusted for multiple comparisons; verdicts use Holm-adjusted p-values. |  |  |  |
 
 Both steps help on their own. On top of step 2, step 1 still helps, since it removes the bad readings that step 2 misses. But step 2 is redundant: every row it finds also fails step 1, so leaving it out removes the same rows as using both steps.
+
+## See Also
+
+[drop_each()](../reference/Ablation.drop_each.md#pointblank.Ablation.drop_each)  
+Remove the rows failing each step, one step at a time.
+
+[drop_all()](../reference/Ablation.drop_all.md#pointblank.Ablation.drop_all)  
+Remove the rows failing any step.
+
+[shapley()](../reference/Ablation.shapley.md#pointblank.Ablation.shapley)  
+Share the effect of the validation among its steps.

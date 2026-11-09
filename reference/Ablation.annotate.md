@@ -4,7 +4,7 @@ Add the results of the ablation to the steps of the validation, as notes.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3981-L4137)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4227-L4387)
 
 ``` python
 Ablation.annotate(validation=None)
@@ -60,3 +60,8 @@ ablation.annotate()
 [TABLE]
 
 The validation report now has a note on each step, with the change in the error from removing its failing rows and the verdict.
+
+## See Also
+
+[get_tabular_report()](../reference/Ablation.get_tabular_report.md#pointblank.Ablation.get_tabular_report)  
+Get a tabular report of the ablation's results.

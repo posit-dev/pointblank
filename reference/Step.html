@@ -2113,7 +2113,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s create a step that checks that ages fall between 0 and 120. Printing it shows the method name and the stored arguments.</p>
-<div id="5a590e57" class="cell" data-execution_count="2">
+<div id="2a312e0c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>age_step <span class="op">=</span> pb.Step(<span class="st">"col_vals_between"</span>, columns<span class="op">=</span><span class="st">"age"</span>, left<span class="op">=</span><span class="dv">0</span>, right<span class="op">=</span><span class="dv">120</span>)</span>
@@ -2124,7 +2124,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
 </div>
 </div>
 <p>The two parts of the step are available as attributes:</p>
-<div id="045b4039" class="cell" data-execution_count="3">
+<div id="aadda130" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(age_step.method)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(age_step.kwargs)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2133,7 +2133,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
 </div>
 </div>
 <p>Steps are normally used in groups. Here are three more rules for a table of patients: each patient ID must appear only once, IDs must follow a pattern, and the <code>visit</code> column must be present. Note that <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct</a> takes <code>columns_subset=</code> rather than <code>columns=</code>, because each step’s arguments are exactly those of its <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> method.</p>
-<div id="0a00f425" class="cell" data-execution_count="4">
+<div id="1c9483b1" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>patient_steps <span class="op">=</span> [</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Step(<span class="st">"rows_distinct"</span>, columns_subset<span class="op">=</span><span class="st">"patient_id"</span>),</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    pb.Step(<span class="st">"col_vals_regex"</span>, columns<span class="op">=</span><span class="st">"patient_id"</span>, pattern<span class="op">=</span><span class="vs">r"</span><span class="dv">^</span><span class="vs">PT-</span><span class="dv">\d</span><span class="op">{3}</span><span class="dv">$</span><span class="vs">"</span>),</span>
@@ -2142,7 +2142,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div>
 </div>
 <p>Placing the steps in a <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link"><code>Contract</code></a> lets us apply them to a table. The steps run in the order they’re listed.</p>
-<div id="5925835a" class="cell" data-execution_count="5">
+<div id="48d8c635" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>patients <span class="op">=</span> pl.DataFrame(</span>
@@ -2447,7 +2447,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
 </div>
 <p>The ID check flags <code>"PT-03"</code>, which is missing a digit, and the age check flags the value <code>130</code>. The other two steps pass.</p>
 <p>The same steps can be added to an ordinary validation by wrapping them in a <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link"><code>Steps</code></a> object. That route also accepts validation methods that contracts don’t support, such as <a href="../reference/Validate.col_vals_str_len.html#pointblank.Validate.col_vals_str_len" class="gdls-link"><code>col_vals_str_len()</code></a>:</p>
-<div id="22fa0dd9" class="cell" data-execution_count="6">
+<div id="441aae2f" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>id_length_step <span class="op">=</span> pb.Step(<span class="st">"col_vals_str_len"</span>, columns<span class="op">=</span><span class="st">"patient_id"</span>, min_val<span class="op">=</span><span class="dv">6</span>, max_val<span class="op">=</span><span class="dv">6</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -2545,7 +2545,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
     <td colspan="14" class="gt_heading gt_title gt_font_normal" id="pb_tbl-title" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-09|15:53:45</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">patients</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-09|19:11:53</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">patients</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -2863,7 +2863,7 @@ A single-key dictionary mapping the method name to its arguments.
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
 <p>Let’s convert a step that checks a value range.</p>
-<div id="162d97a3" class="cell" data-execution_count="7">
+<div id="775cce57" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>step <span class="op">=</span> pb.Step(<span class="st">"col_vals_between"</span>, columns<span class="op">=</span><span class="st">"age"</span>, left<span class="op">=</span><span class="dv">0</span>, right<span class="op">=</span><span class="dv">120</span>)</span>
@@ -2874,14 +2874,14 @@ A single-key dictionary mapping the method name to its arguments.
 </div>
 </div>
 <p>A step without arguments gives an empty dictionary of arguments:</p>
-<div id="45e6fc76" class="cell" data-execution_count="8">
+<div id="8ebdb83c" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pb.Step(<span class="st">"rows_complete"</span>).to_dict()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>{'rows_complete': {}}</code></pre>
 </div>
 </div>
 <p>Thresholds set on a step become a dictionary of the levels that are set:</p>
-<div id="8d0ca358" class="cell" data-execution_count="9">
+<div id="fe80afd5" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>pb.Step(</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"col_vals_not_null"</span>, columns<span class="op">=</span><span class="st">"email"</span>, thresholds<span class="op">=</span>pb.Thresholds(warning<span class="op">=</span><span class="dv">1</span>, error<span class="op">=</span><span class="fl">0.05</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>).to_dict()</span></code></pre></div>
@@ -2949,7 +2949,7 @@ If the value for the method name is neither a dictionary nor <code>None</code>.
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
 <p>Let’s parse a few step definitions written in YAML, as they might appear in a configuration file, and turn each one into a <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">Step</a>.</p>
-<div id="7c8e7656" class="cell" data-execution_count="10">
+<div id="a4b51ecf" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> yaml</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2972,7 +2972,7 @@ If the value for the method name is neither a dictionary nor <code>None</code>.
 </div>
 </div>
 <p>The <code>rows_complete:</code> entry has no value, so its step has no arguments. A step converted with <a href="../reference/Step.html#pointblank.Step.to_dict" class="gdls-link gdls-code">to_dict()</a> and back is equal to the original:</p>
-<div id="d4d11e17" class="cell" data-execution_count="11">
+<div id="a84fb1f3" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>step <span class="op">=</span> pb.Step(<span class="st">"col_vals_in_set"</span>, columns<span class="op">=</span><span class="st">"status"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"open"</span>, <span class="st">"closed"</span>])</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>pb.Step.from_dict(step.to_dict()) <span class="op">==</span> step</span></code></pre></div>

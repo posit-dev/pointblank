@@ -4,7 +4,7 @@ Get the settings and results of the ablation as a JSON string.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4645-L4709)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4917-L4985)
 
 ``` python
 Ablation.to_json(indent=2)
@@ -80,3 +80,8 @@ print(json.dumps(json.loads(ablation.to_json())["settings"], indent=2))
     }
 
 The settings record everything needed to repeat the ablation with the same `evaluate()` function, including the seed.
+
+## See Also
+
+[to_dict()](../reference/Ablation.to_dict.md#pointblank.Ablation.to_dict)  
+Get the settings and results of the ablation as a JSON-serializable dict.

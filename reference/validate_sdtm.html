@@ -2137,7 +2137,7 @@ If there is no template for the domain.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here is a small Demographics (DM) dataset with a few problems: the third row has the wrong <code>DOMAIN</code> and no <code>USUBJID</code>, the second row’s <code>RFSTDTC</code> isn’t an ISO 8601 date, and the fourth row’s <code>SEX</code> is longer than the two characters that SDTM allows:</p>
-<div id="268726bc" class="cell" data-execution_count="2">
+<div id="0e197994" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2820,7 +2820,7 @@ If there is no template for the domain.
 </div>
 <p>The plan starts with the null checks for the five required variables in the data, then checks <code>DOMAIN</code>, the lengths of all six columns, and the format of <code>RFSTDTC</code>. Four steps have a failing test unit, one for each problem. The partial date <code>2024-02</code> and the date-time <code>2024-02-10T09:30</code> both pass the date check, since SDTM allows dates to be truncated.</p>
 <p>The plan doesn’t report the required DM variables that the dataset lacks, such as <code>SITEID</code> and <code>COUNTRY</code>. Since the plan isn’t interrogated yet, a <a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists" class="gdls-link"><code>col_exists()</code></a> step for the template’s required variables can be added to it. This example uses an Adverse Events (AE) dataset and leaves out the length checks to keep the plan short:</p>
-<div id="499ea41a" class="cell" data-execution_count="3">
+<div id="e9c6db09" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ae <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"STUDYID"</span>: [<span class="st">"STUDY01"</span>] <span class="op">*</span> <span class="dv">3</span>,</span>

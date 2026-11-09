@@ -4,7 +4,7 @@ Suggest thresholds for the steps, from what their failing test units cost the mo
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4375-L4528)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4635-L4796)
 
 ``` python
 Ablation.suggest_thresholds(tolerance)
@@ -60,4 +60,9 @@ ablation.suggest_thresholds(tolerance=0.5)
 
     {1: Thresholds(warning=0.013, error=0.025, critical=None)}
 
-Each percent of missing readings adds about 0.2 degrees to the error, so the error threshold is the share of missing readings that adds 0.5 degrees: about 2.5%.
+Each percent of missing readings adds about 0.2 degrees to the error, so the error threshold is the share of missing readings that adds 0.5 degrees: about 2.5%. The warning threshold is half of that. The verdict for the rate of 1% is inconclusive (its effect is small next to the noise), but the slope is fitted over all three rates, and the other two clearly hurt. A suggestion needs at least one rate that hurts, so for a defect with small effects, use rates high enough to measure, or more `repeats=`.
+
+## See Also
+
+[inject()](../reference/Ablation.inject.md#pointblank.Ablation.inject)  
+Add a variant for each rate of a defect, put into clean rows of the table.

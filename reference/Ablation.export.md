@@ -4,7 +4,7 @@ Write out the versions of the table to evaluate, for training them elsewhere.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3156-L3319)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3394-L3561)
 
 ``` python
 Ablation.export(
@@ -81,3 +81,8 @@ shape: (5, 4)
 | "full"  | 4      | 4    | null  |
 
 The template has a row for each of the 15 evaluations (5 repeats of the full table, the variant, and its control), each with the seed to train with.
+
+## See Also
+
+[load_results()](../reference/Ablation.load_results.md#pointblank.Ablation.load_results)  
+Read the results of evaluations made elsewhere.

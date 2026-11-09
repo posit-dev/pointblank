@@ -4,7 +4,7 @@ A version of the training table evaluated in an ablation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L133-L244)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L133-L301)
 
 ``` python
 AblationVariant(
@@ -78,3 +78,68 @@ For a variant of [inject()](../reference/Ablation.inject.md#pointblank.Ablation.
 
 `checked_by: int | None`  
 For a variant of [inject()](../reference/Ablation.inject.md#pointblank.Ablation.inject), the step that checks for the defect, given as its `step=` (otherwise `None`).
+
+## Examples
+
+Here's a table of temperature readings, some of them recorded in tenths of a degree (so they're ten times too high). The `evaluate()` function takes the `variant=` argument and keeps a log of each call, as a real function might do to name the files that its models are saved to.
+
+``` python
+import pointblank as pb
+import polars as pl
+
+temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
+for k in range(0, 300, 25):
+    temps[k] *= 10
+readings = pl.DataFrame({"temp": temps})
+
+calls = []
+
+def evaluate(train, *, seed, variant):
+    calls.append(
+        {
+            "id": variant.id,
+            "strategy": variant.strategy,
+            "n_removed": variant.n_removed,
+            "is_control": variant.is_control,
+            "seed": seed,
+            "n_rows": train.height,
+        }
+    )
+    sample = train.sample(fraction=1.0, with_replacement=True, seed=seed)
+    return abs(sample["temp"].mean() - 20)
+
+validation = (
+    pb.Validate(data=readings)
+    .col_vals_between(columns="temp", left=-10, right=45)
+    .interrogate()
+)
+
+ablation = pb.Ablation(
+    validation, evaluate=evaluate, metric="error", higher_is_better=False, repeats=3
+).drop_each()
+ablation.run()
+
+pl.DataFrame(calls)
+```
+
+shape: (9, 6)
+
+| id           | strategy    | n_removed | is_control | seed | n_rows |
+|--------------|-------------|-----------|------------|------|--------|
+| str          | str         | i64       | bool       | i64  | i64    |
+| "full"       | "full"      | 0         | false      | 0    | 300    |
+| "full"       | "full"      | 0         | false      | 1    | 300    |
+| "full"       | "full"      | 0         | false      | 2    | 300    |
+| "step_1"     | "drop_each" | 12        | false      | 0    | 288    |
+| "step_1"     | "drop_each" | 12        | false      | 1    | 288    |
+| "step_1"     | "drop_each" | 12        | false      | 2    | 288    |
+| "control_12" | "control"   | 12        | true       | 0    | 288    |
+| "control_12" | "control"   | 12        | true       | 1    | 288    |
+| "control_12" | "control"   | 12        | true       | 2    | 288    |
+
+The function was called three times (once for each repeat, with the seeds `0`, `1`, and `2`) for each of the three versions of the table: the full table (`"full"`), the variant of [drop_each()](../reference/Ablation.drop_each.md#pointblank.Ablation.drop_each) that removes the 12 rows failing step 1 (`"step_1"`), and its control, which removes 12 random rows (`"control_12"`). The variant and its control both train on 288 rows, so the training table alone can't tell them apart, but `variant=` can. The variant always removes the same rows, while the control draws a new set of random rows for each repeat.
+
+## See Also
+
+[Ablation](../reference/Ablation.md#pointblank.Ablation)  
+Measure how the rows that fail validation steps affect a model trained on the data.

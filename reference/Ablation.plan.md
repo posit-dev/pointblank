@@ -4,7 +4,7 @@ Show the versions of the table that the ablation will evaluate.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2775-L2938)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2972-L3139)
 
 ``` python
 Ablation.plan(
@@ -77,3 +77,8 @@ ablation.plan()
 | Step 3 isn't used: it removes no rows. |  |
 
 No row failed step 3, so it has no variant, as the note says. With 10 repeats of the full table, two variants, and two controls, the run will make 50 evaluations.
+
+## See Also
+
+[run()](../reference/Ablation.run.md#pointblank.Ablation.run)  
+Evaluate the full table, each variant, and each control.

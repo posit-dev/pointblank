@@ -4,7 +4,7 @@ Get the Shapley values of the steps as a table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4269-L4373)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4524-L4633)
 
 ``` python
 Ablation.get_shapley()
@@ -73,3 +73,11 @@ shape: (2, 5)
 | 2    | -17.432311 | -22.047903 | -12.81672 | "helps" |
 
 Both steps lower the error, and step 2 gets the larger share, since it also catches the readings that step 1 misses.
+
+## See Also
+
+[shapley()](../reference/Ablation.shapley.md#pointblank.Ablation.shapley)  
+Split the effect of removing the steps' rows fairly among the steps.
+
+[get_effects()](../reference/Ablation.get_effects.md#pointblank.Ablation.get_effects)  
+Get the results of the ablation as a table.

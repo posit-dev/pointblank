@@ -4,7 +4,7 @@ Get a tabular report of the ablation's results.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4711-L5036)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4987-L5332)
 
 ``` python
 Ablation.get_tabular_report(
@@ -38,7 +38,7 @@ A Great Tables object.
 
 ## Examples
 
-Here's an ablation of a table of temperature readings with out-of-range and missing values.
+Here's an ablation of a table of temperature readings with missing values and with readings that were recorded in tenths of a degree (so they're ten times too high). The 'model' estimates the average temperature, ignoring missing readings. The `evaluate()` function returns two metrics: the error against the true average of `20`, which the verdicts are based on, and the estimate itself.
 
 ``` python
 import pointblank as pb
@@ -53,7 +53,8 @@ readings = pl.DataFrame({"temp": temps})
 
 def evaluate(train, *, seed, variant):
     sample = train.drop_nulls().sample(fraction=1.0, with_replacement=True, seed=seed)
-    return abs(sample["temp"].mean() - 20)
+    estimate = sample["temp"].mean()
+    return {"error": abs(estimate - 20), "estimate": estimate}
 
 validation = (
     pb.Validate(data=readings)
@@ -79,4 +80,26 @@ ablation.get_tabular_report(title="Which checks matter for the temperature model
 | **Step 2** Expect that values in `temp` should be between `-10` and `45`. | 12 4.0% | 0.069 ± 0.062 Δ vs full −7.109 | −7.974 \[−10.556, −5.393\] ![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyIiB2aWV3Ym94PSIwIDAgMTAwIDEyIiBzdHlsZT0idmVydGljYWwtYWxpZ246IG1pZGRsZTsiPjxsaW5lIHgxPSI1MC4wIiB5MT0iMCIgeDI9IjUwLjAiIHkyPSIxMiIgc3Ryb2tlPSIjQkJCQkJCIiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT48bGluZSB4MT0iNC4wIiB5MT0iNi4wIiB4Mj0iMjYuNSIgeTI9IjYuMCIgc3Ryb2tlPSIjNENBNjRDIiBzdHJva2Utd2lkdGg9IjIiPjwvbGluZT48Y2lyY2xlIGN4PSIxNS4yIiBjeT0iNi4wIiByPSIzIiBmaWxsPSIjNENBNjRDIj48L2NpcmNsZT48L3N2Zz4=) helps |
 | Intervals are 95% paired t-intervals, not adjusted for multiple comparisons; verdicts use Holm-adjusted p-values. |  |  |  |
 
-Removing the readings that are out of range (step 2) helps, while removing the missing readings (step 1) makes no clear difference.
+Removing the readings in tenths (step 2) helps, while removing the missing readings (step 1) makes no clear difference. The error doesn't say in which direction the model was wrong, though. The report for the other metric does:
+
+``` python
+ablation.get_tabular_report(metric="estimate")
+```
+
+| Ablation report |  |  |  |
+|----|----|----|----|
+| estimate on the full table (300 rows): **27.18 ± 2.44**. Each version was evaluated 5 times; Δ is the mean paired difference from removing the same number of random rows. Verdicts are based on error, so none are shown here. |  |  |  |
+| Variant | Removed | estimate | Δ vs random |
+| **Step 1** Expect that all values in `temp` should not be Null. | 8 2.7% | 27.18 ± 2.44 Δ vs full +0.00 | +0.56 \[−4.22, +5.34\] ![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyIiB2aWV3Ym94PSIwIDAgMTAwIDEyIiBzdHlsZT0idmVydGljYWwtYWxpZ246IG1pZGRsZTsiPjxsaW5lIHgxPSI1MC4wIiB5MT0iMCIgeDI9IjUwLjAiIHkyPSIxMiIgc3Ryb2tlPSIjQkJCQkJCIiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT48bGluZSB4MT0iMzEuNiIgeTE9IjYuMCIgeDI9IjczLjMiIHkyPSI2LjAiIHN0cm9rZT0iIzY2NjY2NiIgc3Ryb2tlLXdpZHRoPSIyIj48L2xpbmU+PGNpcmNsZSBjeD0iNTIuNSIgY3k9IjYuMCIgcj0iMyIgZmlsbD0iIzY2NjY2NiI+PC9jaXJjbGU+PC9zdmc+) |
+| **Step 2** Expect that values in `temp` should be between `-10` and `45`. | 12 4.0% | 20.06 ± 0.07 Δ vs full −7.12 | −7.98 \[−10.55, −5.41\] ![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEyIiB2aWV3Ym94PSIwIDAgMTAwIDEyIiBzdHlsZT0idmVydGljYWwtYWxpZ246IG1pZGRsZTsiPjxsaW5lIHgxPSI1MC4wIiB5MT0iMCIgeDI9IjUwLjAiIHkyPSIxMiIgc3Ryb2tlPSIjQkJCQkJCIiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT48bGluZSB4MT0iNC4wIiB5MT0iNi4wIiB4Mj0iMjYuNCIgeTI9IjYuMCIgc3Ryb2tlPSIjNjY2NjY2IiBzdHJva2Utd2lkdGg9IjIiPjwvbGluZT48Y2lyY2xlIGN4PSIxNS4yIiBjeT0iNi4wIiByPSIzIiBmaWxsPSIjNjY2NjY2Ij48L2NpcmNsZT48L3N2Zz4=) |
+| Intervals are 95% paired t-intervals, not adjusted for multiple comparisons; verdicts use Holm-adjusted p-values. |  |  |  |
+
+The readings in tenths pull the estimate up, to about 27 degrees, and removing them brings it back to about 20. There are no verdicts in this report, since they're based on the error. The report can also be in another language, with `lang=` (e.g., `lang="fr"`), and use the number formats of another locale, with `locale=`.
+
+## See Also
+
+[get_effects()](../reference/Ablation.get_effects.md#pointblank.Ablation.get_effects)  
+Get the results of the ablation as a table.
+
+[annotate()](../reference/Ablation.annotate.md#pointblank.Ablation.annotate)  
+Add the results of the ablation to the validation, as notes.

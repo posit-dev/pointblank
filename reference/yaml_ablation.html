@@ -2021,6 +2021,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
   <li><a href="#the-ablation-block" id="toc-the-ablation-block" class="nav-link" data-scroll-target="#the-ablation-block">The <code>ablation:</code> Block</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
@@ -2051,7 +2052,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1394-L1569" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1394-L1574" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">yaml_ablation</span>(</span>
@@ -2146,7 +2147,7 @@ If the configuration is invalid, has no <code>ablation:</code> block, or has Pyt
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s a table of temperature readings with some out-of-range values, and a YAML configuration with a validation step and an <code>ablation:</code> block. The <code>evaluate()</code> function is passed from Python, so the configuration doesn’t need <code>allow_python=True</code>.</p>
-<div id="2b663213" class="cell" data-execution_count="2">
+<div id="090c4cea" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2281,6 +2282,19 @@ If the configuration is invalid, has no <code>ablation:</code> block, or has Pyt
 </div>
 </div>
 <p>The <code>tbl:</code> of the configuration is replaced with the table in <code>set_tbl=</code>, and the ablation was set up from the block, ready to run.</p>
+</section>
+<section id="see-also" class="level2 doc-see-also">
+<h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<dl>
+<dt><a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a></dt>
+<dd>
+<p>Measure how the rows that fail validation steps affect a model trained on the data.</p>
+</dd>
+<dt><a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link gdls-code">yaml_interrogate()</a></dt>
+<dd>
+<p>Execute a YAML-based validation workflow.</p>
+</dd>
+</dl>
 
 
 </section>
