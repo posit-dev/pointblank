@@ -78,7 +78,8 @@ skills/pointblank/
 | Run a custom check                   | `specially`                               |
 | Use LLM-based validation             | `prompt`, `calibrate_prompt`              |
 | Score rows with a model/function     | `col_vals_scored`, `pb.scorers`           |
-| Check text, chat, or RAG data        | `pb.text`, `pb.rag`, `col_vals_chat_format` |
+| Check text quality, language, PII    | `col_vals_text_quality`, `col_vals_in_language`, `col_vals_no_pii` |
+| Check text, chat, or RAG data        | `col_vals_token_len`, `col_vals_chat_format`, `pb.rag` |
 | Reuse a bundle of steps              | `Steps`, `add_steps`                      |
 | Select columns by pattern            | `starts_with`, `contains`, `matches`      |
 | Set failure thresholds               | `Thresholds`                              |

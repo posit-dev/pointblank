@@ -226,8 +226,7 @@ id_checks = (
 
 `add_steps(*steps, active=None, thresholds=None, exclude=None,
 columns_map=None)` can override the bundle's thresholds, skip steps,
-or rename columns. The `pb.text` and `pb.rag` functions return `Steps`
-bundles too.
+or rename columns. The `pb.rag` functions return `Steps` bundles too.
 
 ### Thresholds
 

@@ -220,6 +220,14 @@ Bare expressions (not wrapped in a callable) don't work in
 # Near-duplicate rows (MinHash over word n-grams, or exact after normalizing)
 .rows_near_distinct(columns="text", method="minhash", threshold=0.85, ngram=5, num_perm=128, ...)
 
+# Text checks: each adds col_vals_scored() or col_vals_regex() steps,
+# one set per column, with a brief for each
+.col_vals_text_quality(columns="text", min_words=50, max_words=100_000, ...)  # 8 Gopher filters
+.col_vals_in_language(columns="text", expected="en", expected_column=None,
+                      min_confidence=0.5, backend="langid", ...)
+.col_vals_token_len(columns="text", tokenizer="whitespace", min_val=None, max_val=4096, ...)
+.col_vals_no_pii(columns="text", entities=("email", "phone", "credit_card"), ...)
+
 # Chat conversations (list of messages or JSON text) are well formed
 .col_vals_chat_format(columns="messages", roles=("system", "user", "assistant"),
                       alternate=True, first_role=None, last_role=None,
@@ -235,7 +243,7 @@ Bare expressions (not wrapped in a callable) don't work in
 `ngram=None` in `rows_not_contaminated()` means 13 words. A scorer
 takes a batch (a list of row dicts) and returns a list of numbers or
 `None`; see the `check-training-data` skill for the `pb.scorers`
-adapters and the `pb.text` / `pb.rag` step bundles.
+adapters, the text checks, and the `pb.rag` step bundles.
 
 ## LLM-based validation
 
