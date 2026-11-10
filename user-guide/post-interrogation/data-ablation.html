@@ -707,7 +707,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-data-and-the-model" class="level1">
 <h1>The Data and the Model</h1>
 <p>The <code>nycflights</code> dataset has a row for each flight that left New York City airports in 2013. We’ll train a model to predict a flight’s <code>air_time</code> (in minutes) from its <code>distance</code> (in miles) and the <code>month</code> and <code>hour</code> it left. Here we take 6,000 flights, keeping 2,000 of them aside as the held-out data for scoring the model. The <code>origin</code> airport isn’t used by the model, but we’ll use it later to look at groups of flights.</p>
-<div id="c9d077f3" class="cell" data-execution_count="2">
+<div id="c19cd511" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -722,7 +722,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>holdout <span class="op">=</span> flights.tail(<span class="dv">2000</span>)</span></code></pre></div>
 </div>
 <p>To know what the right answers are, we’ll add two problems to the other 4,000 flights. One flight in every 50 has its air time recorded in hours rather than minutes, and one in every 33 has a missing distance recorded as <code>0</code>:</p>
-<div id="962d0233" class="cell" data-execution_count="3">
+<div id="f3763505" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> (</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    flights.head(<span class="dv">4000</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .with_row_index(<span class="st">"row"</span>)</span>
@@ -917,7 +917,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The validation of the training data has a check for each problem, plus a third one that looks reasonable but isn’t: it treats any flight longer than 2,500 miles as an error, though flights from New York to San Francisco and Honolulu are longer than that.</p>
-<div id="6910092f" class="cell" data-execution_count="4">
+<div id="e144bb8c" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>train, tbl_name<span class="op">=</span><span class="st">"flights_train"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(</span>
@@ -1182,7 +1182,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="writing-the-evaluate-function" class="level1">
 <h1>Writing the <code>evaluate</code> Function</h1>
 <p>An ablation needs a function that trains the model on a version of the training table and scores it. Pointblank calls the function with the table as its first argument (the same type of table as the validation’s data, a Polars DataFrame here) and a <code>seed=</code> keyword. It returns the score, or a dictionary of scores if there’s more than one:</p>
-<div id="672b53cc" class="cell" data-execution_count="5">
+<div id="739deadb" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestRegressor</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_absolute_error, r2_score</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1214,7 +1214,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Planning the Ablation</h1>
 <p>An <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> is built in the same way as a validation: you add variants with its methods, and nothing is evaluated until you call <a href="../../reference/Ablation.run.html#pointblank.Ablation.run" class="gdls-link"><code>Ablation.run()</code></a>. The <a href="../../reference/Ablation.drop_each.html#pointblank.Ablation.drop_each" class="gdls-link"><code>Ablation.drop_each()</code></a> method adds a variant for each step, removing the rows that failed it, and <a href="../../reference/Ablation.drop_all.html#pointblank.Ablation.drop_all" class="gdls-link"><code>Ablation.drop_all()</code></a> adds one that removes the rows that failed any step (the failing set from <a href="../../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link"><code>Validate.get_sundered_data()</code></a>).</p>
 <p>The model is scored on the mean absolute error (<code>"mae"</code>), so lower is better. The <a href="../../reference/Ablation.plan.html#pointblank.Ablation.plan" class="gdls-link"><code>Ablation.plan()</code></a> method shows what the run will do, without evaluating anything:</p>
-<div id="dbe72493" class="cell" data-execution_count="6">
+<div id="824c5a92" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ablation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        validation,</span>
@@ -1370,7 +1370,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="running-the-ablation" class="level1">
 <h1>Running the Ablation</h1>
 <p>The <a href="../../reference/Ablation.run.html#pointblank.Ablation.run" class="gdls-link"><code>Ablation.run()</code></a> method does the evaluations and returns the <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a>, which then shows its report:</p>
-<div id="980cf0c3" class="cell" data-execution_count="7">
+<div id="1df15aca" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ablation.run()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div id="pb_ablation_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1505,7 +1505,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="comparing-other-combinations-of-steps" class="level1">
 <h1>Comparing Other Combinations of Steps</h1>
 <p>The <a href="../../reference/Ablation.drop_steps.html#pointblank.Ablation.drop_steps" class="gdls-link"><code>Ablation.drop_steps()</code></a> method adds a variant that removes the rows failing any of the steps you give it. Let’s try the validation without its third step. Adding a variant clears the results, so the ablation needs to be run again:</p>
-<div id="bc0f49dc" class="cell" data-execution_count="8">
+<div id="a50260fa" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ablation.drop_steps([<span class="dv">1</span>, <span class="dv">2</span>], name<span class="op">=</span><span class="st">"Without step 3"</span>).run()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>ablation.get_tabular_report()</span></code></pre></div>
@@ -1640,7 +1640,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="leaving-one-step-out" class="level1">
 <h1>Leaving One Step Out</h1>
 <p>A step’s variant shows the effect of its rows on their own, but the steps of a validation are used together, and their rows overlap. The <a href="../../reference/Ablation.drop_all_but_each.html#pointblank.Ablation.drop_all_but_each" class="gdls-link"><code>Ablation.drop_all_but_each()</code></a> method asks what each step adds to the others: for each step, it adds a variant that removes the rows failing every <em>other</em> step. The difference between that variant and the one removing every step’s rows is what the left-out step’s rows add on top of the rest:</p>
-<div id="4fb9190f" class="cell" data-execution_count="9">
+<div id="057a74e6" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ablation.drop_all_but_each().run()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div id="pb_ablation_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1798,7 +1798,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="removing-groups-of-rows" class="level1">
 <h1>Removing Groups of Rows</h1>
 <p>The variants don’t have to come from the steps. The <a href="../../reference/Ablation.drop_groups.html#pointblank.Ablation.drop_groups" class="gdls-link"><code>Ablation.drop_groups()</code></a> method adds a variant for each value of a column, removing the rows with that value. This shows whether some part of the data (a source, a region, a period) is worse than the rest, which a validation can’t always say. Here’s an ablation that removes the flights from each of the three airports:</p>
-<div id="5409ddb0" class="cell" data-execution_count="10">
+<div id="4504c889" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>by_origin <span class="op">=</span> (</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        validation,</span>
@@ -1931,7 +1931,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="sweeping-a-threshold" class="level1">
 <h1>Sweeping a Threshold</h1>
 <p>A step’s variant tests one setting of its check, but the setting itself is often the question: is 2,500 miles the right limit, or would a higher one do better? The <a href="../../reference/Ablation.sweep_step.html#pointblank.Ablation.sweep_step" class="gdls-link"><code>Ablation.sweep_step()</code></a> method adds a variant for each of a list of values of one of a step’s parameters, each removing the rows that fail the step with that value. Here’s the limit of step 3 at four values:</p>
-<div id="d40c9ccc" class="cell" data-execution_count="11">
+<div id="434173c9" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>by_limit <span class="op">=</span> (</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        validation,</span>
@@ -2070,7 +2070,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The variants of a sweep are a group of their own in the report, and below the table, a curve shows the change from the full table at each value, with a dashed line for the controls (removing as many random rows). The lower the limit, the more long flights are removed and the worse the model gets. Even a limit of 3,000 miles, which only removes the seven flights to Honolulu, hurts. No limit helps, so this check shouldn’t be used to clean the data at all.</p>
 <p>A check whose limit is a model’s score is the same question: a score is a matter of degree, and where to draw the line is a choice. A <a href="../../reference/Validate.col_vals_scored.html#pointblank.Validate.col_vals_scored" class="gdls-link"><code>Validate.col_vals_scored()</code></a> step (see <a href="../../user-guide/advanced-validation/scored-validation.html">Scored Validation</a>) gives each row a score and keeps the scores. The <a href="../../reference/Ablation.sweep_score.html#pointblank.Ablation.sweep_score" class="gdls-link"><code>Ablation.sweep_score()</code></a> method then removes more and more of the rows with the highest (or lowest) scores, whatever the step’s own bound. Here, the score of a flight is the average speed implied by its distance and air time, which is far too high for the flights with their air times in hours:</p>
-<div id="775ca2a2" class="cell" data-execution_count="12">
+<div id="d6df48ef" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> speed(batch):</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [row[<span class="st">"distance"</span>] <span class="op">/</span> (row[<span class="st">"air_time"</span>] <span class="op">/</span> <span class="dv">60</span>) <span class="cf">for</span> row <span class="kw">in</span> batch]</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2246,7 +2246,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>"duplicate"</code>: rows are copied</li>
 </ul>
 <p>or a function, which is applied to the values of a column. Here, the defect is the problem that step 1 catches, air times in hours, made by a function that divides the air time by 60:</p>
-<div id="1dc20663" class="cell" data-execution_count="13">
+<div id="11c736f2" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>injected <span class="op">=</span> (</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>        validation,</span>
@@ -2389,7 +2389,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="suggesting-thresholds" class="level1">
 <h1>Suggesting Thresholds</h1>
 <p>A step’s thresholds say how many failing rows are too many, but the right number depends on how much the failures cost. With a curve like the one above, that can be worked out: the <a href="../../reference/Ablation.suggest_thresholds.html#pointblank.Ablation.suggest_thresholds" class="gdls-link"><code>Ablation.suggest_thresholds()</code></a> method fits a line through the harm of each injected defect against the share of rows that fail its step, and gives the share at which the harm reaches a <code>tolerance=</code> (in the units of the metric):</p>
-<div id="1b32cd9c" class="cell" data-execution_count="14">
+<div id="f5f355c8" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>injected.suggest_thresholds(tolerance<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
 <pre><code>{1: Thresholds(warning=0.005, error=0.01, critical=None)}</code></pre>
@@ -2400,7 +2400,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="sharing-the-effect-among-the-steps" class="level1">
 <h1>Sharing the Effect Among the Steps</h1>
 <p>Removing every step’s rows has an effect, but the steps’ rows overlap and work together, so their effects on their own don’t add up to it. The <em>Shapley value</em> of a step is its fair share of the whole effect: its average effect when it’s added to every combination of the other steps. The <a href="../../reference/Ablation.shapley.html#pointblank.Ablation.shapley" class="gdls-link"><code>Ablation.shapley()</code></a> method adds a variant for each combination that’s needed (reusing those already in the ablation), and the report shows a Shapley value for each step:</p>
-<div id="25be316e" class="cell" data-execution_count="15">
+<div id="83f35cd8" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>shares <span class="op">=</span> (</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        validation,</span>
@@ -2537,7 +2537,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="getting-the-results" class="level1">
 <h1>Getting the Results</h1>
 <p>The <a href="../../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link"><code>Ablation.get_effects()</code></a> method returns the results as a table, with a row for each variant and metric. Along with the differences from the controls, it has the differences from the full table, the interval bounds, and the p-values:</p>
-<div id="9d61a5a5" class="cell" data-execution_count="16">
+<div id="81cc709c" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>effects <span class="op">=</span> ablation.get_effects()</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>mae <span class="op">=</span> effects.<span class="bu">filter</span>(pl.col(<span class="st">"metric"</span>) <span class="op">==</span> <span class="st">"mae"</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2554,7 +2554,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The verdicts are only given for the metric named in <code>metric=</code>, but the other metrics are evaluated too. The report can show any of them:</p>
-<div id="4c69e055" class="cell" data-execution_count="17">
+<div id="520581cc" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>ablation.get_tabular_report(metric<span class="op">=</span><span class="st">"r2"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
 <div id="pb_ablation_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2709,7 +2709,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The R² tells the same story for steps 1 and 3, but it rates removing all the failing rows as worse than removing random ones. That’s because it’s based on squared errors, so the large errors on the long flights count for more. Metrics can disagree like this, so it’s worth deciding on the metric for the verdicts before running the ablation, rather than picking the one with the most favorable result.</p>
 <p>The <a href="../../reference/Ablation.to_json.html#pointblank.Ablation.to_json" class="gdls-link"><code>Ablation.to_json()</code></a> method (or <a href="../../reference/Ablation.to_dict.html#pointblank.Ablation.to_dict" class="gdls-link"><code>Ablation.to_dict()</code></a>) gives everything about the ablation: its settings, the variants, every evaluation’s results, and the effects. This is useful for keeping a record of the experiment alongside the model.</p>
 <p>The <a href="../../reference/Ablation.annotate.html#pointblank.Ablation.annotate" class="gdls-link"><code>Ablation.annotate()</code></a> method puts the results where the checks are: it adds a note to each step of the validation that has a variant, with its effect and verdict (and what its rows add on top of the other steps, with <a href="../../reference/Ablation.drop_all_but_each.html#pointblank.Ablation.drop_all_but_each" class="gdls-link"><code>Ablation.drop_all_but_each()</code></a>). The notes appear in the validation’s report:</p>
-<div id="018a3931" class="cell" data-execution_count="18">
+<div id="56814894" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>ablation.annotate()</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div>
@@ -2956,7 +2956,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The validation can also be a newer one with the same steps (e.g., an interrogation of next month’s training data), passed as <code>annotate(validation=...)</code>.</p>
 <p>The plan, the report, and the notes are written in the language of the validation (its <code>lang=</code>), with the numbers formatted for its <code>locale=</code>. The plan and the report take <code>lang=</code> and <code>locale=</code> arguments of their own, for another language (the briefs of the steps stay as they are):</p>
-<div id="5e10dbc3" class="cell" data-execution_count="19">
+<div id="f838f347" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>ablation.get_tabular_report(lang<span class="op">=</span><span class="st">"de"</span>, locale<span class="op">=</span><span class="st">"de-CH"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="19">
 <div id="pb_ablation_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -3112,7 +3112,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="a-ready-made-evaluate-function" class="level1">
 <h1>A Ready-Made <code>evaluate</code> Function</h1>
 <p>Many <code>evaluate</code> functions for tabular models are much the same: pick the features, encode them, fit a model, and score it on the held-out data. The <a href="../../reference/ablation.sklearn_evaluator.html#pointblank.ablation.sklearn_evaluator" class="gdls-link"><code>ablation.sklearn_evaluator()</code></a> function makes one from the held-out data and the target. By default it fits a histogram-based gradient boosting model, which handles missing values and string features, and scores it with <code>"r2"</code> for a regression (or <code>"accuracy"</code> for classification). Any scikit-learn scorers can be used instead:</p>
-<div id="e0aec015" class="cell" data-execution_count="20">
+<div id="1b6b2436" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>evaluate_boosting <span class="op">=</span> pb.ablation.sklearn_evaluator(</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    holdout,</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    target<span class="op">=</span><span class="st">"air_time"</span>,</span>
@@ -3252,7 +3252,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-the-held-out-data" class="level1">
 <h1>Checking the Held-Out Data</h1>
 <p>The held-out data is the yardstick of every comparison, so a problem in it is a problem in all of them: a model that’s scored on bad data can be rewarded for learning the same mistakes. With <code>holdout=</code>, the <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> checks the held-out data with the same steps as the training table (it’s never ablated, only checked), and the plan and the report give the health score of each:</p>
-<div id="63224105" class="cell" data-execution_count="21">
+<div id="4edae02f" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>checked <span class="op">=</span> pb.Ablation(</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    validation,</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    evaluate<span class="op">=</span>evaluate,</span>
@@ -3392,7 +3392,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The full results are in the <code>holdout_validation</code> attribute, an interrogated validation of the held-out data:</p>
-<div id="4c66eb67" class="cell" data-execution_count="22">
+<div id="ebf97df2" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>checked.holdout_validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="22">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -3637,7 +3637,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Running Larger Ablations</h1>
 <p>The ablations here make a few dozen evaluations, but with a model that takes minutes to train, a run can take hours. A few things help with that.</p>
 <p>Before a long run, it’s worth checking that the <code>evaluate</code> function uses its seed for all of its randomness, since the paired comparisons rely on it. The <a href="../../reference/Ablation.check_determinism.html#pointblank.Ablation.check_determinism" class="gdls-link"><code>Ablation.check_determinism()</code></a> method evaluates the full table twice with the same seed, and warns if the results differ:</p>
-<div id="a103722a" class="cell" data-execution_count="23">
+<div id="1d144908" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>ablation.check_determinism()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="23">
 <pre><code>True</code></pre>
@@ -3645,7 +3645,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The <code>max_workers=</code> parameter of <a href="../../reference/Ablation.run.html#pointblank.Ablation.run" class="gdls-link"><code>Ablation.run()</code></a> makes the evaluations in parallel. They run in threads by default, which suits models that release Python’s lock while they train (most of those in compiled libraries do), and <code>executor="process"</code> runs them in separate processes instead (this needs an <code>evaluate</code> function defined at the top level of a module). The random forest here already uses every core with <code>n_jobs=-1</code>, so it wouldn’t gain much.</p>
 <p>The <code>cache=</code> parameter of <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> keeps each evaluation’s result in a directory, so that a run that stops partway through (or a run with an added variant) only makes the evaluations it doesn’t already have. A result is found again only for the same data, the same rows removed, and the same seed, so a change to the table gives new evaluations. A change to the model doesn’t, since Pointblank can’t see inside the <code>evaluate</code> function, so give it an <code>evaluate_version=</code> that you change along with the model:</p>
-<div id="6e984a29" class="cell" data-execution_count="24">
+<div id="90af8e62" class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>ablation <span class="op">=</span> pb.Ablation(</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    validation,</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    evaluate<span class="op">=</span>evaluate,</span>
@@ -3659,7 +3659,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The report says how many of the evaluations came from the cache.</p>
 <p>When the training pipeline loads the data itself (from a database, say, or a file that’s too large to copy for each version), <code>pass_as="row_index"</code> gives the <code>evaluate</code> function the list of the numbers of the rows to keep (counting from <code>0</code>, in the order of the table) instead of the table. A list can be sent to another process, so this also makes <code>executor="process"</code> work for any kind of table:</p>
-<div id="e0d8dada" class="cell" data-execution_count="25">
+<div id="98c960f0" class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> evaluate_rows(rows, <span class="op">*</span>, seed):</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> evaluate(train[rows], seed<span class="op">=</span>seed)</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -3678,7 +3678,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Evaluating Somewhere Else</h1>
 <p>Sometimes the model can’t be trained in the Python session that has the validation: it’s trained on a cluster, by another team, or in another language. The <a href="../../reference/Ablation.export.html#pointblank.Ablation.export" class="gdls-link"><code>Ablation.export()</code></a> method writes every version of the training table that a run would evaluate to a directory, as Parquet files, along with a <code>manifest.json</code> that lists each evaluation (its version of the table, its file, and its seed) and a <code>results_template.csv</code> to fill in. With <code>format="indices"</code>, it writes the row numbers that each version removes instead, for a table that’s too large to copy.</p>
 <p>Here, the evaluations are made by reading the files back and calling the same <code>evaluate</code> function, but any process that writes a row of metrics for each evaluation would do:</p>
-<div id="b031c385" class="cell" data-execution_count="26">
+<div id="11e7aa8d" class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -3836,7 +3836,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">drop_groups</span><span class="kw">:</span></span>
 <span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">column</span><span class="kw">:</span><span class="at"> origin</span></span></code></pre></div>
 <p>The <a href="../../reference/yaml_ablation.html#pointblank.yaml_ablation" class="gdls-link"><code>yaml_ablation()</code></a> function interrogates the validation and returns the <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a>, ready to run. Importing the function runs Python code, so it’s only done for a configuration that you trust, with <code>allow_python=True</code>. Otherwise, the function can be passed in directly with <code>evaluate=</code>, as it is here (along with the training table, in place of the file):</p>
-<div id="5fec4863" class="cell" data-execution_count="27">
+<div id="88ba18c2" class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> <span class="st">"""</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: flights_train.parquet</span></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: flights_train</span></span>

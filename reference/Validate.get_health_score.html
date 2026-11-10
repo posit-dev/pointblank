@@ -2047,7 +2047,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22743-L22831" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22750-L22838" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">get_health_score</span>(<span class="va">by</span><span class="op">=</span><span class="cn">None</span>)</span></code></pre></div>
@@ -2081,7 +2081,7 @@ The overall health score as a percentage from <code>0</code> to <code>100</code>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s validate the <code>small_table</code> dataset with a not-null check, a range check, and a check for duplicate rows, then get the overall score.</p>
-<div id="d7245b09" class="cell" data-execution_count="2">
+<div id="60db1468" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
@@ -2100,7 +2100,7 @@ The overall health score as a percentage from <code>0</code> to <code>100</code>
 </div>
 </div>
 <p>The three steps have 39 test units in all, and 29 of them passed, for a score of 74.36. If missing values matter more to you than the other problems, give completeness a larger weight:</p>
-<div id="9faf9827" class="cell" data-execution_count="3">
+<div id="14b4a7d6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pb.config(dimension_weights<span class="op">=</span>{<span class="st">"completeness"</span>: <span class="dv">3</span>})</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>validation.get_health_score()</span></code></pre></div>

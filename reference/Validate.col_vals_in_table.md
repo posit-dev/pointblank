@@ -4,7 +4,7 @@ Validate that column values exist in a reference table (referential integrity).
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L17000-L17182)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L17000-L17184)
 
 ``` python
 Validate.col_vals_in_table(
@@ -39,7 +39,7 @@ The reference table containing the valid values. Can be a DataFrame, a database 
 The column (or list of columns for composite keys) in the reference table to check against. Must have the same length as `columns`.
 
 `na_pass: bool = False`  
-If `True`, rows where the key column(s) are null will pass. If `False` (default), null key values are treated as failing (not found in reference).
+If `True`, rows where the key column(s) are null (or `NaN`) will pass. If `False` (default), null key values are treated as failing (not found in reference), even when the reference column(s) have null values too. A composite key with only some of its columns null always fails.
 
 `pre: Callable | None = None`  
 An optional preprocessing function to apply to the data table before validation.

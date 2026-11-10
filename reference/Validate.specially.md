@@ -4,7 +4,7 @@ Perform a specialized validation with customized logic.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18122-L18478)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18124-L18485)
 
 ``` python
 Validate.specially(
@@ -33,6 +33,8 @@ The callable function must ultimately return one of:
 2.  a table where the final column contains boolean values (column name is unimportant)
 
 The validation will operate over the number of test units that is equal to the number of rows in the data table (if returning a table with boolean values). If returning a scalar boolean value, the validation will operate over a single test unit. For a return of a list of boolean values, the length of the list constitutes the number of test units.
+
+When a table is returned, a row where the final column has a missing value (e.g., `pl.col("a") > 1` when `a` is null) counts as a failing test unit, as in [`col_vals_expr()`](../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr). To let such rows pass, allow for them in the function itself, as in `(pl.col("a") > 1) | pl.col("a").is_null()`.
 
 ## Parameters
 

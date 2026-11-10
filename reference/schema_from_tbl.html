@@ -2049,7 +2049,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1613-L1690" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1616-L1696" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">schema_from_tbl</span>(</span>
@@ -2082,7 +2082,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">detect_presets</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-<p>Attempt to match string columns to known generation presets (e.g., email, url, phone_number) based on column name heuristics and value validation. Default is <code>True</code>.</p>
+<p>Attempt to match string columns to known generation presets (e.g., email, url, phone_number) based on column name heuristics and value validation. Default is <code>True</code>. A column whose name matches a place or organization preset (<code>state</code>, <code>city</code>, <code>country</code>, <code>company</code>, etc.) but holds a small set of repeated values is treated as categorical instead, keeping its values in <code>allowed=</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">sample_size</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -2104,7 +2104,7 @@ A Schema populated with Field objects containing inferred constraints, ready for
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="b9d6cf57" class="cell" data-execution_count="1">
+<div id="8637aae5" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2127,7 +2127,7 @@ A Schema populated with Field objects containing inferred constraints, ready for
 </div>
 <p>The inferred schema has a field for each column. The <code>user_id</code> and <code>age</code> fields take their ranges from the data and are marked unique (every value in those columns is distinct), the <code>email</code> column is matched to the <code>"email"</code> preset by its name and values, and <code>status</code> has few enough distinct values to become a categorical field with an <code>allowed=</code> list.</p>
 <p>Let’s generate synthetic data matching the original’s characteristics:</p>
-<div id="0a537832" class="cell" data-execution_count="2">
+<div id="f6bc0c2e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pb.preview(schema.generate(n<span class="op">=</span><span class="dv">10</span>, seed<span class="op">=</span><span class="dv">23</span>))</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

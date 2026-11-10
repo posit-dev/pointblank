@@ -2192,7 +2192,7 @@ If <code>roles=</code> is empty, or if <code>first_role=</code> or <code>last_ro
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a small table of conversations, stored as JSON text.</p>
-<div id="86000ed0" class="cell" data-execution_count="2">
+<div id="8bf3b57d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2213,7 +2213,7 @@ If <code>roles=</code> is empty, or if <code>first_role=</code> or <code>last_ro
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Let’s validate that each conversation is well formed and ends with a reply of the assistant.</p>
-<div id="6b42a109" class="cell" data-execution_count="3">
+<div id="03f18a7a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_chat_format(columns<span class="op">=</span><span class="st">"messages"</span>, last_role<span class="op">=</span><span class="st">"assistant"</span>)</span>
@@ -2381,7 +2381,7 @@ If <code>roles=</code> is empty, or if <code>first_role=</code> or <code>last_ro
 </div>
 </div>
 <p>Two of the four conversations fail: the second has two user messages in a row, and the fourth has a message with the role <code>"bot"</code>. The step report shows the problem with each failing row in the <code>pb_reason_</code> column.</p>
-<div id="48a0d987" class="cell" data-execution_count="4">
+<div id="cc461c2a" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

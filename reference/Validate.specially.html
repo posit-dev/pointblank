@@ -2058,7 +2058,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18122-L18478" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18124-L18485" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">specially</span>(</span>
@@ -2085,6 +2085,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>a table where the final column contains boolean values (column name is unimportant)</li>
 </ol>
 <p>The validation will operate over the number of test units that is equal to the number of rows in the data table (if returning a table with boolean values). If returning a scalar boolean value, the validation will operate over a single test unit. For a return of a list of boolean values, the length of the list constitutes the number of test units.</p>
+<p>When a table is returned, a row where the final column has a missing value (e.g., <code>pl.col("a") &gt; 1</code> when <code>a</code> is null) counts as a failing test unit, as in <a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link"><code>col_vals_expr()</code></a>. To let such rows pass, allow for them in the function itself, as in <code>(pl.col("a") &gt; 1) | pl.col("a").is_null()</code>.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -2161,7 +2162,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="simple-validation-with-direct-table-access" class="level3">
 <h3 class="anchored" data-anchor-id="simple-validation-with-direct-table-access">Simple validation with direct table access</h3>
 <p>This example shows the most straightforward use case where we create a function that directly checks if the sum of two columns is positive.</p>
-<div id="a312ba7c" class="cell" data-execution_count="2">
+<div id="069f0707" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2338,7 +2339,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="advanced-validation-with-closure-variables-for-parameters" class="level3">
 <h3 class="anchored" data-anchor-id="advanced-validation-with-closure-variables-for-parameters">Advanced validation with closure variables for parameters</h3>
 <p>When you need to make your validation configurable, you can use the function factory pattern (also known as closures) to create parameterized validations:</p>
-<div id="d9d7b813" class="cell" data-execution_count="3">
+<div id="259a3ffc" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a parameterized validation function using closures</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_column_ratio_validator(col1, col2, min_ratio):</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> validate_column_ratio(data):</span>
@@ -2511,7 +2512,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="validation-function-returning-a-list-of-booleans" class="level3">
 <h3 class="anchored" data-anchor-id="validation-function-returning-a-list-of-booleans">Validation function returning a list of booleans</h3>
 <p>This example demonstrates how to create a validation function that returns a list of boolean values, where each element represents a separate test unit:</p>
-<div id="64c54ce3" class="cell" data-execution_count="4">
+<div id="8d135a07" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
@@ -2722,7 +2723,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="table-level-validation-returning-a-single-boolean" class="level3">
 <h3 class="anchored" data-anchor-id="table-level-validation-returning-a-single-boolean">Table-level validation returning a single boolean</h3>
 <p>Sometimes you need to validate properties of the entire table rather than row-by-row. In these cases, your function can return a single boolean value:</p>
-<div id="5115183f" class="cell" data-execution_count="5">
+<div id="e082596b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> validate_table_properties(data):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check if table has at least one row with column 'a' &gt; 10</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    has_large_values <span class="op">=</span> data.<span class="bu">filter</span>(pl.col(<span class="st">"a"</span>) <span class="op">&gt;</span> <span class="dv">10</span>).height <span class="op">&gt;</span> <span class="dv">0</span></span>
@@ -2897,7 +2898,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="environment-validation-that-doesnt-use-the-data-table" class="level3">
 <h3 class="anchored" data-anchor-id="environment-validation-that-doesnt-use-the-data-table">Environment validation that doesn’t use the data table</h3>
 <p>The <a href="../reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link gdls-code">specially()</a> validation method can even be used to validate aspects of your environment that are completely independent of the data:</p>
-<div id="341b1410" class="cell" data-execution_count="6">
+<div id="f475bf19" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> validate_pointblank_version():</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="im">import</span> importlib.metadata</span>
