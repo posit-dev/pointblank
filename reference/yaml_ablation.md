@@ -4,7 +4,7 @@ Set up an ablation from a YAML configuration.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1394-L1574)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1398-L1578)
 
 ``` python
 yaml_ablation(

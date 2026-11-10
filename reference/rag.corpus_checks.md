@@ -4,7 +4,7 @@ Make validation steps that check the corpus of a RAG system.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L88-L308)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L88-L307)
 
 ``` python
 rag.corpus_checks(
@@ -31,7 +31,7 @@ The answers of a retrieval-augmented generation (RAG) system are only as good as
 - every chunk has text (not missing, and not only whitespace): a [col_vals_regex()](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) step
 - the chunk ids are unique, with `chunk_id=`: a [rows_distinct()](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) step
 - every chunk has a value of each column of `metadata=`: a [col_vals_not_null()](../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) step for each
-- the chunks have between `min_tokens=` and `max_tokens=` tokens, with either: a step of [`pb.text.token_length()`](../reference/text.token_length.md#pointblank.text.token_length)
+- the chunks have between `min_tokens=` and `max_tokens=` tokens, with either: a [col_vals_token_len()](../reference/Validate.col_vals_token_len.md#pointblank.Validate.col_vals_token_len) step
 - no chunk is a near duplicate of another, unless `near_duplicates=False`: a [rows_near_distinct()](../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct) step
 - every chunk was updated in the `max_age=` before the reference time, with `updated_at=`: a [col_vals_ge()](../reference/Validate.col_vals_ge.md#pointblank.Validate.col_vals_ge) step
 
@@ -55,7 +55,7 @@ The fewest and the most tokens that a chunk can have. The check is left out if b
 The fewest and the most tokens that a chunk can have. The check is left out if both are `None` (the default).
 
 `tokenizer: str | Any = "whitespace"`  
-The tokenizer of the check of the number of tokens, as in [`pb.text.token_length()`](../reference/text.token_length.md#pointblank.text.token_length) (by default, `"whitespace"`, which counts words). Use the tokenizer of the embedding model or the language model of the system for an accurate count.
+The tokenizer of the check of the number of tokens, as in [col_vals_token_len()](../reference/Validate.col_vals_token_len.md#pointblank.Validate.col_vals_token_len) (by default, `"whitespace"`, which counts words). Use the tokenizer of the embedding model or the language model of the system for an accurate count.
 
 `near_duplicates: bool | float = True`  
 Whether to check for near duplicates (`True` by default), or the threshold of the similarity of two chunks for them to be near duplicates (the `threshold=` of [rows_near_distinct()](../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct), `0.85` with `True`).

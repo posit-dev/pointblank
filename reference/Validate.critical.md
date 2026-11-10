@@ -4,7 +4,7 @@ Get the 'critical' level status for each validation step.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21342-L21446)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22077-L22181)
 
 ``` python
 Validate.critical(

@@ -4,7 +4,7 @@ Make validation steps that check the evaluation set of a RAG system.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L311-L483)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L310-L482)
 
 ``` python
 rag.eval_checks(

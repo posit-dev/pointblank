@@ -146,7 +146,8 @@ skills/pointblank/
 | Run a custom check                   | `specially`                               |
 | Use LLM-based validation             | `prompt`, `calibrate_prompt`              |
 | Score rows with a model/function     | `col_vals_scored`, `pb.scorers`           |
-| Check text, chat, or RAG data        | `pb.text`, `pb.rag`, `col_vals_chat_format` |
+| Check text quality, language, PII    | `col_vals_text_quality`, `col_vals_in_language`, `col_vals_no_pii` |
+| Check text, chat, or RAG data        | `col_vals_token_len`, `col_vals_chat_format`, `pb.rag` |
 | Reuse a bundle of steps              | `Steps`, `add_steps`                      |
 | Select columns by pattern            | `starts_with`, `contains`, `matches`      |
 | Set failure thresholds               | `Thresholds`                              |
@@ -774,6 +775,14 @@ Bare expressions (not wrapped in a callable) don't work in
 # Near-duplicate rows (MinHash over word n-grams, or exact after normalizing)
 .rows_near_distinct(columns="text", method="minhash", threshold=0.85, ngram=5, num_perm=128, ...)
 
+# Text checks: each adds col_vals_scored() or col_vals_regex() steps,
+# one set per column, with a brief for each
+.col_vals_text_quality(columns="text", min_words=50, max_words=100_000, ...)  # 8 Gopher filters
+.col_vals_in_language(columns="text", expected="en", expected_column=None,
+                      min_confidence=0.5, backend="langid", ...)
+.col_vals_token_len(columns="text", tokenizer="whitespace", min_val=None, max_val=4096, ...)
+.col_vals_no_pii(columns="text", entities=("email", "phone", "credit_card"), ...)
+
 # Chat conversations (list of messages or JSON text) are well formed
 .col_vals_chat_format(columns="messages", roles=("system", "user", "assistant"),
                       alternate=True, first_role=None, last_role=None,
@@ -789,7 +798,7 @@ Bare expressions (not wrapped in a callable) don't work in
 `ngram=None` in `rows_not_contaminated()` means 13 words. A scorer
 takes a batch (a list of row dicts) and returns a list of numbers or
 `None`; see the `check-training-data` skill for the `pb.scorers`
-adapters and the `pb.text` / `pb.rag` step bundles.
+adapters, the text checks, and the `pb.rag` step bundles.
 
 ## LLM-based validation
 
@@ -1081,8 +1090,7 @@ id_checks = (
 
 `add_steps(*steps, active=None, thresholds=None, exclude=None,
 columns_map=None)` can override the bundle's thresholds, skip steps,
-or rename columns. The `pb.text` and `pb.rag` functions return `Steps`
-bundles too.
+or rename columns. The `pb.rag` functions return `Steps` bundles too.
 
 ### Thresholds
 
@@ -1298,10 +1306,10 @@ don't accept boolean columns; use `col_vals_expr()` as above.
 
 | Concern                     | Method                                    |
 |-----------------------------|-------------------------------------------|
-| Gopher quality filters      | `add_steps(pb.text.heuristic_filters("text"))` |
-| In the expected language    | `add_steps(pb.text.in_language("text", expected="en"))` |
-| Length in model tokens      | `add_steps(pb.text.token_length("text", tokenizer=..., max_val=4096))` |
-| No emails/phones/card nums  | `add_steps(pb.text.no_pii("text"))`       |
+| Gopher quality filters      | `col_vals_text_quality(columns="text")`   |
+| In the expected language    | `col_vals_in_language(columns="text", expected="en")` |
+| Length in model tokens      | `col_vals_token_len(columns="text", tokenizer=..., max_val=4096)` |
+| No emails/phones/card nums  | `col_vals_no_pii(columns="text")`         |
 | No near duplicates          | `rows_near_distinct(columns="text")`      |
 | Model/function score bound  | `col_vals_scored(columns, scorer, min_val)` |
 | Chat messages well formed   | `col_vals_chat_format(columns="messages")` |
@@ -4773,7 +4781,7 @@ check-training-data/
 name: check-training-data
 description: >
   Check data for training and evaluating models with Pointblank: web
-  text (pb.text heuristic filters, language, PII, token length), scored
+  text (heuristic quality filters, language, PII, token length), scored
   steps (col_vals_scored and pb.scorers), near duplicates, benchmark
   contamination, chat transcripts, RAG corpora and evaluation sets
   (pb.rag), LLM-judged rows with calibration, per-row flags and
@@ -4816,8 +4824,8 @@ docs = pl.DataFrame({"doc_id": [...], "text": [...]})
 
 validation = (
     pb.Validate(data=docs, tbl_name="web_docs")
-    .add_steps(pb.text.heuristic_filters("text"))   # 8 Gopher quality steps
-    .add_steps(pb.text.no_pii("text"))              # email, phone, credit card
+    .col_vals_text_quality(columns="text")          # 8 Gopher quality steps
+    .col_vals_no_pii(columns="text")                # email, phone, credit card
     .rows_near_distinct(columns="text")             # MinHash near duplicates
     .interrogate()
 )
@@ -4832,7 +4840,7 @@ clean = flags.filter(pl.col("pb_n_failed_") == 0)   # keeps one copy of each dup
 skills/check-training-data/
 +-- SKILL.md                         <- This file
 +-- references/
-    +-- text-and-rag-reference.md    <- pb.text, pb.rag, text row checks
+    +-- text-and-rag-reference.md    <- text checks, pb.rag, text row checks
     +-- scorers-reference.md         <- col_vals_scored and pb.scorers
     +-- ablation-reference.md        <- Ablation, strategies, results, YAML
 ```
@@ -4841,10 +4849,10 @@ skills/check-training-data/
 
 | I want to...                                       | Use                                         |
 | -------------------------------------------------- | ------------------------------------------- |
-| Filter web text like the Gopher models             | `add_steps(pb.text.heuristic_filters(col))` |
-| Check text is in the expected language             | `add_steps(pb.text.in_language(col, expected="en"))` |
-| Find emails, phones, card numbers, IPs, SSNs, IBANs | `add_steps(pb.text.no_pii(col, entities=...))` |
-| Bound text length in model tokens                  | `add_steps(pb.text.token_length(col, tokenizer=..., max_val=...))` |
+| Filter web text like the Gopher models             | `col_vals_text_quality(columns)`            |
+| Check text is in the expected language             | `col_vals_in_language(columns, expected="en")` |
+| Find emails, phones, card numbers, IPs, SSNs, IBANs | `col_vals_no_pii(columns, entities=...)`   |
+| Bound text length in model tokens                  | `col_vals_token_len(columns, tokenizer, max_val=...)` |
 | Bound a score from any function or model           | `col_vals_scored(columns, scorer, min_val/max_val)` |
 | Use a ready-made scorer (embeddings, reranker, classifier, ...) | `pb.scorers.*`                  |
 | Find near-duplicate documents                      | `rows_near_distinct(columns)`               |
@@ -4864,33 +4872,37 @@ skills/check-training-data/
 
 ## Core concepts
 
-### Text checks (pb.text)
+### Text checks
 
-The `pb.text` functions return a `pb.Steps` bundle, added with
-`add_steps()`. Each check is its own step in the report:
+Four validation methods check text. Each adds ordinary steps
+(`col_vals_scored()` or `col_vals_regex()`, listed under those names in
+the report, with a brief that says what each checks), one set per
+column of `columns=`:
 
 ```python
 validation = (
     pb.Validate(data=corpus)
-    .add_steps(pb.text.heuristic_filters("text", min_words=10))
-    .add_steps(pb.text.no_pii("text", entities=["email", "phone", "ip_address"]))
-    .add_steps(pb.text.token_length("text", tokenizer="whitespace", max_val=4096))
+    .col_vals_text_quality(columns="text", min_words=10)
+    .col_vals_no_pii(columns="text", entities=["email", "phone", "ip_address"])
+    .col_vals_token_len(columns="text", tokenizer="whitespace", max_val=4096)
     .interrogate()
 )
 ```
 
-- `heuristic_filters()` makes eight steps (word count, mean word length,
-  symbol ratio, bullet lines, ellipsis lines, alphabetic words, stop
-  words, repeated lines) with the Gopher bounds as defaults. Set a bound
-  to `None` to leave its check out.
-- `no_pii()` makes one regex step per entity (`email`, `phone`,
+- `col_vals_text_quality()` adds eight steps (word count, mean word
+  length, symbol ratio, bullet lines, ellipsis lines, alphabetic words,
+  stop words, repeated lines) with the Gopher bounds as defaults. Set a
+  bound to `None` to leave its check out.
+- `col_vals_no_pii()` adds one regex step per entity (`email`, `phone`,
   `credit_card` by default; also `ip_address`, `us_ssn`, `iban`).
-- `in_language()` scores each text's probability of being in
+- `col_vals_in_language()` scores each text's probability of being in
   `expected=` (or the language in `expected_column=`) and needs the
   `langid` package (or `backend="fasttext"` with `model=`).
-- `token_length()` takes a Hugging Face tokenizer name,
+- `col_vals_token_len()` takes a Hugging Face tokenizer name,
   `"tiktoken:cl100k_base"`, `"whitespace"`, a tokenizer object, or a
   function.
+
+They're on `pb.Steps` too, and work in YAML with plain settings.
 
 See `references/text-and-rag-reference.md` for every parameter.
 
@@ -5164,9 +5176,9 @@ from `version=` of the validation. Unknown parts say
 
 ### Cleaning a text corpus
 
-1. Add `pb.text.heuristic_filters()` (adjust `min_words=` for short
-   texts), `no_pii()`, and `rows_near_distinct()`.
-2. Add `in_language()` or scorers (`classifier`, `perplexity`) if the
+1. Add `col_vals_text_quality()` (adjust `min_words=` for short
+   texts), `col_vals_no_pii()`, and `rows_near_distinct()`.
+2. Add `col_vals_in_language()` or scorers (`classifier`, `perplexity`) if the
    packages are available.
 3. Interrogate and read the report: which checks fail the most rows?
 4. Use `get_row_flags()` to drop rows, or `pb_row_score_` to weight
@@ -5207,7 +5219,7 @@ from `version=` of the validation. Unknown parts say
    second copy is flagged by `get_row_flags()`.
 3. **Missing values fail scored steps.** They aren't scored, and fail
    unless `na_pass=True`. In `rows_not_contaminated()` and the regex
-   steps of `no_pii()`, they pass.
+   steps of `col_vals_no_pii()`, they pass.
 4. **Lambda scorers cache only in memory.** A disk `cache=` needs a
    stable scorer name: use `pb.scorers.from_function(fn, name=...)`,
    and change `version=` when the model changes.
@@ -5494,7 +5506,7 @@ can be left out when the step has one column.
 | Adapter | Scores | Needs |
 |---------|--------|-------|
 | `text_stat(stat, stop_words=None)` | A text statistic (below) | nothing |
-| `token_count(tokenizer)` | Number of tokens | depends on the tokenizer (see `token_length`) |
+| `token_count(tokenizer)` | Number of tokens | depends on the tokenizer (see `col_vals_token_len()`) |
 | `langid(expected=, expected_column=, backend="langid", model=None)` | Probability of the expected language(s) | `langid`, or `fasttext` + `model=`, or a function |
 | `embedding_similarity(reference, embedder)` | Cosine similarity to the closest reference text | `sentence-transformers` for a model name; or an object with `encode()`; or a function of a list of texts returning vectors |
 | `classifier(hf_model, label=None, function_to_apply=None, device=None)` | A text classifier's score for `label=` (no label for one-output models) | `transformers` + a backend for a model name; or a pipeline |
@@ -5577,16 +5589,26 @@ raises a `YAMLValidationError`). A scorer of your own needs
 ```` markdown
 # Text and RAG checks reference
 
-The `pb.text` and `pb.rag` functions return a `pb.Steps` bundle, added
-to a validation with `add_steps()`. All of them also take `pre=`,
-`thresholds=`, `actions=`, and `active=` (and most take `segments=` and
-`brief=`), applied to each step they make.
+The text checks are validation methods (on `Validate` and `pb.Steps`)
+that add ordinary steps: `col_vals_scored()` or `col_vals_regex()`
+steps, listed under those names in the report, each with a brief that
+says what it checks. They take `columns=` (a column or a list, with a
+set of steps for each) and also `pre=`, `segments=`, `thresholds=`,
+`actions=`, `brief=`, `active=`, and `dimension=`, applied to each step
+they add. By default, each step's brief is generated; a string `brief=`
+can include it as `"{auto}"`, and `brief=False` leaves it out. They work
+in YAML like any other method (plain settings only, so no function
+backends or tokenizers).
 
-## pb.text.heuristic_filters
+The `pb.rag` functions return a `pb.Steps` bundle, added to a
+validation with `add_steps()`. They take `pre=`, `segments=`,
+`thresholds=`, `actions=`, and `active=`.
+
+## col_vals_text_quality
 
 ```python
-pb.text.heuristic_filters(
-    column,
+.col_vals_text_quality(
+    columns,
     min_words=50, max_words=100_000,
     min_mean_word_length=3, max_mean_word_length=10,
     max_symbol_ratio=0.1,
@@ -5596,6 +5618,7 @@ pb.text.heuristic_filters(
     min_stop_words=2,
     max_repeated_lines=0.3,
     stop_words=None,
+    na_pass=True,
 )
 ```
 
@@ -5614,15 +5637,15 @@ The quality filters of the Gopher models (Rae et al., 2021), as eight
 | 8    | `repeated_lines`   | share of lines repeating an earlier line <= bound |
 
 Set a bound to `None` to drop its check (a two-bound check is dropped
-when both are `None`). Missing values pass, as do texts without the
-words or lines a check needs (step 1 catches those). The default stop
-words are `the be to of and that have with`; set `stop_words=` for
-other languages.
+when both are `None`). Missing values pass (`na_pass=True`), as do
+texts without the words or lines a check needs (step 1 catches
+those). The default stop words are `the be to of and that have with`;
+set `stop_words=` for other languages.
 
-## pb.text.no_pii
+## col_vals_no_pii
 
 ```python
-pb.text.no_pii(columns, entities=("email", "phone", "credit_card"), na_pass=True)
+.col_vals_no_pii(columns, entities=("email", "phone", "credit_card"), na_pass=True)
 ```
 
 One `col_vals_regex(inverse=True)` step per column and entity. The
@@ -5642,11 +5665,11 @@ and PySpark.
 patterns find likely matches; for names and addresses, use a named
 entity model through `col_vals_scored()`.
 
-## pb.text.in_language
+## col_vals_in_language
 
 ```python
-pb.text.in_language(
-    column,
+.col_vals_in_language(
+    columns,
     expected=None,            # "en" or ["en", "fr"]
     expected_column=None,     # or a column with each row's language
     min_confidence=0.5,
@@ -5657,18 +5680,23 @@ pb.text.in_language(
 )
 ```
 
-A `col_vals_scored()` step with the `pb.scorers.langid()` scorer. The
+One `col_vals_scored()` step per column, with the
+`pb.scorers.langid()` scorer. The
 `"langid"` backend needs the `langid` package and `"fasttext"` needs
 `fasttext`. A function backend takes a text and returns
 `{language: probability}` or `[(language, probability), ...]`. `"en"`
 matches `"en_US"`.
 
-## pb.text.token_length
+## col_vals_token_len
 
 ```python
-pb.text.token_length(column, tokenizer, min_val=None, max_val=None,
-                     na_pass=False, cache=True)
+.col_vals_token_len(columns, tokenizer, min_val=None, max_val=None,
+                    na_pass=False, cache=True)
 ```
+
+One `col_vals_scored()` step per column, with the
+`pb.scorers.token_count()` scorer. For a length in characters, use
+`col_vals_str_len()`.
 
 | Tokenizer                    | Needs          |
 |------------------------------|----------------|
@@ -5753,7 +5781,7 @@ pb.rag.corpus_checks(
 | Chunk has text     | always                       | `col_vals_regex`       |
 | Ids are unique     | `chunk_id=`                  | `rows_distinct`        |
 | Metadata present   | `metadata=` (one step each)  | `col_vals_not_null`    |
-| Token length       | `min_tokens=` or `max_tokens=` | `pb.text.token_length` |
+| Token length       | `min_tokens=` or `max_tokens=` | `col_vals_token_len`   |
 | No near duplicates | `near_duplicates=True`       | `rows_near_distinct`   |
 | Fresh enough       | `updated_at=` and `max_age=` | `col_vals_ge`          |
 

@@ -87,6 +87,10 @@
 - [Validate.rows_near_distinct](https://posit-dev.github.io/pointblank/reference/Validate.rows_near_distinct.html)
 - [Validate.rows_not_contaminated](https://posit-dev.github.io/pointblank/reference/Validate.rows_not_contaminated.html)
 - [Validate.col_vals_chat_format](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_chat_format.html)
+- [Validate.col_vals_text_quality](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_text_quality.html)
+- [Validate.col_vals_in_language](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_language.html)
+- [Validate.col_vals_token_len](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_token_len.html)
+- [Validate.col_vals_no_pii](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_no_pii.html)
 
 #### Aggregation Steps
 > These validation methods check aggregated column values (sums, averages, standard deviations) against fixed values or column references.
@@ -122,15 +126,6 @@
 - [scorers.text_stat](https://posit-dev.github.io/pointblank/reference/scorers.text_stat.html)
 - [scorers.token_count](https://posit-dev.github.io/pointblank/reference/scorers.token_count.html)
 - [scorers.clear_cache](https://posit-dev.github.io/pointblank/reference/scorers.clear_cache.html)
-
-#### Text Checks
-> Checks of text data, for corpora used to train or evaluate language models. Each function makes a `Steps` collection of ordinary validation steps (heuristic quality filters, the language of the text, its length in tokens, and personal information) to be added to a validation with `Validate.add_steps()`.
-
-
-- [text.heuristic_filters](https://posit-dev.github.io/pointblank/reference/text.heuristic_filters.html)
-- [text.in_language](https://posit-dev.github.io/pointblank/reference/text.in_language.html)
-- [text.token_length](https://posit-dev.github.io/pointblank/reference/text.token_length.html)
-- [text.no_pii](https://posit-dev.github.io/pointblank/reference/text.no_pii.html)
 
 #### RAG Checks
 > Checks of the data of a retrieval-augmented generation (RAG) system. Each function makes a `Steps` collection of ordinary validation steps: `rag.corpus_checks()` checks the chunks of the corpus (text, unique ids, metadata, length, near duplicates, and freshness), and `rag.eval_checks()` checks the evaluation set (queries, near-duplicate queries, gold documents in the corpus, and the relevance of the gold passages).

@@ -17,7 +17,7 @@ scorers.text_stat(
 )
 ```
 
-These are the statistics of the quality filters that are used to clean web text for language models (those of the Gopher models, by Rae et al., 2021). They need no model, so they're fast, and they catch much of the text that isn't prose: lists of links, menus, tables of numbers, and boilerplate. [`pb.text.heuristic_filters()`](../reference/text.heuristic_filters.md#pointblank.text.heuristic_filters) makes a step for each of them, with the bounds used for Gopher.
+These are the statistics of the quality filters that are used to clean web text for language models (those of the Gopher models, by Rae et al., 2021). They need no model, so they're fast, and they catch much of the text that isn't prose: lists of links, menus, tables of numbers, and boilerplate. [col_vals_text_quality()](../reference/Validate.col_vals_text_quality.md#pointblank.Validate.col_vals_text_quality) adds a step for each of them, with the bounds used for Gopher.
 
 Words are the text split on whitespace, and lines are the text split on newlines (blank lines are left out). The statistics are:
 

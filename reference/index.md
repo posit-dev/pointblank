@@ -202,6 +202,18 @@ Validate whether the text of rows doesn't overlap with a reference, such as a be
 [Validate.col_vals_chat_format()](Validate.col_vals_chat_format.md#pointblank.Validate.col_vals_chat_format)  
 Validate whether column values are well-formed chat conversations.
 
+[Validate.col_vals_text_quality()](Validate.col_vals_text_quality.md#pointblank.Validate.col_vals_text_quality)  
+Validate whether text passes the heuristic quality filters of web text.
+
+[Validate.col_vals_in_language()](Validate.col_vals_in_language.md#pointblank.Validate.col_vals_in_language)  
+Validate whether text is in the expected language.
+
+[Validate.col_vals_token_len()](Validate.col_vals_token_len.md#pointblank.Validate.col_vals_token_len)  
+Validate whether the length of text in tokens is within bounds.
+
+[Validate.col_vals_no_pii()](Validate.col_vals_no_pii.md#pointblank.Validate.col_vals_no_pii)  
+Validate whether text has no personal information.
+
 ## Aggregation Steps
 
 These validation methods check aggregated column values (sums, averages, standard deviations) against fixed values or column references.
@@ -284,22 +296,6 @@ Score text by its number of tokens.
 
 [scorers.clear_cache()](scorers.clear_cache.md#pointblank.scorers.clear_cache)  
 Clear the scores that [Validate.col_vals_scored()](../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) keeps in memory.
-
-## Text Checks
-
-Checks of text data, for corpora used to train or evaluate language models. Each function makes a [Steps](../reference/Steps.md#pointblank.Steps) collection of ordinary validation steps (heuristic quality filters, the language of the text, its length in tokens, and personal information) to be added to a validation with [Validate.add_steps()](../reference/Validate.add_steps.md#pointblank.Validate.add_steps).
-
-[text.heuristic_filters()](text.heuristic_filters.md#pointblank.text.heuristic_filters)  
-Make the heuristic quality filters of web text, as validation steps.
-
-[text.in_language()](text.in_language.md#pointblank.text.in_language)  
-Make a validation step that checks that text is in the expected language.
-
-[text.token_length()](text.token_length.md#pointblank.text.token_length)  
-Make a validation step that checks the length of text in tokens.
-
-[text.no_pii()](text.no_pii.md#pointblank.text.no_pii)  
-Make validation steps that check that text has no personal information.
 
 ## RAG Checks
 

@@ -109,7 +109,7 @@ The `pb.scorers` module has adapters for common kinds of models. Each one uses a
 | [text_stat()](../../reference/scorers.text_stat.md#pointblank.scorers.text_stat) | A statistic of text, like its number of words | None |
 | [token_count()](../../reference/scorers.token_count.md#pointblank.scorers.token_count) | The number of tokens of text | A Hugging Face tokenizer, `tiktoken`, or a function |
 
-The last two need no model to score with (other than a tokenizer), and they're the scorers of the bundles of steps in `pb.text`, for the heuristic quality filters and the length of text in tokens (see the [Checking Text Data](text-checks.md) article).
+The last two need no model to score with (other than a tokenizer), and they're the scorers of the [col_vals_text_quality()](../../reference/Validate.col_vals_text_quality.md#pointblank.Validate.col_vals_text_quality) and [col_vals_token_len()](../../reference/Validate.col_vals_token_len.md#pointblank.Validate.col_vals_token_len) validation methods, for the heuristic quality filters and the length of text in tokens (see the [Checking Text Data](text-checks.md) article).
 
 With real models, the adapters look like this:
 

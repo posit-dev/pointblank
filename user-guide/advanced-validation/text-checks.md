@@ -2,7 +2,7 @@
 
 A corpus of text for training a language model has problems that a table of numbers doesn't. Web pages are often menus, lists of hashtags, or the same page crawled twice. Some documents are in the wrong language, are too long for the model, or have someone's email address in them. Chat data for fine-tuning can have conversations that are out of order, and any training data can contain the questions of the benchmarks that the model will be scored on.
 
-Pointblank has validation methods and step bundles for each of these problems. They give reports, thresholds, and actions like any other step, so a corpus can be checked with the same tools as any other table, and each check can be measured with an [`Ablation`](../post-interrogation/data-ablation.md) to see how much it matters to the model.
+Pointblank has validation methods for each of these problems. They give reports, thresholds, and actions like any other step, so a corpus can be checked with the same tools as any other table, and each check can be measured with an [`Ablation`](../post-interrogation/data-ablation.md) to see how much it matters to the model.
 
 ## A Corpus to Check
 
@@ -53,12 +53,12 @@ pb.preview(corpus)
 
 ## Heuristic Quality Filters
 
-The corpora used to train language models are cleaned with simple rules about each document: how many words it has, how long they are, how many of its lines are bullet points or repeat an earlier line, and whether it has common words like *the* and *of*. The [`pb.text.heuristic_filters()`](../../reference/text.heuristic_filters.md#pointblank.text.heuristic_filters) function makes a validation step for each of the quality filters of the Gopher models, with their bounds as the defaults. It returns a [`Steps`](../../reference/Steps.md#pointblank.Steps) collection, which is added to a validation with [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps). Our documents are short, so we'll lower the number of words that a document needs.
+The corpora used to train language models are cleaned with simple rules about each document: how many words it has, how long they are, how many of its lines are bullet points or repeat an earlier line, and whether it has common words like *the* and *of*. The [col_vals_text_quality()](../../reference/Validate.col_vals_text_quality.md#pointblank.Validate.col_vals_text_quality) method adds a validation step for each of the quality filters of the Gopher models, with their bounds as the defaults. Our documents are short, so we'll lower the number of words that a document needs.
 
 ``` python
 validation = (
     pb.Validate(data=corpus, tbl_name="corpus")
-    .add_steps(pb.text.heuristic_filters("text", min_words=10))
+    .col_vals_text_quality(columns="text", min_words=10)
     .interrogate()
 )
 
@@ -67,7 +67,7 @@ validation
 
 [TABLE]
 
-Each rule is a [col_vals_scored()](../../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) step with a [`text_stat()`](../../reference/scorers.text_stat.md#pointblank.scorers.text_stat) scorer, so the report shows what each one checks and how many documents fail it. The menu has too few words, repeats its lines, and has too few common words, and the list of hashtags has too many symbols for its words. The document in French fails the check of common words too, since the default stop words are English (use `stop_words=` for other languages). Any rule can be turned off by setting its bound to `None`, and since each is an ordinary step, it can be changed like any other.
+Each rule is a [col_vals_scored()](../../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored) step with a [`text_stat()`](../../reference/scorers.text_stat.md#pointblank.scorers.text_stat) scorer, so the report lists them as `col_vals_scored()` steps, with a brief that says what each one checks and how many documents fail it. The menu has too few words, repeats its lines, and has too few common words, and the list of hashtags has too many symbols for its words. The document in French fails the check of common words too, since the default stop words are English (use `stop_words=` for other languages). Any rule can be turned off by setting its bound to `None`, and since each is an ordinary step, it can be changed (or left out of the results) like any other.
 
 ## Near Duplicates
 
@@ -93,17 +93,20 @@ The first two documents differ only in *twelve* and *12!*, so both fail, and the
 
 ## Language, Length, and Personal Information
 
-Three more bundles cover checks that most text corpora need:
+Three more methods cover checks that most text corpora need:
 
-- [`pb.text.in_language()`](../../reference/text.in_language.md#pointblank.text.in_language) checks that each document is in the expected language, with a language identification model (from the [langid](../../reference/scorers.langid.md#pointblank.scorers.langid) package, a fastText model, or a function of your own). The expected language can also come from a column, for a corpus with documents in several languages.
-- [`pb.text.token_length()`](../../reference/text.token_length.md#pointblank.text.token_length) checks the length of each document in the tokens of a model's tokenizer (a Hugging Face tokenizer, a `tiktoken` encoding, or any function that splits text into tokens).
-- [`pb.text.no_pii()`](../../reference/text.no_pii.md#pointblank.text.no_pii) checks that the text has no email addresses, phone numbers, or credit card numbers (or other kinds of personal information, or patterns of your own).
+- [col_vals_in_language()](../../reference/Validate.col_vals_in_language.md#pointblank.Validate.col_vals_in_language) checks that each document is in the expected language, with a language identification model (from the [langid](../../reference/scorers.langid.md#pointblank.scorers.langid) package, a fastText model, or a function of your own). The expected language can also come from a column, for a corpus with documents in several languages.
+- [col_vals_token_len()](../../reference/Validate.col_vals_token_len.md#pointblank.Validate.col_vals_token_len) checks the length of each document in the tokens of a model's tokenizer (a Hugging Face tokenizer, a `tiktoken` encoding, or any function that splits text into tokens).
+- [col_vals_no_pii()](../../reference/Validate.col_vals_no_pii.md#pointblank.Validate.col_vals_no_pii) checks that the text has no email addresses, phone numbers, or credit card numbers (or other kinds of personal information, or patterns of your own).
 
 With real models, the first two look like this:
 
 ``` python
-pb.text.in_language("text", expected="en", min_confidence=0.8)
-pb.text.token_length("text", tokenizer="tiktoken:cl100k_base", max_val=4096)
+(
+    pb.Validate(data=corpus)
+    .col_vals_in_language(columns="text", expected="en", min_confidence=0.8)
+    .col_vals_token_len(columns="text", tokenizer="tiktoken:cl100k_base", max_val=4096)
+)
 ```
 
 To keep this page self-contained, we'll use a function that guesses the language from a few common words, and a tokenizer that splits text into words and punctuation.
@@ -127,9 +130,9 @@ def tokenize(text):
 
 validation = (
     pb.Validate(data=corpus, tbl_name="corpus")
-    .add_steps(pb.text.in_language("text", expected="en", backend=guess_language))
-    .add_steps(pb.text.token_length("text", tokenizer=tokenize, min_val=10, max_val=25))
-    .add_steps(pb.text.no_pii("text"))
+    .col_vals_in_language(columns="text", expected="en", backend=guess_language)
+    .col_vals_token_len(columns="text", tokenizer=tokenize, min_val=10, max_val=25)
+    .col_vals_no_pii(columns="text")
     .interrogate()
 )
 
@@ -138,7 +141,7 @@ validation
 
 [TABLE]
 
-The document in French fails step 1, the menu is too short for step 2, and the email address fails step 3. The checks of personal information are [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) steps, so they run on any backend, including in a database. Their patterns find likely matches rather than certain ones (a number with the shape of a credit card number matches, with no checksum), so for a thorough check, a model of named entities can be used with [col_vals_scored()](../../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored).
+The document in French fails step 1, the menu is too short for step 2, and the email address fails step 3 (`col_vals_no_pii()` adds a step for each kind of personal information, so steps 4 and 5 check for phone and credit card numbers). The checks of personal information are [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) steps, so they run on any backend, including in a database. Their patterns find likely matches rather than certain ones (a number with the shape of a credit card number matches, with no checksum), so for a thorough check, a model of named entities can be used with [col_vals_scored()](../../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored).
 
 ## Chat Conversations
 
@@ -217,8 +220,8 @@ Each of these checks removes some documents, and it isn't always clear which of 
 
 ## Databases and PySpark
 
-The checks of `pb.text.no_pii()` are regular expressions, so they run on any backend. The other checks run in Python: a Polars or pandas table is checked as it is, and for a database table (through Ibis) or a PySpark DataFrame, the distinct values of the step's columns are collected, checked, and the results are joined back to the table on its own backend. With a large table, a `pre=` function that takes a sample of the rows keeps the cost down. For [col_vals_chat_format()](../../reference/Validate.col_vals_chat_format.md#pointblank.Validate.col_vals_chat_format), the conversations in a database table must be JSON text.
+The checks of [col_vals_no_pii()](../../reference/Validate.col_vals_no_pii.md#pointblank.Validate.col_vals_no_pii) are regular expressions, so they run on any backend. The other checks run in Python: a Polars or pandas table is checked as it is, and for a database table (through Ibis) or a PySpark DataFrame, the distinct values of the step's columns are collected, checked, and the results are joined back to the table on its own backend. With a large table, a `pre=` function that takes a sample of the rows keeps the cost down. For [col_vals_chat_format()](../../reference/Validate.col_vals_chat_format.md#pointblank.Validate.col_vals_chat_format), the conversations in a database table must be JSON text.
 
 ## Conclusion
 
-Text data has its own kinds of problems, and Pointblank checks them with the same reports, thresholds, and actions as any other validation. The `pb.text` functions make bundles of steps for the heuristic quality filters, the language and length of the text, and personal information; [rows_near_distinct()](../../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct) finds near duplicates; [col_vals_chat_format()](../../reference/Validate.col_vals_chat_format.md#pointblank.Validate.col_vals_chat_format) checks conversations for fine-tuning; and [rows_not_contaminated()](../../reference/Validate.rows_not_contaminated.md#pointblank.Validate.rows_not_contaminated) keeps benchmark questions out of the training data.
+Text data has its own kinds of problems, and Pointblank checks them with the same reports, thresholds, and actions as any other validation. The [col_vals_text_quality()](../../reference/Validate.col_vals_text_quality.md#pointblank.Validate.col_vals_text_quality), [col_vals_in_language()](../../reference/Validate.col_vals_in_language.md#pointblank.Validate.col_vals_in_language), [col_vals_token_len()](../../reference/Validate.col_vals_token_len.md#pointblank.Validate.col_vals_token_len), and [col_vals_no_pii()](../../reference/Validate.col_vals_no_pii.md#pointblank.Validate.col_vals_no_pii) methods check the quality, language, and length of the text, and look for personal information; [rows_near_distinct()](../../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct) finds near duplicates; [col_vals_chat_format()](../../reference/Validate.col_vals_chat_format.md#pointblank.Validate.col_vals_chat_format) checks conversations for fine-tuning; and [rows_not_contaminated()](../../reference/Validate.rows_not_contaminated.md#pointblank.Validate.rows_not_contaminated) keeps benchmark questions out of the training data.

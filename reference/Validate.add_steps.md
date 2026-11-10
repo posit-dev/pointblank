@@ -35,7 +35,7 @@ Replace the `thresholds=` setting of every added step. If `None` (the default), 
 Steps to leave out, as a list of method names (e.g., `["col_vals_regex"]` skips every regex step) or of 1-based positions (e.g., `[2]` skips the second step). Positions count within each collection, so `[2]` skips the second step of every collection given.
 
 `columns_map: dict[str, str] | None = None`  
-A dictionary that renames columns in the added steps, mapping the column names used in the collection to the names in this table (e.g., `{"customer_id": "cust_id"}`). It applies to column names given as strings or lists of strings in a step's `columns=`, `column=`, or `columns_subset=` argument. Column selectors such as [`starts_with()`](../reference/starts_with.md#pointblank.starts_with) are left as they are.
+A dictionary that renames columns in the added steps, mapping the column names used in the collection to the names in this table (e.g., `{"customer_id": "cust_id"}`). It applies to column names given as strings or lists of strings in a step's `columns=`, `column=`, `columns_subset=`, or `expected_column=` argument. Column selectors such as [`starts_with()`](../reference/starts_with.md#pointblank.starts_with) are left as they are.
 
 ## Returns
 

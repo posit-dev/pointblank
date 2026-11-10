@@ -692,11 +692,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>A corpus of text for training a language model has problems that a table of numbers doesn’t. Web pages are often menus, lists of hashtags, or the same page crawled twice. Some documents are in the wrong language, are too long for the model, or have someone’s email address in them. Chat data for fine-tuning can have conversations that are out of order, and any training data can contain the questions of the benchmarks that the model will be scored on.</p>
-<p>Pointblank has validation methods and step bundles for each of these problems. They give reports, thresholds, and actions like any other step, so a corpus can be checked with the same tools as any other table, and each check can be measured with an <a href="../../user-guide/post-interrogation/data-ablation.html"><code>Ablation</code></a> to see how much it matters to the model.</p>
+<p>Pointblank has validation methods for each of these problems. They give reports, thresholds, and actions like any other step, so a corpus can be checked with the same tools as any other table, and each check can be measured with an <a href="../../user-guide/post-interrogation/data-ablation.html"><code>Ablation</code></a> to see how much it matters to the model.</p>
 <section id="a-corpus-to-check" class="level1">
 <h1>A Corpus to Check</h1>
 <p>Let’s make a small corpus of web documents. Most are fine, but there’s a near duplicate, a menu, a list of hashtags, a document in French, and one with an email address.</p>
-<div id="6cc35774" class="cell" data-execution_count="2">
+<div id="f28696cf" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>corpus <span class="op">=</span> pl.DataFrame(</span>
@@ -869,11 +869,11 @@ Contact</td>
 </section>
 <section id="heuristic-quality-filters" class="level1">
 <h1>Heuristic Quality Filters</h1>
-<p>The corpora used to train language models are cleaned with simple rules about each document: how many words it has, how long they are, how many of its lines are bullet points or repeat an earlier line, and whether it has common words like <em>the</em> and <em>of</em>. The <a href="../../reference/text.heuristic_filters.html#pointblank.text.heuristic_filters" class="gdls-link"><code>pb.text.heuristic_filters()</code></a> function makes a validation step for each of the quality filters of the Gopher models, with their bounds as the defaults. It returns a <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link"><code>Steps</code></a> collection, which is added to a validation with <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">add_steps()</a>. Our documents are short, so we’ll lower the number of words that a document needs.</p>
-<div id="37f0108f" class="cell" data-execution_count="3">
+<p>The corpora used to train language models are cleaned with simple rules about each document: how many words it has, how long they are, how many of its lines are bullet points or repeat an earlier line, and whether it has common words like <em>the</em> and <em>of</em>. The <a href="../../reference/Validate.col_vals_text_quality.html#pointblank.Validate.col_vals_text_quality" class="gdls-link gdls-code">col_vals_text_quality()</a> method adds a validation step for each of the quality filters of the Gopher models, with their bounds as the defaults. Our documents are short, so we’ll lower the number of words that a document needs.</p>
+<div id="d181fcb7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>corpus, tbl_name<span class="op">=</span><span class="st">"corpus"</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .add_steps(pb.text.heuristic_filters(<span class="st">"text"</span>, min_words<span class="op">=</span><span class="dv">10</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_text_quality(columns<span class="op">=</span><span class="st">"text"</span>, min_words<span class="op">=</span><span class="dv">10</span>)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
@@ -1398,12 +1398,12 @@ Contact</td>
 </div>
 </div>
 </div>
-<p>Each rule is a <a href="../../reference/Validate.col_vals_scored.html#pointblank.Validate.col_vals_scored" class="gdls-link gdls-code">col_vals_scored()</a> step with a <a href="../../reference/scorers.text_stat.html#pointblank.scorers.text_stat" class="gdls-link"><code>text_stat()</code></a> scorer, so the report shows what each one checks and how many documents fail it. The menu has too few words, repeats its lines, and has too few common words, and the list of hashtags has too many symbols for its words. The document in French fails the check of common words too, since the default stop words are English (use <code>stop_words=</code> for other languages). Any rule can be turned off by setting its bound to <code>None</code>, and since each is an ordinary step, it can be changed like any other.</p>
+<p>Each rule is a <a href="../../reference/Validate.col_vals_scored.html#pointblank.Validate.col_vals_scored" class="gdls-link gdls-code">col_vals_scored()</a> step with a <a href="../../reference/scorers.text_stat.html#pointblank.scorers.text_stat" class="gdls-link"><code>text_stat()</code></a> scorer, so the report lists them as <code>col_vals_scored()</code> steps, with a brief that says what each one checks and how many documents fail it. The menu has too few words, repeats its lines, and has too few common words, and the list of hashtags has too many symbols for its words. The document in French fails the check of common words too, since the default stop words are English (use <code>stop_words=</code> for other languages). Any rule can be turned off by setting its bound to <code>None</code>, and since each is an ordinary step, it can be changed (or left out of the results) like any other.</p>
 </section>
 <section id="near-duplicates" class="level1">
 <h1>Near Duplicates</h1>
 <p>A document that’s in a corpus many times gets too much weight in training. The <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> method finds rows that are exactly the same, but most duplicates in text differ a little: a changed date, a different footer, or a name filled into a template. The <a href="../../reference/Validate.rows_near_distinct.html#pointblank.Validate.rows_near_distinct" class="gdls-link gdls-code">rows_near_distinct()</a> method finds those too. It normalizes the text (in lower case, without punctuation), and with the default <code>method="minhash"</code>, it finds texts whose sequences of words are mostly the same.</p>
-<div id="73fb66e7" class="cell" data-execution_count="4">
+<div id="a32f575f" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>corpus, tbl_name<span class="op">=</span><span class="st">"corpus"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .rows_near_distinct(columns<span class="op">=</span><span class="st">"text"</span>, threshold<span class="op">=</span><span class="fl">0.8</span>)</span>
@@ -1521,19 +1521,22 @@ Contact</td>
 </section>
 <section id="language-length-and-personal-information" class="level1">
 <h1>Language, Length, and Personal Information</h1>
-<p>Three more bundles cover checks that most text corpora need:</p>
+<p>Three more methods cover checks that most text corpora need:</p>
 <ul>
-<li><a href="../../reference/text.in_language.html#pointblank.text.in_language" class="gdls-link"><code>pb.text.in_language()</code></a> checks that each document is in the expected language, with a language identification model (from the <a href="../../reference/scorers.langid.html#pointblank.scorers.langid" class="gdls-link gdls-code">langid</a> package, a fastText model, or a function of your own). The expected language can also come from a column, for a corpus with documents in several languages.</li>
-<li><a href="../../reference/text.token_length.html#pointblank.text.token_length" class="gdls-link"><code>pb.text.token_length()</code></a> checks the length of each document in the tokens of a model’s tokenizer (a Hugging Face tokenizer, a <code>tiktoken</code> encoding, or any function that splits text into tokens).</li>
-<li><a href="../../reference/text.no_pii.html#pointblank.text.no_pii" class="gdls-link"><code>pb.text.no_pii()</code></a> checks that the text has no email addresses, phone numbers, or credit card numbers (or other kinds of personal information, or patterns of your own).</li>
+<li><a href="../../reference/Validate.col_vals_in_language.html#pointblank.Validate.col_vals_in_language" class="gdls-link gdls-code">col_vals_in_language()</a> checks that each document is in the expected language, with a language identification model (from the <a href="../../reference/scorers.langid.html#pointblank.scorers.langid" class="gdls-link gdls-code">langid</a> package, a fastText model, or a function of your own). The expected language can also come from a column, for a corpus with documents in several languages.</li>
+<li><a href="../../reference/Validate.col_vals_token_len.html#pointblank.Validate.col_vals_token_len" class="gdls-link gdls-code">col_vals_token_len()</a> checks the length of each document in the tokens of a model’s tokenizer (a Hugging Face tokenizer, a <code>tiktoken</code> encoding, or any function that splits text into tokens).</li>
+<li><a href="../../reference/Validate.col_vals_no_pii.html#pointblank.Validate.col_vals_no_pii" class="gdls-link gdls-code">col_vals_no_pii()</a> checks that the text has no email addresses, phone numbers, or credit card numbers (or other kinds of personal information, or patterns of your own).</li>
 </ul>
 <p>With real models, the first two look like this:</p>
-<div id="eaa634b9" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pb.text.in_language(<span class="st">"text"</span>, expected<span class="op">=</span><span class="st">"en"</span>, min_confidence<span class="op">=</span><span class="fl">0.8</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>pb.text.token_length(<span class="st">"text"</span>, tokenizer<span class="op">=</span><span class="st">"tiktoken:cl100k_base"</span>, max_val<span class="op">=</span><span class="dv">4096</span>)</span></code></pre></div>
+<div id="91b63f1f" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>corpus)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_language(columns<span class="op">=</span><span class="st">"text"</span>, expected<span class="op">=</span><span class="st">"en"</span>, min_confidence<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    .col_vals_token_len(columns<span class="op">=</span><span class="st">"text"</span>, tokenizer<span class="op">=</span><span class="st">"tiktoken:cl100k_base"</span>, max_val<span class="op">=</span><span class="dv">4096</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>To keep this page self-contained, we’ll use a function that guesses the language from a few common words, and a tokenizer that splits text into words and punctuation.</p>
-<div id="5c037ad8" class="cell" data-execution_count="6">
+<div id="9392def8" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1552,9 +1555,9 @@ Contact</td>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>corpus, tbl_name<span class="op">=</span><span class="st">"corpus"</span>)</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    .add_steps(pb.text.in_language(<span class="st">"text"</span>, expected<span class="op">=</span><span class="st">"en"</span>, backend<span class="op">=</span>guess_language))</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    .add_steps(pb.text.token_length(<span class="st">"text"</span>, tokenizer<span class="op">=</span>tokenize, min_val<span class="op">=</span><span class="dv">10</span>, max_val<span class="op">=</span><span class="dv">25</span>))</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    .add_steps(pb.text.no_pii(<span class="st">"text"</span>))</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_language(columns<span class="op">=</span><span class="st">"text"</span>, expected<span class="op">=</span><span class="st">"en"</span>, backend<span class="op">=</span>guess_language)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    .col_vals_token_len(columns<span class="op">=</span><span class="st">"text"</span>, tokenizer<span class="op">=</span>tokenize, min_val<span class="op">=</span><span class="dv">10</span>, max_val<span class="op">=</span><span class="dv">25</span>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    .col_vals_no_pii(columns<span class="op">=</span><span class="st">"text"</span>)</span>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
@@ -1690,7 +1693,8 @@ Contact</td>
         <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
             <div>col_vals_scored()</div>
         </div>
-        
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"><p style="font-size: inherit; margin: 0;">The text of <code>text</code> is in <code>en</code> (probability of at least 0.5).</p>
+</div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">text</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">≥0.5<br><span style="font-size: 8px; font-weight: 600; letter-spacing: 0.5px; color: #7B68A6;">LANGID</span></td>
@@ -1739,7 +1743,8 @@ Contact</td>
         <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
             <div>col_vals_scored()</div>
         </div>
-        
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"><p style="font-size: inherit; margin: 0;">Between 10 and 25 tokens in <code>text</code>.</p>
+</div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-columns_upd" class="gt_row gt_left">text</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" headers="pb_tbl-values_upd" class="gt_row gt_left">10–25<br><span style="font-size: 8px; font-weight: 600; letter-spacing: 0.5px; color: #7B68A6;">TOKENS</span></td>
@@ -1906,12 +1911,12 @@ Contact</td>
 </div>
 </div>
 </div>
-<p>The document in French fails step 1, the menu is too short for step 2, and the email address fails step 3. The checks of personal information are <a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a> steps, so they run on any backend, including in a database. Their patterns find likely matches rather than certain ones (a number with the shape of a credit card number matches, with no checksum), so for a thorough check, a model of named entities can be used with <a href="../../reference/Validate.col_vals_scored.html#pointblank.Validate.col_vals_scored" class="gdls-link gdls-code">col_vals_scored()</a>.</p>
+<p>The document in French fails step 1, the menu is too short for step 2, and the email address fails step 3 (<code>col_vals_no_pii()</code> adds a step for each kind of personal information, so steps 4 and 5 check for phone and credit card numbers). The checks of personal information are <a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a> steps, so they run on any backend, including in a database. Their patterns find likely matches rather than certain ones (a number with the shape of a credit card number matches, with no checksum), so for a thorough check, a model of named entities can be used with <a href="../../reference/Validate.col_vals_scored.html#pointblank.Validate.col_vals_scored" class="gdls-link gdls-code">col_vals_scored()</a>.</p>
 </section>
 <section id="chat-conversations" class="level1">
 <h1>Chat Conversations</h1>
 <p>Data for fine-tuning a chat model is a list of messages for each example, each with a role and some content. Data converted from other formats often has conversations with roles out of order, an unknown role, or an empty message, and a training run can fail on them (or quietly learn from them). The <a href="../../reference/Validate.col_vals_chat_format.html#pointblank.Validate.col_vals_chat_format" class="gdls-link gdls-code">col_vals_chat_format()</a> method checks each conversation, given as a list of messages or as JSON text.</p>
-<div id="e84695fb" class="cell" data-execution_count="7">
+<div id="96e99de7" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>chats <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>],</span>
@@ -2045,7 +2050,7 @@ Contact</td>
 <section id="benchmark-contamination" class="level1">
 <h1>Benchmark Contamination</h1>
 <p>A model is often judged by its score on a benchmark, a set of questions with known answers. If the training data contains those questions, the score no longer says how well the model does on questions it hasn’t seen: the benchmark is <em>contaminated</em>. The <a href="../../reference/Validate.rows_not_contaminated.html#pointblank.Validate.rows_not_contaminated" class="gdls-link gdls-code">rows_not_contaminated()</a> method checks the text of each row against a reference, such as the questions of a benchmark or the rows of a test set.</p>
-<div id="02187ada" class="cell" data-execution_count="8">
+<div id="48a771ac" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>benchmark <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"question"</span>: [</span>
@@ -2173,11 +2178,11 @@ Contact</td>
 </section>
 <section id="databases-and-pyspark" class="level1">
 <h1>Databases and PySpark</h1>
-<p>The checks of <code>pb.text.no_pii()</code> are regular expressions, so they run on any backend. The other checks run in Python: a Polars or pandas table is checked as it is, and for a database table (through Ibis) or a PySpark DataFrame, the distinct values of the step’s columns are collected, checked, and the results are joined back to the table on its own backend. With a large table, a <code>pre=</code> function that takes a sample of the rows keeps the cost down. For <a href="../../reference/Validate.col_vals_chat_format.html#pointblank.Validate.col_vals_chat_format" class="gdls-link gdls-code">col_vals_chat_format()</a>, the conversations in a database table must be JSON text.</p>
+<p>The checks of <a href="../../reference/Validate.col_vals_no_pii.html#pointblank.Validate.col_vals_no_pii" class="gdls-link gdls-code">col_vals_no_pii()</a> are regular expressions, so they run on any backend. The other checks run in Python: a Polars or pandas table is checked as it is, and for a database table (through Ibis) or a PySpark DataFrame, the distinct values of the step’s columns are collected, checked, and the results are joined back to the table on its own backend. With a large table, a <code>pre=</code> function that takes a sample of the rows keeps the cost down. For <a href="../../reference/Validate.col_vals_chat_format.html#pointblank.Validate.col_vals_chat_format" class="gdls-link gdls-code">col_vals_chat_format()</a>, the conversations in a database table must be JSON text.</p>
 </section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>
-<p>Text data has its own kinds of problems, and Pointblank checks them with the same reports, thresholds, and actions as any other validation. The <code>pb.text</code> functions make bundles of steps for the heuristic quality filters, the language and length of the text, and personal information; <a href="../../reference/Validate.rows_near_distinct.html#pointblank.Validate.rows_near_distinct" class="gdls-link gdls-code">rows_near_distinct()</a> finds near duplicates; <a href="../../reference/Validate.col_vals_chat_format.html#pointblank.Validate.col_vals_chat_format" class="gdls-link gdls-code">col_vals_chat_format()</a> checks conversations for fine-tuning; and <a href="../../reference/Validate.rows_not_contaminated.html#pointblank.Validate.rows_not_contaminated" class="gdls-link gdls-code">rows_not_contaminated()</a> keeps benchmark questions out of the training data.</p>
+<p>Text data has its own kinds of problems, and Pointblank checks them with the same reports, thresholds, and actions as any other validation. The <a href="../../reference/Validate.col_vals_text_quality.html#pointblank.Validate.col_vals_text_quality" class="gdls-link gdls-code">col_vals_text_quality()</a>, <a href="../../reference/Validate.col_vals_in_language.html#pointblank.Validate.col_vals_in_language" class="gdls-link gdls-code">col_vals_in_language()</a>, <a href="../../reference/Validate.col_vals_token_len.html#pointblank.Validate.col_vals_token_len" class="gdls-link gdls-code">col_vals_token_len()</a>, and <a href="../../reference/Validate.col_vals_no_pii.html#pointblank.Validate.col_vals_no_pii" class="gdls-link gdls-code">col_vals_no_pii()</a> methods check the quality, language, and length of the text, and look for personal information; <a href="../../reference/Validate.rows_near_distinct.html#pointblank.Validate.rows_near_distinct" class="gdls-link gdls-code">rows_near_distinct()</a> finds near duplicates; <a href="../../reference/Validate.col_vals_chat_format.html#pointblank.Validate.col_vals_chat_format" class="gdls-link gdls-code">col_vals_chat_format()</a> checks conversations for fine-tuning; and <a href="../../reference/Validate.rows_not_contaminated.html#pointblank.Validate.rows_not_contaminated" class="gdls-link gdls-code">rows_not_contaminated()</a> keeps benchmark questions out of the training data.</p>
 
 
 </section>
