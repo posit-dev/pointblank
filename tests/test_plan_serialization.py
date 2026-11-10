@@ -927,7 +927,7 @@ steps:
 
 @pytest.mark.parametrize("value", ["pb.col('a')", 'pb.col("a")', "pb.ref('a')"])
 def test_yaml_column_reference_value_without_python_block(small_table, value):
-    from pointblank.column import Column, ReferenceColumn
+    from pointblank.column import Column
 
     yaml_str = f"""
 tbl: small_table
@@ -939,9 +939,10 @@ steps:
     if value.startswith("pb.ref"):
         from pointblank.yaml import YAMLValidator
 
+        # The value is parsed as a reference column, which a row-wise comparison rejects
         validator = YAMLValidator()
-        built = validator.build_validation(validator.load_config(yaml_str))
-        assert isinstance(built.validation_info[0].values, ReferenceColumn)
+        with pytest.raises(TypeError, match=r"can't be a reference column \(`ref\('a'\)`\)"):
+            validator.build_validation(validator.load_config(yaml_str))
         return
 
     validation = yaml_interrogate(yaml_str)
