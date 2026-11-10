@@ -34,19 +34,23 @@ before counting.
 
 ## Expression columns (for conjointly)
 
-`expr_col()` creates column expressions for use in `conjointly()`:
+`expr_col()` creates backend-agnostic column expressions for use in
+`conjointly()`. Each argument of `conjointly()` is a callable that takes
+the table and returns an expression:
 
 ```python
 from pointblank import expr_col
 
 .conjointly(
-    lambda v: v.col_vals_expr(expr_col("start") < expr_col("end")),
-    lambda v: v.col_vals_gt(columns="duration", value=0),
+    lambda df: expr_col("start") < expr_col("end"),
+    lambda df: expr_col("duration") > 0,
 )
 ```
 
 `expr_col` supports: `>`, `<`, `==`, `!=`, `>=`, `<=`, `+`, `-`,
-`*`, `/`, `is_null()`, `is_not_null()`, `&`, `|`.
+`*`, `/`, `is_null()`, `is_not_null()`, `&`, `|`. It doesn't work in
+`col_vals_expr()`, which needs a native Polars/Narwhals/Ibis
+expression (e.g. `pl.col("start") < pl.col("end")`).
 
 ## Reference columns
 
@@ -66,7 +70,11 @@ When `value=None` in aggregate methods and a reference table is set,
 
 ## Usage in validation methods
 
-Selectors work in any method that accepts `columns`:
+Selectors work in the `col_vals_*` methods (except `col_vals_scored`),
+`col_exists`, `col_pct_null`, `col_pct_missing`, `col_missing_coded`,
+and `col_missing_only_coded`. The aggregate methods (`col_sum_gt`, ...),
+`col_missing_consistent`, and the text checks (`col_vals_scored`,
+`rows_near_distinct`, `rows_not_contaminated`) take column names only:
 
 ```python
 import pointblank as pb
