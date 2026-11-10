@@ -28,7 +28,7 @@ def get_api_details(module, exported_list) -> str:
         for part in parts:
             obj = getattr(obj, part)
 
-        # Get the name of the object (with its submodule, e.g., `text.token_length`)
+        # Get the name of the object (with its submodule, e.g., `rag.corpus_checks`)
         obj_name = obj.__name__
         if len(parts) > 1 and inspect.ismodule(getattr(module, parts[0])):
             obj_name = f"{parts[0]}.{obj_name}"
@@ -144,6 +144,10 @@ def _get_api_text() -> str:
         "Validate.rows_near_distinct",
         "Validate.rows_not_contaminated",
         "Validate.col_vals_chat_format",
+        "Validate.col_vals_text_quality",
+        "Validate.col_vals_in_language",
+        "Validate.col_vals_token_len",
+        "Validate.col_vals_no_pii",
     ]
 
     column_selection_exported = [
@@ -206,10 +210,6 @@ def _get_api_text() -> str:
     ]
 
     data_for_models_exported = [
-        "text.heuristic_filters",
-        "text.in_language",
-        "text.token_length",
-        "text.no_pii",
         "rag.corpus_checks",
         "rag.eval_checks",
         "scorers.from_function",
@@ -308,14 +308,15 @@ validation step with `Validate.tbl_match()`, and `Validate.tbl_reconcile()` comp
 (e.g., sums or counts per group of key columns) instead of rows."""
 
     data_for_models_desc = """The *Data for Models* group checks data that trains or evaluates a
-model. The `text.*` functions make validation steps for text data (heuristic filters, language,
-length in tokens, and personal information), and `rag.corpus_checks()` and `rag.eval_checks()` make
-steps for the corpus and the evaluation set of a retrieval-augmented generation (RAG) system; they're
-added to a validation with `add_steps()`. The `scorers.*` functions make scorers (of embeddings,
-rerankers, classifiers, and more) for `col_vals_scored()`. The `check_splits()` function checks the
-splits of a dataset for overlapping rows, label coverage, and drift, and `check_synthetic()` checks
-synthetic data against its seed for fidelity, diversity, and copies. An `Ablation` measures how the
-rows that fail validation steps affect a model, by training it on the data with them removed."""
+model. The `rag.corpus_checks()` and `rag.eval_checks()` functions make validation steps for the
+corpus and the evaluation set of a retrieval-augmented generation (RAG) system, which are added to
+a validation with `add_steps()`. The `scorers.*` functions make scorers (of embeddings, rerankers,
+classifiers, and more) for `col_vals_scored()`; the checks of text data (`col_vals_text_quality()`,
+`col_vals_in_language()`, `col_vals_token_len()`, and `col_vals_no_pii()`) are validation methods.
+The `check_splits()` function checks the splits of a dataset for overlapping rows, label coverage,
+and drift, and `check_synthetic()` checks synthetic data against its seed for fidelity, diversity,
+and copies. An `Ablation` measures how the rows that fail validation steps affect a model, by
+training it on the data with them removed."""
 
     yaml_desc = """The *YAML* group contains functions that allow for the use of YAML to orchestrate
 validation workflows. The `yaml_interrogate()` function can be used to run a validation workflow
