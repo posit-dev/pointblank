@@ -1,6 +1,8 @@
 # LLM providers reference
 
-Configuration for each supported LLM provider.
+Configuration for each supported LLM provider. Everything is installed
+with `pip install "pointblank[generate]"` (chatlas, the Anthropic SDK
+with Bedrock support, the OpenAI SDK, and Shiny for the assistant).
 
 ## Provider model strings
 
@@ -10,13 +12,10 @@ Format: `"provider:model_name"`
 
 ```python
 model="anthropic:claude-sonnet-4-6"
-model="anthropic:claude-haiku-5-5"
 model="anthropic:claude-opus-4-8"
 ```
 
 Environment variable: `ANTHROPIC_API_KEY`
-
-Install: `pip install "pointblank[generate]"` (includes chatlas and every provider's SDK)
 
 ### OpenAI
 
@@ -27,8 +26,6 @@ model="openai:gpt-5.6-sol"
 
 Environment variable: `OPENAI_API_KEY`
 
-Install: `pip install "pointblank[generate]"`
-
 ### Ollama (local)
 
 ```python
@@ -37,7 +34,7 @@ model="ollama:mistral"
 model="ollama:codellama"
 ```
 
-No API key needed. Requires Ollama running locally, and the `openai` package (`pip install "pointblank[generate]"`).
+No API key needed. Requires Ollama running locally.
 
 Setup:
 ```bash
@@ -49,26 +46,34 @@ ollama pull llama3
 
 ```python
 model="bedrock:anthropic.claude-sonnet-5-5"
-model="bedrock:anthropic.claude-haiku-5-5"
 ```
 
 Uses AWS credentials from the environment (AWS_ACCESS_KEY_ID,
-AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION) or AWS profiles.
-
-Install: `pip install "pointblank[generate]"` (Bedrock uses `anthropic[bedrock]`, which brings in boto3)
+AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION) or AWS profiles; `api_key`
+and `verify_ssl` aren't used. Bedrock goes through `anthropic[bedrock]`,
+which brings in boto3.
 
 ### Azure OpenAI
 
 ```python
-model="azure-openai:my-deployment-name"
+model="azure-openai:my-deployment-name"   # the Azure deployment id
 ```
 
 Environment variables:
-- `AZURE_OPENAI_API_KEY`
-- `AZURE_OPENAI_ENDPOINT`
+- `AZURE_OPENAI_API_KEY` (or pass `api_key=`)
+- `AZURE_OPENAI_ENDPOINT` (e.g., `https://<resource>.openai.azure.com`)
 - `OPENAI_API_VERSION` (e.g., `2024-06-01`)
 
-Install: `pip install "pointblank[generate]"`
+A missing endpoint or API version raises a `ValueError`.
+
+### Cohere
+
+```python
+model="cohere:command-a-03-2025"
+```
+
+Environment variable: `CO_API_KEY` (or `COHERE_API_KEY`). Requests go
+to Cohere's OpenAI-compatible API, so this uses the OpenAI SDK.
 
 ## API key options
 
@@ -109,9 +114,14 @@ draft = pb.DraftValidation(
 | OpenAI             | yes | yes | yes |
 | Ollama             | yes | yes | yes |
 | Bedrock            | yes | yes | yes |
-| Azure OpenAI       | yes | yes | no  |
+| Azure OpenAI       | yes | yes | yes |
+| Cohere             | yes | yes | yes |
 | `api_key` param    | yes | yes | yes |
 | `verify_ssl` param | yes | yes | no  |
 | `max_reprompts`    | yes | yes | no  |
+| `data` param       | required | optional | optional |
 | Browser display    | no  | no  | yes |
 | Terminal display   | no  | no  | yes |
+
+`EditValidation.from_plans()` doesn't call a model, so it needs no
+provider at all.

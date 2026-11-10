@@ -72,23 +72,33 @@ skills/write-validation/
 | No null values                    | `col_vals_not_null`                  |
 | All null (placeholder column)     | `col_vals_null`                      |
 | No duplicate rows                 | `rows_distinct`                      |
+| No near-duplicate text            | `rows_near_distinct`                 |
 | All rows complete (no nulls)      | `rows_complete`                      |
 | Values above/below a bound        | `col_vals_gt/lt/ge/le`               |
 | Values in a numeric range         | `col_vals_between`                   |
 | Values outside a range            | `col_vals_outside`                   |
 | Values from an allowed set        | `col_vals_in_set`                    |
+| Values found in a lookup table    | `col_vals_in_table`                  |
 | Values not in a forbidden set     | `col_vals_not_in_set`                |
 | Values match a pattern            | `col_vals_regex`                     |
+| String length within bounds       | `col_vals_str_len`                   |
 | Values match a format (email etc) | `col_vals_within_spec`               |
 | Values are monotonically ordered  | `col_vals_increasing/decreasing`     |
 | Null percentage within budget     | `col_pct_null`                       |
-| Structured missingness            | `col_pct_missing` with `MissingSpec` |
+| Structured missingness            | `col_pct_missing`, `col_missing_coded`, `col_missing_only_coded`, `col_missing_consistent` with `MissingSpec` |
 | Aggregate comparison (sum, avg)   | `col_sum_eq`, `col_avg_gt`, etc.     |
 | Data is recent enough             | `data_freshness`                     |
 | Table matches another table       | `tbl_match` (`keys=`, `tolerance=`)  |
+| Totals agree with a source table  | `tbl_reconcile`                      |
 | Multiple conditions per row       | `conjointly`                         |
 | Custom logic                      | `specially`                          |
 | LLM-based semantic check          | `prompt`                             |
+| Score from a model or function    | `col_vals_scored`                    |
+| Chat data well formed             | `col_vals_chat_format`               |
+| No overlap with a benchmark       | `rows_not_contaminated`              |
+
+For text corpora, RAG data, and model training sets, see the
+`check-training-data` skill.
 
 ## Core concepts
 
@@ -99,15 +109,18 @@ Organize validation steps from structural to semantic:
 1. **Schema checks** -- `col_exists`, `col_schema_match`,
    `col_count_match`, `row_count_match`
 2. **Completeness checks** -- `col_vals_not_null`, `rows_complete`,
-   `col_pct_null`
-3. **Uniqueness checks** -- `rows_distinct`
+   `col_pct_null`, `col_missing_*`
+3. **Uniqueness checks** -- `rows_distinct`, `rows_near_distinct`
 4. **Value-range checks** -- `col_vals_gt`, `col_vals_between`, etc.
-5. **Format checks** -- `col_vals_regex`, `col_vals_within_spec`
-6. **Set membership** -- `col_vals_in_set`, `col_vals_not_in_set`
+5. **Format checks** -- `col_vals_regex`, `col_vals_within_spec`,
+   `col_vals_str_len`, `col_vals_chat_format`
+6. **Set membership** -- `col_vals_in_set`, `col_vals_not_in_set`,
+   `col_vals_in_table`
 7. **Cross-column checks** -- `conjointly`, `col_vals_expr`
-8. **Aggregate checks** -- `col_sum_eq`, `col_avg_gt`
+8. **Aggregate checks** -- `col_sum_eq`, `col_avg_gt`, `tbl_reconcile`
 9. **Freshness checks** -- `data_freshness`
-10. **Custom/semantic checks** -- `specially`, `prompt`
+10. **Custom/semantic checks** -- `specially`, `prompt`,
+    `col_vals_scored`, `rows_not_contaminated`
 
 This order means structural problems surface first before
 value-level checks run.
@@ -140,13 +153,21 @@ missing_spec = pb.MissingSpec(
 
 ### Segmented validation
 
-Break validation into groups to see which segments fail:
+Break validation into groups to see which segments fail. Each
+segment becomes its own step in the report:
 
 ```python
+# One step per distinct value of "region"
+.col_vals_gt(columns="revenue", value=0, segments="region")
+
+# Only some values
+.col_vals_gt(columns="revenue", value=0, segments=("region", ["north", "south"]))
+
+# Combine values into groups (seg_group goes inside the tuple)
 .col_vals_gt(
     columns="revenue",
     value=0,
-    segments=pb.seg_group(["region_a", "region_b", "region_c"]),
+    segments=("region", pb.seg_group([["north", "south"], ["east", "west"]])),
 )
 ```
 
@@ -177,6 +198,36 @@ Transform data before a check with `pre`:
     pre=lambda df: df.filter(pl.col("status") == "active"),
 )
 ```
+
+Steps with `pre=` are left out of `get_sundered_data()` and
+`get_row_flags()`, since their rows can't be matched to the target
+table. Wrap a function that only filters, reorders, or changes values
+in `pb.row_preserving(...)` to keep the step in.
+
+### Reusable bundles of steps
+
+`pb.Steps` records steps (with the same methods as `Validate`) that
+can be added to any validation with `add_steps()`:
+
+```python
+id_checks = (
+    pb.Steps()
+    .col_vals_not_null(columns="id")
+    .rows_distinct(columns_subset="id")
+)
+
+(
+    pb.Validate(data=df)
+    .add_steps(id_checks)
+    .col_vals_gt(columns="amount", value=0)
+    .interrogate()
+)
+```
+
+`add_steps(*steps, active=None, thresholds=None, exclude=None,
+columns_map=None)` can override the bundle's thresholds, skip steps,
+or rename columns. The `pb.text` and `pb.rag` functions return `Steps`
+bundles too.
 
 ### Thresholds
 
@@ -217,17 +268,17 @@ pb.Actions(
 )
 ```
 
-Template variables: `{type}`, `{level}`, `{step}`, `{col}`,
-`{val}`, `{time}`.
+Template variables: `{type}`, `{level}`, `{step}` (or `{i}`), `{col}`
+(or `{column}`), `{val}` (or `{value}`), `{time}`.
 
 ### Final actions
 
 Run after all steps complete, with access to the full summary:
 
 ```python
-def check_overall(summary=None):
+def check_overall():
     summary = pb.get_validation_summary()
-    if summary and summary["n_failed_steps"] > 0:
+    if summary and summary["n_failing_steps"] > 0:
         send_report(summary)
 
 pb.Validate(
@@ -265,6 +316,9 @@ extracts = validation.get_data_extracts(i=1, frame=True)
 # Split into pass/fail subsets
 pass_df = validation.get_sundered_data(type="pass")
 fail_df = validation.get_sundered_data(type="fail")
+
+# Every row, flagged with the steps it failed (pb_failed_<i>_ columns)
+flags = validation.get_row_flags()
 
 # Machine-readable report
 json_report = validation.get_json_report()
@@ -315,9 +369,15 @@ configuration unless changing it is part of the task.
    count.
 4. **`col_vals_between` is closed by default.** Pass
    `inclusive=(False, False)` for an open interval.
-5. **`conjointly` takes lambdas, not method calls.** Each argument is
-   `lambda v: v.col_vals_gt(...)`.
+5. **`conjointly` takes callables that return expressions.** Each
+   argument is like `lambda df: pl.col("a") > 0` (or
+   `lambda df: expr_col("a") > 0`), not a validation method call.
 6. **Aggregate methods compare one value per column**, not per row.
-   They produce a single pass/fail per column.
+   They produce a single pass/fail per column, and they take no `pre=`
+   or `segments=`.
 7. **`segments` splits the check into sub-groups.** Each segment is
-   reported separately in the validation report.
+   reported separately in the validation report. `pb.seg_group()` is
+   only valid inside a `(column, ...)` tuple.
+8. **Comparison methods can't check boolean columns.** Use
+   `col_vals_expr(expr=pl.col("flag"))` (or `~pl.col("flag")`) instead
+   of `col_vals_eq(columns="flag", value=True)`.

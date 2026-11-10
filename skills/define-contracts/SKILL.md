@@ -3,9 +3,10 @@ name: define-contracts
 description: >
   Define data contracts and pipeline validation with Pointblank.
   Covers Contract, Step, Schema, Pipeline, and PipelineResult for
-  enforcing structural and semantic expectations at data boundaries.
-  Use when setting up source/target contracts, pipeline validation,
-  or contract serialization to YAML.
+  enforcing structural and semantic expectations at data boundaries,
+  plus YAML serialization and import/export of external contract
+  formats (JSON Schema, Frictionless, dbt, ODCS). Use when setting up
+  source/target contracts, pipeline validation, or contract files.
 license: MIT
 compatibility: Requires Python >=3.10, pointblank installed.
 metadata:
@@ -44,11 +45,13 @@ contract = pb.Contract(
         pb.Step("col_vals_in_set", columns="status",
                 set=["pending", "shipped", "delivered"]),
     ],
-    on_violation="raise",
+    on_violation="raise",  # applied when a Pipeline enforces the contract
 )
 
-# Validate data against the contract
+# Validate data against the contract (returns an interrogated Validate;
+# never warns or raises, whatever on_violation is)
 validation = contract.validate(data=df)
+validation.assert_passing()  # raise if any test unit failed
 ```
 
 ## Skill directory structure
@@ -73,9 +76,12 @@ skills/define-contracts/
 | Validate both source and target       | `Pipeline` with both   |
 | Serialize a contract to YAML          | `contract.to_yaml()`   |
 | Load a contract from YAML             | `Contract.from_yaml()` |
+| Convert to JSON Schema, dbt, etc.     | `export_contract()`    |
+| Read JSON Schema, dbt, ODCS, etc.     | `import_contract()`    |
+| Add reusable steps to a contract      | `to_validate()` + `add_steps()` |
 | Warn on violation without stopping    | `on_violation="warn"`  |
 | Raise an exception on violation       | `on_violation="raise"` |
-| Log violations silently               | `on_violation="log"`   |
+| Log violations instead of warning     | `on_violation="log"`   |
 
 ## Core concepts
 
@@ -87,7 +93,7 @@ A `Contract` bundles:
 - **direction** -- `"source"` (incoming data) or `"target"` (output)
 - **schema** -- expected column names and types
 - **steps** -- list of `Step` objects defining semantic checks
-- **on_violation** -- what to do when validation fails
+- **on_violation** -- what a `Pipeline` does when validation fails
 
 ```python
 contract = pb.Contract(
@@ -128,8 +134,28 @@ pb.Step("col_schema_match", schema=my_schema, complete=True)
 pb.Step("row_count_match", count=1000, tol=50)
 ```
 
-The `method` argument is any Validate method name. All remaining
-keyword arguments are passed to that method.
+The `method` argument names a Validate method, and the keyword
+arguments are passed to it. A contract accepts only these methods
+(any other name raises a `ValueError` when the contract is created):
+the `col_vals_*` comparison, range, set, null, regex, `within_spec`,
+`increasing`/`decreasing`, and `expr` methods; `col_exists`,
+`col_pct_null`, `col_schema_match`, `col_count_match`,
+`row_count_match`, `rows_distinct`, `rows_complete`; and `conjointly`,
+whose expressions go in a list:
+`pb.Step("conjointly", exprs=[lambda df: pl.col("a") > 0])`.
+
+For other checks (aggregates, `data_freshness`, `tbl_match`, text
+checks, ...), compile the contract and chain them on, or add a
+`pb.Steps` bundle:
+
+```python
+v = (
+    contract.to_validate(data=df)
+    .add_steps(pb.Steps().col_vals_not_null(columns="email"))
+    .data_freshness(column="updated_at", max_age="24 hours")
+    .interrogate()
+)
+```
 
 ### Schema
 
@@ -148,9 +174,8 @@ schema = pb.Schema([("id", "Int64"), ("name", "String")])
 # Column names only (no type checking)
 schema = pb.Schema(["id", "name", "age"])
 
-# Infer from an existing table
-schema = pb.schema_from_tbl(df)
-schema = pb.Schema.from_table(df, infer_constraints=True)
+# Take the names and types from an existing table
+schema = pb.Schema(tbl=df)
 ```
 
 ### Validating against a contract
@@ -175,11 +200,18 @@ v = v.interrogate()
 
 ### on_violation behavior
 
-| Value     | Behavior                             |
-| --------- | ------------------------------------ |
-| `"warn"`  | Print a warning message (default)    |
-| `"raise"` | Raise an exception if any step fails |
-| `"log"`   | Log the violation silently           |
+`on_violation` applies only when a `Pipeline` enforces the contract
+(`run()`, `validate_source()`, `validate_target()`). A boundary fails
+when any test unit fails, whatever the thresholds.
+
+| Value     | Behavior                                                   |
+| --------- | ---------------------------------------------------------- |
+| `"warn"`  | Issue a `UserWarning` (default)                            |
+| `"raise"` | Raise `ContractViolationError` (a `RuntimeError`)          |
+| `"log"`   | Write a warning to the `"pointblank.contract"` logger      |
+
+The error has `contract`, `validation`, and (from `run()`) `result`
+attributes, the last being the `PipelineResult` of the run.
 
 ### Pipeline
 
@@ -222,7 +254,7 @@ result = pipeline.run(data=raw_df, transform=transform)
 ### PipelineResult
 
 ```python
-result.passed                 # True if both source and target passed
+result.passed                 # True if every validated boundary passed
 result.source_passed          # True if source contract passed
 result.target_passed          # True if target contract passed
 result.source_validation      # Validate object for source
@@ -234,8 +266,8 @@ result.get_report()           # summary report string
 ### Serialization
 
 ```python
-# Save contract to YAML
-contract.to_yaml("contracts/orders-source.yaml")
+# Save contract to YAML (also returns the YAML string)
+yaml_text = contract.to_yaml("contracts/orders-source.yaml")
 
 # Load contract from YAML
 contract = pb.Contract.from_yaml("contracts/orders-source.yaml")
@@ -249,13 +281,34 @@ pipeline.to_yaml("pipelines/order-cleaning.yaml")
 pipeline = pb.Pipeline.from_yaml("pipelines/order-cleaning.yaml")
 ```
 
+Step arguments must be plain data to be written to YAML; a lambda, an
+expression, or a column selector makes `to_yaml()` raise a
+`ValueError`.
+
+### Other contract formats
+
+```python
+# To JSON Schema, Frictionless Table Schema, dbt, or ODCS (a dict, or
+# written to a file with a second `destination` argument); a Validate
+# object can be exported too
+spec = pb.export_contract(contract, format="json_schema")   # also "frictionless", "dbt", "odcs"
+
+# From one of those formats (a dict, a string, or a file path)
+imported = pb.import_contract("orders.schema.json", format="json_schema")
+print(imported.summary())          # columns found, constraints mapped, coverage
+contract = imported.to_contract(name="orders")
+```
+
+Rules with no equivalent in the other format are left out of an
+export, and the import summary reports what couldn't be mapped.
+
 ## Workflows
 
 ### Setting up a new contract
 
 1. Profile the data with `pb.DataScan(data=df)` to understand its
    shape, types, and distributions.
-2. Infer a starting schema: `schema = pb.schema_from_tbl(df)`.
+2. Take a starting schema from the data: `schema = pb.Schema(tbl=df)`.
 3. Define steps for the semantic rules your domain requires.
 4. Choose `on_violation` based on criticality.
 5. Test with `contract.validate(data=df)`.
@@ -282,14 +335,22 @@ When schema or rules change:
 
 1. **`direction` is metadata, not enforcement.** It documents intent
    but doesn't change validation behavior.
-2. **`on_violation="raise"` stops execution.** Use `"warn"` or
-   `"log"` when you want to continue despite failures.
-3. **`short_circuit=True` skips target validation** if source
-   validation fails. Set to `False` to always run both.
-4. **Schema type strings are backend-specific.** Use the dtype names
+2. **`on_violation` only acts in a `Pipeline`.** `contract.validate()`
+   returns the validation without warning or raising; check it with
+   `all_passed()` or `assert_passing()`.
+3. **`short_circuit=True` skips the transform and target validation**
+   if source validation fails. Set to `False` to always run both (a
+   source with `on_violation="raise"` then raises after the target
+   is validated).
+4. **A pipeline's `thresholds=` replace the contracts' thresholds**;
+   they aren't merged. Thresholds don't decide whether a boundary
+   passes: any failing test unit fails it.
+5. **Schema type strings are backend-specific.** Use the dtype names
    from your backend (e.g., `"Int64"` for Polars, `"int64"` for
    Pandas).
-5. **`to_validate()` does not call `interrogate()`.** Call it yourself
+6. **`to_validate()` does not call `interrogate()`.** Call it yourself
    if you add steps. Use `validate()` for automatic interrogation.
-6. **Steps reference method names as strings.** Typos in method names
-   surface at validation time, not at contract creation.
+7. **Only some methods can be contract steps.** An unsupported or
+   misspelled method name raises a `ValueError` when the `Contract` is
+   created; a misspelled argument raises a `TypeError` when it's
+   compiled into a validation.

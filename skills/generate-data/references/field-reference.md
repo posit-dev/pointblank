@@ -11,6 +11,9 @@ All field types for synthetic data generation.
 | `unique`           | `bool`             | `False`  | All values must be distinct  |
 | `generator`        | `Callable \| None` | `None`   | Custom generator function    |
 
+A `null_probability` above 0 needs `nullable=True` (otherwise a
+`ValueError` is raised).
+
 ## IntField / int_field()
 
 ```python
@@ -49,7 +52,8 @@ pb.string_field(
 )
 ```
 
-Only one of `preset`, `pattern`, or `allowed` may be set.
+Only one of `preset`, `pattern`, or `allowed` may be set. See
+`presets-reference.md` for the presets.
 
 ## BoolField / bool_field()
 

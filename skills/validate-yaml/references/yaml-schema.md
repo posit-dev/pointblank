@@ -1,14 +1,14 @@
 # YAML schema reference
 
-Complete reference for all keys in a Pointblank YAML validation
-plan.
+Complete reference for the keys in a Pointblank YAML validation
+plan. Unknown top-level keys raise a `YAMLValidationError`.
 
 ## Top-level keys
 
 | Key              | Type                | Required | Default    | Description                        |
 |------------------|---------------------|----------|------------|------------------------------------|
-| `tbl`            | `str`               | yes      | --         | Data source (path or connection)   |
-| `steps`          | `list[dict]`        | yes      | --         | Validation steps                   |
+| `tbl`            | `str \| null \| python:` | yes | --         | Data source (dataset, path, connection, or `null` with `set_tbl=`) |
+| `steps`          | `list`              | yes      | --         | Validation steps (non-empty)       |
 | `tbl_name`       | `str`               | no       | `null`     | Display name for the table         |
 | `label`          | `str`               | no       | `null`     | Validation plan label              |
 | `owner`          | `str`               | no       | `null`     | Data owner identifier              |
@@ -16,48 +16,79 @@ plan.
 | `version`        | `str`               | no       | `null`     | Plan version                       |
 | `lang`           | `str`               | no       | `null`     | Report language code               |
 | `locale`         | `str`               | no       | `null`     | Locale for value formatting        |
-| `df_library`     | `str`               | no       | `"polars"` | DataFrame library (`polars`/`pandas`) |
+| `df_library`     | `str`               | no       | `"polars"` | `polars`, `pandas`, or `duckdb`    |
 | `brief`          | `bool \| str`       | no       | `null`     | Global brief setting               |
-| `reference`      | `str`               | no       | `null`     | Reference table path               |
+| `reference`      | `str \| python:`    | no       | `null`     | Reference table (same forms as `tbl`) |
 | `thresholds`     | `dict`              | no       | `null`     | Global thresholds                  |
 | `actions`        | `dict`              | no       | `null`     | Global actions                     |
-| `final_actions`  | `list[str]`         | no       | `null`     | Post-validation actions            |
-| `missing_specs`  | `dict`              | no       | `null`     | Named MissingSpec definitions      |
+| `final_actions`  | `list`              | no       | `null`     | Post-validation actions            |
+| `missing_specs`  | `dict`              | no       | `null`     | Named `MissingSpec` definitions    |
+| `ablation`       | `dict`              | no       | `null`     | Ablation settings (`yaml_ablation()` only) |
 
-## Step keys
+## Steps
 
-Each step in the `steps` list is a dictionary:
+Each item in `steps` is a mapping of exactly one method name to its
+parameters, or a bare method name for a step with no parameters:
 
-| Key           | Type                | Required | Description                     |
-|---------------|---------------------|----------|---------------------------------|
-| `method`      | `str`               | yes      | Validation method name          |
-| `columns`     | `str \| list[str]`  | varies   | Target column(s)                |
-| `value`       | `any`               | varies   | Comparison value                |
-| `left`        | `number`            | varies   | Left bound (between/outside)    |
-| `right`       | `number`            | varies   | Right bound (between/outside)   |
-| `inclusive`    | `list[bool]`        | no       | Boundary inclusion              |
-| `set`         | `list`              | varies   | Allowed/forbidden values        |
-| `pattern`     | `str`               | varies   | Regex pattern                   |
-| `spec`        | `str`               | varies   | Format spec (email, url, etc.)  |
-| `schema`      | `dict`              | varies   | Schema definition               |
-| `count`       | `int`               | varies   | Expected count                  |
-| `tol`         | `number`            | no       | Tolerance for count checks      |
-| `na_pass`     | `bool`              | no       | Treat nulls as passing          |
-| `inverse`     | `bool`              | no       | Invert the check                |
-| `complete`    | `bool`              | no       | Schema completeness             |
-| `in_order`    | `bool`              | no       | Schema column ordering          |
-| `columns_subset` | `list[str]`      | no       | Column subset for distinct/complete |
-| `thresholds`  | `dict`              | no       | Per-step thresholds             |
-| `actions`     | `dict`              | no       | Per-step actions                |
-| `brief`       | `str \| bool`       | no       | Step brief text                 |
-| `active`      | `bool`              | no       | Enable/disable step             |
-| `dimension`   | `str`               | no       | Dimensional scoring tag         |
+```yaml
+steps:
+  - rows_distinct
+  - col_vals_gt:
+      columns: amount
+      value: 0
+```
+
+The parameters are those of the `Validate` method, with these YAML
+forms:
+
+| Parameter        | YAML form                                                         |
+|------------------|-------------------------------------------------------------------|
+| `columns`        | A name or a list of names                                         |
+| `value`, `left`, `right` | A literal, an ISO date string, or `pb.col("other")` / `pb.ref("col")` |
+| `set`            | A list                                                            |
+| `inclusive`      | A two-item list, e.g. `[true, false]`                             |
+| `tol`            | A number, or a two-item `[lower, upper]` list                     |
+| `schema`         | `{columns: [[name, type], name, ...]}` (for `col_schema_match`)   |
+| `segments`       | A column name, or a list of names and `[column, value]` pairs     |
+| `missing`        | A name from `missing_specs:`, or an inline spec mapping           |
+| `scorer`         | `{<pb.scorers adapter>: {<settings>}}`, or a `python:` block       |
+| `thresholds`     | `{warning: .., error: .., critical: ..}`                          |
+| `actions`        | Same form as the top-level `actions`                              |
+| `active`         | `true`/`false`, `pb.has_columns(...)`, or `pb.has_rows(...)`      |
+| `pre`            | A lambda as a string (needs `allow_python=True`)                  |
+| `expr`           | A string of code (`col_vals_expr`, `specially`; needs `allow_python=True`) |
+| `expressions`    | A list of lambda strings (`conjointly`; needs `allow_python=True`) |
+
+The adapters for `scorer:` are `embedding_similarity`, `reranker`,
+`classifier`, `langid`, `perplexity`, `text_stat`, and `token_count`.
+
+## Python code
+
+A `python:` block (or a string of code in `pre`, `expr`, and
+`expressions`) is run only with `yaml_interrogate(..., allow_python=True)`
+or `pb run ... --allow-python`:
+
+```yaml
+tbl:
+  python: |
+    pl.read_csv("orders.csv").filter(pl.col("region") == "EU")
+steps:
+  - col_vals_gt:
+      columns: amount
+      value:
+        python: math.floor(99.9)    # with namespaces=["math"]
+```
+
+These are evaluated without `allow_python`: `pb.load_dataset()`,
+`pb.col()`, `pb.ref()`, `pb.seg_group()`, `pb.has_columns()`,
+`pb.has_rows()`, the column selectors, `Decimal(...)`,
+`datetime.date/time/datetime/timedelta(...)`, and `ZoneInfo(...)`.
 
 ## Thresholds format
 
 ```yaml
 thresholds:
-  warning: 0.01     # fraction (< 1) or count (>= 1)
+  warning: 0.01     # fraction (< 1) or count (>= 1); reached at >=
   error: 0.05
   critical: 0.25
 ```
@@ -69,52 +100,117 @@ actions:
   warning: "Warning: {col} step {step}"
   error: "Error in {col} at {time}"
   critical: "CRITICAL: {type} failed for {col}"
+  highest_only: true          # only the highest level reached runs
 ```
 
-Template variables: `{type}`, `{level}`, `{step}`, `{i}`, `{col}`,
-`{column}`, `{val}`, `{value}`, `{time}`.
+The keys are `warning`, `error`, `critical`, `default`, and
+`highest_only`. Strings are printed with these template variables
+filled in: `{type}`, `{level}`, `{step}`, `{i}`, `{col}`, `{column}`,
+`{val}`, `{value}`, `{time}`. A callable action is a `python:` block.
+
+`final_actions` is a list of strings (printed as they are) or `python:`
+blocks.
 
 ## Missing specs format
 
+`missing_specs` holds named specs that steps refer to with
+`missing: <name>`:
+
 ```yaml
 missing_specs:
-  column_name:
+  survey:
     reasons:
-      -999: not collected
-      -1: redacted
+      -99: refused
+      -98: not asked
     categories:
-      system: [not collected]
-      policy: [redacted]
+      nonresponse: [refused]
+      design: [not asked]
     null_is_missing: true
     null_reason: unknown
-    description: Clinical data missingness
+    description: Survey nonresponse codes
+
+steps:
+  - col_missing_coded:
+      columns: q1
+      missing: survey
+  - col_pct_missing:
+      columns: q1
+      missing: survey
+      max_pct: 0.10
 ```
+
+## Ablation format
+
+Used by `yaml_ablation()` and ignored by `yaml_interrogate()`. The keys
+are the parameters of `Ablation` other than the validation:
+`evaluate`, `evaluate_version`, `metric`, `higher_is_better`, `repeats`,
+`seed`, `control`, `duplicates`, `duplicates_order_by`, `max_removed`,
+`conf_level`, `adjust`, `label`, `cache`, `holdout`, `ci`, `pass_as`,
+and `strategies`.
+
+```yaml
+ablation:
+  evaluate: my_models.training:evaluate   # needs allow_python, or pass evaluate=
+  metric: mae
+  higher_is_better: false
+  repeats: 5
+  control:
+    stratified: sensor        # or size_matched (default), or null
+  cache: .ablation_cache
+  holdout: data/holdout.parquet
+  strategies:
+    - drop_each
+    - drop_all_but_each
+    - drop_steps:
+        steps: [1, 2]
+        name: Without steps 1 and 2
+    - drop_groups:
+        column: sensor
+    - sweep_step:
+        step: 1
+        param: right
+        values: [30, 45, 60]
+    - inject:
+        corruption: "null"    # null, shuffle, truncate, or duplicate
+        step: 2
+```
+
+The strategies (and their parameters) are `drop_each` (`steps`),
+`drop_all` (`steps`), `drop_steps` (`steps`, `name`),
+`drop_all_but_each` (`steps`), `drop_groups` (`column`, `values`),
+`sweep_score` (`score`, `quantiles`, `values`, `remove`), `sweep_step`
+(`step`, `param`, `values`), `inject` (`corruption`, `column`, `step`,
+`rates`, `name`), and `shapley` (`steps`, `permutations`, `seed`).
 
 ## Data source formats
 
 ```yaml
-# File paths
-tbl: "data/orders.csv"
-tbl: "data/sales.parquet"
+# Built-in datasets
+tbl: small_table
+
+# File paths (read with df_library)
+tbl: data/orders.csv
+tbl: data/sales.parquet
 
 # Database connections (append ::table_name)
-tbl: "duckdb:///warehouse.db::sales"
+tbl: "duckdb:///path/to/warehouse.ddb::sales"
 tbl: "postgresql://user:pass@host:5432/db::orders"
-tbl: "mysql://user:pass@host:3306/db::customers"
-tbl: "sqlite:///local.db::events"
+tbl: "sqlite:///path/to/local.db::events"
+
+# A template: the table is given with set_tbl=
+tbl: null
 ```
 
 ## Complete example
 
 ```yaml
-tbl: "duckdb:///warehouse.db::daily_orders"
+tbl: "duckdb:///path/to/warehouse.ddb::daily_orders"
 tbl_name: daily_orders
 label: "Daily order quality check"
 owner: data-engineering
 consumers: [analytics, finance]
 version: "2.1"
 lang: en
-df_library: polars
 
 thresholds:
   warning: 0.01
@@ -129,46 +225,48 @@ final_actions:
   - "Validation run completed"
 
 missing_specs:
-  amount:
+  amount_codes:
     reasons:
       -1: refunded
     null_is_missing: true
 
 steps:
-  - method: col_schema_match
-    schema:
-      order_id: Int64
-      customer_id: Int64
-      amount: Float64
-      status: String
-      created_at: Datetime
-    complete: true
-    in_order: false
+  - col_schema_match:
+      schema:
+        columns:                  # Ibis type names for a database table
+          - [order_id, int64]
+          - [customer_id, int64]
+          - [amount, float64]
+          - [status, string]
+          - created_at
+      complete: true
+      in_order: false
 
-  - method: row_count_match
-    count: 1000
-    tol: 200
+  - row_count_match:
+      count: 1000
+      tol: 200
 
-  - method: col_vals_not_null
-    columns: [order_id, customer_id, status]
+  - col_vals_not_null:
+      columns: [order_id, customer_id, status]
 
-  - method: rows_distinct
-    columns_subset: [order_id]
+  - rows_distinct:
+      columns_subset: [order_id]
 
-  - method: col_vals_gt
-    columns: amount
-    value: 0
-    na_pass: true
+  - col_vals_gt:
+      columns: amount
+      value: 0
+      missing: amount_codes
 
-  - method: col_vals_in_set
-    columns: status
-    set: [pending, processing, shipped, delivered, cancelled]
+  - col_vals_in_set:
+      columns: status
+      set: [pending, processing, shipped, delivered, cancelled]
 
-  - method: col_vals_regex
-    columns: customer_id
-    pattern: "\\d+"
+  - col_pct_null:
+      columns: amount
+      p: 0
+      tol: 0.05
 
-  - method: col_pct_null
-    columns: amount
-    p: 0.05
+  - data_freshness:
+      column: created_at
+      max_age: 24 hours
 ```

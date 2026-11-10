@@ -1,5 +1,23 @@
 # Schema inference reference
 
+There are two ways to get a schema from a table:
+
+| Call                     | Holds                              | Use it for                        |
+|--------------------------|------------------------------------|-----------------------------------|
+| `pb.Schema(tbl=df)`      | Column names and full dtype strings | `col_schema_match()`, contracts  |
+| `pb.schema_from_tbl(df)` | Field objects with inferred constraints | `schema.generate()`, `generate_dataset()` |
+
+## Schema(tbl=...)
+
+```python
+schema = pb.Schema(tbl=df)
+schema.get_column_list()   # ['date_time', 'date', 'a', ...]
+schema.get_dtype_list()    # ["Datetime(time_unit='us', time_zone=None)", 'Date', 'Int64', ...]
+```
+
+The dtypes are the backend's own names (Polars `Int64`, Pandas
+`int64`, Ibis `int64`), so the schema matches the table it came from.
+
 ## schema_from_tbl
 
 ```python
@@ -7,36 +25,36 @@ pb.schema_from_tbl(
     tbl: Any,
     *,
     infer_constraints: bool = True,
-    categorical_threshold: int = 20,
+    categorical_threshold: int | float = 20,
     detect_presets: bool = True,
     sample_size: int | None = None,
 ) -> Schema
 ```
 
-Creates a Schema from an existing table with optional constraint
-inference.
+Creates a Schema of Field objects (`IntField`, `StringField`, ...)
+whose constraints come from the values, ready for generating
+synthetic data that looks like the table.
 
 ### Parameters
 
 | Parameter                | Default | Description                         |
 |--------------------------|---------|-------------------------------------|
-| `infer_constraints`      | `True`  | Infer value ranges, allowed sets    |
-| `categorical_threshold`  | `20`    | Max distinct values for categorical |
-| `detect_presets`         | `True`  | Detect email, URL, phone patterns   |
-| `sample_size`            | `None`  | Rows to sample (None = all)         |
+| `infer_constraints`      | `True`  | Infer min/max, null rates, uniqueness, allowed sets; `False` behaves like `Schema(tbl=df)` |
+| `categorical_threshold`  | `20`    | Max distinct values (int) or fraction of rows (float in 0-1) for a categorical `allowed=` list |
+| `detect_presets`         | `True`  | Match string columns to presets (email, URL, phone) by name and values |
+| `sample_size`            | `None`  | Rows to sample first (None = all)   |
+
+```python
+gen_schema = pb.schema_from_tbl(df)
+synthetic = gen_schema.generate(n=1000, seed=23)
+```
 
 ## Schema.from_table
 
-Class method with the same parameters:
+Class method with the same parameters as `schema_from_tbl()`:
 
 ```python
-schema = pb.Schema.from_table(
-    df,
-    infer_constraints=True,
-    categorical_threshold=20,
-    detect_presets=True,
-    sample_size=1000,
-)
+schema = pb.Schema.from_table(df, sample_size=1000)
 ```
 
 ## Schema constructor
@@ -63,9 +81,10 @@ pb.Schema(tbl=df)
 | Method                          | Returns        | Description                  |
 |---------------------------------|----------------|------------------------------|
 | `get_column_list()`             | `list[str]`    | Column names                 |
-| `get_dtype_list()`              | `list[str]`    | Data type strings            |
+| `get_dtype_list()`              | `list`         | Dtype strings (Field objects for an inferred schema) |
+| `get_tbl_type()`                | `str`          | Table type the schema came from |
 | `get_schema_coerced(to=None)`   | `Schema`       | Coerced to a target backend  |
-| `generate(n=100, ...)`          | `DataFrame`    | Generate synthetic data      |
+| `generate(n=100, seed=None, output="polars", country="US", shuffle=True, weighted=True)` | DataFrame or dict | Generate synthetic data |
 
 ## Common dtype strings by backend
 
@@ -76,13 +95,13 @@ pb.Schema(tbl=df)
 | String    | `String`     | `object`, `string` |
 | Boolean   | `Boolean`    | `bool`       |
 | Date      | `Date`       | `datetime64[ns]` |
-| Datetime  | `Datetime`   | `datetime64[ns]` |
+| Datetime  | `Datetime(time_unit='us', time_zone=None)` | `datetime64[ns]` |
 | Duration  | `Duration`   | `timedelta64[ns]` |
 
-## Using inferred schema in validation
+## Using a table's schema in validation
 
 ```python
-schema = pb.schema_from_tbl(df)
+schema = pb.Schema(tbl=df)
 
 validation = (
     pb.Validate(data=new_df)
@@ -105,4 +124,4 @@ validation = (
 | `in_order`                 | `True`  | Column order must match             |
 | `case_sensitive_colnames`  | `True`  | Column name comparison              |
 | `case_sensitive_dtypes`    | `True`  | Dtype string comparison             |
-| `full_match_dtypes`        | `True`  | Exact dtype match required          |
+| `full_match_dtypes`        | `True`  | Exact dtype match required (`False` allows a substring, so `"Int"` matches `"Int64"`) |
