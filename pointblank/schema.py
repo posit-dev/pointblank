@@ -343,6 +343,9 @@ class Schema:
         detect_presets
             Attempt to match string columns to known generation presets (e.g., email, url,
             phone_number) based on column name heuristics and value validation. Default is `True`.
+            A column whose name matches a place or organization preset (`state`, `city`, `country`,
+            `company`, etc.) but holds a small set of repeated values is treated as categorical
+            instead, keeping its values in `allowed=`.
         sample_size
             If set, sample this many rows before analysis (useful for very large tables).
             `None` means use all rows.
@@ -1637,7 +1640,10 @@ def schema_from_tbl(
         between `0` and `1`), treat it as categorical and populate `allowed=`. Default is `20`.
     detect_presets
         Attempt to match string columns to known generation presets (e.g., email, url, phone_number)
-        based on column name heuristics and value validation. Default is `True`.
+        based on column name heuristics and value validation. Default is `True`. A column whose name
+        matches a place or organization preset (`state`, `city`, `country`, `company`, etc.) but
+        holds a small set of repeated values is treated as categorical instead, keeping its values
+        in `allowed=`.
     sample_size
         If set, sample this many rows before analysis (useful for very large tables). `None` means
         use all rows.
