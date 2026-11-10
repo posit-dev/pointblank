@@ -101,7 +101,7 @@ def test_corpus_checks_defaults_and_options():
     assert [step.method for step in steps._steps] == [
         "col_vals_regex",
         "col_vals_not_null",
-        "col_vals_scored",
+        "col_vals_token_len",
         "rows_near_distinct",
     ]
     assert steps._steps[2].kwargs["brief"] == "Every chunk has at most 10 tokens."
