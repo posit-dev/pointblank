@@ -469,9 +469,9 @@ corpus = pl.read_parquet("web_corpus.parquet")
 
 validation = (
     pb.Validate(data=corpus, tbl_name="web_corpus")
-    .add_steps(pb.text.heuristic_filters("text"))  # The quality filters of the Gopher models
-    .rows_near_distinct(columns="text")            # Documents that are nearly the same
-    .add_steps(pb.text.no_pii("text"))             # Email addresses, phone and card numbers
+    .col_vals_text_quality(columns="text")  # The quality filters of the Gopher models
+    .rows_near_distinct(columns="text")     # Documents that are nearly the same
+    .col_vals_no_pii(columns="text")        # Email addresses, phone and card numbers
     .interrogate()
 )
 

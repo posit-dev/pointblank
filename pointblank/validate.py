@@ -20,7 +20,7 @@ import shutil
 import tempfile
 import threading
 import uuid
-from collections.abc import Collection, Sequence
+from collections.abc import Collection, Mapping, Sequence
 from dataclasses import dataclass
 from enum import Enum
 from functools import partial
@@ -6795,7 +6795,7 @@ class Validate:
             A dictionary that renames columns in the added steps, mapping the column names used in
             the collection to the names in this table (e.g., `{"customer_id": "cust_id"}`). It
             applies to column names given as strings or lists of strings in a step's `columns=`,
-            `column=`, or `columns_subset=` argument. Column selectors such as
+            `column=`, `columns_subset=`, or `expected_column=` argument. Column selectors such as
             [`starts_with()`](`pointblank.starts_with`) are left as they are.
 
         Returns
@@ -6933,7 +6933,7 @@ class Validate:
                 if thresholds is not None:
                     kwargs["thresholds"] = thresholds
                 if columns_map is not None:
-                    for param in ("columns", "column", "columns_subset"):
+                    for param in ("columns", "column", "columns_subset", "expected_column"):
                         if param in kwargs and kwargs[param] is not None:
                             val = kwargs[param]
                             if isinstance(val, str) and val in columns_map:
@@ -15845,6 +15845,741 @@ class Validate:
             )
 
             self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_vals_text_quality(
+        self,
+        columns: str | list[str],
+        min_words: int | None = 50,
+        max_words: int | None = 100_000,
+        min_mean_word_length: float | None = 3,
+        max_mean_word_length: float | None = 10,
+        max_symbol_ratio: float | None = 0.1,
+        max_bullet_lines: float | None = 0.9,
+        max_ellipsis_lines: float | None = 0.3,
+        min_alpha_words: float | None = 0.8,
+        min_stop_words: int | None = 2,
+        max_repeated_lines: float | None = 0.3,
+        stop_words: Sequence[str] | None = None,
+        na_pass: bool = True,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate whether text passes the heuristic quality filters of web text.
+
+        Text collected from the web for training language models has a lot that isn't prose:
+        menus, lists of links, tables of numbers, placeholder text, and pages that repeat
+        themselves. The quality filters of the Gopher models (Rae et al., 2021) catch much of it
+        with a few simple statistics of each document, and the `col_vals_text_quality()`
+        validation method adds a validation step for each of them, with the bounds used for
+        Gopher as the defaults:
+
+        - the number of words is between `min_words=` and `max_words=` (50 and 100,000)
+        - the mean length of the words is between `min_mean_word_length=` and
+          `max_mean_word_length=` (3 and 10 characters)
+        - there are no more than `max_symbol_ratio=` hash symbols and ellipses for each word
+          (0.1)
+        - no more than `max_bullet_lines=` of the lines start with a bullet point (90%)
+        - no more than `max_ellipsis_lines=` of the lines end with an ellipsis (30%)
+        - at least `min_alpha_words=` of the words have a letter (80%)
+        - the text has at least `min_stop_words=` distinct stop words (2 of the, be, to, of,
+          and, that, have, and with)
+        - no more than `max_repeated_lines=` of the lines repeat an earlier line (30%)
+
+        Each check is a `~~pointblank.Validate.col_vals_scored()` step with a
+        [`text_stat()`](`pointblank.scorers.text_stat`) scorer, so the report shows each one, with
+        its own counts of the documents that fail, and a brief that says what it checks. Each row
+        is a test unit. Set a bound to `None` to leave its check out (a check with two bounds is
+        left out when both are `None`). Documents without the words or lines that a check needs
+        pass it (the check of the number of words catches them).
+
+        The defaults are for English web text. Text in other languages needs other stop words
+        (and perhaps other bounds), and short texts (like titles or chat messages) need a lower
+        `min_words=`.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. There will be a separate set of
+            validation steps for each column.
+        min_words, max_words
+            The fewest and the most words a document can have.
+        min_mean_word_length, max_mean_word_length
+            The bounds of the mean length of the words of a document, in characters.
+        max_symbol_ratio
+            The most hash symbols and ellipses that a document can have for each word.
+        max_bullet_lines
+            The largest share of the lines of a document that can start with a bullet point.
+        max_ellipsis_lines
+            The largest share of the lines of a document that can end with an ellipsis.
+        min_alpha_words
+            The smallest share of the words of a document that must have a letter.
+        min_stop_words
+            The fewest distinct stop words that a document must have.
+        max_repeated_lines
+            The largest share of the lines of a document that can be the same as an earlier
+            line.
+        stop_words
+            The stop words, for `min_stop_words=`. By default, they're the eight English words of
+            the Gopher filters.
+        na_pass
+            Should a missing value pass? The default is `True`, so that missing documents are
+            left to a check like `~~pointblank.Validate.col_vals_not_null()`.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            The brief of each validation step, displayed in the reporting table. By default
+            (`None` or `True`), each step's brief says what it checks (e.g., "Between 50 and
+            100,000 words in `text`."). A string is used for every step, with `"{auto}"` replaced
+            by that description (and `"{step}"` by the step number). Use `False` for no brief.
+        active
+            A boolean value or callable that determines whether the validation steps should be
+            active. Using `False` will make the validation steps inactive (still reporting their
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing.
+        dimension
+            An optional data quality dimension to categorize the validation steps for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is `"validity"`. This label appears in the validation report and feeds the
+            overall and per-dimension health scores.
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation steps.
+
+        Raises
+        ------
+        TypeError
+            If a bound isn't a number or `None`.
+        ValueError
+            If `min_words=` is greater than `max_words=`, or `min_mean_word_length=` is greater
+            than `max_mean_word_length=`.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Let's check a small corpus of web documents. The documents are short, so we'll use a
+        lower `min_words=` than the default.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        corpus = pl.DataFrame(
+            {
+                "text": [
+                    "The museum is open from nine to five, and the entry is free for children "
+                    "under the age of twelve, so it's a good place to spend the day with family.",
+                    "Home\\nAbout\\nHome\\nAbout\\nHome\\nContact us",
+                    "#sale #deals #shoes #free #today ... click to see more of the best deals",
+                    "Our library lends books, films, and music to members of the town for up to "
+                    "three weeks, and the books can be returned to any of its branches.",
+                ]
+            }
+        )
+
+        (
+            pb.Validate(data=corpus)
+            .col_vals_text_quality(columns="text", min_words=10)
+            .interrogate()
+        )
+        ```
+
+        The menu in the second row has too few words and too many repeated lines, and few stop
+        words. The third row, a list of hashtags, has too many symbols for its words. The two
+        documents of prose pass every check.
+        """
+
+        from pointblank import _text
+        from pointblank import scorers as _scorers
+
+        columns = _text_check_columns(columns)
+        rules = _text.text_quality_rules(
+            {
+                "min_words": min_words,
+                "max_words": max_words,
+                "min_mean_word_length": min_mean_word_length,
+                "max_mean_word_length": max_mean_word_length,
+                "max_symbol_ratio": max_symbol_ratio,
+                "max_bullet_lines": max_bullet_lines,
+                "max_ellipsis_lines": max_ellipsis_lines,
+                "min_alpha_words": min_alpha_words,
+                "min_stop_words": min_stop_words,
+                "max_repeated_lines": max_repeated_lines,
+            }
+        )
+        if isinstance(stop_words, str):
+            raise TypeError("`stop_words=` must be a list of words.")
+        if stop_words is not None:
+            stop_words = list(stop_words)
+
+        for column in columns:
+            for stat, low, high, description in rules:
+                self.col_vals_scored(
+                    columns=column,
+                    scorer=_scorers.text_stat(
+                        stat, stop_words=stop_words if stat == "stop_words" else None
+                    ),
+                    min_val=low,
+                    max_val=high,
+                    na_pass=na_pass,
+                    # (the statistics are fast, so there's nothing to gain from keeping them)
+                    cache=False,
+                    pre=pre,
+                    segments=segments,
+                    thresholds=thresholds,
+                    actions=actions,
+                    brief=_text_check_brief(brief, f"{description} in `{column}`."),
+                    active=active,
+                    dimension=dimension,
+                )
+
+        return self
+
+    def col_vals_in_language(
+        self,
+        columns: str | list[str],
+        expected: str | list[str] | None = None,
+        expected_column: str | None = None,
+        min_confidence: float = 0.5,
+        backend: str | Callable[[str], Any] = "langid",
+        model: str | None = None,
+        na_pass: bool = False,
+        cache: bool | str | Path = True,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate whether text is in the expected language.
+
+        The `col_vals_in_language()` validation method checks that the text of each row is in
+        one of the expected languages. A language identification model gives the probability
+        that the text is in each language, and a row fails if the probability of the expected
+        ones is below `min_confidence=`. Each row is a test unit. The expected languages are the
+        same for every row (`expected=`) or come from a column (`expected_column=`), for a corpus
+        with documents in several languages.
+
+        The step is a `~~pointblank.Validate.col_vals_scored()` step with a
+        [`langid()`](`pointblank.scorers.langid`) scorer (it's listed in the report as
+        `col_vals_scored()`, with a brief that says what it checks), so the probabilities are in
+        the step report and in the extracts of failing rows.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. If multiple columns are supplied,
+            there will be a separate validation step generated for each column.
+        expected
+            The expected language (an ISO 639 code like `"en"`), or a list of them.
+        expected_column
+            A column with the expected language of each row, instead of `expected=`.
+        min_confidence
+            The smallest probability that a text is in the expected languages for it to pass,
+            from 0 to 1. The default is `0.5`.
+        backend
+            The language identification model: `"langid"` (the default, which needs the
+            `langid` package), `"fasttext"` (with the path of the model as `model=`), or a
+            function that gives the probabilities of a text by language (see
+            [`langid()`](`pointblank.scorers.langid`)).
+        model
+            The path of the fastText model, with `backend="fasttext"`.
+        na_pass
+            Should a missing value pass? The default is `False`.
+        cache
+            Where the probabilities are kept, so that a validation that's run again doesn't
+            compute them again: in memory (`True`, the default), in a directory, or not at all
+            (`False`).
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            The brief of the validation step, displayed in the reporting table. By default
+            (`None` or `True`), the brief says what the step checks (e.g., "The text of `text` is
+            in `en` (probability of at least 0.5)."). A string is used instead, with `"{auto}"`
+            replaced by that description (and `"{step}"` by the step number). Use `False` for no
+            brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing.
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is `"validity"`. This label appears in the validation report and feeds the
+            overall and per-dimension health scores.
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Raises
+        ------
+        TypeError
+            If `min_confidence=` isn't a number.
+        ValueError
+            If `min_confidence=` isn't between 0 and 1, if neither (or both) of `expected=` and
+            `expected_column=` is given, or if `expected_column=` is one of `columns=`.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        A real check would use the `langid` package or a fastText model. To keep this example
+        self-contained, the backend is a toy function that guesses the language from a few
+        words.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        def guess(text):
+            words = set(text.lower().split())
+            if words & {"the", "and", "is"}:
+                return {"en": 0.9, "fr": 0.1}
+            if words & {"le", "et", "est"}:
+                return {"en": 0.1, "fr": 0.9}
+            return {"en": 0.5, "fr": 0.5}
+
+        docs = pl.DataFrame(
+            {
+                "text": ["the soup is good", "le pain est bon", "the bread is fresh"],
+                "lang": ["en", "fr", "fr"],
+            }
+        )
+
+        (
+            pb.Validate(data=docs)
+            .col_vals_in_language(columns="text", expected="en", backend=guess)
+            .col_vals_in_language(columns="text", expected_column="lang", backend=guess)
+            .interrogate()
+        )
+        ```
+
+        The document in French fails step 1, which expects English for every row. In step 2,
+        each row is checked against its own label, and the last document fails: it's labelled
+        as French, but it's in English.
+        """
+
+        from pointblank import _text
+        from pointblank import scorers as _scorers
+
+        columns = _text_check_columns(columns)
+        if isinstance(min_confidence, bool) or not isinstance(min_confidence, numbers.Real):
+            raise TypeError("`min_confidence=` must be a number.")
+        if not 0 <= min_confidence <= 1:
+            raise ValueError(f"`min_confidence=` must be between 0 and 1, got {min_confidence}.")
+        if expected_column is not None and expected_column in columns:
+            raise ValueError(
+                f"`expected_column=` ({expected_column!r}) can't be one of the columns of text."
+            )
+
+        # (each scorer is made first, so that a bad setting adds no steps)
+        scorers = {
+            column: _scorers.langid(
+                expected=expected,
+                backend=backend,
+                model=model,
+                column=column if expected_column is not None else None,
+                expected_column=expected_column,
+            )
+            for column in columns
+        }
+
+        for column in columns:
+            self.col_vals_scored(
+                columns=column if expected_column is None else [column, expected_column],
+                scorer=scorers[column],
+                min_val=min_confidence,
+                na_pass=na_pass,
+                cache=cache,
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=_text_check_brief(
+                    brief,
+                    _text.language_brief(column, expected, expected_column, min_confidence),
+                ),
+                active=active,
+                dimension=dimension,
+            )
+
+        return self
+
+    def col_vals_token_len(
+        self,
+        columns: str | list[str],
+        tokenizer: str | Any,
+        min_val: int | None = None,
+        max_val: int | None = None,
+        na_pass: bool = False,
+        cache: bool | str | Path = True,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate whether the length of text in tokens is within bounds.
+
+        A language model reads text as tokens, and most have a limit on how many they can take
+        in, so the documents of a corpus for training (or a set of prompts) need to be neither
+        too short nor too long, in the tokens of the model's tokenizer. The
+        `col_vals_token_len()` validation method counts the tokens of the text of each row, and
+        a row fails if its count is below `min_val=` or above `max_val=`. Each row is a test
+        unit. To check the length in characters instead, use
+        `~~pointblank.Validate.col_vals_str_len()`.
+
+        The step is a `~~pointblank.Validate.col_vals_scored()` step with a
+        [`token_count()`](`pointblank.scorers.token_count`) scorer (it's listed in the report as
+        `col_vals_scored()`, with a brief that says what it checks), so the counts are in the
+        step report and in the extracts of failing rows.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. If multiple columns are supplied,
+            there will be a separate validation step generated for each column.
+        tokenizer
+            The tokenizer: the name of a Hugging Face tokenizer, `"tiktoken:"` and the name of an
+            encoding or a model, `"whitespace"`, a tokenizer object, or a function (see
+            [`token_count()`](`pointblank.scorers.token_count`)).
+        min_val, max_val
+            The fewest and the most tokens that a text can have (at least one of them is
+            needed).
+        na_pass
+            Should a missing value pass? The default is `False`.
+        cache
+            Where the counts are kept, so that a validation that's run again doesn't compute them
+            again: in memory (`True`, the default), in a directory, or not at all (`False`).
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            The brief of the validation step, displayed in the reporting table. By default
+            (`None` or `True`), the brief says what the step checks (e.g., "Between 3 and 4,096
+            tokens in `text`."). A string is used instead, with `"{auto}"` replaced by that
+            description (and `"{step}"` by the step number). Use `False` for no brief.
+        active
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing.
+        dimension
+            An optional data quality dimension to categorize this validation step for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is `"validity"`. This label appears in the validation report and feeds the
+            overall and per-dimension health scores.
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Raises
+        ------
+        TypeError
+            If `min_val=` or `max_val=` isn't a number, or `tokenizer=` isn't a tokenizer.
+        ValueError
+            If neither `min_val=` nor `max_val=` is given, or `min_val=` is greater than
+            `max_val=`.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        A real check would use the tokenizer of a model (e.g., `"tiktoken:cl100k_base"`). Here,
+        the tokens are the words, split on whitespace.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        prompts = pl.DataFrame(
+            {"prompt": ["Summarize the article in two sentences.", "Hi", "List three uses of salt."]}
+        )
+
+        (
+            pb.Validate(data=prompts)
+            .col_vals_token_len(columns="prompt", tokenizer="whitespace", min_val=3)
+            .interrogate()
+        )
+        ```
+
+        The second prompt has a single token, so it fails.
+        """
+
+        from pointblank import _text
+        from pointblank import scorers as _scorers
+
+        columns = _text_check_columns(columns)
+        _text.check_bound(min_val, "min_val")
+        _text.check_bound(max_val, "max_val")
+        if min_val is None and max_val is None:
+            raise ValueError("col_vals_token_len() needs `min_val=`, `max_val=`, or both.")
+        if min_val is not None and max_val is not None and min_val > max_val:
+            raise ValueError(
+                f"`min_val=` ({min_val}) must not be greater than `max_val=` ({max_val})."
+            )
+        scorer = _scorers.token_count(tokenizer)
+
+        for column in columns:
+            self.col_vals_scored(
+                columns=column,
+                scorer=scorer,
+                min_val=min_val,
+                max_val=max_val,
+                na_pass=na_pass,
+                cache=cache,
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=_text_check_brief(brief, _text.token_length_brief(column, min_val, max_val)),
+                active=active,
+                dimension=dimension,
+            )
+
+        return self
+
+    def col_vals_no_pii(
+        self,
+        columns: str | list[str],
+        entities: Sequence[str] | Mapping[str, str | None] = ("email", "phone", "credit_card"),
+        na_pass: bool = True,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate:
+        """
+        Validate whether text has no personal information.
+
+        Text collected for training or evaluating a model shouldn't have personal information in
+        it, such as email addresses, phone numbers, or credit card numbers. The
+        `col_vals_no_pii()` validation method adds a `~~pointblank.Validate.col_vals_regex()`
+        step (with `inverse=True`) for each column and each kind of information: a row fails if
+        its text has something that looks like one. Each row is a test unit. The patterns use
+        only the features of regular expressions that every backend has, so the checks run in
+        the database (or in PySpark) like any other `~~pointblank.Validate.col_vals_regex()`
+        step.
+
+        The patterns find likely matches, not certain ones: a number with the shape of a credit
+        card number matches, with no checksum, and an unusual format of a phone number can be
+        missed. For a thorough check, use a model for named entities (e.g., with
+        `~~pointblank.Validate.col_vals_scored()`).
+
+        The entities are:
+
+        - `"email"`: email addresses
+        - `"phone"`: phone numbers of North America, with or without a country code (like
+          `(555) 123-4567` or `+1 555.123.4567`)
+        - `"credit_card"`: credit card numbers (Visa, Mastercard, American Express, and
+          Discover), with or without spaces or dashes
+        - `"ip_address"`: IPv4 addresses
+        - `"us_ssn"`: US Social Security numbers (like `123-45-6789`)
+        - `"iban"`: International Bank Account Numbers
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. There will be a separate set of
+            validation steps for each column (one for each entity).
+        entities
+            The kinds of information to look for (by default, `"email"`, `"phone"`, and
+            `"credit_card"`), or a dictionary of patterns of your own, by name (which can be
+            mixed with the names above, as in `{"email": None, "employee_id": r"EMP-[0-9]{6}"}`,
+            where `None` is the pattern of an entity above).
+        na_pass
+            Should a missing value pass? The default is `True`, as a missing text has no personal
+            information.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            The brief of each validation step, displayed in the reporting table. By default
+            (`None` or `True`), each step's brief says what it checks (e.g., "No email addresses
+            in `text`."). A string is used for every step, with `"{auto}"` replaced by that
+            description (and `"{step}"` by the step number). Use `False` for no brief.
+        active
+            A boolean value or callable that determines whether the validation steps should be
+            active. Using `False` will make the validation steps inactive (still reporting their
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing.
+        dimension
+            An optional data quality dimension to categorize the validation steps for health
+            scoring. One of `"completeness"`, `"validity"`, `"uniqueness"`, `"consistency"`,
+            `"timeliness"`, or `"volume"` (or any custom string). If `None` (the default), the
+            dimension is `"validity"`. This label appears in the validation report and feeds the
+            overall and per-dimension health scores.
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation steps.
+
+        Raises
+        ------
+        TypeError
+            If `entities=` isn't a list of entities or a dictionary of patterns, or a pattern
+            isn't a string.
+        ValueError
+            If `entities=` is empty or has an entity that isn't one of those above.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
+        ```
+
+        Let's check a table of support tickets for personal information.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tickets = pl.DataFrame(
+            {
+                "text": [
+                    "The app crashes when I open the settings page.",
+                    "Please email me at jo.smith@example.com when it's fixed.",
+                    "Call me back on (555) 123-4567 after five.",
+                    "I was charged twice on card 4111 1111 1111 1111.",
+                ]
+            }
+        )
+
+        pb.Validate(data=tickets).col_vals_no_pii(columns="text").interrogate()
+        ```
+
+        Each of the last three tickets fails one of the steps: the email address in step 1, the
+        phone number in step 2, and the card number in step 3.
+        """
+
+        from pointblank import _text
+
+        columns = _text_check_columns(columns)
+        patterns = _text.pii_patterns(entities)
+
+        for column in columns:
+            for name, pattern in patterns.items():
+                self.col_vals_regex(
+                    columns=column,
+                    pattern=pattern,
+                    inverse=True,
+                    na_pass=na_pass,
+                    pre=pre,
+                    segments=segments,
+                    thresholds=thresholds,
+                    actions=actions,
+                    brief=_text_check_brief(brief, _text.pii_brief(name, column)),
+                    active=active,
+                    dimension=dimension,
+                )
 
         return self
 
@@ -27303,6 +28038,35 @@ def _format_timedelta(td: datetime.timedelta) -> str:
     else:
         val = round(total_seconds / 604800)
         return f"{val}w"
+
+
+def _text_check_columns(columns: Any) -> list[str]:
+    """The columns of a text check made of other steps (a column or a list of them)."""
+    if isinstance(columns, str):
+        columns = [columns]
+    if (
+        not isinstance(columns, (list, tuple))
+        or not columns
+        or not all(isinstance(c, str) and c for c in columns)
+    ):
+        raise TypeError("`columns=` must be the name of a column or a list of column names.")
+    if len(set(columns)) != len(columns):
+        raise ValueError("`columns=` has the same column more than once.")
+    return list(columns)
+
+
+def _text_check_brief(brief: str | bool | None, description: str) -> str | bool:
+    """
+    The brief of a step of a text check made of other steps: the description of the step by
+    default, no brief with `False`, or a string, with `"{auto}"` replaced by the description.
+    """
+    if brief is None or brief is True:
+        return description
+    if brief is False:
+        return False
+    if not isinstance(brief, str):
+        raise TypeError(f"`brief=` must be a string or a boolean, got {type(brief).__name__}.")
+    return brief.replace("{auto}", description)
 
 
 def _transform_auto_brief(brief: str | bool | None) -> str | None:

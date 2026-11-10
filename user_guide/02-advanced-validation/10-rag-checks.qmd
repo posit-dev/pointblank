@@ -106,7 +106,7 @@ The steps check, in order (and the brief of each says what it checks):
 - **Length.** Every chunk has from `min_tokens=` to `max_tokens=` tokens. The chunk of the
   shipping article has none, so it fails this step too. The tokens are words by default; with
   `tokenizer=`, they're the tokens of a model (as in
-  [`pb.text.token_length()`](`pointblank.text.token_length`)).
+  `~~pointblank.Validate.col_vals_token_len()`).
 - **Near duplicates.** No chunk is nearly the same as another, which would crowd the other chunks
   out of the results of a search. The two chunks about invoices differ only in their punctuation.
   This is a `~~pointblank.Validate.rows_near_distinct()` step, and `near_duplicates=` sets its

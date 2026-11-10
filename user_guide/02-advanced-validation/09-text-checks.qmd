@@ -19,8 +19,8 @@ wrong language, are too long for the model, or have someone's email address in t
 fine-tuning can have conversations that are out of order, and any training data can contain the
 questions of the benchmarks that the model will be scored on.
 
-Pointblank has validation methods and step bundles for each of these problems. They give reports,
-thresholds, and actions like any other step, so a corpus can be checked with the same tools as any
+Pointblank has validation methods for each of these problems. They give reports, thresholds, and
+actions like any other step, so a corpus can be checked with the same tools as any
 other table, and each check can be measured with an [`Ablation`](../post-interrogation/data-ablation.qmd)
 to see how much it matters to the model.
 
@@ -64,15 +64,14 @@ pb.preview(corpus)
 The corpora used to train language models are cleaned with simple rules about each document: how
 many words it has, how long they are, how many of its lines are bullet points or repeat an earlier
 line, and whether it has common words like *the* and *of*. The
-[`pb.text.heuristic_filters()`](`pointblank.text.heuristic_filters`) function makes a validation
-step for each of the quality filters of the Gopher models, with their bounds as the defaults. It
-returns a [`Steps`](`pointblank.Steps`) collection, which is added to a validation with
-`add_steps()`. Our documents are short, so we'll lower the number of words that a document needs.
+`~~pointblank.Validate.col_vals_text_quality()` method adds a validation step for each of the
+quality filters of the Gopher models, with their bounds as the defaults. Our documents are short,
+so we'll lower the number of words that a document needs.
 
 ```{python}
 validation = (
     pb.Validate(data=corpus, tbl_name="corpus")
-    .add_steps(pb.text.heuristic_filters("text", min_words=10))
+    .col_vals_text_quality(columns="text", min_words=10)
     .interrogate()
 )
 
@@ -80,12 +79,13 @@ validation
 ```
 
 Each rule is a `~~pointblank.Validate.col_vals_scored()` step with a
-[`text_stat()`](`pointblank.scorers.text_stat`) scorer, so the report shows what each one checks and
-how many documents fail it. The menu has too few words, repeats its lines, and has too few common
+[`text_stat()`](`pointblank.scorers.text_stat`) scorer, so the report lists them as
+`col_vals_scored()` steps, with a brief that says what each one checks and how many documents fail
+it. The menu has too few words, repeats its lines, and has too few common
 words, and the list of hashtags has too many symbols for its words. The document in French fails the
 check of common words too, since the default stop words are English (use `stop_words=` for other
 languages). Any rule can be turned off by setting its bound to `None`, and since each is an ordinary
-step, it can be changed like any other.
+step, it can be changed (or left out of the results) like any other.
 
 ## Near Duplicates
 
@@ -115,24 +115,27 @@ when given `duplicates="keep_first"` (without it, the step isn't used for sunder
 
 ## Language, Length, and Personal Information
 
-Three more bundles cover checks that most text corpora need:
+Three more methods cover checks that most text corpora need:
 
-- [`pb.text.in_language()`](`pointblank.text.in_language`) checks that each document is in the
+- `~~pointblank.Validate.col_vals_in_language()` checks that each document is in the
   expected language, with a language identification model (from the `langid` package, a fastText
   model, or a function of your own). The expected language can also come from a column, for a
   corpus with documents in several languages.
-- [`pb.text.token_length()`](`pointblank.text.token_length`) checks the length of each document in
+- `~~pointblank.Validate.col_vals_token_len()` checks the length of each document in
   the tokens of a model's tokenizer (a Hugging Face tokenizer, a `tiktoken` encoding, or any
   function that splits text into tokens).
-- [`pb.text.no_pii()`](`pointblank.text.no_pii`) checks that the text has no email addresses, phone
+- `~~pointblank.Validate.col_vals_no_pii()` checks that the text has no email addresses, phone
   numbers, or credit card numbers (or other kinds of personal information, or patterns of your own).
 
 With real models, the first two look like this:
 
 ```{python}
 #| eval: false
-pb.text.in_language("text", expected="en", min_confidence=0.8)
-pb.text.token_length("text", tokenizer="tiktoken:cl100k_base", max_val=4096)
+(
+    pb.Validate(data=corpus)
+    .col_vals_in_language(columns="text", expected="en", min_confidence=0.8)
+    .col_vals_token_len(columns="text", tokenizer="tiktoken:cl100k_base", max_val=4096)
+)
 ```
 
 To keep this page self-contained, we'll use a function that guesses the language from a few common
@@ -157,9 +160,9 @@ def tokenize(text):
 
 validation = (
     pb.Validate(data=corpus, tbl_name="corpus")
-    .add_steps(pb.text.in_language("text", expected="en", backend=guess_language))
-    .add_steps(pb.text.token_length("text", tokenizer=tokenize, min_val=10, max_val=25))
-    .add_steps(pb.text.no_pii("text"))
+    .col_vals_in_language(columns="text", expected="en", backend=guess_language)
+    .col_vals_token_len(columns="text", tokenizer=tokenize, min_val=10, max_val=25)
+    .col_vals_no_pii(columns="text")
     .interrogate()
 )
 
@@ -167,7 +170,9 @@ validation
 ```
 
 The document in French fails step 1, the menu is too short for step 2, and the email address fails
-step 3. The checks of personal information are `~~pointblank.Validate.col_vals_regex()` steps, so
+step 3 (`col_vals_no_pii()` adds a step for each kind of personal information, so steps 4 and 5
+check for phone and credit card numbers). The checks of personal information are
+`~~pointblank.Validate.col_vals_regex()` steps, so
 they run on any backend, including in a database. Their patterns find likely matches rather than
 certain ones (a number with the shape of a credit card number matches, with no checksum), so for a
 thorough check, a model of named entities can be used with
@@ -262,7 +267,8 @@ find the bound of a scored step (like the number of words) that works best.
 
 ## Databases and PySpark
 
-The checks of `pb.text.no_pii()` are regular expressions, so they run on any backend. The other
+The checks of `~~pointblank.Validate.col_vals_no_pii()` are regular expressions, so they run on
+any backend. The other
 checks run in Python: a Polars or pandas table is checked as it is, and for a database table
 (through Ibis) or a PySpark DataFrame, the distinct values of the step's columns are collected,
 checked, and the results are joined back to the table on its own backend. With a large table, a
@@ -273,8 +279,10 @@ text.
 ## Conclusion
 
 Text data has its own kinds of problems, and Pointblank checks them with the same reports,
-thresholds, and actions as any other validation. The `pb.text` functions make bundles of steps for
-the heuristic quality filters, the language and length of the text, and personal information;
+thresholds, and actions as any other validation. The
+`~~pointblank.Validate.col_vals_text_quality()`, `~~pointblank.Validate.col_vals_in_language()`,
+`~~pointblank.Validate.col_vals_token_len()`, and `~~pointblank.Validate.col_vals_no_pii()` methods
+check the quality, language, and length of the text, and look for personal information;
 `~~pointblank.Validate.rows_near_distinct()` finds near duplicates;
 `~~pointblank.Validate.col_vals_chat_format()` checks conversations for fine-tuning; and
 `~~pointblank.Validate.rows_not_contaminated()` keeps benchmark questions out of the training data.

@@ -1,15 +1,25 @@
 # Text and RAG checks reference
 
-The `pb.text` and `pb.rag` functions return a `pb.Steps` bundle, added
-to a validation with `add_steps()`. All of them also take `pre=`,
-`thresholds=`, `actions=`, and `active=` (and most take `segments=` and
-`brief=`), applied to each step they make.
+The text checks are validation methods (on `Validate` and `pb.Steps`)
+that add ordinary steps: `col_vals_scored()` or `col_vals_regex()`
+steps, listed under those names in the report, each with a brief that
+says what it checks. They take `columns=` (a column or a list, with a
+set of steps for each) and also `pre=`, `segments=`, `thresholds=`,
+`actions=`, `brief=`, `active=`, and `dimension=`, applied to each step
+they add. By default, each step's brief is generated; a string `brief=`
+can include it as `"{auto}"`, and `brief=False` leaves it out. They work
+in YAML like any other method (plain settings only, so no function
+backends or tokenizers).
 
-## pb.text.heuristic_filters
+The `pb.rag` functions return a `pb.Steps` bundle, added to a
+validation with `add_steps()`. They take `pre=`, `segments=`,
+`thresholds=`, `actions=`, and `active=`.
+
+## col_vals_text_quality
 
 ```python
-pb.text.heuristic_filters(
-    column,
+.col_vals_text_quality(
+    columns,
     min_words=50, max_words=100_000,
     min_mean_word_length=3, max_mean_word_length=10,
     max_symbol_ratio=0.1,
@@ -19,6 +29,7 @@ pb.text.heuristic_filters(
     min_stop_words=2,
     max_repeated_lines=0.3,
     stop_words=None,
+    na_pass=True,
 )
 ```
 
@@ -37,15 +48,15 @@ The quality filters of the Gopher models (Rae et al., 2021), as eight
 | 8    | `repeated_lines`   | share of lines repeating an earlier line <= bound |
 
 Set a bound to `None` to drop its check (a two-bound check is dropped
-when both are `None`). Missing values pass, as do texts without the
-words or lines a check needs (step 1 catches those). The default stop
-words are `the be to of and that have with`; set `stop_words=` for
-other languages.
+when both are `None`). Missing values pass (`na_pass=True`), as do
+texts without the words or lines a check needs (step 1 catches
+those). The default stop words are `the be to of and that have with`;
+set `stop_words=` for other languages.
 
-## pb.text.no_pii
+## col_vals_no_pii
 
 ```python
-pb.text.no_pii(columns, entities=("email", "phone", "credit_card"), na_pass=True)
+.col_vals_no_pii(columns, entities=("email", "phone", "credit_card"), na_pass=True)
 ```
 
 One `col_vals_regex(inverse=True)` step per column and entity. The
@@ -65,11 +76,11 @@ and PySpark.
 patterns find likely matches; for names and addresses, use a named
 entity model through `col_vals_scored()`.
 
-## pb.text.in_language
+## col_vals_in_language
 
 ```python
-pb.text.in_language(
-    column,
+.col_vals_in_language(
+    columns,
     expected=None,            # "en" or ["en", "fr"]
     expected_column=None,     # or a column with each row's language
     min_confidence=0.5,
@@ -80,18 +91,23 @@ pb.text.in_language(
 )
 ```
 
-A `col_vals_scored()` step with the `pb.scorers.langid()` scorer. The
+One `col_vals_scored()` step per column, with the
+`pb.scorers.langid()` scorer. The
 `"langid"` backend needs the `langid` package and `"fasttext"` needs
 `fasttext`. A function backend takes a text and returns
 `{language: probability}` or `[(language, probability), ...]`. `"en"`
 matches `"en_US"`.
 
-## pb.text.token_length
+## col_vals_token_len
 
 ```python
-pb.text.token_length(column, tokenizer, min_val=None, max_val=None,
-                     na_pass=False, cache=True)
+.col_vals_token_len(columns, tokenizer, min_val=None, max_val=None,
+                    na_pass=False, cache=True)
 ```
+
+One `col_vals_scored()` step per column, with the
+`pb.scorers.token_count()` scorer. For a length in characters, use
+`col_vals_str_len()`.
 
 | Tokenizer                    | Needs          |
 |------------------------------|----------------|
@@ -176,7 +192,7 @@ pb.rag.corpus_checks(
 | Chunk has text     | always                       | `col_vals_regex`       |
 | Ids are unique     | `chunk_id=`                  | `rows_distinct`        |
 | Metadata present   | `metadata=` (one step each)  | `col_vals_not_null`    |
-| Token length       | `min_tokens=` or `max_tokens=` | `pb.text.token_length` |
+| Token length       | `min_tokens=` or `max_tokens=` | `col_vals_token_len`   |
 | No near duplicates | `near_duplicates=True`       | `rows_near_distinct`   |
 | Fresh enough       | `updated_at=` and `max_age=` | `col_vals_ge`          |
 

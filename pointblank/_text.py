@@ -1,7 +1,8 @@
 """
 The text engine of the text checks: normalization, word n-grams, MinHash with locality-sensitive
 hashing, near-duplicate clusters, n-gram matching against reference texts, the checks of chat
-conversations, and the statistics of the heuristic quality filters.
+conversations, the statistics of the heuristic quality filters, the patterns of personal
+information, and the briefs of the text checks that are made of other steps.
 
 Everything here is plain Python (NumPy, when it's installed, only makes MinHash faster: the
 signatures are the same with and without it), and deterministic: the MinHash permutations come
@@ -558,3 +559,147 @@ PII_DESCRIPTIONS = {
     "us_ssn": "US Social Security numbers",
     "iban": "IBANs",
 }
+
+
+def pii_patterns(entities: Any) -> dict[str, str]:
+    """
+    The patterns of the `entities=` of `col_vals_no_pii()`, by name: a list of the names of
+    built-in entities, or a dictionary of patterns (where `None` is the built-in pattern).
+    """
+    if isinstance(entities, str):
+        entities = [entities]
+    if isinstance(entities, Mapping):
+        patterns = {}
+        for name, pattern in entities.items():
+            if pattern is None:
+                if name not in PII_PATTERNS:
+                    raise ValueError(_unknown_entity(name))
+                pattern = PII_PATTERNS[name]
+            elif not isinstance(pattern, str) or not pattern:
+                raise TypeError(f"The pattern of the entity {name!r} must be a string.")
+            patterns[str(name)] = pattern
+    elif isinstance(entities, (list, tuple)):
+        for name in entities:
+            if name not in PII_PATTERNS:
+                raise ValueError(_unknown_entity(name))
+        patterns = {name: PII_PATTERNS[name] for name in entities}
+    else:
+        raise TypeError("`entities=` must be a list of entities or a dictionary of patterns.")
+    if not patterns:
+        raise ValueError("`entities=` is empty.")
+    return patterns
+
+
+def _unknown_entity(name: Any) -> str:
+    return f"Unknown entity {name!r}: it must be one of {', '.join(map(repr, PII_PATTERNS))}."
+
+
+def pii_brief(name: str, column: str) -> str:
+    what = PII_DESCRIPTIONS.get(name, f"values that look like `{name}`")
+    return f"No {what} in `{column}`."
+
+
+# ---------------------------------------------------------------------------------------------
+# The briefs and bounds of the text checks
+# ---------------------------------------------------------------------------------------------
+
+
+def check_bound(value: Any, param: str) -> None:
+    if value is not None and (isinstance(value, bool) or not isinstance(value, (int, float))):
+        raise TypeError(f"`{param}=` must be a number or `None`, got {type(value).__name__}.")
+
+
+def _number(value: float) -> str:
+    return f"{value:g}" if isinstance(value, float) else f"{value:,}"
+
+
+def describe_bounds(low: Any, high: Any, unit: str, units: str) -> str:
+    """
+    The bounds of a count, like "between 3 and 10 words", "at least 1 word", or "at most 4,096
+    words" (the unit agrees with the number next to it).
+    """
+    if low is not None and high is not None:
+        bound = f"between {_number(low)} and {_number(high)}"
+    elif low is not None:
+        bound = f"at least {_number(low)}"
+    else:
+        bound = f"at most {_number(high)}"
+    last = high if high is not None else low
+    return f"{bound} {unit if last == 1 else units}"
+
+
+def _capitalize(text: str) -> str:
+    return text[0].upper() + text[1:]
+
+
+def text_quality_rules(bounds: dict[str, Any]) -> list[tuple[str, Any, Any, str]]:
+    """
+    The checks of `col_vals_text_quality()`, from its bounds: a list of the statistic, its
+    bounds, and the start of the brief of each check that isn't left out.
+    """
+    for param, value in bounds.items():
+        check_bound(value, param)
+    for low, high in (("min_words", "max_words"), ("min_mean_word_length", "max_mean_word_length")):
+        if bounds[low] is not None and bounds[high] is not None and bounds[low] > bounds[high]:
+            raise ValueError(f"`{low}=` must not be greater than `{high}=`.")
+
+    def share(value: float) -> str:
+        return f"{value:.0%}"
+
+    min_words, max_words = bounds["min_words"], bounds["max_words"]
+    min_length, max_length = bounds["min_mean_word_length"], bounds["max_mean_word_length"]
+    max_symbol_ratio = bounds["max_symbol_ratio"]
+    max_bullet_lines = bounds["max_bullet_lines"]
+    max_ellipsis_lines = bounds["max_ellipsis_lines"]
+    min_alpha_words = bounds["min_alpha_words"]
+    min_stop_words = bounds["min_stop_words"]
+    max_repeated_lines = bounds["max_repeated_lines"]
+
+    rules = []
+    if min_words is not None or max_words is not None:
+        brief = _capitalize(describe_bounds(min_words, max_words, "word", "words"))
+        rules.append(("word_count", min_words, max_words, brief))
+    if min_length is not None or max_length is not None:
+        brief = "A mean word length of " + describe_bounds(
+            min_length, max_length, "character", "characters"
+        )
+        rules.append(("mean_word_length", min_length, max_length, brief))
+    if max_symbol_ratio is not None:
+        brief = f"At most {_number(max_symbol_ratio)} hash symbols and ellipses for each word"
+        rules.append(("symbol_ratio", None, max_symbol_ratio, brief))
+    if max_bullet_lines is not None:
+        brief = f"At most {share(max_bullet_lines)} of the lines start with a bullet point"
+        rules.append(("bullet_lines", None, max_bullet_lines, brief))
+    if max_ellipsis_lines is not None:
+        brief = f"At most {share(max_ellipsis_lines)} of the lines end with an ellipsis"
+        rules.append(("ellipsis_lines", None, max_ellipsis_lines, brief))
+    if min_alpha_words is not None:
+        brief = f"At least {share(min_alpha_words)} of the words have a letter"
+        rules.append(("alpha_words", min_alpha_words, None, brief))
+    if min_stop_words is not None:
+        brief = _capitalize(
+            describe_bounds(min_stop_words, None, "distinct stop word", "distinct stop words")
+        )
+        rules.append(("stop_words", min_stop_words, None, brief))
+    if max_repeated_lines is not None:
+        brief = f"At most {share(max_repeated_lines)} of the lines repeat an earlier line"
+        rules.append(("repeated_lines", None, max_repeated_lines, brief))
+    return rules
+
+
+def language_brief(
+    column: str, expected: Any, expected_column: str | None, min_confidence: Any
+) -> str:
+    if expected_column is not None:
+        language = f"the language of `{expected_column}`"
+    else:
+        codes = [expected] if isinstance(expected, str) else list(expected)
+        language = " or ".join(f"`{code}`" for code in codes)
+    return (
+        f"The text of `{column}` is in {language} "
+        f"(probability of at least {_number(min_confidence)})."
+    )
+
+
+def token_length_brief(column: str, min_val: Any, max_val: Any) -> str:
+    return _capitalize(describe_bounds(min_val, max_val, "token", "tokens")) + f" in `{column}`."

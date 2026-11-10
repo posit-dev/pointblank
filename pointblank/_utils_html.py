@@ -139,7 +139,7 @@ def _create_steps_html(steps_obj: Steps) -> str:
     for i, step in enumerate(steps_obj._steps, start=1):
         kwargs_parts = []
         for k, v in step.kwargs.items():
-            if steps_obj._is_default(k, v):
+            if steps_obj._is_default(k, v, step.method):
                 continue
             v_repr = html_module.escape(repr(v))
             kwargs_parts.append(

@@ -73,7 +73,7 @@ can be left out when the step has one column.
 | Adapter | Scores | Needs |
 |---------|--------|-------|
 | `text_stat(stat, stop_words=None)` | A text statistic (below) | nothing |
-| `token_count(tokenizer)` | Number of tokens | depends on the tokenizer (see `token_length`) |
+| `token_count(tokenizer)` | Number of tokens | depends on the tokenizer (see `col_vals_token_len()`) |
 | `langid(expected=, expected_column=, backend="langid", model=None)` | Probability of the expected language(s) | `langid`, or `fasttext` + `model=`, or a function |
 | `embedding_similarity(reference, embedder)` | Cosine similarity to the closest reference text | `sentence-transformers` for a model name; or an object with `encode()`; or a function of a list of texts returning vectors |
 | `classifier(hf_model, label=None, function_to_apply=None, device=None)` | A text classifier's score for `label=` (no label for one-output models) | `transformers` + a backend for a model name; or a pipeline |

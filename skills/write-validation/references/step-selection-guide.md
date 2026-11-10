@@ -52,10 +52,10 @@ don't accept boolean columns; use `col_vals_expr()` as above.
 
 | Concern                     | Method                                    |
 |-----------------------------|-------------------------------------------|
-| Gopher quality filters      | `add_steps(pb.text.heuristic_filters("text"))` |
-| In the expected language    | `add_steps(pb.text.in_language("text", expected="en"))` |
-| Length in model tokens      | `add_steps(pb.text.token_length("text", tokenizer=..., max_val=4096))` |
-| No emails/phones/card nums  | `add_steps(pb.text.no_pii("text"))`       |
+| Gopher quality filters      | `col_vals_text_quality(columns="text")`   |
+| In the expected language    | `col_vals_in_language(columns="text", expected="en")` |
+| Length in model tokens      | `col_vals_token_len(columns="text", tokenizer=..., max_val=4096)` |
+| No emails/phones/card nums  | `col_vals_no_pii(columns="text")`         |
 | No near duplicates          | `rows_near_distinct(columns="text")`      |
 | Model/function score bound  | `col_vals_scored(columns, scorer, min_val)` |
 | Chat messages well formed   | `col_vals_chat_format(columns="messages")` |
