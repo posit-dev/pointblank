@@ -500,13 +500,25 @@ def _serialization_cases(ref_path):
         "col_vals_scored": lambda v: v.col_vals_scored(
             columns="b", scorer=lambda batch: [len(row["b"]) for row in batch], min_val=3
         ),
+        "col_vals_text_quality": lambda v: v.col_vals_text_quality(
+            columns="b", min_words=1, max_mean_word_length=None, dimension="quality"
+        ),
+        "col_vals_in_language": lambda v: v.col_vals_in_language(
+            columns="b", expected="en", backend=lambda text: {"en": 0.9}
+        ),
+        "col_vals_token_len": lambda v: v.col_vals_token_len(
+            columns="b", tokenizer="whitespace", min_val=1, brief="{auto} ({step})"
+        ),
+        "col_vals_no_pii": lambda v: v.col_vals_no_pii(columns=["b", "f"], entities=["email"]),
     }
 
 
 # Methods whose plans can't be fully serialized (callables, or LLM calls at interrogation), so
 # only the rebuilt plan's structure is compared (a `col_vals_scored()` step with an adapter of
 # `pb.scorers` round-trips in full; that's tested in `test_scorers.py`, with a fake model)
-_LOSSY_METHODS = {"col_vals_expr", "conjointly", "specially", "prompt", "col_vals_scored"}
+_LOSSY_METHODS = {
+    "col_vals_expr", "conjointly", "specially", "prompt", "col_vals_scored", "col_vals_in_language",
+}  # fmt: skip
 
 # Public `Validate` methods that don't add validation steps
 _NON_STEP_METHODS = {
@@ -571,8 +583,8 @@ def test_every_validation_method_serializes(method, interrogated, small_table, r
     if not lossy:
         assert not messages, messages
 
-    if method == "col_vals_scored":
-        # A function scorer is written as the placeholder `your_scorer`, to be replaced by hand
+    if method in ("col_vals_scored", "col_vals_in_language"):
+        # A function scorer (or language backend) is written as the placeholder `your_scorer`, to be replaced by hand
         assert any("your_scorer" in m for m in messages), messages
         code = code.replace("your_scorer", "lambda batch: [1] * len(batch)")
         yaml_str = yaml_str.replace("your_scorer", "'lambda batch: [1] * len(batch)'")
