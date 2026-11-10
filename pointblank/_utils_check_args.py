@@ -109,6 +109,37 @@ def _check_value_float_int(value: float | int | Any) -> None:
         raise ValueError("`value=` must be a float, integer, or reference to a column.")
 
 
+def _check_not_reference_column(value: Any, param_name: str) -> None:
+    """
+    Check that a comparison value isn't a column of the reference table.
+
+    A `ref()` value is only supported by the aggregate methods (like `col_sum_eq()`), which compare
+    a single aggregate value of the target table with that of the reference table. A row-wise
+    comparison method can't use it, since the rows of the two tables don't line up.
+
+    Parameters
+    ----------
+    value
+        The comparison value to check.
+    param_name
+        The name of the parameter being checked. This is used in the error message.
+
+    Raises
+    ------
+    TypeError
+        When `value` is a `ref()` column.
+    """
+    from pointblank.column import ReferenceColumn
+
+    if isinstance(value, ReferenceColumn):
+        raise TypeError(
+            f"`{param_name}=` can't be a reference column (`ref({value.column_name!r})`) in a "
+            "row-wise comparison. To compare an aggregate of a column with the reference table, "
+            "use an aggregate method like `col_sum_eq()` or `col_avg_ge()`; to compare with "
+            "another column of the same table, use `col()`."
+        )
+
+
 def _check_set_types(set: list[float | int | str]) -> None:
     """
     Check that input value of the `set=` parameter is a list of floats, integers, or strings.
