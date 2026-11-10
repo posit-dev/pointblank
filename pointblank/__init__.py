@@ -94,7 +94,6 @@ from pointblank.pipeline import ContractViolationError, Pipeline, PipelineResult
 from pointblank.preprocessing import row_preserving
 from pointblank.ablation import Ablation, AblationVariant
 from pointblank import scorers
-from pointblank import text
 from pointblank import rag
 from pointblank.schema import Schema, generate_dataset, schema_from_tbl
 from pointblank.segments import seg_group
@@ -174,7 +173,6 @@ __all__ = [
     "Ablation",
     "AblationVariant",
     "scorers",
-    "text",
     "rag",
     "check_splits",
     "SplitCheck",
