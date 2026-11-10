@@ -585,6 +585,74 @@ def test_mixed_backends(tbl_kind, ref_kind):
     assert v.n_failed(i=1, scalar=True) == 2
 
 
+@pytest.mark.parametrize("na_pass, n_passed", [(False, 2), (True, 3)])
+@pytest.mark.parametrize("ref_kind", _BACKEND_KINDS)
+@pytest.mark.parametrize("tbl_kind", _BACKEND_KINDS)
+def test_mixed_backends_null_in_ref(tbl_kind, ref_kind, na_pass, n_passed):
+    """A null key isn't found in a reference column that has nulls too (it passes via `na_pass=`)."""
+    tbl = _table_on(tbl_kind, pl.DataFrame({"k": [1, 2, 3, None]}), "tbl")
+    ref = _table_on(ref_kind, pl.DataFrame({"k": [1, 2, None]}), "ref")
+
+    v = pb.Validate(data=tbl).col_vals_in_table(
+        columns="k", ref_table=ref, ref_column="k", na_pass=na_pass
+    )
+    v = v.interrogate()
+
+    assert v.n_passed(i=1, scalar=True) == n_passed
+    assert v.n_failed(i=1, scalar=True) == 4 - n_passed
+
+
+@pytest.mark.parametrize("na_pass, n_passed", [(False, 2), (True, 3)])
+@pytest.mark.parametrize("kind", _BACKEND_KINDS)
+def test_null_string_key_with_null_in_ref(kind, na_pass, n_passed):
+    tbl = _table_on(kind, pl.DataFrame({"k": ["a", "b", "c", None]}), "tbl")
+    ref = _table_on(kind, pl.DataFrame({"k": ["a", "b", None]}), "ref")
+
+    v = pb.Validate(data=tbl).col_vals_in_table(
+        columns="k", ref_table=ref, ref_column="k", na_pass=na_pass
+    )
+    v = v.interrogate()
+
+    assert v.n_passed(i=1, scalar=True) == n_passed
+    assert v.n_failed(i=1, scalar=True) == 4 - n_passed
+
+
+@pytest.mark.parametrize("na_pass, n_passed", [(False, 1), (True, 3)])
+@pytest.mark.parametrize("kind", _BACKEND_KINDS)
+def test_nan_key_is_missing(kind, na_pass, n_passed):
+    """`NaN` is a missing key on every backend, as in the comparison methods (pandas stores nulls
+    as `NaN`), so it isn't found even in a reference column that has a `NaN`."""
+    tbl = _table_on(kind, pl.DataFrame({"k": [1.0, 2.0, float("nan"), None]}), "tbl")
+    ref = _table_on(kind, pl.DataFrame({"k": [1.0, float("nan")]}), "ref")
+
+    v = pb.Validate(data=tbl).col_vals_in_table(
+        columns="k", ref_table=ref, ref_column="k", na_pass=na_pass
+    )
+    v = v.interrogate()
+
+    assert v.n_passed(i=1, scalar=True) == n_passed
+    assert v.n_failed(i=1, scalar=True) == 4 - n_passed
+
+
+@pytest.mark.parametrize("na_pass, n_passed", [(False, 1), (True, 3)])
+@pytest.mark.parametrize("kind", _BACKEND_KINDS)
+def test_composite_key_nan_is_missing(kind, na_pass, n_passed):
+    """A composite key with a `NaN` or null part isn't found; an all-missing key passes with
+    `na_pass=True`."""
+    nan = float("nan")
+    df = pl.DataFrame({"a": [1.0, nan, nan, None, 5.0], "b": [1.0, nan, 2.0, None, None]})
+    tbl = _table_on(kind, df, "tbl")
+    ref = _table_on(kind, df, "ref")
+
+    v = pb.Validate(data=tbl).col_vals_in_table(
+        columns=["a", "b"], ref_table=ref, ref_column=["a", "b"], na_pass=na_pass
+    )
+    v = v.interrogate()
+
+    assert v.n_passed(i=1, scalar=True) == n_passed
+    assert v.n_failed(i=1, scalar=True) == 5 - n_passed
+
+
 def test_failed_ref_conversion_is_eval_error():
     """A reference table that can't be materialized is an evaluation error, not a crash."""
     from unittest.mock import patch

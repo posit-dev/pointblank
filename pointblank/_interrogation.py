@@ -459,6 +459,16 @@ class SpeciallyValidation:
             else:  # pragma: no cover
                 raise NotImplementedError(f"Support for {tbl_type} is not yet implemented")
 
+            # A null result (e.g., from `pl.col("a") > 1` where `a` is null) is neither `True` nor
+            # `False`, so it would be left out of both the passing and the failing counts; it is a
+            # failing test unit, as in `col_vals_expr()` and `conjointly()`
+            if "pb_is_good_" in result.columns:
+                result = (
+                    nw.from_native(result)
+                    .with_columns(pb_is_good_=nw.col("pb_is_good_").fill_null(False))
+                    .to_native()
+                )
+
         elif isinstance(result, bool):
             # If it's a single boolean, return that as a list
             return [result]
@@ -1355,9 +1365,12 @@ def interrogate_in_table(
         ref_values = ref_unique.get_column(ref_col_name).to_list()
         ref_values_clean = [v for v in ref_values if v is not None]
 
-        expr: nw.Expr = _is_in(col_name, ref_values_clean, tbl_schema[col_name])
-        if na_pass:
-            expr = expr | nw.col(col_name).is_null()
+        # A missing key (null, or `NaN` as in the comparison methods) never counts as found, even
+        # when the reference column has missing values too: pandas stores those as `NaN`, which
+        # `is_in()` would match; so it passes only with `na_pass=True`, on every backend
+        in_ref = _is_in(col_name, ref_values_clean, tbl_schema[col_name]).fill_null(False)
+        is_missing = _safe_is_nan_or_null_expr(nw_tbl, nw.col(col_name), col_name)
+        expr: nw.Expr = (in_ref & ~is_missing) | (is_missing & na_pass)
 
         result_tbl = nw_tbl.with_columns(pb_is_good_=expr)
         return result_tbl.to_native()
@@ -1397,12 +1410,18 @@ def interrogate_in_table(
     # so it is cast to make it a proper boolean column
     matched_series = joined.get_column("__pb_ref_matched__").fill_null(value=False).cast(nw.Boolean)
 
+    # As with a single column, a key with a missing value never counts as found (the joins of
+    # Polars and DuckDB match `NaN` to `NaN`, while pandas treats it as null); a key that is
+    # missing altogether passes with `na_pass=True`
+    is_missing = [_safe_is_nan_or_null_expr(nw_tbl, nw.col(c), c) for c in columns]
+    missing_flags = nw_tbl.select(
+        nw.any_horizontal(*is_missing, ignore_nulls=False).alias("__pb_any_missing__"),
+        nw.all_horizontal(*is_missing, ignore_nulls=False).alias("__pb_all_missing__"),
+    )
+    matched_series = matched_series & ~missing_flags.get_column("__pb_any_missing__")
+
     if na_pass:
-        all_null = nw.all_horizontal(*[nw.col(c).is_null() for c in columns], ignore_nulls=False)
-        all_null_series = nw_tbl.select(all_null.alias("__pb_all_null__")).get_column(
-            "__pb_all_null__"
-        )
-        matched_series = matched_series | all_null_series
+        matched_series = matched_series | missing_flags.get_column("__pb_all_missing__")
 
     result_tbl = nw_tbl.with_columns(pb_is_good_=matched_series)
     return result_tbl.to_native()

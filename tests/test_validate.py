@@ -6168,6 +6168,61 @@ def test_specially_simple_validation_duckdb() -> None:
     assert validation.n_failed(i=1, scalar=True) == 0
 
 
+def test_specially_null_results_fail() -> None:
+    """A row where the returned boolean column is null fails, as in `col_vals_expr()`."""
+    data = {"a": [1.0, 2.0, None, 5.0, 2.0]}
+
+    tbls_fns = [
+        (pl.DataFrame(data), lambda df: df.select(pl.col("a") > 1)),
+        (pl.LazyFrame(data), lambda df: df.select(pl.col("a") > 1)),
+        (pl.DataFrame(data), lambda df: nw.from_native(df).select(nw.col("a") > 1).to_native()),
+        (
+            pd.DataFrame({"a": pd.array(data["a"], dtype="Float64")}),
+            lambda df: df.assign(ok=df["a"] > 1),
+        ),
+        (
+            pd.DataFrame({"a": pd.array([1, 2, None, 5, 2], dtype="Int64")}),
+            lambda df: df[["a"]] > 1,
+        ),
+        (
+            ibis.duckdb.connect().create_table("tbl", pl.DataFrame(data)),
+            lambda t: t.mutate(ok=t.a > 1),
+        ),
+        (ibis.memtable(pl.DataFrame(data)), lambda t: t.select(ok=t.a > 1)),
+    ]
+
+    for tbl, fn in tbls_fns:
+        validation = Validate(data=tbl).specially(expr=fn).interrogate()
+
+        assert validation.n(i=1, scalar=True) == 5
+        assert validation.n_passed(i=1, scalar=True) == 3
+        assert validation.n_failed(i=1, scalar=True) == 2
+        assert validation.f_passed(i=1, scalar=True) == pytest.approx(0.6)
+        assert validation.f_failed(i=1, scalar=True) == pytest.approx(0.4)
+
+    # Where the null results are the only ones that aren't `True`, the step isn't a pass
+    tbl = pl.DataFrame({"a": [5.0, 6.0, None]})
+    validation = (
+        Validate(data=tbl)
+        .specially(expr=lambda df: df.select(pl.col("a") > 1), thresholds=1)
+        .interrogate()
+    )
+
+    assert validation.n_failed(i=1, scalar=True) == 1
+    assert not validation.all_passed()
+    assert validation.warning(i=1, scalar=True)
+
+    # Allowing for the nulls in the function itself lets those rows pass
+    validation = (
+        Validate(data=tbl)
+        .specially(expr=lambda df: df.select((pl.col("a") > 1) | pl.col("a").is_null()))
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 3
+    assert validation.all_passed()
+
+
 def test_specially_advanced_validation() -> None:
     tbl = pl.DataFrame({"a": [5, 7, 1, 3, 9, 4], "b": [6, 3, 0, 5, 8, 2]})
 

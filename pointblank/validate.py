@@ -17044,8 +17044,10 @@ class Validate:
             The column (or list of columns for composite keys) in the reference table to check
             against. Must have the same length as ``columns``.
         na_pass
-            If `True`, rows where the key column(s) are null will pass. If `False` (default), null
-            key values are treated as failing (not found in reference).
+            If `True`, rows where the key column(s) are null (or `NaN`) will pass. If `False`
+            (default), null key values are treated as failing (not found in reference), even when
+            the reference column(s) have null values too. A composite key with only some of its
+            columns null always fails.
         pre
             An optional preprocessing function to apply to the data table before validation.
         thresholds
@@ -18154,6 +18156,11 @@ class Validate:
         rows in the data table (if returning a table with boolean values). If returning a scalar
         boolean value, the validation will operate over a single test unit. For a return of a list
         of boolean values, the length of the list constitutes the number of test units.
+
+        When a table is returned, a row where the final column has a missing value (e.g.,
+        `pl.col("a") > 1` when `a` is null) counts as a failing test unit, as in
+        [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`). To let such rows pass, allow for
+        them in the function itself, as in `(pl.col("a") > 1) | pl.col("a").is_null()`.
 
         Parameters
         ----------

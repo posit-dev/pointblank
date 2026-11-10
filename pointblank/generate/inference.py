@@ -90,6 +90,14 @@ _NAME_TO_PRESET: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"(?:^|_)(?:currency|curr|cy)(?:$|_)"), "currency_code"),
 ]
 
+# Presets matched on the column name alone whose values are not personal data. A column that
+# matches one of these but holds a small set of repeated values (e.g., a `region` column with
+# three sales regions) is a categorical column, so its values are kept as `allowed=` instead of
+# being replaced by the preset.
+_CATEGORICAL_PRESETS: frozenset[str] = frozenset(
+    {"state", "city", "country", "country_code_2", "currency_code", "company", "job"}
+)
+
 # Column-name patterns that indicate a role (not a preset) — used for
 # inferring uniqueness and ID-like behavior on non-string columns too.
 _ID_COLUMN_RE = re.compile(
@@ -298,6 +306,14 @@ def _infer_string_field(
 ) -> StringField:
     """Infer a StringField from observed string values."""
     non_null = [str(v) for v in values if v is not None]
+    unique_count = len(set(non_null))
+    threshold = (
+        categorical_threshold
+        if isinstance(categorical_threshold, int)
+        else int(categorical_threshold * total_count)
+    )
+    # A small set of values with at least one repeat is categorical
+    is_categorical = unique_count <= threshold and unique_count < len(non_null)
 
     kwargs: dict[str, Any] = {}
 
@@ -305,6 +321,10 @@ def _infer_string_field(
     if detect_presets and non_null:
         sample = non_null[:200]  # sample for validation
         preset = _detect_preset(col_name, sample)
+        # A name-matched, non-personal preset gives way to the observed values when the column
+        # is categorical (e.g., a `region` column with three repeated values)
+        if preset in _CATEGORICAL_PRESETS and is_categorical:
+            preset = None
         if preset is not None:
             kwargs["preset"] = preset
             # When using a preset, skip length/allowed inference
@@ -317,12 +337,6 @@ def _infer_string_field(
 
     # Categorical detection
     if non_null:
-        unique_count = len(set(non_null))
-        threshold = (
-            categorical_threshold
-            if isinstance(categorical_threshold, int)
-            else int(categorical_threshold * total_count)
-        )
         if unique_count <= threshold:
             kwargs["allowed"] = sorted(set(non_null))
         else:

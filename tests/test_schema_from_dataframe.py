@@ -172,6 +172,94 @@ class TestStringInference:
         assert field.unique is True
 
 
+class TestCategoricalOverPreset:
+    """Name-matched place/organization presets give way to a small set of repeated values."""
+
+    def test_low_cardinality_columns_keep_their_values(self):
+        values = ["nord", "centro", "sud"] * 50
+        df = pl.DataFrame({name: values for name in ["region", "city", "company", "zona"]})
+        schema = Schema.from_table(df, categorical_threshold=20)
+        for name in ["region", "city", "company", "zona"]:
+            field = _get_field(schema, name)
+            assert isinstance(field, StringField)
+            assert field.preset is None
+            assert field.allowed == ["centro", "nord", "sud"]
+
+    @pytest.mark.parametrize(
+        "col_name, preset",
+        [
+            ("state", "state"),
+            ("country", "country"),
+            ("ctry", "country_code_2"),
+            ("currency", "currency_code"),
+            ("job_title", "job"),
+        ],
+    )
+    def test_each_place_or_organization_preset_defers(self, col_name, preset):
+        values = ["AA", "BB", "CC"] * 10
+        assert _detect_preset(col_name, values) == preset
+        schema = Schema.from_table(pl.DataFrame({col_name: values}))
+        field = _get_field(schema, col_name)
+        assert field.preset is None
+        assert field.allowed == ["AA", "BB", "CC"]
+
+    def test_personal_presets_are_kept(self):
+        """Repeated person names are not copied into `allowed=`."""
+        df = pl.DataFrame(
+            {
+                "product_name": ["Widget", "Gadget", "Gizmo"] * 50,
+                "first_name": ["Ann", "Bob", "Cy"] * 50,
+                "email": ["a@x.com", "b@x.com", "c@x.com"] * 50,
+            }
+        )
+        schema = Schema.from_table(df)
+        assert _get_field(schema, "product_name").preset == "name"
+        assert _get_field(schema, "first_name").preset == "first_name"
+        assert _get_field(schema, "email").preset == "email"
+        for name in ["product_name", "first_name", "email"]:
+            assert _get_field(schema, name).allowed is None
+
+    def test_many_distinct_values_keep_the_preset(self):
+        """Above the categorical threshold the name-matched preset still applies."""
+        values = [f"State {i}" for i in range(30)] * 2
+        schema = Schema.from_table(pl.DataFrame({"state": values}), categorical_threshold=20)
+        field = _get_field(schema, "state")
+        assert field.preset == "state"
+        assert field.allowed is None
+
+    def test_all_distinct_values_keep_the_preset(self):
+        """Few rows without any repeated value are not categorical."""
+        values = ["Rome", "Paris", "Oslo", "Lima", "Kyiv"]
+        schema = Schema.from_table(pl.DataFrame({"city": values}))
+        field = _get_field(schema, "city")
+        assert field.preset == "city"
+        assert field.unique is True
+        assert field.allowed is None
+
+    def test_fractional_threshold_and_nulls(self):
+        values = ["EUR", "USD", None, "EUR", "USD", "EUR", "USD", "EUR", "USD", "EUR"]
+        schema = Schema.from_table(pl.DataFrame({"currency": values}), categorical_threshold=0.3)
+        field = _get_field(schema, "currency")
+        assert field.preset is None
+        assert field.allowed == ["EUR", "USD"]
+        assert field.nullable is True
+        assert field.null_probability == pytest.approx(0.1, abs=0.01)
+
+    def test_pandas_table(self):
+        df = pd.DataFrame({"region": ["north", "south"] * 20})
+        schema = Schema.from_table(df)
+        field = _get_field(schema, "region")
+        assert field.preset is None
+        assert field.allowed == ["north", "south"]
+
+    def test_detect_presets_false_unchanged(self):
+        df = pl.DataFrame({"region": ["north", "south"] * 20})
+        schema = Schema.from_table(df, detect_presets=False)
+        field = _get_field(schema, "region")
+        assert field.preset is None
+        assert field.allowed == ["north", "south"]
+
+
 # ---------------------------------------------------------------------------
 # Boolean inference
 # ---------------------------------------------------------------------------
