@@ -154,7 +154,7 @@ ul.task-list li input[type="checkbox"] {
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="503" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="506" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -640,6 +640,10 @@ ul.task-list li input[type="checkbox"] {
 
 <p>This page explains the terms used throughout the Pointblank documentation, in alphabetical order. Where a term matches something in Pointblank’s API, the name of the class, function, or method is shown in <code>code</code>. Terms in <strong>bold</strong> have their own entry on this page.</p>
 <dl>
+<dt>Ablation</dt>
+<dd>
+An experiment that measures whether the rows failing a <strong>validation step</strong> actually matter to a model trained on the data. The <a href="../../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> class takes an interrogated validation and an <code>evaluate=</code> function that you write, which trains and scores your model on a version of the table. Methods such as <a href="../../reference/Ablation.drop_each.html#pointblank.Ablation.drop_each" class="gdls-link gdls-code">Ablation.drop_each()</a> add <em>variants</em> (versions of the table with some failing rows removed), and <a href="../../reference/Ablation.run.html#pointblank.Ablation.run" class="gdls-link gdls-code">Ablation.run()</a> evaluates them. Each variant is compared with a <em>control</em> that removes the same number of rows at random, and gets a verdict: it <em>helps</em>, <em>hurts</em>, or is <em>inconclusive</em>. A step whose rows help on their own but add nothing once the other steps’ rows are removed is <em>redundant</em>. An ablation can also be written in a <strong>YAML workflow</strong> and loaded with <a href="../../reference/yaml_ablation.html#pointblank.yaml_ablation" class="gdls-link gdls-code">yaml_ablation()</a>. See also <strong>sweep</strong>, <strong>defect injection</strong>, <strong>Shapley value</strong>, and <strong>holdout data</strong>. <a href="../../user-guide/post-interrogation/data-ablation.html">Learn more</a>.
+</dd>
 <dt>Action</dt>
 <dd>
 Something Pointblank does when a step’s failures reach a <strong>threshold</strong> level, such as printing a message or running a function you supply. You set actions with the <a href="../../reference/Actions.html#pointblank.Actions" class="gdls-link gdls-code">Actions</a> class, either for the whole validation (<code>Validate(actions=...)</code>) or for a single step. Messages can include placeholders like <code>{step}</code>, <code>{col}</code>, and <code>{level}</code>, which are filled in when the action runs. By default, only the action for the most serious level reached is run. Inside a function used as an action, <a href="../../reference/get_action_metadata.html#pointblank.get_action_metadata" class="gdls-link gdls-code">get_action_metadata()</a> gives details such as the step number, the column, and the level reached. See also <strong>final action</strong>. <a href="../../user-guide/validation-plan/actions.html">Learn more</a>.
@@ -658,7 +662,7 @@ A check on a summary of a whole column, such as its sum, average, or standard de
 </dd>
 <dt>AI check</dt>
 <dd>
-A <strong>validation step</strong> where a large language model (LLM) reads each row and judges whether it follows a rule you describe in plain words. This helps with rules that are hard to write as code, like “the description should mention the product’s color”. Added with <a href="../../reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt()</a>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
+A <strong>validation step</strong> where a large language model (LLM) reads each row and judges whether it follows a rule you describe in plain words. This helps with rules that are hard to write as code, like “the description should mention the product’s color”. Added with <a href="../../reference/Validate.prompt.html#pointblank.Validate.prompt" class="gdls-link gdls-code">prompt()</a>. With a list of models in <code>model=</code>, each model judges every row and their verdicts are combined by a vote (<code>aggregate=</code>). To see how far to trust the step, label some rows yourself and compare them with its results using <a href="../../reference/Validate.calibrate_prompt.html#pointblank.Validate.calibrate_prompt" class="gdls-link gdls-code">calibrate_prompt()</a>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
 </dd>
 <dt>AI Validation Editor</dt>
 <dd>
@@ -666,7 +670,7 @@ A tool that changes an existing <strong>validation plan</strong> based on a plai
 </dd>
 <dt>Assertion</dt>
 <dd>
-A way to stop your code when data doesn’t pass validation. After building a plan, call <a href="../../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" class="gdls-link gdls-code">assert_passing()</a> to raise an error if any <strong>test unit</strong> failed, or <a href="../../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="gdls-link gdls-code">assert_below_threshold()</a> to raise an error if a <strong>threshold</strong> level was reached. Both run <strong>interrogation</strong> first if it hasn’t happened yet. This is handy in data pipelines and tests. There’s also <a href="../../reference/Validate.assert_dimension_scores.html#pointblank.Validate.assert_dimension_scores" class="gdls-link gdls-code">assert_dimension_scores()</a>, which raises an error if the score for any <strong>quality dimension</strong> is below a minimum you set. If you’d rather get <code>True</code> or <code>False</code> than an error, use a <strong>status check</strong>. <a href="../../user-guide/advanced-validation/assertions.html">Learn more</a>.
+A way to stop your code when data doesn’t pass validation. After building a plan, call <a href="../../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" class="gdls-link gdls-code">assert_passing()</a> to raise an error if any <strong>test unit</strong> failed, or <a href="../../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" class="gdls-link gdls-code">assert_below_threshold()</a> to raise an error if a <strong>threshold</strong> level was reached. Both run <strong>interrogation</strong> first if it hasn’t happened yet. This is handy in data pipelines and tests. There’s also <a href="../../reference/Validate.assert_dimension_scores.html#pointblank.Validate.assert_dimension_scores" class="gdls-link gdls-code">assert_dimension_scores()</a>, which raises an error if the score for any <strong>quality dimension</strong> is below a minimum you set (in every <strong>segment</strong>, with <code>by=</code>). If you’d rather get <code>True</code> or <code>False</code> than an error, use a <strong>status check</strong>. <a href="../../user-guide/advanced-validation/assertions.html">Learn more</a>.
 </dd>
 <dt>Assistant</dt>
 <dd>
@@ -687,6 +691,10 @@ A short description of what a <strong>validation step</strong> checks, shown in 
 <dt>CDISC (Clinical Data Interchange Standards Consortium)</dt>
 <dd>
 The organization that sets data standards for clinical trials, including <strong>SDTM</strong>, <strong>ADaM</strong>, and <strong>Define-XML</strong>. Pointblank can read CDISC metadata, check that datasets have the expected structure, and check a set of trial datasets against CDISC’s rules. It can do that last part with its own built-in rules (<a href="../../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link gdls-code">validate_sdtmig()</a>) or by running the <strong>CORE</strong> engine. <a href="../../user-guide/metadata-import/cdisc-validation.html">Learn more</a>.
+</dd>
+<dt>Chat format check</dt>
+<dd>
+A check that each row holds a well-formed conversation for training a chat model: a list of messages (or JSON text), each with a known role and some content, with the roles in a sensible order. Added with <a href="../../reference/Validate.col_vals_chat_format.html#pointblank.Validate.col_vals_chat_format" class="gdls-link gdls-code">col_vals_chat_format()</a>. The <strong>step report</strong> gives the problem with each failing row. <a href="../../user-guide/advanced-validation/text-checks.html#chat-conversations">Learn more</a>.
 </dd>
 <dt>CLI (command-line interface)</dt>
 <dd>
@@ -718,7 +726,7 @@ See <strong>table comparison</strong>.
 </dd>
 <dt>Composable steps</dt>
 <dd>
-A reusable set of <strong>validation steps</strong> that isn’t tied to any particular table. You build the set with the <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> class, using the same method names as <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a>, and add it to any validation with <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">Validate.add_steps()</a>. This lets you write common checks once and reuse them for many tables. <a href="../../user-guide/advanced-validation/composable-steps.html">Learn more</a>.
+A reusable set of <strong>validation steps</strong> that isn’t tied to any particular table. You build the set with the <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> class, using the same method names as <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a>, and add it to any validation with <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">Validate.add_steps()</a>. This lets you write common checks once and reuse them for many tables. Some Pointblank functions make a set of steps for you (see <strong>step bundle</strong>). <a href="../../user-guide/advanced-validation/composable-steps.html">Learn more</a>.
 </dd>
 <dt>Conformance report</dt>
 <dd>
@@ -732,6 +740,10 @@ A single <strong>validation step</strong> that checks several conditions on each
 <dd>
 A piece of text that points to a database table, such as <code>"duckdb:///path/to/db.ddb::table_name"</code>. The part before <code>::</code> says how to reach the database, and the part after it names the table. You can pass a connection string as the data for <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> or for <strong>CLI</strong> commands, instead of a table you’ve already loaded. <a href="../../user-guide/the-pointblank-cli/cli-data-inspection.html">Learn more</a>.
 </dd>
+<dt>Contamination check</dt>
+<dd>
+A check that the text of each row doesn’t overlap with a reference, such as the questions of a benchmark that a model will be scored on. If the training data contains those questions, the model’s score on the benchmark looks better than it should. Added with <a href="../../reference/Validate.rows_not_contaminated.html#pointblank.Validate.rows_not_contaminated" class="gdls-link gdls-code">rows_not_contaminated()</a>. By default, a row overlaps with a reference text if they share a run of 13 words (set with <code>ngram=</code>), and <code>method=</code> can look for texts that are the same or nearly the same instead. To check a dataset’s own splits against each other, see <strong>split check</strong>. <a href="../../user-guide/advanced-validation/text-checks.html#benchmark-contamination">Learn more</a>.
+</dd>
 <dt>Contract</dt>
 <dd>
 A written-down agreement about what a table should look like. It combines a <strong>schema</strong> (the expected columns and their types), a list of rules, and details like the owner and version. You create one with the <a href="../../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> class and check a table against it with <code>.validate(data)</code>. Contracts can be saved as YAML, imported from other formats (such as JSON Schema, Frictionless, dbt, and ODCS) with <a href="../../reference/import_contract.html#pointblank.import_contract" class="gdls-link"><code>import_contract()</code></a>, and exported with <a href="../../reference/export_contract.html#pointblank.export_contract" class="gdls-link"><code>export_contract()</code></a>. See also <strong>pipeline</strong>, <strong>contract import</strong>, and <strong>violation handling</strong>. <a href="../../user-guide/contracts-and-pipelines/contracts.html">Learn more</a>.
@@ -743,6 +755,10 @@ The part of Pointblank that translates between a <strong>contract</strong> and o
 <dt>Contract import</dt>
 <dd>
 What you get back from <a href="../../reference/import_contract.html#pointblank.import_contract" class="gdls-link"><code>import_contract()</code></a>: a <a href="../../reference/ContractImport.html#pointblank.ContractImport" class="gdls-link gdls-code">ContractImport</a> object holding the checks that were translated from an outside format. Nothing is checked yet. Its <code>coverage</code> is the share of the outside rules that could be translated, and <code>warnings</code> lists any that couldn’t. From there, <code>to_validate(data)</code> gives a <strong>validation plan</strong>, <a href="../../reference/ContractImport.html#pointblank.ContractImport.to_contract" class="gdls-link gdls-code">to_contract()</a> gives a <strong>contract</strong>, and <a href="../../reference/ContractImport.html#pointblank.ContractImport.to_python" class="gdls-link gdls-code">to_python()</a> or <a href="../../reference/ContractImport.html#pointblank.ContractImport.to_yaml" class="gdls-link"><code>to_yaml()</code></a> give code. <a href="../../user-guide/contracts-and-pipelines/importing-contracts.html">Learn more</a>.
+</dd>
+<dt>Control</dt>
+<dd>
+See <strong>ablation</strong>.
 </dd>
 <dt>Controlled terminology (CT)</dt>
 <dd>
@@ -760,6 +776,10 @@ See <strong>warning, error, and critical</strong>.
 <dd>
 A <strong>validation step</strong> that uses a function you write, for rules that none of the built-in validation methods cover. Your function receives the table and returns <code>True</code> or <code>False</code> values showing what passed. Added with <a href="../../reference/Validate.specially.html#pointblank.Validate.specially" class="gdls-link gdls-code">specially()</a>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
 </dd>
+<dt>Data card</dt>
+<dd>
+A Markdown document that describes a dataset for the people who use it, written from a validation with <a href="../../reference/Validate.to_data_card.html#pointblank.Validate.to_data_card" class="gdls-link gdls-code">Validate.to_data_card()</a>. By default it’s a Hugging Face dataset card, which can be saved as the <code>README.md</code> of a dataset on the Hub, and <code>format="datasheet"</code> gives a datasheet (from <em>Datasheets for Datasets</em>) instead. The results of the validation, including the <strong>health score</strong>, are the evidence of the data’s quality, and with <code>ablation=</code> the card also gives the measured effect of each check (see <strong>ablation</strong>). Details the validation can’t know, like the license, are given as arguments. <a href="../../user-guide/post-interrogation/data-cards.html">Learn more</a>.
+</dd>
 <dt>Data coherence</dt>
 <dd>
 In <strong>test data generation</strong>, the way related columns are made to fit together within each row. For example, an email address is made from the person’s name, and the address, city, postcode, phone number, and coordinates all belong to the same place. This happens on its own when related <strong>presets</strong> are used together, and it still holds when rows from several countries are mixed. <a href="../../user-guide/test-data-generation/country-specific-data.html#data-coherence">Learn more</a>.
@@ -775,6 +795,14 @@ Whether a table has recent data. <a href="../../reference/Validate.data_freshnes
 <dt>DataScan</dt>
 <dd>
 An object that holds a column-by-column profile of a table, with statistics like counts, missing values, and averages. It’s what the <strong>column summary table</strong> is built from. You can save a <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> to a JSON file, load it again later, and compare two scans to spot <strong>drift</strong>. <a href="../../user-guide/data-inspection/col-summary-tbl.html">Learn more</a>.
+</dd>
+<dt>Datasheet</dt>
+<dd>
+See <strong>data card</strong>.
+</dd>
+<dt>Defect injection</dt>
+<dd>
+Adding a problem to clean rows on purpose, to see how much it would hurt a model, with <a href="../../reference/Ablation.inject.html#pointblank.Ablation.inject" class="gdls-link gdls-code">Ablation.inject()</a>. The defect can be missing values (<code>"null"</code>), values moved to the wrong rows (<code>"shuffle"</code>), text cut short (<code>"truncate"</code>), copied rows (<code>"duplicate"</code>), or a function you write, and it’s added to a growing share of the rows (<code>rates=</code>). <a href="../../reference/Ablation.suggest_thresholds.html#pointblank.Ablation.suggest_thresholds" class="gdls-link gdls-code">Ablation.suggest_thresholds()</a> then works out the share of failing rows at which the harm becomes too much, as <strong>thresholds</strong> for the step that checks for the defect. See also <strong>ablation</strong>. <a href="../../user-guide/post-interrogation/data-ablation.html#injecting-defects">Learn more</a>.
 </dd>
 <dt>Define-XML</dt>
 <dd>
@@ -798,7 +826,7 @@ A change in a table between two points in time, like a column being added or rem
 </dd>
 <dt>Drift score</dt>
 <dd>
-A number that measures how far a column’s values have shifted between two <strong>DataScan</strong> objects. <a href="../../reference/DataScan.compare.html#pointblank.DataScan.compare" class="gdls-link gdls-code">DataScan.compare()</a> gives two kinds. The PSI (Population Stability Index) works for numeric and categorical columns: under 0.1 means little change, and over 0.25 means a large shift. The KS (Kolmogorov-Smirnov) test works for numeric columns, and a small p-value (say, under 0.05) means the two sets of values differ. Drift scores need the original data, so they can’t be worked out for a scan loaded from a JSON file. <a href="../../user-guide/data-inspection/col-summary-tbl.html">Learn more</a>.
+A number that measures how far a column’s values have shifted between two <strong>DataScan</strong> objects. <a href="../../reference/DataScan.compare.html#pointblank.DataScan.compare" class="gdls-link gdls-code">DataScan.compare()</a> gives two kinds. The PSI (Population Stability Index) works for numeric and categorical columns: under 0.1 means little change, and over 0.25 means a large shift. The KS (Kolmogorov-Smirnov) test works for numeric columns, and a small p-value (say, under 0.05) means the two sets of values differ. Drift scores need the original data, so they can’t be worked out for a scan loaded from a JSON file. The same two measures are used by a <strong>split check</strong> and a <strong>synthetic data check</strong>. <a href="../../user-guide/data-inspection/col-summary-tbl.html">Learn more</a>.
 </dd>
 <dt>Error</dt>
 <dd>
@@ -834,7 +862,15 @@ The Python library Pointblank uses to make its tables, such as the <strong>valid
 </dd>
 <dt>Health score</dt>
 <dd>
-A single number from 0 to 100 that sums up data quality: the share of all <strong>test units</strong> that passed. Pointblank also works out a score for each <strong>quality dimension</strong>. Get the scores with <a href="../../reference/Validate.get_health_score.html#pointblank.Validate.get_health_score" class="gdls-link gdls-code">get_health_score()</a> and <a href="../../reference/Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link gdls-code">get_dimension_scores()</a>, or show them with <a href="../../reference/Validate.get_scorecard.html#pointblank.Validate.get_scorecard" class="gdls-link gdls-code">get_scorecard()</a>. They appear in the <strong>validation report</strong> when you use <code>incl_dimensions=True</code>. <a href="../../user-guide/post-interrogation/quality-dimensions-and-scoring.html">Learn more</a>.
+A single number from 0 to 100 that sums up data quality: the share of all <strong>test units</strong> that passed. Pointblank also works out a score for each <strong>quality dimension</strong>. Get the scores with <a href="../../reference/Validate.get_health_score.html#pointblank.Validate.get_health_score" class="gdls-link gdls-code">get_health_score()</a> and <a href="../../reference/Validate.get_dimension_scores.html#pointblank.Validate.get_dimension_scores" class="gdls-link gdls-code">get_dimension_scores()</a>, or show them with <a href="../../reference/Validate.get_scorecard.html#pointblank.Validate.get_scorecard" class="gdls-link gdls-code">get_scorecard()</a>. They appear in the <strong>validation report</strong> when you use <code>incl_dimensions=True</code>. When steps are split into <strong>segments</strong>, <code>by=</code> gives the scores of each segment, so that one bad region or source isn’t hidden by the rest. <a href="../../user-guide/post-interrogation/quality-dimensions-and-scoring.html">Learn more</a>.
+</dd>
+<dt>Heuristic quality filter</dt>
+<dd>
+A simple rule about a text document that’s used to clean the data for training a language model, such as how many words it has, how long its words are, or how many of its lines repeat. <a href="../../reference/text.heuristic_filters.html#pointblank.text.heuristic_filters" class="gdls-link"><code>pb.text.heuristic_filters()</code></a> makes a <strong>validation step</strong> for each of the filters used for the Gopher models, with their limits as the defaults. Each one is a <strong>scored check</strong>. See also <strong>step bundle</strong>. <a href="../../user-guide/advanced-validation/text-checks.html#heuristic-quality-filters">Learn more</a>.
+</dd>
+<dt>Holdout data</dt>
+<dd>
+Data kept aside for scoring a model, so that every version of the training table in an <strong>ablation</strong> is judged against the same yardstick. Your <code>evaluate=</code> function uses it, and it’s never ablated itself. With <code>Ablation(holdout=...)</code>, Pointblank also checks it with the same steps as the training table, since a problem in the holdout data affects every comparison. The results are in the ablation’s <code>holdout_validation</code>. <a href="../../user-guide/post-interrogation/data-ablation.html#checking-the-held-out-data">Learn more</a>.
 </dd>
 <dt>Interrogation</dt>
 <dd>
@@ -843,6 +879,10 @@ Running the checks in a <strong>validation plan</strong>, which happens when you
 <dt>JSON report</dt>
 <dd>
 The validation results as JSON text, which other programs can read. You get it with <a href="../../reference/Validate.get_json_report.html#pointblank.Validate.get_json_report" class="gdls-link gdls-code">Validate.get_json_report()</a>, and you can choose which details to include with <code>use_fields=</code> or leave some out with <code>exclude_fields=</code>. See also <strong>validation report</strong>.
+</dd>
+<dt>Leakage</dt>
+<dd>
+See <strong>split check</strong>.
 </dd>
 <dt>MCP server</dt>
 <dd>
@@ -864,6 +904,10 @@ An option on many validation methods that decides whether missing values (nulls)
 <dd>
 The library Pointblank uses to work with tables from different <strong>backends</strong> in the same way. It’s why a validation you write once works whether your table is in Polars, Pandas, or a database. Pointblank installs it for you, so you won’t usually need to use it directly.
 </dd>
+<dt>Near duplicate</dt>
+<dd>
+A row that’s almost the same as another, such as two copies of a web page that differ only in a date or a footer. <a href="../../reference/Validate.rows_near_distinct.html#pointblank.Validate.rows_near_distinct" class="gdls-link gdls-code">rows_near_distinct()</a> finds them by comparing the text in lower case and without punctuation, with <code>threshold=</code> setting how alike two rows must be. As with <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a>, every row of a group of near duplicates fails, and the <strong>step report</strong> shows each group together. <strong>Row flags</strong> keep the first row of each group by default, and so does <strong>sundering</strong> with <code>duplicates="keep_first"</code>. <a href="../../user-guide/advanced-validation/text-checks.html#near-duplicates">Learn more</a>.
+</dd>
 <dt>Null flavor</dt>
 <dd>
 A standard code from the HL7 and <strong>CDISC</strong> standards that says why a value is missing. For example, <code>"NI"</code> means no information, <code>"UNK"</code> means unknown, and <code>"ASKU"</code> means asked but unknown. <a href="../../reference/MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link gdls-code">MissingSpec.from_cdisc_null_flavors()</a> sets up all 14 codes for you. See also <strong>coded missing value</strong>. <a href="../../user-guide/metadata-import/cdisc-validation.html">Learn more</a>.
@@ -876,6 +920,14 @@ OpenTelemetry is a widely used standard for sending measurements from programs t
 <dd>
 A way to compare tables that are too large to fit in memory. With <code>partitions=N</code>, <a href="../../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a> (and <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> and <a href="../../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a>) works through the tables in N passes, each covering a share of the keys from both tables. The results are the same as in a single pass, but less memory is needed at once. More partitions use less memory but take longer. See also <strong>table comparison</strong>. <a href="../../user-guide/table-comparison/comparing-large-files.html">Learn more</a>.
 </dd>
+<dt>Personal information check</dt>
+<dd>
+A check that text has no email addresses, phone numbers, credit card numbers, or other personal information, made with <a href="../../reference/text.no_pii.html#pointblank.text.no_pii" class="gdls-link"><code>pb.text.no_pii()</code></a>. Its checks are patterns (<a href="../../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" class="gdls-link gdls-code">col_vals_regex()</a> steps), so they work on any <strong>backend</strong>, but they find likely matches rather than certain ones. See also <strong>step bundle</strong>. <a href="../../user-guide/advanced-validation/text-checks.html#language-length-and-personal-information">Learn more</a>.
+</dd>
+<dt>PII (personally identifiable information)</dt>
+<dd>
+See <strong>personal information check</strong>.
+</dd>
 <dt>Pipeline</dt>
 <dd>
 A data-processing step with <strong>contracts</strong> on both sides. A <a href="../../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link gdls-code">Pipeline</a> checks the incoming data (the source), runs your transformation function, then checks the result (the target), all in one call to <code>run(data, transform)</code>. By default, if the incoming data fails, the transformation is skipped. The <a href="../../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a> that comes back holds both validations and the transformed data, and its <a href="../../reference/PipelineResult.html#pointblank.PipelineResult.passed" class="gdls-link gdls-code">passed</a> is <code>True</code> only if both checks passed. Checking data at these two points is sometimes called <em>boundary enforcement</em>. See also <strong>source and target</strong> and <strong>violation handling</strong>. <a href="../../user-guide/contracts-and-pipelines/pipelines.html">Learn more</a>.
@@ -886,7 +938,7 @@ Turning a <strong>validation plan</strong> into text so it can be saved, shared,
 </dd>
 <dt>Preprocessing</dt>
 <dd>
-Changing the table for just one step before it’s checked, using the <code>pre=</code> option. You give <code>pre=</code> a function that takes the table and returns a changed version, for example with some rows filtered out or a new column added. The original data and other steps are not affected. The number of <strong>test units</strong> is counted after the change. <a href="../../user-guide/validation-plan/preprocessing.html">Learn more</a>.
+Changing the table for just one step before it’s checked, using the <code>pre=</code> option. You give <code>pre=</code> a function that takes the table and returns a changed version, for example with some rows filtered out or a new column added. The original data and other steps are not affected. The number of <strong>test units</strong> is counted after the change. Since the rows such a step checked can’t be matched to the table’s rows, steps with <code>pre=</code> are left out of <strong>sundering</strong>, <strong>row flags</strong>, and <strong>ablations</strong>. If your function only filters rows or changes their values, wrap it in <a href="../../reference/row_preserving.html#pointblank.row_preserving" class="gdls-link gdls-code">row_preserving()</a> so that its step is used there too. <a href="../../user-guide/validation-plan/preprocessing.html">Learn more</a>.
 </dd>
 <dt>Preset</dt>
 <dd>
@@ -904,6 +956,10 @@ A way to write Python code inside a <strong>YAML workflow</strong>, for settings
 <dd>
 A category describing what kind of data quality a step measures. The categories are <em>completeness</em>, <em>validity</em>, <em>uniqueness</em>, <em>consistency</em>, <em>timeliness</em>, and <em>volume</em>. Each validation method has a default category (for example, <a href="../../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null()</a> measures completeness), and you can change it with <code>dimension=</code>. Each dimension gets its own score, and together they make up the <strong>health score</strong>. <a href="../../user-guide/post-interrogation/quality-dimensions-and-scoring.html">Learn more</a>.
 </dd>
+<dt>RAG checks</dt>
+<dd>
+Checks for the data behind a retrieval-augmented generation (RAG) system, which answers a question by finding chunks of text like it in a corpus and giving them to an LLM. <a href="../../reference/rag.corpus_checks.html#pointblank.rag.corpus_checks" class="gdls-link"><code>pb.rag.corpus_checks()</code></a> checks that every chunk has text, a unique id, the metadata the system needs (such as its source), a useful length, no <strong>near duplicates</strong>, and a recent update. <a href="../../reference/rag.eval_checks.html#pointblank.rag.eval_checks" class="gdls-link"><code>pb.rag.eval_checks()</code></a> checks the evaluation set: that its questions aren’t repeated, that each one’s <em>gold</em> document (the one that answers it) is in the corpus, and, with a <strong>scorer</strong>, that each gold passage is relevant to its question. See also <strong>step bundle</strong>. <a href="../../user-guide/advanced-validation/rag-checks.html">Learn more</a>.
+</dd>
 <dt>Reconciliation</dt>
 <dd>
 Checking that two tables add up to the same numbers even though their rows differ, for example that a summary table agrees with the detailed records it was built from. <a href="../../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a> groups both tables by the <code>keys=</code> columns, totals the <code>measures=</code> columns (with <code>agg="sum"</code> by default, or <code>"count"</code>, <code>"mean"</code>, <code>"min"</code>, or <code>"max"</code>), and compares the results group by group. Each group is one <strong>test unit</strong>. See also <strong>table comparison</strong>. <a href="../../user-guide/table-comparison/comparing-tables.html">Learn more</a>.
@@ -918,7 +974,7 @@ A check that every value in a column also appears in a column of another table, 
 </dd>
 <dt>Report language</dt>
 <dd>
-The language used for the text in reports and in generated <strong>briefs</strong>, set with <code>Validate(lang=...)</code>. Forty languages are available. A separate option, <code>locale=</code>, controls how numbers are formatted (for example, whether a comma or a period is used as the decimal mark). <a href="../../user-guide/validation-plan/briefs.html">Learn more</a>.
+The language used for the text in reports and in generated <strong>briefs</strong>, set with <code>Validate(lang=...)</code>. Forty languages are available. A separate option, <code>locale=</code>, controls how numbers are formatted (for example, whether a comma or a period is used as the decimal mark). What’s made from a validation, such as an <strong>ablation</strong>’s report or a <strong>data card</strong>, uses the same language, and these (along with the reports of a <strong>split check</strong> or a <strong>synthetic data check</strong>) also take <code>lang=</code> and <code>locale=</code> of their own. <a href="../../user-guide/validation-plan/briefs.html">Learn more</a>.
 </dd>
 <dt>Round trip</dt>
 <dd>
@@ -926,7 +982,15 @@ Turning something into another form and back again, ending up with the same thin
 </dd>
 <dt>Row-based check</dt>
 <dd>
-A check on whole rows rather than on single values. <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> checks that no row appears more than once, and <a href="../../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" class="gdls-link gdls-code">rows_complete()</a> checks that no row has missing values. Both can look at just some of the columns with <code>columns_subset=</code>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
+A check on whole rows rather than on single values. <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> checks that no row appears more than once, and <a href="../../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" class="gdls-link gdls-code">rows_complete()</a> checks that no row has missing values. Both can look at just some of the columns with <code>columns_subset=</code>. See also <strong>near duplicate</strong>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
+</dd>
+<dt>Row flags</dt>
+<dd>
+A copy of the table with a <code>True</code>/<code>False</code> column for each row-level <strong>validation step</strong> (<code>pb_failed_1_</code>, <code>pb_failed_2_</code>, and so on) saying whether the row failed it, made with <a href="../../reference/Validate.get_row_flags.html#pointblank.Validate.get_row_flags" class="gdls-link gdls-code">Validate.get_row_flags()</a>. It also has the number of steps each row failed (<code>pb_n_failed_</code>), the share of its checks that it passed (<code>pb_row_score_</code>), and the scores of any <strong>scored checks</strong>. Where <strong>sundering</strong> only splits the rows into passing and failing, the flags let you decide later which checks matter for each use of the data. <a href="../../user-guide/post-interrogation/sundering.html#flagging-rows-instead-of-splitting-them">Learn more</a>.
+</dd>
+<dt>Row-preserving preprocessing</dt>
+<dd>
+See <strong>preprocessing</strong>.
 </dd>
 <dt>Row status</dt>
 <dd>
@@ -940,6 +1004,14 @@ A description of the columns a table should have: their names and, optionally, t
 <dd>
 A compact table showing the <strong>health score</strong> and the score for each <strong>quality dimension</strong>, made with <a href="../../reference/Validate.get_scorecard.html#pointblank.Validate.get_scorecard" class="gdls-link gdls-code">Validate.get_scorecard()</a>. <a href="../../user-guide/post-interrogation/quality-dimensions-and-scoring.html">Learn more</a>.
 </dd>
+<dt>Scored check</dt>
+<dd>
+A <strong>validation step</strong> that gives each row a score with a <strong>scorer</strong> and checks that the score is within bounds (<code>min_val=</code> and <code>max_val=</code>). This is for checks about the meaning of text, such as whether a document is in the expected language, whether a passage answers its query, or whether text is of good quality. Added with <a href="../../reference/Validate.col_vals_scored.html#pointblank.Validate.col_vals_scored" class="gdls-link gdls-code">col_vals_scored()</a>. Rows without a score fail unless <code>na_pass=True</code>. The scores are kept with the results, so they show in the <strong>step report</strong> and the <strong>row flags</strong>. <a href="../../user-guide/advanced-validation/scored-validation.html">Learn more</a>.
+</dd>
+<dt>Scorer</dt>
+<dd>
+A function that takes a batch of rows (as a list of dictionaries) and returns a score for each, used by a <strong>scored check</strong>. You can write your own, or use one of the adapters in <code>pb.scorers</code> for common kinds of models, such as <a href="../../reference/scorers.reranker.html#pointblank.scorers.reranker" class="gdls-link"><code>reranker()</code></a>, <a href="../../reference/scorers.classifier.html#pointblank.scorers.classifier" class="gdls-link"><code>classifier()</code></a>, <a href="../../reference/scorers.langid.html#pointblank.scorers.langid" class="gdls-link"><code>langid()</code></a>, and <a href="../../reference/scorers.token_count.html#pointblank.scorers.token_count" class="gdls-link"><code>token_count()</code></a>. The adapters use models you already have, since Pointblank never trains one. Scores are cached by the scorer’s name and version and the row’s values, so no row is scored twice, and with a directory as <code>cache=</code>, the cache is kept on disk for later sessions. <a href="../../user-guide/advanced-validation/scored-validation.html#writing-a-scorer">Learn more</a>.
+</dd>
 <dt>SDTM (Study Data Tabulation Model)</dt>
 <dd>
 A <strong>CDISC</strong> standard for organizing the data collected in a clinical trial into tables called <em>domains</em>, such as DM (demographics), AE (adverse events), and LB (lab results). Pointblank can check that a domain has the columns the standard requires (<a href="../../reference/validate_sdtm_structure.html#pointblank.validate_sdtm_structure" class="gdls-link gdls-code">validate_sdtm_structure()</a>), and it can check datasets against the SDTM rules (<a href="../../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link gdls-code">validate_sdtmig()</a>). <a href="../../user-guide/metadata-import/cdisc-validation.html">Learn more</a>.
@@ -950,7 +1022,7 @@ CDISC’s detailed rules for how data should be laid out in <strong>SDTM</strong
 </dd>
 <dt>Seed</dt>
 <dd>
-A number that makes randomly generated data repeatable: <code>generate_dataset(schema, seed=23)</code> gives the same rows each time with the same version of Pointblank. The <a href="../../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset</a> pytest fixture picks a seed from each test’s name, so every test gets its own data, which stays the same from one run to the next. <a href="../../user-guide/test-data-generation/pytest-fixture.html">Learn more</a>.
+A number that makes randomly generated data repeatable: <code>generate_dataset(schema, seed=23)</code> gives the same rows each time with the same version of Pointblank. The <a href="../../reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset</a> pytest fixture picks a seed from each test’s name, so every test gets its own data, which stays the same from one run to the next. In a <strong>synthetic data check</strong>, the <em>seed</em> is something else: the real data that the synthetic data was made from. <a href="../../user-guide/test-data-generation/pytest-fixture.html">Learn more</a>.
 </dd>
 <dt>Segment</dt>
 <dd>
@@ -960,6 +1032,10 @@ A group of rows that gets checked and reported on its own. Using <code>segments=
 <dd>
 See <strong>warning, error, and critical</strong>.
 </dd>
+<dt>Shapley value</dt>
+<dd>
+A step’s fair share of the effect of removing the failing rows of every step in an <strong>ablation</strong>. The steps’ failing rows overlap, so their effects on their own don’t add up to the effect of removing them all. A step’s Shapley value is its average effect when it’s added to every combination of the other steps, and the values of all the steps add up to the total. <a href="../../reference/Ablation.shapley.html#pointblank.Ablation.shapley" class="gdls-link gdls-code">Ablation.shapley()</a> adds the variants that are needed, and <a href="../../reference/Ablation.get_shapley.html#pointblank.Ablation.get_shapley" class="gdls-link gdls-code">Ablation.get_shapley()</a> gives the values as a table. <a href="../../user-guide/post-interrogation/data-ablation.html#sharing-the-effect-among-the-steps">Learn more</a>.
+</dd>
 <dt>Source and target</dt>
 <dd>
 The two sides of a <strong>table comparison</strong> or a <strong>pipeline</strong>. In a table comparison, the source is the table you start from and the target is the one checked against it. With <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a>, the table being validated is the target, and <code>tbl_compare=</code> is the source. In a pipeline, the source is the data going into your transformation and the target is what comes out, and each can have its own <strong>contract</strong>. A contract’s <code>direction=</code> (<code>"source"</code> or <code>"target"</code>) records which side it’s meant for. <a href="../../user-guide/contracts-and-pipelines/pipelines.html">Learn more</a>.
@@ -968,6 +1044,10 @@ The two sides of a <strong>table comparison</strong> or a <strong>pipeline</stro
 <dd>
 A check that text values follow a well-known format, such as email addresses, URLs, postal codes, credit card numbers, ISBNs, VINs, or IBANs. Added with <a href="../../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec" class="gdls-link gdls-code">col_vals_within_spec()</a>, for example with <code>spec="email"</code> or <code>spec="postal_code[USA]"</code>. <a href="../../user-guide/validation-plan/validation-methods.html">Learn more</a>.
 </dd>
+<dt>Split check</dt>
+<dd>
+A check that the splits of a dataset (for example, the training, validation, and test splits used for a model) are independent and alike. <a href="../../reference/check_splits.html#pointblank.check_splits" class="gdls-link gdls-code">check_splits()</a> finds rows of one split that are also in another (<em>leakage</em>), exactly or, with <code>near=True</code>, nearly; labels that a split is missing or has on its own (with <code>label=</code>); and columns whose values are distributed differently (with <strong>drift scores</strong>). It returns a <a href="../../reference/SplitCheck.html#pointblank.SplitCheck" class="gdls-link gdls-code">SplitCheck</a>, whose <code>ok</code> is <code>True</code> if no problems were found and whose <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> lists them. <a href="../../user-guide/table-comparison/checking-splits.html">Learn more</a>.
+</dd>
 <dt>Status check</dt>
 <dd>
 A method that tells you how a validation went, as <code>True</code> or <code>False</code>, without stopping your code. <a href="../../reference/Validate.all_passed.html#pointblank.Validate.all_passed" class="gdls-link"><code>all_passed()</code></a> tells you whether every <strong>test unit</strong> passed, and <a href="../../reference/Validate.above_threshold.html#pointblank.Validate.above_threshold" class="gdls-link gdls-code">above_threshold()</a>, <a href="../../reference/Validate.warning.html#pointblank.Validate.warning" class="gdls-link gdls-code">warning()</a>, <a href="../../reference/Validate.error.html#pointblank.Validate.error" class="gdls-link gdls-code">error()</a>, and <a href="../../reference/Validate.critical.html#pointblank.Validate.critical" class="gdls-link gdls-code">critical()</a> tell you whether <strong>threshold</strong> levels were reached. See also <strong>assertion</strong>. <a href="../../user-guide/advanced-validation/assertions.html">Learn more</a>.
@@ -975,6 +1055,10 @@ A method that tells you how a validation went, as <code>True</code> or <code>Fal
 <dt>Step</dt>
 <dd>
 Usually short for <strong>validation step</strong>. In a <strong>contract</strong>, the <a href="../../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">Step</a> class describes one validation method call by its name and arguments (for example, <code>Step("col_vals_not_null", columns="id")</code>), so that it can be saved as YAML or JSON. <a href="../../user-guide/contracts-and-pipelines/contracts.html">Learn more</a>.
+</dd>
+<dt>Step bundle</dt>
+<dd>
+A ready-made set of <strong>validation steps</strong> for a common task, given as a <a href="../../reference/Steps.html#pointblank.Steps" class="gdls-link gdls-code">Steps</a> collection that you add to a validation with <a href="../../reference/Validate.add_steps.html#pointblank.Validate.add_steps" class="gdls-link gdls-code">Validate.add_steps()</a>. For text, there are <a href="../../reference/text.heuristic_filters.html#pointblank.text.heuristic_filters" class="gdls-link"><code>pb.text.heuristic_filters()</code></a>, <a href="../../reference/text.in_language.html#pointblank.text.in_language" class="gdls-link"><code>pb.text.in_language()</code></a>, <a href="../../reference/text.token_length.html#pointblank.text.token_length" class="gdls-link"><code>pb.text.token_length()</code></a>, and <a href="../../reference/text.no_pii.html#pointblank.text.no_pii" class="gdls-link"><code>pb.text.no_pii()</code></a>, and for RAG data, there are <a href="../../reference/rag.corpus_checks.html#pointblank.rag.corpus_checks" class="gdls-link"><code>pb.rag.corpus_checks()</code></a> and <a href="../../reference/rag.eval_checks.html#pointblank.rag.eval_checks" class="gdls-link"><code>pb.rag.eval_checks()</code></a>. Each step of a bundle is an ordinary step, so you can change it or turn it off. See also <strong>composable steps</strong>. <a href="../../user-guide/advanced-validation/text-checks.html">Learn more</a>.
 </dd>
 <dt>Step report</dt>
 <dd>
@@ -986,7 +1070,15 @@ See <strong>coded missing value</strong>.
 </dd>
 <dt>Sundering</dt>
 <dd>
-Splitting a table in two after validation: the rows that passed every row-by-row check, and the rows that failed at least one. You get either part with <a href="../../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link gdls-code">Validate.get_sundered_data()</a>, using <code>type="pass"</code> or <code>type="fail"</code>. See also <strong>data extract</strong>. <a href="../../user-guide/post-interrogation/sundering.html">Learn more</a>.
+Splitting a table in two after validation: the rows that passed every row-by-row check, and the rows that failed at least one. You get either part with <a href="../../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" class="gdls-link gdls-code">Validate.get_sundered_data()</a>, using <code>type="pass"</code> or <code>type="fail"</code>. Steps with <code>pre=</code> are left out unless the function is marked with <a href="../../reference/row_preserving.html#pointblank.row_preserving" class="gdls-link gdls-code">row_preserving()</a> (see <strong>preprocessing</strong>), and checks for duplicate rows are left out unless you say which copy to keep with <code>duplicates=</code> (such as <code>"keep_first"</code>). To see which steps each row failed, use <strong>row flags</strong>. See also <strong>data extract</strong>. <a href="../../user-guide/post-interrogation/sundering.html">Learn more</a>.
+</dd>
+<dt>Sweep</dt>
+<dd>
+A set of <strong>ablation</strong> variants that try one setting at several values, to find where a limit should be. <a href="../../reference/Ablation.sweep_step.html#pointblank.Ablation.sweep_step" class="gdls-link gdls-code">Ablation.sweep_step()</a> makes a variant for each of a list of values of one of a step’s parameters (for example, <code>value=</code> at 1,500, 2,000, and 2,500), removing the rows that fail the step with that value. <a href="../../reference/Ablation.sweep_score.html#pointblank.Ablation.sweep_score" class="gdls-link gdls-code">Ablation.sweep_score()</a> removes a growing share of the highest- or lowest-scoring rows of a <strong>scored check</strong>. The report shows the effect at each value as a curve. <a href="../../user-guide/post-interrogation/data-ablation.html#sweeping-a-threshold">Learn more</a>.
+</dd>
+<dt>Synthetic data check</dt>
+<dd>
+A comparison of synthetic data with the real data it was made from (its <em>seed</em>), made with <a href="../../reference/check_synthetic.html#pointblank.check_synthetic" class="gdls-link gdls-code">check_synthetic()</a>. It checks <em>fidelity</em> (whether each column’s values and share of missing values are like the seed’s, using <strong>drift scores</strong>), <em>diversity</em> (whether rows or text repeat more than in the seed, a sign of a generator stuck on a few kinds of rows), and <em>copies</em> (synthetic rows that are the same as a seed row, or whose text nearly is, which can give private data away). It returns a <a href="../../reference/SyntheticCheck.html#pointblank.SyntheticCheck" class="gdls-link gdls-code">SyntheticCheck</a>, whose <code>ok</code> is <code>True</code> if no problems were found and whose <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> lists them. <a href="../../user-guide/table-comparison/checking-synthetic-data.html">Learn more</a>.
 </dd>
 <dt>Table comparison</dt>
 <dd>
@@ -1039,6 +1131,14 @@ One check in a <strong>validation plan</strong>. Each call to a <strong>validati
 <dt>Validation template</dt>
 <dd>
 A <strong>YAML workflow</strong> written to be used with many tables. Leave the data out with <code>tbl: null</code>, then give a table each time it runs with <code>yaml_interrogate(..., set_tbl=...)</code>. This way, a set of checks written once can be run on, say, each quarter’s data. <a href="../../user-guide/yaml/yaml-validation-workflows.html">Learn more</a>.
+</dd>
+<dt>Variant</dt>
+<dd>
+See <strong>ablation</strong>.
+</dd>
+<dt>Verdict</dt>
+<dd>
+See <strong>ablation</strong>.
 </dd>
 <dt>Violation handling</dt>
 <dd>

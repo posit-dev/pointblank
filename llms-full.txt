@@ -42693,8 +42693,9 @@ validation.get_step_report(i=1)
 The first two documents differ only in *twelve* and *12!*, so both fail, and the step report shows
 them together as one group (in the `pb_cluster_` column). Every row of a group fails, as with
 `~~pointblank.Validate.rows_distinct()`, since the validation can't know which copy we'd want to
-keep. That's decided when the results are used to clean the table: `get_row_flags()` and
-`get_sundered_data()` keep the first row of each group by default (`duplicates="keep_first"`).
+keep. That's decided when the results are used to clean the table: `get_row_flags()` keeps the
+first row of each group by default (`duplicates="keep_first"`), and `get_sundered_data()` does so
+when given `duplicates="keep_first"` (without it, the step isn't used for sundering).
 
 ## Language, Length, and Personal Information
 
@@ -56893,6 +56894,18 @@ This page explains the terms used throughout the Pointblank documentation, in al
 Where a term matches something in Pointblank's API, the name of the class, function, or method is
 shown in `code`. Terms in **bold** have their own entry on this page.
 
+Ablation
+: An experiment that measures whether the rows failing a **validation step** actually matter to a
+  model trained on the data. The `Ablation` class takes an interrogated validation and an
+  `evaluate=` function that you write, which trains and scores your model on a version of the
+  table. Methods such as `Ablation.drop_each()` add *variants* (versions of the table with some
+  failing rows removed), and `Ablation.run()` evaluates them. Each variant is compared with a
+  *control* that removes the same number of rows at random, and gets a verdict: it *helps*, *hurts*,
+  or is *inconclusive*. A step whose rows help on their own but add nothing once the other steps'
+  rows are removed is *redundant*. An ablation can also be written in a **YAML workflow** and
+  loaded with `yaml_ablation()`. See also **sweep**, **defect injection**, **Shapley value**, and
+  **holdout data**. [Learn more](../post-interrogation/data-ablation.qmd).
+
 Action
 : Something Pointblank does when a step's failures reach a **threshold** level, such as printing a
   message or running a function you supply. You set actions with the `Actions` class, either for
@@ -56926,8 +56939,10 @@ Aggregate check
 AI check
 : A **validation step** where a large language model (LLM) reads each row and judges whether it
   follows a rule you describe in plain words. This helps with rules that are hard to write as code,
-  like "the description should mention the product's color". Added with `prompt()`. [Learn
-  more](../validation-plan/validation-methods.qmd).
+  like "the description should mention the product's color". Added with `prompt()`. With a list
+  of models in `model=`, each model judges every row and their verdicts are combined by a vote
+  (`aggregate=`). To see how far to trust the step, label some rows yourself and compare them with
+  its results using `calibrate_prompt()`. [Learn more](../validation-plan/validation-methods.qmd).
 
 AI Validation Editor
 : A tool that changes an existing **validation plan** based on a plain-English instruction, such as
@@ -56942,8 +56957,9 @@ Assertion
   to raise an error if a **threshold** level was reached. Both run **interrogation** first if it
   hasn't happened yet. This is handy in data pipelines and tests. There's also
   `assert_dimension_scores()`, which raises an error if the score for any **quality dimension** is
-  below a minimum you set. If you'd rather get `True` or `False` than an error, use a **status
-  check**. [Learn more](../advanced-validation/assertions.qmd).
+  below a minimum you set (in every **segment**, with `by=`). If you'd rather get `True` or
+  `False` than an error, use a **status check**. [Learn
+  more](../advanced-validation/assertions.qmd).
 
 Assistant
 : A chat window where you can ask an LLM questions about your data and about Pointblank. You start
@@ -56974,6 +56990,13 @@ CDISC (Clinical Data Interchange Standards Consortium)
   structure, and check a set of trial datasets against CDISC's rules. It can do that last part with
   its own built-in rules (`validate_sdtmig()`) or by running the **CORE** engine. [Learn
   more](../metadata-import/cdisc-validation.qmd).
+
+Chat format check
+: A check that each row holds a well-formed conversation for training a chat model: a list of
+  messages (or JSON text), each with a known role and some content, with the roles in a sensible
+  order. Added with `~~pointblank.Validate.col_vals_chat_format()`. The **step report** gives the
+  problem with each failing row. [Learn
+  more](../advanced-validation/text-checks.qmd#chat-conversations).
 
 CLI (command-line interface)
 : The `pb` command, which you run in a terminal to use Pointblank without writing Python. `pb
@@ -57023,7 +57046,8 @@ Composable steps
 : A reusable set of **validation steps** that isn't tied to any particular table. You build the set
   with the `Steps` class, using the same method names as `Validate`, and add it to any validation
   with `Validate.add_steps()`. This lets you write common checks once and reuse them for many
-  tables. [Learn more](../advanced-validation/composable-steps.qmd).
+  tables. Some Pointblank functions make a set of steps for you (see **step bundle**). [Learn
+  more](../advanced-validation/composable-steps.qmd).
 
 Conformance report
 : The results of checking a set of clinical trial datasets against **CDISC** rules, given by
@@ -57045,6 +57069,15 @@ Connection string
   the part after it names the table. You can pass a connection string as the data for `Validate`
   or for **CLI** commands, instead of a table you've already loaded. [Learn
   more](../the-pointblank-cli/cli-data-inspection.qmd).
+
+Contamination check
+: A check that the text of each row doesn't overlap with a reference, such as the questions of a
+  benchmark that a model will be scored on. If the training data contains those questions, the
+  model's score on the benchmark looks better than it should. Added with
+  `~~pointblank.Validate.rows_not_contaminated()`. By default, a row overlaps with a reference text
+  if they share a run of 13 words (set with `ngram=`), and `method=` can look for texts that are
+  the same or nearly the same instead. To check a dataset's own splits against each other, see
+  **split check**. [Learn more](../advanced-validation/text-checks.qmd#benchmark-contamination).
 
 Contract
 : A written-down agreement about what a table should look like. It combines a **schema** (the
@@ -57072,6 +57105,9 @@ Contract import
   a **contract**, and `to_python()` or [`to_yaml()`](`ContractImport.to_yaml`) give code. [Learn
   more](../contracts-and-pipelines/importing-contracts.qmd).
 
+Control
+: See **ablation**.
+
 Controlled terminology (CT)
 : CDISC's published lists of the allowed values for clinical trial data, such as the codes for sex,
   race, or units of measure. They're released as dated packages a few times a year, so it's good
@@ -57096,6 +57132,15 @@ Custom check
   showing what passed. Added with `specially()`. [Learn
   more](../validation-plan/validation-methods.qmd).
 
+Data card
+: A Markdown document that describes a dataset for the people who use it, written from a
+  validation with `Validate.to_data_card()`. By default it's a Hugging Face dataset card, which can
+  be saved as the `README.md` of a dataset on the Hub, and `format="datasheet"` gives a datasheet
+  (from *Datasheets for Datasets*) instead. The results of the validation, including the **health
+  score**, are the evidence of the data's quality, and with `ablation=` the card also gives the
+  measured effect of each check (see **ablation**). Details the validation can't know, like the
+  license, are given as arguments. [Learn more](../post-interrogation/data-cards.qmd).
+
 Data coherence
 : In **test data generation**, the way related columns are made to fit together within each row.
   For example, an email address is made from the person's name, and the address, city, postcode,
@@ -57111,16 +57156,27 @@ Data extract
 
 Data freshness
 : Whether a table has recent data. `~~pointblank.Validate.data_freshness()` checks that the latest
-date or time in a
-  column is no older than `max_age=`, given as text like `"6h"`, `"2d"`, or `"1d 12h"`. The
-  **validation report** shows how old the data was, which helps tell a small delay from a pipeline
-  that has stopped. [Learn more](../validation-plan/validation-methods.qmd).
+  date or time in a column is no older than `max_age=`, given as text like `"6h"`, `"2d"`, or `"1d
+  12h"`. The **validation report** shows how old the data was, which helps tell a small delay from a
+  pipeline that has stopped. [Learn more](../validation-plan/validation-methods.qmd).
 
 DataScan
 : An object that holds a column-by-column profile of a table, with statistics like counts, missing
   values, and averages. It's what the **column summary table** is built from. You can save a
   `DataScan` to a JSON file, load it again later, and compare two scans to spot **drift**. [Learn
   more](../data-inspection/col-summary-tbl.qmd).
+
+Datasheet
+: See **data card**.
+
+Defect injection
+: Adding a problem to clean rows on purpose, to see how much it would hurt a model, with
+  `Ablation.inject()`. The defect can be missing values (`"null"`), values moved to the wrong rows
+  (`"shuffle"`), text cut short (`"truncate"`), copied rows (`"duplicate"`), or a function you
+  write, and it's added to a growing share of the rows (`rates=`). `Ablation.suggest_thresholds()`
+  then works out the share of failing rows at which the harm becomes too much, as **thresholds**
+  for the step that checks for the defect. See also **ablation**. [Learn
+  more](../post-interrogation/data-ablation.qmd#injecting-defects).
 
 Define-XML
 : A **CDISC** file format (written in XML) that describes a clinical trial dataset: its column
@@ -57154,7 +57210,8 @@ Drift score
   categorical columns: under 0.1 means little change, and over 0.25 means a large shift. The KS
   (Kolmogorov-Smirnov) test works for numeric columns, and a small p-value (say, under 0.05) means
   the two sets of values differ. Drift scores need the original data, so they can't be worked out
-  for a scan loaded from a JSON file. [Learn more](../data-inspection/col-summary-tbl.qmd).
+  for a scan loaded from a JSON file. The same two measures are used by a **split check** and a
+  **synthetic data check**. [Learn more](../data-inspection/col-summary-tbl.qmd).
 
 Error
 : See **warning, error, and critical**.
@@ -57209,8 +57266,25 @@ Health score
 : A single number from 0 to 100 that sums up data quality: the share of all **test units** that
   passed. Pointblank also works out a score for each **quality dimension**. Get the scores with
   `get_health_score()` and `get_dimension_scores()`, or show them with `get_scorecard()`. They
-  appear in the **validation report** when you use `incl_dimensions=True`. [Learn
-  more](../post-interrogation/quality-dimensions-and-scoring.qmd).
+  appear in the **validation report** when you use `incl_dimensions=True`. When steps are split
+  into **segments**, `by=` gives the scores of each segment, so that one bad region or source
+  isn't hidden by the rest. [Learn more](../post-interrogation/quality-dimensions-and-scoring.qmd).
+
+Heuristic quality filter
+: A simple rule about a text document that's used to clean the data for training a language model,
+  such as how many words it has, how long its words are, or how many of its lines repeat.
+  [`pb.text.heuristic_filters()`](`pointblank.text.heuristic_filters`) makes a **validation step**
+  for each of the filters used for the Gopher models, with their limits as the defaults. Each one
+  is a **scored check**. See also **step bundle**. [Learn
+  more](../advanced-validation/text-checks.qmd#heuristic-quality-filters).
+
+Holdout data
+: Data kept aside for scoring a model, so that every version of the training table in an
+  **ablation** is judged against the same yardstick. Your `evaluate=` function uses it, and it's
+  never ablated itself. With `Ablation(holdout=...)`, Pointblank also checks it with the same steps
+  as the training table, since a problem in the holdout data affects every comparison. The results
+  are in the ablation's `holdout_validation`. [Learn
+  more](../post-interrogation/data-ablation.qmd#checking-the-held-out-data).
 
 Interrogation
 : Running the checks in a **validation plan**, which happens when you call `.interrogate()`.
@@ -57222,6 +57296,9 @@ JSON report
 : The validation results as JSON text, which other programs can read. You get it with
   `Validate.get_json_report()`, and you can choose which details to include with `use_fields=` or
   leave some out with `exclude_fields=`. See also **validation report**.
+
+Leakage
+: See **split check**.
 
 MCP server
 : A way for AI assistants (such as the AI chat in VS Code or Positron) to use Pointblank for
@@ -57252,6 +57329,15 @@ Narwhals
   why a validation you write once works whether your table is in Polars, Pandas, or a database.
   Pointblank installs it for you, so you won't usually need to use it directly.
 
+Near duplicate
+: A row that's almost the same as another, such as two copies of a web page that differ only in a
+  date or a footer. `~~pointblank.Validate.rows_near_distinct()` finds them by comparing the text in
+  lower case and without punctuation, with `threshold=` setting how alike two rows must be. As with
+  `~~pointblank.Validate.rows_distinct()`, every row of a group of near duplicates fails, and the
+  **step report** shows each group together. **Row flags** keep the first row of each group by
+  default, and so does **sundering** with `duplicates="keep_first"`. [Learn
+  more](../advanced-validation/text-checks.qmd#near-duplicates).
+
 Null flavor
 : A standard code from the HL7 and **CDISC** standards that says why a value is missing. For
   example, `"NI"` means no information, `"UNK"` means unknown, and `"ASKU"` means asked but
@@ -57273,6 +57359,16 @@ Partitions
   is needed at once. More partitions use less memory but take longer. See also **table comparison**.
   [Learn more](../table-comparison/comparing-large-files.qmd).
 
+Personal information check
+: A check that text has no email addresses, phone numbers, credit card numbers, or other personal
+  information, made with [`pb.text.no_pii()`](`pointblank.text.no_pii`). Its checks are patterns
+  (`~~pointblank.Validate.col_vals_regex()` steps), so they work on any **backend**, but they find
+  likely matches rather than certain ones. See also **step bundle**. [Learn
+  more](../advanced-validation/text-checks.qmd#language-length-and-personal-information).
+
+PII (personally identifiable information)
+: See **personal information check**.
+
 Pipeline
 : A data-processing step with **contracts** on both sides. A `Pipeline` checks the incoming data
   (the source), runs your transformation function, then checks the result (the target), all in
@@ -57292,7 +57388,10 @@ Preprocessing
 : Changing the table for just one step before it's checked, using the `pre=` option. You give
   `pre=` a function that takes the table and returns a changed version, for example with some rows
   filtered out or a new column added. The original data and other steps are not affected. The
-  number of **test units** is counted after the change. [Learn
+  number of **test units** is counted after the change. Since the rows such a step checked can't
+  be matched to the table's rows, steps with `pre=` are left out of **sundering**, **row flags**,
+  and **ablations**. If your function only filters rows or changes their values, wrap it in
+  `row_preserving()` so that its step is used there too. [Learn
   more](../validation-plan/preprocessing.qmd).
 
 Preset
@@ -57322,6 +57421,16 @@ Quality dimension
   score, and together they make up the **health score**. [Learn
   more](../post-interrogation/quality-dimensions-and-scoring.qmd).
 
+RAG checks
+: Checks for the data behind a retrieval-augmented generation (RAG) system, which answers a
+  question by finding chunks of text like it in a corpus and giving them to an LLM.
+  [`pb.rag.corpus_checks()`](`pointblank.rag.corpus_checks`) checks that every chunk has text, a
+  unique id, the metadata the system needs (such as its source), a useful length, no **near
+  duplicates**, and a recent update. [`pb.rag.eval_checks()`](`pointblank.rag.eval_checks`) checks
+  the evaluation set: that its questions aren't repeated, that each one's *gold* document (the one
+  that answers it) is in the corpus, and, with a **scorer**, that each gold passage is relevant to
+  its question. See also **step bundle**. [Learn more](../advanced-validation/rag-checks.qmd).
+
 Reconciliation
 : Checking that two tables add up to the same numbers even though their rows differ, for example
   that a summary table agrees with the detailed records it was built from.
@@ -57348,7 +57457,9 @@ Report language
 : The language used for the text in reports and in generated **briefs**, set with
   `Validate(lang=...)`. Forty languages are available. A separate option, `locale=`, controls how
   numbers are formatted (for example, whether a comma or a period is used as the decimal mark).
-  [Learn more](../validation-plan/briefs.qmd).
+  What's made from a validation, such as an **ablation**'s report or a **data card**, uses the same
+  language, and these (along with the reports of a **split check** or a **synthetic data check**)
+  also take `lang=` and `locale=` of their own. [Learn more](../validation-plan/briefs.qmd).
 
 Round trip
 : Turning something into another form and back again, ending up with the same thing. For example, a
@@ -57359,11 +57470,22 @@ Round trip
   more](../advanced-validation/plan-serialization.qmd).
 
 Row-based check
-: A check on whole rows rather than on single values. `~~pointblank.Validate.rows_distinct()` checks
-that no row appears
-  more than once, and `~~pointblank.Validate.rows_complete()` checks that no row has missing values.
-  Both can look at just some of the columns with `columns_subset=`. [Learn
-  more](../validation-plan/validation-methods.qmd).
+: A check on whole rows rather than on single values. `~~pointblank.Validate.rows_distinct()`
+  checks that no row appears more than once, and `~~pointblank.Validate.rows_complete()` checks
+  that no row has missing values. Both can look at just some of the columns with `columns_subset=`.
+  See also **near duplicate**. [Learn more](../validation-plan/validation-methods.qmd).
+
+Row flags
+: A copy of the table with a `True`/`False` column for each row-level **validation step**
+  (`pb_failed_1_`, `pb_failed_2_`, and so on) saying whether the row failed it, made with
+  `Validate.get_row_flags()`. It also has the number of steps each row failed (`pb_n_failed_`), the
+  share of its checks that it passed (`pb_row_score_`), and the scores of any **scored checks**.
+  Where **sundering** only splits the rows into passing and failing, the flags let you decide later
+  which checks matter for each use of the data. [Learn
+  more](../post-interrogation/sundering.qmd#flagging-rows-instead-of-splitting-them).
+
+Row-preserving preprocessing
+: See **preprocessing**.
 
 Row status
 : The result for one row in a **table comparison**: `match` (in both tables, with equal values),
@@ -57384,6 +57506,25 @@ Scorecard
   with `Validate.get_scorecard()`. [Learn
   more](../post-interrogation/quality-dimensions-and-scoring.qmd).
 
+Scored check
+: A **validation step** that gives each row a score with a **scorer** and checks that the score is
+  within bounds (`min_val=` and `max_val=`). This is for checks about the meaning of text, such as
+  whether a document is in the expected language, whether a passage answers its query, or whether
+  text is of good quality. Added with `~~pointblank.Validate.col_vals_scored()`. Rows without a
+  score fail unless `na_pass=True`. The scores are kept with the results, so they show in the
+  **step report** and the **row flags**. [Learn more](../advanced-validation/scored-validation.qmd).
+
+Scorer
+: A function that takes a batch of rows (as a list of dictionaries) and returns a score for each,
+  used by a **scored check**. You can write your own, or use one of the adapters in `pb.scorers`
+  for common kinds of models, such as [`reranker()`](`pointblank.scorers.reranker`),
+  [`classifier()`](`pointblank.scorers.classifier`), [`langid()`](`pointblank.scorers.langid`),
+  and [`token_count()`](`pointblank.scorers.token_count`). The adapters use models you already
+  have, since Pointblank never trains one. Scores are cached by the scorer's name and version and
+  the row's values, so no row is scored twice, and with a directory as `cache=`, the cache is kept
+  on disk for later sessions. [Learn
+  more](../advanced-validation/scored-validation.qmd#writing-a-scorer).
+
 SDTM (Study Data Tabulation Model)
 : A **CDISC** standard for organizing the data collected in a clinical trial into tables called
   *domains*, such as DM (demographics), AE (adverse events), and LB (lab results). Pointblank can
@@ -57402,7 +57543,9 @@ Seed
 : A number that makes randomly generated data repeatable: `generate_dataset(schema, seed=23)` gives
   the same rows each time with the same version of Pointblank. The `generate_dataset` pytest
   fixture picks a seed from each test's name, so every test gets its own data, which stays the
-  same from one run to the next. [Learn more](../test-data-generation/pytest-fixture.qmd).
+  same from one run to the next. In a **synthetic data check**, the *seed* is something else: the
+  real data that the synthetic data was made from. [Learn
+  more](../test-data-generation/pytest-fixture.qmd).
 
 Segment
 : A group of rows that gets checked and reported on its own. Using `segments=` splits one step
@@ -57413,6 +57556,15 @@ Segment
 
 Severity level
 : See **warning, error, and critical**.
+
+Shapley value
+: A step's fair share of the effect of removing the failing rows of every step in an
+  **ablation**. The steps' failing rows overlap, so their effects on their own don't add up to the
+  effect of removing them all. A step's Shapley value is its average effect when it's added to
+  every combination of the other steps, and the values of all the steps add up to the total.
+  `Ablation.shapley()` adds the variants that are needed, and `Ablation.get_shapley()` gives the
+  values as a table. [Learn
+  more](../post-interrogation/data-ablation.qmd#sharing-the-effect-among-the-steps).
 
 Source and target
 : The two sides of a **table comparison** or a **pipeline**. In a table comparison, the source is
@@ -57429,6 +57581,14 @@ Specification check
   `~~pointblank.Validate.col_vals_within_spec()`, for example with `spec="email"` or
   `spec="postal_code[USA]"`. [Learn more](../validation-plan/validation-methods.qmd).
 
+Split check
+: A check that the splits of a dataset (for example, the training, validation, and test splits
+  used for a model) are independent and alike. `check_splits()` finds rows of one split that are
+  also in another (*leakage*), exactly or, with `near=True`, nearly; labels that a split is missing
+  or has on its own (with `label=`); and columns whose values are distributed differently (with
+  **drift scores**). It returns a `SplitCheck`, whose `ok` is `True` if no problems were found and
+  whose `issues` lists them. [Learn more](../table-comparison/checking-splits.qmd).
+
 Status check
 : A method that tells you how a validation went, as `True` or `False`, without stopping your code.
   [`all_passed()`](`Validate.all_passed`) tells you whether every **test unit** passed, and
@@ -57441,6 +57601,18 @@ Step
   columns="id")`), so that it can be saved as YAML or JSON. [Learn
   more](../contracts-and-pipelines/contracts.qmd).
 
+Step bundle
+: A ready-made set of **validation steps** for a common task, given as a `Steps` collection that you
+  add to a validation with `Validate.add_steps()`. For text, there are
+  [`pb.text.heuristic_filters()`](`pointblank.text.heuristic_filters`),
+  [`pb.text.in_language()`](`pointblank.text.in_language`),
+  [`pb.text.token_length()`](`pointblank.text.token_length`), and
+  [`pb.text.no_pii()`](`pointblank.text.no_pii`), and for RAG data, there are
+  [`pb.rag.corpus_checks()`](`pointblank.rag.corpus_checks`) and
+  [`pb.rag.eval_checks()`](`pointblank.rag.eval_checks`). Each step of a bundle is an ordinary
+  step, so you can change it or turn it off. See also **composable steps**. [Learn
+  more](../advanced-validation/text-checks.qmd).
+
 Step report
 : A detailed view of a single **validation step**, showing what it checked and, where it makes
   sense, the rows that failed. You get one with `Validate.get_step_report()`. See also **validation
@@ -57452,8 +57624,28 @@ Structured missingness
 Sundering
 : Splitting a table in two after validation: the rows that passed every row-by-row check, and the
   rows that failed at least one. You get either part with `Validate.get_sundered_data()`, using
-  `type="pass"` or `type="fail"`. See also **data extract**. [Learn
+  `type="pass"` or `type="fail"`. Steps with `pre=` are left out unless the function is marked
+  with `row_preserving()` (see **preprocessing**), and checks for duplicate rows are left out
+  unless you say which copy to keep with `duplicates=` (such as `"keep_first"`). To see which steps
+  each row failed, use **row flags**. See also **data extract**. [Learn
   more](../post-interrogation/sundering.qmd).
+
+Sweep
+: A set of **ablation** variants that try one setting at several values, to find where a limit
+  should be. `Ablation.sweep_step()` makes a variant for each of a list of values of one of a step's
+  parameters (for example, `value=` at 1,500, 2,000, and 2,500), removing the rows that fail the
+  step with that value. `Ablation.sweep_score()` removes a growing share of the highest- or
+  lowest-scoring rows of a **scored check**. The report shows the effect at each value as a curve.
+  [Learn more](../post-interrogation/data-ablation.qmd#sweeping-a-threshold).
+
+Synthetic data check
+: A comparison of synthetic data with the real data it was made from (its *seed*), made with
+  `check_synthetic()`. It checks *fidelity* (whether each column's values and share of missing
+  values are like the seed's, using **drift scores**), *diversity* (whether rows or text repeat
+  more than in the seed, a sign of a generator stuck on a few kinds of rows), and *copies*
+  (synthetic rows that are the same as a seed row, or whose text nearly is, which can give private
+  data away). It returns a `SyntheticCheck`, whose `ok` is `True` if no problems were found and
+  whose `issues` lists them. [Learn more](../table-comparison/checking-synthetic-data.qmd).
 
 Table comparison
 : Finding the differences between two tables. [`compare()`](`pointblank.compare`) matches up the
@@ -57510,11 +57702,10 @@ Tolerance
 
 Trend check
 : A check that a column's values go up (`~~pointblank.Validate.col_vals_increasing()`) or down
-(`~~pointblank.Validate.col_vals_decreasing()`)
-  from one row to the next, as in a time series. Repeated values fail unless
-  `allow_stationary=True`. Rows are compared in the table's own order, or in the order given by
-  `order_by=`, which database tables need since their rows have no fixed order. [Learn
-  more](../validation-plan/validation-methods.qmd).
+  (`~~pointblank.Validate.col_vals_decreasing()`) from one row to the next, as in a time series.
+  Repeated values fail unless `allow_stationary=True`. Rows are compared in the table's own order,
+  or in the order given by `order_by=`, which database tables need since their rows have no fixed
+  order. [Learn more](../validation-plan/validation-methods.qmd).
 
 Validate
 : The main class in Pointblank. A `Validate` object holds your table, settings like
@@ -57525,10 +57716,9 @@ Validate
 
 Validation method
 : A method of `Validate` that adds a check to the **validation plan**, such as
-`~~pointblank.Validate.col_vals_gt()`
-  (values are greater than some number) or `~~pointblank.Validate.rows_distinct()` (no duplicate
-  rows). Each call adds one or more **validation steps**. [Learn
-  more](../validation-plan/validation-methods.qmd).
+  `~~pointblank.Validate.col_vals_gt()` (values are greater than some number) or
+  `~~pointblank.Validate.rows_distinct()` (no duplicate rows). Each call adds one or more
+  **validation steps**. [Learn more](../validation-plan/validation-methods.qmd).
 
 Validation plan
 : The list of checks you've added to a `Validate` object. Building the plan doesn't check anything
@@ -57554,6 +57744,12 @@ Validation template
   then give a table each time it runs with `yaml_interrogate(..., set_tbl=...)`. This way, a set of
   checks written once can be run on, say, each quarter's data. [Learn
   more](../yaml/yaml-validation-workflows.qmd).
+
+Variant
+: See **ablation**.
+
+Verdict
+: See **ablation**.
 
 Violation handling
 : What happens when data fails a **contract** inside a **pipeline**, set with the contract's

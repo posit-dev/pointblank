@@ -2,6 +2,9 @@
 
 This page explains the terms used throughout the Pointblank documentation, in alphabetical order. Where a term matches something in Pointblank's API, the name of the class, function, or method is shown in `code`. Terms in **bold** have their own entry on this page.
 
+Ablation  
+An experiment that measures whether the rows failing a **validation step** actually matter to a model trained on the data. The [Ablation](../../reference/Ablation.md#pointblank.Ablation) class takes an interrogated validation and an `evaluate=` function that you write, which trains and scores your model on a version of the table. Methods such as [Ablation.drop_each()](../../reference/Ablation.drop_each.md#pointblank.Ablation.drop_each) add *variants* (versions of the table with some failing rows removed), and [Ablation.run()](../../reference/Ablation.run.md#pointblank.Ablation.run) evaluates them. Each variant is compared with a *control* that removes the same number of rows at random, and gets a verdict: it *helps*, *hurts*, or is *inconclusive*. A step whose rows help on their own but add nothing once the other steps' rows are removed is *redundant*. An ablation can also be written in a **YAML workflow** and loaded with [yaml_ablation()](../../reference/yaml_ablation.md#pointblank.yaml_ablation). See also **sweep**, **defect injection**, **Shapley value**, and **holdout data**. [Learn more](../post-interrogation/data-ablation.md).
+
 Action  
 Something Pointblank does when a step's failures reach a **threshold** level, such as printing a message or running a function you supply. You set actions with the [Actions](../../reference/Actions.md#pointblank.Actions) class, either for the whole validation (`Validate(actions=...)`) or for a single step. Messages can include placeholders like `{step}`, `{col}`, and `{level}`, which are filled in when the action runs. By default, only the action for the most serious level reached is run. Inside a function used as an action, [get_action_metadata()](../../reference/get_action_metadata.md#pointblank.get_action_metadata) gives details such as the step number, the column, and the level reached. See also **final action**. [Learn more](../validation-plan/actions.md).
 
@@ -15,13 +18,13 @@ Aggregate check
 A check on a summary of a whole column, such as its sum, average, or standard deviation, instead of on each value. Examples include [col_sum_gt()](../../reference/Validate.col_sum_gt.md#pointblank.Validate.col_sum_gt), [col_avg_eq()](../../reference/Validate.col_avg_eq.md#pointblank.Validate.col_avg_eq), and [col_sd_lt()](../../reference/Validate.col_sd_lt.md#pointblank.Validate.col_sd_lt). Because the whole column is summarized into one number, an aggregate check has a single **test unit**. Use `tol=` to allow some leeway (see **tolerance**), and set **reference data** to compare with the same summary of another table. [Learn more](../validation-plan/validation-methods.md).
 
 AI check  
-A **validation step** where a large language model (LLM) reads each row and judges whether it follows a rule you describe in plain words. This helps with rules that are hard to write as code, like "the description should mention the product's color". Added with [prompt()](../../reference/Validate.prompt.md#pointblank.Validate.prompt). [Learn more](../validation-plan/validation-methods.md).
+A **validation step** where a large language model (LLM) reads each row and judges whether it follows a rule you describe in plain words. This helps with rules that are hard to write as code, like "the description should mention the product's color". Added with [prompt()](../../reference/Validate.prompt.md#pointblank.Validate.prompt). With a list of models in `model=`, each model judges every row and their verdicts are combined by a vote (`aggregate=`). To see how far to trust the step, label some rows yourself and compare them with its results using [calibrate_prompt()](../../reference/Validate.calibrate_prompt.md#pointblank.Validate.calibrate_prompt). [Learn more](../validation-plan/validation-methods.md).
 
 AI Validation Editor  
 A tool that changes an existing **validation plan** based on a plain-English instruction, such as "also check that the email column has no missing values". It uses an LLM to write the revised plan. With the [EditValidation](../../reference/EditValidation.md#pointblank.EditValidation) class you can see what changed ([diff()](../../reference/EditValidation.md#pointblank.EditValidation.diff) or [review()](../../reference/EditValidation.md#pointblank.EditValidation.review)) and then get the new plan with [accept()](../../reference/EditValidation.md#pointblank.EditValidation.accept). It's also available from the **CLI** as `pb edit`. See also **DraftValidation**. [Learn more](../advanced-validation/ai-validation-editor.md).
 
 Assertion  
-A way to stop your code when data doesn't pass validation. After building a plan, call [assert_passing()](../../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing) to raise an error if any **test unit** failed, or [assert_below_threshold()](../../reference/Validate.assert_below_threshold.md#pointblank.Validate.assert_below_threshold) to raise an error if a **threshold** level was reached. Both run **interrogation** first if it hasn't happened yet. This is handy in data pipelines and tests. There's also [assert_dimension_scores()](../../reference/Validate.assert_dimension_scores.md#pointblank.Validate.assert_dimension_scores), which raises an error if the score for any **quality dimension** is below a minimum you set. If you'd rather get `True` or `False` than an error, use a **status check**. [Learn more](../advanced-validation/assertions.md).
+A way to stop your code when data doesn't pass validation. After building a plan, call [assert_passing()](../../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing) to raise an error if any **test unit** failed, or [assert_below_threshold()](../../reference/Validate.assert_below_threshold.md#pointblank.Validate.assert_below_threshold) to raise an error if a **threshold** level was reached. Both run **interrogation** first if it hasn't happened yet. This is handy in data pipelines and tests. There's also [assert_dimension_scores()](../../reference/Validate.assert_dimension_scores.md#pointblank.Validate.assert_dimension_scores), which raises an error if the score for any **quality dimension** is below a minimum you set (in every **segment**, with `by=`). If you'd rather get `True` or `False` than an error, use a **status check**. [Learn more](../advanced-validation/assertions.md).
 
 Assistant  
 A chat window where you can ask an LLM questions about your data and about Pointblank. You start it with `assistant()`, and it opens in your web browser or in the terminal. If you give it a table, a summary of that table is shared with the model so its answers fit your data.
@@ -37,6 +40,9 @@ A short description of what a **validation step** checks, shown in the STEP colu
 
 CDISC (Clinical Data Interchange Standards Consortium)  
 The organization that sets data standards for clinical trials, including **SDTM**, **ADaM**, and **Define-XML**. Pointblank can read CDISC metadata, check that datasets have the expected structure, and check a set of trial datasets against CDISC's rules. It can do that last part with its own built-in rules ([validate_sdtmig()](../../reference/validate_sdtmig.md#pointblank.validate_sdtmig)) or by running the **CORE** engine. [Learn more](../metadata-import/cdisc-validation.md).
+
+Chat format check  
+A check that each row holds a well-formed conversation for training a chat model: a list of messages (or JSON text), each with a known role and some content, with the roles in a sensible order. Added with [col_vals_chat_format()](../../reference/Validate.col_vals_chat_format.md#pointblank.Validate.col_vals_chat_format). The **step report** gives the problem with each failing row. [Learn more](../advanced-validation/text-checks.md#chat-conversations).
 
 CLI (command-line interface)  
 The `pb` command, which you run in a terminal to use Pointblank without writing Python. `pb preview`, `pb scan`, `pb missing`, and `pb info` let you look at a table. `pb validate` runs quick one-off checks, and `pb run` runs a full validation written in Python or YAML. `pb compare` runs a **table comparison**, `pb make-template` creates a starter file, and `pb edit` opens the **AI Validation Editor**. See also **exit code**. [Learn more](../../reference/cli/index.md).
@@ -60,7 +66,7 @@ Comparison
 See **table comparison**.
 
 Composable steps  
-A reusable set of **validation steps** that isn't tied to any particular table. You build the set with the [Steps](../../reference/Steps.md#pointblank.Steps) class, using the same method names as [Validate](../../reference/Validate.md#pointblank.Validate), and add it to any validation with [Validate.add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps). This lets you write common checks once and reuse them for many tables. [Learn more](../advanced-validation/composable-steps.md).
+A reusable set of **validation steps** that isn't tied to any particular table. You build the set with the [Steps](../../reference/Steps.md#pointblank.Steps) class, using the same method names as [Validate](../../reference/Validate.md#pointblank.Validate), and add it to any validation with [Validate.add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps). This lets you write common checks once and reuse them for many tables. Some Pointblank functions make a set of steps for you (see **step bundle**). [Learn more](../advanced-validation/composable-steps.md).
 
 Conformance report  
 The results of checking a set of clinical trial datasets against **CDISC** rules, given by [validate_sdtmig()](../../reference/validate_sdtmig.md#pointblank.validate_sdtmig) and [validate_cdisc_submission()](../../reference/validate_cdisc_submission.md#pointblank.validate_cdisc_submission) as a [ConformanceReport](../../reference/ConformanceReport.md#pointblank.ConformanceReport). Its table shows one row per rule, with a status of pass, fail, error, not applicable, or not supported. The *findings* (one for each record that broke a rule, with the column and value at fault) are available as a table with [get_findings_table()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table) or as a DataFrame with [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df). [Learn more](../metadata-import/cdisc-submission-conformance.md).
@@ -71,6 +77,9 @@ A single **validation step** that checks several conditions on each row at once.
 Connection string  
 A piece of text that points to a database table, such as `"duckdb:///path/to/db.ddb::table_name"`. The part before `::` says how to reach the database, and the part after it names the table. You can pass a connection string as the data for [Validate](../../reference/Validate.md#pointblank.Validate) or for **CLI** commands, instead of a table you've already loaded. [Learn more](../the-pointblank-cli/cli-data-inspection.md).
 
+Contamination check  
+A check that the text of each row doesn't overlap with a reference, such as the questions of a benchmark that a model will be scored on. If the training data contains those questions, the model's score on the benchmark looks better than it should. Added with [rows_not_contaminated()](../../reference/Validate.rows_not_contaminated.md#pointblank.Validate.rows_not_contaminated). By default, a row overlaps with a reference text if they share a run of 13 words (set with `ngram=`), and `method=` can look for texts that are the same or nearly the same instead. To check a dataset's own splits against each other, see **split check**. [Learn more](../advanced-validation/text-checks.md#benchmark-contamination).
+
 Contract  
 A written-down agreement about what a table should look like. It combines a **schema** (the expected columns and their types), a list of rules, and details like the owner and version. You create one with the [Contract](../../reference/Contract.md#pointblank.Contract) class and check a table against it with `.validate(data)`. Contracts can be saved as YAML, imported from other formats (such as JSON Schema, Frictionless, dbt, and ODCS) with [`import_contract()`](../../reference/import_contract.md#pointblank.import_contract), and exported with [`export_contract()`](../../reference/export_contract.md#pointblank.export_contract). See also **pipeline**, **contract import**, and **violation handling**. [Learn more](../contracts-and-pipelines/contracts.md).
 
@@ -79,6 +88,9 @@ The part of Pointblank that translates between a **contract** and one outside fo
 
 Contract import  
 What you get back from [`import_contract()`](../../reference/import_contract.md#pointblank.import_contract): a [ContractImport](../../reference/ContractImport.md#pointblank.ContractImport) object holding the checks that were translated from an outside format. Nothing is checked yet. Its `coverage` is the share of the outside rules that could be translated, and `warnings` lists any that couldn't. From there, `to_validate(data)` gives a **validation plan**, [to_contract()](../../reference/ContractImport.md#pointblank.ContractImport.to_contract) gives a **contract**, and [to_python()](../../reference/ContractImport.md#pointblank.ContractImport.to_python) or [`to_yaml()`](../../reference/ContractImport.md#pointblank.ContractImport.to_yaml) give code. [Learn more](../contracts-and-pipelines/importing-contracts.md).
+
+Control  
+See **ablation**.
 
 Controlled terminology (CT)  
 CDISC's published lists of the allowed values for clinical trial data, such as the codes for sex, race, or units of measure. They're released as dated packages a few times a year, so it's good practice to use the same version your study was set up with. `import_metadata(..., format="cdisc_ct")` reads a package as a set of **codelists**, and [validate_sdtmig()](../../reference/validate_sdtmig.md#pointblank.validate_sdtmig) checks values against a package that comes with Pointblank (or one you pick with `ct_packages=`). Some codelists are *extensible*, meaning a study may add its own values. [Learn more](../metadata-import/cdisc-validation.md).
@@ -92,6 +104,9 @@ See **warning, error, and critical**.
 Custom check  
 A **validation step** that uses a function you write, for rules that none of the built-in validation methods cover. Your function receives the table and returns `True` or `False` values showing what passed. Added with [specially()](../../reference/Validate.specially.md#pointblank.Validate.specially). [Learn more](../validation-plan/validation-methods.md).
 
+Data card  
+A Markdown document that describes a dataset for the people who use it, written from a validation with [Validate.to_data_card()](../../reference/Validate.to_data_card.md#pointblank.Validate.to_data_card). By default it's a Hugging Face dataset card, which can be saved as the `README.md` of a dataset on the Hub, and `format="datasheet"` gives a datasheet (from *Datasheets for Datasets*) instead. The results of the validation, including the **health score**, are the evidence of the data's quality, and with `ablation=` the card also gives the measured effect of each check (see **ablation**). Details the validation can't know, like the license, are given as arguments. [Learn more](../post-interrogation/data-cards.md).
+
 Data coherence  
 In **test data generation**, the way related columns are made to fit together within each row. For example, an email address is made from the person's name, and the address, city, postcode, phone number, and coordinates all belong to the same place. This happens on its own when related **presets** are used together, and it still holds when rows from several countries are mixed. [Learn more](../test-data-generation/country-specific-data.md#data-coherence).
 
@@ -103,6 +118,12 @@ Whether a table has recent data. [data_freshness()](../../reference/Validate.dat
 
 DataScan  
 An object that holds a column-by-column profile of a table, with statistics like counts, missing values, and averages. It's what the **column summary table** is built from. You can save a [DataScan](../../reference/DataScan.md#pointblank.DataScan) to a JSON file, load it again later, and compare two scans to spot **drift**. [Learn more](../data-inspection/col-summary-tbl.md).
+
+Datasheet  
+See **data card**.
+
+Defect injection  
+Adding a problem to clean rows on purpose, to see how much it would hurt a model, with [Ablation.inject()](../../reference/Ablation.inject.md#pointblank.Ablation.inject). The defect can be missing values (`"null"`), values moved to the wrong rows (`"shuffle"`), text cut short (`"truncate"`), copied rows (`"duplicate"`), or a function you write, and it's added to a growing share of the rows (`rates=`). [Ablation.suggest_thresholds()](../../reference/Ablation.suggest_thresholds.md#pointblank.Ablation.suggest_thresholds) then works out the share of failing rows at which the harm becomes too much, as **thresholds** for the step that checks for the defect. See also **ablation**. [Learn more](../post-interrogation/data-ablation.md#injecting-defects).
 
 Define-XML  
 A **CDISC** file format (written in XML) that describes a clinical trial dataset: its column names, labels, types, and allowed values. Pointblank can read Define-XML files with [import_metadata()](../../reference/import_metadata.md#pointblank.import_metadata) and can pass them to **CORE**. [Learn more](../metadata-import/cdisc-validation.md).
@@ -120,7 +141,7 @@ Drift
 A change in a table between two points in time, like a column being added or removed, or the typical values in a column shifting. You can look for drift by comparing two **DataScan** objects with [DataScan.compare()](../../reference/DataScan.compare.md#pointblank.DataScan.compare). It returns a [DataScanDiff](../../reference/DataScanDiff.md#pointblank.DataScanDiff), which lists the columns that were added, removed, or changed, along with **drift scores**. [Learn more](../data-inspection/col-summary-tbl.md).
 
 Drift score  
-A number that measures how far a column's values have shifted between two **DataScan** objects. [DataScan.compare()](../../reference/DataScan.compare.md#pointblank.DataScan.compare) gives two kinds. The PSI (Population Stability Index) works for numeric and categorical columns: under 0.1 means little change, and over 0.25 means a large shift. The KS (Kolmogorov-Smirnov) test works for numeric columns, and a small p-value (say, under 0.05) means the two sets of values differ. Drift scores need the original data, so they can't be worked out for a scan loaded from a JSON file. [Learn more](../data-inspection/col-summary-tbl.md).
+A number that measures how far a column's values have shifted between two **DataScan** objects. [DataScan.compare()](../../reference/DataScan.compare.md#pointblank.DataScan.compare) gives two kinds. The PSI (Population Stability Index) works for numeric and categorical columns: under 0.1 means little change, and over 0.25 means a large shift. The KS (Kolmogorov-Smirnov) test works for numeric columns, and a small p-value (say, under 0.05) means the two sets of values differ. Drift scores need the original data, so they can't be worked out for a scan loaded from a JSON file. The same two measures are used by a **split check** and a **synthetic data check**. [Learn more](../data-inspection/col-summary-tbl.md).
 
 Error  
 See **warning, error, and critical**.
@@ -147,13 +168,22 @@ Great Tables
 The Python library Pointblank uses to make its tables, such as the **validation report**, the **step report**, and the **column summary table**. These come back as Great Tables `GT` objects, so you can show them, turn them into HTML with `as_raw_html()`, or save them as an image with `gtsave()`.
 
 Health score  
-A single number from 0 to 100 that sums up data quality: the share of all **test units** that passed. Pointblank also works out a score for each **quality dimension**. Get the scores with [get_health_score()](../../reference/Validate.get_health_score.md#pointblank.Validate.get_health_score) and [get_dimension_scores()](../../reference/Validate.get_dimension_scores.md#pointblank.Validate.get_dimension_scores), or show them with [get_scorecard()](../../reference/Validate.get_scorecard.md#pointblank.Validate.get_scorecard). They appear in the **validation report** when you use `incl_dimensions=True`. [Learn more](../post-interrogation/quality-dimensions-and-scoring.md).
+A single number from 0 to 100 that sums up data quality: the share of all **test units** that passed. Pointblank also works out a score for each **quality dimension**. Get the scores with [get_health_score()](../../reference/Validate.get_health_score.md#pointblank.Validate.get_health_score) and [get_dimension_scores()](../../reference/Validate.get_dimension_scores.md#pointblank.Validate.get_dimension_scores), or show them with [get_scorecard()](../../reference/Validate.get_scorecard.md#pointblank.Validate.get_scorecard). They appear in the **validation report** when you use `incl_dimensions=True`. When steps are split into **segments**, `by=` gives the scores of each segment, so that one bad region or source isn't hidden by the rest. [Learn more](../post-interrogation/quality-dimensions-and-scoring.md).
+
+Heuristic quality filter  
+A simple rule about a text document that's used to clean the data for training a language model, such as how many words it has, how long its words are, or how many of its lines repeat. [`pb.text.heuristic_filters()`](../../reference/text.heuristic_filters.md#pointblank.text.heuristic_filters) makes a **validation step** for each of the filters used for the Gopher models, with their limits as the defaults. Each one is a **scored check**. See also **step bundle**. [Learn more](../advanced-validation/text-checks.md#heuristic-quality-filters).
+
+Holdout data  
+Data kept aside for scoring a model, so that every version of the training table in an **ablation** is judged against the same yardstick. Your `evaluate=` function uses it, and it's never ablated itself. With `Ablation(holdout=...)`, Pointblank also checks it with the same steps as the training table, since a problem in the holdout data affects every comparison. The results are in the ablation's `holdout_validation`. [Learn more](../post-interrogation/data-ablation.md#checking-the-held-out-data).
 
 Interrogation  
 Running the checks in a **validation plan**, which happens when you call `.interrogate()`. Nothing is checked until then. Interrogation runs every step, counts what passed and failed, compares the counts to the **thresholds**, runs any **actions**, and saves **data extracts**. [Learn more](../validation-plan/validation-overview.md).
 
 JSON report  
 The validation results as JSON text, which other programs can read. You get it with [Validate.get_json_report()](../../reference/Validate.get_json_report.md#pointblank.Validate.get_json_report), and you can choose which details to include with `use_fields=` or leave some out with `exclude_fields=`. See also **validation report**.
+
+Leakage  
+See **split check**.
 
 MCP server  
 A way for AI assistants (such as the AI chat in VS Code or Positron) to use Pointblank for you. MCP (Model Context Protocol) is a standard way for AI tools to connect to other programs. Through it, an assistant can load data, build and run validations, and show previews and summaries. [Learn more](../integrations/mcp-quick-start.md).
@@ -170,6 +200,9 @@ An option on many validation methods that decides whether missing values (nulls)
 Narwhals  
 The library Pointblank uses to work with tables from different **backends** in the same way. It's why a validation you write once works whether your table is in Polars, Pandas, or a database. Pointblank installs it for you, so you won't usually need to use it directly.
 
+Near duplicate  
+A row that's almost the same as another, such as two copies of a web page that differ only in a date or a footer. [rows_near_distinct()](../../reference/Validate.rows_near_distinct.md#pointblank.Validate.rows_near_distinct) finds them by comparing the text in lower case and without punctuation, with `threshold=` setting how alike two rows must be. As with [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct), every row of a group of near duplicates fails, and the **step report** shows each group together. **Row flags** keep the first row of each group by default, and so does **sundering** with `duplicates="keep_first"`. [Learn more](../advanced-validation/text-checks.md#near-duplicates).
+
 Null flavor  
 A standard code from the HL7 and **CDISC** standards that says why a value is missing. For example, `"NI"` means no information, `"UNK"` means unknown, and `"ASKU"` means asked but unknown. [MissingSpec.from_cdisc_null_flavors()](../../reference/MissingSpec.md#pointblank.MissingSpec.from_cdisc_null_flavors) sets up all 14 codes for you. See also **coded missing value**. [Learn more](../metadata-import/cdisc-validation.md).
 
@@ -179,6 +212,12 @@ OpenTelemetry is a widely used standard for sending measurements from programs t
 Partitions  
 A way to compare tables that are too large to fit in memory. With `partitions=N`, [`compare()`](../../reference/compare.md#pointblank.compare) (and [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) and [tbl_reconcile()](../../reference/Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile)) works through the tables in N passes, each covering a share of the keys from both tables. The results are the same as in a single pass, but less memory is needed at once. More partitions use less memory but take longer. See also **table comparison**. [Learn more](../table-comparison/comparing-large-files.md).
 
+Personal information check  
+A check that text has no email addresses, phone numbers, credit card numbers, or other personal information, made with [`pb.text.no_pii()`](../../reference/text.no_pii.md#pointblank.text.no_pii). Its checks are patterns ([col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) steps), so they work on any **backend**, but they find likely matches rather than certain ones. See also **step bundle**. [Learn more](../advanced-validation/text-checks.md#language-length-and-personal-information).
+
+PII (personally identifiable information)  
+See **personal information check**.
+
 Pipeline  
 A data-processing step with **contracts** on both sides. A [Pipeline](../../reference/Pipeline.md#pointblank.Pipeline) checks the incoming data (the source), runs your transformation function, then checks the result (the target), all in one call to `run(data, transform)`. By default, if the incoming data fails, the transformation is skipped. The [PipelineResult](../../reference/PipelineResult.md#pointblank.PipelineResult) that comes back holds both validations and the transformed data, and its [passed](../../reference/PipelineResult.md#pointblank.PipelineResult.passed) is `True` only if both checks passed. Checking data at these two points is sometimes called *boundary enforcement*. See also **source and target** and **violation handling**. [Learn more](../contracts-and-pipelines/pipelines.md).
 
@@ -186,7 +225,7 @@ Plan serialization
 Turning a **validation plan** into text so it can be saved, shared, reviewed, or rebuilt later. [Validate.to_code()](../../reference/Validate.to_code.md#pointblank.Validate.to_code) gives Python code, [Validate.to_yaml()](../../reference/Validate.to_yaml.md#pointblank.Validate.to_yaml) gives a **YAML workflow**, and [Validate.to_json_schema()](../../reference/Validate.to_json_schema.md#pointblank.Validate.to_json_schema) gives a JSON Schema document. See also **round trip**. [Learn more](../advanced-validation/plan-serialization.md).
 
 Preprocessing  
-Changing the table for just one step before it's checked, using the `pre=` option. You give `pre=` a function that takes the table and returns a changed version, for example with some rows filtered out or a new column added. The original data and other steps are not affected. The number of **test units** is counted after the change. [Learn more](../validation-plan/preprocessing.md).
+Changing the table for just one step before it's checked, using the `pre=` option. You give `pre=` a function that takes the table and returns a changed version, for example with some rows filtered out or a new column added. The original data and other steps are not affected. The number of **test units** is counted after the change. Since the rows such a step checked can't be matched to the table's rows, steps with `pre=` are left out of **sundering**, **row flags**, and **ablations**. If your function only filters rows or changes their values, wrap it in [row_preserving()](../../reference/row_preserving.md#pointblank.row_preserving) so that its step is used there too. [Learn more](../validation-plan/preprocessing.md).
 
 Preset  
 A ready-made kind of realistic text for **test data generation**, chosen with `string_field(preset=...)`. There are presets for names, email addresses, street addresses, cities, phone numbers, company names, URLs, credit card numbers, and more. [profile_fields()](../../reference/profile_fields.md#pointblank.profile_fields) gives a whole set of person-related presets at once. Presets follow the `country=` given to [generate_dataset()](../../reference/generate_dataset.md#pointblank.generate_dataset), and related presets fit together within a row (see **data coherence**). [Learn more](../test-data-generation/generating-test-data.md#available-presets).
@@ -200,6 +239,9 @@ A way to write Python code inside a **YAML workflow**, for settings that need it
 Quality dimension  
 A category describing what kind of data quality a step measures. The categories are *completeness*, *validity*, *uniqueness*, *consistency*, *timeliness*, and *volume*. Each validation method has a default category (for example, [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null) measures completeness), and you can change it with `dimension=`. Each dimension gets its own score, and together they make up the **health score**. [Learn more](../post-interrogation/quality-dimensions-and-scoring.md).
 
+RAG checks  
+Checks for the data behind a retrieval-augmented generation (RAG) system, which answers a question by finding chunks of text like it in a corpus and giving them to an LLM. [`pb.rag.corpus_checks()`](../../reference/rag.corpus_checks.md#pointblank.rag.corpus_checks) checks that every chunk has text, a unique id, the metadata the system needs (such as its source), a useful length, no **near duplicates**, and a recent update. [`pb.rag.eval_checks()`](../../reference/rag.eval_checks.md#pointblank.rag.eval_checks) checks the evaluation set: that its questions aren't repeated, that each one's *gold* document (the one that answers it) is in the corpus, and, with a **scorer**, that each gold passage is relevant to its question. See also **step bundle**. [Learn more](../advanced-validation/rag-checks.md).
+
 Reconciliation  
 Checking that two tables add up to the same numbers even though their rows differ, for example that a summary table agrees with the detailed records it was built from. [tbl_reconcile()](../../reference/Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile) groups both tables by the `keys=` columns, totals the `measures=` columns (with `agg="sum"` by default, or `"count"`, `"mean"`, `"min"`, or `"max"`), and compares the results group by group. Each group is one **test unit**. See also **table comparison**. [Learn more](../table-comparison/comparing-tables.md).
 
@@ -210,13 +252,19 @@ Referential check
 A check that every value in a column also appears in a column of another table, for example that every `customer_id` in an orders table exists in the customers table. Added with [col_vals_in_table()](../../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table). [Learn more](../validation-plan/validation-methods.md).
 
 Report language  
-The language used for the text in reports and in generated **briefs**, set with `Validate(lang=...)`. Forty languages are available. A separate option, `locale=`, controls how numbers are formatted (for example, whether a comma or a period is used as the decimal mark). [Learn more](../validation-plan/briefs.md).
+The language used for the text in reports and in generated **briefs**, set with `Validate(lang=...)`. Forty languages are available. A separate option, `locale=`, controls how numbers are formatted (for example, whether a comma or a period is used as the decimal mark). What's made from a validation, such as an **ablation**'s report or a **data card**, uses the same language, and these (along with the reports of a **split check** or a **synthetic data check**) also take `lang=` and `locale=` of their own. [Learn more](../validation-plan/briefs.md).
 
 Round trip  
 Turning something into another form and back again, ending up with the same thing. For example, a **validation plan** saved with [`to_yaml()`](../../reference/Validate.to_yaml.md#pointblank.Validate.to_yaml) and loaded again with [yaml_interrogate()](../../reference/yaml_interrogate.md#pointblank.yaml_interrogate), or a **contract** imported from JSON Schema and exported back. Anything that both forms can express survives the round trip. Things that only one form can express, such as a `pre=` function, are replaced with a placeholder or left out. [Learn more](../advanced-validation/plan-serialization.md).
 
 Row-based check  
-A check on whole rows rather than on single values. [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) checks that no row appears more than once, and [rows_complete()](../../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete) checks that no row has missing values. Both can look at just some of the columns with `columns_subset=`. [Learn more](../validation-plan/validation-methods.md).
+A check on whole rows rather than on single values. [rows_distinct()](../../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct) checks that no row appears more than once, and [rows_complete()](../../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete) checks that no row has missing values. Both can look at just some of the columns with `columns_subset=`. See also **near duplicate**. [Learn more](../validation-plan/validation-methods.md).
+
+Row flags  
+A copy of the table with a `True`/`False` column for each row-level **validation step** (`pb_failed_1_`, `pb_failed_2_`, and so on) saying whether the row failed it, made with [Validate.get_row_flags()](../../reference/Validate.get_row_flags.md#pointblank.Validate.get_row_flags). It also has the number of steps each row failed (`pb_n_failed_`), the share of its checks that it passed (`pb_row_score_`), and the scores of any **scored checks**. Where **sundering** only splits the rows into passing and failing, the flags let you decide later which checks matter for each use of the data. [Learn more](../post-interrogation/sundering.md#flagging-rows-instead-of-splitting-them).
+
+Row-preserving preprocessing  
+See **preprocessing**.
 
 Row status  
 The result for one row in a **table comparison**: `match` (in both tables, with equal values), `changed` (in both tables, but at least one value differs), `missing` (only in the source table), `extra` (only in the target table), or `dup_key` (its key appears more than once, so it can't be matched up). The counts are in the [status_counts](../../reference/Comparison.status_counts.md#pointblank.Comparison.status_counts) of a [Comparison](../../reference/Comparison.md#pointblank.Comparison). See also **source and target**. [Learn more](../table-comparison/comparing-tables.md).
@@ -227,6 +275,12 @@ A description of the columns a table should have: their names and, optionally, t
 Scorecard  
 A compact table showing the **health score** and the score for each **quality dimension**, made with [Validate.get_scorecard()](../../reference/Validate.get_scorecard.md#pointblank.Validate.get_scorecard). [Learn more](../post-interrogation/quality-dimensions-and-scoring.md).
 
+Scored check  
+A **validation step** that gives each row a score with a **scorer** and checks that the score is within bounds (`min_val=` and `max_val=`). This is for checks about the meaning of text, such as whether a document is in the expected language, whether a passage answers its query, or whether text is of good quality. Added with [col_vals_scored()](../../reference/Validate.col_vals_scored.md#pointblank.Validate.col_vals_scored). Rows without a score fail unless `na_pass=True`. The scores are kept with the results, so they show in the **step report** and the **row flags**. [Learn more](../advanced-validation/scored-validation.md).
+
+Scorer  
+A function that takes a batch of rows (as a list of dictionaries) and returns a score for each, used by a **scored check**. You can write your own, or use one of the adapters in `pb.scorers` for common kinds of models, such as [`reranker()`](../../reference/scorers.reranker.md#pointblank.scorers.reranker), [`classifier()`](../../reference/scorers.classifier.md#pointblank.scorers.classifier), [`langid()`](../../reference/scorers.langid.md#pointblank.scorers.langid), and [`token_count()`](../../reference/scorers.token_count.md#pointblank.scorers.token_count). The adapters use models you already have, since Pointblank never trains one. Scores are cached by the scorer's name and version and the row's values, so no row is scored twice, and with a directory as `cache=`, the cache is kept on disk for later sessions. [Learn more](../advanced-validation/scored-validation.md#writing-a-scorer).
+
 SDTM (Study Data Tabulation Model)  
 A **CDISC** standard for organizing the data collected in a clinical trial into tables called *domains*, such as DM (demographics), AE (adverse events), and LB (lab results). Pointblank can check that a domain has the columns the standard requires ([validate_sdtm_structure()](../../reference/validate_sdtm_structure.md#pointblank.validate_sdtm_structure)), and it can check datasets against the SDTM rules ([validate_sdtmig()](../../reference/validate_sdtmig.md#pointblank.validate_sdtmig)). [Learn more](../metadata-import/cdisc-validation.md).
 
@@ -234,7 +288,7 @@ SDTMIG (SDTM Implementation Guide)
 CDISC's detailed rules for how data should be laid out in **SDTM** domains: which columns each domain needs, what values they can hold, and how the domains relate to each other. [validate_sdtmig()](../../reference/validate_sdtmig.md#pointblank.validate_sdtmig) checks a set of domains against the SDTMIG 3.4 rules, without needing **CORE**, and gives back a **conformance report**. [Learn more](../metadata-import/cdisc-submission-conformance.md).
 
 Seed  
-A number that makes randomly generated data repeatable: `generate_dataset(schema, seed=23)` gives the same rows each time with the same version of Pointblank. The [generate_dataset](../../reference/generate_dataset.md#pointblank.generate_dataset) pytest fixture picks a seed from each test's name, so every test gets its own data, which stays the same from one run to the next. [Learn more](../test-data-generation/pytest-fixture.md).
+A number that makes randomly generated data repeatable: `generate_dataset(schema, seed=23)` gives the same rows each time with the same version of Pointblank. The [generate_dataset](../../reference/generate_dataset.md#pointblank.generate_dataset) pytest fixture picks a seed from each test's name, so every test gets its own data, which stays the same from one run to the next. In a **synthetic data check**, the *seed* is something else: the real data that the synthetic data was made from. [Learn more](../test-data-generation/pytest-fixture.md).
 
 Segment  
 A group of rows that gets checked and reported on its own. Using `segments=` splits one step into several, one per group. For example, `segments="region"` makes one step for each region in the table, and `segments=("region", ["East", "West"])` makes steps for just those two regions. To treat several values as one group, use [seg_group()](../../reference/seg_group.md#pointblank.seg_group). [Learn more](../validation-plan/segmentation.md).
@@ -242,17 +296,26 @@ A group of rows that gets checked and reported on its own. Using `segments=` spl
 Severity level  
 See **warning, error, and critical**.
 
+Shapley value  
+A step's fair share of the effect of removing the failing rows of every step in an **ablation**. The steps' failing rows overlap, so their effects on their own don't add up to the effect of removing them all. A step's Shapley value is its average effect when it's added to every combination of the other steps, and the values of all the steps add up to the total. [Ablation.shapley()](../../reference/Ablation.shapley.md#pointblank.Ablation.shapley) adds the variants that are needed, and [Ablation.get_shapley()](../../reference/Ablation.get_shapley.md#pointblank.Ablation.get_shapley) gives the values as a table. [Learn more](../post-interrogation/data-ablation.md#sharing-the-effect-among-the-steps).
+
 Source and target  
 The two sides of a **table comparison** or a **pipeline**. In a table comparison, the source is the table you start from and the target is the one checked against it. With [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match), the table being validated is the target, and `tbl_compare=` is the source. In a pipeline, the source is the data going into your transformation and the target is what comes out, and each can have its own **contract**. A contract's `direction=` (`"source"` or `"target"`) records which side it's meant for. [Learn more](../contracts-and-pipelines/pipelines.md).
 
 Specification check  
 A check that text values follow a well-known format, such as email addresses, URLs, postal codes, credit card numbers, ISBNs, VINs, or IBANs. Added with [col_vals_within_spec()](../../reference/Validate.col_vals_within_spec.md#pointblank.Validate.col_vals_within_spec), for example with `spec="email"` or `spec="postal_code[USA]"`. [Learn more](../validation-plan/validation-methods.md).
 
+Split check  
+A check that the splits of a dataset (for example, the training, validation, and test splits used for a model) are independent and alike. [check_splits()](../../reference/check_splits.md#pointblank.check_splits) finds rows of one split that are also in another (*leakage*), exactly or, with `near=True`, nearly; labels that a split is missing or has on its own (with `label=`); and columns whose values are distributed differently (with **drift scores**). It returns a [SplitCheck](../../reference/SplitCheck.md#pointblank.SplitCheck), whose `ok` is `True` if no problems were found and whose [issues](../../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) lists them. [Learn more](../table-comparison/checking-splits.md).
+
 Status check  
 A method that tells you how a validation went, as `True` or `False`, without stopping your code. [`all_passed()`](../../reference/Validate.all_passed.md#pointblank.Validate.all_passed) tells you whether every **test unit** passed, and [above_threshold()](../../reference/Validate.above_threshold.md#pointblank.Validate.above_threshold), [warning()](../../reference/Validate.warning.md#pointblank.Validate.warning), [error()](../../reference/Validate.error.md#pointblank.Validate.error), and [critical()](../../reference/Validate.critical.md#pointblank.Validate.critical) tell you whether **threshold** levels were reached. See also **assertion**. [Learn more](../advanced-validation/assertions.md).
 
 Step  
 Usually short for **validation step**. In a **contract**, the [Step](../../reference/Step.md#pointblank.Step) class describes one validation method call by its name and arguments (for example, `Step("col_vals_not_null", columns="id")`), so that it can be saved as YAML or JSON. [Learn more](../contracts-and-pipelines/contracts.md).
+
+Step bundle  
+A ready-made set of **validation steps** for a common task, given as a [Steps](../../reference/Steps.md#pointblank.Steps) collection that you add to a validation with [Validate.add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps). For text, there are [`pb.text.heuristic_filters()`](../../reference/text.heuristic_filters.md#pointblank.text.heuristic_filters), [`pb.text.in_language()`](../../reference/text.in_language.md#pointblank.text.in_language), [`pb.text.token_length()`](../../reference/text.token_length.md#pointblank.text.token_length), and [`pb.text.no_pii()`](../../reference/text.no_pii.md#pointblank.text.no_pii), and for RAG data, there are [`pb.rag.corpus_checks()`](../../reference/rag.corpus_checks.md#pointblank.rag.corpus_checks) and [`pb.rag.eval_checks()`](../../reference/rag.eval_checks.md#pointblank.rag.eval_checks). Each step of a bundle is an ordinary step, so you can change it or turn it off. See also **composable steps**. [Learn more](../advanced-validation/text-checks.md).
 
 Step report  
 A detailed view of a single **validation step**, showing what it checked and, where it makes sense, the rows that failed. You get one with [Validate.get_step_report()](../../reference/Validate.get_step_report.md#pointblank.Validate.get_step_report). See also **validation report**. [Learn more](../post-interrogation/step-reports.md).
@@ -261,7 +324,13 @@ Structured missingness
 See **coded missing value**.
 
 Sundering  
-Splitting a table in two after validation: the rows that passed every row-by-row check, and the rows that failed at least one. You get either part with [Validate.get_sundered_data()](../../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data), using `type="pass"` or `type="fail"`. See also **data extract**. [Learn more](../post-interrogation/sundering.md).
+Splitting a table in two after validation: the rows that passed every row-by-row check, and the rows that failed at least one. You get either part with [Validate.get_sundered_data()](../../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data), using `type="pass"` or `type="fail"`. Steps with `pre=` are left out unless the function is marked with [row_preserving()](../../reference/row_preserving.md#pointblank.row_preserving) (see **preprocessing**), and checks for duplicate rows are left out unless you say which copy to keep with `duplicates=` (such as `"keep_first"`). To see which steps each row failed, use **row flags**. See also **data extract**. [Learn more](../post-interrogation/sundering.md).
+
+Sweep  
+A set of **ablation** variants that try one setting at several values, to find where a limit should be. [Ablation.sweep_step()](../../reference/Ablation.sweep_step.md#pointblank.Ablation.sweep_step) makes a variant for each of a list of values of one of a step's parameters (for example, `value=` at 1,500, 2,000, and 2,500), removing the rows that fail the step with that value. [Ablation.sweep_score()](../../reference/Ablation.sweep_score.md#pointblank.Ablation.sweep_score) removes a growing share of the highest- or lowest-scoring rows of a **scored check**. The report shows the effect at each value as a curve. [Learn more](../post-interrogation/data-ablation.md#sweeping-a-threshold).
+
+Synthetic data check  
+A comparison of synthetic data with the real data it was made from (its *seed*), made with [check_synthetic()](../../reference/check_synthetic.md#pointblank.check_synthetic). It checks *fidelity* (whether each column's values and share of missing values are like the seed's, using **drift scores**), *diversity* (whether rows or text repeat more than in the seed, a sign of a generator stuck on a few kinds of rows), and *copies* (synthetic rows that are the same as a seed row, or whose text nearly is, which can give private data away). It returns a [SyntheticCheck](../../reference/SyntheticCheck.md#pointblank.SyntheticCheck), whose `ok` is `True` if no problems were found and whose [issues](../../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) lists them. [Learn more](../table-comparison/checking-synthetic-data.md).
 
 Table comparison  
 Finding the differences between two tables. [`compare()`](../../reference/compare.md#pointblank.compare) matches up the rows of a source table and a target table, gives each row a **row status** (such as `changed` or `missing`), and reports any differences in their columns. It returns a [Comparison](../../reference/Comparison.md#pointblank.Comparison) object, which counts as `True` only if the tables match. Rows can be matched by key columns (`keys="id"`), by position (the default), or regardless of order (`keys="*"`), and small differences can be allowed with `tolerance=` or ignored with `normalize=` (for example, letter case). As a **validation step**, [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) runs the same comparison with each row as a **test unit**, and [tbl_reconcile()](../../reference/Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile) compares totals instead (see **reconciliation**). From the **CLI**, use `pb compare`. To check only the number of rows or columns, use [row_count_match()](../../reference/Validate.row_count_match.md#pointblank.Validate.row_count_match) or [col_count_match()](../../reference/Validate.col_count_match.md#pointblank.Validate.col_count_match). See also **source and target** and **partitions**. [Learn more](../table-comparison/comparing-tables.md).
@@ -301,6 +370,12 @@ One check in a **validation plan**. Each call to a **validation method** creates
 
 Validation template  
 A **YAML workflow** written to be used with many tables. Leave the data out with `tbl: null`, then give a table each time it runs with `yaml_interrogate(..., set_tbl=...)`. This way, a set of checks written once can be run on, say, each quarter's data. [Learn more](../yaml/yaml-validation-workflows.md).
+
+Variant  
+See **ablation**.
+
+Verdict  
+See **ablation**.
 
 Violation handling  
 What happens when data fails a **contract** inside a **pipeline**, set with the contract's `on_violation=`. With `"warn"` (the default), Python shows a warning; with `"raise"`, an error stops the run; and with `"log"`, a message is written to the `pointblank.contract` logger. [Learn more](../contracts-and-pipelines/contracts.md).
