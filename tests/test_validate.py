@@ -18714,6 +18714,145 @@ def test_assert_passing_example() -> None:
     passing_validation_no_interrogation.assert_passing()
 
 
+def test_all_passed_ignores_inactive_steps() -> None:
+    tbl = pl.DataFrame({"x": [1, 2, 3]})
+
+    validation = (
+        Validate(data=tbl)
+        .col_vals_gt(columns="x", value=0)
+        .col_vals_gt(columns="x", value=5, active=False)
+        .col_vals_gt(columns="x", value=5, active=has_columns("not_there"))
+        .interrogate()
+    )
+
+    assert validation.validation_info[1].n_failed is None
+    assert validation.validation_info[2].active is False
+    assert validation.all_passed()
+
+    # An inactive step's `n_failed` is `None`, which used to raise a `TypeError` here
+    validation.assert_passing()
+
+
+def test_all_passed_inactive_steps_dont_hide_failures() -> None:
+    tbl = pl.DataFrame({"x": [1, 2, 3]})
+
+    validation = (
+        Validate(data=tbl)
+        .col_vals_gt(columns="x", value=5, active=False)
+        .col_vals_gt(columns="x", value=2)
+        .interrogate()
+    )
+
+    assert not validation.all_passed()
+
+    with pytest.raises(AssertionError) as exc_info:
+        validation.assert_passing()
+
+    msg = str(exc_info.value)
+    assert "Step 2: Expect that values in `x`" in msg
+    assert "Step 1" not in msg
+
+
+def test_all_passed_counts_eval_errors_as_not_passing() -> None:
+    tbl = pl.DataFrame({"x": [1, 2, 3]})
+
+    validation = (
+        Validate(data=tbl)
+        .col_vals_gt(columns="x", value=0)
+        .col_vals_gt(columns="missing", value=0)
+        .col_vals_gt(columns="x", value=0, pre=lambda df: df.filter(pl.col("x") > 9))
+        .col_vals_expr(expr=pl.col("not_there") > 1)
+        .interrogate()
+    )
+
+    # Steps that couldn't be evaluated are set to be inactive, but still count as not passing
+    assert all(step.eval_error for step in validation.validation_info[1:])
+    assert not validation.all_passed()
+
+    with pytest.raises(AssertionError) as exc_info:
+        validation.assert_passing()
+
+    msg = str(exc_info.value)
+    assert "Step 1" not in msg
+    assert (
+        "- Step 2: Expect that values in `missing` should be > `0`. (couldn't be evaluated)" in msg
+    )
+    assert "- Step 3: Expect that values in `x` should be > `0`. (couldn't be evaluated)" in msg
+    # The step's note gives the reason when there is one
+    assert "- Step 4:" in msg
+    assert "(couldn't be evaluated: The expr= expression couldn't be evaluated" in msg
+
+
+def test_all_passed_only_inactive_steps() -> None:
+    tbl = pl.DataFrame({"x": [1, 2, 3]})
+
+    validation = Validate(data=tbl).col_vals_gt(columns="x", value=5, active=False).interrogate()
+
+    assert validation.all_passed()
+    validation.assert_passing()
+
+
+def test_final_actions_summary_all_passed_ignores_inactive_steps() -> None:
+    tbl = pl.DataFrame({"x": [1, 2, 3]})
+    summaries = []
+
+    def capture():
+        summaries.append(pb.get_validation_summary())
+
+    (
+        Validate(data=tbl, final_actions=pb.FinalActions(capture))
+        .col_vals_gt(columns="x", value=0)
+        .col_vals_gt(columns="x", value=5, active=False)
+        .interrogate()
+    )
+
+    assert summaries[0]["all_passed"] is True
+    assert summaries[0]["highest_severity"] == "all passed"
+
+
+@pytest.mark.parametrize(
+    "method",
+    ["col_vals_gt", "col_vals_ge", "col_vals_lt", "col_vals_le", "col_vals_eq", "col_vals_ne"],
+)
+def test_comparison_rejects_ref_value(method: str) -> None:
+    tbl = pl.DataFrame({"d": [1, 2, 3]})
+    validation = Validate(data=tbl, reference=tbl)
+
+    # The error is raised when the step is defined, not at interrogation
+    with pytest.raises(TypeError, match=r"`value=` can't be a reference column \(`ref\('d'\)`\)"):
+        getattr(validation, method)(columns="d", value=pb.ref("d"))
+
+    assert validation.validation_info == []
+
+
+@pytest.mark.parametrize("method", ["col_vals_between", "col_vals_outside"])
+@pytest.mark.parametrize("param", ["left", "right"])
+def test_comparison_rejects_ref_bounds(method: str, param: str) -> None:
+    tbl = pl.DataFrame({"d": [1, 2, 3]})
+    validation = Validate(data=tbl, reference=tbl)
+    bounds = {"left": 0, "right": 10, param: pb.ref("d")}
+
+    with pytest.raises(TypeError, match=rf"`{param}=` can't be a reference column"):
+        getattr(validation, method)(columns="d", **bounds)
+
+    assert validation.validation_info == []
+
+
+def test_comparison_ref_error_points_to_alternatives() -> None:
+    tbl = pl.DataFrame({"d": [1, 2, 3]})
+
+    with pytest.raises(TypeError) as exc_info:
+        Validate(data=tbl, reference=tbl).col_vals_ge(columns="d", value=pb.ref("d"))
+
+    msg = str(exc_info.value)
+    assert "col_sum_eq()" in msg
+    assert "col()" in msg
+
+    # The alternatives work: an aggregate method with `ref()`, and `col()` for the same table
+    assert Validate(data=tbl, reference=tbl).col_sum_eq("d", pb.ref("d")).interrogate().all_passed()
+    assert Validate(data=tbl).col_vals_ge(columns="d", value=pb.col("d")).interrogate().all_passed()
+
+
 def test_assert_below_threshold_basic() -> None:
     # Create a very simple table with obvious pass/fail patterns
     tbl = pl.DataFrame({"values": [1, 2, 3, 4, 5]})
