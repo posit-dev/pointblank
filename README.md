@@ -107,61 +107,13 @@ _Data validation toolkit for assessing and monitoring data quality._
 
 <br>
 
-Pointblank takes a different approach to data quality. It doesn't have to be a tedious technical task. Rather, it can become a process focused on clear communication between team members. While other validation libraries focus solely on catching errors, Pointblank is great at both **finding issues and sharing insights**. Our beautiful, customizable reports turn validation results into conversations with stakeholders, making data quality issues immediately understandable and actionable for everyone on your team.
+Pointblank is a data validation library for Python. You describe what your data should look like in a validation plan, Pointblank checks the data against it, and the results come back as a report that's easy to read and to share. Data quality then becomes something the whole team can discuss, not just a list of errors in a log.
 
-**Get started in minutes, not hours.** Pointblank's AI-powered [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/draft-validation.html) feature analyzes your data and suggests intelligent validation rules automatically. So there's no need to stare at an empty validation script wondering where to begin. Pointblank can kickstart your data quality journey so you can focus on what matters most.
+The same plan works on Polars and Pandas DataFrames, on database tables (DuckDB, PostgreSQL, Snowflake, BigQuery, and others), and on PySpark. After a validation, you can look at the failing rows, split the table into the rows that pass and the rows that fail, or act when too many rows fail.
 
-Whether you're a data scientist who needs to quickly communicate data quality findings, a data engineer building robust pipelines, or an analyst presenting data quality results to business stakeholders, Pointblank helps you to turn data quality from an afterthought into a competitive advantage.
+## Getting Started
 
-## Getting Started with AI-Powered Validation Drafting
-
-The `DraftValidation` class uses LLMs to analyze your data and generate a complete validation plan with intelligent suggestions. This helps you quickly get started with data validation or jumpstart a new project.
-
-```python
-import pointblank as pb
-
-# Load your data
-data = pb.load_dataset("game_revenue")              # A sample dataset
-
-# Use DraftValidation to generate a validation plan
-pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
-```
-
-The output is a complete validation plan with intelligent suggestions based on your data:
-
-```python
-import pointblank as pb
-
-# The validation plan
-validation = (
-    pb.Validate(
-        data=data,
-        label="Draft Validation",
-        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
-    )
-    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
-    .col_vals_gt(columns="item_revenue", value=0)
-    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
-    .col_count_match(count=11)
-    .row_count_match(count=2000)
-    .rows_distinct()
-    .interrogate()
-)
-
-validation
-```
-
-<div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
-</div>
-
-<br>
-
-Copy, paste, and customize the generated validation plan for your needs.
-
-## Chainable Validation API
-
-Pointblank's chainable API makes validation simple and readable. The same pattern always applies: (1) start with `Validate`, (2) add validation steps, and (3) finish with `interrogate()`.
+Every validation follows the same pattern: (1) start with `Validate`, (2) add validation steps, and (3) finish with `interrogate()`.
 
 ```python
 import pointblank as pb
@@ -187,23 +139,60 @@ validation
 
 <br>
 
-Once you have an interrogated `validation` object, you can leverage a variety of methods to extract insights like:
+Once you have an interrogated `validation` object, you can:
 
-- getting detailed reports for single steps to see what went wrong
-- filtering tables based on validation results
-- extracting problematic data for debugging
+- get a [report for a single step](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/step-reports.html) that shows the failing rows
+- [extract the failing rows](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/extracts.html) for debugging
+- [split the table](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/sundering.html) into the rows that pass and the rows that fail
 
-## Why Choose Pointblank?
+## Installation
 
-- **Works with your existing stack**: Seamlessly integrates with Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake, and more!
-- **Beautiful, interactive reports**: Crystal-clear validation results that highlight issues and help communicate data quality
-- **Composable validation pipeline**: Chain validation steps into a complete data quality workflow
-- **Threshold-based alerts**: Set 'warning', 'error', and 'critical' thresholds with custom actions
-- **Practical outputs**: Use validation results to filter tables, extract problematic data, or trigger downstream processes
+You can install Pointblank using pip:
 
-## Production-Ready Validation Pipeline
+```bash
+pip install pointblank
+```
 
-Here's how Pointblank handles complex, real-world scenarios with advanced features like threshold management, automated alerts, and comprehensive business rule validation:
+You can also install Pointblank from Conda-Forge by using:
+
+```bash
+conda install conda-forge::pointblank
+```
+
+If you don't have Polars or Pandas installed, you'll need to install one of them to use Pointblank.
+
+```bash
+pip install "pointblank[pl]" # Install Pointblank with Polars
+pip install "pointblank[pd]" # Install Pointblank with Pandas
+```
+
+To validate tables in a database, install Pointblank with the Ibis backend for it (or with PySpark, for Spark DataFrames):
+
+```bash
+pip install "pointblank[duckdb]"     # DuckDB
+pip install "pointblank[postgres]"   # PostgreSQL
+pip install "pointblank[mysql]"      # MySQL
+pip install "pointblank[sqlite]"     # SQLite
+pip install "pointblank[mssql]"      # SQL Server
+pip install "pointblank[snowflake]"  # Snowflake
+pip install "pointblank[bigquery]"   # BigQuery
+pip install "pointblank[databricks]" # Databricks
+pip install "pointblank[pyspark]"    # PySpark
+```
+
+Other extras add optional features, such as `generate` (for drafting plans with an LLM), `mcp` (the MCP server), and `otel` (OpenTelemetry). See the [installation guide](https://posit-dev.github.io/pointblank/user-guide/getting-started/installation.html) for more.
+
+## Why Pointblank?
+
+- **Works with your existing stack**: one API for Polars, Pandas, PySpark, DuckDB, PostgreSQL, MySQL, SQLite, SQL Server, Snowflake, BigQuery, Databricks, and files like CSV and Parquet
+- **Reports to share**: validation reports that show what was checked and what failed, for colleagues who don't read code, in 40 languages
+- **Thresholds and actions**: set 'warning', 'error', and 'critical' levels for each step, and run actions (like a Slack message) when they're exceeded
+- **Results you can use**: counts, failing rows, the table split by the results, or a full report
+- **Runs anywhere**: in notebooks, scripts, CI pipelines, scheduled jobs, or from the command line
+
+## A Validation for Production
+
+A validation in a production pipeline usually needs more: a name for the table, thresholds, actions when the thresholds are exceeded, and briefs that say what each step checks.
 
 ```python
 import pointblank as pb
@@ -212,24 +201,23 @@ import polars as pl
 # Load your data
 sales_data = pl.read_csv("sales_data.csv")
 
-# Create a comprehensive validation
 validation = (
    pb.Validate(
       data=sales_data,
       tbl_name="sales_data",           # Name of the table for reporting
       label="Real-world example.",     # Label for the validation, appears in reports
-      thresholds=(0.01, 0.02, 0.05),   # Set thresholds for warnings, errors, and critical issues
-      actions=pb.Actions(              # Define actions for any threshold exceedance
+      thresholds=(0.01, 0.02, 0.05),   # Thresholds for warnings, errors, and critical issues
+      actions=pb.Actions(              # An action for any step that exceeds the 'critical' level
          critical="Major data quality issue found in step {step} ({time})."
       ),
-      final_actions=pb.FinalActions(   # Define final actions for the entire validation
+      final_actions=pb.FinalActions(   # An action once the whole validation is done
          pb.send_slack_notification(
             webhook_url="https://hooks.slack.com/services/your/webhook/url"
          )
       ),
-      brief=True,                      # Add automatically-generated briefs for each step
+      brief=True,                      # A generated brief for each step
    )
-   .col_vals_between(            # Check numeric ranges with precision
+   .col_vals_between(            # Check numeric ranges
       columns=["price", "quantity"],
       left=0, right=1000
    )
@@ -275,6 +263,52 @@ validation.get_step_report(i=3).show("browser")  # Get failing records from step
 </div>
 
 <br>
+
+## Drafting a Plan with an LLM
+
+If you're not sure where to start with a table, [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/draft-validation.html) can have an LLM draft a plan for you. It sends the model a summary of the table (its columns and their types, statistics like the number of missing values, and a few values from each column) rather than the whole table, and gets back a validation plan:
+
+```python
+import pointblank as pb
+
+# Load your data
+data = pb.load_dataset("game_revenue")              # A sample dataset
+
+# Use DraftValidation to generate a validation plan
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
+```
+
+The output is a plan that you can run as it is:
+
+```python
+import pointblank as pb
+
+# The validation plan
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+A draft is a starting point. Copy it, then add, remove, and adjust steps for what you know about the data. To change an existing plan with an instruction in plain English, use the [AI validation editor](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/ai-validation-editor.html).
 
 ## YAML Configuration
 
@@ -420,7 +454,7 @@ Click the following headings to see some terminal recordings of the CLI in actio
 
 ## Generate Realistic Test Data
 
-Need test data for your validation workflows? The `generate_dataset()` function creates realistic, locale-aware synthetic data based on schema definitions. It's very useful for developing pipelines without production data, running CI/CD tests with reproducible scenarios, or prototyping workflows before production data is available.
+Need test data for your validation workflows? The `generate_dataset()` function creates realistic, locale-aware synthetic data from a schema. It's useful for developing pipelines without production data, running CI tests with reproducible data, or prototyping a workflow before the real data is available.
 
 ```python
 import pointblank as pb
@@ -446,15 +480,14 @@ pb.preview(data)
 
 <br>
 
-The generator supports sophisticated data generation with these capabilities:
+The generator has:
 
-- **Realistic data with presets**: Use built-in presets like `"name"`, `"email"`, `"address"`, `"phone"`, etc.
-- **User agent strings**: Generate highly varied, realistic browser user agent strings from 17 browser categories with over 42,000 unique combinations
-- **100 country support**: Generate locale-specific data (e.g., `country="DE"` for German addresses)
-- **Field constraints**: Control ranges, patterns, uniqueness, and allowed values
-- **Multiple output formats**: Returns Polars DataFrames by default, but also supports Pandas (`output="pandas"`) or dictionaries (`output="dict"`)
+- **Over 50 presets**: realistic values like `"name"`, `"email"`, `"address"`, `"phone_number"`, and `"user_agent"`, which agree with each other within a row (the email address is made from the name)
+- **Data for 100 countries**: locale-specific values (e.g., `country="DE"` for German addresses), from one country or a mix of them
+- **Field constraints**: ranges, patterns, uniqueness, missing values, and allowed values
+- **Several output formats**: Polars DataFrames by default, or Pandas (`output="pandas"`) or dictionaries (`output="dict"`)
 
-This makes it easy to generate test data that matches your validation rules, helping you develop and test data quality workflows without relying on real data. When synthetic data stands in for a real table, [`check_synthetic()`](https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-synthetic-data.html) compares the two: how closely each column's distribution matches, how varied the rows are, and whether any rows are copies of real ones.
+This makes it easy to generate test data that matches your validation rules. A [pytest fixture](https://posit-dev.github.io/pointblank/user-guide/test-data-generation/pytest-fixture.html) gives each test its own reproducible data. When synthetic data stands in for a real table, [`check_synthetic()`](https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-synthetic-data.html) compares the two: how closely each column's distribution matches, how varied the rows are, and whether any rows are copies of real ones.
 
 ## Check Data for Model Training
 
@@ -518,16 +551,19 @@ There's more for training data in the User Guide:
 - **[Checking splits](https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-splits.html)** and **[data ablation](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/data-ablation.html)**: the full guides to the examples above
 - **[Data cards](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/data-cards.html)**: a card describing a dataset, with the validation's results as the evidence of its quality
 
-## Features That Set Pointblank Apart
+## More of What Pointblank Does
 
-- **Complete validation workflow**: From data access to validation to reporting in a single pipeline
-- **Built for collaboration**: Share results with colleagues through beautiful interactive reports
-- **Practical outputs**: Get exactly what you need: counts, extracts, summaries, or full reports
-- **Flexible deployment**: Use in notebooks, scripts, or data pipelines
-- **Synthetic data generation**: Create realistic test data with 30+ presets, user agent strings, locale-aware formatting, and 100 country support
-- **Checks for training data**: Find low-quality text, near duplicates, personal information, and leaks between splits, then measure which checks actually improve a model
-- **Customizable**: Tailor validation steps and reporting to your specific needs
-- **Internationalization**: Reports can be generated in 40 languages, including English, Spanish, French, and German
+- **[Segmentation](https://posit-dev.github.io/pointblank/user-guide/validation-plan/segmentation.html)**: run a step separately for each group of rows, like each region or each month
+- **[Coded missing values](https://posit-dev.github.io/pointblank/user-guide/validation-plan/validation-methods.html#structured-missingness-with-missing)**: treat codes like `-99` or `"refused"` as missing, by reason, with `MissingSpec`
+- **[Validation with an LLM](https://posit-dev.github.io/pointblank/user-guide/validation-plan/validation-methods.html#validating-with-natural-language-prompts)**: check rows against a rule written in plain English, with `prompt()`
+- **[Reusable steps](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/composable-steps.html)** and **[plan serialization](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/plan-serialization.html)**: share sets of steps between plans, and write a plan out as Python code or YAML
+- **[Quality dimensions and health scores](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/quality-dimensions-and-scoring.html)**: scores for completeness, validity, uniqueness, and other dimensions, rolled up into one score for the table
+- **[Data contracts](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/contracts.html)** and **[pipelines](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/pipelines.html)**: the schema and rules of a table in one portable contract, enforced on the input and output of a transformation
+- **[Table comparison](https://posit-dev.github.io/pointblank/user-guide/table-comparison/comparing-tables.html)**: find the rows that are missing, extra, or changed between two versions of a table, with `pb.compare()`
+- **[Profiles and drift](https://posit-dev.github.io/pointblank/user-guide/data-inspection/col-summary-tbl.html#comparing-profiles-for-drift)**: profile a table with `DataScan`, save the profile, and compare later versions with it
+- **[Metadata import](https://posit-dev.github.io/pointblank/user-guide/metadata-import/metadata-import.html)** and **[CDISC validation](https://posit-dev.github.io/pointblank/user-guide/metadata-import/cdisc-validation.html)**: turn SPSS, Stata, SAS, Frictionless, and Define-XML metadata into validations, and check clinical data against the CDISC standards
+- **[MCP server](https://posit-dev.github.io/pointblank/user-guide/integrations/mcp-quick-start.html)**: validate data by asking an AI assistant, in VS Code or Positron
+- **[OpenTelemetry](https://posit-dev.github.io/pointblank/user-guide/integrations/otel-integration.html)**: send validation results to Grafana, Datadog, and other monitoring tools
 
 ## Documentation and Examples
 
@@ -535,7 +571,7 @@ Visit our [documentation site](https://posit-dev.github.io/pointblank) for:
 
 - [The User Guide](https://posit-dev.github.io/pointblank/user-guide/)
 - [API reference](https://posit-dev.github.io/pointblank/reference/)
-- [Example gallery](https://posit-dev.github.io/pointblank/demos/)
+- [Examples](https://posit-dev.github.io/pointblank/examples/)
 - [The Pointblog](https://posit-dev.github.io/pointblank/blog/)
 
 ## Join the Community
@@ -544,65 +580,16 @@ We'd love to hear from you! Connect with us:
 
 - [GitHub Issues](https://github.com/posit-dev/pointblank/issues) for bug reports and feature requests
 - [_Discord server_](https://discord.com/invite/YH7CybCNCQ) for discussions and help
-- [Contributing guidelines](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) if you'd like to help improve Pointblank
 
-## Installation
-
-You can install Pointblank using pip:
-
-```bash
-pip install pointblank
-```
-
-You can also install Pointblank from Conda-Forge by using:
-
-```bash
-conda install conda-forge::pointblank
-```
-
-If you don't have Polars or Pandas installed, you'll need to install one of them to use Pointblank.
-
-```bash
-pip install "pointblank[pl]" # Install Pointblank with Polars
-pip install "pointblank[pd]" # Install Pointblank with Pandas
-```
-
-To use Pointblank with DuckDB, MySQL, PostgreSQL, or SQLite, install Ibis with the appropriate backend:
-
-```bash
-pip install "pointblank[duckdb]"   # Install Pointblank with Ibis + DuckDB
-pip install "pointblank[mysql]"    # Install Pointblank with Ibis + MySQL
-pip install "pointblank[postgres]" # Install Pointblank with Ibis + PostgreSQL
-pip install "pointblank[sqlite]"   # Install Pointblank with Ibis + SQLite
-```
+There are many ways to contribute to the development of Pointblank. Some contributions are simple (like fixing typos, improving the documentation, or filing issues for feature requests or problems) and others take more time and care (like answering questions and submitting PRs with code changes). Anything you can do to help is very much appreciated! The [contributing guidelines](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) explain how to get started.
 
 ## Technical Details
 
-Pointblank uses [Narwhals](https://github.com/narwhals-dev/narwhals) to work with Polars and Pandas DataFrames, and integrates with [Ibis](https://github.com/ibis-project/ibis) for database and file format support. This architecture provides a consistent API for validating tabular data from various sources.
-
-## Contributing to Pointblank
-
-There are many ways to contribute to the ongoing development of Pointblank. Some contributions can be simple (like fixing typos, improving documentation, filing issues for feature requests or problems, etc.) and others might take more time and care (like answering questions and submitting PRs with code changes). Just know that anything you can do to help would be very much appreciated!
-
-Please read over the [contributing guidelines](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) for
-information on how to get started.
+Pointblank uses [Narwhals](https://github.com/narwhals-dev/narwhals) to work with Polars and Pandas DataFrames, and integrates with [Ibis](https://github.com/ibis-project/ibis) for database and file format support. It also validates PySpark DataFrames. This gives one API for validating tabular data from all of these sources.
 
 ## Pointblank for R
 
 There's also a version of Pointblank for R, which has been around since 2017 and is widely used in the R community. You can find it at https://github.com/rstudio/pointblank.
-
-## Roadmap
-
-We're actively working on enhancing Pointblank with:
-
-1. Additional validation methods for comprehensive data quality checks
-2. Advanced logging capabilities
-3. Email notifications for threshold exceedances
-4. LLM-powered data dictionary generation
-5. Expanded backend support and certification
-6. High-quality documentation and examples
-
-If you have any ideas for features or improvements, don't hesitate to share them with us! We are always looking for ways to make Pointblank better.
 
 ## Code of Conduct
 
