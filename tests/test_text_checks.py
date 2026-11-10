@@ -785,7 +785,7 @@ def test_text_checks_to_code_placeholder():
 
 
 # ---------------------------------------------------------------------------------------------
-# pb.text
+# col_vals_text_quality(), col_vals_in_language(), col_vals_token_len(), and col_vals_no_pii()
 # ---------------------------------------------------------------------------------------------
 
 _WEB = pl.DataFrame(
@@ -809,10 +809,12 @@ def _failing_by_step(validation: pb.Validate) -> list[list[int]]:
 
 
 @pytest.mark.parametrize("tbl_type", _TBL_TYPES)
-def test_heuristic_filters(tbl_type):
-    steps = pb.text.heuristic_filters("text", min_words=10, max_bullet_lines=0.5)
-
-    validation = pb.Validate(data=_tbl(tbl_type, _WEB)).add_steps(steps).interrogate()
+def test_col_vals_text_quality(tbl_type):
+    validation = (
+        pb.Validate(data=_tbl(tbl_type, _WEB))
+        .col_vals_text_quality(columns="text", min_words=10, max_bullet_lines=0.5)
+        .interrogate()
+    )
 
     assert [s.assertion_type for s in validation.validation_info] == ["col_vals_scored"] * 8
     assert _failing_by_step(validation) == [[2], [], [3], [4], [], [4], [2], [2]]
@@ -820,23 +822,25 @@ def test_heuristic_filters(tbl_type):
     assert all(s.n == 5 for s in validation.validation_info)
 
 
-def test_heuristic_filters_briefs_and_bounds():
-    steps = pb.text.heuristic_filters(
-        "text",
-        min_words=None,
-        max_words=500,
-        min_mean_word_length=None,
-        max_mean_word_length=None,
-        max_symbol_ratio=None,
-        max_bullet_lines=None,
-        max_ellipsis_lines=None,
-        min_alpha_words=0.75,
-        min_stop_words=1,
-        max_repeated_lines=None,
-        stop_words=["est", "le"],
+def test_col_vals_text_quality_briefs_and_bounds():
+    validation = (
+        pb.Validate(data=_WEB)
+        .col_vals_text_quality(
+            columns="text",
+            min_words=None,
+            max_words=500,
+            min_mean_word_length=None,
+            max_mean_word_length=None,
+            max_symbol_ratio=None,
+            max_bullet_lines=None,
+            max_ellipsis_lines=None,
+            min_alpha_words=0.75,
+            min_stop_words=1,
+            max_repeated_lines=None,
+            stop_words=["est", "le"],
+        )
+        .interrogate()
     )
-
-    validation = pb.Validate(data=_WEB).add_steps(steps).interrogate()
 
     assert [s.brief for s in validation.validation_info] == [
         "At most 500 words in `text`.",
@@ -851,29 +855,49 @@ def test_heuristic_filters_briefs_and_bounds():
     # None of the texts has a French stop word
     assert _failing(validation, 3) == [1, 2, 3, 4]
 
-    defaults = pb.Validate(data=_WEB).add_steps(pb.text.heuristic_filters("text"))
-    assert [s.brief for s in defaults.validation_info][:2] == [
+    defaults = pb.Validate(data=_WEB).col_vals_text_quality(columns="text")
+    assert [s.brief for s in defaults.validation_info] == [
         "Between 50 and 100,000 words in `text`.",
         "A mean word length of between 3 and 10 characters in `text`.",
+        "At most 0.1 hash symbols and ellipses for each word in `text`.",
+        "At most 90% of the lines start with a bullet point in `text`.",
+        "At most 30% of the lines end with an ellipsis in `text`.",
+        "At least 80% of the words have a letter in `text`.",
+        "At least 2 distinct stop words in `text`.",
+        "At most 30% of the lines repeat an earlier line in `text`.",
     ]
+    assert all(s.na_pass for s in defaults.validation_info)
+    assert all(s.values["cache"] is False for s in defaults.validation_info)
 
 
-def test_heuristic_filters_settings_reach_the_steps():
-    steps = pb.text.heuristic_filters(
-        "text", min_words=10, thresholds=(1, 2), active=False, pre=lambda df: df
+def test_col_vals_text_quality_columns_and_settings():
+    tbl = _WEB.with_columns(title=pl.lit("A title"))
+
+    validation = pb.Validate(data=tbl).col_vals_text_quality(
+        columns=["text", "title"],
+        min_words=10,
+        na_pass=False,
+        thresholds=(1, 2),
+        active=False,
+        pre=lambda df: df,
+        dimension="text_quality",
     )
 
-    validation = pb.Validate(data=_WEB).add_steps(steps)
-
+    assert [s.column for s in validation.validation_info] == [["text"]] * 8 + [["title"]] * 8
+    assert validation.validation_info[8].brief == "Between 10 and 100,000 words in `title`."
     assert all(s.active is False for s in validation.validation_info)
     assert all(s.thresholds.warning == 1 for s in validation.validation_info)
-    assert all(s.na_pass for s in validation.validation_info)
+    assert all(s.na_pass is False for s in validation.validation_info)
+    assert all(s.pre is not None for s in validation.validation_info)
+    assert all(s.dimension == "text_quality" for s in validation.validation_info)
 
 
 @pytest.mark.parametrize(
     "kwargs, error, message",
     [
-        ({"column": ["text"]}, TypeError, "`column=` must be the name of a column"),
+        ({"columns": 1}, TypeError, "`columns=` must be the name of a column"),
+        ({"columns": []}, TypeError, "`columns=` must be the name of a column"),
+        ({"columns": ["text", "text"]}, ValueError, "the same column more than once"),
         ({"min_words": "50"}, TypeError, "`min_words=` must be a number"),
         ({"max_symbol_ratio": True}, TypeError, "`max_symbol_ratio=` must be a number"),
         ({"min_words": 10, "max_words": 5}, ValueError, "`min_words=` must not be greater"),
@@ -882,12 +906,18 @@ def test_heuristic_filters_settings_reach_the_steps():
             ValueError,
             "`min_mean_word_length=` must not be greater",
         ),
+        ({"stop_words": "the"}, TypeError, "`stop_words=` must be a list"),
+        ({"brief": 1}, TypeError, "`brief=` must be a string or a boolean"),
+        ({"na_pass": "yes"}, ValueError, "na_pass"),
     ],
 )
-def test_heuristic_filters_bad_arguments(kwargs, error, message):
-    kwargs = {"column": "text", **kwargs}
+def test_col_vals_text_quality_bad_arguments(kwargs, error, message):
+    kwargs = {"columns": "text", **kwargs}
+    validation = pb.Validate(data=_WEB)
     with pytest.raises(error, match=message):
-        pb.text.heuristic_filters(**kwargs)
+        validation.col_vals_text_quality(**kwargs)
+    # A bad setting adds no steps
+    assert validation.validation_info == []
 
 
 def _guess(text):
@@ -908,20 +938,45 @@ _LANGS = pl.DataFrame(
 )
 
 
-def test_in_language():
+def test_col_vals_in_language():
     validation = (
         pb.Validate(data=_LANGS)
-        .add_steps(pb.text.in_language("text", expected="en", backend=_guess))
-        .add_steps(pb.text.in_language("text", expected=["en", "fr"], backend=_guess))
-        .add_steps(
-            pb.text.in_language("text", expected_column="lang", backend=_guess, min_confidence=0.6)
+        .col_vals_in_language(columns="text", expected="en", backend=_guess)
+        .col_vals_in_language(columns="text", expected=["en", "fr"], backend=_guess)
+        .col_vals_in_language(
+            columns="text", expected_column="lang", backend=_guess, min_confidence=0.6
         )
         .interrogate()
     )
 
+    assert [s.assertion_type for s in validation.validation_info] == ["col_vals_scored"] * 3
     assert _failing_by_step(validation) == [[2], [], [3, 4]]
     assert validation.validation_info[2].column == ["text", "lang"]
     assert validation.validation_info[2].values["min_val"] == 0.6
+    assert [s.brief for s in validation.validation_info] == [
+        "The text of `text` is in `en` (probability of at least 0.5).",
+        "The text of `text` is in `en` or `fr` (probability of at least 0.5).",
+        "The text of `text` is in the language of `lang` (probability of at least 0.6).",
+    ]
+
+
+def test_col_vals_in_language_columns():
+    tbl = _LANGS.with_columns(title=pl.lit("le titre"))
+
+    validation = (
+        pb.Validate(data=tbl)
+        .col_vals_in_language(
+            columns=["text", "title"], expected_column="lang", backend=_guess, brief=False
+        )
+        .interrogate()
+    )
+
+    assert [s.column for s in validation.validation_info] == [
+        ["text", "lang"],
+        ["title", "lang"],
+    ]
+    assert _failing_by_step(validation) == [[3], [1, 4]]
+    assert all(s.brief is None for s in validation.validation_info)
 
 
 @pytest.mark.parametrize(
@@ -930,34 +985,69 @@ def test_in_language():
         ({}, ValueError, "needs one of `expected=` and `expected_column=`"),
         ({"expected": "en", "min_confidence": 2}, ValueError, "between 0 and 1"),
         ({"expected": "en", "min_confidence": "high"}, TypeError, "must be a number"),
-        ({"expected": "en", "column": 1}, TypeError, "`column=` must be the name"),
+        ({"expected": "en", "columns": 1}, TypeError, "`columns=` must be the name"),
+        ({"expected_column": "text"}, ValueError, "can't be one of the columns of text"),
     ],
 )
-def test_in_language_bad_arguments(kwargs, error, message):
-    kwargs = {"column": "text", "backend": _guess, **kwargs}
+def test_col_vals_in_language_bad_arguments(kwargs, error, message):
+    kwargs = {"columns": "text", "backend": _guess, **kwargs}
+    validation = pb.Validate(data=_LANGS)
     with pytest.raises(error, match=message):
-        pb.text.in_language(**kwargs)
+        validation.col_vals_in_language(**kwargs)
+    assert validation.validation_info == []
 
 
-def test_token_length():
+def test_col_vals_token_len():
     prompts = pl.DataFrame(
-        {"prompt": ["Summarize the article.", "Hi", "a b c d e f", None], "id": [1, 2, 3, 4]}
+        {
+            "prompt": ["Summarize the article.", "Hi", "a b c d e f", None],
+            "reply": ["Sure.", "Hello there, how can I help?", "ok", "Yes"],
+            "id": [1, 2, 3, 4],
+        }
     )
 
     validation = (
         pb.Validate(data=prompts)
-        .add_steps(pb.text.token_length("prompt", tokenizer="whitespace", min_val=2))
-        .add_steps(pb.text.token_length("prompt", tokenizer=list, max_val=11, na_pass=True))
+        .col_vals_token_len(columns="prompt", tokenizer="whitespace", min_val=2)
+        .col_vals_token_len(columns="prompt", tokenizer=list, max_val=11, na_pass=True)
+        .col_vals_token_len(columns=["prompt", "reply"], tokenizer="whitespace", min_val=2)
         .interrogate()
     )
 
-    assert _failing_by_step(validation) == [[2, 4], [1]]
-    with pytest.raises(ValueError, match="needs `min_val=`, `max_val=`, or both"):
-        pb.text.token_length("prompt", tokenizer="whitespace")
-    with pytest.raises(TypeError, match="`max_val=` must be a number"):
-        pb.text.token_length("prompt", tokenizer="whitespace", max_val="10")
-    with pytest.raises(TypeError, match="`tokenizer=` must be the name of a tokenizer"):
-        pb.text.token_length("prompt", tokenizer=1, max_val=10)
+    assert [s.assertion_type for s in validation.validation_info] == ["col_vals_scored"] * 4
+    assert _failing_by_step(validation) == [[2, 4], [1], [2, 4], [1, 3, 4]]
+    assert [s.brief for s in validation.validation_info] == [
+        "At least 2 tokens in `prompt`.",
+        "At most 11 tokens in `prompt`.",
+        "At least 2 tokens in `prompt`.",
+        "At least 2 tokens in `reply`.",
+    ]
+
+    one = pb.Validate(data=prompts).col_vals_token_len(
+        columns="prompt", tokenizer="whitespace", min_val=1, max_val=1, brief="Step {step}: {auto}"
+    )
+    assert one.validation_info[0].brief == "Step {step}: Between 1 and 1 token in `prompt`."
+
+
+@pytest.mark.parametrize(
+    "kwargs, error, message",
+    [
+        ({}, ValueError, "needs `min_val=`, `max_val=`, or both"),
+        ({"max_val": "10"}, TypeError, "`max_val=` must be a number"),
+        ({"min_val": 5, "max_val": 2}, ValueError, "must not be greater than `max_val=`"),
+        (
+            {"tokenizer": 1, "max_val": 10},
+            TypeError,
+            "`tokenizer=` must be the name of a tokenizer",
+        ),
+    ],
+)
+def test_col_vals_token_len_bad_arguments(kwargs, error, message):
+    kwargs = {"columns": "prompt", "tokenizer": "whitespace", **kwargs}
+    validation = pb.Validate(data=_LANGS)
+    with pytest.raises(error, match=message):
+        validation.col_vals_token_len(**kwargs)
+    assert validation.validation_info == []
 
 
 _TICKETS = pl.DataFrame(
@@ -984,10 +1074,9 @@ _TICKETS = pl.DataFrame(
 
 
 @pytest.mark.parametrize("tbl_type", _TBL_TYPES)
-def test_no_pii(tbl_type):
-    steps = pb.text.no_pii("text")
-
-    validation = pb.Validate(data=_tbl(tbl_type, _TICKETS)).add_steps(steps).interrogate()
+def test_col_vals_no_pii(tbl_type):
+    validation = pb.Validate(data=_tbl(tbl_type, _TICKETS)).col_vals_no_pii(columns="text")
+    validation = validation.interrogate()
 
     assert [s.assertion_type for s in validation.validation_info] == ["col_vals_regex"] * 3
     assert [s.brief for s in validation.validation_info] == [
@@ -995,16 +1084,17 @@ def test_no_pii(tbl_type):
         "No phone numbers in `text`.",
         "No credit card numbers in `text`.",
     ]
+    assert all(s.values["inverse"] for s in validation.validation_info)
     assert _failing_by_step(validation) == [[2], [3], [4]]
 
 
 @pytest.mark.parametrize("tbl_type", _TBL_TYPES)
-def test_no_pii_other_entities(tbl_type):
+def test_col_vals_no_pii_other_entities(tbl_type):
     entities = {"ip_address": None, "us_ssn": None, "iban": None, "employee": r"EMP-[0-9]{6}"}
 
     validation = (
         pb.Validate(data=_tbl(tbl_type, _TICKETS))
-        .add_steps(pb.text.no_pii(["text", "note"], entities=entities))
+        .col_vals_no_pii(columns=["text", "note"], entities=entities)
         .interrogate()
     )
 
@@ -1014,15 +1104,18 @@ def test_no_pii_other_entities(tbl_type):
     assert validation.validation_info[7].brief == "No values that look like `employee` in `note`."
 
 
-def test_no_pii_missing_values_and_settings():
+def test_col_vals_no_pii_missing_values_and_settings():
     validation = (
         pb.Validate(data=_TICKETS)
-        .add_steps(pb.text.no_pii("text", entities="email", na_pass=False, thresholds=(1, 2)))
+        .col_vals_no_pii(
+            columns="text", entities="email", na_pass=False, thresholds=(1, 2), dimension="privacy"
+        )
         .interrogate()
     )
 
     assert _failing(validation) == [2, 6]
     assert validation.validation_info[0].thresholds.warning == 1
+    assert validation.validation_info[0].dimension == "privacy"
 
 
 @pytest.mark.parametrize(
@@ -1037,17 +1130,82 @@ def test_no_pii_missing_values_and_settings():
         ({"entities": 1}, TypeError, "`entities=` must be a list"),
     ],
 )
-def test_no_pii_bad_arguments(kwargs, error, message):
+def test_col_vals_no_pii_bad_arguments(kwargs, error, message):
     kwargs = {"columns": "text", **kwargs}
+    validation = pb.Validate(data=_TICKETS)
     with pytest.raises(error, match=message):
-        pb.text.no_pii(**kwargs)
+        validation.col_vals_no_pii(**kwargs)
+    assert validation.validation_info == []
+
+
+def test_text_checks_as_steps():
+    steps = (
+        pb.Steps()
+        .col_vals_text_quality("body", min_words=10)
+        .col_vals_in_language("body", expected_column="language", backend=_guess)
+        .col_vals_token_len("body", tokenizer="whitespace", max_val=100)
+        .col_vals_no_pii("body")
+    )
+
+    # Each method is one step of the collection, with only its settings that aren't defaults
+    assert len(steps) == 4
+    assert repr(steps).splitlines()[1:] == [
+        "  1. col_vals_text_quality(columns='body', min_words=10)",
+        f"  2. col_vals_in_language(columns='body', expected_column='language', backend={_guess!r})",
+        "  3. col_vals_token_len(columns='body', tokenizer='whitespace', max_val=100)",
+        "  4. col_vals_no_pii(columns='body')",
+    ]
+
+    tbl = _WEB.rename({"text": "words"}).with_columns(lang=pl.lit("en"))
+    validation = pb.Validate(data=tbl).add_steps(
+        steps, columns_map={"body": "words", "language": "lang"}
+    )
+
+    assert len(validation.validation_info) == 8 + 1 + 1 + 3
+    assert validation.validation_info[8].column == ["words", "lang"]
+    assert validation.validation_info[-1].brief == "No credit card numbers in `words`."
+
+    # `exclude=` counts the steps of the collection, so one position leaves out a whole check
+    fewer = pb.Validate(data=tbl).add_steps(
+        steps, columns_map={"body": "words", "language": "lang"}, exclude=[1, "col_vals_no_pii"]
+    )
+    assert len(fewer.validation_info) == 2
+
+
+def test_text_checks_in_yaml():
+    config = """
+tbl: web
+steps:
+  - col_vals_text_quality:
+      columns: text
+      min_words: 10
+      max_bullet_lines: 0.5
+  - col_vals_token_len:
+      columns: text
+      tokenizer: whitespace
+      max_val: 20
+  - col_vals_no_pii:
+      columns: [text]
+      entities:
+        email: null
+        employee: EMP-[0-9]{6}
+      dimension: privacy
+"""
+    validation = pb.yaml_interrogate(config, set_tbl=_WEB)
+
+    assert len(validation.validation_info) == 8 + 1 + 2
+    assert _failing_by_step(validation)[:8] == [[2], [], [3], [4], [], [4], [2], [2]]
+    assert validation.validation_info[8].brief == "At most 20 tokens in `text`."
+    assert validation.validation_info[10].brief == "No values that look like `employee` in `text`."
+    assert validation.validation_info[10].dimension == "privacy"
 
 
 def test_text_steps_round_trip_through_yaml():
     validation = (
         pb.Validate(data=_WEB, tbl_name="web")
-        .add_steps(pb.text.heuristic_filters("text", min_words=10))
-        .add_steps(pb.text.no_pii("text"))
+        .col_vals_text_quality(columns="text", min_words=10)
+        .col_vals_token_len(columns="text", tokenizer="whitespace", min_val=3)
+        .col_vals_no_pii(columns="text")
         .interrogate()
     )
 
@@ -1059,3 +1217,7 @@ def test_text_steps_round_trip_through_yaml():
     assert [s.n_failed for s in rebuilt.validation_info] == [
         s.n_failed for s in validation.validation_info
     ]
+
+
+def test_text_module_is_gone():
+    assert not hasattr(pb, "text")
