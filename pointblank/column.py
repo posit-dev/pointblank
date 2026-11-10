@@ -556,6 +556,11 @@ def ref(column_name: str) -> ReferenceColumn:
     To use this function, you must first set the reference data on the `Validate` object using
     the `reference=` parameter in the constructor.
 
+    A reference column can't be used with the row-wise comparison methods (like
+    `~~pointblank.Validate.col_vals_gt()` or `~~pointblank.Validate.col_vals_between()`), since the
+    rows of the two tables don't line up; these raise a `TypeError` when given one. To compare with
+    another column of the same table in those methods, use [`col()`](`pointblank.col`).
+
     Parameters
     ----------
     column_name

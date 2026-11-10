@@ -137,6 +137,7 @@ from pointblank._utils_check_args import (
     _check_active_input,
     _check_boolean_input,
     _check_column,
+    _check_not_reference_column,
     _check_pre,
     _check_set_types,
     _check_thresholds,
@@ -7236,6 +7237,7 @@ class Validate:
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
         _check_active_input(param=active, param_name="active")
+        _check_not_reference_column(value=value, param_name="value")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         value = _string_date_dttm_conversion(value=value)
@@ -7549,6 +7551,7 @@ class Validate:
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
         _check_active_input(param=active, param_name="active")
+        _check_not_reference_column(value=value, param_name="value")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         value = _string_date_dttm_conversion(value=value)
@@ -7868,6 +7871,7 @@ class Validate:
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
         _check_active_input(param=active, param_name="active")
+        _check_not_reference_column(value=value, param_name="value")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         # Allow regular strings to pass through for string comparisons
@@ -8186,6 +8190,7 @@ class Validate:
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
         _check_active_input(param=active, param_name="active")
+        _check_not_reference_column(value=value, param_name="value")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         # Allow regular strings to pass through for string comparisons
@@ -8508,6 +8513,7 @@ class Validate:
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
         _check_active_input(param=active, param_name="active")
+        _check_not_reference_column(value=value, param_name="value")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         value = _string_date_dttm_conversion(value=value)
@@ -8829,6 +8835,7 @@ class Validate:
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
         _check_active_input(param=active, param_name="active")
+        _check_not_reference_column(value=value, param_name="value")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         value = _string_date_dttm_conversion(value=value)
@@ -9173,6 +9180,8 @@ class Validate:
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
         _check_active_input(param=active, param_name="active")
+        _check_not_reference_column(value=left, param_name="left")
+        _check_not_reference_column(value=right, param_name="right")
 
         # If `left=` or `right=` is a string-based date or datetime, convert to the appropriate type
         left = _string_date_dttm_conversion(value=left)
@@ -9522,6 +9531,8 @@ class Validate:
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
         _check_active_input(param=active, param_name="active")
+        _check_not_reference_column(value=left, param_name="left")
+        _check_not_reference_column(value=right, param_name="right")
 
         # If `left=` or `right=` is a string-based date or datetime, convert to the appropriate type
         left = _string_date_dttm_conversion(value=left)
@@ -20217,6 +20228,12 @@ class Validate:
         validation steps with flying colors. If there's even a single failing test unit in any
         validation step, this method will return `False`.
 
+        A step that couldn't be evaluated (because its column is missing, its `pre=` function
+        raised an error, or its table has no rows, say) also makes the method return `False`, since
+        nothing about it is known to pass. A step that was turned off, with `active=False` or with
+        an `active=` function (like [`has_columns()`](`pointblank.has_columns`)) that returned
+        `False`, is left out.
+
         This validation metric might be overly stringent for some validation plans where failing
         test units are generally expected (and the strategy is to monitor data quality over time).
         However, the value of `all_passed()` could be suitable for validation plans designed to
@@ -20226,7 +20243,8 @@ class Validate:
         Returns
         -------
         bool
-            `True` if all validation steps had no failing test units, `False` otherwise.
+            `True` if all active validation steps were evaluated and had no failing test units,
+            `False` otherwise.
 
         Examples
         --------
@@ -20261,16 +20279,20 @@ class Validate:
         The returned value is `False` since the second validation step had a failing test unit. If
         it weren't for that one failing test unit, the return value would have been `True`.
         """
-        return all(validation.all_passed for validation in self.validation_info)
+        return all(
+            step.all_passed for step in self.validation_info if _step_counts_toward_passing(step)
+        )
 
     def assert_passing(self) -> None:
         """
         Raise an `AssertionError` if all tests are not passing.
 
         The `assert_passing()` method will raise an `AssertionError` if a test does not pass. This
-        method simply wraps [`all_passed()`](`pointblank.Validate.all_passed`) for more ready use
-        in test suites. The step number and assertion made is printed in the `AssertionError`
-        message if a failure occurs, ensuring some details are preserved.
+        method wraps [`all_passed()`](`pointblank.Validate.all_passed`) for more ready use in test
+        suites. The step number and assertion made is printed in the `AssertionError` message if a
+        failure occurs, ensuring some details are preserved. A step that couldn't be evaluated is
+        listed as failing too, with the reason it couldn't be, and a step that was turned off (with
+        `active=`) is left out.
 
         If the validation has not yet been interrogated, this method will automatically call
         [`interrogate()`](`pointblank.Validate.interrogate`) with default parameters before checking
@@ -20279,7 +20301,7 @@ class Validate:
         Raises
         -------
         AssertionError
-            If any validation step has failing test units.
+            If any active validation step has failing test units or couldn't be evaluated.
 
         Examples
         --------
@@ -20326,14 +20348,18 @@ class Validate:
             self.interrogate()
 
         if not self.all_passed():
-            failed_steps = [
-                (i, str(step.autobrief))
-                for i, step in enumerate(self.validation_info)
-                if step.n_failed > 0
-            ]
-            msg = "The following assertions failed:\n" + "\n".join(
-                [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]
-            )
+            failed_steps = []
+            for i, step in enumerate(self.validation_info):
+                if not _step_counts_toward_passing(step) or step.all_passed:
+                    continue
+                line = f"- Step {i + 1}: {step.autobrief}"
+                if step.eval_error:
+                    # Give the reason the step couldn't be evaluated, when there's a note with it
+                    note = (step.notes or {}).get("eval_error")
+                    reason = f": {note['text']}" if note else ""
+                    line += f" (couldn't be evaluated{reason})"
+                failed_steps.append(line)
+            msg = "The following assertions failed:\n" + "\n".join(failed_steps)
             raise AssertionError(msg)
 
     def assert_below_threshold(
@@ -26260,7 +26286,7 @@ class Validate:
             "dict_warning": {step.i: step.warning for step in self.validation_info},
             "dict_error": {step.i: step.error for step in self.validation_info},
             "dict_critical": {step.i: step.critical for step in self.validation_info},
-            "all_passed": all(step.all_passed for step in self.validation_info),
+            "all_passed": self.all_passed(),
             "highest_severity": highest_severity,
             "tbl_row_count": row_count,
             "tbl_column_count": column_count,
@@ -26294,10 +26320,21 @@ class Validate:
             return "error"
         elif any(step.warning for step in self.validation_info):
             return "warning"
-        elif any(not step.all_passed for step in self.validation_info):
+        elif not self.all_passed():
             return "some failing"
         else:
             return "all passed"
+
+
+def _step_counts_toward_passing(step: _ValidationInfo) -> bool:
+    """
+    Determine whether a step counts toward `all_passed()` and `assert_passing()`.
+
+    A step that was turned off (with `active=False`, or an `active=` function that returned
+    `False`) doesn't count. A step that couldn't be evaluated is also set to be inactive during
+    interrogation, but it counts (as a step that didn't pass), so it's told apart by `eval_error`.
+    """
+    return bool(step.active) or bool(step.eval_error)
 
 
 def _as_named_query(tbl_nw: Any, name: str) -> Any:
