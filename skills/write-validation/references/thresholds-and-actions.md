@@ -6,12 +6,15 @@
 
 ### Value interpretation
 
-| Value     | Meaning                       | Example             |
-|-----------|-------------------------------|----------------------|
-| `0.05`    | 5% of test units may fail     | 50 failures in 1000 |
-| `5`       | At most 5 test units may fail | Absolute count       |
-| `True`    | Any failure triggers          | Same as `1`          |
-| `None`    | Level not used                | No threshold set     |
+| Value     | Level is reached when...           | Example                |
+|-----------|------------------------------------|------------------------|
+| `0.05`    | 5% or more of test units fail      | 50 failures in 1000    |
+| `5`       | 5 or more test units fail          | Absolute count         |
+| `True`    | Any test unit fails                | Same as `1`            |
+| `None`    | Level not used                     | No threshold set       |
+
+`Thresholds` also accepts a tuple (`(0.01, 0.05, 0.10)`) or a dict
+(`{"warning": 0.01, "error": 0.05}`) wherever `thresholds=` is taken.
 
 ### Setting thresholds
 
@@ -40,7 +43,7 @@ highest_only=True)`
 
 Each level accepts:
 
-- `str` -- message template (printed to stdout)
+- `str` -- message template (printed)
 - `Callable` -- function to call
 - `list[str | Callable]` -- multiple actions
 - `None` -- no action
@@ -55,6 +58,8 @@ Each level accepts:
 | `{col}` or `{column}` | Column name                 |
 | `{val}` or `{value}` | Comparison value              |
 | `{time}`          | Timestamp                        |
+
+Other placeholders (e.g. `{n_failed}`, `{n}`) are not substituted.
 
 ### Examples
 
@@ -102,7 +107,8 @@ step details:
 ```python
 def my_action():
     meta = pb.get_action_metadata()
-    # meta keys: step, column, type, level, value, time, ...
+    # meta keys: step, column, type, value, level, level_num, time,
+    #            autobrief, failure_text
 ```
 
 ## Final actions
@@ -112,14 +118,17 @@ def my_action():
 ```python
 def summary_check():
     summary = pb.get_validation_summary()
-    if summary["n_failed_steps"] > 0:
+    if summary["n_failing_steps"] > 0:
         create_jira_ticket(summary)
 
 pb.Validate(
     data=df,
-    final_actions=pb.FinalActions(summary_check, "Validation complete at {time}"),
+    final_actions=pb.FinalActions(summary_check, "Validation complete."),
 )
 ```
+
+String final actions are printed as they are: template variables like
+`{time}` are not substituted (use a callable for dynamic messages).
 
 ### get_validation_summary()
 
@@ -128,8 +137,12 @@ Inside a final action callable, call `pb.get_validation_summary()`:
 ```python
 def report():
     s = pb.get_validation_summary()
-    # s keys: n_steps, n_passed_steps, n_failed_steps,
-    #         warn_count, error_count, critical_count, ...
+    # s keys: n_steps, n_passing_steps, n_failing_steps,
+    #         n_warning_steps, n_error_steps, n_critical_steps,
+    #         list_passing_steps, list_failing_steps, all_passed,
+    #         highest_severity, overall_health_score, dimension_scores,
+    #         tbl_name, tbl_row_count, tbl_column_count,
+    #         validation_duration, and dict_* (per-step dicts)
 ```
 
 ## Common patterns
