@@ -135,8 +135,10 @@ to install it. Pointblank never trains a model: the adapters use models that are
 | `token_count()` | The number of tokens of text | A Hugging Face tokenizer, `tiktoken`, or a function |
 
 The last two need no model to score with (other than a tokenizer), and they're the scorers of the
-bundles of steps in `pb.text`, for the heuristic quality filters and the length of text in tokens
-(see the [Checking Text Data](text-checks.qmd) article).
+`~~pointblank.Validate.col_vals_text_quality()` and
+`~~pointblank.Validate.col_vals_token_len()` validation methods, for the
+heuristic quality filters and the length of text in tokens (see the
+[Checking Text Data](text-checks.qmd) article).
 
 With real models, the adapters look like this:
 
