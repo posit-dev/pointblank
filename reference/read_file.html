@@ -2088,7 +2088,7 @@ The restored validation object with all its original state, validation results, 
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s first save a validation object to disk with <a href="../reference/write_file.html#pointblank.write_file" class="gdls-link gdls-code">write_file()</a>. We’ll use a temporary directory here, and <code>keep_tbl=True</code> saves the target table along with the validation results:</p>
-<div id="c369077b" class="cell" data-execution_count="2">
+<div id="68114ff4" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -2104,7 +2104,7 @@ The restored validation object with all its original state, validation results, 
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>pb.write_file(validation, <span class="st">"my_validation"</span>, path<span class="op">=</span>save_dir, keep_tbl<span class="op">=</span><span class="va">True</span>, quiet<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 </div>
 <p>Now we can load the validation object from disk with <a href="../reference/read_file.html#pointblank.read_file" class="gdls-link gdls-code">read_file()</a>. The filename can be given without its extension, in which case <a href="../reference/read_file.html#pointblank.read_file" class="gdls-link gdls-code">read_file()</a> looks for <code>"my_validation.pkl"</code>:</p>
-<div id="bfa71a94" class="cell" data-execution_count="3">
+<div id="f7e38ad7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>restored <span class="op">=</span> pb.read_file(os.path.join(save_dir, <span class="st">"my_validation"</span>))</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>restored</span></code></pre></div>
@@ -2304,7 +2304,7 @@ The restored validation object with all its original state, validation results, 
 </div>
 </div>
 <p>The restored object has the same results as the original: the first step has 6 failing test units and the second has 2. The loaded validation object retains all its functionality, so we can, for example, get the rows that failed any step (since the target table was saved):</p>
-<div id="96f0844f" class="cell" data-execution_count="4">
+<div id="e1251211" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pb.preview(restored.get_sundered_data(<span class="bu">type</span><span class="op">=</span><span class="st">"fail"</span>))</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
