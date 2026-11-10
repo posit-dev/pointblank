@@ -2050,7 +2050,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L548-L628" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L548-L633" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ref</span>(<span class="va">column_name</span>)</span></code></pre></div>
@@ -2058,6 +2058,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="doc-text">
 <p>This function is used with aggregate validation methods (like <a href="../reference/Validate.col_sum_eq.html#pointblank.Validate.col_sum_eq" class="gdls-link gdls-code">col_sum_eq</a>, <a href="../reference/Validate.col_avg_gt.html#pointblank.Validate.col_avg_gt" class="gdls-link gdls-code">col_avg_gt</a>, etc.) to compare the aggregate value of a column in the main data against the aggregate value of a column in the reference data.</p>
 <p>To use this function, you must first set the reference data on the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object using the <code>reference=</code> parameter in the constructor.</p>
+<p>A reference column can’t be used with the row-wise comparison methods (like <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a> or <a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" class="gdls-link gdls-code">col_vals_between()</a>), since the rows of the two tables don’t line up; these raise a <code>TypeError</code> when given one. To compare with another column of the same table in those methods, use <a href="../reference/col.html#pointblank.col" class="gdls-link"><code>col()</code></a>.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -2084,7 +2085,7 @@ A reference column marker that indicates the value should be computed from the r
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose we have two DataFrames: a current data table and a reference (historical) table. We want to validate that the sum of a column in the current data matches the sum of the same column in the reference data.</p>
-<div id="996ff101" class="cell" data-execution_count="2">
+<div id="93b728a0" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2260,7 +2261,7 @@ A reference column marker that indicates the value should be computed from the r
 </div>
 <p>The <code>sales</code> column sums to <code>600</code> in both tables, so the single test unit passes.</p>
 <p>You can also compare different columns or use tolerance:</p>
-<div id="3cec0cde" class="cell" data-execution_count="3">
+<div id="8e10c4ee" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>current_data <span class="op">=</span> pl.DataFrame({<span class="st">"revenue"</span>: [<span class="dv">105</span>, <span class="dv">205</span>, <span class="dv">305</span>]})</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>reference_data <span class="op">=</span> pl.DataFrame({<span class="st">"sales"</span>: [<span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">300</span>]})</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>

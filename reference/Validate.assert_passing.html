@@ -2045,13 +2045,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20266-L20337" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20286-L20363" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">assert_passing</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The <a href="../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" class="gdls-link gdls-code">assert_passing()</a> method will raise an <code>AssertionError</code> if a test does not pass. This method simply wraps <a href="../reference/Validate.all_passed.html#pointblank.Validate.all_passed" class="gdls-link"><code>all_passed()</code></a> for more ready use in test suites. The step number and assertion made is printed in the <code>AssertionError</code> message if a failure occurs, ensuring some details are preserved.</p>
+<p>The <a href="../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" class="gdls-link gdls-code">assert_passing()</a> method will raise an <code>AssertionError</code> if a test does not pass. This method wraps <a href="../reference/Validate.all_passed.html#pointblank.Validate.all_passed" class="gdls-link"><code>all_passed()</code></a> for more ready use in test suites. The step number and assertion made is printed in the <code>AssertionError</code> message if a failure occurs, ensuring some details are preserved. A step that couldn’t be evaluated is listed as failing too, with the reason it couldn’t be, and a step that was turned off (with <code>active=</code>) is left out.</p>
 <p>If the validation has not yet been interrogated, this method will automatically call <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a> with default parameters before checking for passing tests.</p>
 </div>
 <section id="raises" class="level2 doc-raises">
@@ -2060,7 +2060,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code> <span class="doc-parameter-annotation">AssertionError</span></code></dt>
 <dd>
-If any validation step has failing test units.
+If any active validation step has failing test units or couldn’t be evaluated.
 </dd>
 </dl>
 </div>
@@ -2068,7 +2068,7 @@ If any validation step has failing test units.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). The <a href="../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" class="gdls-link gdls-code">assert_passing()</a> method is used to assert that all validation steps passed perfectly, automatically performing the interrogation if needed.</p>
-<div id="f8c70ac5" class="cell" data-execution_count="1">
+<div id="3e72ac6e" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2093,19 +2093,19 @@ If any validation step has failing test units.
 <div class="ansi-escaped-output">
 <pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
 <span class="ansi-red-fg">AssertionError</span>                            Traceback (most recent call last)
-<span class="ansi-green-fg">/var/folders/s8/bj_jsx3d7jqd2btw7bwm6yx80000gp/T/ipykernel_19168/137793627.py</span> in <span class="ansi-cyan-fg">?</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[1]</span><span class="ansi-green-fg">, line 20</span>
 <span class="ansi-green-fg">     16</span>     .col_vals_in_set(columns=<span class="ansi-yellow-fg">"c"</span>, set=[<span class="ansi-yellow-fg">"a"</span>, <span class="ansi-yellow-fg">"b"</span>])
 <span class="ansi-green-fg">     17</span> )
 <span class="ansi-green-fg">     18</span> 
 <span class="ansi-green-fg">     19</span> <span style="font-style:italic;color:rgb(95,135,135)"># No need to call `interrogate()` explicitly</span>
 <span class="ansi-green-fg">---&gt; </span><span class="ansi-green-fg">20</span> validation.assert_passing()
 
-<span class="ansi-green-fg">~/py_projects/pointblank/pointblank/validate.py</span> in <span class="ansi-cyan-fg">?</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-fg">  20333</span>             ]
-<span class="ansi-green-fg">  20334</span>             msg = "The following assertions failed:\n" + "\n".join(
-<span class="ansi-green-fg">  20335</span>                 [<span class="ansi-yellow-fg">f"- Step {i + 1}: {autobrief}"</span> <span style="font-weight:bold;color:rgb(0,135,0)">for</span> i, autobrief <span style="font-weight:bold;color:rgb(0,135,0)">in</span> failed_steps]
-<span class="ansi-green-fg">  20336</span>             )
-<span class="ansi-green-fg">&gt; </span><span class="ansi-green-fg">20337</span>             <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> AssertionError(msg)
+<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/work/pointblank/pointblank/pointblank/validate.py:20363</span>, in <span class="ansi-cyan-fg">Validate.assert_passing</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg">  20359</span>                     reason = <span class="ansi-yellow-fg">f": {note['text']}"</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> note <span style="font-weight:bold;color:rgb(0,135,0)">else</span> <span class="ansi-yellow-fg">""</span>
+<span class="ansi-green-fg">  20360</span>                     line += <span class="ansi-yellow-fg">f" (couldn't be evaluated{reason})"</span>
+<span class="ansi-green-fg">  20361</span>                 failed_steps.append(line)
+<span class="ansi-green-fg">  20362</span>             msg = <span class="ansi-yellow-fg">"The following assertions failed:\n"</span> + <span class="ansi-yellow-fg">"\n"</span>.join(failed_steps)
+<span class="ansi-green-fg">&gt; </span><span class="ansi-green-fg">20363</span>             <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> AssertionError(msg)
 
 <span class="ansi-red-fg">AssertionError</span>: The following assertions failed:
 - Step 2: Expect that values in `b` should be &lt; `9`.</pre>

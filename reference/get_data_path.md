@@ -4,7 +4,7 @@ Get the file path to a dataset included with the Pointblank package.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1562-L1728)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1563-L1729)
 
 ``` python
 get_data_path(

@@ -4,7 +4,7 @@ Determine if every validation step passed perfectly, with no failing test units.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20211-L20264)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20222-L20284)
 
 ``` python
 Validate.all_passed()
@@ -12,12 +12,14 @@ Validate.all_passed()
 
 The `all_passed()` method determines if every validation step passed perfectly, with no failing test units. This method is useful for quickly checking if the table passed all validation steps with flying colors. If there's even a single failing test unit in any validation step, this method will return `False`.
 
+A step that couldn't be evaluated (because its column is missing, its `pre=` function raised an error, or its table has no rows, say) also makes the method return `False`, since nothing about it is known to pass. A step that was turned off, with `active=False` or with an `active=` function (like [`has_columns()`](../reference/has_columns.md#pointblank.has_columns)) that returned `False`, is left out.
+
 This validation metric might be overly stringent for some validation plans where failing test units are generally expected (and the strategy is to monitor data quality over time). However, the value of `all_passed()` could be suitable for validation plans designed to ensure that every test unit passes perfectly (e.g., checks for column presence, null-checking tests, etc.).
 
 ## Returns
 
 `bool`  
-`True` if all validation steps had no failing test units, `False` otherwise.
+`True` if all active validation steps were evaluated and had no failing test units, `False` otherwise.
 
 ## Examples
 

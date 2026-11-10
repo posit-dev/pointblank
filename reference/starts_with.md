@@ -4,7 +4,7 @@ Select columns that start with specified text.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L631-L791)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L636-L796)
 
 ``` python
 starts_with(

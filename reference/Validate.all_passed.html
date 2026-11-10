@@ -2045,13 +2045,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20211-L20264" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L20222-L20284" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">all_passed</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
 <p>The <code>all_passed()</code> method determines if every validation step passed perfectly, with no failing test units. This method is useful for quickly checking if the table passed all validation steps with flying colors. If there’s even a single failing test unit in any validation step, this method will return <code>False</code>.</p>
+<p>A step that couldn’t be evaluated (because its column is missing, its <code>pre=</code> function raised an error, or its table has no rows, say) also makes the method return <code>False</code>, since nothing about it is known to pass. A step that was turned off, with <code>active=False</code> or with an <code>active=</code> function (like <a href="../reference/has_columns.html#pointblank.has_columns" class="gdls-link"><code>has_columns()</code></a>) that returned <code>False</code>, is left out.</p>
 <p>This validation metric might be overly stringent for some validation plans where failing test units are generally expected (and the strategy is to monitor data quality over time). However, the value of <code>all_passed()</code> could be suitable for validation plans designed to ensure that every test unit passes perfectly (e.g., checks for column presence, null-checking tests, etc.).</p>
 </div>
 <section id="returns" class="level2 doc-returns">
@@ -2060,7 +2061,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code> <span class="doc-parameter-annotation">bool</span></code></dt>
 <dd>
-<code>True</code> if all validation steps had no failing test units, <code>False</code> otherwise.
+<code>True</code> if all active validation steps were evaluated and had no failing test units, <code>False</code> otherwise.
 </dd>
 </dl>
 </div>
@@ -2068,7 +2069,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). After interrogation, the <code>all_passed()</code> method is used to determine if all validation steps passed perfectly.</p>
-<div id="ea50727e" class="cell" data-execution_count="1">
+<div id="e3fa6f4e" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>

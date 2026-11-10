@@ -4,7 +4,7 @@ Read a Validate object from disk that was previously saved with [write_file()](.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L794-L959)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L795-L960)
 
 ``` python
 read_file(filepath)

@@ -21267,6 +21267,12 @@ failing test units. This method is useful for quickly checking if the table pass
 validation steps with flying colors. If there's even a single failing test unit in any
 validation step, this method will return `False`.
 
+A step that couldn't be evaluated (because its column is missing, its `pre=` function
+raised an error, or its table has no rows, say) also makes the method return `False`, since
+nothing about it is known to pass. A step that was turned off, with `active=False` or with
+an `active=` function (like [`has_columns()`](`pointblank.has_columns`)) that returned
+`False`, is left out.
+
 This validation metric might be overly stringent for some validation plans where failing
 test units are generally expected (and the strategy is to monitor data quality over time).
 However, the value of `all_passed()` could be suitable for validation plans designed to
@@ -21276,7 +21282,8 @@ null-checking tests, etc.).
 Returns
 -------
 bool
-    `True` if all validation steps had no failing test units, `False` otherwise.
+    `True` if all active validation steps were evaluated and had no failing test units,
+    `False` otherwise.
 
 Examples
 --------
@@ -21316,9 +21323,11 @@ assert_passing(self) -> 'None'
 Raise an `AssertionError` if all tests are not passing.
 
 The `assert_passing()` method will raise an `AssertionError` if a test does not pass. This
-method simply wraps [`all_passed()`](`pointblank.Validate.all_passed`) for more ready use
-in test suites. The step number and assertion made is printed in the `AssertionError`
-message if a failure occurs, ensuring some details are preserved.
+method wraps [`all_passed()`](`pointblank.Validate.all_passed`) for more ready use in test
+suites. The step number and assertion made is printed in the `AssertionError` message if a
+failure occurs, ensuring some details are preserved. A step that couldn't be evaluated is
+listed as failing too, with the reason it couldn't be, and a step that was turned off (with
+`active=`) is left out.
 
 If the validation has not yet been interrogated, this method will automatically call
 [`interrogate()`](`pointblank.Validate.interrogate`) with default parameters before checking
@@ -21327,7 +21336,7 @@ for passing tests.
 Raises
 -------
 AssertionError
-    If any validation step has failing test units.
+    If any active validation step has failing test units or couldn't be evaluated.
 
 Examples
 --------
@@ -30503,6 +30512,11 @@ a column in the reference data.
 
 To use this function, you must first set the reference data on the `Validate` object using
 the `reference=` parameter in the constructor.
+
+A reference column can't be used with the row-wise comparison methods (like
+`~~pointblank.Validate.col_vals_gt()` or `~~pointblank.Validate.col_vals_between()`), since the
+rows of the two tables don't line up; these raise a `TypeError` when given one. To compare with
+another column of the same table in those methods, use [`col()`](`pointblank.col`).
 
 Parameters
 ----------

@@ -4,7 +4,7 @@ Reference a column from the reference data for aggregate comparisons.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L548-L628)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L548-L633)
 
 ``` python
 ref(column_name)
@@ -13,6 +13,8 @@ ref(column_name)
 This function is used with aggregate validation methods (like [col_sum_eq](../reference/Validate.col_sum_eq.md#pointblank.Validate.col_sum_eq), [col_avg_gt](../reference/Validate.col_avg_gt.md#pointblank.Validate.col_avg_gt), etc.) to compare the aggregate value of a column in the main data against the aggregate value of a column in the reference data.
 
 To use this function, you must first set the reference data on the [Validate](../reference/Validate.md#pointblank.Validate) object using the `reference=` parameter in the constructor.
+
+A reference column can't be used with the row-wise comparison methods (like [col_vals_gt()](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) or [col_vals_between()](../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between)), since the rows of the two tables don't line up; these raise a `TypeError` when given one. To compare with another column of the same table in those methods, use [`col()`](../reference/col.md#pointblank.col).
 
 ## Parameters
 
