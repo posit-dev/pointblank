@@ -536,7 +536,7 @@ class OTelExporter:
         root_attrs = {
             **attrs,
             "pb.steps.total": len(validation.validation_info),
-            "pb.all_passed": all(v.all_passed for v in validation.validation_info),
+            "pb.all_passed": validation.all_passed(),
             "pb.duration_s": (validation.time_end - validation.time_start).total_seconds(),
         }
 
