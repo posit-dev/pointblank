@@ -1,6 +1,6 @@
 import datetime
 from _typeshed import Incomplete
-from collections.abc import Collection, Sequence
+from collections.abc import Collection, Mapping, Sequence
 from dataclasses import dataclass
 from great_tables import GT
 from narwhals.typing import IntoDataFrame, IntoFrame
@@ -640,6 +640,76 @@ class Validate:
         role_key: str = "role",
         content_key: str = "content",
         na_pass: bool = False,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_text_quality(
+        self,
+        columns: str | list[str],
+        min_words: int | None = 50,
+        max_words: int | None = 100000,
+        min_mean_word_length: float | None = 3,
+        max_mean_word_length: float | None = 10,
+        max_symbol_ratio: float | None = 0.1,
+        max_bullet_lines: float | None = 0.9,
+        max_ellipsis_lines: float | None = 0.3,
+        min_alpha_words: float | None = 0.8,
+        min_stop_words: int | None = 2,
+        max_repeated_lines: float | None = 0.3,
+        stop_words: Sequence[str] | None = None,
+        na_pass: bool = True,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_in_language(
+        self,
+        columns: str | list[str],
+        expected: str | list[str] | None = None,
+        expected_column: str | None = None,
+        min_confidence: float = 0.5,
+        backend: str | Callable[[str], Any] = "langid",
+        model: str | None = None,
+        na_pass: bool = False,
+        cache: bool | str | Path = True,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_token_len(
+        self,
+        columns: str | list[str],
+        tokenizer: str | Any,
+        min_val: int | None = None,
+        max_val: int | None = None,
+        na_pass: bool = False,
+        cache: bool | str | Path = True,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool | Callable = True,
+        dimension: str | None = None,
+    ) -> Validate: ...
+    def col_vals_no_pii(
+        self,
+        columns: str | list[str],
+        entities: Sequence[str] | Mapping[str, str | None] = ("email", "phone", "credit_card"),
+        na_pass: bool = True,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
