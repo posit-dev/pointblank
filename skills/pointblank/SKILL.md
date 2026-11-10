@@ -3,9 +3,10 @@ name: pointblank
 description: >
   Validate DataFrames and database tables with Pointblank. Covers the
   Validate workflow (plan, interrogate, report), column selectors, data
-  backends (Polars, Pandas, DuckDB, databases via Ibis), threshold
-  levels, actions, and result extraction. Use when building, running,
-  or troubleshooting data-validation pipelines.
+  backends (Polars, Pandas, PySpark, DuckDB, databases via Ibis),
+  threshold levels, actions, and result extraction (including per-row
+  failure flags). Use when building, running, or troubleshooting
+  data-validation pipelines.
 license: MIT
 compatibility: Requires Python >=3.10.
 metadata:
@@ -18,6 +19,7 @@ metadata:
     - pandas
     - duckdb
     - ibis
+    - pyspark
 ---
 
 # Pointblank
@@ -53,35 +55,46 @@ skills/pointblank/
 +-- references/
     +-- validation-methods.md   <- All col_vals_* / row / schema methods
     +-- column-selectors.md     <- col(), starts_with(), matches(), etc.
-    +-- data-backends.md        <- Polars, Pandas, DuckDB, Ibis, files
+    +-- data-backends.md        <- Polars, Pandas, PySpark, DuckDB, Ibis, files
 ```
 
 ## When to use what
 
-| I want to...                         | Use                                  |
-| ------------------------------------ | ------------------------------------ |
-| Check column values meet a condition | `col_vals_gt/lt/eq/...`              |
-| Ensure no nulls in a column          | `col_vals_not_null`                  |
-| Check values are in an allowed set   | `col_vals_in_set`                    |
-| Match a regex pattern                | `col_vals_regex`                     |
-| Validate table schema                | `col_schema_match`                   |
-| Check row/column counts              | `row_count_match`, `col_count_match` |
-| Find duplicate rows                  | `rows_distinct`                      |
-| Check data freshness                 | `data_freshness`                     |
-| Combine multiple conditions          | `conjointly`                         |
-| Run a custom check                   | `specially`                          |
-| Use LLM-based validation             | `prompt`                             |
-| Select columns by pattern            | `starts_with`, `contains`, `matches` |
-| Set failure thresholds               | `Thresholds`                         |
-| Trigger actions on failure           | `Actions`, `FinalActions`            |
-| Get failing rows                     | `get_data_extracts`                  |
-| Split data into pass/fail            | `get_sundered_data`                  |
-| Profile a dataset first              | `DataScan`                           |
-| Compare two tables (diff)            | `compare`, `tbl_match(keys=...)`     |
-| Define validation in YAML            | `yaml_interrogate`                   |
-| Enforce contracts in a pipeline      | `Contract`, `Pipeline`               |
-| Generate test data                   | `Schema.generate`, field classes     |
-| Draft validation with an LLM         | `DraftValidation`                    |
+| I want to...                         | Use                                       |
+| ------------------------------------ | ----------------------------------------- |
+| Check column values meet a condition | `col_vals_gt/lt/eq/...`                   |
+| Ensure no nulls in a column          | `col_vals_not_null`                       |
+| Check values are in an allowed set   | `col_vals_in_set`, `col_vals_in_table`    |
+| Match a regex pattern                | `col_vals_regex`                          |
+| Check string lengths                 | `col_vals_str_len`                        |
+| Validate table schema                | `col_schema_match`                        |
+| Check row/column counts              | `row_count_match`, `col_count_match`      |
+| Find duplicate rows                  | `rows_distinct`, `rows_near_distinct`     |
+| Check data freshness                 | `data_freshness`                          |
+| Check coded missing values           | `MissingSpec`, `col_missing_*`            |
+| Check column sums/means/SDs          | `col_sum_*`, `col_avg_*`, `col_sd_*`      |
+| Reconcile totals with a source       | `tbl_reconcile`                           |
+| Combine multiple conditions          | `conjointly`                              |
+| Run a custom check                   | `specially`                               |
+| Use LLM-based validation             | `prompt`, `calibrate_prompt`              |
+| Score rows with a model/function     | `col_vals_scored`, `pb.scorers`           |
+| Check text, chat, or RAG data        | `pb.text`, `pb.rag`, `col_vals_chat_format` |
+| Reuse a bundle of steps              | `Steps`, `add_steps`                      |
+| Select columns by pattern            | `starts_with`, `contains`, `matches`      |
+| Set failure thresholds               | `Thresholds`                              |
+| Trigger actions on failure           | `Actions`, `FinalActions`                 |
+| Get failing rows                     | `get_data_extracts`                       |
+| Split data into pass/fail            | `get_sundered_data`                       |
+| Flag the steps each row failed       | `get_row_flags`                           |
+| Profile a dataset first              | `DataScan`                                |
+| Compare two tables (diff)            | `compare`, `tbl_match(keys=...)`          |
+| Define validation in YAML            | `yaml_interrogate`                        |
+| Enforce contracts in a pipeline      | `Contract`, `Pipeline`                    |
+| Generate test data                   | `Schema.generate`, field classes          |
+| Draft validation with an LLM         | `DraftValidation`                         |
+| See which checks matter to a model   | `Ablation`                                |
+| Check splits or synthetic data       | `check_splits`, `check_synthetic`         |
+| Write a dataset card                 | `to_data_card`                            |
 
 ## Core concepts
 
@@ -116,15 +129,16 @@ Pointblank works with multiple table types through the same API:
 | ----------- | ------------------------------------------------------------------- |
 | Polars      | `pl.DataFrame` or `pl.LazyFrame`                                    |
 | Pandas      | `pd.DataFrame`                                                      |
-| DuckDB      | `ibis.Table` via `pb.connect_to_table("duckdb://path.db::table")`   |
+| DuckDB      | `ibis.Table` via `pb.connect_to_table("duckdb://...::table")`       |
 | PostgreSQL  | `ibis.Table` via `pb.connect_to_table("postgresql://...")`          |
 | MySQL       | `ibis.Table` via `pb.connect_to_table("mysql://...")`               |
 | SQLite      | `ibis.Table` via `pb.connect_to_table("sqlite://...")`              |
 | Snowflake   | `ibis.Table` via `pb.connect_to_table("snowflake://...")`           |
+| PySpark     | `pyspark.sql.DataFrame`                                             |
 | CSV/Parquet | File path string: `"data/orders.csv"`, `"s3://bucket/file.parquet"` |
 
 ```python
-tbl = pb.connect_to_table("duckdb:///warehouse.db::sales")
+tbl = pb.connect_to_table("duckdb:///path/to/warehouse.ddb::sales")
 validation = pb.Validate(data=tbl).col_vals_gt(columns="revenue", value=0).interrogate()
 ```
 
@@ -188,6 +202,10 @@ extracts = validation.get_data_extracts(i=1, frame=True)
 pass_df = validation.get_sundered_data(type="pass")
 fail_df = validation.get_sundered_data(type="fail")
 
+# Keep every row, with a pb_failed_<i>_ column per step plus
+# pb_n_failed_ and pb_row_score_ (share of the row's checks passed)
+flags = validation.get_row_flags()
+
 # JSON report for downstream systems
 json_str = validation.get_json_report()
 ```
@@ -221,14 +239,15 @@ restored = pb.read_file("nightly_check.pb")
 
 ## Related skills
 
-| Skill            | When to use it                                    |
-| ---------------- | ------------------------------------------------- |
-| write-validation | Detailed guidance on choosing and composing steps |
-| define-contracts | Contract and Pipeline boundary validation         |
-| scan-and-profile | Profile data before writing validation rules      |
-| validate-yaml    | Define validation plans in YAML                   |
-| generate-data    | Create synthetic test data from schemas           |
-| draft-validation | LLM-assisted validation drafting and editing      |
+| Skill               | When to use it                                    |
+| ------------------- | ------------------------------------------------- |
+| write-validation    | Detailed guidance on choosing and composing steps |
+| define-contracts    | Contract and Pipeline boundary validation         |
+| scan-and-profile    | Profile data before writing validation rules      |
+| validate-yaml       | Define validation plans in YAML                   |
+| generate-data       | Create synthetic test data from schemas           |
+| draft-validation    | LLM-assisted validation drafting and editing      |
+| check-training-data | Text/RAG/ML data checks, ablation, data cards     |
 
 ## Gotchas
 
@@ -237,8 +256,9 @@ restored = pb.read_file("nightly_check.pb")
 2. **Column selectors are case-insensitive by default.** Pass
    `case_sensitive=True` to `starts_with()`, `contains()`, etc. if
    needed.
-3. **Threshold fractions vs counts.** A threshold of `0.05` means 5% of
-   rows may fail; a threshold of `5` means at most 5 rows may fail.
+3. **Threshold fractions vs counts.** A threshold of `0.05` is reached
+   when 5% or more of test units fail; a threshold of `5` is reached
+   when 5 or more fail.
 4. **`na_pass=False` is the default.** Null values count as failures
    unless you set `na_pass=True`.
 5. **Database tables require Ibis.** Use `pb.connect_to_table()` with a

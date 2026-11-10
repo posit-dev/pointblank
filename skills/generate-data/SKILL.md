@@ -5,8 +5,10 @@ description: >
   classes. Covers IntField, FloatField, StringField, BoolField,
   DateField, DatetimeField, and more. Supports presets (name, email,
   address, etc.), country-specific data, nullable columns, unique
-  constraints, and profile_fields() for person data. Use when creating
-  test data, fixtures, or synthetic datasets for validation testing.
+  constraints, profile_fields() for person data, schemas inferred from
+  a real table, and check_synthetic() for comparing synthetic data with
+  the real data it imitates. Use when creating test data, fixtures, or
+  synthetic datasets for validation testing.
 license: MIT
 compatibility: Requires Python >=3.10, pointblank installed.
 metadata:
@@ -17,7 +19,6 @@ metadata:
     - synthetic-data
     - test-data
     - schema
-    - faker
 ---
 
 # Generate Data
@@ -70,6 +71,9 @@ skills/generate-data/
 | Define duration columns             | `duration_field()`                    |
 | Add person profile fields           | `profile_fields()`                    |
 | Generate country-specific data      | `generate(country="DE")`              |
+| Mix several countries               | `generate(country=["DE", "FR"])`      |
+| Imitate an existing table           | `schema_from_tbl(df).generate()`      |
+| Check synthetic data against real   | `check_synthetic()`                   |
 | Make columns nullable               | `nullable=True, null_probability=0.1` |
 | Ensure unique values                | `unique=True`                         |
 | Use a custom generator function     | `generator=my_func`                   |
@@ -99,8 +103,8 @@ df = schema.generate(n=500, seed=42, output="polars")
 | ---------- | ---------- | --------------------------------------- |
 | `n`        | `100`      | Number of rows to generate              |
 | `seed`     | `None`     | Random seed for reproducibility         |
-| `output`   | `"polars"` | Output format: `"polars"` or `"pandas"` |
-| `country`  | `"US"`     | Country code for locale-aware data      |
+| `output`   | `"polars"` | `"polars"`, `"pandas"`, or `"dict"`     |
+| `country`  | `"US"`     | A country code, a list of them, or a dict of codes to weights |
 | `shuffle`  | `True`     | Shuffle rows after generation           |
 | `weighted` | `True`     | Use weighted distributions              |
 
@@ -110,9 +114,11 @@ df = schema.generate(n=500, seed=42, output="polars")
 df = pb.generate_dataset(schema, n=500, seed=42)
 ```
 
+It takes the same parameters as `generate()`.
+
 ### Nullable columns
 
-Any field type supports nulls:
+Any field type supports nulls (`null_probability` needs `nullable=True`):
 
 ```python
 pb.int_field(min_val=0, max_val=100, nullable=True, null_probability=0.1)
@@ -155,8 +161,9 @@ Use built-in presets for realistic data:
 ```python
 pb.string_field(preset="name")           # full names
 pb.string_field(preset="email")          # email addresses
-pb.string_field(preset="address")        # street addresses
+pb.string_field(preset="address")        # full addresses
 pb.string_field(preset="city")           # city names
+pb.string_field(preset="postcode")       # postal codes
 pb.string_field(preset="phone_number")   # phone numbers
 pb.string_field(preset="company")        # company names
 pb.string_field(preset="job")            # job titles
@@ -166,7 +173,11 @@ pb.string_field(preset="iban")           # IBANs
 pb.string_field(preset="ssn")            # SSNs
 ```
 
-Presets produce country-specific data when `country` is set.
+Presets produce country-specific data when `country` is set, and the
+presets in a row agree with each other (the email is built from the
+name, the city, state, and postcode go together). See
+`references/presets-reference.md` for the full list; an unknown preset
+raises a `ValueError` that lists them.
 
 ### Profile fields
 
@@ -206,7 +217,7 @@ schema = pb.Schema(
 
 ### Country-specific generation
 
-Over 100 countries supported:
+Over 100 countries supported (ISO 3166-1 alpha-2 codes):
 
 ```python
 # German names, addresses, phone numbers
@@ -217,6 +228,10 @@ df = schema.generate(n=100, country="JP")
 
 # Brazilian
 df = schema.generate(n=100, country="BR")
+
+# A mix: rows spread evenly over the countries, or by weight
+df = schema.generate(n=100, country=["DE", "FR"])
+df = schema.generate(n=100, country={"JP": 0.7, "BR": 0.3})
 ```
 
 ## Workflows
@@ -251,8 +266,8 @@ validation = (
 ### Generating fixtures from an existing table
 
 ```python
-# Infer schema from real data
-schema = pb.Schema.from_table(
+# Infer field constraints from real data
+schema = pb.schema_from_tbl(
     production_df,
     infer_constraints=True,
     categorical_threshold=20,
@@ -262,17 +277,59 @@ schema = pb.Schema.from_table(
 fixture = schema.generate(n=100, seed=1)
 ```
 
+`pb.Schema.from_table()` is the same as `schema_from_tbl()`. Each field
+gets its range, null rate, uniqueness, and (for few distinct values) an
+`allowed=` list from the data, and string columns are matched to
+presets by name and values.
+
+### Checking synthetic data against the real data
+
+`check_synthetic()` compares synthetic data with its seed (the real
+data it imitates) for fidelity (each column's distribution, by PSI and
+KS), diversity (repeated rows, and distinct-n for `text=` columns), and
+copies of seed rows (exact, or near copies of `text=` columns):
+
+```python
+real = pb.load_dataset("small_table")
+synthetic = pb.schema_from_tbl(real).generate(n=50, seed=1)
+
+check = pb.check_synthetic(synthetic, real)
+
+check.ok                    # False if there's any issue
+check.issues                # e.g. "The distribution of 'd' ... differs ... (PSI 2.65)."
+check.fidelity              # per-column psi, ks, level, missing shares
+check.get_tabular_report()
+check.get_copies()          # synthetic rows that copy a seed row
+```
+
+Inferred fields keep each column's range but not its shape, so numeric
+columns often fail fidelity; tighten those fields (or use `allowed=`)
+when the distribution matters. See the `check-training-data` skill for
+more on synthetic data used for training.
+
 ## Gotchas
 
 1. **`unique=True` needs a large enough range.** If `max_val - min_val`
    < `n`, generation will fail for integer fields.
 2. **Only one of `preset`, `pattern`, `allowed` per StringField.**
    They are mutually exclusive.
-3. **Presets require `faker` to be installed.** Install with
-   `pip install pointblank[faker]` or `pip install faker`.
-4. **`seed` makes generation reproducible** but the same seed with
-   different `n` produces different data (not a prefix of larger).
-5. **`output` only supports `"polars"` and `"pandas"`.** For other
+3. **Presets don't need Faker.** Their data ships with Pointblank,
+   so no extra install is needed.
+4. **`seed` makes generation reproducible for a given `n`.** With a
+   larger `n`, most columns start with the smaller dataset's rows, but
+   not all (`email` addresses come out differently), so don't rely on
+   a smaller dataset being the first rows of a larger one.
+5. **`output` is `"polars"`, `"pandas"`, or `"dict"`.** For other
    formats, convert after generation.
-6. **`null_probability=0` with `nullable=True`** generates no nulls.
-   Set the probability to get actual null values.
+6. **`null_probability` needs `nullable=True`.** A probability above 0
+   without it raises a `ValueError`, and `nullable=True` with the
+   default `null_probability=0.0` generates no nulls.
+
+## Related skills
+
+| Skill               | When to use it                                   |
+| ------------------- | ------------------------------------------------ |
+| pointblank          | Validate the generated data                      |
+| scan-and-profile    | Profile the real table the schema imitates       |
+| write-validation    | Write the plan that the test data exercises      |
+| check-training-data | Check synthetic data used for training a model   |
