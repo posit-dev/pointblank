@@ -6,17 +6,28 @@ of the backend.
 
 ## Supported backends
 
-| Backend       | Input type              | Extra dependency     |
-|---------------|-------------------------|----------------------|
-| Polars        | `pl.DataFrame`, `pl.LazyFrame` | `polars`       |
-| Pandas        | `pd.DataFrame`          | `pandas`             |
-| DuckDB        | `ibis.Table`            | `ibis-framework[duckdb]` |
-| PostgreSQL    | `ibis.Table`            | `ibis-framework[postgres]` |
-| MySQL         | `ibis.Table`            | `ibis-framework[mysql]` |
-| SQLite        | `ibis.Table`            | `ibis-framework[sqlite]` |
-| Snowflake     | `ibis.Table`            | `ibis-framework[snowflake]` |
-| CSV files     | File path string        | (none)               |
-| Parquet files | File path string        | (none)               |
+| Backend       | Input type              | Install extra             |
+|---------------|-------------------------|---------------------------|
+| Polars        | `pl.DataFrame`, `pl.LazyFrame` | `pointblank[pl]`   |
+| Pandas        | `pd.DataFrame`          | `pointblank[pd]`          |
+| PySpark       | `pyspark.sql.DataFrame` | `pointblank[pyspark]`     |
+| DuckDB        | `ibis.Table`            | `pointblank[duckdb]`      |
+| PostgreSQL    | `ibis.Table`            | `pointblank[postgres]`    |
+| MySQL         | `ibis.Table`            | `pointblank[mysql]`       |
+| SQLite        | `ibis.Table`            | `pointblank[sqlite]`      |
+| SQL Server    | `ibis.Table`            | `pointblank[mssql]`       |
+| Snowflake     | `ibis.Table`            | `pointblank[snowflake]`   |
+| BigQuery      | `ibis.Table`            | `pointblank[bigquery]`    |
+| Databricks    | `ibis.Table`            | `pointblank[databricks]`  |
+| CSV files     | File path string        | (none)                    |
+| Parquet files | File path string        | (none)                    |
+
+A PySpark DataFrame is passed to `Validate(data=...)` as it is; the
+checks run on Spark. The text and scoring checks (`col_vals_scored`,
+`rows_near_distinct`, `col_vals_chat_format`, `rows_not_contaminated`)
+collect the distinct values of their columns to Python for a database
+or PySpark table and join the results back, so a sampling `pre=` keeps
+large tables cheap.
 
 ## Connecting to databases
 
@@ -27,7 +38,7 @@ Use `pb.connect_to_table()` with a connection string. Append
 import pointblank as pb
 
 # DuckDB
-tbl = pb.connect_to_table("duckdb:///warehouse.db::sales")
+tbl = pb.connect_to_table("duckdb:///path/to/warehouse.ddb::sales")
 
 # PostgreSQL
 tbl = pb.connect_to_table("postgresql://user:pass@host:5432/db::orders")
@@ -36,7 +47,7 @@ tbl = pb.connect_to_table("postgresql://user:pass@host:5432/db::orders")
 tbl = pb.connect_to_table("mysql://user:pass@host:3306/db::customers")
 
 # SQLite
-tbl = pb.connect_to_table("sqlite:///local.db::events")
+tbl = pb.connect_to_table("sqlite:///path/to/local.db::events")
 
 # Snowflake
 tbl = pb.connect_to_table("snowflake://user:pass@account/db/schema::table")
@@ -80,7 +91,7 @@ Available types: `"polars"` (default), `"pandas"`, `"duckdb"`.
 ## Listing database tables
 
 ```python
-pb.print_database_tables("duckdb:///warehouse.db")
+pb.print_database_tables("duckdb:///path/to/warehouse.ddb")  # returns a list of table names
 ```
 
 ## Utility functions
