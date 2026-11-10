@@ -454,7 +454,69 @@ The generator supports sophisticated data generation with these capabilities:
 - **Field constraints**: Control ranges, patterns, uniqueness, and allowed values
 - **Multiple output formats**: Returns Polars DataFrames by default, but also supports Pandas (`output="pandas"`) or dictionaries (`output="dict"`)
 
-This makes it easy to generate test data that matches your validation rules, helping you develop and test data quality workflows without relying on real data.
+This makes it easy to generate test data that matches your validation rules, helping you develop and test data quality workflows without relying on real data. When synthetic data stands in for a real table, [`check_synthetic()`](https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-synthetic-data.html) compares the two: how closely each column's distribution matches, how varied the rows are, and whether any rows are copies of real ones.
+
+## Check Data for Model Training
+
+A model learns from everything in its training data, including the boilerplate, the duplicates, and any rows of the test set that leaked in. Pointblank has validation methods and step bundles for these problems. They're ordinary validation steps, so they come with the same reports, thresholds, and actions as any other.
+
+```python
+import pointblank as pb
+import polars as pl
+
+# A corpus of web documents for training a language model, one per row
+corpus = pl.read_parquet("web_corpus.parquet")
+
+validation = (
+    pb.Validate(data=corpus, tbl_name="web_corpus")
+    .add_steps(pb.text.heuristic_filters("text"))  # The quality filters of the Gopher models
+    .rows_near_distinct(columns="text")            # Documents that are nearly the same
+    .add_steps(pb.text.no_pii("text"))             # Email addresses, phone and card numbers
+    .interrogate()
+)
+
+# Keep the documents that pass, with one copy of each group of near duplicates
+clean = validation.get_sundered_data(type="pass", duplicates="keep_first")
+```
+
+A model is judged fairly only if its splits are independent and alike. The `check_splits()` function looks for rows of a later split that are also in an earlier one, labels that are missing from a split, and columns whose distributions drift between splits:
+
+```python
+check = pb.check_splits(
+    train=train, valid=valid, test=test, columns="text", label="topic", near=True
+)
+
+print("\n".join(check.issues))
+```
+
+```
+2 rows of 'test' (0.7%) are also in 'train' (1 the same and 1 nearly the same).
+'test' has no rows with the label 'returns' of 'train'.
+The shares of the labels of 'test' differ from those of 'train' (PSI 1.75).
+The distribution of 'wait_days' in 'test' differs from that in 'train' (PSI 0.798).
+```
+
+Failing a check doesn't always mean that the rows hurt the model. An `Ablation` tests this by experiment. It trains the model without each step's failing rows, compares each version with one that has the same number of random rows removed, and reports whether removing the rows helps, hurts, or makes no clear difference:
+
+```python
+def evaluate(train, *, seed):
+    ...  # Train the model on `train` and return its score on held-out data
+
+ablation = (
+    pb.Ablation(validation, evaluate=evaluate, metric="accuracy")
+    .drop_each()  # A version without the failing rows of each step
+    .drop_all()   # A version without the rows that fail any step
+    .run()
+)
+```
+
+There's more for training data in the User Guide:
+
+- **[Text checks](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/text-checks.html)**: the language of each document, its length in a tokenizer's tokens, and the format of chat conversations for fine-tuning
+- **[RAG checks](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/rag-checks.html)**: the chunks of a retrieval corpus and the questions of its evaluation set
+- **[Scored validation](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/scored-validation.html)**: checks of each row's score from a model, such as an embedding similarity, a classifier, or a language model's perplexity
+- **[Checking splits](https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-splits.html)** and **[data ablation](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/data-ablation.html)**: the full guides to the examples above
+- **[Data cards](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/data-cards.html)**: a card describing a dataset, with the validation's results as the evidence of its quality
 
 ## Features That Set Pointblank Apart
 
@@ -463,6 +525,7 @@ This makes it easy to generate test data that matches your validation rules, hel
 - **Practical outputs**: Get exactly what you need: counts, extracts, summaries, or full reports
 - **Flexible deployment**: Use in notebooks, scripts, or data pipelines
 - **Synthetic data generation**: Create realistic test data with 30+ presets, user agent strings, locale-aware formatting, and 100 country support
+- **Checks for training data**: Find low-quality text, near duplicates, personal information, and leaks between splits, then measure which checks actually improve a model
 - **Customizable**: Tailor validation steps and reporting to your specific needs
 - **Internationalization**: Reports can be generated in 40 languages, including English, Spanish, French, and German
 
@@ -534,12 +597,10 @@ We're actively working on enhancing Pointblank with:
 
 1. Additional validation methods for comprehensive data quality checks
 2. Advanced logging capabilities
-3. Messaging actions (Slack, email) for threshold exceedances
-4. LLM-powered validation suggestions and data dictionary generation
-5. JSON/YAML configuration for pipeline portability
-6. CLI utility for validation from the command line
-7. Expanded backend support and certification
-8. High-quality documentation and examples
+3. Email notifications for threshold exceedances
+4. LLM-powered data dictionary generation
+5. Expanded backend support and certification
+6. High-quality documentation and examples
 
 If you have any ideas for features or improvements, don't hesitate to share them with us! We are always looking for ways to make Pointblank better.
 
