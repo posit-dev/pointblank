@@ -1,8 +1,8 @@
 <div align="center">
 
-<a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="75%"/></a>
+<a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="85%"/></a>
 
-_डेटा गुणवत्ता का आकलन और निगरानी के लिए डेटा सत्यापन टूलकिट_
+_डेटा क्वालिटी का आकलन और निगरानी करने के लिए डेटा वैलिडेशन टूलकिट।_
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)
@@ -14,6 +14,7 @@ _डेटा गुणवत्ता का आकलन और निगर�
 [![Codecov branch](https://img.shields.io/codecov/c/github/posit-dev/pointblank/main.svg)](https://codecov.io/gh/posit-dev/pointblank)
 [![Repo Status](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Documentation](https://img.shields.io/badge/docs-project_website-blue.svg)](https://posit-dev.github.io/pointblank/)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/posit-dev/pointblank)
 
 [![Contributors](https://img.shields.io/github/contributors/posit-dev/pointblank)](https://github.com/posit-dev/pointblank/graphs/contributors)
 [![Discord](https://img.shields.io/discord/1345877328982446110?color=%237289da&label=Discord)](https://discord.com/invite/YH7CybCNCQ)
@@ -35,61 +36,15 @@ _डेटा गुणवत्ता का आकलन और निगर�
    <a href="README.ar.md">العربية</a>
 </div>
 
-Pointblank डेटा क्वालिटी के लिए अलग दृष्टिकोण अपनाता है। यह एक उबाऊ तकनीकी काम होना जरूरी नहीं है। बल्कि, यह टीम के सदस्यों के बीच स्पष्ट संवाद पर केंद्रित एक प्रक्रिया बन सकती है। जबकि अन्य वैलिडेशन लाइब्रेरियां केवल त्रुटियों को पकड़ने पर ध्यान देती हैं, Pointblank **समस्याओं को खोजने और अंतर्दृष्टि साझा करने** दोनों में उत्कृष्ट है। हमारे सुंदर, कस्टमाइज़ करने योग्य रिपोर्ट्स वैलिडेशन के परिणामों को हितधारकों के साथ बातचीत में बदल देते हैं, जिससे डेटा क्वालिटी की समस्याएं आपकी पूरी टीम के लिए तुरंत समझने योग्य और कार्यशील बन जाती हैं।
-
-**घंटों में नहीं, मिनटों में शुरू करें।** Pointblank की AI-संचालित [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) सुविधा आपके डेटा का विश्लेषण करती है और आन्तरिक वैलिडेशन नियमों को स्वचालित रूप से सुझाती है। इसलिए खाली वैलिडेशन स्क्रिप्ट को देखते रहने और सोचने की जरूरत नहीं कि कहां से शुरू करना है। Pointblank आपकी डेटा क्वालिटी यात्रा को गति दे सकती है ताकि आप सबसे महत्वपूर्ण चीजों पर ध्यान दे सकें।
-
-चाहे आप एक डेटा साइंटिस्ट हों जिन्हें डेटा क्वालिटी की खोजों को जल्दी से संप्रेषित करना है, एक डेटा इंजीनियर जो मजबूत पाइपलाइन बना रहे हैं, या एक विश्लेषक जो बिजनेस हितधारकों को डेटा क्वालिटी के परिणाम प्रस्तुत कर रहे हैं, Pointblank आपको डेटा क्वालिटी को एक बाद के विचार से एक प्रतियोगी फायदे में बदलने में मदद करती है।
-
-## AI-संचालित वैलिडेशन ड्राफ्टिंग के साथ शुरुआत
-
-`DraftValidation` क्लास LLM का उपयोग करके आपके डेटा का विश्लेषण करती है और बुद्धिमान सुझावों के साथ एक पूर्ण वैलिडेशन योजना गेनरेट करती है। यह आपको डेटा वैलिडेशन के साथ जल्दी से शुरू करने या एक नए प्रोजेक्ट को हरी झंडी दिखाने में मदद करती है।
-
-```python
-import pointblank as pb
-
-# अपना डेटा लोड करें
-data = pb.load_dataset("game_revenue")              # एक नमूना डेटासेट
-
-# वैलिडेशन योजना गेनरेट करने के लिए DraftValidation का उपयोग करें
-pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
-```
-
-आउटपुट आपके डेटा के आधार पर बुद्धिमान सुझावों के साथ एक पूर्ण वैलिडेशन योजना है:
-
-```python
-import pointblank as pb
-
-# वैलिडेशन योजना
-validation = (
-    pb.Validate(
-        data=data,
-        label="Draft Validation",
-        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
-    )
-    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
-    .col_vals_gt(columns="item_revenue", value=0)
-    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
-    .col_count_match(count=11)
-    .row_count_match(count=2000)
-    .rows_distinct()
-    .interrogate()
-)
-
-validation
-```
-
-<div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
-</div>
-
 <br>
 
-आपकी जरूरतों के लिए गेनरेट की गई वैलिडेशन योजना को कॉपी, पेस्ट और कस्टमाइज़ करें।
+Pointblank, Python के लिए एक डेटा वैलिडेशन लाइब्रेरी है। आप एक वैलिडेशन प्लान में बताते हैं कि आपका डेटा कैसा होना चाहिए, Pointblank उस प्लान के अनुसार डेटा की जाँच करता है, और परिणाम एक ऐसी रिपोर्ट के रूप में मिलते हैं जिसे पढ़ना और साझा करना आसान है। इस तरह डेटा क्वालिटी लॉग में त्रुटियों की एक सूची भर नहीं रहती, बल्कि ऐसा विषय बन जाती है जिस पर पूरी टीम चर्चा कर सकती है।
 
-## चेनेबल वैलिडेशन API
+वही प्लान Polars और Pandas DataFrames पर, डेटाबेस टेबल्स (DuckDB, PostgreSQL, Snowflake, BigQuery, और अन्य) पर, और PySpark पर काम करता है। वैलिडेशन के बाद, आप असफल पंक्तियों को देख सकते हैं, टेबल को पास होने वाली और असफल पंक्तियों में बाँट सकते हैं, या बहुत अधिक पंक्तियाँ असफल होने पर कोई एक्शन ले सकते हैं।
 
-Pointblank का चेनेबल API वैलिडेशन को सरल और पढ़ने योग्य बनाता है। वही पैटर्न हमेशा लागू होता है: (1) `Validate` से शुरू करें, (2) वैलिडेशन स्टेप्स जोड़ें, और (3) `interrogate()` से खत्म करें।
+## शुरुआत करें
+
+हर वैलिडेशन एक ही पैटर्न का पालन करता है: (1) `Validate` से शुरू करें, (2) वैलिडेशन स्टेप्स जोड़ें, और (3) `interrogate()` से खत्म करें।
 
 ```python
 import pointblank as pb
@@ -115,21 +70,60 @@ validation
 
 <br>
 
-एक बार आपके पास पूछताछ की गई `validation` ऑब्जेक्ट है, तो आप अंतर्दृष्टि निकालने के लिए विभिन्न मेथड्स का उपयोग कर सकते हैं जैसे:
+एक बार आपके पास interrogate किया हुआ `validation` ऑब्जेक्ट हो, तो आप:
 
-- व्यक्तिगत स्टेप्स के लिए विस्तृत रिपोर्ट प्राप्त करना यह देखने के लिए कि क्या गलत हुआ
-- वैलिडेशन के परिणामों के आधार पर टेबल को फिल्टर करना
-- डिबगिंग के लिए समस्याग्रस्त डेटा निकालना
+- किसी [एक स्टेप की रिपोर्ट](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/step-reports.html) प्राप्त कर सकते हैं जो असफल पंक्तियाँ दिखाती है
+- डिबगिंग के लिए [असफल पंक्तियाँ निकाल](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/extracts.html) सकते हैं
+- टेबल को पास होने वाली और असफल पंक्तियों में [बाँट](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/sundering.html) सकते हैं
 
-## पॉइन्टब्लैंक क्यों चुनें?
+## इंस्टॉलेशन
 
-- **आपके मौजूदा स्टैक के साथ काम करता है**: पोलर्स, पांडास, डकडीबी, MySQL, पोस्टग्रेSQL, SQLite, पारक्वेट, PySpark, स्नोफ्लेक, और अधिक के साथ निर्बाध रूप से एकीकृत होता है!
-- **सुंदर, इंटरैक्टिव रिपोर्ट्स**: क्रिस्टल-क्लियर वैलिडेशन परिणाम जो समस्याओं को हाइलाइट करते हैं और डेटा क्वालिटी को संप्रेषित करने में मदद करते हैं
-- **संयोजनीय वैलिडेशन पाइपलाइन**: वैलिडेशन स्टेप्स को एक पूर्ण डेटा क्वालिटी वर्कफ्लो में श्रृंखलाबद्ध करें
-- **थ्रेशोल्ड-आधारित अलर्ट**: कस्टम एक्शन्स के साथ 'चेतावनी', 'त्रुटि', और 'महत्वपूर्ण' थ्रेशोल्ड सेट करें
-- **व्यावहारिक आउटपुट**: वैलिडेशन परिणामों का उपयोग टेबल्स को फ़िल्टर करने, समस्याग्रस्त डेटा निकालने, या डाउनस्ट्रीम प्रक्रियाओं को ट्रिगर करने के लिए करें
+आप pip का उपयोग करके Pointblank इंस्टॉल कर सकते हैं:
 
-## वास्तविक जगत का उदाहरण
+```bash
+pip install pointblank
+```
+
+आप Conda-Forge से भी Pointblank इंस्टॉल कर सकते हैं:
+
+```bash
+conda install conda-forge::pointblank
+```
+
+यदि आपके पास Polars या Pandas इंस्टॉल नहीं है, तो Pointblank का उपयोग करने के लिए आपको उनमें से एक को इंस्टॉल करना होगा।
+
+```bash
+pip install "pointblank[pl]" # Polars के साथ Pointblank इंस्टॉल करें
+pip install "pointblank[pd]" # Pandas के साथ Pointblank इंस्टॉल करें
+```
+
+किसी डेटाबेस की टेबल्स को वैलिडेट करने के लिए, Pointblank को उस डेटाबेस के Ibis बैकएंड के साथ इंस्टॉल करें (या Spark DataFrames के लिए PySpark के साथ):
+
+```bash
+pip install "pointblank[duckdb]"     # DuckDB
+pip install "pointblank[postgres]"   # PostgreSQL
+pip install "pointblank[mysql]"      # MySQL
+pip install "pointblank[sqlite]"     # SQLite
+pip install "pointblank[mssql]"      # SQL Server
+pip install "pointblank[snowflake]"  # Snowflake
+pip install "pointblank[bigquery]"   # BigQuery
+pip install "pointblank[databricks]" # Databricks
+pip install "pointblank[pyspark]"    # PySpark
+```
+
+अन्य एक्स्ट्रा वैकल्पिक सुविधाएँ जोड़ते हैं, जैसे `generate` (LLM के साथ प्लान का ड्राफ्ट बनाने के लिए), `mcp` (MCP सर्वर), और `otel` (OpenTelemetry)। अधिक जानकारी के लिए [इंस्टॉलेशन गाइड](https://posit-dev.github.io/pointblank/user-guide/getting-started/installation.html) देखें।
+
+## Pointblank क्यों?
+
+- **आपके मौजूदा स्टैक के साथ काम करता है**: Polars, Pandas, PySpark, DuckDB, PostgreSQL, MySQL, SQLite, SQL Server, Snowflake, BigQuery, Databricks, और CSV व Parquet जैसी फ़ाइलों के लिए एक ही API
+- **साझा करने योग्य रिपोर्ट्स**: वैलिडेशन रिपोर्ट्स जो दिखाती हैं कि क्या जाँचा गया और क्या असफल हुआ, उन सहकर्मियों के लिए भी जो कोड नहीं पढ़ते, 40 भाषाओं में
+- **थ्रेशोल्ड और एक्शन्स**: हर स्टेप के लिए 'चेतावनी', 'त्रुटि', और 'गंभीर' स्तर सेट करें, और उनके पार होने पर एक्शन्स (जैसे Slack संदेश) चलाएँ
+- **उपयोग करने योग्य परिणाम**: गिनती, असफल पंक्तियाँ, परिणामों के अनुसार बँटी हुई टेबल, या पूरी रिपोर्ट
+- **कहीं भी चलता है**: नोटबुक, स्क्रिप्ट, CI पाइपलाइन, शेड्यूल्ड जॉब्स में, या कमांड लाइन से
+
+## प्रोडक्शन के लिए वैलिडेशन
+
+प्रोडक्शन पाइपलाइन में वैलिडेशन को आमतौर पर और भी चीज़ों की ज़रूरत होती है: टेबल का नाम, थ्रेशोल्ड, थ्रेशोल्ड पार होने पर एक्शन्स, और ब्रीफ़ (brief) जो बताते हैं कि हर स्टेप क्या जाँचता है।
 
 ```python
 import pointblank as pb
@@ -138,24 +132,23 @@ import polars as pl
 # अपना डेटा लोड करें
 sales_data = pl.read_csv("sales_data.csv")
 
-# व्यापक वैलिडेशन बनाएं
 validation = (
    pb.Validate(
       data=sales_data,
       tbl_name="sales_data",           # रिपोर्टिंग के लिए टेबल का नाम
       label="वास्तविक जगत का उदाहरण.",  # वैलिडेशन के लिए लेबल, रिपोर्ट में दिखता है
-      thresholds=(0.01, 0.02, 0.05),   # चेतावनियों, त्रुटियों और महत्वपूर्ण समस्याओं के लिए थ्रेशोल्ड सेट करें
-      actions=pb.Actions(              # किसी भी थ्रेशोल्ड उल्लंघन के लिए एक्शन्स परिभाषित करें
+      thresholds=(0.01, 0.02, 0.05),   # चेतावनियों, त्रुटियों और गंभीर समस्याओं के लिए थ्रेशोल्ड
+      actions=pb.Actions(              # 'critical' स्तर पार करने वाले किसी भी स्टेप के लिए एक्शन
          critical="स्टेप {step} में बड़ी डेटा क्वालिटी समस्या मिली ({time})."
       ),
-      final_actions=pb.FinalActions(   # संपूर्ण वैलिडेशन के लिए अंतिम एक्शन्स परिभाषित करें
+      final_actions=pb.FinalActions(   # पूरा वैलिडेशन हो जाने पर एक्शन
          pb.send_slack_notification(
             webhook_url="https://hooks.slack.com/services/your/webhook/url"
          )
       ),
-      brief=True,                      # प्रत्येक स्टेप के लिए स्वचालित रूप से जनरेट किए गए ब्रीफ जोड़ें
+      brief=True,                      # हर स्टेप के लिए स्वचालित रूप से जनरेट किया गया ब्रीफ़
    )
-   .col_vals_between(            # सटीकता के साथ संख्यात्मक रेंज जाँचें
+   .col_vals_between(            # संख्यात्मक रेंज जाँचें
       columns=["price", "quantity"],
       left=0, right=1000
    )
@@ -202,9 +195,55 @@ validation.get_step_report(i=3).show("browser")  # स्टेप 3 से अ�
 
 <br>
 
+## LLM के साथ प्लान का ड्राफ्ट बनाना
+
+यदि आपको पता नहीं है कि किसी टेबल के साथ कहाँ से शुरू करें, तो [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/draft-validation.html) एक LLM से आपके लिए प्लान का ड्राफ्ट बनवा सकता है। यह मॉडल को पूरी टेबल के बजाय टेबल का सारांश भेजता है (इसके कॉलम और उनके प्रकार, गुम मानों की संख्या जैसे आँकड़े, और हर कॉलम के कुछ मान), और बदले में एक वैलिडेशन प्लान प्राप्त करता है:
+
+```python
+import pointblank as pb
+
+# अपना डेटा लोड करें
+data = pb.load_dataset("game_revenue")              # एक नमूना डेटासेट
+
+# वैलिडेशन प्लान जनरेट करने के लिए DraftValidation का उपयोग करें
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
+```
+
+आउटपुट एक ऐसा प्लान है जिसे आप जैसा है वैसा ही चला सकते हैं:
+
+```python
+import pointblank as pb
+
+# वैलिडेशन प्लान
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+ड्राफ्ट एक शुरुआती बिंदु है। इसे कॉपी करें, फिर डेटा के बारे में आप जो जानते हैं उसके अनुसार स्टेप्स जोड़ें, हटाएँ और बदलें। किसी मौजूदा प्लान को सामान्य भाषा में लिखे निर्देश से बदलने के लिए, [AI वैलिडेशन एडिटर](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/ai-validation-editor.html) का उपयोग करें।
+
 ## YAML कॉन्फ़िगरेशन
 
-उन टीमों के लिए जिन्हें पोर्टेबल, वर्जन-नियंत्रित वैलिडेशन वर्कफ़लो की आवश्यकता है, पॉइन्टब्लैंक YAML कॉन्फ़िगरेशन फ़ाइलों का समर्थन करता है। यह विभिन्न वातावरणों और टीम के सदस्यों के बीच वैलिडेशन लॉजिक साझा करना आसान बनाता है, यह सुनिश्चित करते हुए कि सभी एक ही पृष्ठ पर हैं।
+उन टीमों के लिए जिन्हें पोर्टेबल, वर्जन-नियंत्रित वैलिडेशन वर्कफ़्लो की आवश्यकता है, Pointblank YAML कॉन्फ़िगरेशन फ़ाइलों का समर्थन करता है। इससे विभिन्न वातावरणों और टीम के सदस्यों के बीच वैलिडेशन लॉजिक साझा करना आसान हो जाता है, और सभी एक ही नियमों का उपयोग करते हैं।
 
 **validation.yaml**
 
@@ -237,19 +276,19 @@ validation = pb.yaml_interrogate("validation.yaml")
 validation.get_tabular_report().show()
 ```
 
-यह दृष्टिकोण इसके लिए परफेक्ट है:
+यह दृष्टिकोण इनके लिए उपयुक्त है:
 
 - **CI/CD पाइपलाइन्स**: अपने कोड के साथ वैलिडेशन नियम स्टोर करें
 - **टीम सहयोग**: पठनीय प्रारूप में वैलिडेशन लॉजिक साझा करें
 - **वातावरण स्थिरता**: डेवलपमेंट, स्टेजिंग और प्रोडक्शन में समान वैलिडेशन का उपयोग करें
-- **दस्तावेज़ीकरण**: YAML फ़ाइलें आपकी डेटा गुणवत्ता आवश्यकताओं के जीवित दस्तावेज़ीकरण के रूप में काम करती हैं
+- **दस्तावेज़ीकरण**: YAML फ़ाइलें आपकी डेटा क्वालिटी आवश्यकताओं के जीवित दस्तावेज़ीकरण के रूप में काम करती हैं
 
 ## कमांड लाइन इंटरफेस (CLI)
 
-पॉइन्टब्लैंक में `pb` नामक एक शक्तिशाली CLI उपयोगिता शामिल है जो आपको कमांड लाइन से सीधे डेटा वैलिडेशन वर्कफ़लो चलाने की अनुमति देता है। CI/CD पाइपलाइनों, निर्धारित डेटा गुणवत्ता जांच, या त्वरित वैलिडेशन कार्यों के लिए परफेक्ट है।
+Pointblank में `pb` नामक एक शक्तिशाली CLI उपयोगिता शामिल है जो आपको कमांड लाइन से सीधे डेटा वैलिडेशन वर्कफ़्लो चलाने देती है। यह CI/CD पाइपलाइनों, शेड्यूल्ड डेटा क्वालिटी जाँचों, या त्वरित वैलिडेशन कार्यों के लिए उपयुक्त है।
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-complete-workflow.gif" width="800px">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-complete-workflow.gif" width="100%">
 </div>
 
 **अपने डेटा की खोज करें**
@@ -264,7 +303,7 @@ pb preview "https://github.com/user/repo/blob/main/data.csv"
 # Parquet फाइलों में गुम मानों की जांच करें
 pb missing data.parquet
 
-# डेटाबेस कनेक्शन से स्तंभ सारांश जेनरेट करें
+# डेटाबेस कनेक्शन से कॉलम सारांश जनरेट करें
 pb scan "duckdb:///data/sales.ddb::customers"
 ```
 
@@ -296,14 +335,57 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 # एकल-पंक्ति वैलिडेशन में स्वचालन के लिए एक्जिट कोड का उपयोग करें (0 = पास, 1 = फेल)
 pb validate small_table --check rows-distinct --exit-code
 
-# एक्जिट कोड के साथ वैलिडेशन वर्कफ़लो चलाएं
+# एक्जिट कोड के साथ वैलिडेशन वर्कफ़्लो चलाएं
 pb run validation.yaml --exit-code
 pb run validation.py --exit-code
 ```
 
+CLI को काम करते हुए दिखाने वाली कुछ टर्मिनल रिकॉर्डिंग देखने के लिए नीचे दिए गए शीर्षकों पर क्लिक करें:
+
+<details>
+<summary>Pointblank CLI के साथ शुरुआत</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-getting-started.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>डेटा की खोज करना</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-data-exploration.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>CLI के साथ डेटा वैलिडेट करना</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-essential-validations.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>CLI में Polars का उपयोग करना</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-using-polars.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Pointblank को CI/CD के साथ एकीकृत करना</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-cicd-workflows.gif" width="100%">
+</div>
+
+</details>
+
 ## यथार्थवादी टेस्ट डेटा जनरेट करें
 
-अपने वैलिडेशन वर्कफ़्लो के लिए टेस्ट डेटा चाहिए? `generate_dataset()` फ़ंक्शन स्कीमा परिभाषाओं के आधार पर यथार्थवादी, लोकेल-अवेयर सिंथेटिक डेटा बनाता है। प्रोडक्शन डेटा के बिना पाइपलाइन विकसित करने, पुन: प्रस्तुत करने योग्य परिदृश्यों के साथ CI/CD टेस्ट चलाने, या प्रोडक्शन डेटा उपलब्ध होने से पहले वर्कफ़्लो का प्रोटोटाइप बनाने के लिए बहुत उपयोगी।
+अपने वैलिडेशन वर्कफ़्लो के लिए टेस्ट डेटा चाहिए? `generate_dataset()` फ़ंक्शन एक स्कीमा से यथार्थवादी, लोकेल-अवेयर सिंथेटिक डेटा बनाता है। यह प्रोडक्शन डेटा के बिना पाइपलाइन विकसित करने, दोहराए जा सकने वाले डेटा के साथ CI टेस्ट चलाने, या असली डेटा उपलब्ध होने से पहले किसी वर्कफ़्लो का प्रोटोटाइप बनाने के लिए उपयोगी है।
 
 ```python
 import pointblank as pb
@@ -329,32 +411,99 @@ pb.preview(data)
 
 <br>
 
-जनरेटर इन क्षमताओं के साथ परिष्कृत डेटा जनरेशन का समर्थन करता है:
+जनरेटर में ये सुविधाएँ हैं:
 
-- **प्रीसेट के साथ यथार्थवादी डेटा**: `"name"`, `"email"`, `"address"`, `"phone"` आदि जैसे बिल्ट-इन प्रीसेट का उपयोग करें
-- **यूजर एजेंट स्ट्रिंग्स**: 17 ब्राउज़र श्रेणियों से 42,000 से अधिक अनूठे संयोजनों के साथ अत्यधिक विविध और यथार्थवादी ब्राउज़र यूजर एजेंट स्ट्रिंग्स जनरेट करें
-- **100 देशों का समर्थन**: लोकेल-विशिष्ट डेटा जनरेट करें (उदा., जर्मन पतों के लिए `country="DE"`)
-- **फ़ील्ड बाधाएं**: रेंज, पैटर्न, विशिष्टता और अनुमत मानों को नियंत्रित करें
-- **एकाधिक आउटपुट प्रारूप**: डिफ़ॉल्ट रूप से Polars DataFrame लौटाता है, लेकिन Pandas (`output="pandas"`) या शब्दकोश (`output="dict"`) का भी समर्थन करता है
+- **50 से अधिक प्रीसेट**: `"name"`, `"email"`, `"address"`, `"phone_number"`, और `"user_agent"` जैसे यथार्थवादी मान, जो एक पंक्ति के भीतर आपस में मेल खाते हैं (ईमेल पता नाम से बनाया जाता है)
+- **100 देशों का डेटा**: लोकेल-विशिष्ट मान (उदा., जर्मन पतों के लिए `country="DE"`), एक देश से या कई देशों के मिश्रण से
+- **फ़ील्ड बाधाएँ**: रेंज, पैटर्न, विशिष्टता, गुम मान, और अनुमत मान
+- **कई आउटपुट प्रारूप**: डिफ़ॉल्ट रूप से Polars DataFrames, या Pandas (`output="pandas"`) या शब्दकोश (`output="dict"`)
 
-## विशेषताएं जो पॉइन्टब्लैंक को अलग बनाती हैं
+इससे ऐसा टेस्ट डेटा जनरेट करना आसान हो जाता है जो आपके वैलिडेशन नियमों से मेल खाता हो। एक [pytest fixture](https://posit-dev.github.io/pointblank/user-guide/test-data-generation/pytest-fixture.html) हर टेस्ट को उसका अपना दोहराए जा सकने वाला डेटा देता है। जब सिंथेटिक डेटा किसी असली टेबल की जगह लेता है, तो [`check_synthetic()`](https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-synthetic-data.html) दोनों की तुलना करता है: हर कॉलम का वितरण कितना मेल खाता है, पंक्तियाँ कितनी विविध हैं, और क्या कोई पंक्ति असली पंक्तियों की प्रतिलिपि है।
 
-- **पूर्ण वैलिडेशन वर्कफ्लो**: डेटा एक्सेस से वैलिडेशन से रिपोर्टिंग तक एक ही पाइपलाइन में
-- **सहयोग के लिए बनाया गया**: सुंदर इंटरैक्टिव रिपोर्ट्स के माध्यम से सहकर्मियों के साथ परिणाम साझा करें
-- **व्यावहारिक आउटपुट**: वही प्राप्त करें जिसकी आपको आवश्यकता है: गणना, निकासी, सारांश, या पूर्ण रिपोर्ट
-- **लचीला परिनियोजन**: नोटबुक, स्क्रिप्ट या डेटा पाइपलाइन में उपयोग करें
-- **सिंथेटिक डेटा जनरेशन**: 30+ प्रीसेट, यूजर एजेंट स्ट्रिंग्स, लोकेल-अनुकूल फ़ॉर्मेटिंग और 100 देश समर्थन के साथ यथार्थवादी टेस्ट डेटा बनाएं
-- **अनुकूलन योग्य**: अपनी विशिष्ट आवश्यकताओं के अनुसार वैलिडेशन स्टेप्स और रिपोर्टिंग को अनुकूलित करें
-- **अंतर्राष्ट्रीयकरण**: रिपोर्ट्स 40 भाषाओं में जनरेट की जा सकती हैं, जिनमें अंग्रेजी, स्पेनिश, फ्रेंच और जर्मन शामिल हैं
+## मॉडल ट्रेनिंग के लिए डेटा की जाँच
+
+एक मॉडल अपने ट्रेनिंग डेटा की हर चीज़ से सीखता है, जिसमें बॉयलरप्लेट (boilerplate), डुप्लिकेट, और टेस्ट सेट की वे पंक्तियाँ भी शामिल हैं जो उसमें घुस आई हों। Pointblank में इन समस्याओं के लिए वैलिडेशन मेथड्स और स्टेप बंडल हैं। ये सामान्य वैलिडेशन स्टेप्स हैं, इसलिए इनके साथ भी किसी अन्य स्टेप की तरह रिपोर्ट्स, थ्रेशोल्ड और एक्शन्स मिलते हैं।
+
+```python
+import pointblank as pb
+import polars as pl
+
+# एक लैंग्वेज मॉडल की ट्रेनिंग के लिए वेब दस्तावेज़ों का कॉर्पस, हर पंक्ति में एक
+corpus = pl.read_parquet("web_corpus.parquet")
+
+validation = (
+    pb.Validate(data=corpus, tbl_name="web_corpus")
+    .col_vals_text_quality(columns="text")  # Gopher मॉडलों के क्वालिटी फ़िल्टर
+    .rows_near_distinct(columns="text")     # लगभग एक जैसे दस्तावेज़
+    .col_vals_no_pii(columns="text")        # ईमेल पते, फ़ोन और कार्ड नंबर
+    .interrogate()
+)
+
+# पास होने वाले दस्तावेज़ रखें, लगभग-डुप्लिकेट के हर समूह की एक प्रति के साथ
+clean = validation.get_sundered_data(type="pass", duplicates="keep_first")
+```
+
+किसी मॉडल का निष्पक्ष मूल्यांकन तभी होता है जब उसके स्प्लिट (split) स्वतंत्र हों और एक जैसे हों। `check_splits()` फ़ंक्शन बाद के स्प्लिट की उन पंक्तियों को खोजता है जो पहले के स्प्लिट में भी हैं, उन लेबल्स को जो किसी स्प्लिट से गायब हैं, और उन कॉलम्स को जिनका वितरण स्प्लिट्स के बीच बदल जाता है:
+
+```python
+check = pb.check_splits(
+    train=train, valid=valid, test=test, columns="text", label="topic", near=True
+)
+
+print("\n".join(check.issues))
+```
+
+```
+2 rows of 'test' (0.7%) are also in 'train' (1 the same and 1 nearly the same).
+'test' has no rows with the label 'returns' of 'train'.
+The shares of the labels of 'test' differ from those of 'train' (PSI 1.75).
+The distribution of 'wait_days' in 'test' differs from that in 'train' (PSI 0.798).
+```
+
+किसी जाँच में असफल होने का मतलब हमेशा यह नहीं होता कि वे पंक्तियाँ मॉडल को नुकसान पहुँचाती हैं। `Ablation` इसे प्रयोग से परखता है। यह हर स्टेप की असफल पंक्तियों के बिना मॉडल को ट्रेन करता है, हर संस्करण की तुलना ऐसे संस्करण से करता है जिससे उतनी ही यादृच्छिक पंक्तियाँ हटाई गई हों, और बताता है कि पंक्तियाँ हटाने से मदद मिलती है, नुकसान होता है, या कोई स्पष्ट अंतर नहीं पड़ता:
+
+```python
+def evaluate(train, *, seed):
+    ...  # `train` पर मॉडल ट्रेन करें और held-out डेटा पर उसका स्कोर लौटाएँ
+
+ablation = (
+    pb.Ablation(validation, evaluate=evaluate, metric="accuracy")
+    .drop_each()  # हर स्टेप की असफल पंक्तियों के बिना एक संस्करण
+    .drop_all()   # किसी भी स्टेप में असफल पंक्तियों के बिना एक संस्करण
+    .run()
+)
+```
+
+यूज़र गाइड में ट्रेनिंग डेटा के लिए और भी बहुत कुछ है:
+
+- **[टेक्स्ट जाँच](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/text-checks.html)**: हर दस्तावेज़ की भाषा, टोकनाइज़र के टोकन में उसकी लंबाई, और फ़ाइन-ट्यूनिंग के लिए चैट वार्तालापों का प्रारूप
+- **[RAG जाँच](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/rag-checks.html)**: रिट्रीवल कॉर्पस के चंक (chunk) और उसके इवैल्युएशन सेट के प्रश्न
+- **[स्कोर-आधारित वैलिडेशन](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/scored-validation.html)**: किसी मॉडल द्वारा हर पंक्ति को दिए गए स्कोर की जाँच, जैसे एम्बेडिंग समानता, कोई क्लासिफ़ायर, या किसी लैंग्वेज मॉडल की परप्लेक्सिटी
+- **[स्प्लिट्स की जाँच](https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-splits.html)** और **[डेटा एब्लेशन](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/data-ablation.html)**: ऊपर दिए उदाहरणों की पूरी गाइड
+- **[डेटा कार्ड](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/data-cards.html)**: किसी डेटासेट का वर्णन करने वाला कार्ड, जिसमें वैलिडेशन के परिणाम उसकी क्वालिटी के प्रमाण होते हैं
+
+## Pointblank और क्या करता है
+
+- **[सेगमेंटेशन](https://posit-dev.github.io/pointblank/user-guide/validation-plan/segmentation.html)**: पंक्तियों के हर समूह के लिए, जैसे हर क्षेत्र या हर महीने के लिए, एक स्टेप अलग से चलाएँ
+- **[कोडेड गुम मान](https://posit-dev.github.io/pointblank/user-guide/validation-plan/validation-methods.html#structured-missingness-with-missing)**: `MissingSpec` के साथ `-99` या `"refused"` जैसे कोड को कारण के अनुसार गुम मान मानें
+- **[LLM के साथ वैलिडेशन](https://posit-dev.github.io/pointblank/user-guide/validation-plan/validation-methods.html#validating-with-natural-language-prompts)**: `prompt()` के साथ सामान्य भाषा में लिखे नियम के अनुसार पंक्तियों की जाँच करें
+- **[पुन: प्रयोज्य स्टेप्स](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/composable-steps.html)** और **[प्लान सीरियलाइज़ेशन](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/plan-serialization.html)**: प्लानों के बीच स्टेप्स के सेट साझा करें, और किसी प्लान को Python कोड या YAML के रूप में लिखें
+- **[क्वालिटी आयाम और हेल्थ स्कोर](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/quality-dimensions-and-scoring.html)**: पूर्णता, वैधता, विशिष्टता और अन्य आयामों के स्कोर, जिन्हें टेबल के एक स्कोर में जोड़ा जाता है
+- **[डेटा कॉन्ट्रैक्ट्स](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/contracts.html)** और **[पाइपलाइन्स](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/pipelines.html)**: किसी टेबल का स्कीमा और नियम एक पोर्टेबल कॉन्ट्रैक्ट में, जिसे किसी ट्रांसफ़ॉर्मेशन के इनपुट और आउटपुट पर लागू किया जाता है
+- **[टेबल तुलना](https://posit-dev.github.io/pointblank/user-guide/table-comparison/comparing-tables.html)**: `pb.compare()` के साथ किसी टेबल के दो संस्करणों के बीच गायब, अतिरिक्त, या बदली हुई पंक्तियाँ खोजें
+- **[प्रोफ़ाइल और ड्रिफ़्ट](https://posit-dev.github.io/pointblank/user-guide/data-inspection/col-summary-tbl.html#comparing-profiles-for-drift)**: `DataScan` से किसी टेबल की प्रोफ़ाइल बनाएँ, उसे सहेजें, और बाद के संस्करणों की उससे तुलना करें
+- **[मेटाडेटा इम्पोर्ट](https://posit-dev.github.io/pointblank/user-guide/metadata-import/metadata-import.html)** और **[CDISC वैलिडेशन](https://posit-dev.github.io/pointblank/user-guide/metadata-import/cdisc-validation.html)**: SPSS, Stata, SAS, Frictionless, और Define-XML मेटाडेटा को वैलिडेशन में बदलें, और क्लिनिकल डेटा को CDISC मानकों के अनुसार जाँचें
+- **[MCP सर्वर](https://posit-dev.github.io/pointblank/user-guide/integrations/mcp-quick-start.html)**: VS Code या Positron में किसी AI असिस्टेंट से कहकर डेटा वैलिडेट करें
+- **[OpenTelemetry](https://posit-dev.github.io/pointblank/user-guide/integrations/otel-integration.html)**: वैलिडेशन परिणामों को Grafana, Datadog, और अन्य मॉनिटरिंग टूल्स पर भेजें
 
 ## दस्तावेज़ीकरण और उदाहरण
 
-हमारे [दस्तावेज़ीकरण साइट](https://posit-dev.github.io/pointblank) पर जाएँ:
+हमारी [दस्तावेज़ीकरण साइट](https://posit-dev.github.io/pointblank) पर जाएँ:
 
-- [यूजर गाइड](https://posit-dev.github.io/pointblank/user-guide/)
+- [यूज़र गाइड](https://posit-dev.github.io/pointblank/user-guide/)
 - [API संदर्भ](https://posit-dev.github.io/pointblank/reference/)
-- [उदाहरण गैलरी](https://posit-dev.github.io/pointblank/demos/)
-- [पॉइंटब्लॉग](https://posit-dev.github.io/pointblank/blog/)
+- [उदाहरण](https://posit-dev.github.io/pointblank/examples/)
+- [Pointblog](https://posit-dev.github.io/pointblank/blog/)
 
 ## समुदाय से जुड़ें
 
@@ -362,70 +511,24 @@ pb.preview(data)
 
 - [GitHub Issues](https://github.com/posit-dev/pointblank/issues) बग रिपोर्ट और फीचर अनुरोधों के लिए
 - [_Discord सर्वर_](https://discord.com/invite/YH7CybCNCQ) चर्चाओं और सहायता के लिए
-- [योगदान दिशानिर्देश](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) यदि आप पॉइन्टब्लैंक को सुधारने में मदद करना चाहते हैं
 
-## इंस्टॉलेशन
-
-आप pip का उपयोग करके पॉइन्टब्लैंक इंस्टॉल कर सकते हैं:
-
-```bash
-pip install pointblank
-```
-
-आप Conda-Forge से पॉइन्टब्लैंक भी इंस्टॉल कर सकते हैं:
-
-```bash
-conda install conda-forge::pointblank
-```
-
-यदि आपके पास Polars या Pandas इंस्टॉल नहीं है, तो आपको पॉइन्टब्लैंक का उपयोग करने के लिए उनमें से एक को इंस्टॉल करने की आवश्यकता होगी।
-
-```bash
-pip install "pointblank[pl]" # Polars के साथ पॉइन्टब्लैंक इंस्टॉल करें
-pip install "pointblank[pd]" # Pandas के साथ पॉइन्टब्लैंक इंस्टॉल करें
-```
-
-DuckDB, MySQL, PostgreSQL, या SQLite के साथ पॉइन्टब्लैंक का उपयोग करने के लिए, उपयुक्त बैकएंड के साथ Ibis इंस्टॉल करें:
-
-```bash
-pip install "pointblank[duckdb]"   # Ibis + DuckDB के साथ पॉइन्टब्लैंक इंस्टॉल करें
-pip install "pointblank[mysql]"    # Ibis + MySQL के साथ पॉइन्टब्लैंक इंस्टॉल करें
-pip install "pointblank[postgres]" # Ibis + PostgreSQL के साथ पॉइन्टब्लैंक इंस्टॉल करें
-pip install "pointblank[sqlite]"   # Ibis + SQLite के साथ पॉइन्टब्लैंक इंस्टॉल करें
-```
+Pointblank के विकास में योगदान देने के कई तरीके हैं। कुछ योगदान सरल होते हैं (जैसे टाइपो ठीक करना, दस्तावेज़ीकरण में सुधार करना, या फीचर अनुरोधों या समस्याओं के लिए इश्यू दर्ज करना) और कुछ में अधिक समय और ध्यान लगता है (जैसे प्रश्नों के उत्तर देना और कोड परिवर्तनों के साथ PR सबमिट करना)। आप जो भी मदद कर सकें, उसकी बहुत सराहना की जाती है! [योगदान दिशानिर्देश](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) बताते हैं कि शुरुआत कैसे करें।
 
 ## तकनीकी विवरण
 
-पॉइन्टब्लैंक, Polars और Pandas DataFrames के साथ काम करने के लिए [Narwhals](https://github.com/narwhals-dev/narwhals) का उपयोग करता है और डेटाबेस और फाइल फॉर्मेट सपोर्ट के लिए [Ibis](https://github.com/ibis-project/ibis) के साथ एकीकृत होता है। यह आर्किटेक्चर विभिन्न स्रोतों से टेबुलर डेटा को वैलिडेट करने के लिए एक सुसंगत API प्रदान करता है।
+Pointblank, Polars और Pandas DataFrames के साथ काम करने के लिए [Narwhals](https://github.com/narwhals-dev/narwhals) का उपयोग करता है, और डेटाबेस व फ़ाइल फ़ॉर्मेट सपोर्ट के लिए [Ibis](https://github.com/ibis-project/ibis) के साथ एकीकृत होता है। यह PySpark DataFrames को भी वैलिडेट करता है। इससे इन सभी स्रोतों से आने वाले टेबुलर डेटा को वैलिडेट करने के लिए एक ही API मिलता है।
 
-## पॉइन्टब्लैंक में योगदान देना
+## R के लिए Pointblank
 
-पॉइन्टब्लैंक के चल रहे विकास में योगदान देने के कई तरीके हैं। कुछ योगदान सरल हो सकते हैं (जैसे टाइपो ठीक करना, दस्तावेज़ीकरण में सुधार, फीचर अनुरोधों या समस्याओं के लिए इश्यूज दर्ज करना, आदि) और अन्य को अधिक समय और देखभाल की आवश्यकता हो सकती है (जैसे प्रश्नों के उत्तर देना और कोड परिवर्तन के साथ PRs सबमिट करना)। बस यह जानें कि आप जो भी मदद कर सकते हैं उसकी बहुत सराहना की जाएगी!
-
-शुरू करने के बारे में जानकारी के लिए कृपया [योगदान दिशानिर्देश](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) पढ़ें।
-
-## रोडमैप
-
-हम सक्रिय रूप से पॉइन्टब्लैंक को इन विशेषताओं के साथ बढ़ा रहे हैं:
-
-1. व्यापक डेटा क्वालिटी जाँच के लिए अतिरिक्त वैलिडेशन मेथड्स
-2. उन्नत लॉगिंग क्षमताएं
-3. थ्रेशोल्ड उल्लंघन के लिए मैसेजिंग एक्शन्स (स्लैक, ईमेल)
-4. LLM-पावर्ड वैलिडेशन सुझाव और डेटा डिक्शनरी जनरेशन
-5. पाइपलाइन पोर्टेबिलिटी के लिए JSON/YAML कॉन्फिगरेशन
-6. कमांड लाइन से वैलिडेशन के लिए CLI उपयोगिता
-7. विस्तारित बैकएंड समर्थन और प्रमाणीकरण
-8. उच्च-गुणवत्ता दस्तावेज़ीकरण और उदाहरण
-
-यदि आपके पास फीचर्स या सुधारों के लिए कोई विचार है, तो हमसे साझा करने में संकोच न करें! हम हमेशा पॉइन्टब्लैंक को बेहतर बनाने के तरीके तलाश रहे हैं।
+R के लिए भी Pointblank का एक संस्करण है, जो 2017 से उपलब्ध है और R समुदाय में व्यापक रूप से उपयोग किया जाता है। आप इसे https://github.com/rstudio/pointblank पर पा सकते हैं।
 
 ## आचार संहिता
 
-कृपया ध्यान दें कि पॉइन्टब्लैंक प्रोजेक्ट [योगदानकर्ता आचार संहिता](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) के साथ जारी किया गया है। <br>इस प्रोजेक्ट में भाग लेकर, आप इसके नियमों का पालन करने के लिए सहमत हैं।
+कृपया ध्यान दें कि Pointblank प्रोजेक्ट [योगदानकर्ता आचार संहिता](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) के साथ जारी किया गया है। <br>इस प्रोजेक्ट में भाग लेकर, आप इसके नियमों का पालन करने के लिए सहमत होते हैं।
 
 ## 📄 लाइसेंस
 
-पॉइन्टब्लैंक MIT लाइसेंस के अंतर्गत लाइसेंस प्राप्त है।
+Pointblank, MIT लाइसेंस के अंतर्गत लाइसेंस प्राप्त है।
 
 © Posit Software, PBC.
 

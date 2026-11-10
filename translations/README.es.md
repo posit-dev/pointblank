@@ -1,8 +1,8 @@
 <div align="center">
 
-<a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="75%"/></a>
+<a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="85%"/></a>
 
-_Kit de herramientas de validación de datos para evaluar y monitorear la calidad de los datos_
+_Kit de herramientas de validación de datos para evaluar y monitorear la calidad de los datos._
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)
@@ -14,6 +14,7 @@ _Kit de herramientas de validación de datos para evaluar y monitorear la calida
 [![Codecov branch](https://img.shields.io/codecov/c/github/posit-dev/pointblank/main.svg)](https://codecov.io/gh/posit-dev/pointblank)
 [![Repo Status](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Documentation](https://img.shields.io/badge/docs-project_website-blue.svg)](https://posit-dev.github.io/pointblank/)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/posit-dev/pointblank)
 
 [![Contributors](https://img.shields.io/github/contributors/posit-dev/pointblank)](https://github.com/posit-dev/pointblank/graphs/contributors)
 [![Discord](https://img.shields.io/discord/1345877328982446110?color=%237289da&label=Discord)](https://discord.com/invite/YH7CybCNCQ)
@@ -35,61 +36,15 @@ _Kit de herramientas de validación de datos para evaluar y monitorear la calida
    <a href="README.ar.md">العربية</a>
 </div>
 
-Pointblank adopta un enfoque diferente para la calidad de datos. No tiene que ser una tarea técnica tediosa. Más bien, puede convertirse en un proceso enfocado en la comunicación clara entre los miembros del equipo. Mientras que otras librerías de validación se enfocan únicamente en detectar errores, Pointblank sobresale tanto en **encontrar problemas como en compartir insights**. Nuestros hermosos informes personalizables convierten los resultados de validación en conversaciones con los stakeholders, haciendo que los problemas de calidad de datos sean inmediatamente comprensibles y procesables para todo tu equipo.
-
-**Comienza en minutos, no en horas.** La función [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) potenciada por IA de Pointblank analiza tus datos y sugiere reglas de validación inteligentes automáticamente. Así que no hay necesidad de quedarse mirando un script de validación vacío preguntándose por dónde empezar. Pointblank puede impulsar tu viaje de calidad de datos para que puedas enfocarte en lo que más importa.
-
-Ya seas un científico de datos que necesita comunicar rápidamente los hallazgos de calidad de datos, un ingeniero de datos construyendo pipelines robustos, o un analista presentando resultados de calidad de datos a stakeholders del negocio, Pointblank te ayuda a convertir la calidad de datos de una idea tardía en una ventaja competitiva.
-
-## Comenzando con Validación Potenciada por IA
-
-La clase `DraftValidation` utiliza LLMs para analizar tus datos y generar un plan de validación completo con sugerencias inteligentes. Esto te ayuda a comenzar rápidamente con la validación de datos o iniciar un nuevo proyecto.
-
-```python
-import pointblank as pb
-
-# Carga tus datos
-data = pb.load_dataset("game_revenue")              # Un conjunto de datos de ejemplo
-
-# Usa DraftValidation para generar un plan de validación
-pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
-```
-
-La salida es un plan de validación completo con sugerencias inteligentes basadas en tus datos:
-
-```python
-import pointblank as pb
-
-# El plan de validación
-validation = (
-    pb.Validate(
-        data=data,
-        label="Draft Validation",
-        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
-    )
-    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
-    .col_vals_gt(columns="item_revenue", value=0)
-    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
-    .col_count_match(count=11)
-    .row_count_match(count=2000)
-    .rows_distinct()
-    .interrogate()
-)
-
-validation
-```
-
-<div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
-</div>
-
 <br>
 
-Copia, pega y personaliza el plan de validación generado según tus necesidades.
+Pointblank es una biblioteca de validación de datos para Python. Describes en un plan de validación cómo deberían ser tus datos, Pointblank comprueba los datos con ese plan y los resultados llegan como un informe fácil de leer y de compartir. Así, la calidad de los datos se convierte en algo que todo el equipo puede discutir, no solo en una lista de errores en un log.
 
-## API de Validación Encadenable
+El mismo plan funciona con DataFrames de Polars y Pandas, con tablas de bases de datos (DuckDB, PostgreSQL, Snowflake, BigQuery y otras) y con PySpark. Después de una validación, puedes revisar las filas que fallan, dividir la tabla en las filas que pasan y las que fallan, o actuar cuando fallan demasiadas filas.
 
-La API encadenable de Pointblank hace que la validación sea simple y legible. El mismo patrón siempre se aplica: (1) comienza con `Validate`, (2) agrega pasos de validación, y (3) termina con `interrogate()`.
+## Primeros pasos
+
+Toda validación sigue el mismo patrón: (1) comienza con `Validate`, (2) agrega pasos de validación y (3) termina con `interrogate()`.
 
 ```python
 import pointblank as pb
@@ -102,7 +57,7 @@ validation = (
    .interrogate()                                   # Ejecutar y recopilar resultados
 )
 
-# Obtén el informe de validación desde REPL con:
+# Obtén el informe de validación desde el REPL con:
 validation.get_tabular_report().show()
 
 # Desde un notebook simplemente usa:
@@ -115,21 +70,60 @@ validation
 
 <br>
 
-Una vez que tengas un objeto `validation` interrogado, puedes aprovechar una variedad de métodos para extraer insights como:
+Una vez que tengas un objeto `validation` interrogado, puedes:
 
-- obtener informes detallados para pasos individuales para ver qué salió mal
-- filtrar tablas basándose en resultados de validación
-- extraer datos problemáticos para depuración
+- obtener un [informe de un solo paso](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/step-reports.html) que muestra las filas que fallan
+- [extraer las filas que fallan](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/extracts.html) para depurar
+- [dividir la tabla](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/sundering.html) en las filas que pasan y las filas que fallan
 
-## ¿Por qué elegir Pointblank?
+## Instalación
 
-- **Funciona con tu stack existente**: Se integra perfectamente con Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake, ¡y más!
-- **Informes interactivos hermosos**: Resultados de validación claros que destacan problemas y ayudan a comunicar la calidad de los datos
-- **Pipeline de validación componible**: Encadena pasos de validación en un flujo de trabajo completo de calidad de datos
-- **Alertas basadas en umbrales**: Establece umbrales de 'advertencia', 'error' y 'crítico' con acciones personalizadas
-- **Salidas prácticas**: Utiliza resultados de validación para filtrar tablas, extraer datos problemáticos o activar procesos posteriores
+Puedes instalar Pointblank usando pip:
 
-## Ejemplo del mundo real
+```bash
+pip install pointblank
+```
+
+También puedes instalar Pointblank desde Conda-Forge usando:
+
+```bash
+conda install conda-forge::pointblank
+```
+
+Si no tienes Polars o Pandas instalado, necesitarás instalar uno de ellos para usar Pointblank.
+
+```bash
+pip install "pointblank[pl]" # Instalar Pointblank con Polars
+pip install "pointblank[pd]" # Instalar Pointblank con Pandas
+```
+
+Para validar tablas en una base de datos, instala Pointblank con el backend de Ibis correspondiente (o con PySpark, para DataFrames de Spark):
+
+```bash
+pip install "pointblank[duckdb]"     # DuckDB
+pip install "pointblank[postgres]"   # PostgreSQL
+pip install "pointblank[mysql]"      # MySQL
+pip install "pointblank[sqlite]"     # SQLite
+pip install "pointblank[mssql]"      # SQL Server
+pip install "pointblank[snowflake]"  # Snowflake
+pip install "pointblank[bigquery]"   # BigQuery
+pip install "pointblank[databricks]" # Databricks
+pip install "pointblank[pyspark]"    # PySpark
+```
+
+Otros extras añaden funciones opcionales, como `generate` (para redactar planes con un LLM), `mcp` (el servidor MCP) y `otel` (OpenTelemetry). Consulta la [guía de instalación](https://posit-dev.github.io/pointblank/user-guide/getting-started/installation.html) para más información.
+
+## ¿Por qué Pointblank?
+
+- **Funciona con tu stack existente**: una sola API para Polars, Pandas, PySpark, DuckDB, PostgreSQL, MySQL, SQLite, SQL Server, Snowflake, BigQuery, Databricks y archivos como CSV y Parquet
+- **Informes para compartir**: informes de validación que muestran qué se comprobó y qué falló, para colegas que no leen código, en 40 idiomas
+- **Umbrales y acciones**: establece niveles de 'advertencia', 'error' y 'crítico' para cada paso, y ejecuta acciones (como un mensaje de Slack) cuando se superan
+- **Resultados que puedes usar**: recuentos, filas que fallan, la tabla dividida según los resultados o un informe completo
+- **Funciona en cualquier lugar**: en notebooks, scripts, pipelines de CI, tareas programadas o desde la línea de comandos
+
+## Una validación para producción
+
+Una validación en un pipeline de producción suele necesitar más: un nombre para la tabla, umbrales, acciones cuando se superan los umbrales y descripciones breves (briefs) que indican qué comprueba cada paso.
 
 ```python
 import pointblank as pb
@@ -138,25 +132,24 @@ import polars as pl
 # Carga tus datos
 sales_data = pl.read_csv("sales_data.csv")
 
-# Crea una validación completa
 validation = (
    pb.Validate(
       data=sales_data,
       tbl_name="sales_data",           # Nombre de la tabla para informes
       label="Ejemplo del mundo real",  # Etiqueta para la validación, aparece en informes
-      thresholds=(0.01, 0.02, 0.05),   # Establece umbrales para advertencias, errores y problemas críticos
-      actions=pb.Actions(              # Define acciones para cualquier exceso de umbral
+      thresholds=(0.01, 0.02, 0.05),   # Umbrales para advertencias, errores y problemas críticos
+      actions=pb.Actions(              # Una acción para cualquier paso que supere el nivel 'critical'
          critical="Se encontró un problema importante de calidad de datos en el paso {step} ({time})."
       ),
-      final_actions=pb.FinalActions(   # Define acciones finales para toda la validación
+      final_actions=pb.FinalActions(   # Una acción cuando termina toda la validación
          pb.send_slack_notification(
             webhook_url="https://hooks.slack.com/services/your/webhook/url"
          )
       ),
-      brief=True,                      # Añade resúmenes generados automáticamente para cada paso
-      lang="es"
+      brief=True,                      # Una descripción breve generada para cada paso
+      lang="es",
    )
-   .col_vals_between(            # Comprueba rangos numéricos con precisión
+   .col_vals_between(            # Comprueba rangos numéricos
       columns=["price", "quantity"],
       left=0, right=1000
    )
@@ -203,9 +196,55 @@ validation.get_step_report(i=3).show("browser")  # Obtén los registros fallidos
 
 <br>
 
+## Redactar un plan con un LLM
+
+Si no sabes por dónde empezar con una tabla, [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/draft-validation.html) puede pedirle a un LLM que redacte un plan por ti. Envía al modelo un resumen de la tabla (sus columnas y sus tipos, estadísticas como el número de valores faltantes y algunos valores de cada columna) en lugar de la tabla completa, y recibe a cambio un plan de validación:
+
+```python
+import pointblank as pb
+
+# Carga tus datos
+data = pb.load_dataset("game_revenue")              # Un conjunto de datos de ejemplo
+
+# Usa DraftValidation para generar un plan de validación
+pb.DraftValidation(data=data, model="anthropic:claude-opus-4-6")
+```
+
+El resultado es un plan que puedes ejecutar tal cual:
+
+```python
+import pointblank as pb
+
+# El plan de validación
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+Un borrador es un punto de partida. Cópialo y luego añade, elimina y ajusta pasos según lo que sabes de los datos. Para cambiar un plan existente con una instrucción en lenguaje natural, usa el [editor de validación con IA](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/ai-validation-editor.html).
+
 ## Configuración YAML
 
-Para equipos que necesitan flujos de trabajo de validación portátiles y controlados por versión, Pointblank soporta archivos de configuración YAML. Esto facilita compartir la lógica de validación entre diferentes entornos y miembros del equipo, asegurando que todos estén en la misma página.
+Para equipos que necesitan flujos de trabajo de validación portátiles y con control de versiones, Pointblank admite archivos de configuración YAML. Esto facilita compartir la lógica de validación entre diferentes entornos y miembros del equipo, y asegura que todos trabajen con las mismas reglas.
 
 **validation.yaml**
 
@@ -238,19 +277,19 @@ validation = pb.yaml_interrogate("validation.yaml")
 validation.get_tabular_report().show()
 ```
 
-Este enfoque es perfecto para:
+Este enfoque es adecuado para:
 
-- **Pipelines CI/CD**: Almacena reglas de validación junto con tu código
-- **Colaboración en equipo**: Comparte lógica de validación en formato legible
-- **Consistencia de entorno**: Usa la misma validación en desarrollo, staging y producción
-- **Documentación**: Los archivos YAML sirven como documentación viva de tus requisitos de calidad de datos
+- **Pipelines CI/CD**: almacena las reglas de validación junto con tu código
+- **Colaboración en equipo**: comparte la lógica de validación en un formato legible
+- **Consistencia entre entornos**: usa la misma validación en desarrollo, staging y producción
+- **Documentación**: los archivos YAML sirven como documentación viva de tus requisitos de calidad de datos
 
-## Interfaz de Línea de Comandos (CLI)
+## Interfaz de línea de comandos (CLI)
 
-Pointblank incluye una potente herramienta CLI llamada `pb` que te permite ejecutar flujos de trabajo de validación de datos directamente desde la línea de comandos. Perfecto para pipelines CI/CD, verificaciones programadas de calidad de datos, o tareas de validación rápidas.
+Pointblank incluye una potente herramienta CLI llamada `pb` que te permite ejecutar flujos de trabajo de validación de datos directamente desde la línea de comandos. Perfecta para pipelines CI/CD, comprobaciones programadas de calidad de datos o tareas de validación rápidas.
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-complete-workflow.gif" width="800px">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-complete-workflow.gif" width="100%">
 </div>
 
 **Explora tus datos**
@@ -302,9 +341,52 @@ pb run validation.yaml --exit-code
 pb run validation.py --exit-code
 ```
 
-## Generar Datos de Prueba Realistas
+Haz clic en los siguientes títulos para ver algunas grabaciones de terminal de la CLI en acción:
 
-¿Necesitas datos de prueba para tus flujos de trabajo de validación? La función `generate_dataset()` crea datos sintéticos realistas y adaptados a la localización, basados en definiciones de esquema. Es muy útil para desarrollar pipelines sin datos de producción, ejecutar pruebas CI/CD con escenarios reproducibles, o crear prototipos de flujos de trabajo antes de que los datos de producción estén disponibles.
+<details>
+<summary>Primeros pasos con la CLI de Pointblank</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-getting-started.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Explorar los datos</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-data-exploration.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Validar datos con la CLI</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-essential-validations.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Usar Polars en la CLI</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-using-polars.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Integrar Pointblank con CI/CD</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/termshow/cli-cicd-workflows.gif" width="100%">
+</div>
+
+</details>
+
+## Generar datos de prueba realistas
+
+¿Necesitas datos de prueba para tus flujos de trabajo de validación? La función `generate_dataset()` crea a partir de un esquema datos sintéticos realistas y adaptados a la configuración regional. Es útil para desarrollar pipelines sin datos de producción, ejecutar pruebas de CI con datos reproducibles o crear un prototipo de un flujo de trabajo antes de que los datos reales estén disponibles.
 
 ```python
 import pointblank as pb
@@ -330,31 +412,98 @@ pb.preview(data)
 
 <br>
 
-El generador soporta generación de datos sofisticada con estas capacidades:
+El generador tiene:
 
-- **Datos realistas con presets**: Usa presets integrados como `"name"`, `"email"`, `"address"`, `"phone"`, etc.
-- **Cadenas de user agent**: Genera cadenas de user agent de navegador altamente variadas y realistas de 17 categorías de navegadores con más de 42.000 combinaciones únicas
-- **Soporte de 100 países**: Genera datos específicos de localización (ej., `country="DE"` para direcciones alemanas)
-- **Restricciones de campos**: Controla rangos, patrones, unicidad y valores permitidos
-- **Múltiples formatos de salida**: Devuelve DataFrames de Polars por defecto, pero también soporta Pandas (`output="pandas"`) o diccionarios (`output="dict"`)
+- **Más de 50 presets**: valores realistas como `"name"`, `"email"`, `"address"`, `"phone_number"` y `"user_agent"`, coherentes entre sí dentro de una fila (la dirección de correo se forma a partir del nombre)
+- **Datos de 100 países**: valores específicos de cada configuración regional (p. ej., `country="DE"` para direcciones alemanas), de un solo país o de una mezcla de varios
+- **Restricciones de campos**: rangos, patrones, unicidad, valores faltantes y valores permitidos
+- **Varios formatos de salida**: DataFrames de Polars por defecto, o Pandas (`output="pandas"`) o diccionarios (`output="dict"`)
 
-## Características que diferencian a Pointblank
+Así es fácil generar datos de prueba que se ajusten a tus reglas de validación. Un [fixture de pytest](https://posit-dev.github.io/pointblank/user-guide/test-data-generation/pytest-fixture.html) da a cada prueba sus propios datos reproducibles. Cuando los datos sintéticos sustituyen a una tabla real, [`check_synthetic()`](https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-synthetic-data.html) compara ambas: cuánto se parece la distribución de cada columna, qué tan variadas son las filas y si alguna fila es copia de una real.
 
-- **Flujo de trabajo de validación completo**: Desde el acceso a los datos hasta la validación y los informes en un solo pipeline
-- **Construido para la colaboración**: Comparte resultados con colegas a través de hermosos informes interactivos
-- **Salidas prácticas**: Obtén exactamente lo que necesitas: recuentos, extractos, resúmenes o informes completos
-- **Implementación flexible**: Úsalo en notebooks, scripts o pipelines de datos
-- **Generación de datos sintéticos**: Crea datos de prueba realistas con más de 30 presets, cadenas de user agent, formateo adaptado al locale y soporte de 100 países
-- **Personalizable**: Adapta los pasos de validación e informes a tus necesidades específicas
-- **Internacionalización**: Los informes pueden generarse en 40 idiomas, incluidos inglés, español, francés y alemán
+## Comprobar los datos para entrenar modelos
+
+Un modelo aprende de todo lo que hay en sus datos de entrenamiento, incluido el texto repetitivo (boilerplate), los duplicados y las filas del conjunto de prueba que se colaron. Pointblank tiene métodos de validación y paquetes de pasos para estos problemas. Son pasos de validación normales, así que tienen los mismos informes, umbrales y acciones que cualquier otro.
+
+```python
+import pointblank as pb
+import polars as pl
+
+# Un corpus de documentos web para entrenar un modelo de lenguaje, uno por fila
+corpus = pl.read_parquet("web_corpus.parquet")
+
+validation = (
+    pb.Validate(data=corpus, tbl_name="web_corpus")
+    .col_vals_text_quality(columns="text")  # Los filtros de calidad de los modelos Gopher
+    .rows_near_distinct(columns="text")     # Documentos que son casi iguales
+    .col_vals_no_pii(columns="text")        # Correos electrónicos, números de teléfono y de tarjeta
+    .interrogate()
+)
+
+# Conserva los documentos que pasan, con una copia de cada grupo de casi duplicados
+clean = validation.get_sundered_data(type="pass", duplicates="keep_first")
+```
+
+Un modelo solo se evalúa de forma justa si sus particiones (splits) son independientes y parecidas. La función `check_splits()` busca filas de una partición posterior que también están en una anterior, etiquetas que faltan en una partición y columnas cuya distribución cambia entre particiones:
+
+```python
+check = pb.check_splits(
+    train=train, valid=valid, test=test, columns="text", label="topic", near=True
+)
+
+print("\n".join(check.issues))
+```
+
+```
+2 rows of 'test' (0.7%) are also in 'train' (1 the same and 1 nearly the same).
+'test' has no rows with the label 'returns' of 'train'.
+The shares of the labels of 'test' differ from those of 'train' (PSI 1.75).
+The distribution of 'wait_days' in 'test' differs from that in 'train' (PSI 0.798).
+```
+
+Que una comprobación falle no siempre significa que las filas perjudiquen al modelo. Una `Ablation` lo pone a prueba con un experimento. Entrena el modelo sin las filas que fallan en cada paso, compara cada versión con otra a la que se le quitó el mismo número de filas al azar, e informa si quitar las filas ayuda, perjudica o no marca una diferencia clara:
+
+```python
+def evaluate(train, *, seed):
+    ...  # Entrena el modelo con `train` y devuelve su puntuación en datos reservados
+
+ablation = (
+    pb.Ablation(validation, evaluate=evaluate, metric="accuracy")
+    .drop_each()  # Una versión sin las filas que fallan en cada paso
+    .drop_all()   # Una versión sin las filas que fallan en algún paso
+    .run()
+)
+```
+
+Hay más sobre datos de entrenamiento en la guía del usuario:
+
+- **[Comprobaciones de texto](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/text-checks.html)**: el idioma de cada documento, su longitud en tokens de un tokenizador y el formato de las conversaciones de chat para el ajuste fino (fine-tuning)
+- **[Comprobaciones RAG](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/rag-checks.html)**: los fragmentos (chunks) de un corpus de recuperación y las preguntas de su conjunto de evaluación
+- **[Validación con puntuaciones](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/scored-validation.html)**: comprobaciones de la puntuación que un modelo da a cada fila, como una similitud de embeddings, un clasificador o la perplejidad de un modelo de lenguaje
+- **[Comprobar particiones](https://posit-dev.github.io/pointblank/user-guide/table-comparison/checking-splits.html)** y **[ablación de datos](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/data-ablation.html)**: las guías completas de los ejemplos anteriores
+- **[Fichas de datos](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/data-cards.html)**: una ficha que describe un conjunto de datos, con los resultados de la validación como prueba de su calidad
+
+## Más de lo que hace Pointblank
+
+- **[Segmentación](https://posit-dev.github.io/pointblank/user-guide/validation-plan/segmentation.html)**: ejecuta un paso por separado para cada grupo de filas, como cada región o cada mes
+- **[Valores faltantes codificados](https://posit-dev.github.io/pointblank/user-guide/validation-plan/validation-methods.html#structured-missingness-with-missing)**: trata códigos como `-99` o `"refused"` como faltantes, por motivo, con `MissingSpec`
+- **[Validación con un LLM](https://posit-dev.github.io/pointblank/user-guide/validation-plan/validation-methods.html#validating-with-natural-language-prompts)**: comprueba filas con una regla escrita en lenguaje natural, con `prompt()`
+- **[Pasos reutilizables](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/composable-steps.html)** y **[serialización de planes](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/plan-serialization.html)**: comparte conjuntos de pasos entre planes y guarda un plan como código Python o YAML
+- **[Dimensiones de calidad y puntuaciones de salud](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/quality-dimensions-and-scoring.html)**: puntuaciones de completitud, validez, unicidad y otras dimensiones, combinadas en una sola puntuación para la tabla
+- **[Contratos de datos](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/contracts.html)** y **[pipelines](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/pipelines.html)**: el esquema y las reglas de una tabla en un contrato portátil, aplicado a la entrada y a la salida de una transformación
+- **[Comparación de tablas](https://posit-dev.github.io/pointblank/user-guide/table-comparison/comparing-tables.html)**: encuentra las filas que faltan, sobran o cambiaron entre dos versiones de una tabla, con `pb.compare()`
+- **[Perfiles y deriva](https://posit-dev.github.io/pointblank/user-guide/data-inspection/col-summary-tbl.html#comparing-profiles-for-drift)**: perfila una tabla con `DataScan`, guarda el perfil y compara con él las versiones posteriores
+- **[Importación de metadatos](https://posit-dev.github.io/pointblank/user-guide/metadata-import/metadata-import.html)** y **[validación CDISC](https://posit-dev.github.io/pointblank/user-guide/metadata-import/cdisc-validation.html)**: convierte metadatos de SPSS, Stata, SAS, Frictionless y Define-XML en validaciones, y comprueba datos clínicos con los estándares CDISC
+- **[Servidor MCP](https://posit-dev.github.io/pointblank/user-guide/integrations/mcp-quick-start.html)**: valida datos pidiéndoselo a un asistente de IA, en VS Code o Positron
+- **[OpenTelemetry](https://posit-dev.github.io/pointblank/user-guide/integrations/otel-integration.html)**: envía los resultados de validación a Grafana, Datadog y otras herramientas de monitoreo
 
 ## Documentación y ejemplos
 
 Visita nuestro [sitio de documentación](https://posit-dev.github.io/pointblank) para:
 
 - [La guía del usuario](https://posit-dev.github.io/pointblank/user-guide/)
-- [Referencia de la API](https://posit-dev.github.io/pointblank/reference/)
-- [Galería de ejemplos](https://posit-dev.github.io/pointblank/demos/)
+- [La referencia de la API](https://posit-dev.github.io/pointblank/reference/)
+- [Los ejemplos](https://posit-dev.github.io/pointblank/examples/)
 - [El Pointblog](https://posit-dev.github.io/pointblank/blog/)
 
 ## Únete a la comunidad
@@ -362,63 +511,17 @@ Visita nuestro [sitio de documentación](https://posit-dev.github.io/pointblank)
 ¡Nos encantaría saber de ti! Conéctate con nosotros:
 
 - [GitHub Issues](https://github.com/posit-dev/pointblank/issues) para reportes de errores y solicitudes de funciones
-- [Servidor de Discord](https://discord.com/invite/YH7CybCNCQ) para discusiones y ayuda
-- [Guías para contribuir](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) si te gustaría ayudar a mejorar Pointblank
+- [_Servidor de Discord_](https://discord.com/invite/YH7CybCNCQ) para discusiones y ayuda
 
-## Instalación
-
-Puedes instalar Pointblank usando pip:
-
-```bash
-pip install pointblank
-```
-
-También puedes instalar Pointblank desde Conda-Forge usando:
-
-```bash
-conda install conda-forge::pointblank
-```
-
-Si no tienes Polars o Pandas instalado, necesitarás instalar uno de ellos para usar Pointblank.
-
-```bash
-pip install "pointblank[pl]" # Install Pointblank with Polars
-pip install "pointblank[pd]" # Install Pointblank with Pandas
-```
-
-Para usar Pointblank con DuckDB, MySQL, PostgreSQL o SQLite, instala Ibis con el backend apropiado:
-
-```bash
-pip install "pointblank[duckdb]"   # Install Pointblank with Ibis + DuckDB
-pip install "pointblank[mysql]"    # Install Pointblank with Ibis + MySQL
-pip install "pointblank[postgres]" # Install Pointblank with Ibis + PostgreSQL
-pip install "pointblank[sqlite]"   # Install Pointblank with Ibis + SQLite
-```
+Hay muchas formas de contribuir al desarrollo de Pointblank. Algunas contribuciones son sencillas (como corregir errores tipográficos, mejorar la documentación o abrir issues para solicitar funciones o reportar problemas) y otras requieren más tiempo y cuidado (como responder preguntas y enviar PRs con cambios de código). ¡Cualquier ayuda es muy apreciada! Las [directrices de contribución](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) explican cómo empezar.
 
 ## Detalles técnicos
 
-Pointblank usa [Narwhals](https://github.com/narwhals-dev/narwhals) para trabajar con DataFrames de Polars y Pandas, y se integra con [Ibis](https://github.com/ibis-project/ibis) para soporte de bases de datos y formatos de archivo. Esta arquitectura proporciona una API consistente para validar datos tabulares de diversas fuentes.
+Pointblank usa [Narwhals](https://github.com/narwhals-dev/narwhals) para trabajar con DataFrames de Polars y Pandas, y se integra con [Ibis](https://github.com/ibis-project/ibis) para dar soporte a bases de datos y formatos de archivo. También valida DataFrames de PySpark. Esto ofrece una sola API para validar datos tabulares de todas estas fuentes.
 
-## Contribuir a Pointblank
+## Pointblank para R
 
-Hay muchas formas de contribuir al desarrollo continuo de Pointblank. Algunas contribuciones pueden ser simples (como corregir errores tipográficos, mejorar la documentación, presentar problemas para solicitar funciones o reportar problemas, etc.) y otras pueden requerir más tiempo y cuidado (como responder preguntas y enviar PR con cambios de código). ¡Solo debes saber que cualquier cosa que puedas hacer para ayudar será muy apreciada!
-
-Por favor, lee las [directrices de contribución](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) para obtener información sobre cómo comenzar.
-
-## Hoja de ruta
-
-Estamos trabajando activamente en mejorar Pointblank con:
-
-1. Métodos de validación adicionales para comprobaciones exhaustivas de calidad de datos
-2. Capacidades avanzadas de registro
-3. Acciones de mensajería (Slack, correo electrónico) para excesos de umbral
-4. Sugerencias de validación impulsidas por LLM y generación de diccionario de datos
-5. Configuración JSON/YAML para portabilidad de pipelines
-6. Utilidad CLI para validación desde la línea de comandos
-7. Soporte ampliado de backend y certificación
-8. Documentación y ejemplos de alta calidad
-
-Si tienes alguna idea para características o mejoras, ¡no dudes en compartirlas con nosotros! Siempre estamos buscando maneras de hacer que Pointblank sea mejor.
+También existe una versión de Pointblank para R, disponible desde 2017 y muy usada en la comunidad de R. Puedes encontrarla en https://github.com/rstudio/pointblank.
 
 ## Código de conducta
 
