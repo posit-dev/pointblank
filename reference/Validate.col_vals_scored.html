@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="506" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2184,7 +2184,7 @@ If neither <code>min_val=</code> nor <code>max_val=</code> is given, if <code>mi
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a table of product reviews and a scorer that stands in for a model: it scores a review by the share of its words that are on a list of positive words. A real scorer would be a classifier, such as <code>pb.scorers.classifier(hf_model=..., label="POSITIVE")</code>.</p>
-<div id="e6b8b4b8" class="cell" data-execution_count="2">
+<div id="84cf6e48" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2331,7 +2331,7 @@ If neither <code>min_val=</code> nor <code>max_val=</code> is given, if <code>mi
 </div>
 </div>
 <p>Let’s validate that each review scores at least <code>0.25</code>.</p>
-<div id="1e84f44e" class="cell" data-execution_count="3">
+<div id="fe84e842" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_scored(columns<span class="op">=</span><span class="st">"review"</span>, scorer<span class="op">=</span>positivity, min_val<span class="op">=</span><span class="fl">0.25</span>)</span>
@@ -2502,7 +2502,7 @@ If neither <code>min_val=</code> nor <code>max_val=</code> is given, if <code>mi
 </div>
 </div>
 <p>The step has six test units, one for each row, and three fail: two reviews have no positive words, and the missing review isn’t scored (use <code>na_pass=True</code> to let such rows pass). The step’s note gives the range of the scores. The failing rows can be seen with their scores, in the <code>pb_score_</code> column, with <a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link"><code>get_step_report()</code></a>.</p>
-<div id="cb1902e1" class="cell" data-execution_count="4">
+<div id="50cfbf57" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
