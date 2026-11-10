@@ -12,7 +12,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Callable
 
-from pointblank import text as _text
+from pointblank._text import check_bound
 from pointblank.steps import Steps
 
 if TYPE_CHECKING:
@@ -118,8 +118,8 @@ def corpus_checks(
     - the chunk ids are unique, with `chunk_id=`: a `~~pointblank.Validate.rows_distinct()` step
     -  every chunk has a value of each column of `metadata=`: a
       `~~pointblank.Validate.col_vals_not_null()` step for each
-    - the chunks have between `min_tokens=` and `max_tokens=` tokens, with either: a step of
-      [`pb.text.token_length()`](`pointblank.text.token_length`)
+    - the chunks have between `min_tokens=` and `max_tokens=` tokens, with either: a
+      `~~pointblank.Validate.col_vals_token_len()` step
     - no chunk is a near duplicate of another, unless `near_duplicates=False`: a
       `~~pointblank.Validate.rows_near_distinct()` step
     - every chunk was updated in the `max_age=` before the reference time, with `updated_at=`: a
@@ -143,8 +143,8 @@ def corpus_checks(
         `None` (the default).
     tokenizer
         The tokenizer of the check of the number of tokens, as in
-        [`pb.text.token_length()`](`pointblank.text.token_length`) (by default, `"whitespace"`,
-        which counts words). Use the tokenizer of the embedding model or the language model of the
+        `~~pointblank.Validate.col_vals_token_len()` (by default, `"whitespace"`, which counts
+        words). Use the tokenizer of the embedding model or the language model of the
         system for an accurate count.
     near_duplicates
         Whether to check for near duplicates (`True` by default), or the threshold of the
@@ -245,8 +245,8 @@ def corpus_checks(
         raise TypeError("`metadata=` must be the name of a column or a list of them.")
     for column in metadata:
         _check_column_name(column, "metadata")
-    _text._check_bound(min_tokens, "min_tokens")
-    _text._check_bound(max_tokens, "max_tokens")
+    check_bound(min_tokens, "min_tokens")
+    check_bound(max_tokens, "max_tokens")
     threshold = _near_threshold(near_duplicates)
     if updated_at is not None:
         _check_column_name(updated_at, "updated_at")
@@ -282,15 +282,14 @@ def corpus_checks(
             bounds = f"at least {min_tokens:,}"
         else:
             bounds = f"{min_tokens:,} to {max_tokens:,}"
-        length = _text.token_length(
-            text,
+        steps.col_vals_token_len(
+            columns=text,
             tokenizer=tokenizer,
             min_val=min_tokens,
             max_val=max_tokens,
             brief=f"Every chunk has {bounds} tokens.",
             **common,
         )
-        steps._steps.extend(length._steps)
     if threshold is not None:
         steps.rows_near_distinct(
             columns=text,
