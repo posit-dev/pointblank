@@ -131,6 +131,7 @@ from pointblank._utils import (
     _is_value_a_df,
     _PBUnresolvedColumn,
     _resolve_columns,
+    _resolve_columns_subset,
     _select_df_lib,
     _with_row_index,
 )
@@ -4778,24 +4779,26 @@ def _validation_info_to_step(
         warnings_out.append(note)
         return _UnserializablePlaceholder(code=code, note=note, yaml_value=yaml_value)
 
-    def _columns_param() -> None:
+    def _columns_param(key: str = "columns") -> None:
         # Aggregate methods store `column` as a list of resolved names; column-value methods
         # store a single string (or a Column selector, which can't be serialized simply). A
-        # selector is replaced at interrogation by each column it resolves to, so the original
-        # selector is used when the step's objects are kept.
+        # selector is replaced at interrogation by each column it resolves to (or, for
+        # `columns_subset=`, by the list of them), so the original selector is used when the
+        # step's objects are kept.
         column = vi.column
         if keep_objects and vi.column_spec is not None:
             column = vi.column_spec
         if isinstance(column, (list, tuple)):
             names = [_column_to_name(c) for c in column]
             if names and all(n is not None for n in names):
-                params["columns"] = names[0] if len(names) == 1 else names
+                # A `columns_subset=` list stays a list
+                params[key] = names if key == "columns_subset" or len(names) > 1 else names[0]
                 return
         name = _column_to_name(column)
         if name is not None:
-            params["columns"] = name
+            params[key] = name
         else:
-            params["columns"] = _placeholder(
+            params[key] = _placeholder(
                 column,
                 code=repr(str(column)),
                 note=(
@@ -4936,11 +4939,7 @@ def _validation_info_to_step(
             params["inverse"] = True
     elif at in ("rows_distinct", "rows_complete"):
         if vi.column is not None:
-            name = _column_to_name(vi.column)
-            if isinstance(vi.column, (list, tuple)):
-                params["columns_subset"] = list(vi.column)
-            elif name is not None:  # pragma: no cover
-                params["columns_subset"] = name  # pragma: no cover
+            _columns_param(key="columns_subset")
     elif at in ("tbl_match", "tbl_reconcile"):
         values = vi.values or {}
         tbl_compare = values.get("tbl_compare")
@@ -13535,7 +13534,12 @@ class Validate:
 
     def rows_distinct(
         self,
-        columns_subset: str | list[str] | None = None,
+        columns_subset: str
+        | list[str]
+        | Column
+        | ColumnSelector
+        | ColumnSelectorNarwhals
+        | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -13564,7 +13568,9 @@ class Validate:
             A single column or a list of columns to use as a subset for the distinct comparison.
             If `None`, then all columns in the table will be used for the comparison. If multiple
             columns are supplied, the distinct comparison will be made over the combination of
-            values in those columns.
+            values in those columns. A column selector (e.g.,
+            [`starts_with()`](`pointblank.starts_with`)) can be used too, and the columns it
+            selects are compared together in a single validation step.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -13772,10 +13778,7 @@ class Validate:
             self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
-        if columns_subset is not None and isinstance(columns_subset, str):
-            columns_subset = [columns_subset]
-
-        # TODO: incorporate Column object
+        columns_subset = _resolve_columns_subset(columns_subset)
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
@@ -13798,7 +13801,12 @@ class Validate:
 
     def rows_complete(
         self,
-        columns_subset: str | list[str] | None = None,
+        columns_subset: str
+        | list[str]
+        | Column
+        | ColumnSelector
+        | ColumnSelectorNarwhals
+        | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -13821,7 +13829,9 @@ class Validate:
         ----------
         columns_subset
             A single column or a list of columns to use as a subset for the completeness check. If
-            `None` (the default), then all columns in the table will be used.
+            `None` (the default), then all columns in the table will be used. A column selector
+            (e.g., [`starts_with()`](`pointblank.starts_with`)) can be used too, and the columns it
+            selects are checked together in a single validation step.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -14029,10 +14039,7 @@ class Validate:
             self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
-        if columns_subset is not None and isinstance(columns_subset, str):  # pragma: no cover
-            columns_subset = [columns_subset]  # pragma: no cover
-
-        # TODO: incorporate Column object
+        columns_subset = _resolve_columns_subset(columns_subset)
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
@@ -26848,6 +26855,14 @@ class Validate:
                     text=note_text,
                 )
 
+                expanded_validation_info.append(validation)
+                continue
+
+            # A `columns_subset=` selector (`rows_distinct()` and `rows_complete()`) gives the
+            # columns that the step uses together, so the step isn't expanded
+            if validation.assertion_type in _ALL_COLUMNS_STEPS:
+                validation.column = list(columns_resolved)
+                validation.column_spec = column_expr
                 expanded_validation_info.append(validation)
                 continue
 
