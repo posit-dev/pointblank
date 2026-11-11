@@ -4,7 +4,7 @@ Enforce data contracts at both ends of a data transformation.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L373-L1557)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L373-L1563)
 
 ``` python
 Pipeline(
@@ -543,7 +543,7 @@ Write the pipeline as YAML.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1468-L1545)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1474-L1551)
 
 ``` python
 to_yaml(path=None)
@@ -625,7 +625,7 @@ Read a pipeline from a YAML file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1338-L1466)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1344-L1472)
 
 ``` python
 from_yaml(path)
@@ -737,7 +737,7 @@ Convert the pipeline to a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1144-L1214)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1150-L1220)
 
 ``` python
 to_dict()
@@ -793,7 +793,7 @@ Create a pipeline from a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1216-L1336)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/pipeline.py#L1222-L1342)
 
 ``` python
 from_dict(data)

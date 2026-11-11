@@ -4,7 +4,7 @@ Clear the scores that [Validate.col_vals_scored()](../reference/Validate.col_val
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1601-L1636)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1626-L1661)
 
 ``` python
 scorers.clear_cache()

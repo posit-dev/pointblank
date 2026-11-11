@@ -5516,9 +5516,10 @@ can be left out when the step has one column.
 Notes:
 
 - `classifier()` with a function instead of a pipeline calls it as
-  `fn(texts, top_k=None, truncation=True)` (plus `function_to_apply=`
-  if set), so the function must accept those keywords; it returns, for
-  each text, a list of `{"label": ..., "score": ...}` dicts.
+  `fn(texts)`, adding `top_k=None`, `truncation=True`, and
+  `function_to_apply=` (if set) only for the keywords the function
+  takes; it returns, for each text, a list of
+  `{"label": ..., "score": ...}` dicts.
 - `langid()` with a function backend: `fn(text)` returns
   `{lang: prob}` or `[(lang, prob), ...]`.
 - `reranker()` scores from different models aren't on one scale; pick

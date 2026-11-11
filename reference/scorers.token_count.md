@@ -4,7 +4,7 @@ Score text by its number of tokens.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1504-L1589)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1529-L1614)
 
 ``` python
 scorers.token_count(

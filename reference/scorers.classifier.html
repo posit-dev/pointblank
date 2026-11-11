@@ -2038,7 +2038,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L854-L931" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L877-L956" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">scorers</span><span class="op">.</span><span class="fu">classifier</span>(</span>
@@ -2061,7 +2061,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">hf_model</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>The model: the name of a model on the Hugging Face Hub (e.g., <code>"HuggingFaceFW/fineweb-edu-classifier"</code>), or a <code>transformers</code> text-classification pipeline (or any function that takes a list of texts and returns, for each, a list of <code>{"label": ..., "score": ...}</code> dictionaries).</p>
+<p>The model: the name of a model on the Hugging Face Hub (e.g., <code>"HuggingFaceFW/fineweb-edu-classifier"</code>), or a <code>transformers</code> text-classification pipeline (or any function that takes a list of texts and returns, for each, a list of <code>{"label": ..., "score": ...}</code> dictionaries). A function is given the pipeline’s <code>top_k=</code>, <code>truncation=</code>, and <code>function_to_apply=</code> arguments only if it takes them.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">label</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -2073,7 +2073,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">function_to_apply</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-<p>How the model’s outputs are turned into scores: <code>"sigmoid"</code>, <code>"softmax"</code>, or <code>"none"</code> (the raw outputs, e.g., for a regression model). By default, the pipeline chooses.</p>
+<p>How the model’s outputs are turned into scores: <code>"sigmoid"</code>, <code>"softmax"</code>, or <code>"none"</code> (the raw outputs, e.g., for a regression model). By default, the pipeline chooses. It can’t be used with a function that doesn’t take it.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">device</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>

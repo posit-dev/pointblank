@@ -4,7 +4,7 @@ Score text with a text-classification model from Hugging Face.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L854-L931)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L877-L956)
 
 ``` python
 scorers.classifier(
@@ -24,7 +24,7 @@ A text classifier scores text for a label: a quality or toxicity classifier, a s
 ## Parameters
 
 `hf_model: Any`  
-The model: the name of a model on the Hugging Face Hub (e.g., `"HuggingFaceFW/fineweb-edu-classifier"`), or a `transformers` text-classification pipeline (or any function that takes a list of texts and returns, for each, a list of `{"label": ..., "score": ...}` dictionaries).
+The model: the name of a model on the Hugging Face Hub (e.g., `"HuggingFaceFW/fineweb-edu-classifier"`), or a `transformers` text-classification pipeline (or any function that takes a list of texts and returns, for each, a list of `{"label": ..., "score": ...}` dictionaries). A function is given the pipeline's `top_k=`, `truncation=`, and `function_to_apply=` arguments only if it takes them.
 
 `label: str | None = None`  
 The label whose score is the score of a row. It can be left out for a model with one output.
@@ -33,7 +33,7 @@ The label whose score is the score of a row. It can be left out for a model with
 The column with the text to score. It can be left out if the step has one column.
 
 `function_to_apply: str | None = None`  
-How the model's outputs are turned into scores: `"sigmoid"`, `"softmax"`, or `"none"` (the raw outputs, e.g., for a regression model). By default, the pipeline chooses.
+How the model's outputs are turned into scores: `"sigmoid"`, `"softmax"`, or `"none"` (the raw outputs, e.g., for a regression model). By default, the pipeline chooses. It can't be used with a function that doesn't take it.
 
 `device: Any = None`  
 The device that the model runs on (e.g., `"cuda"`, `"mps"`, or `-1` for the CPU), when the model is given by name.

@@ -4,7 +4,7 @@ Score text by how likely it is to be in the expected languages.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1054-L1159)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1079-L1184)
 
 ``` python
 scorers.langid(
