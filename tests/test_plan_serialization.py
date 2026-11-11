@@ -1085,6 +1085,63 @@ def test_to_code_imports_nothing_extra_for_plain_values(small_table):
     )
 
 
+# ─── Non-finite floats and NumPy scalars ─────────────────────────────────────────
+
+
+def _nonfinite_value_plan(data):
+    import numpy as np
+
+    return (
+        Validate(data=data)
+        .col_vals_lt(columns="x", value=float("inf"))
+        .col_vals_gt(columns="x", value=float("-inf"))
+        .col_vals_lt(columns="x", value=np.float64(2.0))
+        .col_vals_between(columns="x", left=np.int64(0), right=np.float64(np.inf))
+        .col_vals_in_set(columns="x", set=[1.5, float("nan")])
+    )
+
+
+def test_to_code_writes_nonfinite_floats_and_numpy_scalars(typed_table):
+    code = _nonfinite_value_plan(typed_table).to_code()
+
+    # `inf` and `nan` aren't Python names, and `np` isn't imported by the code
+    assert 'value=float("inf")' in code
+    assert 'value=float("-inf")' in code
+    assert "value=2.0" in code
+    assert 'left=0, right=float("inf")' in code
+    assert 'set=[1.5, float("nan")]' in code
+    assert "np." not in code
+
+    namespace = {"your_data": typed_table}
+    exec(code, namespace)
+    expected = _results(_nonfinite_value_plan(typed_table).interrogate())
+    assert _results(namespace["validation"].interrogate()) == expected
+
+
+def test_to_yaml_writes_nonfinite_floats_and_numpy_scalars(typed_table):
+    import yaml
+
+    yaml_str = _nonfinite_value_plan(typed_table).to_yaml()
+
+    # NumPy scalars are written as plain YAML numbers, not as `!!python/object` tags or strings
+    assert "!!python" not in yaml_str
+    steps = yaml.safe_load(yaml_str)["steps"]
+    assert steps[2]["col_vals_lt"]["value"] == 2.0
+    assert steps[3]["col_vals_between"]["left"] == 0
+
+    rebuilt = yaml_interrogate(yaml_str, set_tbl=typed_table)
+    assert _results(rebuilt) == _results(_nonfinite_value_plan(typed_table).interrogate())
+
+
+def test_yaml_to_python_writes_nonfinite_floats(typed_table):
+    python_code = pb.yaml_to_python(_nonfinite_value_plan(typed_table).to_yaml())
+
+    assert 'value=float("inf")' in python_code
+    assert 'left=0, right=float("inf")' in python_code
+    assert 'set=[1.5, float("nan")]' in python_code
+    compile(python_code.strip("`\n").removeprefix("python\n"), "<yaml_to_python>", "exec")
+
+
 @pytest.mark.parametrize("tolerance_in_dict", [False, True])
 def test_to_code_tbl_match_timedelta_tolerance_imports_datetime(tolerance_in_dict):
     import datetime
