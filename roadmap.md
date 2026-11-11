@@ -4,41 +4,24 @@
 
 High-priority features that build on existing infrastructure.
 
-### Contract Adapter Fixes & Additions
+### Multi-Table Relationship Checks
 
-Fill gaps in the contract adapter system (currently only `json_schema` and `frictionless` are registered; other advertised formats like `dbt` raise errors).
-
-- Implement a **dbt `schema.yml`** adapter
-- Implement an **ODCS (Open Data Contract Standard)** adapter
-- Correct docstrings and examples to match the set of actually-registered adapters
-
-### Foreign-Key / Referential-Integrity Checks
-
-Expose a general-purpose referential-integrity validation (partial logic already exists in the CDISC conformance engine).
+`col_vals_in_table()` checks foreign keys against one reference table (and finds orphaned keys). The next step is checking a set of related tables together.
 
 - `pb.ValidateRelationships` or equivalent API for multi-table FK checks
-- Foreign key validation between related tables
-- Referential integrity checks (orphan detection, cardinality)
-- Cross-table aggregate validations
+- Cardinality checks (one-to-one, one-to-many) between related tables
+- Cross-table aggregate validations across more than one reference table
 
-### Data Profiling & Drift Detection
+### Drift Detection Follow-Ons
 
-Expand [DataScan](./reference/DataScan.md#pointblank.DataScan) into comprehensive profiling with drift detection. Ship a minimal profile-persist-and-compare first.
+[DataScan](./reference/DataScan.md#pointblank.DataScan) profiles can be saved, loaded, and compared, with PSI and KS statistics for each column and a report of schema changes. What's left builds on that comparison.
 
-- `pb.DataProfile` class for comprehensive profiling
-- Profile persistence and comparison
-- Statistical drift detection (KS test, PSI, etc.)
-- Schema drift detection
 - Distribution visualization
 - Automatic validation generation from drift
 
-### Schema Export
+### YAML Support for RAG Checks
 
-Export validation rules and schemas to standard interchange formats.
-
-- `.to_json_schema()` method on [Validate](./reference/Validate.md#pointblank.Validate) for JSON Schema output
-- `.to_documentation()` for auto-generated data documentation (Markdown, HTML)
-- Round-trip compatibility with YAML validation configs
+Bring the RAG step bundles (`pb.rag.corpus_checks()` and `pb.rag.eval_checks()`) to YAML validation configs, as was done for the text checks.
 
 ### Rich Notification Ecosystem
 
@@ -72,7 +55,6 @@ Organizational catalog for sharing and discovering validation definitions.
 Improve the existing `.prompt()` LLM-based validation method.
 
 - Batch processing optimization for LLM calls
-- Confidence scores for semantic validations
 - Advanced caching and cost optimization
 - Fallback strategies for rate limits
 - Custom prompt templates
@@ -81,9 +63,7 @@ Improve the existing `.prompt()` LLM-based validation method.
 
 Extend the existing [generate_dataset()](./reference/generate_dataset.md#pointblank.generate_dataset) capabilities.
 
-- Schema interoperability: use a `col_schema_match()` schema to generate test data
-- Unified schema model bridging simple schemas (column/type pairs) and advanced schemas (with field constraints)
-- Edge case generation (nulls, boundaries, Unicode, etc.)
+- Edge case generation (boundaries, Unicode, etc.)
 - Hypothesis integration for property-based testing
 
 ------------------------------------------------------------------------
@@ -94,11 +74,10 @@ Features that expand Pointblank's scope into new domains.
 
 ### AI-Powered Data Documentation
 
-Auto-generate data dictionaries and documentation from data and validations.
+[Validate.to_data_card()](./reference/Validate.to_data_card.md#pointblank.Validate.to_data_card) writes a Hugging Face dataset card or a datasheet, with the validation's results as evidence of quality. The descriptions in it are still written by hand.
 
-- `pb.document()` function for AI-generated documentation
-- Multiple output formats (Markdown, HTML, PDF, Quarto)
-- Integration with validation results for quality context
+- AI-generated descriptions of the dataset and its columns
+- More output formats (HTML, PDF, Quarto)
 - Customizable documentation templates
 - Incremental documentation updates
 
@@ -151,7 +130,7 @@ Delightful notebook validation experience.
 
 Seamlessly move between data, schemas, and validations.
 
-- `Schema.from_data()` with configurable inference
+- Configurable inference for `Schema.from_table()`
 - Export Schema to JSON Schema, Avro, SQL DDL, Pydantic
 - Import Schema from Pydantic, SQL, Avro, JSON Schema
 - `.with_rules_from_schema()` to auto-generate validation steps

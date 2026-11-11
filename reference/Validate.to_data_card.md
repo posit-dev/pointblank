@@ -154,7 +154,7 @@ print(card)
 
     ## Data Quality
 
-    The data was validated with Pointblank 0.1.dev1+g28a2cec50 on 2026-11-11: 1 of 3 checks passed for every row (or other test unit).
+    The data was validated with Pointblank 0.1.dev1+g21df7c61a on 2026-11-11: 1 of 3 checks passed for every row (or other test unit).
 
     The health score (the share of the test units that passed, from 0 to 100) is **80.0**.
 
@@ -198,6 +198,6 @@ print(card)
 
     Data Team
 
-    *This card was made with [Pointblank](https://posit-dev.github.io/pointblank/) 0.1.dev1+g28a2cec50.*
+    *This card was made with [Pointblank](https://posit-dev.github.io/pointblank/) 0.1.dev1+g21df7c61a.*
 
 The card starts with the front matter of a Hugging Face card, then has the structure of the table (one review is missing), the scores, the steps (one rating is out of range), and the scores of each language. With `path="README.md"`, it would also be written to a file, and with `format="datasheet"`, it would be a datasheet instead. With `lang="fr"`, the card would be written in French (whatever the languages of the data, given in `language=`).

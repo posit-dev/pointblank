@@ -692,7 +692,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-data" class="level1">
 <h1>The Data</h1>
 <p>Let’s make a seed of 500 customers of a bank, each with an age, a plan, a monthly spend, and a message to the bank’s support team. Then we’ll make 500 synthetic customers, with a generator that has some of the usual faults: it rarely gives the less common plans, it often leaves the spend out, its messages are about fewer things, and it memorized three customers of the seed (and gives one of them as it is, one in capital letters, and one with different punctuation).</p>
-<div id="0cc8b403" class="cell" data-execution_count="2">
+<div id="b8e88f60" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -940,7 +940,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="checking-the-synthetic-data" class="level1">
 <h1>Checking the Synthetic Data</h1>
 <p>The synthetic data comes first, then the seed. We’ll say which columns identify a customer, for finding copies: every column but the id, since the generator gives each synthetic customer an id of its own (and a copy with a new id is still a copy). We’ll also say which column has free text, so that its diversity is measured and copies of its text are found even if they’re not exactly the same.</p>
-<div id="4c439b13" class="cell" data-execution_count="3">
+<div id="857c6f51" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>check <span class="op">=</span> pb.check_synthetic(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    synthetic, seed, columns<span class="op">=</span>[<span class="st">"age"</span>, <span class="st">"plan"</span>, <span class="st">"monthly_spend"</span>, <span class="st">"message"</span>], text<span class="op">=</span><span class="st">"message"</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1086,7 +1086,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-results" class="level1">
 <h1>The Results</h1>
 <p>The problems found are also in the <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> attribute, as messages, and <code>ok</code> is <code>True</code> when there are none, which makes a check of synthetic data easy to put in a test or a pipeline that makes it.</p>
-<div id="af1fe4a9" class="cell" data-execution_count="4">
+<div id="7d722ebe" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>check.issues</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>["The distribution of 'plan' in the synthetic data differs from that in the seed (PSI 0.512).",
@@ -1096,7 +1096,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The <a href="../../reference/SyntheticCheck.get_copies.html#pointblank.SyntheticCheck.get_copies" class="gdls-link gdls-code">get_copies()</a> method gives the synthetic rows that copy a seed row, with the row number of each in its own table and the kind of copy.</p>
-<div id="db820a9d" class="cell" data-execution_count="5">
+<div id="e9e6b168" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>check.get_copies()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div><style>
@@ -1111,7 +1111,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The other attributes have the numbers behind the report (<code>fidelity</code>, <code>duplicates</code>, <code>diversity</code>, and <code>copies</code>), and <a href="../../reference/SyntheticCheck.to_dict.html#pointblank.SyntheticCheck.to_dict" class="gdls-link gdls-code">to_dict()</a> gives all of them as a dictionary that can be written as JSON.</p>
 <p>The report is in English by default, and <a href="../../reference/SyntheticCheck.get_tabular_report.html#pointblank.SyntheticCheck.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a> takes <code>lang=</code> and <code>locale=</code> for another language (the messages of <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> stay in English):</p>
-<div id="8d33db6d" class="cell" data-execution_count="6">
+<div id="9328b788" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>check.get_tabular_report(lang<span class="op">=</span><span class="st">"es"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_synthetic_report" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

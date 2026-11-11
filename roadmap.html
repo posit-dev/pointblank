@@ -174,10 +174,9 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#planned-near-term" id="toc-planned-near-term" class="nav-link active" data-scroll-target="#planned-near-term">Planned — Near Term</a>
   <ul class="collapse">
-  <li><a href="#contract-adapter-fixes-additions" id="toc-contract-adapter-fixes-additions" class="nav-link" data-scroll-target="#contract-adapter-fixes-additions">Contract Adapter Fixes &amp; Additions</a></li>
-  <li><a href="#foreign-key-referential-integrity-checks" id="toc-foreign-key-referential-integrity-checks" class="nav-link" data-scroll-target="#foreign-key-referential-integrity-checks">Foreign-Key / Referential-Integrity Checks</a></li>
-  <li><a href="#data-profiling-drift-detection" id="toc-data-profiling-drift-detection" class="nav-link" data-scroll-target="#data-profiling-drift-detection">Data Profiling &amp; Drift Detection</a></li>
-  <li><a href="#schema-export" id="toc-schema-export" class="nav-link" data-scroll-target="#schema-export">Schema Export</a></li>
+  <li><a href="#multi-table-relationship-checks" id="toc-multi-table-relationship-checks" class="nav-link" data-scroll-target="#multi-table-relationship-checks">Multi-Table Relationship Checks</a></li>
+  <li><a href="#drift-detection-follow-ons" id="toc-drift-detection-follow-ons" class="nav-link" data-scroll-target="#drift-detection-follow-ons">Drift Detection Follow-Ons</a></li>
+  <li><a href="#yaml-support-for-rag-checks" id="toc-yaml-support-for-rag-checks" class="nav-link" data-scroll-target="#yaml-support-for-rag-checks">YAML Support for RAG Checks</a></li>
   <li><a href="#rich-notification-ecosystem" id="toc-rich-notification-ecosystem" class="nav-link" data-scroll-target="#rich-notification-ecosystem">Rich Notification Ecosystem</a></li>
   <li><a href="#pipeline-integration-adapter" id="toc-pipeline-integration-adapter" class="nav-link" data-scroll-target="#pipeline-integration-adapter">Pipeline Integration Adapter</a></li>
   <li><a href="#validation-registry" id="toc-validation-registry" class="nav-link" data-scroll-target="#validation-registry">Validation Registry</a></li>
@@ -228,45 +227,26 @@ ul.task-list li input[type="checkbox"] {
 <section id="planned-near-term" class="level1">
 <h1>Planned — Near Term</h1>
 <p>High-priority features that build on existing infrastructure.</p>
-<section id="contract-adapter-fixes-additions" class="level2">
-<h2 class="anchored" data-anchor-id="contract-adapter-fixes-additions">Contract Adapter Fixes &amp; Additions</h2>
-<p>Fill gaps in the contract adapter system (currently only <code>json_schema</code> and <code>frictionless</code> are registered; other advertised formats like <code>dbt</code> raise errors).</p>
-<ul>
-<li>Implement a <strong>dbt <code>schema.yml</code></strong> adapter</li>
-<li>Implement an <strong>ODCS (Open Data Contract Standard)</strong> adapter</li>
-<li>Correct docstrings and examples to match the set of actually-registered adapters</li>
-</ul>
-</section>
-<section id="foreign-key-referential-integrity-checks" class="level2">
-<h2 class="anchored" data-anchor-id="foreign-key-referential-integrity-checks">Foreign-Key / Referential-Integrity Checks</h2>
-<p>Expose a general-purpose referential-integrity validation (partial logic already exists in the CDISC conformance engine).</p>
+<section id="multi-table-relationship-checks" class="level2">
+<h2 class="anchored" data-anchor-id="multi-table-relationship-checks">Multi-Table Relationship Checks</h2>
+<p><code>col_vals_in_table()</code> checks foreign keys against one reference table (and finds orphaned keys). The next step is checking a set of related tables together.</p>
 <ul>
 <li><code>pb.ValidateRelationships</code> or equivalent API for multi-table FK checks</li>
-<li>Foreign key validation between related tables</li>
-<li>Referential integrity checks (orphan detection, cardinality)</li>
-<li>Cross-table aggregate validations</li>
+<li>Cardinality checks (one-to-one, one-to-many) between related tables</li>
+<li>Cross-table aggregate validations across more than one reference table</li>
 </ul>
 </section>
-<section id="data-profiling-drift-detection" class="level2">
-<h2 class="anchored" data-anchor-id="data-profiling-drift-detection">Data Profiling &amp; Drift Detection</h2>
-<p>Expand <a href="./reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> into comprehensive profiling with drift detection. Ship a minimal profile-persist-and-compare first.</p>
+<section id="drift-detection-follow-ons" class="level2">
+<h2 class="anchored" data-anchor-id="drift-detection-follow-ons">Drift Detection Follow-Ons</h2>
+<p><a href="./reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> profiles can be saved, loaded, and compared, with PSI and KS statistics for each column and a report of schema changes. What’s left builds on that comparison.</p>
 <ul>
-<li><code>pb.DataProfile</code> class for comprehensive profiling</li>
-<li>Profile persistence and comparison</li>
-<li>Statistical drift detection (KS test, PSI, etc.)</li>
-<li>Schema drift detection</li>
 <li>Distribution visualization</li>
 <li>Automatic validation generation from drift</li>
 </ul>
 </section>
-<section id="schema-export" class="level2">
-<h2 class="anchored" data-anchor-id="schema-export">Schema Export</h2>
-<p>Export validation rules and schemas to standard interchange formats.</p>
-<ul>
-<li><code>.to_json_schema()</code> method on <a href="./reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> for JSON Schema output</li>
-<li><code>.to_documentation()</code> for auto-generated data documentation (Markdown, HTML)</li>
-<li>Round-trip compatibility with YAML validation configs</li>
-</ul>
+<section id="yaml-support-for-rag-checks" class="level2">
+<h2 class="anchored" data-anchor-id="yaml-support-for-rag-checks">YAML Support for RAG Checks</h2>
+<p>Bring the RAG step bundles (<code>pb.rag.corpus_checks()</code> and <code>pb.rag.eval_checks()</code>) to YAML validation configs, as was done for the text checks.</p>
 </section>
 <section id="rich-notification-ecosystem" class="level2">
 <h2 class="anchored" data-anchor-id="rich-notification-ecosystem">Rich Notification Ecosystem</h2>
@@ -303,7 +283,6 @@ ul.task-list li input[type="checkbox"] {
 <p>Improve the existing <code>.prompt()</code> LLM-based validation method.</p>
 <ul>
 <li>Batch processing optimization for LLM calls</li>
-<li>Confidence scores for semantic validations</li>
 <li>Advanced caching and cost optimization</li>
 <li>Fallback strategies for rate limits</li>
 <li>Custom prompt templates</li>
@@ -313,9 +292,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="test-data-generation-enhancements">Test Data Generation Enhancements</h2>
 <p>Extend the existing <a href="./reference/generate_dataset.html#pointblank.generate_dataset" class="gdls-link gdls-code">generate_dataset()</a> capabilities.</p>
 <ul>
-<li>Schema interoperability: use a <code>col_schema_match()</code> schema to generate test data</li>
-<li>Unified schema model bridging simple schemas (column/type pairs) and advanced schemas (with field constraints)</li>
-<li>Edge case generation (nulls, boundaries, Unicode, etc.)</li>
+<li>Edge case generation (boundaries, Unicode, etc.)</li>
 <li>Hypothesis integration for property-based testing</li>
 </ul>
 <hr>
@@ -326,11 +303,10 @@ ul.task-list li input[type="checkbox"] {
 <p>Features that expand Pointblank’s scope into new domains.</p>
 <section id="ai-powered-data-documentation" class="level2">
 <h2 class="anchored" data-anchor-id="ai-powered-data-documentation">AI-Powered Data Documentation</h2>
-<p>Auto-generate data dictionaries and documentation from data and validations.</p>
+<p><a href="./reference/Validate.to_data_card.html#pointblank.Validate.to_data_card" class="gdls-link gdls-code">Validate.to_data_card()</a> writes a Hugging Face dataset card or a datasheet, with the validation’s results as evidence of quality. The descriptions in it are still written by hand.</p>
 <ul>
-<li><code>pb.document()</code> function for AI-generated documentation</li>
-<li>Multiple output formats (Markdown, HTML, PDF, Quarto)</li>
-<li>Integration with validation results for quality context</li>
+<li>AI-generated descriptions of the dataset and its columns</li>
+<li>More output formats (HTML, PDF, Quarto)</li>
 <li>Customizable documentation templates</li>
 <li>Incremental documentation updates</li>
 </ul>
@@ -387,7 +363,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="schema-inference-serialization">Schema Inference &amp; Serialization</h2>
 <p>Seamlessly move between data, schemas, and validations.</p>
 <ul>
-<li><code>Schema.from_data()</code> with configurable inference</li>
+<li>Configurable inference for <code>Schema.from_table()</code></li>
 <li>Export Schema to JSON Schema, Avro, SQL DDL, Pydantic</li>
 <li>Import Schema from Pydantic, SQL, Avro, JSON Schema</li>
 <li><code>.with_rules_from_schema()</code> to auto-generate validation steps</li>
