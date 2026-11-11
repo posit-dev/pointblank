@@ -11,6 +11,7 @@ import functools
 import html as html_module
 import inspect
 import json
+import math
 import numbers
 import operator
 import os
@@ -5227,8 +5228,16 @@ def _coalesce_plan_steps(
     return merged
 
 
+def _as_python_scalar(value: Any) -> Any:
+    """Get the Python value held by a NumPy scalar (e.g., `1.5` from `np.float64(1.5)`)."""
+    if type(value).__module__ == "numpy" and getattr(value, "ndim", None) == 0:
+        return value.item()
+    return value
+
+
 def _render_code_value(value: Any) -> str:
     """Render a single Python value as source code for `to_code()`."""
+    value = _as_python_scalar(value)
     if isinstance(value, _UnserializablePlaceholder):
         return value.code
     if isinstance(value, bool):
@@ -5237,6 +5246,9 @@ def _render_code_value(value: Any) -> str:
         return "None"
     if isinstance(value, str):
         return json.dumps(value)
+    if isinstance(value, float) and not math.isfinite(value):
+        # `repr()` gives `inf`, `-inf`, or `nan`, which aren't names that Python knows
+        return f'float("{value!r}")'
     if isinstance(value, (int, float)):
         return repr(value)
     if _is_zoned_datetime(value):
@@ -5312,6 +5324,7 @@ def _render_zoned_datetime_code(value: datetime.datetime) -> str:
 
 def _code_value_imports(value: Any) -> set[str]:
     """Get the imports needed by the code that `_render_code_value()` writes for a value."""
+    value = _as_python_scalar(value)
     if _is_zoned_datetime(value):
         return {"import datetime", "from zoneinfo import ZoneInfo"}
     if isinstance(value, decimal.Decimal):
@@ -5382,6 +5395,7 @@ _REFERENCE_PLACEHOLDER_NOTE = (
 
 def _value_to_yaml(value: Any, warnings_out: list[str]) -> Any:
     """Convert a Python value into a YAML-safe structure for `to_yaml()`."""
+    value = _as_python_scalar(value)
     if isinstance(value, _UnserializablePlaceholder):
         if value.yaml_value in ("null", None):
             return None
