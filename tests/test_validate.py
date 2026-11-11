@@ -5895,6 +5895,68 @@ def test_rows_distinct(request, tbl_fixture) -> None:
     )
 
 
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+def test_rows_distinct_complete_column_selectors(tbl_type) -> None:
+    """A `columns_subset=` selector gives the columns that one step uses together."""
+    tbl = pl.DataFrame({"a1": [1, 1, 2, None], "a2": [2, 2, 3, 4], "b": [1, 2, 3, 4]})
+    if tbl_type == "pandas":
+        tbl = tbl.to_pandas()
+    elif tbl_type == "duckdb":
+        tbl = ibis.memtable(tbl)
+
+    validation = (
+        Validate(tbl)
+        .rows_distinct(columns_subset=starts_with("a"))
+        .rows_complete(columns_subset=starts_with("a"))
+        .rows_distinct(columns_subset=col(starts_with("a") | matches("^b$")))
+        .rows_distinct(columns_subset=ncs.numeric())
+        .interrogate()
+    )
+
+    steps = validation.validation_info
+    assert [step.column for step in steps] == [
+        ["a1", "a2"],
+        ["a1", "a2"],
+        ["a1", "a2", "b"],
+        ["a1", "a2", "b"],
+    ]
+    assert [step.n_failed for step in steps] == [2, 1, 0, 0]
+    assert not any(step.eval_error for step in steps)
+
+
+def test_rows_distinct_column_selector_resolution() -> None:
+    """A `columns_subset=` selector is resolved after `pre=`, and kept for a new table."""
+    tbl = pl.DataFrame({"a1": [1, 1], "a2": [2, 2], "b": [1, 2]})
+
+    # The selector is resolved against the table that `pre=` gives
+    step = (
+        Validate(tbl)
+        .rows_distinct(
+            columns_subset=starts_with("x"), pre=lambda df: df.rename({"a1": "x1", "a2": "x2"})
+        )
+        .interrogate()
+        .validation_info[0]
+    )
+    assert step.column == ["x1", "x2"]
+    assert step.n_failed == 2
+
+    # A selector that matches no columns is an evaluation error, with a note
+    validation = Validate(tbl).rows_complete(columns_subset=starts_with("z")).interrogate()
+    assert validation.validation_info[0].eval_error
+    assert validation.get_note(i=1, key="no_columns_resolved") is not None
+
+    # After interrogation, `to_code()` writes the columns that the selector resolved to
+    validation = Validate(tbl).rows_distinct(columns_subset=starts_with("a")).interrogate()
+    assert '.rows_distinct(columns_subset=["a1", "a2"])' in validation.to_code()
+    assert [step.column for step in validation.interrogate().validation_info] == [["a1", "a2"]]
+
+    # `add_steps()` keeps the selector, which is resolved against the new table
+    new_tbl = pl.DataFrame({"a1": [1, 2], "a3": [2, 2], "a4": [5, 5]})
+    step = Validate(new_tbl).add_steps(validation).interrogate().validation_info[0]
+    assert step.column == ["a1", "a3", "a4"]
+    assert step.n_failed == 0
+
+
 @pytest.mark.parametrize(
     "tbl_type",
     ["polars", "pandas"],
