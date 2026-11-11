@@ -1633,25 +1633,25 @@ def test_validation_briefs(request, tbl_fixture) -> None:
     assert v.validation_info[12].brief == "Check of column `x`. Step 13"
 
     # `rows_distinct()`
-    assert v.validation_info[13].brief == "Check of column `{col}`. Step 14"
+    assert v.validation_info[13].brief == "Check of column `all columns`. Step 14"
 
     # `rows_distinct()` - subset of columns
     assert v.validation_info[14].brief == "Check of column `x, y`. Step 15"
 
     # `rows_complete()`
-    assert v.validation_info[15].brief == "Check of column `{col}`. Step 16"
+    assert v.validation_info[15].brief == "Check of column `all columns`. Step 16"
 
     # `rows_complete()` - subset of columns
     assert v.validation_info[16].brief == "Check of column `x, y`. Step 17"
 
     # `col_schema_match()`
-    assert v.validation_info[17].brief == "Check of column `{col}`. Step 18"
+    assert v.validation_info[17].brief == "Check of column `the table`. Step 18"
 
     # `row_count_match()`
-    assert v.validation_info[18].brief == "Check of column `{col}`. Step 19"
+    assert v.validation_info[18].brief == "Check of column `the table`. Step 19"
 
     # `col_count_match()`
-    assert v.validation_info[19].brief == "Check of column `{col}`. Step 20"
+    assert v.validation_info[19].brief == "Check of column `the table`. Step 20"
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
@@ -12044,6 +12044,101 @@ def test_process_action_str() -> None:
     assert partial_process_action_str(action_str="Action: {i} {ASSERTION} {SEVERITY} {time}") == (
         f"Action: 1 COL_VALS_GT WARNING {datetime_val}"
     )
+
+
+@pytest.mark.parametrize(
+    "assertion_type, col, value, lang, expected",
+    [
+        ("rows_distinct", None, None, "en", "on all columns ()"),
+        ("rows_complete", None, None, "de", "on alle Spalten ()"),
+        ("rows_distinct", ["a", "b"], None, "en", "on a, b ()"),
+        ("row_count_match", None, {"count": 13, "inverse": False}, "en", "on the table (13)"),
+        ("col_schema_match", None, {"schema": None, "complete": True}, "fr", "on la table ()"),
+        ("conjointly", None, {"expressions": (lambda df: True,)}, "en", "on the table ()"),
+        ("specially", None, lambda df: True, "en", "on the table ()"),
+        ("col_vals_regex", "b", {"pattern": "^x", "inverse": False}, "en", "on b (^x)"),
+        ("col_sum_gt", ["d"], {"value": 1, "tol": 0}, "en", "on d (1)"),
+        ("col_vals_in_set", "f", ["low", "mid"], "en", "on f (low, mid)"),
+        ("col_vals_between", "d", (1, 5), "en", "on d ((1, 5))"),
+    ],
+)
+def test_placeholders_for_any_step(assertion_type, col, value, lang, expected) -> None:
+    """`{col}` and `{value}` are always replaced, also for a step without a column or a value."""
+    action = _process_action_str(
+        action_str="on {col} ({value})",
+        step=1,
+        col=col,
+        value=value,
+        type=assertion_type,
+        level="warning",
+        time="",
+        lang=lang,
+    )
+    assert action == expected
+    assert (
+        _process_action_str(
+            action_str="on {column} ({val})",
+            step=1,
+            col=col,
+            value=value,
+            type=assertion_type,
+            level="warning",
+            time="",
+            lang=lang,
+        )
+        == action
+    )
+
+    brief = _process_brief(
+        brief="on {col} ({value})",
+        step=1,
+        col=col,
+        values=value,
+        thresholds=None,
+        segment=None,
+        assertion_type=assertion_type,
+        lang=lang,
+    )
+    assert brief == expected
+
+
+@pytest.mark.parametrize("lang", REPORTING_LANGUAGES)
+def test_placeholder_column_in_every_language(lang) -> None:
+    for assertion_type in ("rows_distinct", "row_count_match"):
+        text = _process_action_str(
+            action_str="{col}",
+            step=1,
+            col=None,
+            value=None,
+            type=assertion_type,
+            level="warning",
+            time="",
+            lang=lang,
+        )
+        assert text and "{" not in text
+
+
+def test_placeholders_in_actions_and_briefs_after_interrogation(capsys) -> None:
+    validation = (
+        Validate(
+            data=load_dataset("small_table"),
+            thresholds=Thresholds(warning=1),
+            actions=Actions(warning="Step {step} on {col} ({value})"),
+            lang="es",
+        )
+        .rows_distinct(brief="{col} distintas")
+        .row_count_match(count=1, brief="Filas de {col}: {value}")
+        .interrogate()
+    )
+
+    assert [step.brief for step in validation.validation_info] == [
+        "todas las columnas distintas",
+        "Filas de la tabla: 1",
+    ]
+    assert capsys.readouterr().out.splitlines() == [
+        "Step 1 on todas las columnas ()",
+        "Step 2 on la tabla (1)",
+    ]
 
 
 def test_process_data_dataframe_passthrough_polars() -> None:

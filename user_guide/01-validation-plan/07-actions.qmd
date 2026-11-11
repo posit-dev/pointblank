@@ -100,8 +100,10 @@ variety of situations. The following placeholders are available for use:
 - `{type}`: The validation step type where the action is executed (e.g., ‘col_vals_gt’, etc.)
 - `{level}`: The threshold level where the action is executed (‘warning’, ‘error’, or ‘critical’)
 - `{step}` or `{i}`: The step number in the validation workflow where the action is executed
-- `{col}` or `{column}`: The column name where the action is executed
-- `{val}` or `{value}`: An associated value for the validation method
+- `{col}` or `{column}`: The column name where the action is executed (for a step without a column,
+  "all columns" for `rows_distinct()` and `rows_complete()` or "the table" otherwise, in the
+  language set by `lang=`)
+- `{val}` or `{value}`: An associated value for the validation method (empty for a step without one)
 - `{time}`: A datetime value for when the action was executed
 
 Here's an example where we prepare a console message with a number of value placeholders
@@ -270,7 +272,8 @@ returned by `get_action_metadata()`.
 
 For example, some validation steps like [`Validate.col_vals_gt()`](`Validate.col_vals_gt`) provide a `value` field that can
 be accessed with `{value}` in string templates, while others like [`Validate.col_exists()`](`Validate.col_exists`) don't
-have this concept. When creating default actions, either use only the universally available
+have this concept (so `{value}` is left empty). Similarly, `{col}` names a column only for steps
+that have one. When creating default actions, either use only the universally available
 placeholders (`{step}`, `{level}`, `{type}`, and `{time}`), or include conditional logic in your
 callable functions to handle different validation types appropriately.
 

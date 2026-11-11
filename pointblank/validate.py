@@ -19418,6 +19418,8 @@ class Validate:
                 values=value,
                 thresholds=threshold,
                 segment=segment,
+                assertion_type=assertion_type,
+                lang=self.lang,
             )
 
             # Generate the autobrief description for the validation step; it's important to perform
@@ -20764,6 +20766,7 @@ class Validate:
                                         type=assertion_type,
                                         time=str(start_time),
                                         level=level,
+                                        lang=self.lang,
                                     )
 
                                     print(act)
@@ -20807,6 +20810,7 @@ class Validate:
                                         type=assertion_type,
                                         time=str(start_time),
                                         level=level,
+                                        lang=self.lang,
                                     )
 
                                     print(act)
@@ -27667,6 +27671,8 @@ def _process_brief(
     values: Any | None,
     thresholds: Any | None,
     segment: Any | None,
+    assertion_type: str | None = None,
+    lang: str = "en",
 ) -> str:
     # If there is no brief, return `None`
     if brief is None:
@@ -27677,22 +27683,13 @@ def _process_brief(
     brief = brief.replace("{step}", str(step))
     brief = brief.replace("{i}", str(step))
 
-    # If a `col` value is available for the validation step *and* the brief contains a placeholder
-    # for the column name then replace with `col`; placeholders are: {col} and {column}
-    if col is not None:
-        # If a list of columns is provided, then join the columns into a comma-separated string
-        if isinstance(col, list):
-            col = ", ".join(col)
+    # Replace a placeholder for the column name(s); placeholders are: {col} and {column}
+    col_text = _placeholder_column(col, assertion_type=assertion_type, lang=lang)
+    brief = brief.replace("{col}", col_text)
+    brief = brief.replace("{column}", col_text)
 
-        brief = brief.replace("{col}", col)
-        brief = brief.replace("{column}", col)
-
-    if values is not None:
-        # If the value is a list, then join the values into a comma-separated string
-        if isinstance(values, list):
-            values = ", ".join([str(v) for v in values])
-
-        brief = brief.replace("{value}", str(values))
+    # Replace a placeholder for the value(s), joining a list of them with commas
+    brief = brief.replace("{value}", _placeholder_value(values, assertion_type=assertion_type))
 
     if thresholds is not None:
         # Get the string representation of thresholds in the form of:
@@ -28101,35 +28098,69 @@ def _transform_auto_brief(brief: str | bool | None) -> str | None:
         return brief
 
 
+# The steps without a column that check all the columns of each row (unless given a subset)
+_ALL_COLUMNS_STEPS = ("rows_distinct", "rows_complete")
+
+# The setting shown for a `{value}` placeholder by a step that keeps its settings in a dict (the
+# `"value"` setting if the step isn't listed, as for `col_sum_gt()`)
+_PLACEHOLDER_VALUE_KEYS = {
+    "col_vals_regex": "pattern",
+    "col_vals_within_spec": "spec",
+    "col_pct_null": "p",
+    "row_count_match": "count",
+    "col_count_match": "count",
+    "data_freshness": "max_age_str",
+}
+
+
+def _placeholder_column(col: Any, assertion_type: str | None, lang: str) -> str:
+    """
+    Get the text for a `{col}` placeholder: the step's column(s), or, for a step without a column,
+    what it checks ("all columns" or "the table", in the language of the reporting).
+    """
+    if col is None:
+        key = "all_columns_text" if assertion_type in _ALL_COLUMNS_STEPS else "table_text"
+        return EXPECT_FAIL_TEXT[key][lang]
+    if isinstance(col, list):
+        return ", ".join(str(c) for c in col)
+    return str(col)
+
+
+def _placeholder_value(values: Any, assertion_type: str | None) -> str:
+    """Get the text for a `{value}` placeholder (empty for a step without a value to show)."""
+    if isinstance(values, dict):
+        values = values.get(_PLACEHOLDER_VALUE_KEYS.get(assertion_type, "value"))
+    if values is None or callable(values):
+        return ""
+    if isinstance(values, list):
+        return ", ".join(str(v) for v in values)
+    return str(values)
+
+
 def _process_action_str(
     action_str: str,
     step: int,
-    col: str | None,
+    col: str | list[str] | None,
     value: Any,
     type: str,
     level: str,
     time: str,
+    lang: str = "en",
 ) -> str:
     # If the action string contains a placeholder for the step number then replace with `step`;
     # placeholders are: {step} and {i}
     action_str = action_str.replace("{step}", str(step))
     action_str = action_str.replace("{i}", str(step))
 
-    # If a `col` value is available for the validation step *and* the action string contains a
-    # placeholder for the column name then replace with `col`; placeholders are: {col} and {column}
-    if col is not None:
-        # If a list of columns is provided, then join the columns into a comma-separated string
-        if isinstance(col, list):
-            col = ", ".join(col)  # pragma: no cover
+    # Replace a placeholder for the column name(s); placeholders are: {col} and {column}
+    col_text = _placeholder_column(col, assertion_type=type, lang=lang)
+    action_str = action_str.replace("{col}", col_text)
+    action_str = action_str.replace("{column}", col_text)
 
-        action_str = action_str.replace("{col}", col)
-        action_str = action_str.replace("{column}", col)
-
-    # If a `value` value is available for the validation step *and* the action string contains a
-    # placeholder for the value then replace with `value`; placeholders are: {value} and {val}
-    if value is not None:
-        action_str = action_str.replace("{value}", str(value))
-        action_str = action_str.replace("{val}", str(value))
+    # Replace a placeholder for the value; placeholders are: {value} and {val}
+    value_text = _placeholder_value(value, assertion_type=type)
+    action_str = action_str.replace("{value}", value_text)
+    action_str = action_str.replace("{val}", value_text)
 
     # If the action string contains a `type` placeholder then replace with `type` either in
     # lowercase or uppercase; placeholders for the lowercase form are {type} and {assertion}
