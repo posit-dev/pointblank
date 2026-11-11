@@ -65,8 +65,8 @@ Displaying console messages may be a simple approach, but it is effective. And t
 - `{type}`: The validation step type where the action is executed (e.g., 'col_vals_gt', etc.)
 - `{level}`: The threshold level where the action is executed ('warning', 'error', or 'critical')
 - `{step}` or `{i}`: The step number in the validation workflow where the action is executed
-- `{col}` or `{column}`: The column name where the action is executed
-- `{val}` or `{value}`: An associated value for the validation method
+- `{col}` or `{column}`: The column name where the action is executed (for a step without a column, "all columns" for `rows_distinct()` and `rows_complete()` or "the table" otherwise, in the language set by `lang=`)
+- `{val}` or `{value}`: An associated value for the validation method (empty for a step without one)
 - `{time}`: A datetime value for when the action was executed
 
 Here's an example where we prepare a console message with a number of value placeholders (`action_str`) and use it globally at `Actions(critical=)`:
@@ -89,8 +89,8 @@ action_str = "[{LEVEL}: {TYPE}]: Step {step} has failed validation. ({time})"
 )
 ```
 
-    [CRITICAL: COL_VALS_GT]: Step 2 has failed validation. (2026-11-11 18:50:21.610702+00:00)
-    [CRITICAL: COL_VALS_GE]: Step 3 has failed validation. (2026-11-11 18:50:21.710116+00:00)
+    [CRITICAL: COL_VALS_GT]: Step 2 has failed validation. (2026-11-11 19:37:56.859784+00:00)
+    [CRITICAL: COL_VALS_GE]: Step 3 has failed validation. (2026-11-11 19:37:56.967444+00:00)
 
 [TABLE]
 
@@ -122,7 +122,7 @@ def duration_issue():
 )
 ```
 
-    Data quality issue found (2026-11-11 18:50:22.654587).
+    Data quality issue found (2026-11-11 19:37:57.909943).
 
 [TABLE]
 
@@ -221,7 +221,7 @@ The `default=` parameter sets the same action for all threshold levels. If you l
 
 When using the `default=` parameter, be aware that your action (whether a string template or callable function) needs to work across all validation steps where thresholds might be exceeded. Not all validation methods provide the same context for string templates or in the metadata dictionary returned by [get_action_metadata()](../../reference/get_action_metadata.md#pointblank.get_action_metadata).
 
-For example, some validation steps like [`Validate.col_vals_gt()`](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) provide a `value` field that can be accessed with `{value}` in string templates, while others like [`Validate.col_exists()`](../../reference/Validate.col_exists.md#pointblank.Validate.col_exists) don't have this concept. When creating default actions, either use only the universally available placeholders (`{step}`, `{level}`, `{type}`, and `{time}`), or include conditional logic in your callable functions to handle different validation types appropriately.
+For example, some validation steps like [`Validate.col_vals_gt()`](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) provide a `value` field that can be accessed with `{value}` in string templates, while others like [`Validate.col_exists()`](../../reference/Validate.col_exists.md#pointblank.Validate.col_exists) don't have this concept (so `{value}` is left empty). Similarly, `{col}` names a column only for steps that have one. When creating default actions, either use only the universally available placeholders (`{step}`, `{level}`, `{type}`, and `{time}`), or include conditional logic in your callable functions to handle different validation types appropriately.
 
 ### Controlling Action Execution with `highest_only=`
 

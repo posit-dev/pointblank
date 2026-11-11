@@ -73,7 +73,7 @@ Briefs support templating elements that get replaced with specific values:
 
 - `{auto}`: an auto-generated description of the validation
 - `{step}`: the step number in the validation plan
-- `{col}`: the column name(s) being validated
+- `{col}`: the column name(s) being validated ("all columns" for `rows_distinct()` and `rows_complete()` without a subset, or "the table" for other steps without a column)
 - `{value}`: the comparison value used in the validation (when applicable)
 - `{thresholds}`: a short summary of thresholds levels set (or unset) for the step
 - `{segment}`, `{segment_column}`, `{segment_value}`: information on the step's segment
@@ -99,7 +99,7 @@ Here's how to use these templates:
 
 These template elements make briefs highly flexible and customizable. You can combine multiple templating elements in a single brief to create descriptive yet concise validation step descriptions. The templates help maintain consistency across your validation reports while providing enough detail to understand what each step is checking.
 
-Note that not all templating elements will be relevant for every validation step. For instance, `{value}` is only applicable to validation functions that hold a comparison value like [`Validate.col_vals_gt()`](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt). If you include a templating element that isn't relevant to a particular step, it will not be replaced with a corresponding value.
+Note that not all templating elements will be relevant for every validation step. For instance, `{value}` is only applicable to validation functions that hold a comparison value like [`Validate.col_vals_gt()`](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), and it's left empty for a step without one. The text that `{col}` gives for a step without a column is in the language set by `lang=`. Other templating elements that aren't relevant to a particular step (e.g., `{segment}` in a step without segments) are not replaced.
 
 Briefs support the use of Markdown formatting, allowing you to add emphasis with **bold** or *italic* text, include `inline code` formatting, or other Markdown elements to make your briefs more visually distinctive and informative. This can be especially helpful when you want certain parts of your briefs to stand out in the validation report.
 

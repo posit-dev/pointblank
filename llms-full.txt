@@ -747,9 +747,12 @@ When using a string as an action, you can include placeholders for the following
 - `{level}`: The threshold level where the action is executed ('warning', 'error', or
 'critical')
 - `{step}` or `{i}`: The step number in the validation workflow where the action is executed
-- `{col}` or `{column}`: The column name where the action is executed
+- `{col}` or `{column}`: The column name where the action is executed (for a step without a
+column, 'all columns' for `rows_distinct()` and `rows_complete()` or 'the table' otherwise, in
+the language of the validation's `lang=`)
 - `{val}` or `{value}`: An associated value for the validation method (e.g., the value to
-compare against in a 'col_vals_gt' validation step)
+compare against in a 'col_vals_gt' validation step, or the count in a 'row_count_match' step);
+it's empty for a step without one
 - `{time}`: A datetime value for when the action was executed
 
 The first two placeholders can also be used in uppercase (e.g., `{TYPE}` or `{LEVEL}`) and the
@@ -39152,8 +39155,10 @@ variety of situations. The following placeholders are available for use:
 - `{type}`: The validation step type where the action is executed (e.g., ‘col_vals_gt’, etc.)
 - `{level}`: The threshold level where the action is executed (‘warning’, ‘error’, or ‘critical’)
 - `{step}` or `{i}`: The step number in the validation workflow where the action is executed
-- `{col}` or `{column}`: The column name where the action is executed
-- `{val}` or `{value}`: An associated value for the validation method
+- `{col}` or `{column}`: The column name where the action is executed (for a step without a column,
+  "all columns" for `rows_distinct()` and `rows_complete()` or "the table" otherwise, in the
+  language set by `lang=`)
+- `{val}` or `{value}`: An associated value for the validation method (empty for a step without one)
 - `{time}`: A datetime value for when the action was executed
 
 Here's an example where we prepare a console message with a number of value placeholders
@@ -39322,7 +39327,8 @@ returned by `get_action_metadata()`.
 
 For example, some validation steps like [`Validate.col_vals_gt()`](`Validate.col_vals_gt`) provide a `value` field that can
 be accessed with `{value}` in string templates, while others like [`Validate.col_exists()`](`Validate.col_exists`) don't
-have this concept. When creating default actions, either use only the universally available
+have this concept (so `{value}` is left empty). Similarly, `{col}` names a column only for steps
+that have one. When creating default actions, either use only the universally available
 placeholders (`{step}`, `{level}`, `{type}`, and `{time}`), or include conditional logic in your
 callable functions to handle different validation types appropriately.
 
@@ -39672,7 +39678,8 @@ Briefs support templating elements that get replaced with specific values:
 
 - `{auto}`: an auto-generated description of the validation
 - `{step}`: the step number in the validation plan
-- `{col}`: the column name(s) being validated
+- `{col}`: the column name(s) being validated ("all columns" for `rows_distinct()` and
+  `rows_complete()` without a subset, or "the table" for other steps without a column)
 - `{value}`: the comparison value used in the validation (when applicable)
 - `{thresholds}`: a short summary of thresholds levels set (or unset) for the step
 - `{segment}`, `{segment_column}`, `{segment_value}`: information on the step's segment
@@ -39701,8 +39708,10 @@ enough detail to understand what each step is checking.
 
 Note that not all templating elements will be relevant for every validation step. For instance,
 `{value}` is only applicable to validation functions that hold a comparison value like
-[`Validate.col_vals_gt()`](`Validate.col_vals_gt`). If you include a templating element that isn't relevant to a particular
-step, it will not be replaced with a corresponding value.
+[`Validate.col_vals_gt()`](`Validate.col_vals_gt`), and it's left empty for a step without one. The text that `{col}` gives
+for a step without a column is in the language set by `lang=`. Other templating elements that
+aren't relevant to a particular step (e.g., `{segment}` in a step without segments) are not
+replaced.
 
 Briefs support the use of Markdown formatting, allowing you to add emphasis with **bold** or
 _italic_ text, include `inline code` formatting, or other Markdown elements to make your briefs more

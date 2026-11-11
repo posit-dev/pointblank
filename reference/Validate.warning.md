@@ -4,7 +4,7 @@ Get the 'warning' level status for each validation step.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21888-L21991)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21892-L21995)
 
 ``` python
 Validate.warning(

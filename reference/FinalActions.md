@@ -4,7 +4,7 @@ Define actions to be taken after validation is complete.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/thresholds.py#L504-L660)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/thresholds.py#L507-L663)
 
 ``` python
 FinalActions(*actions)

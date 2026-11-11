@@ -4,7 +4,7 @@ Execute each validation step against the table and store the results.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19244-L20984)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19244-L20988)
 
 ``` python
 Validate.interrogate(

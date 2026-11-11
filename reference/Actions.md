@@ -4,7 +4,7 @@ Definition of action values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/thresholds.py#L294-L501)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/thresholds.py#L294-L504)
 
 ``` python
 Actions(
@@ -59,8 +59,8 @@ When using a string as an action, you can include placeholders for the following
 - `{type}`: The validation step type where the action is executed (e.g., 'col_vals_gt', 'col_vals_lt', etc.)
 - `{level}`: The threshold level where the action is executed ('warning', 'error', or 'critical')
 - `{step}` or `{i}`: The step number in the validation workflow where the action is executed
-- `{col}` or `{column}`: The column name where the action is executed
-- `{val}` or `{value}`: An associated value for the validation method (e.g., the value to compare against in a 'col_vals_gt' validation step)
+- `{col}` or `{column}`: The column name where the action is executed (for a step without a column, 'all columns' for `rows_distinct()` and `rows_complete()` or 'the table' otherwise, in the language of the validation's `lang=`)
+- `{val}` or `{value}`: An associated value for the validation method (e.g., the value to compare against in a 'col_vals_gt' validation step, or the count in a 'row_count_match' step); it's empty for a step without one
 - `{time}`: A datetime value for when the action was executed
 
 The first two placeholders can also be used in uppercase (e.g., `{TYPE}` or `{LEVEL}`) and the corresponding values will be displayed in uppercase. The placeholders are replaced with the actual values during interrogation.
@@ -125,7 +125,7 @@ validation = (
 validation
 ```
 
-    Data quality issue found (2026-11-09 15:46:42.579198).
+    Data quality issue found (2026-11-11 19:31:10.566341).
 
 [TABLE]
 
