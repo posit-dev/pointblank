@@ -758,6 +758,18 @@ def reranker(
     return _Reranker(provider, model, query, document, api_key, name, version, batch_size)
 
 
+def _keywords_taken(fn: Callable[..., Any], kwargs: dict[str, Any]) -> dict[str, Any]:
+    """Get the keyword arguments in `kwargs` that `fn` takes (all of them if it takes `**kwargs`)."""
+    try:
+        params = inspect.signature(fn).parameters.values()
+    except (TypeError, ValueError):
+        return kwargs
+    if any(p.kind is p.VAR_KEYWORD for p in params):
+        return kwargs
+    names = {p.name for p in params if p.kind in (p.POSITIONAL_OR_KEYWORD, p.KEYWORD_ONLY)}
+    return {key: value for key, value in kwargs.items() if key in names}
+
+
 class _Classifier(_Adapter):
     _kind = "classifier"
     _label = "CLASSIFIER"
@@ -780,6 +792,15 @@ class _Classifier(_Adapter):
         ):
             raise ValueError('`function_to_apply=` must be "sigmoid", "softmax", or "none".')
         _check_column(column)
+        if (
+            function_to_apply is not None
+            and not isinstance(hf_model, str)
+            and not _keywords_taken(hf_model, {"function_to_apply": function_to_apply})
+        ):
+            raise ValueError(
+                "`function_to_apply=` needs a model name or a pipeline; the function given as "
+                "`hf_model=` doesn't take it."
+            )
         self._hf_model = hf_model
         self._target = label
         self._column = column
@@ -827,7 +848,9 @@ class _Classifier(_Adapter):
         kwargs: dict[str, Any] = {"top_k": None, "truncation": True}
         if self._function_to_apply is not None:
             kwargs["function_to_apply"] = self._function_to_apply
-        outputs = self._get_pipeline()(texts, **kwargs)
+        pipe = self._get_pipeline()
+        # A pipeline takes all of these, while a function of a list of texts may take none of them
+        outputs = pipe(texts, **_keywords_taken(pipe, kwargs))
         if len(texts) == 1 and outputs and isinstance(outputs[0], dict):
             outputs = [outputs]
         scores = []
@@ -876,7 +899,8 @@ def classifier(
         The model: the name of a model on the Hugging Face Hub (e.g.,
         `"HuggingFaceFW/fineweb-edu-classifier"`), or a `transformers` text-classification
         pipeline (or any function that takes a list of texts and returns, for each, a list of
-        `{"label": ..., "score": ...}` dictionaries).
+        `{"label": ..., "score": ...}` dictionaries). A function is given the pipeline's
+        `top_k=`, `truncation=`, and `function_to_apply=` arguments only if it takes them.
     label
         The label whose score is the score of a row. It can be left out for a model with one
         output.
@@ -884,7 +908,8 @@ def classifier(
         The column with the text to score. It can be left out if the step has one column.
     function_to_apply
         How the model's outputs are turned into scores: `"sigmoid"`, `"softmax"`, or `"none"`
-        (the raw outputs, e.g., for a regression model). By default, the pipeline chooses.
+        (the raw outputs, e.g., for a regression model). By default, the pipeline chooses. It
+        can't be used with a function that doesn't take it.
     device
         The device that the model runs on (e.g., `"cuda"`, `"mps"`, or `-1` for the CPU), when
         the model is given by name.
