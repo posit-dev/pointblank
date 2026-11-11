@@ -912,6 +912,45 @@ class TestPipelineEdgeCases:
         assert result.target_passed is False
         assert result.transform_output is not None
 
+    def test_conjointly_steps(self, raw_data, transform_fn):
+        """A `conjointly` step's `exprs=` are given to `conjointly()` positionally."""
+        source = Contract(
+            name="raw_orders",
+            direction="source",
+            steps=[
+                Step(
+                    "conjointly",
+                    exprs=[
+                        lambda df: pl.col("id") > 0,
+                        lambda df: pl.col("amount_cents") > 0,
+                    ],
+                )
+            ],
+        )
+        target = Contract(
+            name="clean_orders",
+            direction="target",
+            steps=[
+                Step(
+                    "conjointly",
+                    exprs=[lambda df: pl.col("amount") > 150],
+                    brief="Large amounts",
+                )
+            ],
+        )
+        result = Pipeline(source=source, target=target).run(data=raw_data, transform=transform_fn)
+
+        source_info = result.source_validation.validation_info[0]
+        assert source_info.assertion_type == "conjointly"
+        assert source_info.eval_error is not True
+        assert result.source_passed is True
+
+        target_info = result.target_validation.validation_info[0]
+        assert target_info.assertion_type == "conjointly"
+        assert target_info.brief == "Large amounts"
+        assert target_info.n_failed == 2
+        assert result.target_passed is False
+
 
 # ─── Additional Coverage Tests ───────────────────────────────────────────────────
 
