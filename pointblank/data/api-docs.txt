@@ -19677,6 +19677,40 @@ SplitCheck(values: 'dict[str, dict[str, list[Any]]]', schema: 'dict[str, Any]', 
         The problems found, as messages: overlapping rows, missing or unseen labels, and major
         changes in distribution (a PSI of at least 0.2). A moderate change isn't an issue, but
         it's shown in the report.
+
+    Examples
+    --------
+    Here are the training and test splits of a small dataset of animals, labelled as pets or
+    wild animals. One test row is also in the training split.
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    train = pl.DataFrame(
+        {"text": ["a cat", "a dog", "a bird", "a fish"], "label": ["pet", "pet", "wild", "wild"]}
+    )
+    test = pl.DataFrame({"text": ["a dog", "a frog"], "label": ["pet", "pet"]})
+
+    check = pb.check_splits(train=train, test=test, columns="text", label="label")
+    check.overlap
+    ```
+
+    One of the two test rows is the same as a training row. The test split also has no wild
+    animals, which shows in the check of the labels:
+
+    ```python
+    check.labels["missing"]
+    ```
+
+    Every problem is in `issues`, as a message:
+
+    ```python
+    check.issues
+    ```
+
+    The `ok` property is `True` only when there are no issues, so a pipeline can stop when it's
+    `False`.
     
 
 check_synthetic(synthetic: 'Any', seed: 'Any', *, columns: 'str | list[str] | None' = None, text: 'str | list[str] | None' = None, near: 'bool' = True, threshold: 'float' = 0.8, ngram: 'int' = 5, num_perm: 'int' = 128, fidelity_columns: 'str | list[str] | bool | None' = None) -> 'SyntheticCheck'
@@ -19823,6 +19857,38 @@ SyntheticCheck(values: 'dict[str, dict[str, list[Any]]]', numeric: 'dict[str, bo
         changes of at least 10 percentage points in the share of missing values, more repeated
         rows, text that's less diverse, and copies. A moderate change isn't an issue, but it's
         shown in the report.
+
+    Examples
+    --------
+    Here's a seed of four people, and four synthetic people made from it. The second synthetic
+    person is the same as the second real one.
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    seed = pl.DataFrame({"name": ["Ana", "Ben", "Cleo", "Dev"], "age": [34, 51, 27, 45]})
+    synthetic = pl.DataFrame({"name": ["Dan", "Ben", "Eve", "Fay"], "age": [40, 51, 29, 44]})
+
+    check = pb.check_synthetic(synthetic, seed)
+    check.copies
+    ```
+
+    One synthetic row (a quarter of them) is a copy. The ages are compared too. Four rows are too
+    few for a PSI, so the level of the change is `None`, but there's still a KS statistic:
+
+    ```python
+    check.fidelity
+    ```
+
+    Every problem is in `issues`, as a message:
+
+    ```python
+    check.issues
+    ```
+
+    The `ok` property is `True` only when there are no issues, so a pipeline can stop when it's
+    `False`.
     
 
 Ablation(validation: 'Validate', evaluate: 'Callable[..., Any] | None' = None, metric: 'str | None' = None, higher_is_better: 'bool' = True, repeats: 'int' = 5, seed: 'int' = 0, control: 'str | Stratified | None' = 'size_matched', duplicates: 'str | None' = 'keep_first', duplicates_order_by: 'str | list[str] | None' = None, max_removed: 'float' = 0.5, conf_level: 'float' = 0.95, adjust: 'str | None' = 'holm', label: 'str | None' = None, evaluate_version: 'str | None' = None, cache: 'str | os.PathLike[str] | None' = None, holdout: 'Any' = None, ci: 'str' = 't', pass_as: 'str' = 'table') -> 'None'
