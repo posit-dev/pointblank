@@ -275,6 +275,38 @@ class SyntheticCheck:
         changes of at least 10 percentage points in the share of missing values, more repeated
         rows, text that's less diverse, and copies. A moderate change isn't an issue, but it's
         shown in the report.
+
+    Examples
+    --------
+    Here's a seed of four people, and four synthetic people made from it. The second synthetic
+    person is the same as the second real one.
+
+    ```{python}
+    import pointblank as pb
+    import polars as pl
+
+    seed = pl.DataFrame({"name": ["Ana", "Ben", "Cleo", "Dev"], "age": [34, 51, 27, 45]})
+    synthetic = pl.DataFrame({"name": ["Dan", "Ben", "Eve", "Fay"], "age": [40, 51, 29, 44]})
+
+    check = pb.check_synthetic(synthetic, seed)
+    check.copies
+    ```
+
+    One synthetic row (a quarter of them) is a copy. The ages are compared too. Four rows are too
+    few for a PSI, so the level of the change is `None`, but there's still a KS statistic:
+
+    ```{python}
+    check.fidelity
+    ```
+
+    Every problem is in `issues`, as a message:
+
+    ```{python}
+    check.issues
+    ```
+
+    The `ok` property is `True` only when there are no issues, so a pipeline can stop when it's
+    `False`.
     """
 
     def __init__(
@@ -493,6 +525,24 @@ class SyntheticCheck:
         dict
             The sizes of the tables, the settings, and the results of the checks of fidelity,
             diversity, and copies, with the issues found.
+
+        Examples
+        --------
+        ```{python}
+        import json
+
+        import pointblank as pb
+        import polars as pl
+
+        seed = pl.DataFrame({"name": ["Ana", "Ben", "Cleo"], "age": [34, 51, 27]})
+        synthetic = pl.DataFrame({"name": ["Dan", "Ben", "Eve"], "age": [40, 51, 27]})
+
+        results = pb.check_synthetic(synthetic, seed).to_dict()
+        print(json.dumps({"copies": results["copies"], "issues": results["issues"]}, indent=2))
+        ```
+
+        The dictionary holds only plain values, so it can be written as JSON and kept with the
+        synthetic data, or compared with the results for another batch of it.
         """
         return {
             "rows": dict(self.rows),
