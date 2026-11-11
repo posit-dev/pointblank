@@ -530,7 +530,12 @@ class Validate:
     ) -> Validate: ...
     def rows_distinct(
         self,
-        columns_subset: str | list[str] | None = None,
+        columns_subset: str
+        | list[str]
+        | Column
+        | ColumnSelector
+        | ColumnSelectorNarwhals
+        | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -541,7 +546,12 @@ class Validate:
     ) -> Validate: ...
     def rows_complete(
         self,
-        columns_subset: str | list[str] | None = None,
+        columns_subset: str
+        | list[str]
+        | Column
+        | ColumnSelector
+        | ColumnSelectorNarwhals
+        | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,

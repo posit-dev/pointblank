@@ -9073,7 +9073,7 @@ Does the column standard deviation satisfy an equal to comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `25.0684 == 26.1454` (the standard deviation of `revenue` in `current`, then in `baseline`), so it fails. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+rows_distinct(self, columns_subset: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether rows in the table are distinct.
 
@@ -9094,7 +9094,9 @@ rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
             A single column or a list of columns to use as a subset for the distinct comparison.
             If `None`, then all columns in the table will be used for the comparison. If multiple
             columns are supplied, the distinct comparison will be made over the combination of
-            values in those columns.
+            values in those columns. A column selector (e.g.,
+            [`starts_with()`](`pointblank.starts_with`)) can be used too, and the columns it
+            selects are compared together in a single validation step.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -9283,7 +9285,7 @@ rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
         others.
         
 
-rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+rows_complete(self, columns_subset: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 
         Validate whether row data are complete by having no missing values.
 
@@ -9298,7 +9300,9 @@ rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
         ----------
         columns_subset
             A single column or a list of columns to use as a subset for the completeness check. If
-            `None` (the default), then all columns in the table will be used.
+            `None` (the default), then all columns in the table will be used. A column selector
+            (e.g., [`starts_with()`](`pointblank.starts_with`)) can be used too, and the columns it
+            selects are checked together in a single validation step.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.

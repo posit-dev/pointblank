@@ -806,6 +806,18 @@ def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
     return columns
 
 
+def _resolve_columns_subset(
+    columns_subset: _PBUnresolvedColumn | None,
+) -> Column | list[str] | None:
+    # A selector becomes a `Column` that's resolved at interrogation, where all the columns it
+    # selects are used together in one step (unlike `columns=`, which makes a step per column)
+    if isinstance(columns_subset, (ColumnSelector, nw.selectors.Selector)):
+        return col(columns_subset)
+    if isinstance(columns_subset, str):
+        return [columns_subset]
+    return columns_subset
+
+
 def _narwhals_expr_nodes(expr: nw.Expr) -> list[Any]:
     # Narwhals doesn't have a public API for inspecting expressions so this relies on the
     # `_nodes` attribute (present in recent versions); callers must guard against failure
