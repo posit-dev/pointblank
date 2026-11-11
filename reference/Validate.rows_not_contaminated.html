@@ -2043,7 +2043,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15369-L15618" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15376-L15625" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">rows_not_contaminated</span>(</span>
@@ -2164,7 +2164,7 @@ If <code>method=</code> isn’t <code>"ngram"</code>, <code>"exact"</code>, or <
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a small table of training documents and a benchmark of two questions. One document contains the first question of the benchmark, word for word.</p>
-<div id="829f43c6" class="cell" data-execution_count="2">
+<div id="adc01d35" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2192,7 +2192,7 @@ If <code>method=</code> isn’t <code>"ngram"</code>, <code>"exact"</code>, or <
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Let’s validate that no training document overlaps with the benchmark’s questions.</p>
-<div id="ba58ef79" class="cell" data-execution_count="3">
+<div id="e674245d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>train)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .rows_not_contaminated(</span>
@@ -2364,7 +2364,7 @@ If <code>method=</code> isn’t <code>"ngram"</code>, <code>"exact"</code>, or <
 </div>
 </div>
 <p>The second document fails: it shares a run of 13 words (in fact, the whole question) with the benchmark. The step report shows the benchmark question that it matched, in the <code>pb_match_</code> column.</p>
-<div id="4a7513db" class="cell" data-execution_count="4">
+<div id="123b1c5e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

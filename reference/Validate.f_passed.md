@@ -4,7 +4,7 @@ Provides a dictionary of the fraction of test units that passed for each validat
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21722-L21805)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21729-L21812)
 
 ``` python
 Validate.f_passed(

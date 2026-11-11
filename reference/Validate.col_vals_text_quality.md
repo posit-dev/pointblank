@@ -4,7 +4,7 @@ Validate whether text passes the heuristic quality filters of web text.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15873-L16090)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15880-L16097)
 
 ``` python
 Validate.col_vals_text_quality(

@@ -4,7 +4,7 @@ Access validation summary information when authoring final actions.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L328-L461)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L329-L462)
 
 ``` python
 get_validation_summary()

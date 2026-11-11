@@ -4,7 +4,7 @@ Raise an `AssertionError` if any dimension's health score falls below a minimum.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L23601-L23726)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L23608-L23733)
 
 ``` python
 Validate.assert_dimension_scores(

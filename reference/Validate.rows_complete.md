@@ -4,7 +4,7 @@ Validate whether row data are complete by having no missing values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13799-L14054)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13802-L14061)
 
 ``` python
 Validate.rows_complete(
@@ -23,8 +23,8 @@ The `rows_complete()` method checks whether rows in the table are complete. Comp
 
 ## Parameters
 
-`columns_subset: str | list[str] | None = None`  
-A single column or a list of columns to use as a subset for the completeness check. If `None` (the default), then all columns in the table will be used.
+`columns_subset: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals | None = None`  
+A single column or a list of columns to use as a subset for the completeness check. If `None` (the default), then all columns in the table will be used. A column selector (e.g., [`starts_with()`](../reference/starts_with.md#pointblank.starts_with)) can be used too, and the columns it selects are checked together in a single validation step.
 
 `pre: Callable | None = None`  
 An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the *Preprocessing* section for more information on how to use this argument.

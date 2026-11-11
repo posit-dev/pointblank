@@ -4,7 +4,7 @@ Validate whether column values are well-formed chat conversations.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15620-L15871)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15627-L15878)
 
 ``` python
 Validate.col_vals_chat_format(

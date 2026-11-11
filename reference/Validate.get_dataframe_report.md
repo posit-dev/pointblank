@@ -4,7 +4,7 @@ Get a report of the validation results as a DataFrame.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L26378-L26744)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L26385-L26751)
 
 ``` python
 Validate.get_dataframe_report(tbl_type="polars")

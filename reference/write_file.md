@@ -4,7 +4,7 @@ Write a Validate object to disk as a serialized file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1210-L1561)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L1211-L1562)
 
 ``` python
 write_file(

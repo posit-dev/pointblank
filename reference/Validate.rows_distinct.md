@@ -4,7 +4,7 @@ Validate whether rows in the table are distinct.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13536-L13797)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13535-L13800)
 
 ``` python
 Validate.rows_distinct(
@@ -25,8 +25,8 @@ Duplicate rows often come from loading the same data twice or from a join that m
 
 ## Parameters
 
-`columns_subset: str | list[str] | None = None`  
-A single column or a list of columns to use as a subset for the distinct comparison. If `None`, then all columns in the table will be used for the comparison. If multiple columns are supplied, the distinct comparison will be made over the combination of values in those columns.
+`columns_subset: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals | None = None`  
+A single column or a list of columns to use as a subset for the distinct comparison. If `None`, then all columns in the table will be used for the comparison. If multiple columns are supplied, the distinct comparison will be made over the combination of values in those columns. A column selector (e.g., [`starts_with()`](../reference/starts_with.md#pointblank.starts_with)) can be used too, and the columns it selects are compared together in a single validation step.
 
 `pre: Callable | None = None`  
 An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the *Preprocessing* section for more information on how to use this argument.
