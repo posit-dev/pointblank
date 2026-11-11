@@ -538,11 +538,10 @@ def _check_nulls_across_columns_nw(table, columns_subset):
     # Get all column names from the table
     column_names = columns_subset if columns_subset else table.columns
 
-    # Build the expression by combining each column's `is_null()` with OR operations
+    # Build the expression by combining each column's null (or NaN) check with OR operations
     null_expr = functools.reduce(
-        lambda acc, col: acc | nw.col(col).is_null() if acc is not None else nw.col(col).is_null(),
-        column_names,
-        None,
+        lambda acc, expr: acc | expr,
+        [_safe_is_nan_or_null_expr(table, nw.col(col), col) for col in column_names],
     )
 
     # Add the expression as a new column to the table
@@ -793,19 +792,22 @@ def col_pct_null_details(
     """
     nw_frame = nw.from_native(data_tbl)
 
+    # A NaN in a float column counts as a null value
+    null_expr = _safe_is_nan_or_null_expr(data_tbl, nw.col(column), column)
+
     # Use lazy-compatible aggregation to get total rows and null count
     # Cast boolean to Int32 before sum to support PySpark which can't sum booleans
     if is_narwhals_lazyframe(nw_frame):
         stats = nw_frame.select(
             total_rows=nw.len(),
-            n_null=nw.col(column).is_null().cast(nw.Int32).sum(),
+            n_null=null_expr.cast(nw.Int32).sum(),
         ).collect()
         total_rows: int = int(stats["total_rows"][0])
         n_null: int = int(stats["n_null"][0])
     else:
         assert is_narwhals_dataframe(nw_frame)
         total_rows = int(nw_frame.select(nw.len()).item())
-        n_null = int(nw_frame.select(nw.col(column).is_null().cast(nw.Int32).sum()).item())
+        n_null = int(nw_frame.select(null_expr.cast(nw.Int32).sum()).item())
 
     abs_target: float = round(total_rows * p)
     lower_bound, upper_bound = bound_finder(abs_target)
@@ -2002,7 +2004,9 @@ def interrogate_null(tbl: IntoFrame, column: str) -> Any:
 
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
-    result_tbl = nw_tbl.with_columns(pb_is_good_=nw.col(column).is_null())
+    result_tbl = nw_tbl.with_columns(
+        pb_is_good_=_safe_is_nan_or_null_expr(tbl, nw.col(column), column)
+    )
     return result_tbl.to_native()
 
 
@@ -2011,7 +2015,9 @@ def interrogate_not_null(tbl: IntoFrame, column: str) -> Any:
 
     nw_tbl = nw.from_native(tbl)
     assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
-    result_tbl = nw_tbl.with_columns(pb_is_good_=~nw.col(column).is_null())
+    result_tbl = nw_tbl.with_columns(
+        pb_is_good_=~_safe_is_nan_or_null_expr(tbl, nw.col(column), column)
+    )
     return result_tbl.to_native()
 
 

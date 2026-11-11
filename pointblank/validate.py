@@ -10801,6 +10801,9 @@ class Validate:
         proportion of nulls in a column rather than every value, use
         [`col_pct_null()`](`pointblank.Validate.col_pct_null`).
 
+        A `NaN` in a float column counts as a null value on every backend (as in comparison
+        methods such as [`col_vals_gt()`](`pointblank.Validate.col_vals_gt`)), so it passes.
+
         Parameters
         ----------
         columns
@@ -11069,6 +11072,9 @@ class Validate:
         their proportion with [`col_pct_null()`](`pointblank.Validate.col_pct_null`); and when
         missing values are recorded with codes such as `-99`, see
         [`col_missing_coded()`](`pointblank.Validate.col_missing_coded`).
+
+        A `NaN` in a float column counts as a null value on every backend (as in comparison
+        methods such as [`col_vals_gt()`](`pointblank.Validate.col_vals_gt`)), so it fails.
 
         Parameters
         ----------
@@ -12609,7 +12615,8 @@ class Validate:
         column matches a specified percentage `p=` (within an optional tolerance `tol=`). This
         validation operates at the column level, generating a single validation step per column that
         passes or fails based on whether the actual percentage of Null values falls within the
-        acceptable range defined by `p ± tol`.
+        acceptable range defined by `p ± tol`. A `NaN` in a float column counts as a Null value on
+        every backend.
 
         Parameters
         ----------
@@ -13793,7 +13800,8 @@ class Validate:
         of a row means that there are no missing values within the row. This validation will operate
         over the number of test units that is equal to the number of rows in the table (determined
         after any `pre=` mutation has been applied). A subset of columns can be specified for the
-        completeness check. If no subset is provided, all columns in the table will be used.
+        completeness check. If no subset is provided, all columns in the table will be used. A `NaN`
+        in a float column counts as a missing value on every backend.
 
         Parameters
         ----------
