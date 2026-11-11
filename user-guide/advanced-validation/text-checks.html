@@ -696,7 +696,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="a-corpus-to-check" class="level1">
 <h1>A Corpus to Check</h1>
 <p>Let’s make a small corpus of web documents. Most are fine, but there’s a near duplicate, a menu, a list of hashtags, a document in French, and one with an email address.</p>
-<div id="87688047" class="cell" data-execution_count="2">
+<div id="d68057bc" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>corpus <span class="op">=</span> pl.DataFrame(</span>
@@ -870,7 +870,7 @@ Contact</td>
 <section id="heuristic-quality-filters" class="level1">
 <h1>Heuristic Quality Filters</h1>
 <p>The corpora used to train language models are cleaned with simple rules about each document: how many words it has, how long they are, how many of its lines are bullet points or repeat an earlier line, and whether it has common words like <em>the</em> and <em>of</em>. The <a href="../../reference/Validate.col_vals_text_quality.html#pointblank.Validate.col_vals_text_quality" class="gdls-link gdls-code">col_vals_text_quality()</a> method adds a validation step for each of the quality filters of the Gopher models, with their bounds as the defaults. Our documents are short, so we’ll lower the number of words that a document needs.</p>
-<div id="7d8d0099" class="cell" data-execution_count="3">
+<div id="9edf54d8" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>corpus, tbl_name<span class="op">=</span><span class="st">"corpus"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_text_quality(columns<span class="op">=</span><span class="st">"text"</span>, min_words<span class="op">=</span><span class="dv">10</span>)</span>
@@ -1403,7 +1403,7 @@ Contact</td>
 <section id="near-duplicates" class="level1">
 <h1>Near Duplicates</h1>
 <p>A document that’s in a corpus many times gets too much weight in training. The <a href="../../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> method finds rows that are exactly the same, but most duplicates in text differ a little: a changed date, a different footer, or a name filled into a template. The <a href="../../reference/Validate.rows_near_distinct.html#pointblank.Validate.rows_near_distinct" class="gdls-link gdls-code">rows_near_distinct()</a> method finds those too. It normalizes the text (in lower case, without punctuation), and with the default <code>method="minhash"</code>, it finds texts whose sequences of words are mostly the same.</p>
-<div id="30a7a31a" class="cell" data-execution_count="4">
+<div id="48364550" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>corpus, tbl_name<span class="op">=</span><span class="st">"corpus"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .rows_near_distinct(columns<span class="op">=</span><span class="st">"text"</span>, threshold<span class="op">=</span><span class="fl">0.8</span>)</span>
@@ -1528,7 +1528,7 @@ Contact</td>
 <li><a href="../../reference/Validate.col_vals_no_pii.html#pointblank.Validate.col_vals_no_pii" class="gdls-link gdls-code">col_vals_no_pii()</a> checks that the text has no email addresses, phone numbers, or credit card numbers (or other kinds of personal information, or patterns of your own).</li>
 </ul>
 <p>With real models, the first two look like this:</p>
-<div id="a131af4b" class="cell" data-execution_count="5">
+<div id="03fa46ae" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>corpus)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_language(columns<span class="op">=</span><span class="st">"text"</span>, expected<span class="op">=</span><span class="st">"en"</span>, min_confidence<span class="op">=</span><span class="fl">0.8</span>)</span>
@@ -1536,7 +1536,7 @@ Contact</td>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>To keep this page self-contained, we’ll use a function that guesses the language from a few common words, and a tokenizer that splits text into words and punctuation.</p>
-<div id="51ef5ee0" class="cell" data-execution_count="6">
+<div id="c5dfe629" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1916,7 +1916,7 @@ Contact</td>
 <section id="chat-conversations" class="level1">
 <h1>Chat Conversations</h1>
 <p>Data for fine-tuning a chat model is a list of messages for each example, each with a role and some content. Data converted from other formats often has conversations with roles out of order, an unknown role, or an empty message, and a training run can fail on them (or quietly learn from them). The <a href="../../reference/Validate.col_vals_chat_format.html#pointblank.Validate.col_vals_chat_format" class="gdls-link gdls-code">col_vals_chat_format()</a> method checks each conversation, given as a list of messages or as JSON text.</p>
-<div id="34032ced" class="cell" data-execution_count="7">
+<div id="5f041103" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>chats <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>],</span>
@@ -2050,7 +2050,7 @@ Contact</td>
 <section id="benchmark-contamination" class="level1">
 <h1>Benchmark Contamination</h1>
 <p>A model is often judged by its score on a benchmark, a set of questions with known answers. If the training data contains those questions, the score no longer says how well the model does on questions it hasn’t seen: the benchmark is <em>contaminated</em>. The <a href="../../reference/Validate.rows_not_contaminated.html#pointblank.Validate.rows_not_contaminated" class="gdls-link gdls-code">rows_not_contaminated()</a> method checks the text of each row against a reference, such as the questions of a benchmark or the rows of a test set.</p>
-<div id="601d5f3f" class="cell" data-execution_count="8">
+<div id="8905257d" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>benchmark <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"question"</span>: [</span>

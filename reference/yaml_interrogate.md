@@ -4,7 +4,7 @@ Execute a YAML-based validation workflow.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1636-L2027)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L1642-L2033)
 
 ``` python
 yaml_interrogate(

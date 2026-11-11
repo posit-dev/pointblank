@@ -688,7 +688,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="a-card-from-a-validation" class="level1">
 <h1>A Card from a Validation</h1>
 <p>Let’s validate a table of readings from weather stations, with an owner for the data and its users. A few of the temperatures were recorded in tenths of a degree, so they’re ten times too large, and some readings have no humidity.</p>
-<div id="ca04b08b" class="cell" data-execution_count="2">
+<div id="9d09515d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>temps <span class="op">=</span> [<span class="dv">20</span> <span class="op">+</span> (k <span class="op">*</span> <span class="dv">37</span> <span class="op">%</span> <span class="dv">11</span> <span class="op">-</span> <span class="dv">5</span>) <span class="op">*</span> <span class="fl">0.6</span> <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">300</span>)]</span>
@@ -717,7 +717,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>The card is made from the validation, with what it doesn’t know (a description, the license, the source of the data, and so on) given as arguments:</p>
-<div id="48af90e7" class="cell" data-execution_count="3">
+<div id="993134ed" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>card <span class="op">=</span> validation.to_data_card(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    description<span class="op">=</span><span class="st">"Hourly readings from three weather stations."</span>,</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    license<span class="op">=</span><span class="st">"cc-by-4.0"</span>,</span>
@@ -768,7 +768,7 @@ The data has 300 rows and 3 columns.
 
 ## Data Quality
 
-The data was validated with Pointblank 0.1.dev1+gd3fb04c70 on 2026-11-11: 0 of 4 checks passed for every row (or other test unit).
+The data was validated with Pointblank 0.1.dev1+g86f883f72 on 2026-11-11: 0 of 4 checks passed for every row (or other test unit).
 
 The health score (the share of the test units that passed, from 0 to 100) is **96.7**.
 
@@ -814,7 +814,7 @@ The validation found problems in 4 of 4 checks (see *Data Quality*): 12 test uni
 
 Climate Data Team
 
-*This card was made with [Pointblank](https://posit-dev.github.io/pointblank/) 0.1.dev1+gd3fb04c70.*
+*This card was made with [Pointblank](https://posit-dev.github.io/pointblank/) 0.1.dev1+g86f883f72.*
 </code></pre>
 </div>
 </div>
@@ -831,7 +831,7 @@ Climate Data Team
 <section id="a-datasheet" class="level1">
 <h1>A Datasheet</h1>
 <p>The other format is a datasheet, from <em>Datasheets for Datasets</em> (Gebru et al., 2021), which answers a list of questions about a dataset in seven sections: its motivation, composition, collection, preprocessing, uses, distribution, and maintenance. The results of the validation answer the questions about the composition of the data, including “Are there any errors, sources of noise, or redundancies in the dataset?”</p>
-<div id="74f061ae" class="cell" data-execution_count="4">
+<div id="6c4e415d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sheet <span class="op">=</span> validation.to_data_card(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">format</span><span class="op">=</span><span class="st">"datasheet"</span>, description<span class="op">=</span><span class="st">"Hourly readings from three weather stations."</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -856,7 +856,7 @@ The data has 300 rows and 3 columns.
 
 **Are there any errors, sources of noise, or redundancies in the dataset?**
 
-The data was validated with Pointblank 0.1.dev1+gd3fb04c70 on 2026-11-11: 0 of 4 checks passed for every row (or other test unit).
+The data was validated with Pointblank 0.1.dev1+g86f883f72 on 2026-11-11: 0 of 4 checks passed for every row (or other test unit).
 
 The health score (the share of the test units that passed, from 0 to 100) is **96.7**.
 
@@ -882,7 +882,7 @@ The health score (the share of the test units that passed, from 0 to 100) is **9
 <h1>Evidence from an Ablation</h1>
 <p>A validation says which rows fail its checks, but not whether those rows matter. An <a href="../../user-guide/post-interrogation/data-ablation.html"><code>Ablation</code></a> measures that, by training a model on the data with the failing rows of each step removed. With <code>ablation=</code>, the card gets an <em>Ablation Evidence</em> section with the measured effect of each check (and, in a datasheet, it’s the answer to the question about preprocessing).</p>
 <p>Here, the “model” is as simple as can be: it predicts the mean of the temperatures that it’s trained on, and it’s scored by its mean absolute error on readings that it wasn’t trained on.</p>
-<div id="8006efa6" class="cell" data-execution_count="5">
+<div id="eab0a7cc" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>holdout <span class="op">=</span> [<span class="dv">20</span> <span class="op">+</span> (k <span class="op">*</span> <span class="dv">41</span> <span class="op">%</span> <span class="dv">11</span> <span class="op">-</span> <span class="dv">5</span>) <span class="op">*</span> <span class="fl">0.6</span> <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">200</span>)]</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -920,14 +920,14 @@ The checks were tested by data ablation. Each variant below is a version of the 
 <section id="cards-in-other-languages" class="level1">
 <h1>Cards in Other Languages</h1>
 <p>A card is written in the language of the validation (its <code>lang=</code>), with the numbers formatted for its <code>locale=</code>. The <code>lang=</code> and <code>locale=</code> arguments of <a href="../../reference/Validate.to_data_card.html#pointblank.Validate.to_data_card" class="gdls-link gdls-code">to_data_card()</a> give another language. The front matter stays as it is, since the Hub reads it, and so do the arguments with text of their own (like <code>description=</code>):</p>
-<div id="275b40db" class="cell" data-execution_count="6">
+<div id="642246a8" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>card <span class="op">=</span> validation.to_data_card(lang<span class="op">=</span><span class="st">"fr"</span>, by<span class="op">=</span><span class="st">"station"</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(card[card.index(<span class="st">"## Qualité des données"</span>) : card.index(<span class="st">"### Étapes de validation"</span>)])</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>## Qualité des données
 
-Les données ont été validées avec Pointblank 0.1.dev1+gd3fb04c70 le 2026-11-11 : 0 des 4 vérifications ont réussi pour chaque ligne (ou autre unité de test).
+Les données ont été validées avec Pointblank 0.1.dev1+g86f883f72 le 2026-11-11 : 0 des 4 vérifications ont réussi pour chaque ligne (ou autre unité de test).
 
 Le score de santé (la part des unités de test réussies, de 0 à 100) est de **96,7**.
 
