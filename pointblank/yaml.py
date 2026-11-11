@@ -4,6 +4,7 @@ import ast
 import datetime
 import decimal
 import json
+import math
 import operator
 import re
 from importlib import import_module
@@ -1621,6 +1622,14 @@ def _literal_code(value: Any) -> str:
     if isinstance(value, dict):
         items = (f"{_literal_code(k)}: {_literal_code(v)}" for k, v in value.items())
         return "{" + ", ".join(items) + "}"
+    return _value_code(value)
+
+
+def _value_code(value: Any) -> str:
+    """Python code for a value, written as `float("inf")` (etc.) for a non-finite float."""
+    if isinstance(value, float) and not math.isfinite(value):
+        # `repr()` gives `inf`, `-inf`, or `nan`, which aren't names that Python knows
+        return f'float("{value!r}")'
     return repr(value)
 
 
@@ -2760,15 +2769,17 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                 param_parts.append(f"{key}={str(value)}")
             elif isinstance(value, tuple):
                 # Handle tuples like `inclusive=(False, True)`
-                tuple_str = "(" + ", ".join([str(item) for item in value]) + ")"
+                tuple_str = "(" + ", ".join([_value_code(item) for item in value]) + ")"
                 param_parts.append(f"{key}={tuple_str}")
             elif isinstance(value, list):
                 # Handle lists/tuples (like `set=` parameter)
                 if all(isinstance(item, str) for item in value):
                     list_str = "[" + ", ".join([f'"{item}"' for item in value]) + "]"
                 else:
-                    list_str = str(list(value))
+                    list_str = "[" + ", ".join([_value_code(item) for item in value]) + "]"
                 param_parts.append(f"{key}={list_str}")
+            elif isinstance(value, float):
+                param_parts.append(f"{key}={_value_code(value)}")
             else:
                 # Handle complex objects (like polars/pandas expressions from python: blocks)
                 # For these, we'll use a placeholder since they can't be easily converted back
