@@ -222,3 +222,39 @@ def test_spec_helpers_treat_nan_as_null(null_is_missing) -> None:
     assert spec.is_missing(-99) is True
     assert spec.is_missing(1.5) is False
     assert spec.reason_for(1.5) is None
+
+
+# NaN is not a null in Polars, PyArrow and DuckDB, so the null checks have to look for it on their
+# own (pandas already treats it as a null), or a NaN fails `col_vals_null()`, passes
+# `col_vals_not_null()` and `rows_complete()`, and isn't counted by `col_pct_null()` there
+@pytest.mark.parametrize("tbl_type", TABLE_TYPES + ["duckdb", "sqlite"])
+def test_nan_is_missing_in_null_checks(tbl_type) -> None:
+    tbl = _table(tbl_type, {"x": [1.0, NAN, None, 4.0], "y": [1.0, 2.0, 3.0, 4.0]})
+
+    validation = (
+        pb.Validate(tbl)
+        .col_vals_null("x")
+        .col_vals_not_null("x")
+        .rows_complete()
+        .rows_complete(columns_subset=["x"])
+        .rows_complete(columns_subset=["y"])
+        .col_pct_null("x", p=0.5)
+        .interrogate()
+    )
+
+    assert [
+        (validation.n_passed(i=i, scalar=True), validation.n_failed(i=i, scalar=True))
+        for i in range(1, 7)
+    ] == [(2, 2), (2, 2), (2, 2), (2, 2), (4, 0), (1, 0)]
+
+
+# The rows that fail because of a NaN are the ones extracted as failing rows
+@pytest.mark.parametrize("tbl_type", ["polars", "duckdb"])
+def test_nan_rows_are_extracted_as_failing_in_null_checks(tbl_type) -> None:
+    tbl = _table(tbl_type, {"x": [1.0, NAN, 3.0], "y": [1.0, 2.0, 3.0]})
+
+    validation = pb.Validate(tbl).col_vals_not_null("x").rows_complete().interrogate()
+
+    for i in (1, 2):
+        extract = validation.get_data_extracts(i=i, frame=True)
+        assert len(extract) == 1
