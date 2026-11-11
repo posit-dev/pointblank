@@ -5766,12 +5766,27 @@ def test_roundtrip_column_selectors():
         columns:
           python: pb.col(pb.matches("^[ad]$"))
         value: 0
+    - rows_distinct:
+        columns_subset:
+          python: pb.starts_with("d")
+    - rows_complete:
+        columns_subset:
+          python: pb.col(pb.matches("^[cd]$"))
     """
     yaml_result = yaml_interrogate(yaml_content)
 
     steps = yaml_result.validation_info
-    assert [step.column for step in steps] == ["date_time", "date", "d", "a", "d"]
+    assert [step.column for step in steps] == [
+        "date_time",
+        "date",
+        "d",
+        "a",
+        "d",
+        ["date_time", "date", "d"],
+        ["c", "d"],
+    ]
     assert not any(step.eval_error for step in steps)
+    assert [step.n_failed for step in steps[-2:]] == [2, 2]
 
     python_result = _exec_yaml_to_python(yaml_content)
     _compare_validation_results(yaml_result, python_result)
