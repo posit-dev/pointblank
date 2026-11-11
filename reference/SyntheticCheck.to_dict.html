@@ -2006,6 +2006,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#returns" id="toc-returns" class="nav-link active" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
     </div>
@@ -2036,7 +2037,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/synthetic.py#L487-L511" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/synthetic.py#L519-L561" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">SyntheticCheck</span><span class="op">.</span><span class="fu">to_dict</span>()</span></code></pre></div>
@@ -2051,6 +2052,34 @@ The sizes of the tables, the settings, and the results of the checks of fidelity
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<div id="0de84236" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>seed <span class="op">=</span> pl.DataFrame({<span class="st">"name"</span>: [<span class="st">"Ana"</span>, <span class="st">"Ben"</span>, <span class="st">"Cleo"</span>], <span class="st">"age"</span>: [<span class="dv">34</span>, <span class="dv">51</span>, <span class="dv">27</span>]})</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>synthetic <span class="op">=</span> pl.DataFrame({<span class="st">"name"</span>: [<span class="st">"Dan"</span>, <span class="st">"Ben"</span>, <span class="st">"Eve"</span>], <span class="st">"age"</span>: [<span class="dv">40</span>, <span class="dv">51</span>, <span class="dv">27</span>]})</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> pb.check_synthetic(synthetic, seed).to_dict()</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json.dumps({<span class="st">"copies"</span>: results[<span class="st">"copies"</span>], <span class="st">"issues"</span>: results[<span class="st">"issues"</span>]}, indent<span class="op">=</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{
+  "copies": {
+    "exact": 1,
+    "near": null,
+    "share": 0.3333333333333333
+  },
+  "issues": [
+    "1 row of the synthetic data (33.3%) copies a seed row (1 the same)."
+  ]
+}</code></pre>
+</div>
+</div>
+<p>The dictionary holds only plain values, so it can be written as JSON and kept with the synthetic data, or compared with the results for another batch of it.</p>
 
 
 </section>

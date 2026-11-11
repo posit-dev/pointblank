@@ -4,7 +4,7 @@ Get the synthetic rows that copy a seed row.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/synthetic.py#L444-L485)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/synthetic.py#L476-L517)
 
 ``` python
 SyntheticCheck.get_copies()

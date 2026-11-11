@@ -4,7 +4,7 @@ Get a tabular report of the checks of the synthetic data.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/synthetic.py#L513-L737)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/synthetic.py#L563-L787)
 
 ``` python
 SyntheticCheck.get_tabular_report(

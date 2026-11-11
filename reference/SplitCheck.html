@@ -2006,6 +2006,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#attributes" id="toc-attributes" class="nav-link active" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
     </div>
@@ -2036,7 +2037,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L236-L752" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L236-L803" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">SplitCheck</span>(</span>
@@ -2077,6 +2078,47 @@ The problems found, as messages: overlapping rows, missing or unseen labels, and
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Here are the training and test splits of a small dataset of animals, labelled as pets or wild animals. One test row is also in the training split.</p>
+<div id="f3021b52" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"text"</span>: [<span class="st">"a cat"</span>, <span class="st">"a dog"</span>, <span class="st">"a bird"</span>, <span class="st">"a fish"</span>], <span class="st">"label"</span>: [<span class="st">"pet"</span>, <span class="st">"pet"</span>, <span class="st">"wild"</span>, <span class="st">"wild"</span>]}</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> pl.DataFrame({<span class="st">"text"</span>: [<span class="st">"a dog"</span>, <span class="st">"a frog"</span>], <span class="st">"label"</span>: [<span class="st">"pet"</span>, <span class="st">"pet"</span>]})</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>check <span class="op">=</span> pb.check_splits(train<span class="op">=</span>train, test<span class="op">=</span>test, columns<span class="op">=</span><span class="st">"text"</span>, label<span class="op">=</span><span class="st">"label"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>check.overlap</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>[{'first': 'train',
+  'second': 'test',
+  'n_second': 2,
+  'exact': 1,
+  'near': None,
+  'share': 0.5}]</code></pre>
+</div>
+</div>
+<p>One of the two test rows is the same as a training row. The test split also has no wild animals, which shows in the check of the labels:</p>
+<div id="8850c651" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>check.labels[<span class="st">"missing"</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>{'test': ['wild']}</code></pre>
+</div>
+</div>
+<p>Every problem is in <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a>, as a message:</p>
+<div id="3d67a1fb" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>check.issues</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>["1 row of 'test' (50.0%) is also in 'train' (1 the same).",
+ "'test' has no rows with the label 'wild' of 'train'.",
+ "The shares of the labels of 'test' differ from those of 'train' (PSI 4.6)."]</code></pre>
+</div>
+</div>
+<p>The <code>ok</code> property is <code>True</code> only when there are no issues, so a pipeline can stop when it’s <code>False</code>.</p>
 
 
 </section>

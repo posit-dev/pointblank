@@ -2006,6 +2006,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#attributes" id="toc-attributes" class="nav-link active" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
     </div>
@@ -2036,7 +2037,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/synthetic.py#L249-L747" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/synthetic.py#L249-L797" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">SyntheticCheck</span>(</span>
@@ -2081,6 +2082,45 @@ The problems found, as messages: major changes in distribution (a PSI of at leas
 </dd>
 </dl>
 </div>
+</section>
+<section id="examples" class="level2 doc-examples">
+<h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Here’s a seed of four people, and four synthetic people made from it. The second synthetic person is the same as the second real one.</p>
+<div id="33009a4c" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>seed <span class="op">=</span> pl.DataFrame({<span class="st">"name"</span>: [<span class="st">"Ana"</span>, <span class="st">"Ben"</span>, <span class="st">"Cleo"</span>, <span class="st">"Dev"</span>], <span class="st">"age"</span>: [<span class="dv">34</span>, <span class="dv">51</span>, <span class="dv">27</span>, <span class="dv">45</span>]})</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>synthetic <span class="op">=</span> pl.DataFrame({<span class="st">"name"</span>: [<span class="st">"Dan"</span>, <span class="st">"Ben"</span>, <span class="st">"Eve"</span>, <span class="st">"Fay"</span>], <span class="st">"age"</span>: [<span class="dv">40</span>, <span class="dv">51</span>, <span class="dv">29</span>, <span class="dv">44</span>]})</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>check <span class="op">=</span> pb.check_synthetic(synthetic, seed)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>check.copies</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>{'exact': 1, 'near': None, 'share': 0.25}</code></pre>
+</div>
+</div>
+<p>One synthetic row (a quarter of them) is a copy. The ages are compared too. Four rows are too few for a PSI, so the level of the change is <code>None</code>, but there’s still a KS statistic:</p>
+<div id="576d51d5" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>check.fidelity</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>[{'column': 'age',
+  'kind': 'numeric',
+  'psi': None,
+  'ks': 0.25,
+  'ks_p_value': 1.0,
+  'level': None,
+  'missing_seed': 0.0,
+  'missing_synthetic': 0.0}]</code></pre>
+</div>
+</div>
+<p>Every problem is in <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a>, as a message:</p>
+<div id="51e921ae" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>check.issues</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>['1 row of the synthetic data (25.0%) copies a seed row (1 the same).']</code></pre>
+</div>
+</div>
+<p>The <code>ok</code> property is <code>True</code> only when there are no issues, so a pipeline can stop when it’s <code>False</code>.</p>
 
 
 </section>

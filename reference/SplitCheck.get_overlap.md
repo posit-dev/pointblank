@@ -4,7 +4,7 @@ Get the rows of a split that are also in an earlier split.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L435-L491)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L469-L525)
 
 ``` python
 SplitCheck.get_overlap(
