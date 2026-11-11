@@ -4,7 +4,7 @@ Do column data lie between two specified values or data in other columns?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L8881-L9230)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L8895-L9244)
 
 ``` python
 Validate.col_vals_between(

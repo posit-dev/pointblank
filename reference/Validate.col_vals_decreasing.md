@@ -4,7 +4,7 @@ Are column data decreasing by row?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10528-L10776)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10542-L10790)
 
 ``` python
 Validate.col_vals_decreasing(

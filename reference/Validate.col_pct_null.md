@@ -4,7 +4,7 @@ Validate whether a column has a specific percentage of Null values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12594-L12901)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L12614-L12922)
 
 ``` python
 Validate.col_pct_null(
@@ -19,7 +19,7 @@ Validate.col_pct_null(
 )
 ```
 
-The `col_pct_null()` validation method checks whether the percentage of Null values in a column matches a specified percentage `p=` (within an optional tolerance `tol=`). This validation operates at the column level, generating a single validation step per column that passes or fails based on whether the actual percentage of Null values falls within the acceptable range defined by `p ± tol`.
+The `col_pct_null()` validation method checks whether the percentage of Null values in a column matches a specified percentage `p=` (within an optional tolerance `tol=`). This validation operates at the column level, generating a single validation step per column that passes or fails based on whether the actual percentage of Null values falls within the acceptable range defined by `p ± tol`. A `NaN` in a float column counts as a Null value on every backend.
 
 ## Parameters
 

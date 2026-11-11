@@ -89,7 +89,7 @@ print(card)
 
     ## Data Quality
 
-    The data was validated with Pointblank 0.1.dev1+g21df7c61a on 2026-11-11: 0 of 4 checks passed for every row (or other test unit).
+    The data was validated with Pointblank 0.1.dev1+g77fa32d05 on 2026-11-11: 0 of 4 checks passed for every row (or other test unit).
 
     The health score (the share of the test units that passed, from 0 to 100) is **96.7**.
 
@@ -135,7 +135,7 @@ print(card)
 
     Climate Data Team
 
-    *This card was made with [Pointblank](https://posit-dev.github.io/pointblank/) 0.1.dev1+g21df7c61a.*
+    *This card was made with [Pointblank](https://posit-dev.github.io/pointblank/) 0.1.dev1+g77fa32d05.*
 
 The card is a [Hugging Face dataset card](https://huggingface.co/docs/hub/datasets-cards), so it can be saved as the `README.md` of a dataset on the Hub (with `path="README.md"`). It has:
 
@@ -177,7 +177,7 @@ print(sheet[sheet.index("## Composition") : sheet.index("## Collection Process")
 
     **Are there any errors, sources of noise, or redundancies in the dataset?**
 
-    The data was validated with Pointblank 0.1.dev1+g21df7c61a on 2026-11-11: 0 of 4 checks passed for every row (or other test unit).
+    The data was validated with Pointblank 0.1.dev1+g77fa32d05 on 2026-11-11: 0 of 4 checks passed for every row (or other test unit).
 
     The health score (the share of the test units that passed, from 0 to 100) is **96.7**.
 
@@ -246,7 +246,7 @@ print(card[card.index("## Qualité des données") : card.index("### Étapes de v
 
     ## Qualité des données
 
-    Les données ont été validées avec Pointblank 0.1.dev1+g21df7c61a le 2026-11-11 : 0 des 4 vérifications ont réussi pour chaque ligne (ou autre unité de test).
+    Les données ont été validées avec Pointblank 0.1.dev1+g77fa32d05 le 2026-11-11 : 0 des 4 vérifications ont réussi pour chaque ligne (ou autre unité de test).
 
     Le score de santé (la part des unités de test réussies, de 0 à 100) est de **96,7**.
 

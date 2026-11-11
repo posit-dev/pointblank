@@ -4,7 +4,7 @@ Validate whether row data are complete by having no missing values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13778-L14032)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13799-L14054)
 
 ``` python
 Validate.rows_complete(
@@ -19,7 +19,7 @@ Validate.rows_complete(
 )
 ```
 
-The `rows_complete()` method checks whether rows in the table are complete. Completeness of a row means that there are no missing values within the row. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied). A subset of columns can be specified for the completeness check. If no subset is provided, all columns in the table will be used.
+The `rows_complete()` method checks whether rows in the table are complete. Completeness of a row means that there are no missing values within the row. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any `pre=` mutation has been applied). A subset of columns can be specified for the completeness check. If no subset is provided, all columns in the table will be used. A `NaN` in a float column counts as a missing value on every backend.
 
 ## Parameters
 

@@ -4,7 +4,7 @@ Validate whether the length of text in tokens is within bounds.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L16268-L16426)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L16290-L16448)
 
 ``` python
 Validate.col_vals_token_len(
