@@ -6,6 +6,7 @@ import tempfile
 import os
 import io
 import contextlib
+import warnings
 import datetime
 from decimal import Decimal
 from zoneinfo import ZoneInfo
@@ -1939,11 +1940,10 @@ def test_yaml_to_python_conjointly_validation():
     assert "pb.Validate(" in python_code
     assert 'tbl_name="Conjointly Test"' in python_code
     assert 'label="Test conjointly conversion"' in python_code
-    assert ".conjointly(" in python_code
-    assert "expressions=[" in python_code
-    assert "\"lambda df: df['d'] > df['a']\"" in python_code
-    assert "\"lambda df: df['a'] > 0\"" in python_code
-    assert "\"lambda df: df['a'] + df['d'] < 12000\"" in python_code
+    assert (
+        ".conjointly(lambda df: df['d'] > df['a'], lambda df: df['a'] > 0, "
+        "lambda df: df['a'] + df['d'] < 12000, "
+    ) in python_code
     assert 'brief="All conditions must pass jointly"' in python_code
     assert "thresholds=pb.Thresholds(warning=0.1, error=0.2)" in python_code
     assert ".interrogate()" in python_code
@@ -2033,10 +2033,7 @@ def test_yaml_to_python_conjointly_and_specially_combined():
     assert "pb.Thresholds(warning=0.1, error=0.2)" in python_code
 
     # Check conjointly method
-    assert ".conjointly(" in python_code
-    assert "expressions=[" in python_code
-    assert "\"lambda df: df['a'] > 0\"" in python_code
-    assert "\"lambda df: df['d'] > 0\"" in python_code
+    assert ".conjointly(lambda df: df['a'] > 0, lambda df: df['d'] > 0, " in python_code
     assert 'brief="Basic positive value checks"' in python_code
 
     # Check specially method
@@ -3630,10 +3627,7 @@ def test_yaml_to_python_conjointly_expressions_list():
     """
 
     result = yaml_to_python(yaml_content)
-    assert (
-        "conjointly(expressions=[\"lambda df: df['a'] > 0\", \"lambda df: df['b'] < 10\"])"
-        in result
-    )
+    assert ".conjointly(lambda df: df['a'] > 0, lambda df: df['b'] < 10)" in result
 
 
 def test_yaml_to_python_specially_expr():
@@ -4417,9 +4411,8 @@ steps:
 """
 
     result = yaml_to_python(yaml_content)
-    # Should format conjointly expressions properly
-    assert "conjointly" in result
-    assert "expressions=" in result
+    # The expressions are positional arguments, not a list of strings
+    assert ".conjointly(lambda x: True, lambda x: True)" in result
 
 
 def test_yaml_to_python_specially_expr():
@@ -5782,6 +5775,71 @@ def test_roundtrip_column_selectors():
 
     python_result = _exec_yaml_to_python(yaml_content)
     _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_strings_with_quotes_and_backslashes():
+    """Round-trip: strings with quotes and backslashes are escaped in the generated code."""
+    yaml_content = r"""
+    tbl: small_table
+    tbl_name: 'The "small" table'
+    label: 'C:\data\new'
+    brief: 'Say "hi"'
+    owner: O'Brien
+    consumers: ['Team "A"', 'Team \B']
+    steps:
+    - col_vals_regex:
+        columns: b
+        pattern: '^\d-[a-z]{3}\b'
+        brief: 'Check "b"'
+        actions:
+          warning: 'Step {step}: "{col}" failed'
+    - col_vals_in_set:
+        columns: f
+        set: [low, mid, 'h"igh']
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert 'tbl_name="The \\"small\\" table"' in python_code
+    assert 'label="C:\\\\data\\\\new"' in python_code
+    assert 'pattern="^\\\\d-[a-z]{3}\\\\b"' in python_code
+    assert 'set=["low", "mid", "h\\"igh"]' in python_code
+
+    # An invalid escape (e.g., `"\d"`) in the generated code would be a `SyntaxWarning`
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", SyntaxWarning)
+        python_result = _exec_yaml_to_python(yaml_content)
+
+    yaml_result = yaml_interrogate(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+    for attr in ("tbl_name", "label", "brief", "owner", "consumers"):
+        assert getattr(python_result, attr) == getattr(yaml_result, attr)
+    assert python_result.validation_info[0].values["pattern"] == r"^\d-[a-z]{3}\b"
+    assert python_result.validation_info[0].brief == 'Check "b"'
+    assert python_result.validation_info[0].actions.warning == ['Step {step}: "{col}" failed']
+    assert python_result.validation_info[0].all_passed
+
+
+def test_roundtrip_conjointly():
+    """Round-trip: `conjointly()` expressions are written as positional lambdas."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - conjointly:
+        expressions:
+          - "lambda df: pl.col('d') > pl.col('a')"
+          - "lambda df: pl.col('a') > 2"
+        thresholds:
+          warning: 1
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert (
+        ".conjointly(lambda df: pl.col('d') > pl.col('a'), lambda df: pl.col('a') > 2, "
+        "thresholds=pb.Thresholds(warning=1))"
+    ) in python_code
+
+    yaml_result = yaml_interrogate(yaml_content, allow_python=True)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+    assert not python_result.validation_info[0].all_passed
 
 
 def test_yaml_interrogate_with_reference():

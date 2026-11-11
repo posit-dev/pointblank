@@ -2520,11 +2520,11 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
 
     # Add table name if present
     if "tbl_name" in config:
-        validate_args.append(f'tbl_name="{config["tbl_name"]}"')
+        validate_args.append(f"tbl_name={_literal_code(str(config['tbl_name']))}")
 
     # Add `label=` if present
     if "label" in config:
-        validate_args.append(f'label="{config["label"]}"')
+        validate_args.append(f"label={_literal_code(str(config['label']))}")
 
     # Add `thresholds=` if present: format as `pb.Thresholds()` for an idiomatic style
     if "thresholds" in config:
@@ -2546,7 +2546,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                 # Use the original Python expression for callables
                 action_params.append(f"{key}={original_actions_expressions[key]}")
             elif isinstance(value, str):
-                action_params.append(f'{key}="{value}"')
+                action_params.append(f"{key}={_literal_code(value)}")
             else:
                 # For callables or complex expressions, use placeholder
                 action_params.append(f"{key}={value}")  # pragma: no cover
@@ -2555,38 +2555,37 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
 
     # Add language if present
     if "lang" in config:
-        validate_args.append(f'lang="{config["lang"]}"')
+        validate_args.append(f"lang={_literal_code(str(config['lang']))}")
 
     # Add locale if present
     if "locale" in config:
-        validate_args.append(f'locale="{config["locale"]}"')
+        validate_args.append(f"locale={_literal_code(str(config['locale']))}")
 
     # Add global brief if present
     if "brief" in config:
         if isinstance(config["brief"], bool):
             validate_args.append(f"brief={str(config['brief'])}")
         else:
-            validate_args.append(f'brief="{config["brief"]}"')
+            validate_args.append(f"brief={_literal_code(str(config['brief']))}")
 
     # Add owner if present (governance)
     if "owner" in config:
-        validate_args.append(f'owner="{config["owner"]}"')
+        validate_args.append(f"owner={_literal_code(str(config['owner']))}")
 
     # Add consumers if present (governance)
     if "consumers" in config:
         consumers = config["consumers"]
         if isinstance(consumers, list):
             if len(consumers) == 1:
-                validate_args.append(f'consumers="{consumers[0]}"')
+                validate_args.append(f"consumers={_literal_code(str(consumers[0]))}")
             else:
-                consumers_str = "[" + ", ".join([f'"{c}"' for c in consumers]) + "]"
-                validate_args.append(f"consumers={consumers_str}")
+                validate_args.append(f"consumers={_literal_code([str(c) for c in consumers])}")
         elif isinstance(consumers, str):
-            validate_args.append(f'consumers="{consumers}"')
+            validate_args.append(f"consumers={_literal_code(consumers)}")
 
     # Add version if present (governance)
     if "version" in config:
-        validate_args.append(f'version="{config["version"]}"')
+        validate_args.append(f"version={_literal_code(str(config['version']))}")
 
     # Add reference if present
     if "reference" in config:
@@ -2681,12 +2680,10 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                 # A column reference written directly (e.g., `value: pb.col("b")`)
                 param_parts.append(f"{key}={step_params[key].strip()}")
             elif key == "expressions" and method_name == "conjointly":
-                # Handle conjointly expressions list
-                if isinstance(value, list):
-                    expressions_str = "[" + ", ".join([f'"{expr}"' for expr in value]) + "]"
-                    param_parts.append(f"expressions={expressions_str}")
-                else:
-                    param_parts.append(f"expressions={value}")  # pragma: no cover
+                # The expressions are Python code, passed to `conjointly()` as positional
+                # arguments ahead of the keyword arguments
+                expressions = value if isinstance(value, list) else [value]
+                param_parts[:0] = [str(expr).strip() for expr in expressions]
             elif key == "expr" and method_name == "specially":
                 # Handle specially expr parameter: should be unquoted lambda expression
                 if isinstance(value, str):
@@ -2697,13 +2694,12 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                 if isinstance(value, list):
                     if len(value) == 1:
                         # Single column as string
-                        param_parts.append(f'{key}="{value[0]}"')
+                        param_parts.append(f"{key}={_literal_code(value[0])}")
                     else:
                         # Multiple columns as list
-                        columns_str = "[" + ", ".join([f'"{col}"' for col in value]) + "]"
-                        param_parts.append(f"{key}={columns_str}")
+                        param_parts.append(f"{key}={_literal_code(value)}")
                 else:
-                    param_parts.append(f'{key}="{value}"')  # pragma: no cover
+                    param_parts.append(f"{key}={_literal_code(value)}")  # pragma: no cover
             elif key == "schema" and isinstance(value, Schema):
                 # Render a `Schema` as a `pb.Schema(columns=[...])` constructor call
                 param_parts.append(f"schema={_render_schema_code(value)}")
@@ -2715,7 +2711,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                 if isinstance(value, bool):
                     param_parts.append(f"brief={str(value)}")
                 else:
-                    param_parts.append(f'brief="{value}"')
+                    param_parts.append(f"brief={_literal_code(value)}")
             elif key == "actions":
                 # Handle actions parameter: format as `pb.Actions()`
                 if isinstance(value, Actions):
@@ -2730,7 +2726,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                         if warning_expr_path in step_expressions:
                             action_params.append(f"warning={step_expressions[warning_expr_path]}")
                         elif isinstance(value.warning, list) and len(value.warning) == 1:
-                            action_params.append(f'warning="{value.warning[0]}"')
+                            action_params.append(f"warning={_literal_code(str(value.warning[0]))}")
                         else:
                             action_params.append(f"warning={value.warning}")  # pragma: no cover
 
@@ -2741,7 +2737,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                                 f"error={step_expressions[error_expr_path]}"
                             )  # pragma: no cover
                         elif isinstance(value.error, list) and len(value.error) == 1:
-                            action_params.append(f'error="{value.error[0]}"')
+                            action_params.append(f"error={_literal_code(str(value.error[0]))}")
                         else:
                             action_params.append(f"error={value.error}")  # pragma: no cover
 
@@ -2752,7 +2748,9 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                                 f"critical={step_expressions[critical_expr_path]}"
                             )  # pragma: no cover
                         elif isinstance(value.critical, list) and len(value.critical) == 1:
-                            action_params.append(f'critical="{value.critical[0]}"')
+                            action_params.append(
+                                f"critical={_literal_code(str(value.critical[0]))}"
+                            )
                         else:
                             action_params.append(f"critical={value.critical}")  # pragma: no cover
 
@@ -2773,7 +2771,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                 else:
                     param_parts.append(f"thresholds={value}")
             elif isinstance(value, str):
-                param_parts.append(f'{key}="{value}"')
+                param_parts.append(f"{key}={_literal_code(value)}")
             elif isinstance(value, bool):
                 param_parts.append(f"{key}={str(value)}")
             elif isinstance(value, tuple):
@@ -2782,11 +2780,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                 param_parts.append(f"{key}={tuple_str}")
             elif isinstance(value, list):
                 # Handle lists/tuples (like `set=` parameter)
-                if all(isinstance(item, str) for item in value):
-                    list_str = "[" + ", ".join([f'"{item}"' for item in value]) + "]"
-                else:
-                    list_str = "[" + ", ".join([_value_code(item) for item in value]) + "]"
-                param_parts.append(f"{key}={list_str}")
+                param_parts.append(f"{key}={_literal_code(value)}")
             elif isinstance(value, float):
                 param_parts.append(f"{key}={_value_code(value)}")
             else:
