@@ -19179,7 +19179,8 @@ scorers.classifier(hf_model: 'Any', label: 'str | None' = None, column: 'str | N
         The model: the name of a model on the Hugging Face Hub (e.g.,
         `"HuggingFaceFW/fineweb-edu-classifier"`), or a `transformers` text-classification
         pipeline (or any function that takes a list of texts and returns, for each, a list of
-        `{"label": ..., "score": ...}` dictionaries).
+        `{"label": ..., "score": ...}` dictionaries). A function is given the pipeline's
+        `top_k=`, `truncation=`, and `function_to_apply=` arguments only if it takes them.
     label
         The label whose score is the score of a row. It can be left out for a model with one
         output.
@@ -19187,7 +19188,8 @@ scorers.classifier(hf_model: 'Any', label: 'str | None' = None, column: 'str | N
         The column with the text to score. It can be left out if the step has one column.
     function_to_apply
         How the model's outputs are turned into scores: `"sigmoid"`, `"softmax"`, or `"none"`
-        (the raw outputs, e.g., for a regression model). By default, the pipeline chooses.
+        (the raw outputs, e.g., for a regression model). By default, the pipeline chooses. It
+        can't be used with a function that doesn't take it.
     device
         The device that the model runs on (e.g., `"cuda"`, `"mps"`, or `-1` for the CPU), when
         the model is given by name.

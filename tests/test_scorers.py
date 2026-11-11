@@ -901,6 +901,53 @@ def test_classifier(monkeypatch):
     assert pb.scorers.classifier(hf_model=regression)([{"t": "ab"}, {"t": "a"}]) == [2.0, 1.0]
 
 
+def test_classifier_with_a_function():
+    # A function of just the texts gets none of the pipeline's keyword arguments
+    def labels(texts):
+        return [[{"label": "POS", "score": len(t) / 10}] for t in texts]
+
+    scorer = pb.scorers.classifier(hf_model=labels, label="POS")
+    assert scorer([{"t": "abc"}, {"t": "a"}]) == [0.3, 0.1]
+    assert scorer([{"t": "ab"}]) == [0.2]
+
+    # It gets the ones it takes
+    calls = []
+
+    def truncating(texts, truncation=False):
+        calls.append(truncation)
+        return [{"label": "LABEL_0", "score": float(len(t))} for t in texts]
+
+    assert pb.scorers.classifier(hf_model=truncating)([{"t": "ab"}, {"t": "a"}]) == [2.0, 1.0]
+    assert calls == [True]
+
+    def applying(texts, *, function_to_apply):
+        calls.append(function_to_apply)
+        return [[{"label": "POS", "score": 0.5}] for _ in texts]
+
+    scorer = pb.scorers.classifier(hf_model=applying, label="POS", function_to_apply="sigmoid")
+    assert scorer([{"t": "a"}, {"t": "b"}]) == [0.5, 0.5]
+    assert calls[-1] == "sigmoid"
+
+    # As a scorer, it works through `col_vals_scored()`
+    validation = (
+        pb.Validate(data=pl.DataFrame({"t": ["abc", "a", "abcde"]}))
+        .col_vals_scored(
+            columns="t", scorer=pb.scorers.classifier(hf_model=labels, label="POS"), min_val=0.3
+        )
+        .interrogate()
+    )
+    info = validation.validation_info[0]
+    assert info.eval_error is not True
+    assert (info.n_passed, info.n_failed) == (2, 1)
+
+    # `function_to_apply=` needs a function that takes it
+    with pytest.raises(ValueError, match="`function_to_apply=` needs a model name or a pipeline"):
+        pb.scorers.classifier(hf_model=labels, function_to_apply="softmax")
+
+    # A callable without a signature to inspect gets all of them
+    assert scorers._keywords_taken(type, {"top_k": None}) == {"top_k": None}
+
+
 def test_classifier_with_a_model_name(monkeypatch):
     made = []
 

@@ -1093,7 +1093,13 @@ class Pipeline:
                     f"Validate object has no method '{step.method}'. "
                     f"This may indicate a version mismatch."
                 )
-            validation = method(**step.kwargs)
+            # `conjointly()` takes its expressions positionally, so a step stores them in `exprs=`
+            if step.method == "conjointly" and "exprs" in step.kwargs:
+                kwargs = dict(step.kwargs)
+                exprs = kwargs.pop("exprs")
+                validation = method(*exprs, **kwargs)
+            else:
+                validation = method(**step.kwargs)
 
         return validation
 
