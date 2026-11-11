@@ -12,13 +12,16 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Iterable, Literal, Mapping, Optional, Union
 from zoneinfo import ZoneInfo
 
+import narwhals as nw
 import yaml
 
 from pointblank._agg import is_valid_agg
 from pointblank._utils import _is_lib_present
+from pointblank.column import Column, ColumnSelector
 from pointblank.missing import MissingSpec, _missing_spec_to_code
+from pointblank.schema import Schema
 from pointblank.thresholds import Actions
-from pointblank.validate import Validate, load_dataset
+from pointblank.validate import Validate, _render_schema_code, load_dataset
 
 if TYPE_CHECKING:
     from pointblank.ablation import Ablation
@@ -699,7 +702,7 @@ class YAMLValidator:
                 f"Failed to load CSV file '{file_path}' with {df_library}: {e}"
             )
 
-    def _parse_column_spec(self, columns_expr: Any) -> list[str]:
+    def _parse_column_spec(self, columns_expr: Any) -> Any:
         """Parse column specification from YAML.
 
         Handles standard YAML syntax for columns.
@@ -707,13 +710,16 @@ class YAMLValidator:
         Parameters
         ----------
         columns_expr
-            Column specification (list, or string).
+            Column specification (list, string, or a column selector from a `python:` block).
 
         Returns
         -------
-        list[str]
-            List of column names.
+        list[str] | Column | ColumnSelector | nw.selectors.Selector
+            List of column names, or the column selector (resolved against the table later).
         """
+        if isinstance(columns_expr, (Column, ColumnSelector, nw.selectors.Selector)):
+            return columns_expr
+
         if isinstance(columns_expr, list):
             return [str(col) for col in columns_expr]
 
@@ -2698,6 +2704,9 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                         param_parts.append(f"{key}={columns_str}")
                 else:
                     param_parts.append(f'{key}="{value}"')  # pragma: no cover
+            elif key == "schema" and isinstance(value, Schema):
+                # Render a `Schema` as a `pb.Schema(columns=[...])` constructor call
+                param_parts.append(f"schema={_render_schema_code(value)}")
             elif key == "missing" and isinstance(value, MissingSpec):
                 # Render a resolved MissingSpec as a `pb.MissingSpec(...)` constructor call
                 param_parts.append(f"missing={_missing_spec_to_code(value)}")

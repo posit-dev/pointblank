@@ -5729,6 +5729,61 @@ def test_roundtrip_step_level_thresholds():
     _compare_validation_results(yaml_result, python_result)
 
 
+def test_roundtrip_col_schema_match():
+    """Round-trip: a `col_schema_match()` schema is written as a `pb.Schema()` call."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_schema_match:
+        schema:
+          columns:
+            - [date_time, "Datetime(time_unit='us', time_zone=None)"]
+            - [date, Date]
+            - [a, [Int64, Int32]]
+            - b
+            - [c]
+        complete: false
+    - col_schema_match:
+        schema:
+          columns:
+            - [a, String]
+        complete: false
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert (
+        'schema=pb.Schema(columns=[("date_time", "Datetime(time_unit=\'us\', time_zone=None)"), '
+        '("date", "Date"), ("a", ["Int64", "Int32"]), ("b",), ("c",)])'
+    ) in python_code
+
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+    assert [step.all_passed for step in python_result.validation_info] == [True, False]
+
+
+def test_roundtrip_column_selectors():
+    """Round-trip: column selectors in `python:` blocks select columns of the table."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_not_null:
+        columns:
+          python: pb.starts_with("d")
+    - col_vals_gt:
+        columns:
+          python: pb.col(pb.matches("^[ad]$"))
+        value: 0
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+
+    steps = yaml_result.validation_info
+    assert [step.column for step in steps] == ["date_time", "date", "d", "a", "d"]
+    assert not any(step.eval_error for step in steps)
+
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
 def test_yaml_interrogate_with_reference():
     """reference key in build_validation loads data."""
     yaml_content = """
