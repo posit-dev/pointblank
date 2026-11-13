@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import re
 from typing import TYPE_CHECKING, Any
 
@@ -537,7 +538,8 @@ def infer_fields_from_table(
     result: list[tuple[str, Field]] = []
 
     for i, (name, dtype_str) in enumerate(zip(col_names, col_dtypes)):
-        values = col_values[i]
+        # Count NaN as missing, as the null checks do, whatever the backend
+        values = [None if _is_nan(v) else v for v in col_values[i]]
         null_count = sum(1 for v in values if v is None)
         category = _classify_dtype(dtype_str)
 
@@ -573,6 +575,11 @@ def infer_fields_from_table(
 # ---------------------------------------------------------------------------
 # Table extraction helpers
 # ---------------------------------------------------------------------------
+
+
+def _is_nan(value: Any) -> bool:
+    """Return True for a float NaN (also NumPy floats, which subclass `float`)."""
+    return isinstance(value, float) and math.isnan(value)
 
 
 def _extract_polars(
