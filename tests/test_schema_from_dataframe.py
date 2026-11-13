@@ -138,6 +138,38 @@ class TestFloatInference:
         assert field.nullable is True
         assert field.null_probability == pytest.approx(0.4, abs=0.01)
 
+    def test_nan_counts_as_missing(self):
+        # The null checks count NaN as missing, so inference does too (#561)
+        df = pl.DataFrame({"val": [1.0, 2.0, 3.0, float("nan"), float("nan")]})
+        schema = Schema.from_table(df)
+        field = _get_field(schema, "val")
+        assert isinstance(field, FloatField)
+        assert field.nullable is True
+        assert field.null_probability == pytest.approx(0.4, abs=0.01)
+
+    def test_nan_and_null_count_together(self):
+        df = pl.DataFrame({"val": [float("nan"), 2.0, None, 4.0]})
+        schema = Schema.from_table(df)
+        field = _get_field(schema, "val")
+        assert field.nullable is True
+        assert field.null_probability == pytest.approx(0.5, abs=0.01)
+
+    def test_nan_is_ignored_for_min_max(self):
+        df = pl.DataFrame({"val": [float("nan"), 2.5, 1.5, float("nan")]})
+        schema = Schema.from_table(df)
+        field = _get_field(schema, "val")
+        assert field.min_val == pytest.approx(1.5)
+        assert field.max_val == pytest.approx(2.5)
+
+    def test_nan_schema_agrees_with_col_vals_not_null(self):
+        import pointblank as pb
+
+        df = pl.DataFrame({"val": [1.0, float("nan"), 3.0]})
+        field = _get_field(schema_from_tbl(df), "val")
+        validation = pb.Validate(df).col_vals_not_null(columns="val").interrogate()
+        assert validation.n_failed(i=1, scalar=True) == 1
+        assert field.nullable is True
+
 
 # ---------------------------------------------------------------------------
 # String inference
