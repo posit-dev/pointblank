@@ -15579,6 +15579,45 @@ def test_missing_vals_tbl_no_fail_duckdb_table() -> None:
     missing_vals_tbl(nycflights)
 
 
+def _missing_vals_tbl_sectors(gt) -> dict[str, list[float]]:
+    tbl_data = gt._tbl_data
+    records = (
+        tbl_data.to_dicts() if isinstance(tbl_data, pl.DataFrame) else tbl_data.to_dict("records")
+    )
+    return {rec["columns"]: [rec[str(i)] for i in range(1, 11)] for rec in records}
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+def test_missing_vals_tbl_counts_nan_as_missing(tbl_type) -> None:
+    # Ten rows give one row per sector; NaN in rows 2 and 5 and a null in row 3
+    data = pl.DataFrame(
+        {
+            "x": [1.0, float("nan"), None, 4.0, float("nan"), 6.0, 7.0, 8.0, 9.0, 10.0],
+            "y": ["a", None, "c", "d", "e", "f", "g", "h", "i", "j"],
+        },
+        nan_to_null=False,
+    )
+    if tbl_type == "polars":
+        tbl = data
+    elif tbl_type == "pandas":
+        tbl = data.to_pandas()
+    else:
+        tbl = ibis.duckdb.connect().create_table("tbl", data.to_arrow())
+
+    gt = missing_vals_tbl(tbl)
+
+    sectors = _missing_vals_tbl_sectors(gt)
+    assert sectors["x"] == [0.0, 100.0, 100.0, 0.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    assert sectors["y"] == [0.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+    # The total in the header counts the NaN values too
+    assert "4 in total" in gt.as_raw_html()
+
+    # The same missing values as `col_vals_not_null()` finds
+    validation = Validate(data=tbl).col_vals_not_null(columns="x").interrogate()
+    assert validation.n_failed(i=1, scalar=True) == 3
+
+
 # TODO: Fix this test: great_tables has internal pandas dependencies that cannot be mocked
 @pytest.mark.skip(reason="TODO: Fix great_tables internal pandas dependency issue")
 def test_missing_vals_tbl_no_pandas() -> None:
@@ -15645,6 +15684,24 @@ def test_missing_vals_tbl_no_fail_pyspark_table() -> None:
 
     # The result should be a GT object
     assert hasattr(result, "_build_data"), "Result should be a GT object"
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_missing_vals_tbl_counts_nan_as_missing_pyspark_table() -> None:
+    spark = get_spark_session()
+
+    # Ten rows give one row per sector; NaN in rows 2 and 5 and a null in row 3
+    x_vals = [1.0, float("nan"), None, 4.0, float("nan"), 6.0, 7.0, 8.0, 9.0, 10.0]
+    spark_df = spark.createDataFrame(
+        [(i, x) for i, x in enumerate(x_vals)], schema="id long, x double"
+    )
+
+    gt = missing_vals_tbl(spark_df)
+
+    sectors = _missing_vals_tbl_sectors(gt)
+    assert sectors["x"] == [0.0, 100.0, 100.0, 0.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    assert sectors["id"] == [0.0] * 10
+    assert "3 in total" in gt.as_raw_html()
 
 
 def test_missing_vals_tbl_parquet_input() -> None:

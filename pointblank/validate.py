@@ -3362,8 +3362,23 @@ def missing_vals_tbl(
     # - get 10 cut points for table preview, these are row numbers used as buckets for determining
     #   the proportion of missing values in each 'sector' in each column
     if ibis_tbl:
+        from pointblank._interrogation import _ibis_backend_supports_is_nan
+
         # Get the column names from the table
         col_names = list(data.columns)
+
+        # A NaN in a float column counts as missing, as in `col_vals_null()` and the other checks
+        # for missing values (some backends, like SQLite, can't check for NaN)
+        nan_cols = (
+            {col for col, dtype in data.schema().items() if dtype.is_floating()}
+            if _ibis_backend_supports_is_nan(data)
+            else set()
+        )
+
+        def _is_missing(col_data, col: str):
+            if col in nan_cols:
+                return col_data.isnull() | col_data.isnan()
+            return col_data.isnull()
 
         # Use the `row_ranges` list of lists to query, for each column, the proportion of missing
         # values in each 'sector' of the table (a sector is a range of rows)
@@ -3388,7 +3403,7 @@ def missing_vals_tbl(
 
                     if sector_size > 0:
                         sector_data = data[start_row:end_row][col]
-                        null_sum = sector_data.isnull().sum()
+                        null_sum = _is_missing(sector_data, col).sum()
 
                         # Apply the appropriate conversion method
                         if use_polars_conversion:
@@ -3407,7 +3422,7 @@ def missing_vals_tbl(
                     sector_size = n_rows - start_row
 
                     sector_data = data[start_row:n_rows][col]
-                    null_sum = sector_data.isnull().sum()
+                    null_sum = _is_missing(sector_data, col).sum()
 
                     # Apply the appropriate conversion method
                     if use_polars_conversion:
@@ -3446,11 +3461,11 @@ def missing_vals_tbl(
         # Get a dictionary of counts of missing values in each column
         if df_lib_name_gt == "polars":
             missing_val_counts = {
-                col: data[col].isnull().sum().to_polars() for col in data.columns
+                col: _is_missing(data[col], col).sum().to_polars() for col in data.columns
             }  # pragma: no cover
         else:
             missing_val_counts = {
-                col: data[col].isnull().sum().to_pandas() for col in data.columns
+                col: _is_missing(data[col], col).sum().to_pandas() for col in data.columns
             }  # pragma: no cover
 
     if pl_pb_tbl:
@@ -3459,15 +3474,22 @@ def missing_vals_tbl(
 
         # Helper function for DataFrame missing value calculation (Polars/Pandas)
         def _calculate_missing_proportions_dataframe(is_polars: bool = False):
-            null_method = "is_null" if is_polars else "isnull"
+            def _is_missing(col_data):
+                if not is_polars:
+                    # Pandas' `isnull()` already counts NaN as missing
+                    return col_data.isnull()
+                # A NaN in a float column counts as missing, as in `col_vals_null()` and the
+                # other checks for missing values
+                if col_data.dtype.is_float():
+                    return col_data.is_null() | col_data.is_nan()
+                return col_data.is_null()
 
             missing_vals = {
                 col: [
                     (
-                        getattr(
-                            data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col],
-                            null_method,
-                        )().sum()
+                        _is_missing(
+                            data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col]
+                        ).sum()
                         / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
                         * 100
                         if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
@@ -3477,7 +3499,7 @@ def missing_vals_tbl(
                 ]
                 + [
                     (
-                        getattr(data[cut_points[-1] : n_rows][col], null_method)().sum()
+                        _is_missing(data[cut_points[-1] : n_rows][col]).sum()
                         / (n_rows - cut_points[-1])
                         * 100
                         if n_rows > cut_points[-1]
@@ -3497,9 +3519,7 @@ def missing_vals_tbl(
             }
 
             # Get a dictionary of counts of missing values in each column
-            missing_val_counts = {
-                col: getattr(data[col], null_method)().sum() for col in data.columns
-            }
+            missing_val_counts = {col: _is_missing(data[col]).sum() for col in data.columns}
 
             return formatted_missing_vals, missing_val_counts
 
@@ -3517,6 +3537,21 @@ def missing_vals_tbl(
 
         elif "pyspark" in tbl_type:
             from pyspark.sql.functions import col as pyspark_col
+            from pyspark.sql.functions import isnan
+            from pyspark.sql.types import DoubleType, FloatType
+
+            # A NaN in a float column counts as missing, as in `col_vals_null()` and the other
+            # checks for missing values
+            nan_cols = {
+                field.name
+                for field in data.schema.fields
+                if isinstance(field.dataType, (DoubleType, FloatType))
+            }
+
+            def _is_missing(col_name: str):
+                if col_name in nan_cols:
+                    return pyspark_col(col_name).isNull() | isnan(pyspark_col(col_name))
+                return pyspark_col(col_name).isNull()
 
             # PySpark implementation for missing values calculation
             missing_vals = {}
@@ -3543,7 +3578,7 @@ def missing_vals_tbl(
                         )
 
                         # Count nulls in this sector
-                        null_count = sector_data.filter(pyspark_col(col_name).isNull()).count()  # type: ignore[call-arg]
+                        null_count = sector_data.filter(_is_missing(col_name)).count()  # type: ignore[call-arg]
                         missing_prop = (null_count / sector_size) * 100
                         col_missing_props.append(missing_prop)
                     else:
@@ -3563,7 +3598,7 @@ def missing_vals_tbl(
                         pyspark_col("row_num") > start_row
                     )
 
-                    null_count = sector_data.filter(pyspark_col(col_name).isNull()).count()  # type: ignore[call-arg]
+                    null_count = sector_data.filter(_is_missing(col_name)).count()  # type: ignore[call-arg]
                     missing_prop = (null_count / sector_size) * 100
                     col_missing_props.append(missing_prop)
                 else:
@@ -3583,7 +3618,7 @@ def missing_vals_tbl(
             # Get a dictionary of counts of missing values in each column
             missing_val_counts = {}
             for col_name in data.columns:
-                null_count = data.filter(pyspark_col(col_name).isNull()).count()  # type: ignore[call-arg]
+                null_count = data.filter(_is_missing(col_name)).count()  # type: ignore[call-arg]
                 missing_val_counts[col_name] = null_count
 
     # From `missing_vals`, create the DataFrame with the missing value proportions
