@@ -88,7 +88,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -137,7 +137,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/advanced-validation/ai-validation-editor.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/advanced-validation/ai-validation-editor.html">
@@ -193,7 +193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -740,7 +740,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="editing-a-plan-with-editvalidation" class="level1">
 <h1>Editing a Plan with <a href="../../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a></h1>
 <p>Suppose you have an existing plan:</p>
-<div id="29637f55" class="cell" data-execution_count="1">
+<div id="05263ce4" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -750,7 +750,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Describe the change you want in plain English and hand both to <a href="../../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a>:</p>
-<div id="ffb14456" class="cell" data-execution_count="2">
+<div id="4119a359" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>edited <span class="op">=</span> pb.EditValidation(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    validation<span class="op">=</span>validation,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    instruction<span class="op">=</span><span class="st">"Loosen the d check to 50, drop the b regex, and add a not-null check on a."</span>,</span>
@@ -766,8 +766,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The Editor proposes; you dispose. Before anything runs, inspect what the model changed using the <code>edited</code> object from above.</p>
 <section id="as-a-unified-diff" class="level2">
 <h2 class="anchored" data-anchor-id="as-a-unified-diff">As a Unified Diff</h2>
-<p><a href="../../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link"><code>diff()</code></a> returns a textual, line-level diff of the original plan versus the revised plan:</p>
-<div id="45021130" class="cell" data-execution_count="4">
+<p><a href="../../reference/pointblank.EditValidation.diff.html" class="gdls-link"><code>diff()</code></a> returns a textual, line-level diff of the original plan versus the revised plan:</p>
+<div id="1c045348" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(edited.diff())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>--- original_plan.py
@@ -789,8 +789,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="as-a-structured-change-list" class="level2">
 <h2 class="anchored" data-anchor-id="as-a-structured-change-list">As a Structured Change List</h2>
-<p><a href="../../reference/EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link"><code>changed_steps()</code></a> compares the two plans at the level of validation steps and returns a structured list. Unlike the textual diff, this is robust to reformatting (it compares whole steps rather than lines):</p>
-<div id="a39e7e8f" class="cell" data-execution_count="5">
+<p><a href="../../reference/pointblank.EditValidation.changed_steps.html" class="gdls-link"><code>changed_steps()</code></a> compares the two plans at the level of validation steps and returns a structured list. Unlike the textual diff, this is robust to reformatting (it compares whole steps rather than lines):</p>
+<div id="f34b20c3" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>edited.changed_steps()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>[{'action': 'modify',
@@ -809,71 +809,71 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="as-a-table" class="level2">
 <h2 class="anchored" data-anchor-id="as-a-table">As a Table</h2>
-<p><a href="../../reference/EditValidation.html#pointblank.EditValidation.review" class="gdls-link"><code>review()</code></a> renders the same change list as a <a href="https://posit-dev.github.io/great-tables/">Great Tables</a> object, color-coding additions, removals, and modifications for quick visual review in a notebook:</p>
-<div id="b5e9c7b3" class="cell" data-execution_count="6">
+<p><a href="../../reference/pointblank.EditValidation.review.html" class="gdls-link"><code>review()</code></a> renders the same change list as a <a href="https://posit-dev.github.io/great-tables/">Great Tables</a> object, color-coding additions, removals, and modifications for quick visual review in a notebook:</p>
+<div id="a56a117a" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>edited.review()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
-<div id="bnuelkiptm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="bfdzyyxqlj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
-#bnuelkiptm table {
+#bfdzyyxqlj table {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#bnuelkiptm thead, tbody, tfoot, tr, td, th { border-style: none; }
+#bfdzyyxqlj thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#bnuelkiptm p { margin: 0; padding: 0; }
- #bnuelkiptm .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #bnuelkiptm .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #bnuelkiptm .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #bnuelkiptm .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #bnuelkiptm .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #bnuelkiptm .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #bnuelkiptm .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #bnuelkiptm .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #bnuelkiptm .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #bnuelkiptm .gt_column_spanner_outer:first-child { padding-left: 0; }
- #bnuelkiptm .gt_column_spanner_outer:last-child { padding-right: 0; }
- #bnuelkiptm .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #bnuelkiptm .gt_spanner_row { border-bottom-style: hidden; }
- #bnuelkiptm .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #bnuelkiptm .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #bnuelkiptm .gt_from_md> :first-child { margin-top: 0; }
- #bnuelkiptm .gt_from_md> :last-child { margin-bottom: 0; }
- #bnuelkiptm .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #bnuelkiptm .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #bnuelkiptm .gt_indent_1 { text-indent: 5px; }
- #bnuelkiptm .gt_indent_2 { text-indent: calc(5px * 2); }
- #bnuelkiptm .gt_indent_3 { text-indent: calc(5px * 3); }
- #bnuelkiptm .gt_indent_4 { text-indent: calc(5px * 4); }
- #bnuelkiptm .gt_indent_5 { text-indent: calc(5px * 5); }
- #bnuelkiptm .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #bnuelkiptm .gt_row_group_first td { border-top-width: 2px; }
- #bnuelkiptm .gt_row_group_first th { border-top-width: 2px; }
- #bnuelkiptm .gt_striped { color: #333333; background-color: #F4F4F4; }
- #bnuelkiptm .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #bnuelkiptm .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #bnuelkiptm .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #bnuelkiptm .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #bnuelkiptm .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #bnuelkiptm .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #bnuelkiptm .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #bnuelkiptm .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #bnuelkiptm .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #bnuelkiptm .gt_left { text-align: left; }
- #bnuelkiptm .gt_center { text-align: center; }
- #bnuelkiptm .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #bnuelkiptm .gt_font_normal { font-weight: normal; }
- #bnuelkiptm .gt_font_bold { font-weight: bold; }
- #bnuelkiptm .gt_font_italic { font-style: italic; }
- #bnuelkiptm .gt_super { font-size: 65%; }
- #bnuelkiptm .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #bnuelkiptm .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #bnuelkiptm .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #bnuelkiptm .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #bnuelkiptm .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #bnuelkiptm .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#bfdzyyxqlj p { margin: 0; padding: 0; }
+ #bfdzyyxqlj .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #bfdzyyxqlj .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #bfdzyyxqlj .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #bfdzyyxqlj .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #bfdzyyxqlj .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #bfdzyyxqlj .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #bfdzyyxqlj .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #bfdzyyxqlj .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #bfdzyyxqlj .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #bfdzyyxqlj .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #bfdzyyxqlj .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #bfdzyyxqlj .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #bfdzyyxqlj .gt_spanner_row { border-bottom-style: hidden; }
+ #bfdzyyxqlj .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #bfdzyyxqlj .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #bfdzyyxqlj .gt_from_md> :first-child { margin-top: 0; }
+ #bfdzyyxqlj .gt_from_md> :last-child { margin-bottom: 0; }
+ #bfdzyyxqlj .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #bfdzyyxqlj .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #bfdzyyxqlj .gt_indent_1 { text-indent: 5px; }
+ #bfdzyyxqlj .gt_indent_2 { text-indent: calc(5px * 2); }
+ #bfdzyyxqlj .gt_indent_3 { text-indent: calc(5px * 3); }
+ #bfdzyyxqlj .gt_indent_4 { text-indent: calc(5px * 4); }
+ #bfdzyyxqlj .gt_indent_5 { text-indent: calc(5px * 5); }
+ #bfdzyyxqlj .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #bfdzyyxqlj .gt_row_group_first td { border-top-width: 2px; }
+ #bfdzyyxqlj .gt_row_group_first th { border-top-width: 2px; }
+ #bfdzyyxqlj .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #bfdzyyxqlj .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #bfdzyyxqlj .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #bfdzyyxqlj .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #bfdzyyxqlj .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #bfdzyyxqlj .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #bfdzyyxqlj .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #bfdzyyxqlj .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #bfdzyyxqlj .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #bfdzyyxqlj .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #bfdzyyxqlj .gt_left { text-align: left; }
+ #bfdzyyxqlj .gt_center { text-align: center; }
+ #bfdzyyxqlj .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #bfdzyyxqlj .gt_font_normal { font-weight: normal; }
+ #bfdzyyxqlj .gt_font_bold { font-weight: bold; }
+ #bfdzyyxqlj .gt_font_italic { font-style: italic; }
+ #bfdzyyxqlj .gt_super { font-size: 65%; }
+ #bfdzyyxqlj .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #bfdzyyxqlj .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #bfdzyyxqlj .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #bfdzyyxqlj .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #bfdzyyxqlj .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #bfdzyyxqlj .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table class="gt_table" aria-labelledby="title" aria-describedby="subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
@@ -922,8 +922,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="accepting-the-edit" class="level1">
 <h1>Accepting the Edit</h1>
-<p>Once you’re satisfied with the proposed change, <a href="../../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a> executes the revised plan and returns a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, ready to interrogate:</p>
-<div id="56fccceb" class="cell" data-execution_count="7">
+<p>Once you’re satisfied with the proposed change, <a href="../../reference/pointblank.EditValidation.accept.html" class="gdls-link"><code>accept()</code></a> executes the revised plan and returns a <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, ready to interrogate:</p>
+<div id="625b4acf" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>plan <span class="op">=</span> edited.accept()          <span class="co"># a Validate (not yet interrogated)</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>plan.interrogate()              <span class="co"># run it</span></span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
@@ -1121,18 +1121,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td style="height: 40px;" headers="pb_tbl-extract_upd" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
-<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-11-11 23:35:51 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-11-11 23:35:51 UTC</span></div></span></td></tr></tfoot>
+<tfoot><tr class="gt_sourcenotes"><td class="gt_sourcenote" colspan="14" style="text-align: left;"><span class="gt_from_md"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-11-16 22:25:48 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-11-16 22:25:48 UTC</span></div></span></td></tr></tfoot>
 </table>
 
 </div>
 </div>
 </div>
-<p>The data bound to the plan is the <code>data=</code> you passed to <a href="../../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a>; you can override it with <code>edited.accept(data=other_table)</code>. Nothing runs until you call <a href="../../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link gdls-code">accept()</a>, and the plan isn’t interrogated until you call <a href="../../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a>, so there’s a clear, deliberate boundary between the model’s proposal and execution.</p>
+<p>The data bound to the plan is the <code>data=</code> you passed to <a href="../../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a>; you can override it with <code>edited.accept(data=other_table)</code>. Nothing runs until you call <a href="../../reference/pointblank.EditValidation.accept.html" class="gdls-link gdls-code">accept()</a>, and the plan isn’t interrogated until you call <a href="../../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link gdls-code">interrogate()</a>, so there’s a clear, deliberate boundary between the model’s proposal and execution.</p>
 </section>
 <section id="comparing-two-plans-without-a-model" class="level1">
 <h1>Comparing Two Plans Without a Model</h1>
-<p>You don’t need an LLM to review the difference between two plans. When you already have a “before” and “after” (for example, two versions of a plan from source control), <a href="../../reference/EditValidation.html#pointblank.EditValidation.from_plans" class="gdls-link"><code>EditValidation.from_plans()</code></a> builds the same comparison object directly, with all of <a href="../../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link gdls-code">diff()</a>, <a href="../../reference/EditValidation.html#pointblank.EditValidation.changed_steps" class="gdls-link gdls-code">changed_steps()</a>, and <a href="../../reference/EditValidation.html#pointblank.EditValidation.review" class="gdls-link gdls-code">review()</a> available and no API key required. The following example is fully live:</p>
-<div id="266570c1" class="cell" data-execution_count="8">
+<p>You don’t need an LLM to review the difference between two plans. When you already have a “before” and “after” (for example, two versions of a plan from source control), <a href="../../reference/pointblank.EditValidation.from_plans.html" class="gdls-link"><code>EditValidation.from_plans()</code></a> builds the same comparison object directly, with all of <a href="../../reference/pointblank.EditValidation.diff.html" class="gdls-link gdls-code">diff()</a>, <a href="../../reference/pointblank.EditValidation.changed_steps.html" class="gdls-link gdls-code">changed_steps()</a>, and <a href="../../reference/pointblank.EditValidation.review.html" class="gdls-link gdls-code">review()</a> available and no API key required. The following example is fully live:</p>
+<div id="f8853e6d" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>before <span class="op">=</span> pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>)).col_vals_gt(columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span><span class="dv">100</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>after <span class="op">=</span> (</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
@@ -1142,67 +1142,67 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>pb.EditValidation.from_plans(before, after).review()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
-<div id="ztwtwxkidw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="woypxdnrcd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
-#ztwtwxkidw table {
+#woypxdnrcd table {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#ztwtwxkidw thead, tbody, tfoot, tr, td, th { border-style: none; }
+#woypxdnrcd thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#ztwtwxkidw p { margin: 0; padding: 0; }
- #ztwtwxkidw .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #ztwtwxkidw .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #ztwtwxkidw .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #ztwtwxkidw .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #ztwtwxkidw .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #ztwtwxkidw .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #ztwtwxkidw .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #ztwtwxkidw .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #ztwtwxkidw .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #ztwtwxkidw .gt_column_spanner_outer:first-child { padding-left: 0; }
- #ztwtwxkidw .gt_column_spanner_outer:last-child { padding-right: 0; }
- #ztwtwxkidw .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #ztwtwxkidw .gt_spanner_row { border-bottom-style: hidden; }
- #ztwtwxkidw .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #ztwtwxkidw .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #ztwtwxkidw .gt_from_md> :first-child { margin-top: 0; }
- #ztwtwxkidw .gt_from_md> :last-child { margin-bottom: 0; }
- #ztwtwxkidw .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #ztwtwxkidw .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #ztwtwxkidw .gt_indent_1 { text-indent: 5px; }
- #ztwtwxkidw .gt_indent_2 { text-indent: calc(5px * 2); }
- #ztwtwxkidw .gt_indent_3 { text-indent: calc(5px * 3); }
- #ztwtwxkidw .gt_indent_4 { text-indent: calc(5px * 4); }
- #ztwtwxkidw .gt_indent_5 { text-indent: calc(5px * 5); }
- #ztwtwxkidw .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #ztwtwxkidw .gt_row_group_first td { border-top-width: 2px; }
- #ztwtwxkidw .gt_row_group_first th { border-top-width: 2px; }
- #ztwtwxkidw .gt_striped { color: #333333; background-color: #F4F4F4; }
- #ztwtwxkidw .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #ztwtwxkidw .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #ztwtwxkidw .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #ztwtwxkidw .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #ztwtwxkidw .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #ztwtwxkidw .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #ztwtwxkidw .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #ztwtwxkidw .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #ztwtwxkidw .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #ztwtwxkidw .gt_left { text-align: left; }
- #ztwtwxkidw .gt_center { text-align: center; }
- #ztwtwxkidw .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #ztwtwxkidw .gt_font_normal { font-weight: normal; }
- #ztwtwxkidw .gt_font_bold { font-weight: bold; }
- #ztwtwxkidw .gt_font_italic { font-style: italic; }
- #ztwtwxkidw .gt_super { font-size: 65%; }
- #ztwtwxkidw .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #ztwtwxkidw .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #ztwtwxkidw .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #ztwtwxkidw .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #ztwtwxkidw .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #ztwtwxkidw .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#woypxdnrcd p { margin: 0; padding: 0; }
+ #woypxdnrcd .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #woypxdnrcd .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #woypxdnrcd .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #woypxdnrcd .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #woypxdnrcd .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #woypxdnrcd .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #woypxdnrcd .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #woypxdnrcd .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #woypxdnrcd .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #woypxdnrcd .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #woypxdnrcd .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #woypxdnrcd .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #woypxdnrcd .gt_spanner_row { border-bottom-style: hidden; }
+ #woypxdnrcd .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #woypxdnrcd .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #woypxdnrcd .gt_from_md> :first-child { margin-top: 0; }
+ #woypxdnrcd .gt_from_md> :last-child { margin-bottom: 0; }
+ #woypxdnrcd .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #woypxdnrcd .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #woypxdnrcd .gt_indent_1 { text-indent: 5px; }
+ #woypxdnrcd .gt_indent_2 { text-indent: calc(5px * 2); }
+ #woypxdnrcd .gt_indent_3 { text-indent: calc(5px * 3); }
+ #woypxdnrcd .gt_indent_4 { text-indent: calc(5px * 4); }
+ #woypxdnrcd .gt_indent_5 { text-indent: calc(5px * 5); }
+ #woypxdnrcd .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #woypxdnrcd .gt_row_group_first td { border-top-width: 2px; }
+ #woypxdnrcd .gt_row_group_first th { border-top-width: 2px; }
+ #woypxdnrcd .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #woypxdnrcd .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #woypxdnrcd .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #woypxdnrcd .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #woypxdnrcd .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #woypxdnrcd .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #woypxdnrcd .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #woypxdnrcd .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #woypxdnrcd .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #woypxdnrcd .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #woypxdnrcd .gt_left { text-align: left; }
+ #woypxdnrcd .gt_center { text-align: center; }
+ #woypxdnrcd .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #woypxdnrcd .gt_font_normal { font-weight: normal; }
+ #woypxdnrcd .gt_font_bold { font-weight: bold; }
+ #woypxdnrcd .gt_font_italic { font-style: italic; }
+ #woypxdnrcd .gt_super { font-size: 65%; }
+ #woypxdnrcd .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #woypxdnrcd .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #woypxdnrcd .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #woypxdnrcd .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #woypxdnrcd .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #woypxdnrcd .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table class="gt_table" aria-labelledby="title" aria-describedby="subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
@@ -1246,8 +1246,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Guardrails</h1>
 <p>Two guardrails keep the flow from handing you broken code.</p>
 <ul>
-<li><strong>Syntax and lint check.</strong> The revised code is parsed with <code>ast.parse()</code> and checked for validation-method typos before it’s returned. <a href="../../reference/EditValidation.html#pointblank.EditValidation.validate_syntax" class="gdls-link"><code>validate_syntax()</code></a> reports whether the current revision passes.</li>
-<li><strong>Automatic re-prompt.</strong> If the check fails, the model is automatically re-prompted with the error message to correct itself, up to <code>max_reprompts</code> times (default <code>1</code>). If the code still doesn’t pass, <a href="../../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link"><code>accept()</code></a> refuses to run it and points you at <a href="../../reference/EditValidation.html#pointblank.EditValidation.to_code" class="gdls-link"><code>to_code()</code></a> so you can fix it by hand.</li>
+<li><strong>Syntax and lint check.</strong> The revised code is parsed with <code>ast.parse()</code> and checked for validation-method typos before it’s returned. <a href="../../reference/pointblank.EditValidation.validate_syntax.html" class="gdls-link"><code>validate_syntax()</code></a> reports whether the current revision passes.</li>
+<li><strong>Automatic re-prompt.</strong> If the check fails, the model is automatically re-prompted with the error message to correct itself, up to <code>max_reprompts</code> times (default <code>1</code>). If the code still doesn’t pass, <a href="../../reference/pointblank.EditValidation.accept.html" class="gdls-link"><code>accept()</code></a> refuses to run it and points you at <a href="../../reference/pointblank.EditValidation.to_code.html" class="gdls-link"><code>to_code()</code></a> so you can fix it by hand.</li>
 </ul>
 <p>These same guardrails are also applied to <a href="../../user-guide/advanced-validation/draft-validation.html"><code>DraftValidation</code></a>.</p>
 </section>
@@ -1257,10 +1257,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="suggesting-improvements" class="level2">
 <h2 class="anchored" data-anchor-id="suggesting-improvements">Suggesting Improvements</h2>
 <p><a href="../../reference/Validate.suggest_improvements.html#pointblank.Validate.suggest_improvements" class="gdls-link"><code>suggest_improvements()</code></a> profiles the table, derives an instruction targeting gaps in the current plan (columns with no coverage, missing thresholds), and asks the model to extend the plan. It returns an <a href="../../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> you review and accept as usual:</p>
-<div id="777c7e9f" class="cell" data-execution_count="9">
+<div id="a74a44d5" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>proposal <span class="op">=</span> validation.suggest_improvements(model<span class="op">=</span><span class="st">"anthropic:claude-opus-4-8"</span>)</span></code></pre></div>
 </div>
-<div id="913da8d5" class="cell" data-execution_count="11">
+<div id="8e1d53f8" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(proposal.diff())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>--- original_plan.py
@@ -1286,7 +1286,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="building-a-plan-from-a-prompt" class="level2">
 <h2 class="anchored" data-anchor-id="building-a-plan-from-a-prompt">Building a Plan from a Prompt</h2>
 <p><a href="../../reference/Validate.from_prompt.html#pointblank.Validate.from_prompt" class="gdls-link"><code>from_prompt()</code></a> is the same flow starting from an <em>empty</em> plan: the model authors steps that satisfy your prompt, using a <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> profile of the data and any table name, label, and thresholds carried by the object you call it on:</p>
-<div id="4703419b" class="cell" data-execution_count="12">
+<div id="a821742f" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>), tbl_name<span class="op">=</span><span class="st">"small_table"</span>)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>authored <span class="op">=</span> base.from_prompt(</span>
@@ -1294,7 +1294,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-opus-4-8"</span>,</span>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<div id="b5028200" class="cell" data-execution_count="14">
+<div id="68ef6b18" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(authored.to_code())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>import pointblank as pb
@@ -1783,7 +1783,7 @@ validation</code></pre>
     </div>
   </div>
 </footer>
-<script src="../../github-widget.js"></script>
+<script src="../../repository-widget.js"></script>
 <script src="../../copy-page.js"></script>
 <script src="../../sidebar-wrap.js"></script>
 <script src="../../sidebar-float.js"></script>

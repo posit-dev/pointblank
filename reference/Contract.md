@@ -59,16 +59,16 @@ An optional longer description of the contract's purpose. It's kept with the con
 Default [`Thresholds`](../reference/Thresholds.md#pointblank.Thresholds) for the validation built from this contract. These set when a failing step is considered a 'warning', 'error', or 'critical' issue. If the contract is used in a [Pipeline](../reference/Pipeline.md#pointblank.Pipeline) that has its own thresholds, the pipeline's thresholds take precedence.
 
 `on_violation: Literal["warn", "raise", "log"] = "warn"`  
-What a [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline) should do when data fails this contract: `"warn"` (the default) issues a `UserWarning`, `"raise"` raises a [`ContractViolationError`](../reference/ContractViolationError.md#pointblank.ContractViolationError) (a `RuntimeError`), and `"log"` writes a warning to the `"pointblank.contract"` logger. This setting applies only when the contract is enforced through a [Pipeline](../reference/Pipeline.md#pointblank.Pipeline). Calling [`validate()`](../reference/Contract.md#pointblank.Contract.validate) directly always returns the validation without warning or raising, so check the result yourself (e.g., with [`assert_passing()`](../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing)).
+What a [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline) should do when data fails this contract: `"warn"` (the default) issues a `UserWarning`, `"raise"` raises a [`ContractViolationError`](../reference/ContractViolationError.md#pointblank.ContractViolationError) (a `RuntimeError`), and `"log"` writes a warning to the `"pointblank.contract"` logger. This setting applies only when the contract is enforced through a [Pipeline](../reference/Pipeline.md#pointblank.Pipeline). Calling [`validate()`](../reference/pointblank.Contract.validate.md) directly always returns the validation without warning or raising, so check the result yourself (e.g., with [`assert_passing()`](../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing)).
 
 ## Returns
 
 `Contract`  
-A [Contract](../reference/Contract.md#pointblank.Contract) object. Apply it to data with [`validate()`](../reference/Contract.md#pointblank.Contract.validate), or with [`to_validate()`](../reference/Contract.md#pointblank.Contract.to_validate) when you want to add more steps before interrogating.
+A [Contract](../reference/Contract.md#pointblank.Contract) object. Apply it to data with [`validate()`](../reference/pointblank.Contract.validate.md), or with [`to_validate()`](../reference/pointblank.Contract.to_validate.md) when you want to add more steps before interrogating.
 
 ## How A Contract Becomes A Validation
 
-A contract holds no data and runs nothing until it's applied to a table. Calling [`to_validate()`](../reference/Contract.md#pointblank.Contract.to_validate) (or [`validate()`](../reference/Contract.md#pointblank.Contract.validate), which also interrogates) compiles the contract into a [Validate](../reference/Validate.md#pointblank.Validate) object:
+A contract holds no data and runs nothing until it's applied to a table. Calling [`to_validate()`](../reference/pointblank.Contract.to_validate.md) (or [`validate()`](../reference/pointblank.Contract.validate.md), which also interrogates) compiles the contract into a [Validate](../reference/Validate.md#pointblank.Validate) object:
 
 1.  a [Validate](../reference/Validate.md#pointblank.Validate) is created for the table, with `tbl_name=` set to the contract name, a label of the form `"Contract: <name> v<version>"`, and the contract's `thresholds=`, `owner=`, `consumers=`, and `version=`
 2.  if the contract has a schema, a [col_schema_match()](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) step is added first
@@ -85,11 +85,11 @@ These validation methods can be used in a contract's steps:
 - table-level checks: [col_schema_match](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match), [col_count_match](../reference/Validate.col_count_match.md#pointblank.Validate.col_count_match), [row_count_match](../reference/Validate.row_count_match.md#pointblank.Validate.row_count_match), [rows_distinct](../reference/Validate.rows_distinct.md#pointblank.Validate.rows_distinct), and [rows_complete](../reference/Validate.rows_complete.md#pointblank.Validate.rows_complete)
 - multi-condition checks: [conjointly](../reference/Validate.conjointly.md#pointblank.Validate.conjointly), with its expressions given as a list in `exprs=`
 
-Each takes the same arguments as the [`Validate`](../reference/Validate.md#pointblank.Validate) method of the same name. A step that names any other method is rejected with a `ValueError` when the contract is created. For steps that a contract can't express, compile the contract with [`to_validate()`](../reference/Contract.md#pointblank.Contract.to_validate) and chain the extra methods onto the result.
+Each takes the same arguments as the [`Validate`](../reference/Validate.md#pointblank.Validate) method of the same name. A step that names any other method is rejected with a `ValueError` when the contract is created. For steps that a contract can't express, compile the contract with [`to_validate()`](../reference/pointblank.Contract.to_validate.md) and chain the extra methods onto the result.
 
 ## Serialization
 
-Contracts are meant to live outside your code, so they round-trip through YAML and plain dictionaries. [`to_yaml()`](../reference/Contract.md#pointblank.Contract.to_yaml) and [`from_yaml()`](../reference/Contract.md#pointblank.Contract.from_yaml) work with YAML files, and [`to_dict()`](../reference/Contract.md#pointblank.Contract.to_dict) and [`from_dict()`](../reference/Contract.md#pointblank.Contract.from_dict) work with dictionaries (useful for JSON or a configuration system). The schema is stored as a mapping of column names to type strings, the thresholds as a mapping of levels to values, and each step as a single-key mapping from method name to arguments. Step arguments must be plain data (strings, numbers, booleans, dates, lists, and dictionaries) for a contract to be written to YAML, although step-level [Thresholds](../reference/Thresholds.md#pointblank.Thresholds) objects and tuples are converted to dictionaries automatically. A contract with other objects in its steps, such as a column selector (e.g., `pb.starts_with("amt_")`), a Polars expression, or a function, can't be written: [to_yaml()](../reference/Contract.md#pointblank.Contract.to_yaml) raises a `ValueError` that says where the object is. Keep contracts like that in Python.
+Contracts are meant to live outside your code, so they round-trip through YAML and plain dictionaries. [`to_yaml()`](../reference/pointblank.Contract.to_yaml.md) and [`from_yaml()`](../reference/pointblank.Contract.from_yaml.md) work with YAML files, and [`to_dict()`](../reference/pointblank.Contract.to_dict.md) and [`from_dict()`](../reference/pointblank.Contract.from_dict.md) work with dictionaries (useful for JSON or a configuration system). The schema is stored as a mapping of column names to type strings, the thresholds as a mapping of levels to values, and each step as a single-key mapping from method name to arguments. Step arguments must be plain data (strings, numbers, booleans, dates, lists, and dictionaries) for a contract to be written to YAML, although step-level [Thresholds](../reference/Thresholds.md#pointblank.Thresholds) objects and tuples are converted to dictionaries automatically. A contract with other objects in its steps, such as a column selector (e.g., `pb.starts_with("amt_")`), a Polars expression, or a function, can't be written: [to_yaml()](../reference/pointblank.Contract.to_yaml.md) raises a `ValueError` that says where the object is. Keep contracts like that in Python.
 
 ## Working With Other Pointblank Tools
 
@@ -97,7 +97,7 @@ A contract is the building block for several other parts of the API:
 
 - [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline) pairs a source contract and a target contract around a transformation function. It validates the input, runs the transformation, validates the output, and applies each contract's `on_violation=` setting. The results come back in a [`PipelineResult`](../reference/PipelineResult.md#pointblank.PipelineResult).
 - [`export_contract()`](../reference/export_contract.md#pointblank.export_contract) converts a contract into an external format (JSON Schema, Frictionless Table Schema, dbt, or the Open Data Contract Standard), and [`import_contract()`](../reference/import_contract.md#pointblank.import_contract) reads one of those formats. Call [`to_contract()`](../reference/ContractImport.md#pointblank.ContractImport.to_contract) on the result to get a [Contract](../reference/Contract.md#pointblank.Contract). Each format supports a different set of rules, so checks with no equivalent in the target format are left out of the export.
-- Because [`to_validate()`](../reference/Contract.md#pointblank.Contract.to_validate) returns an ordinary [Validate](../reference/Validate.md#pointblank.Validate) object, a contract can be combined with reusable [`Steps`](../reference/Steps.md#pointblank.Steps) libraries through [`Validate.add_steps()`](../reference/Validate.add_steps.md#pointblank.Validate.add_steps).
+- Because [`to_validate()`](../reference/pointblank.Contract.to_validate.md) returns an ordinary [Validate](../reference/Validate.md#pointblank.Validate) object, a contract can be combined with reusable [`Steps`](../reference/Steps.md#pointblank.Steps) libraries through [`Validate.add_steps()`](../reference/Validate.add_steps.md#pointblank.Validate.add_steps).
 
 ## Examples
 
@@ -135,7 +135,7 @@ orders_contract
 
 The contract itself is just a definition. Printing it shows a short summary: the name, direction, version, whether a schema is set, and the number of steps.
 
-Now let's apply the contract to a day's extract that meets every expectation. The [`validate()`](../reference/Contract.md#pointblank.Contract.validate) method compiles the contract against the table and interrogates it, returning a [Validate](../reference/Validate.md#pointblank.Validate) object that displays as a validation report.
+Now let's apply the contract to a day's extract that meets every expectation. The [`validate()`](../reference/pointblank.Contract.validate.md) method compiles the contract against the table and interrogates it, returning a [Validate](../reference/Validate.md#pointblank.Validate) object that displays as a validation report.
 
 ``` python
 orders_day_1 = pl.DataFrame(
@@ -181,7 +181,7 @@ validation.all_passed()
 
     False
 
-To share the contract with another team or keep it under version control, write it out as YAML. Called without a path, [`to_yaml()`](../reference/Contract.md#pointblank.Contract.to_yaml) returns the YAML text.
+To share the contract with another team or keep it under version control, write it out as YAML. Called without a path, [`to_yaml()`](../reference/pointblank.Contract.to_yaml.md) returns the YAML text.
 
 ``` python
 print(orders_contract.to_yaml())
@@ -221,9 +221,9 @@ print(orders_contract.to_yaml())
         warning: 1
         error: 0.1
 
-The YAML lists the metadata, schema, steps, and thresholds in a form that's easy to read and review. [`from_yaml()`](../reference/Contract.md#pointblank.Contract.from_yaml) reads it back into an equivalent [Contract](../reference/Contract.md#pointblank.Contract).
+The YAML lists the metadata, schema, steps, and thresholds in a form that's easy to read and review. [`from_yaml()`](../reference/pointblank.Contract.from_yaml.md) reads it back into an equivalent [Contract](../reference/Contract.md#pointblank.Contract).
 
-Finally, a contract can be the starting point for a stricter, local validation. Here, [`to_validate()`](../reference/Contract.md#pointblank.Contract.to_validate) compiles the contract without interrogating, and we add one more check (orders of 100 or less) before calling [`interrogate()`](../reference/Validate.interrogate.md#pointblank.Validate.interrogate).
+Finally, a contract can be the starting point for a stricter, local validation. Here, [`to_validate()`](../reference/pointblank.Contract.to_validate.md) compiles the contract without interrogating, and we add one more check (orders of 100 or less) before calling [`interrogate()`](../reference/Validate.interrogate.md#pointblank.Validate.interrogate).
 
 ``` python
 (
@@ -254,524 +254,13 @@ Convert a contract to JSON Schema, Frictionless, dbt, or ODCS.
 [import_contract()](../reference/import_contract.md#pointblank.import_contract)  
 Read an external format, then call [to_contract()](../reference/ContractImport.md#pointblank.ContractImport.to_contract) on it.
 
-## Methods
+## Functions
 
 | Name | Description |
 |----|----|
-| [validate()](#validate) | Check a table against the contract. |
-| [to_validate()](#to_validate) | Compile the contract into a validation plan for a table, without running it. |
-| [to_yaml()](#to_yaml) | Write the contract as YAML. |
-| [from_yaml()](#from_yaml) | Read a contract from a YAML file. |
-| [to_dict()](#to_dict) | Convert the contract to a dictionary. |
-| [from_dict()](#from_dict) | Create a contract from a dictionary. |
-
-### validate()
-
-Check a table against the contract.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L838-L930)
-
-``` python
-validate(data)
-```
-
-This is the usual way to apply a contract. It compiles the contract into a validation plan for the table and interrogates it right away. This is the same as calling [`to_validate()`](../reference/Contract.md#pointblank.Contract.to_validate) and then [`interrogate()`](../reference/Validate.interrogate.md#pointblank.Validate.interrogate). The result is an ordinary interrogated [`Validate`](../reference/Validate.md#pointblank.Validate) object. You can display it as a report, inspect individual steps with [`get_step_report()`](../reference/Validate.get_step_report.md#pointblank.Validate.get_step_report), pull out failing rows with [`get_data_extracts()`](../reference/Validate.get_data_extracts.md#pointblank.Validate.get_data_extracts), or check the outcome in code.
-
-A failing contract doesn't raise an error or warning here, whatever the contract's `on_violation=` setting is. That setting is applied by [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline). When you call [validate()](../reference/Contract.md#pointblank.Contract.validate) yourself, check the result with a method like [`all_passed()`](../reference/Validate.all_passed.md#pointblank.Validate.all_passed), [`assert_passing()`](../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing), or [`assert_below_threshold()`](../reference/Validate.assert_below_threshold.md#pointblank.Validate.assert_below_threshold). To add checks before the validation runs, use [`to_validate()`](../reference/Contract.md#pointblank.Contract.to_validate) instead.
-
-#### Parameters
-
-`data: IntoDataFrame`  
-The table to validate against the contract. Any table type that [Validate](../reference/Validate.md#pointblank.Validate) accepts can be used (e.g., a Polars or Pandas DataFrame, or an Ibis table).
-
-#### Returns
-
-`Validate`  
-An interrogated [Validate](../reference/Validate.md#pointblank.Validate) object with the results of every contract check.
-
-#### Raises
-
-`TypeError`  
-If a step's arguments don't fit its validation method (for example, a misspelled parameter name). Step arguments are only checked when the contract is compiled.
-
-#### Examples
-
-Here's a contract for a sensor readings feed. Each reading needs a sensor ID, the temperature must be within a plausible range, and the feed must have five rows. Any failing test unit counts as an error.
-
-``` python
-import pointblank as pb
-import polars as pl
-
-readings_contract = pb.Contract(
-    name="sensor_readings",
-    owner="iot-platform",
-    steps=[
-        pb.Step("col_vals_not_null", columns="sensor_id"),
-        pb.Step("col_vals_between", columns="temp_c", left=-40, right=60),
-        pb.Step("row_count_match", count=5),
-    ],
-    thresholds=pb.Thresholds(error=1),
-)
-
-readings = pl.DataFrame(
-    {
-        "sensor_id": ["s1", "s2", None, "s4", "s5"],
-        "temp_c": [21.5, 19.0, 22.1, 85.0, 20.4],
-    }
-)
-
-validation = readings_contract.validate(readings)
-
-validation
-```
-
-[TABLE]
-
-The row count is right, but the report shows two problems: one reading has no sensor ID, and one temperature (85.0) is out of range. Both steps reach the error threshold. Because [validate()](../reference/Contract.md#pointblank.Contract.validate) doesn't raise, a script or scheduled job decides what happens next. For example, it could test whether any step reached the error level:
-
-``` python
-validation.above_threshold(level="error")
-```
-
-    True
-
-In a pipeline where bad data should stop processing, [`assert_below_threshold()`](../reference/Validate.assert_below_threshold.md#pointblank.Validate.assert_below_threshold) raises an `AssertionError` in this situation instead.
-
-### to_validate()
-
-Compile the contract into a validation plan for a table, without running it.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L719-L836)
-
-``` python
-to_validate(data)
-```
-
-This method turns the contract into a [`Validate`](../reference/Validate.md#pointblank.Validate) object for the given table. The validation is set up with the contract's name, label, thresholds, and governance metadata (owner, consumers, and version). Then the schema check (if the contract has a schema) and each of the contract's steps are added in order. Nothing is checked yet: the plan runs when you call [`interrogate()`](../reference/Validate.interrogate.md#pointblank.Validate.interrogate) on it.
-
-Use this method instead of [`validate()`](../reference/Contract.md#pointblank.Contract.validate) when you want to do something with the plan before it runs. Most often that's adding checks that are local to one use of the data, or ones a contract can't express, such as [`col_vals_str_len()`](../reference/Validate.col_vals_str_len.md#pointblank.Validate.col_vals_str_len) or [`specially()`](../reference/Validate.specially.md#pointblank.Validate.specially). You can also attach [`Actions`](../reference/Actions.md#pointblank.Actions) and final actions this way, or combine the contract with a reusable [`Steps`](../reference/Steps.md#pointblank.Steps) library via [`add_steps()`](../reference/Validate.add_steps.md#pointblank.Validate.add_steps). The contract itself isn't changed, so these additions don't affect anyone else using it.
-
-#### Parameters
-
-`data: IntoDataFrame`  
-The table to validate against the contract. Any table type that [Validate](../reference/Validate.md#pointblank.Validate) accepts can be used (e.g., a Polars or Pandas DataFrame, or an Ibis table).
-
-#### Returns
-
-`Validate`  
-A [Validate](../reference/Validate.md#pointblank.Validate) object holding the contract's checks, not yet interrogated.
-
-#### Raises
-
-`TypeError`  
-If a step's arguments don't fit its validation method (for example, a misspelled parameter name). Step arguments are only checked when the contract is compiled.
-
-#### Examples
-
-Let's define a small contract for a table of products: a two-column schema, plus rules that product IDs are present and prices are positive.
-
-``` python
-import pointblank as pb
-import polars as pl
-
-products_contract = pb.Contract(
-    name="products",
-    version="2.0.0",
-    schema=pb.Schema(product_id="String", price="Float64"),
-    steps=[
-        pb.Step("col_vals_not_null", columns="product_id"),
-        pb.Step("col_vals_gt", columns="price", value=0),
-    ],
-)
-
-products = pl.DataFrame(
-    {
-        "product_id": ["P-100", "P-101", "P-102", "X-103"],
-        "price": [19.99, 5.49, 120.00, 7.25],
-    }
-)
-```
-
-Our team also wants product IDs to start with `"P-"`. That rule isn't part of the shared contract, so we compile the contract with `to_validate()`, add a [`col_vals_regex()`](../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex) step, and then interrogate.
-
-``` python
-(
-    products_contract.to_validate(products)
-    .col_vals_regex(columns="product_id", pattern=r"^P-")
-    .interrogate()
-)
-```
-
-[TABLE]
-
-The first three steps come from the contract (the schema check, then the two rules) and all pass. The fourth step is our addition, and it flags the ID `"X-103"`.
-
-### to_yaml()
-
-Write the contract as YAML.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1279-L1374)
-
-``` python
-to_yaml(path=None)
-```
-
-YAML is the natural way to store and share a contract. It can sit in version control next to the pipeline code, so changes to the rules go through review, and other teams can read it without running Python. This method writes the contract under a top-level `contract:` key, with the fields in a fixed order (name and metadata first, then the schema, steps, and thresholds). [`from_yaml()`](../reference/Contract.md#pointblank.Contract.from_yaml) reads the file back into an equivalent [Contract](../reference/Contract.md#pointblank.Contract).
-
-Fields that aren't set, and the default `direction=` and `on_violation=` values, are left out of the YAML (see [`to_dict()`](../reference/Contract.md#pointblank.Contract.to_dict)). Step arguments must be plain data (strings, numbers, booleans, dates, lists, and dictionaries) so that [from_yaml()](../reference/Contract.md#pointblank.Contract.from_yaml) can read them back. Step-level thresholds are converted to dictionaries automatically, but column selectors, expressions, and functions can't be written.
-
-#### Parameters
-
-`path: str | Path | None = None`  
-An optional path to write the YAML to. Any missing parent directories are created, and an existing file is overwritten. If `None` (the default), nothing is written.
-
-#### Returns
-
-`str`  
-The YAML text. It's returned whether or not `path=` is given.
-
-#### Raises
-
-`ValueError`  
-If a step argument can't be represented in YAML (for example, a column selector such as `pb.starts_with("amt_")` or a Polars expression). The message names the step and argument. Nothing is written to `path=` in this case.
-
-#### Examples
-
-Let's define a contract for a table of web sessions and get its YAML representation.
-
-``` python
-import pointblank as pb
-
-sessions_contract = pb.Contract(
-    name="web_sessions",
-    version="3.1.0",
-    owner="web-analytics",
-    consumers=["marketing", "product"],
-    on_violation="raise",
-    schema=pb.Schema(session_id="String", duration_s="Int64", device="String"),
-    steps=[
-        pb.Step("col_vals_ge", columns="duration_s", value=0),
-        pb.Step("col_vals_in_set", columns="device", set=["desktop", "mobile", "tablet"]),
-    ],
-)
-
-print(sessions_contract.to_yaml())
-```
-
-    contract:
-      name: web_sessions
-      version: 3.1.0
-      owner: web-analytics
-      consumers:
-      - marketing
-      - product
-      on_violation: raise
-      schema:
-        session_id: String
-        duration_s: Int64
-        device: String
-      steps:
-      - col_vals_ge:
-          columns: duration_s
-          value: 0
-      - col_vals_in_set:
-          columns: device
-          set:
-          - desktop
-          - mobile
-          - tablet
-
-The output lists the metadata first, including `on_violation` because it isn't the default, then the schema and the steps. Each step is written as its method name with the arguments nested below it.
-
-To save the contract, pass a file path. The parent directory is created if needed, and the YAML text is still returned. Reading the file back gives a contract equal to the original:
-
-``` python
-import tempfile
-from pathlib import Path
-
-contract_path = Path(tempfile.mkdtemp()) / "contracts" / "web_sessions.yaml"
-
-_ = sessions_contract.to_yaml(contract_path)
-
-pb.Contract.from_yaml(contract_path) == sessions_contract
-```
-
-    True
-
-The file holds everything needed to rebuild the contract. A natural place for it is version control, next to the code that produces the data, so that changes to the rules are reviewed like any other change. Wherever the contract is enforced, it can be loaded with [`from_yaml()`](../reference/Contract.md#pointblank.Contract.from_yaml) (or as part of a pipeline with [`Pipeline.from_yaml()`](../reference/Pipeline.md#pointblank.Pipeline.from_yaml)).
-
-### from_yaml()
-
-Read a contract from a YAML file.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1151-L1277)
-
-``` python
-from_yaml(path)
-```
-
-Keeping contracts in YAML files separates the definition of "valid data" from the code that checks it. The files are easy to read, can be reviewed and versioned like any other change, and can be shared between the teams that produce and consume a dataset. This method loads such a file into a [Contract](../reference/Contract.md#pointblank.Contract), ready to use with [`validate()`](../reference/Contract.md#pointblank.Contract.validate) or a [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline).
-
-The file can hold the contract under a top-level `contract:` key, as [`to_yaml()`](../reference/Contract.md#pointblank.Contract.to_yaml) writes it, or have the contract fields at the top level. The fields are the contract's parameter names (see [`from_dict()`](../reference/Contract.md#pointblank.Contract.from_dict) for the expected structure). A hand-written contract file might look like this:
-
-``` yaml
-contract:
-  name: payments
-  version: 1.0.0
-  owner: billing-team
-  schema:
-    payment_id: String
-    amount: Float64
-  steps:
-  - col_vals_not_null:
-      columns: payment_id
-  - col_vals_gt:
-      columns: amount
-      value: 0
-  thresholds:
-    warning: 1
-```
-
-#### Parameters
-
-`path: str | Path`  
-The path to the YAML file.
-
-#### Returns
-
-`Contract`  
-A new [Contract](../reference/Contract.md#pointblank.Contract) object.
-
-#### Raises
-
-`FileNotFoundError`  
-If no file exists at `path`.
-
-`ValueError`  
-If the file is empty, if it has no contract `name`, or if a field has an invalid value (see [`from_dict()`](../reference/Contract.md#pointblank.Contract.from_dict)).
-
-#### Examples
-
-Let's write the contract file shown above to a temporary directory, then load it.
-
-``` python
-import pointblank as pb
-import polars as pl
-import tempfile
-from pathlib import Path
-
-contract_yaml = '''
-contract:
-  name: payments
-  version: 1.0.0
-  owner: billing-team
-  schema:
-    payment_id: String
-    amount: Float64
-  steps:
-  - col_vals_not_null:
-      columns: payment_id
-  - col_vals_gt:
-      columns: amount
-      value: 0
-  thresholds:
-    warning: 1
-'''
-
-contract_path = Path(tempfile.mkdtemp()) / "payments.yaml"
-contract_path.write_text(contract_yaml)
-
-payments_contract = pb.Contract.from_yaml(contract_path)
-
-payments_contract
-```
-
-    Contract(name='payments', direction='source', version='1.0.0', schema=<defined>, steps=2)
-
-The loaded contract works like one defined in Python. Here it is applied to a small payments table:
-
-``` python
-payments = pl.DataFrame({"payment_id": ["T1", "T2", "T3"], "amount": [50.0, 0.0, 12.5]})
-
-payments_contract.validate(payments)
-```
-
-[TABLE]
-
-The report label, `Contract: payments v1.0.0`, comes from the file. The payment with an amount of `0.0` fails the [col_vals_gt](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) step and triggers the warning threshold.
-
-### to_dict()
-
-Convert the contract to a dictionary.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L932-L1019)
-
-``` python
-to_dict()
-```
-
-This method gives you the contract as plain Python data (strings, numbers, lists, and dictionaries), ready to be written as JSON, stored in a database or configuration system, or compared with another contract's definition. It's the same structure that [`to_yaml()`](../reference/Contract.md#pointblank.Contract.to_yaml) writes, but without the top-level `contract` key. [`from_dict()`](../reference/Contract.md#pointblank.Contract.from_dict) turns it back into a [Contract](../reference/Contract.md#pointblank.Contract).
-
-The dictionary always has a `"name"` key. Other fields are only included when they are set. `direction=` is left out when it's `"source"` and `on_violation=` when it's `"warn"`, because those are the defaults. The schema becomes a mapping of column names to type strings, each step becomes a single-key mapping from method name to arguments (see [`Step.to_dict()`](../reference/Step.md#pointblank.Step.to_dict)), and the thresholds become a mapping with the levels that are set.
-
-#### Returns
-
-`dict[str, Any]`  
-A dictionary representation of the contract.
-
-#### Examples
-
-Let's create a contract for a target table and convert it to a dictionary.
-
-``` python
-import pointblank as pb
-
-accounts_contract = pb.Contract(
-    name="accounts",
-    direction="target",
-    version="1.0.0",
-    schema=pb.Schema(account_id="Int64", email="String"),
-    steps=[
-        pb.Step("rows_distinct", columns_subset="account_id"),
-        pb.Step("col_vals_regex", columns="email", pattern=r"^[^@]+@[^@]+$"),
-    ],
-    thresholds=pb.Thresholds(warning=0.01),
-)
-
-accounts_contract.to_dict()
-```
-
-    {'name': 'accounts',
-     'direction': 'target',
-     'version': '1.0.0',
-     'schema': {'account_id': 'Int64', 'email': 'String'},
-     'steps': [{'rows_distinct': {'columns_subset': 'account_id'}},
-      {'col_vals_regex': {'columns': 'email', 'pattern': '^[^@]+@[^@]+$'}}],
-     'thresholds': {'warning': 0.01}}
-
-`direction` is included because `"target"` isn't the default, while `on_violation`, `owner`, and the other unset fields are left out. Only the warning level of the thresholds is set, so it's the only one listed.
-
-A dictionary like this converts directly to JSON with the standard library:
-
-``` python
-import json
-
-print(json.dumps(accounts_contract.to_dict(), indent=2))
-```
-
-    {
-      "name": "accounts",
-      "direction": "target",
-      "version": "1.0.0",
-      "schema": {
-        "account_id": "Int64",
-        "email": "String"
-      },
-      "steps": [
-        {
-          "rows_distinct": {
-            "columns_subset": "account_id"
-          }
-        },
-        {
-          "col_vals_regex": {
-            "columns": "email",
-            "pattern": "^[^@]+@[^@]+$"
-          }
-        }
-      ],
-      "thresholds": {
-        "warning": 0.01
-      }
-    }
-
-The JSON text can be stored in a database column or sent to an API. After it's parsed with `json.loads()`, [`from_dict()`](../reference/Contract.md#pointblank.Contract.from_dict) rebuilds the contract.
-
-### from_dict()
-
-Create a contract from a dictionary.
-
-Usage
-
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/contract.py#L1021-L1149)
-
-``` python
-from_dict(data)
-```
-
-This is the reverse of [`to_dict()`](../reference/Contract.md#pointblank.Contract.to_dict). Use it when the contract comes from somewhere other than a YAML file: a JSON document, an API response, a database record, or a dictionary built in code. To read a YAML file directly, use [`from_yaml()`](../reference/Contract.md#pointblank.Contract.from_yaml).
-
-The dictionary uses the contract's parameter names as keys. Only `"name"` is required. `"schema"` should map column names to type strings, `"steps"` should be a list of single-key mappings from method name to arguments, and `"thresholds"` should map any of `"warning"`, `"error"`, and `"critical"` to a value. The parsed contract is checked as usual, so an invalid `direction`, `on_violation`, or step method raises an error.
-
-#### Parameters
-
-`data: dict[str, Any]`  
-A dictionary describing a contract, in the form produced by [`to_dict()`](../reference/Contract.md#pointblank.Contract.to_dict).
-
-#### Returns
-
-`Contract`  
-A new [Contract](../reference/Contract.md#pointblank.Contract) object.
-
-#### Raises
-
-`ValueError`  
-If `"name"` is missing or empty, if `"direction"` or `"on_violation"` has an invalid value, or if a step names a method that contracts don't support.
-
-`TypeError`  
-If `"steps"` isn't a list, or if a step's arguments aren't a dictionary.
-
-#### Examples
-
-Suppose a contract definition arrives as JSON from a configuration service. After parsing, it's a dictionary that `from_dict()` can turn into a [Contract](../reference/Contract.md#pointblank.Contract).
-
-``` python
-import json
-import pointblank as pb
-
-contract_json = '''
-{
-  "name": "shipments",
-  "version": "0.3.0",
-  "owner": "logistics",
-  "schema": {"shipment_id": "String", "weight_kg": "Float64"},
-  "steps": [
-    {"col_vals_not_null": {"columns": "shipment_id"}},
-    {"col_vals_between": {"columns": "weight_kg", "left": 0, "right": 1000}}
-  ],
-  "thresholds": {"warning": 1, "error": 0.05}
-}
-'''
-
-shipments_contract = pb.Contract.from_dict(json.loads(contract_json))
-
-shipments_contract
-```
-
-    Contract(name='shipments', direction='source', version='0.3.0', schema=<defined>, steps=2)
-
-The result is a regular [Contract](../reference/Contract.md#pointblank.Contract), ready to use on data:
-
-``` python
-import polars as pl
-
-shipments = pl.DataFrame(
-    {"shipment_id": ["S1", "S2", "S3"], "weight_kg": [12.5, 980.0, 1250.0]}
-)
-
-shipments_contract.validate(shipments)
-```
-
-[TABLE]
-
-The schema check and the not-null check pass, and the range check flags the shipment weighing 1250 kg.
+| [validate()](pointblank.Contract.validate.md) | Check a table against the contract. |
+| [to_validate()](pointblank.Contract.to_validate.md) | Compile the contract into a validation plan for a table, without running it. |
+| [to_yaml()](pointblank.Contract.to_yaml.md) | Write the contract as YAML. |
+| [from_yaml()](pointblank.Contract.from_yaml.md) | Read a contract from a YAML file. |
+| [to_dict()](pointblank.Contract.to_dict.md) | Convert the contract to a dictionary. |
+| [from_dict()](pointblank.Contract.from_dict.md) | Create a contract from a dictionary. |

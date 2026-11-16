@@ -15,7 +15,7 @@ ContractViolationError(
 )
 ```
 
-A [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline) raises this error when a boundary validation has any failing test units and that boundary's [`Contract`](../reference/Contract.md#pointblank.Contract) was created with `on_violation="raise"`. It's raised by [`run()`](../reference/Pipeline.md#pointblank.Pipeline.run), [`validate_source()`](../reference/Pipeline.md#pointblank.Pipeline.validate_source), and [`validate_target()`](../reference/Pipeline.md#pointblank.Pipeline.validate_target). The message names the contract and its direction, and the error carries the failing validation, so the code that catches it can report or log the details before stopping.
+A [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline) raises this error when a boundary validation has any failing test units and that boundary's [`Contract`](../reference/Contract.md#pointblank.Contract) was created with `on_violation="raise"`. It's raised by [`run()`](../reference/pointblank.Pipeline.run.md), [`validate_source()`](../reference/pointblank.Pipeline.validate_source.md), and [`validate_target()`](../reference/pointblank.Pipeline.validate_target.md). The message names the contract and its direction, and the error carries the failing validation, so the code that catches it can report or log the details before stopping.
 
 It's a subclass of `RuntimeError`, so `except RuntimeError:` catches it as well.
 
@@ -28,7 +28,7 @@ The [`Contract`](../reference/Contract.md#pointblank.Contract) that the data fai
 The interrogated [`Validate`](../reference/Validate.md#pointblank.Validate) object for the failing boundary. Display it to see the validation report.
 
 `result`  
-The [`PipelineResult`](../reference/PipelineResult.md#pointblank.PipelineResult) of the run, holding everything the run produced before it stopped (the source validation, and the transformed data and target validation if they were reached). It's `None` when the error comes from [validate_source()](../reference/Pipeline.md#pointblank.Pipeline.validate_source) or [validate_target()](../reference/Pipeline.md#pointblank.Pipeline.validate_target).
+The [`PipelineResult`](../reference/PipelineResult.md#pointblank.PipelineResult) of the run, holding everything the run produced before it stopped (the source validation, and the transformed data and target validation if they were reached). It's `None` when the error comes from [validate_source()](../reference/pointblank.Pipeline.validate_source.md) or [validate_target()](../reference/pointblank.Pipeline.validate_target.md).
 
 ## Examples
 
@@ -66,7 +66,7 @@ failed_run.target_validation
 
 [TABLE]
 
-The report shows the one failing test unit in the [col_vals_gt](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) step, the row for item `"b"`. Nothing after the [run()](../reference/Pipeline.md#pointblank.Pipeline.run) call was reached, so the prices weren't published.
+The report shows the one failing test unit in the [col_vals_gt](../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt) step, the row for item `"b"`. Nothing after the [run()](../reference/pointblank.Pipeline.run.md) call was reached, so the prices weren't published.
 
 ## See Also
 

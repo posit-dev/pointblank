@@ -182,9 +182,9 @@ Template variables available for action strings:
 - `{level}`: severity level ('warning'/'error'/'critical')
 - `{time}`: timestamp of validation
 
-### Structured Missingness ([missing_specs](../../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs))
+### Structured Missingness ([missing_specs](../../reference/pointblank.MetadataImport.missing_specs.md))
 
-The optional top-level [missing_specs](../../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs) key defines named [`MissingSpec`](../../reference/MissingSpec.md#pointblank.MissingSpec) objects that steps can reference. Each named spec maps sentinel values to reason labels, and may declare `categories`, `null_is_missing`, and `null_reason`:
+The optional top-level [missing_specs](../../reference/pointblank.MetadataImport.missing_specs.md) key defines named [`MissingSpec`](../../reference/MissingSpec.md#pointblank.MissingSpec) objects that steps can reference. Each named spec maps sentinel values to reason labels, and may declare `categories`, `null_is_missing`, and `null_reason`:
 
 ``` yaml
 missing_specs:

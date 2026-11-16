@@ -11,7 +11,7 @@
 <meta name="description" content="Evaluate the full table, each variant, and each control.">
 
 <title>Ablation.run() | Pointblank</title>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Ablation.run - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Ablation.run.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "codeRepository": "https://github.com/posit-dev/pointblank", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Ablation.run - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Ablation.run.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -136,7 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Ablation.run.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Ablation.run.html">
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2087,7 +2087,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an ablation of a table of temperature readings, some of them recorded in tenths of a degree. The <code>evaluate()</code> function also returns the number of rows it was given, which is a second metric in the results. With <code>max_workers=4</code>, the run makes four evaluations at a time.</p>
-<div id="a4270a81" class="cell" data-execution_count="2">
+<div id="3d98eada" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2216,7 +2216,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 </div>
 </div>
 <p>After the run, the <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> object shows its report, for the metric named in <code>metric=</code>. Removing the 12 readings in tenths helps. The other metric has a report of its own, from <code>get_tabular_report(metric="n_train")</code>, and both are in the results of <a href="../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link"><code>get_effects()</code></a>:</p>
-<div id="c6460b56" class="cell" data-execution_count="3">
+<div id="475b3c1f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ablation.get_effects().select(<span class="st">"variant"</span>, <span class="st">"metric"</span>, <span class="st">"mean"</span>, <span class="st">"delta_vs_control"</span>, <span class="st">"verdict"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div><style>
@@ -2231,7 +2231,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 </div>
 <p>The full table has 300 rows, and the variant and its control have 288. There’s no verdict for <code>n_train</code>, since verdicts are only for the metric in <code>metric=</code>.</p>
 <p>Making the evaluations at the same time doesn’t change the results, since each evaluation gets the same table and seed either way. Here’s the same ablation, run one evaluation after another:</p>
-<div id="712a578e" class="cell" data-execution_count="4">
+<div id="785800fb" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>serial <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(validation, evaluate<span class="op">=</span>evaluate, metric<span class="op">=</span><span class="st">"error"</span>, higher_is_better<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .drop_each()</span>
@@ -2694,7 +2694,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
     </div>
   </div>
 </footer>
-<script src="../github-widget.js"></script>
+<script src="../repository-widget.js"></script>
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>

@@ -105,7 +105,7 @@ print(route.extended_values())
 [CodelistEntry](../reference/CodelistEntry.md#pointblank.CodelistEntry)  
 A single entry in a codelist.
 
-[get_codelist()](../reference/MetadataImport.md#pointblank.MetadataImport.get_codelist)  
+[get_codelist()](../reference/pointblank.MetadataImport.get_codelist.md)  
 Get a codelist from imported metadata.
 
 ## Methods

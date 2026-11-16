@@ -17,7 +17,7 @@ MissingValueCode(
 
 Many data formats let a dataset declare the values that stand for missing data: the user-defined missing values of an SPSS variable (such as `-99` for "Refused"), or the `missingValues` and `null` markers of a Frictionless or CSVW schema (such as `"NA"`). When [`import_metadata()`](../reference/import_metadata.md#pointblank.import_metadata) reads these declarations, it records each one as a [MissingValueCode](../reference/MissingValueCode.md#pointblank.MissingValueCode) in [`MetadataImport.missing_value_codes`](../reference/MetadataImport.md#pointblank.MetadataImport), a dictionary from column name to that column's list of codes.
 
-These objects describe the codes. To use the codes in validation, build [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) objects with [`MetadataImport.missing_specs()`](../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs), which works from each variable's [`missing_values`](../reference/VariableMetadata.md#pointblank.VariableMetadata) and their labels.
+These objects describe the codes. To use the codes in validation, build [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) objects with [`MetadataImport.missing_specs()`](../reference/pointblank.MetadataImport.missing_specs.md), which works from each variable's [`missing_values`](../reference/VariableMetadata.md#pointblank.VariableMetadata) and their labels.
 
 ## Parameters
 
@@ -61,7 +61,7 @@ Creating codes yourself is mainly useful when you build a [`MetadataImport`](../
 
 ## See Also
 
-[missing_specs()](../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs)  
+[missing_specs()](../reference/pointblank.MetadataImport.missing_specs.md)  
 Build missing-value specs from imported metadata.
 
 [MissingSpec](../reference/MissingSpec.md#pointblank.MissingSpec)  

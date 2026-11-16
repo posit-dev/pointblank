@@ -194,7 +194,7 @@ print(yaml_output)
 
 ### Loading from YAML
 
-The [Contract.from_yaml()](../../reference/Contract.md#pointblank.Contract.from_yaml) class method reads a YAML file and reconstructs the full [Contract](../../reference/Contract.md#pointblank.Contract) object, including schema, steps, thresholds, and all metadata. The loaded contract is identical in behavior to one created directly in Python (there's no functional difference).
+The [Contract.from_yaml()](../../reference/pointblank.Contract.from_yaml.md) class method reads a YAML file and reconstructs the full [Contract](../../reference/Contract.md#pointblank.Contract) object, including schema, steps, thresholds, and all metadata. The loaded contract is identical in behavior to one created directly in Python (there's no functional difference).
 
 ``` python
 # Load the contract back
@@ -391,7 +391,7 @@ target:
 
 ### Loading and Running a Pipeline from YAML
 
-Loading a pipeline from YAML works the same way as loading a contract: call the [`from_yaml()`](../../reference/Pipeline.md#pointblank.Pipeline.from_yaml) class method with the file path. The returned [Pipeline](../../reference/Pipeline.md#pointblank.Pipeline) object is fully functional and ready to validate data or run a complete boundary enforcement workflow.
+Loading a pipeline from YAML works the same way as loading a contract: call the [`from_yaml()`](../../reference/pointblank.Pipeline.from_yaml.md) class method with the file path. The returned [Pipeline](../../reference/Pipeline.md#pointblank.Pipeline) object is fully functional and ready to validate data or run a complete boundary enforcement workflow.
 
 ``` python
 # Load the pipeline from YAML

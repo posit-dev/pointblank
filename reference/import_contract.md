@@ -208,7 +208,7 @@ print(orders_contract.to_yaml())
           - shipped
           - returned
 
-The contract now has a name and an owner, and the dbt model's four translated tests are its steps. From here it works like any other contract: it can be saved as YAML next to the dbt project, enforced with [`Contract.validate()`](../reference/Contract.md#pointblank.Contract.validate), or used as a boundary in a [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline).
+The contract now has a name and an owner, and the dbt model's four translated tests are its steps. From here it works like any other contract: it can be saved as YAML next to the dbt project, enforced with [`Contract.validate()`](../reference/pointblank.Contract.validate.md), or used as a boundary in a [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline).
 
 ## See Also
 

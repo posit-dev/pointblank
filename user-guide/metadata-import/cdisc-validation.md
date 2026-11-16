@@ -102,7 +102,7 @@ Define-XML documents contain rich structural metadata. Pointblank extracts the f
 
 ### Controlled Terminology from Define-XML
 
-Define-XML documents embed the codelists that constrain variable values. When Pointblank parses a Define-XML, all codelists are extracted and linked to their respective variables. The [`to_validate()`](../../reference/MetadataImport.md#pointblank.MetadataImport.to_validate) method then generates [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) checks for each variable that references a codelist:
+Define-XML documents embed the codelists that constrain variable values. When Pointblank parses a Define-XML, all codelists are extracted and linked to their respective variables. The [`to_validate()`](../../reference/pointblank.MetadataImport.to_validate.md) method then generates [col_vals_in_set()](../../reference/Validate.col_vals_in_set.md#pointblank.Validate.col_vals_in_set) checks for each variable that references a codelist:
 
 ``` python
 # Inspect codelists referenced by the Demographics domain
@@ -331,7 +331,7 @@ Three steps now report a failing unit: the [col_vals_not_null()](../../reference
 
 ### Converting SDTM Templates to MetadataImport
 
-If you prefer to work with the standard [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) interface (for example, to use [to_schema()](../../reference/MetadataImport.md#pointblank.MetadataImport.to_schema) or combine SDTM metadata with other sources), you can convert a domain template:
+If you prefer to work with the standard [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) interface (for example, to use [to_schema()](../../reference/pointblank.MetadataImport.to_schema.md) or combine SDTM metadata with other sources), you can convert a domain template:
 
 ``` python
 from pointblank.metadata import sdtm_to_metadata
@@ -498,7 +498,7 @@ print(f"Population flags present: {result['population_flags_found']}")
 
 ### Converting ADaM Templates to MetadataImport
 
-The [adam_to_metadata()](../../reference/adam_to_metadata.md#pointblank.adam_to_metadata) function converts an ADaM template into the standard [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) format, giving you access to [to_schema()](../../reference/MetadataImport.md#pointblank.MetadataImport.to_schema) and [`to_validate()`](../../reference/MetadataImport.md#pointblank.MetadataImport.to_validate):
+The [adam_to_metadata()](../../reference/adam_to_metadata.md#pointblank.adam_to_metadata) function converts an ADaM template into the standard [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) format, giving you access to [to_schema()](../../reference/pointblank.MetadataImport.to_schema.md) and [`to_validate()`](../../reference/pointblank.MetadataImport.to_validate.md):
 
 ``` python
 from pointblank.metadata import adam_to_metadata
@@ -658,7 +658,7 @@ This layered approach gives you the flexibility to apply different levels of val
 
 ## Null Flavors and Structured Missingness
 
-Clinical data uses standardized HL7/CDISC *null flavors* to record *why* a value is absent (e.g., `"NASK"` = not asked, `"UNK"` = unknown, `"NA"` = not applicable). Pointblank ships a pre-built [`MissingSpec`](../../reference/MissingSpec.md#pointblank.MissingSpec) for these codes via [MissingSpec.from_cdisc_null_flavors()](../../reference/MissingSpec.md#pointblank.MissingSpec.from_cdisc_null_flavors):
+Clinical data uses standardized HL7/CDISC *null flavors* to record *why* a value is absent (e.g., `"NASK"` = not asked, `"UNK"` = unknown, `"NA"` = not applicable). Pointblank ships a pre-built [`MissingSpec`](../../reference/MissingSpec.md#pointblank.MissingSpec) for these codes via [MissingSpec.from_cdisc_null_flavors()](../../reference/pointblank.MissingSpec.from_cdisc_null_flavors.md):
 
 ``` python
 cdisc = pb.MissingSpec.from_cdisc_null_flavors()

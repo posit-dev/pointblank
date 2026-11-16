@@ -41,20 +41,20 @@ Pointblank requires a DataFrame library but doesn't include one by default, givi
 
 ``` bash
 # Using pip
-pip install pointblank[pl]
+pip install "pointblank[pl]"
 
 # Or manually
-pip install polars>=1.24.0
+pip install "polars>=1.33.0"
 ```
 
 **Pandas**
 
 ``` bash
 # Using pip
-pip install pointblank[pd]
+pip install "pointblank[pd]"
 
 # Or manually
-pip install pandas>=2.2.3
+pip install "pandas>=2.2.3"
 ```
 
 Pointblank works seamlessly with both libraries, and you can choose the one that best fits your workflow and performance requirements.
@@ -68,35 +68,35 @@ To work with various database systems through [Ibis](https://ibis-project.org), 
 **pip**
 
 ``` bash
-pip install pointblank[sqlite]      # SQLite
-pip install pointblank[duckdb]      # DuckDB
-pip install pointblank[postgres]    # PostgreSQL
-pip install pointblank[mysql]       # MySQL
-pip install pointblank[mssql]       # Microsoft SQL Server
-pip install pointblank[bigquery]    # BigQuery
-pip install pointblank[pyspark]     # Apache Spark
-pip install pointblank[databricks]  # Databricks
-pip install pointblank[snowflake]   # Snowflake
+pip install "pointblank[sqlite]"      # SQLite
+pip install "pointblank[duckdb]"      # DuckDB
+pip install "pointblank[postgres]"    # PostgreSQL
+pip install "pointblank[mysql]"       # MySQL
+pip install "pointblank[mssql]"       # Microsoft SQL Server
+pip install "pointblank[bigquery]"    # BigQuery
+pip install "pointblank[pyspark]"     # Apache Spark
+pip install "pointblank[databricks]"  # Databricks
+pip install "pointblank[snowflake]"   # Snowflake
 
 # Example of installing multiple backends
-pip install pointblank[duckdb,postgres,sqlite]
+pip install "pointblank[duckdb,postgres,sqlite]"
 ```
 
 **uv**
 
 ``` bash
-uv pip install pointblank[sqlite]      # SQLite
-uv pip install pointblank[duckdb]      # DuckDB
-uv pip install pointblank[postgres]    # PostgreSQL
-uv pip install pointblank[mysql]       # MySQL
-uv pip install pointblank[mssql]       # Microsoft SQL Server
-uv pip install pointblank[bigquery]    # BigQuery
-uv pip install pointblank[pyspark]     # Apache Spark
-uv pip install pointblank[databricks]  # Databricks
-uv pip install pointblank[snowflake]   # Snowflake
+uv pip install "pointblank[sqlite]"      # SQLite
+uv pip install "pointblank[duckdb]"      # DuckDB
+uv pip install "pointblank[postgres]"    # PostgreSQL
+uv pip install "pointblank[mysql]"       # MySQL
+uv pip install "pointblank[mssql]"       # Microsoft SQL Server
+uv pip install "pointblank[bigquery]"    # BigQuery
+uv pip install "pointblank[pyspark]"     # Apache Spark
+uv pip install "pointblank[databricks]"  # Databricks
+uv pip install "pointblank[snowflake]"   # Snowflake
 
 # Example of installing multiple backends
-uv pip install pointblank[duckdb,postgres,sqlite]
+uv pip install "pointblank[duckdb,postgres,sqlite]"
 ```
 
 **conda**
@@ -142,7 +142,7 @@ pixi add pointblank-duckdb pointblank-postgres pointblank-sqlite
 Pointblank includes experimental support for AI-assisted validation plan generation:
 
 ``` bash
-pip install pointblank[generate]
+pip install "pointblank[generate]"
 ```
 
 This installs the necessary dependencies for working with LLM providers to help generate validation plans. See the [Draft Validation](../advanced-validation/draft-validation.md) article for how to create validation plans from existing data.
@@ -172,7 +172,7 @@ print(pb.__version__)
 
 ## Next Steps
 
-Now that you've installed Pointblank, you're ready to start validating your data. If you haven't read the [Introduction](index.md) yet, consider starting there to learn the basic concepts.
+Now that you've installed Pointblank, you're ready to start validating your data. If you haven't read the [Quickstart](quickstart.md) yet, consider starting there to learn the basic concepts.
 
 If you encounter any installation issues, please [open an issue on GitHub](https://github.com/posit-dev/pointblank/issues/new) with details about your system and the specific error messages you're seeing. The maintainers actively monitor these issues and can help troubleshoot problems.
 

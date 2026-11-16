@@ -41,7 +41,7 @@ VariableMetadata(
 
 A [`MetadataImport`](../reference/MetadataImport.md#pointblank.MetadataImport) holds one [VariableMetadata](../reference/VariableMetadata.md#pointblank.VariableMetadata) for each variable described in the imported file. It gathers everything the file says about the variable in one place: its name, label and type, the constraints on its values, any value labels and missing-value codes, and (for clinical data) its CDISC attributes. Each format fills in the fields it has information for and leaves the rest as `None`.
 
-Some fields are used to generate validation steps in [`MetadataImport.to_validate()`](../reference/MetadataImport.md#pointblank.MetadataImport.to_validate): `dtype` (in the schema check), `required`, `unique`, `min_val` and `max_val`, `allowed_values`, `pattern` and `missing_values`. All of the constraint fields, including `min_length` and `max_length`, are written out by [`export_metadata()`](../reference/export_metadata.md#pointblank.export_metadata). The other fields are descriptive, and are kept so that you can use them in your own checks or reports.
+Some fields are used to generate validation steps in [`MetadataImport.to_validate()`](../reference/pointblank.MetadataImport.to_validate.md): `dtype` (in the schema check), `required`, `unique`, `min_val` and `max_val`, `allowed_values`, `pattern` and `missing_values`. All of the constraint fields, including `min_length` and `max_length`, are written out by [`export_metadata()`](../reference/export_metadata.md#pointblank.export_metadata). The other fields are descriptive, and are kept so that you can use them in your own checks or reports.
 
 ## Parameters
 
@@ -131,7 +131,7 @@ The system of units, such as `"SI"`. The default is `None`.
 
 ## Examples
 
-Let's look up a variable in the bundled Frictionless Data Package with [`get_variable()`](../reference/MetadataImport.md#pointblank.MetadataImport.get_variable):
+Let's look up a variable in the bundled Frictionless Data Package with [`get_variable()`](../reference/pointblank.MetadataImport.get_variable.md):
 
 ``` python
 import pointblank as pb
@@ -176,7 +176,7 @@ Only the fields that are given get a value, and the rest stay at their defaults.
 [MetadataImport](../reference/MetadataImport.md#pointblank.MetadataImport)  
 The metadata for a dataset, with one of these per variable.
 
-[get_variable()](../reference/MetadataImport.md#pointblank.MetadataImport.get_variable)  
+[get_variable()](../reference/pointblank.MetadataImport.get_variable.md)  
 Get the metadata of a variable by name.
 
 ## Methods
@@ -197,7 +197,7 @@ Usage
 to_missing_spec()
 ```
 
-Each value in `missing_values` becomes a sentinel value of the spec. Its reason is made from the value's label in `missing_value_labels` or, failing that, in `value_labels`, turned into a lowercase name (`"Not asked"` becomes `"not_asked"`). A value with no label gets a placeholder reason, such as `"missing_99"` for `99`. The result is the same as [`MissingSpec.from_variable_metadata()`](../reference/MissingSpec.md#pointblank.MissingSpec.from_variable_metadata).
+Each value in `missing_values` becomes a sentinel value of the spec. Its reason is made from the value's label in `missing_value_labels` or, failing that, in `value_labels`, turned into a lowercase name (`"Not asked"` becomes `"not_asked"`). A value with no label gets a placeholder reason, such as `"missing_99"` for `99`. The result is the same as [`MissingSpec.from_variable_metadata()`](../reference/pointblank.MissingSpec.from_variable_metadata.md).
 
 #### Returns
 
@@ -229,4 +229,4 @@ print(pb.VariableMetadata(name="age", dtype="Int64").to_missing_spec())
 
     None
 
-To get the specs of all the variables of a dataset at once, use [`MetadataImport.missing_specs()`](../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs).
+To get the specs of all the variables of a dataset at once, use [`MetadataImport.missing_specs()`](../reference/pointblank.MetadataImport.missing_specs.md).

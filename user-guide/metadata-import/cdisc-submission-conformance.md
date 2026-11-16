@@ -414,7 +414,7 @@ Domain keys are matched case-insensitively (`"dm"` and `"DM"` are equivalent). P
 
 ### The Conformance Report
 
-The tabular report shown above is produced by [`get_tabular_report()`](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_tabular_report). Each row is one rule from the SDTMIG 3.4 catalog; the colored bar on the left edge encodes its status:
+The tabular report shown above is produced by [`get_tabular_report()`](../../reference/pointblank.ConformanceReport.get_tabular_report.md). Each row is one rule from the SDTMIG 3.4 catalog; the colored bar on the left edge encodes its status:
 
 | Color | Status | Meaning |
 |----|----|----|
@@ -428,7 +428,7 @@ Rules are sorted by severity: failures first, then errors, then passes, then not
 
 The header shows a `PASS` or `FAIL` badge alongside the standard, version, and a full status breakdown (e.g., `SDTMIG 3-4 · 346 passed · 4 failed · 12 n/a`).
 
-Call [get_tabular_report()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_tabular_report) to get the `GT` object directly if you need to embed it in a report pipeline:
+Call [get_tabular_report()](../../reference/pointblank.ConformanceReport.get_tabular_report.md) to get the `GT` object directly if you need to embed it in a report pipeline:
 
 ``` python
 gt = report.get_tabular_report()
@@ -439,7 +439,7 @@ The `GT` object can be passed to any Great Tables export method (for example, `g
 
 ### Findings Drill-Down
 
-When rules fail, the tabular report shows how many records violated each rule but not which ones. [`get_findings_table()`](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table) provides that drill-down: one row per failing record, showing the subject, the specific column that violated the rule, the offending value, and the 1-based row number in the source dataset.
+When rules fail, the tabular report shows how many records violated each rule but not which ones. [`get_findings_table()`](../../reference/pointblank.ConformanceReport.get_findings_table.md) provides that drill-down: one row per failing record, showing the subject, the specific column that violated the rule, the offending value, and the 1-based row number in the source dataset.
 
 To see it in action, introduce a few deliberate violations:
 
@@ -484,11 +484,11 @@ The findings table groups its columns into two spanners:
 - **SDTM Rule Definition**: `Rule`, `Domain` and `Description` identify which rule fired and where.
 - **Finding**: `USUBJID` identifies the subject; `Column` and `Value` show exactly what was wrong; `Row` is the 1-based row number in the source dataset for quick lookup.
 
-At most 100 findings per rule are shown in the table. The true total for each rule is always visible in [get_tabular_report()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_tabular_report). To export findings to a spreadsheet or join them back to your source data, use [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) instead.
+At most 100 findings per rule are shown in the table. The true total for each rule is always visible in [get_tabular_report()](../../reference/pointblank.ConformanceReport.get_tabular_report.md). To export findings to a spreadsheet or join them back to your source data, use [findings_df()](../../reference/pointblank.ConformanceReport.findings_df.md) instead.
 
 ### Programmatic Access with findings_df()
 
-[`findings_df()`](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) returns the same findings as a Polars DataFrame, which is better suited for filtering, grouping, exporting to CSV, or joining back to the source data:
+[`findings_df()`](../../reference/pointblank.ConformanceReport.findings_df.md) returns the same findings as a Polars DataFrame, which is better suited for filtering, grouping, exporting to CSV, or joining back to the source data:
 
 ``` python
 df = report_with_issues.findings_df()
@@ -560,7 +560,7 @@ The bundled SDTMIG 3.4 catalog contains 362 rules across seven types:
 | `DEFINE_ITEM_METADATA_CHECK` | Variable declarations against Define-XML | Activated when `define_xml` is supplied |
 | `DEFINE_CODELIST_CHECK` | Codelist values against Define-XML | Activated when `define_xml` is supplied |
 
-Only `RECORD_CHECK`, `DATASET_CONTENTS_CHECK` and `DEFINE_CODELIST_CHECK` rules produce row-level findings accessible via [findings_df()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) and [get_findings_table()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table). The other types report a violation count in [get_tabular_report()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.get_tabular_report) but do not have individual record detail.
+Only `RECORD_CHECK`, `DATASET_CONTENTS_CHECK` and `DEFINE_CODELIST_CHECK` rules produce row-level findings accessible via [findings_df()](../../reference/pointblank.ConformanceReport.findings_df.md) and [get_findings_table()](../../reference/pointblank.ConformanceReport.get_findings_table.md). The other types report a violation count in [get_tabular_report()](../../reference/pointblank.ConformanceReport.get_tabular_report.md) but do not have individual record detail.
 
 Rules that target a domain not present in your datasets have nothing to check, so they are reported as `pass`. For example, a rule that checks `AESTDTC` in the AE domain passes when no AE dataset is supplied. A `pass` therefore doesn't mean that a domain was checked: adding more domains to the dictionary passed to [validate_sdtmig()](../../reference/validate_sdtmig.md#pointblank.validate_sdtmig) gives the rules for those domains something to evaluate, giving a more complete conformance picture. Only rules that need an input that wasn't supplied (such as a Define-XML) are marked `not_applicable`.
 
@@ -633,7 +633,7 @@ Pointblank handles the SAS empty-string convention automatically, so XPT data do
 
 - **Reading XPT files** with `pyreadstat`: `pip install pyreadstat`
 - **Writing XPT files** for CORE (automatic, handled internally): `pip install pyreadstat`
-- **Excel export** with [to_excel()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.to_excel): `pip install openpyxl`
+- **Excel export** with [to_excel()](../../reference/pointblank.ConformanceReport.to_excel.md): `pip install openpyxl`
 
 ``` bash
 pip install pointblank[cdisc]    # adds pyreadstat
@@ -755,7 +755,7 @@ print(report)
       430 rules (EXECUTION ERROR=2, ISSUE REPORTED=6, SKIPPED=344, SUCCESS=78)
       8 issues -- FAIL
 
-**Overall result.** [`all_passed()`](../../reference/ConformanceReport.md#pointblank.ConformanceReport.all_passed) returns `True` when no rules reported issues; [is_core](../../reference/ConformanceReport.md#pointblank.ConformanceReport.is_core) confirms the report originated from the CORE engine rather than the built-in engine:
+**Overall result.** [`all_passed()`](../../reference/pointblank.ConformanceReport.all_passed.md) returns `True` when no rules reported issues; [is_core](../../reference/pointblank.ConformanceReport.is_core.md) confirms the report originated from the CORE engine rather than the built-in engine:
 
 ``` python
 print("All passed:", report.all_passed())
@@ -765,7 +765,7 @@ print("Is CORE report:", report.is_core)
     All passed: False
     Is CORE report: True
 
-**Summary dictionary.** [`summary()`](../../reference/ConformanceReport.md#pointblank.ConformanceReport.summary) returns run provenance and rule counts as a plain dictionary, useful for logging, assertions in CI scripts, or building a custom status page:
+**Summary dictionary.** [`summary()`](../../reference/pointblank.ConformanceReport.summary.md) returns run provenance and rule counts as a plain dictionary, useful for logging, assertions in CI scripts, or building a custom status page:
 
 ``` python
 s = report.summary()
@@ -794,7 +794,7 @@ for status, count in sorted(s["status_counts"].items()):
 
 The [status_counts](../../reference/Comparison.status_counts.md#pointblank.Comparison.status_counts) dictionary enumerates every status bucket CORE reported. Use it to build pass/fail thresholds or trend charts across multiple submission runs.
 
-**Issues.** [issues()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) returns one record per (dataset, rule) pair that reported at least one issue. Pass a `status` filter to separate conformance violations from execution errors:
+**Issues.** [issues()](../../reference/pointblank.ConformanceReport.issues.md) returns one record per (dataset, rule) pair that reported at least one issue. Pass a `status` filter to separate conformance violations from execution errors:
 
 ``` python
 issues = report.issues()
@@ -840,7 +840,7 @@ print(f"Execution errors:  {len(exec_errors)}")
 
 Execution errors (`STATUS_ERROR`) indicate that CORE could not evaluate a rule, typically because a required variable or dataset was absent or had an unexpected format. They are distinct from conformance issues (`STATUS_ISSUE`) where the rule ran successfully but found a violation.
 
-**Row-level findings.** [findings()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.findings) returns the row-level detail from CORE's `Issue_Details` section, giving the exact record that triggered each rule:
+**Row-level findings.** [findings()](../../reference/pointblank.ConformanceReport.findings.md) returns the row-level detail from CORE's `Issue_Details` section, giving the exact record that triggered each rule:
 
 ``` python
 findings = report.findings()
@@ -867,7 +867,7 @@ print(f"Values:        {f.values}")
 
 Each finding carries the `USUBJID`, the affected variables and their values, and the 1-based row number in the source dataset, matching the information shown in the built-in engine's findings table.
 
-**Per-rule run results.** [rules()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.rules) returns one `CoreRuleResult` per rule with its run status:
+**Per-rule run results.** [rules()](../../reference/pointblank.ConformanceReport.rules.md) returns one `CoreRuleResult` per rule with its run status:
 
 ``` python
 from pointblank.metadata._cdisc_core import STATUS_SUCCESS, STATUS_SKIPPED
@@ -904,7 +904,7 @@ Both built-in and CORE reports can be exported for archiving, sharing with a bio
 
 ### JSON
 
-[`to_json()`](../../reference/ConformanceReport.md#pointblank.ConformanceReport.to_json) saves the report as a JSON file. For CORE reports the structure mirrors CORE's native output and is parseable by `parse_core_report()`:
+[`to_json()`](../../reference/pointblank.ConformanceReport.to_json.md) saves the report as a JSON file. For CORE reports the structure mirrors CORE's native output and is parseable by `parse_core_report()`:
 
 ``` python
 import tempfile
@@ -927,7 +927,7 @@ The round-trip fidelity means a JSON file written by Pointblank can be re-loaded
 
 ### Excel
 
-[to_excel()](../../reference/ConformanceReport.md#pointblank.ConformanceReport.to_excel) writes the report as a workbook. Requires `openpyxl`:
+[to_excel()](../../reference/pointblank.ConformanceReport.to_excel.md) writes the report as a workbook. Requires `openpyxl`:
 
 ``` python
 dest = report.to_excel("conformance_report.xlsx")

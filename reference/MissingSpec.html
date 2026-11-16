@@ -11,7 +11,7 @@
 <meta name="description" content="Specification for structured missing values in a column.">
 
 <title>MissingSpec | Pointblank</title>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "MissingSpec - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/MissingSpec.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "codeRepository": "https://github.com/posit-dev/pointblank", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "MissingSpec - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/MissingSpec.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -136,7 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/MissingSpec.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/MissingSpec.html">
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2012,20 +2012,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
-  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
-  <ul class="collapse">
-  <li><a href="#from_cdisc_null_flavors" id="toc-from_cdisc_null_flavors" class="nav-link" data-scroll-target="#from_cdisc_null_flavors"><span class="doc-object-name doc-function doc-label doc-label-method">from_cdisc_null_flavors()</span></a></li>
-  <li><a href="#from_cdisc" id="toc-from_cdisc" class="nav-link" data-scroll-target="#from_cdisc"><span class="doc-object-name doc-function doc-label doc-label-method">from_cdisc()</span></a></li>
-  <li><a href="#from_sas" id="toc-from_sas" class="nav-link" data-scroll-target="#from_sas"><span class="doc-object-name doc-function doc-label doc-label-method">from_sas()</span></a></li>
-  <li><a href="#from_spss" id="toc-from_spss" class="nav-link" data-scroll-target="#from_spss"><span class="doc-object-name doc-function doc-label doc-label-method">from_spss()</span></a></li>
-  <li><a href="#from_variable_metadata" id="toc-from_variable_metadata" class="nav-link" data-scroll-target="#from_variable_metadata"><span class="doc-object-name doc-function doc-label doc-label-method">from_variable_metadata()</span></a></li>
-  <li><a href="#is_missing" id="toc-is_missing" class="nav-link" data-scroll-target="#is_missing"><span class="doc-object-name doc-function doc-label doc-label-method">is_missing()</span></a></li>
-  <li><a href="#reason_for" id="toc-reason_for" class="nav-link" data-scroll-target="#reason_for"><span class="doc-object-name doc-function doc-label doc-label-method">reason_for()</span></a></li>
-  <li><a href="#sentinel_values" id="toc-sentinel_values" class="nav-link" data-scroll-target="#sentinel_values"><span class="doc-object-name doc-function doc-label doc-label-method">sentinel_values()</span></a></li>
-  <li><a href="#reasons_list" id="toc-reasons_list" class="nav-link" data-scroll-target="#reasons_list"><span class="doc-object-name doc-function doc-label doc-label-method">reasons_list()</span></a></li>
-  <li><a href="#values_for_reason" id="toc-values_for_reason" class="nav-link" data-scroll-target="#values_for_reason"><span class="doc-object-name doc-function doc-label doc-label-method">values_for_reason()</span></a></li>
-  <li><a href="#values_for_category" id="toc-values_for_category" class="nav-link" data-scroll-target="#values_for_category"><span class="doc-object-name doc-function doc-label doc-label-method">values_for_category()</span></a></li>
-  </ul></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a></li>
   </ul>
 </nav>
     </div>
@@ -2078,7 +2065,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><a href="../reference/missing_vals_tbl.html#pointblank.missing_vals_tbl" class="gdls-link"><code>missing_vals_tbl()</code></a>, whose <code>missing=</code> mapping of column names to specs gives a breakdown of each column’s missing values by reason</li>
 <li>YAML configurations, through a top-level <code>missing_specs:</code> block or an inline <code>missing:</code> mapping on a step</li>
 </ul>
-<p>The factory methods build common specs: <a href="../reference/MissingSpec.html#pointblank.MissingSpec.from_sas" class="gdls-link"><code>from_sas()</code></a> and <a href="../reference/MissingSpec.html#pointblank.MissingSpec.from_spss" class="gdls-link"><code>from_spss()</code></a> for statistical packages, <a href="../reference/MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link"><code>from_cdisc_null_flavors()</code></a> for clinical data, and <a href="../reference/MissingSpec.html#pointblank.MissingSpec.from_variable_metadata" class="gdls-link"><code>from_variable_metadata()</code></a> for variables read with <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a>.</p>
+<p>The factory methods build common specs: <a href="../reference/pointblank.MissingSpec.from_sas.html" class="gdls-link"><code>from_sas()</code></a> and <a href="../reference/pointblank.MissingSpec.from_spss.html" class="gdls-link"><code>from_spss()</code></a> for statistical packages, <a href="../reference/pointblank.MissingSpec.from_cdisc_null_flavors.html" class="gdls-link"><code>from_cdisc_null_flavors()</code></a> for clinical data, and <a href="../reference/pointblank.MissingSpec.from_variable_metadata.html" class="gdls-link"><code>from_variable_metadata()</code></a> for variables read with <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a>.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
 <h2 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -2121,7 +2108,7 @@ A missing-value specification that can be passed to validation methods (via <cod
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose a survey records the respondent’s age, with three codes for an age that wasn’t given: <code>-99</code> when the question wasn’t asked, <code>-98</code> when the respondent refused, and <code>-97</code> when they didn’t know. The last two are both <em>item nonresponse</em> (the question was asked but not answered), so we’ll group them in a category:</p>
-<div id="b6dc4ad5" class="cell" data-execution_count="2">
+<div id="b529d4d0" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2140,7 +2127,7 @@ refused
 </div>
 </div>
 <p>The spec lists its sentinel values, gives the reason for any of them, and finds the values in a category. Here’s some survey data that uses these codes, along with a null and an age of <code>150</code> that’s a genuine error:</p>
-<div id="91c3100f" class="cell" data-execution_count="3">
+<div id="66a5c12b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>survey <span class="op">=</span> pl.DataFrame({<span class="st">"age"</span>: [<span class="dv">34</span>, <span class="op">-</span><span class="dv">98</span>, <span class="dv">51</span>, <span class="op">-</span><span class="dv">99</span>, <span class="va">None</span>, <span class="dv">27</span>, <span class="dv">150</span>, <span class="op">-</span><span class="dv">97</span>, <span class="dv">45</span>, <span class="dv">62</span>]})</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>pb.preview(survey)</span></code></pre></div>
@@ -2272,7 +2259,7 @@ refused
 </div>
 </div>
 <p>We’ll check the ages with and without the spec, and then limit the item nonresponse to 10% of the rows:</p>
-<div id="9f8bd097" class="cell" data-execution_count="4">
+<div id="e007eca9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>survey)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"age"</span>, left<span class="op">=</span><span class="dv">0</span>, right<span class="op">=</span><span class="dv">120</span>)</span>
@@ -2546,8 +2533,8 @@ refused
 </dd>
 </dl>
 </section>
-<section id="methods" class="level2 doc-methods">
-<h2 class="doc-methods anchored" data-anchor-id="methods">Methods</h2>
+<section id="functions" class="level2 doc-functions doc-pages">
+<h2 class="doc-functions doc-pages anchored" data-anchor-id="functions">Functions</h2>
 <table class="gd-summary-table caption-top table">
 <thead>
 <tr class="header">
@@ -2557,713 +2544,53 @@ refused
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#from_cdisc_null_flavors" class="doc-function doc-label doc-label-method">from_cdisc_null_flavors()</a></td>
+<td><a href="../reference/pointblank.MissingSpec.from_cdisc_null_flavors.html" class="doc-function doc-label doc-label-method">from_cdisc_null_flavors()</a></td>
 <td>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for the standard HL7/CDISC <em>null flavors</em>.</td>
 </tr>
 <tr class="even">
-<td><a href="#from_cdisc" class="doc-function doc-label doc-label-method">from_cdisc()</a></td>
+<td><a href="../reference/pointblank.MissingSpec.from_cdisc.html" class="doc-function doc-label doc-label-method">from_cdisc()</a></td>
 <td>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for the standard HL7/CDISC null flavors (short alias).</td>
 </tr>
 <tr class="odd">
-<td><a href="#from_sas" class="doc-function doc-label doc-label-method">from_sas()</a></td>
+<td><a href="../reference/pointblank.MissingSpec.from_sas.html" class="doc-function doc-label doc-label-method">from_sas()</a></td>
 <td>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for SAS special missing values.</td>
 </tr>
 <tr class="even">
-<td><a href="#from_spss" class="doc-function doc-label doc-label-method">from_spss()</a></td>
+<td><a href="../reference/pointblank.MissingSpec.from_spss.html" class="doc-function doc-label doc-label-method">from_spss()</a></td>
 <td>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> from SPSS-style user-defined missing values.</td>
 </tr>
 <tr class="odd">
-<td><a href="#from_variable_metadata" class="doc-function doc-label doc-label-method">from_variable_metadata()</a></td>
+<td><a href="../reference/pointblank.MissingSpec.from_variable_metadata.html" class="doc-function doc-label doc-label-method">from_variable_metadata()</a></td>
 <td>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> from an imported variable’s metadata.</td>
 </tr>
 <tr class="even">
-<td><a href="#is_missing" class="doc-function doc-label doc-label-method">is_missing()</a></td>
+<td><a href="../reference/pointblank.MissingSpec.is_missing.html" class="doc-function doc-label doc-label-method">is_missing()</a></td>
 <td>Check whether a value should be considered missing under this spec.</td>
 </tr>
 <tr class="odd">
-<td><a href="#reason_for" class="doc-function doc-label doc-label-method">reason_for()</a></td>
+<td><a href="../reference/pointblank.MissingSpec.reason_for.html" class="doc-function doc-label doc-label-method">reason_for()</a></td>
 <td>Get the reason label for a specific value.</td>
 </tr>
 <tr class="even">
-<td><a href="#sentinel_values" class="doc-function doc-label doc-label-method">sentinel_values()</a></td>
+<td><a href="../reference/pointblank.MissingSpec.sentinel_values.html" class="doc-function doc-label doc-label-method">sentinel_values()</a></td>
 <td>Get all sentinel values that encode missingness.</td>
 </tr>
 <tr class="odd">
-<td><a href="#reasons_list" class="doc-function doc-label doc-label-method">reasons_list()</a></td>
+<td><a href="../reference/pointblank.MissingSpec.reasons_list.html" class="doc-function doc-label doc-label-method">reasons_list()</a></td>
 <td>Get the distinct reason labels defined by this spec.</td>
 </tr>
 <tr class="even">
-<td><a href="#values_for_reason" class="doc-function doc-label doc-label-method">values_for_reason()</a></td>
+<td><a href="../reference/pointblank.MissingSpec.values_for_reason.html" class="doc-function doc-label doc-label-method">values_for_reason()</a></td>
 <td>Get all sentinel values that correspond to a given reason.</td>
 </tr>
 <tr class="odd">
-<td><a href="#values_for_category" class="doc-function doc-label doc-label-method">values_for_category()</a></td>
+<td><a href="../reference/pointblank.MissingSpec.values_for_category.html" class="doc-function doc-label doc-label-method">values_for_category()</a></td>
 <td>Get all sentinel values whose reason falls in a given category.</td>
 </tr>
 </tbody>
 </table>
-<section id="from_cdisc_null_flavors" class="level3">
-<h3 class="anchored" data-anchor-id="from_cdisc_null_flavors"><span class="doc-object-name doc-function doc-label doc-label-method">from_cdisc_null_flavors()</span></h3>
-<div class="doc-subject">
-<p>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for the standard HL7/CDISC <em>null flavors</em>.</p>
-</div>
-<div class="doc-usage-source">
-<p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L445-L522" target="_blank" rel="noopener">Source</a></p>
-</div>
-<div class="doc-signature doc-function">
-<div class="sourceCode" id="cb6"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_cdisc_null_flavors</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_is_missing</span><span class="op">=</span><span class="bn">True</span>,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_reason</span><span class="op">=</span><span class="st">"no_information"</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span><span class="op">=</span><span class="st">"CDISC/HL7 null flavors"</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-</div>
-<div class="doc-text">
-<p>Clinical data uses standardized null flavor codes to record <em>why</em> a value is absent (e.g., <code>"NASK"</code> for “not asked”, <code>"UNK"</code> for “unknown”). This returns a ready-to-use spec that maps the 14 standard codes to snake_case reason labels (<code>"NI"</code> to <code>"no_information"</code>, <code>"NA"</code> to <code>"not_applicable"</code>, <code>"ASKU"</code> to <code>"asked_but_unknown"</code>, and so on). It also defines three categories:</p>
-<ul>
-<li><code>"unknown"</code>: <code>no_information</code>, <code>unknown</code>, <code>asked_but_unknown</code>, and <code>temporarily_unavailable</code></li>
-<li><code>"not_applicable"</code>: <code>not_applicable</code>, <code>not_asked</code>, and <code>not_present</code></li>
-<li><code>"boundary"</code>: <code>positive_infinity</code> and <code>negative_infinity</code></li>
-</ul>
-<p>The codes <code>"OTH"</code>, <code>"MSK"</code>, <code>"DER"</code>, <code>"QS"</code>, and <code>"TRC"</code> aren’t in any category. The codes are strings, so the spec is meant for character columns. Note that <code>"NA"</code> is one of them: in a column where <code>"NA"</code> is a real value, use a spec of your own instead.</p>
-</div>
-<section id="parameters-1" class="level4 doc-parameters">
-<h4 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code><span class="doc-parameter-name">null_is_missing</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
-<dd>
-<p>Whether actual null values should also be treated as missing. Default is <code>True</code>.</p>
-</dd>
-<dt><code><span class="doc-parameter-name">null_reason</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"no_information"</span></span></code></dt>
-<dd>
-<p>The reason label for actual null values. Default is <code>"no_information"</code>, which places nulls in the <code>"unknown"</code> category.</p>
-</dd>
-<dt><code><span class="doc-parameter-name">description</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"CDISC/HL7 null flavors"</span></span></code></dt>
-<dd>
-Optional description. Default identifies the spec as CDISC/HL7 null flavors.
-</dd>
-</dl>
-</div>
-</section>
-<section id="returns-1" class="level4 doc-returns">
-<h4 class="doc-returns anchored" data-anchor-id="returns-1">Returns</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code> <span class="doc-parameter-annotation">MissingSpec</span></code></dt>
-<dd>
-A spec with the standard null flavor codes.
-</dd>
-</dl>
-</div>
-</section>
-<section id="examples-1" class="level4 doc-examples">
-<h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="12cee94e" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>cdisc_missing <span class="op">=</span> pb.MissingSpec.from_cdisc_null_flavors()</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cdisc_missing.reason_for(<span class="st">"NASK"</span>))</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cdisc_missing.values_for_category(<span class="st">"not_applicable"</span>))</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cdisc_missing.reason_for(<span class="va">None</span>))</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>not_asked
-['NA', 'NASK', 'NP']
-no_information</code></pre>
-</div>
-</div>
-<p><code>"NASK"</code> maps to <code>"not_asked"</code>, and the <code>"not_applicable"</code> category covers the three codes for a value that doesn’t apply. A null gets the <code>"no_information"</code> reason, the same as the <code>"NI"</code> code. Pass the spec to a check with <code>missing=</code> so that these codes aren’t tested as if they were real values.</p>
-</section>
-<section id="see-also-1" class="level4 doc-see-also">
-<h4 class="doc-see-also anchored" data-anchor-id="see-also-1">See Also</h4>
-<dl>
-<dt><a href="../reference/MissingSpec.html#pointblank.MissingSpec.from_cdisc" class="gdls-link gdls-code">from_cdisc()</a></dt>
-<dd>
-<p>A shorter name for this method.</p>
-</dd>
-</dl>
-</section>
-</section>
-<section id="from_cdisc" class="level3">
-<h3 class="anchored" data-anchor-id="from_cdisc"><span class="doc-object-name doc-function doc-label doc-label-method">from_cdisc()</span></h3>
-<div class="doc-subject">
-<p>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for the standard HL7/CDISC null flavors (short alias).</p>
-</div>
-<div class="doc-usage-source">
-<p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L525-L557" target="_blank" rel="noopener">Source</a></p>
-</div>
-<div class="doc-signature doc-function">
-<div class="sourceCode" id="cb9"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_cdisc</span>(<span class="op">**</span><span class="va">kwargs</span>)</span></code></pre></div>
-</div>
-<div class="doc-text">
-<p>This is a shorter name for <a href="../reference/MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link"><code>from_cdisc_null_flavors()</code></a>, and it takes the same keyword arguments (<code>null_is_missing=</code>, <code>null_reason=</code>, and <code>description=</code>).</p>
-</div>
-<section id="parameters-2" class="level4 doc-parameters">
-<h4 class="doc-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code><span class="doc-parameter-name">**kwargs</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
-<dd>
-Keyword arguments passed on to <a href="../reference/MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link gdls-code">from_cdisc_null_flavors()</a>.
-</dd>
-</dl>
-</div>
-</section>
-<section id="returns-2" class="level4 doc-returns">
-<h4 class="doc-returns anchored" data-anchor-id="returns-2">Returns</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code> <span class="doc-parameter-annotation">MissingSpec</span></code></dt>
-<dd>
-A spec with the standard null flavor codes.
-</dd>
-</dl>
-</div>
-</section>
-<section id="examples-2" class="level4 doc-examples">
-<h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="09a27cbc" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>cdisc_missing <span class="op">=</span> pb.MissingSpec.from_cdisc(null_reason<span class="op">=</span><span class="st">"unknown"</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>cdisc_missing.reason_for(<span class="va">None</span>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
-<pre><code>'unknown'</code></pre>
-</div>
-</div>
-<p>Here nulls get the <code>"unknown"</code> reason rather than the default <code>"no_information"</code>, which still places them in the <code>"unknown"</code> category.</p>
-</section>
-</section>
-<section id="from_sas" class="level3">
-<h3 class="anchored" data-anchor-id="from_sas"><span class="doc-object-name doc-function doc-label doc-label-method">from_sas()</span></h3>
-<div class="doc-subject">
-<p>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> for SAS special missing values.</p>
-</div>
-<div class="doc-usage-source">
-<p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L559-L627" target="_blank" rel="noopener">Source</a></p>
-</div>
-<div class="doc-signature doc-function">
-<div class="sourceCode" id="cb12"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_sas</span>(</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">reasons</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">include_underscore</span><span class="op">=</span><span class="bn">True</span>,</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_is_missing</span><span class="op">=</span><span class="bn">True</span>,</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_reason</span><span class="op">=</span><span class="st">"system_missing"</span>,</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span><span class="op">=</span><span class="st">"SAS special missing values"</span>,</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-</div>
-<div class="doc-text">
-<p>SAS encodes missingness with <code>"."</code> (system missing), <code>"._"</code>, and <code>".A"</code> through <code>".Z"</code> (27 user-defined missing codes). This returns a spec covering all of them: <code>"."</code> and <code>"._"</code> get the reason <code>"system_missing"</code>, and each letter code gets a placeholder reason such as <code>"user_missing_a"</code>. Give the codes your study actually uses a meaningful reason with <code>reasons=</code>. The codes are strings, so the spec matches columns that hold them as text.</p>
-</div>
-<section id="parameters-3" class="level4 doc-parameters">
-<h4 class="doc-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code><span class="doc-parameter-name">reasons</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[str, str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
-<dd>
-<p>Optional mapping of specific SAS missing codes to custom reason labels (e.g., <code>{".A": "not_applicable", ".B": "below_detection"}</code>). These override the defaults.</p>
-</dd>
-<dt><code><span class="doc-parameter-name">include_underscore</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
-<dd>
-<p>Whether to include the <code>"._"</code> special missing code. Default is <code>True</code>.</p>
-</dd>
-<dt><code><span class="doc-parameter-name">null_is_missing</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
-<dd>
-<p>Whether actual null values should also be treated as missing. Default is <code>True</code>.</p>
-</dd>
-<dt><code><span class="doc-parameter-name">null_reason</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"system_missing"</span></span></code></dt>
-<dd>
-<p>The reason label for actual null values. Default is <code>"system_missing"</code>.</p>
-</dd>
-<dt><code><span class="doc-parameter-name">description</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"SAS special missing values"</span></span></code></dt>
-<dd>
-Optional description. Default identifies the spec as SAS special missing values.
-</dd>
-</dl>
-</div>
-</section>
-<section id="returns-3" class="level4 doc-returns">
-<h4 class="doc-returns anchored" data-anchor-id="returns-3">Returns</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code> <span class="doc-parameter-annotation">MissingSpec</span></code></dt>
-<dd>
-A spec covering the SAS special missing values.
-</dd>
-</dl>
-</div>
-</section>
-<section id="examples-3" class="level4 doc-examples">
-<h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
-<div id="55b8545c" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>sas_missing <span class="op">=</span> pb.MissingSpec.from_sas(</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    reasons<span class="op">=</span>{<span class="st">".A"</span>: <span class="st">"not_applicable"</span>, <span class="st">".B"</span>: <span class="st">"below_detection"</span>}</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(sas_missing.sentinel_values()))</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sas_missing.reason_for(<span class="st">".A"</span>))</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sas_missing.reason_for(<span class="st">".C"</span>))</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sas_missing.values_for_reason(<span class="st">"system_missing"</span>))</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>28
-not_applicable
-user_missing_c
-['.', '._']</code></pre>
-</div>
-</div>
-<p>The spec has 28 codes: <code>"."</code>, <code>"._"</code>, and the 26 letters. <code>".A"</code> has the reason given in <code>reasons=</code>, while <code>".C"</code> keeps its placeholder. Nulls also get the <code>"system_missing"</code> reason, but they aren’t listed by <a href="../reference/MissingSpec.html#pointblank.MissingSpec.values_for_reason" class="gdls-link gdls-code">values_for_reason()</a> because they aren’t sentinel values.</p>
-</section>
-</section>
-<section id="from_spss" class="level3">
-<h3 class="anchored" data-anchor-id="from_spss"><span class="doc-object-name doc-function doc-label doc-label-method">from_spss()</span></h3>
-<div class="doc-subject">
-<p>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> from SPSS-style user-defined missing values.</p>
-</div>
-<div class="doc-usage-source">
-<p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L629-L694" target="_blank" rel="noopener">Source</a></p>
-</div>
-<div class="doc-signature doc-function">
-<div class="sourceCode" id="cb15"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_spss</span>(</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">missing_values</span>,</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">labels</span><span class="op">=</span><span class="cn">None</span>,</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_is_missing</span><span class="op">=</span><span class="bn">True</span>,</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_reason</span><span class="op">=</span><span class="st">"unknown"</span>,</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span><span class="op">=</span><span class="st">"SPSS user-defined missing values"</span>,</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-</div>
-<div class="doc-text">
-<p>SPSS supports up to 3 user-defined missing values per variable (plus a range). Pass the missing values (and optionally their value labels) to build a spec. Reason labels are derived from the labels when available, otherwise a <code>"missing_&lt;value&gt;"</code> placeholder is used. A range of missing values can’t be given, so list the values in the range that occur in the data.</p>
-</div>
-<section id="parameters-4" class="level4 doc-parameters">
-<h4 class="doc-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code><span class="doc-parameter-name">missing_values</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list</span></code></dt>
-<dd>
-<p>The sentinel values that SPSS marks as missing for the variable (e.g., <code>[-99, -98]</code>).</p>
-</dd>
-<dt><code><span class="doc-parameter-name">labels</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[Any, str] | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
-<dd>
-<p>Optional mapping of sentinel value to human-readable label (e.g., <code>{-99: "Refused"}</code>). Labels are slugified into reason identifiers (e.g., <code>"Not asked"</code> becomes <code>"not_asked"</code>).</p>
-</dd>
-<dt><code><span class="doc-parameter-name">null_is_missing</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
-<dd>
-<p>Whether actual null values should also be treated as missing. Default is <code>True</code>.</p>
-</dd>
-<dt><code><span class="doc-parameter-name">null_reason</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"unknown"</span></span></code></dt>
-<dd>
-<p>The reason label for actual null values. Default is <code>"unknown"</code>.</p>
-</dd>
-<dt><code><span class="doc-parameter-name">description</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"SPSS user-defined missing values"</span></span></code></dt>
-<dd>
-Optional description. Default identifies the spec as SPSS user-defined missing values.
-</dd>
-</dl>
-</div>
-</section>
-<section id="returns-4" class="level4 doc-returns">
-<h4 class="doc-returns anchored" data-anchor-id="returns-4">Returns</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code> <span class="doc-parameter-annotation">MissingSpec</span></code></dt>
-<dd>
-A spec built from the SPSS missing values.
-</dd>
-</dl>
-</div>
-</section>
-<section id="examples-4" class="level4 doc-examples">
-<h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
-<div id="11ac9c72" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>spss_missing <span class="op">=</span> pb.MissingSpec.from_spss(</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    missing_values<span class="op">=</span>[<span class="op">-</span><span class="dv">99</span>, <span class="op">-</span><span class="dv">98</span>, <span class="dv">99</span>],</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    labels<span class="op">=</span>{<span class="op">-</span><span class="dv">99</span>: <span class="st">"Not asked"</span>, <span class="op">-</span><span class="dv">98</span>: <span class="st">"Refused"</span>},</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>spss_missing.reasons</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="8">
-<pre><code>{-99: 'not_asked', -98: 'refused', 99: 'missing_99'}</code></pre>
-</div>
-</div>
-<p>The labels become the reasons <code>"not_asked"</code> and <code>"refused"</code>. The value <code>99</code> has no label, so its reason is the placeholder <code>"missing_99"</code>. To read the missing values and labels straight from an SPSS file, use <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a> and <a href="../reference/MissingSpec.html#pointblank.MissingSpec.from_variable_metadata" class="gdls-link"><code>from_variable_metadata()</code></a> instead.</p>
-</section>
-</section>
-<section id="from_variable_metadata" class="level3">
-<h3 class="anchored" data-anchor-id="from_variable_metadata"><span class="doc-object-name doc-function doc-label doc-label-method">from_variable_metadata()</span></h3>
-<div class="doc-subject">
-<p>Create a <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link gdls-code">MissingSpec</a> from an imported variable’s metadata.</p>
-</div>
-<div class="doc-usage-source">
-<p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L696-L771" target="_blank" rel="noopener">Source</a></p>
-</div>
-<div class="doc-signature doc-function">
-<div class="sourceCode" id="cb18"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">from_variable_metadata</span>(</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">variable</span>,</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_is_missing</span><span class="op">=</span><span class="bn">True</span>,</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">null_reason</span><span class="op">=</span><span class="st">"unknown"</span>,</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-</div>
-<div class="doc-text">
-<p>This works with a <a href="../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link"><code>VariableMetadata</code></a> object (as produced by <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a> for SPSS, Stata, and SAS files). It reads the variable’s <code>missing_values</code> and derives reason labels from <code>missing_value_labels</code> or <code>value_labels</code> when available. Values with neither get a <code>"missing_&lt;value&gt;"</code> placeholder. The <a href="../reference/VariableMetadata.html#pointblank.VariableMetadata.to_missing_spec" class="gdls-link gdls-code">to_missing_spec()</a> method of <a href="../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link gdls-code">VariableMetadata</a> does the same thing.</p>
-</div>
-<section id="parameters-5" class="level4 doc-parameters">
-<h4 class="doc-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code><span class="doc-parameter-name">variable</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
-<dd>
-<p>A variable-metadata object exposing <code>missing_values</code> and (optionally) <code>missing_value_labels</code> / <code>value_labels</code> attributes.</p>
-</dd>
-<dt><code><span class="doc-parameter-name">null_is_missing</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
-<dd>
-<p>Whether actual null values should also be treated as missing. Default is <code>True</code>.</p>
-</dd>
-<dt><code><span class="doc-parameter-name">null_reason</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="st">"unknown"</span></span></code></dt>
-<dd>
-The reason label for actual null values. Default is <code>"unknown"</code>.
-</dd>
-</dl>
-</div>
-</section>
-<section id="returns-5" class="level4 doc-returns">
-<h4 class="doc-returns anchored" data-anchor-id="returns-5">Returns</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code> <span class="doc-parameter-annotation">MissingSpec | None</span></code></dt>
-<dd>
-A spec built from the variable’s missing values, or <code>None</code> if the variable declares no missing values.
-</dd>
-</dl>
-</div>
-</section>
-<section id="examples-5" class="level4 doc-examples">
-<h4 class="doc-examples anchored" data-anchor-id="examples-5">Examples</h4>
-<p>In practice the variable comes from an imported file, but we’ll build one here to show how it’s read:</p>
-<div id="850d5c9b" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>q5 <span class="op">=</span> pb.VariableMetadata(</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"q5"</span>,</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    missing_values<span class="op">=</span>[<span class="op">-</span><span class="dv">99</span>, <span class="op">-</span><span class="dv">98</span>],</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    value_labels<span class="op">=</span>{<span class="op">-</span><span class="dv">99</span>: <span class="st">"Not asked"</span>, <span class="op">-</span><span class="dv">98</span>: <span class="st">"Refused"</span>, <span class="dv">1</span>: <span class="st">"Yes"</span>, <span class="dv">2</span>: <span class="st">"No"</span>},</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> pb.MissingSpec.from_variable_metadata(q5)</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(spec.reasons)</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(spec.description)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>{-99: 'not_asked', -98: 'refused'}
-Imported missing values for 'q5'</code></pre>
-</div>
-</div>
-<p>Only the declared missing values become sentinels, and their value labels become the reasons. The value labels for <code>1</code> and <code>2</code> are ignored because those are real answers. A variable that declares no missing values gives <code>None</code> rather than a spec, so check for that before passing the result to <code>missing=</code>.</p>
-</section>
-</section>
-<section id="is_missing" class="level3">
-<h3 class="anchored" data-anchor-id="is_missing"><span class="doc-object-name doc-function doc-label doc-label-method">is_missing()</span></h3>
-<div class="doc-subject">
-<p>Check whether a value should be considered missing under this spec.</p>
-</div>
-<div class="doc-usage-source">
-<p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L304-L340" target="_blank" rel="noopener">Source</a></p>
-</div>
-<div class="doc-signature doc-function">
-<div class="sourceCode" id="cb21"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is_missing</span>(<span class="va">value</span>)</span></code></pre></div>
-</div>
-<div class="doc-text">
-<p>This applies the same rule that validation methods use with <code>missing=</code>: a value is missing if it’s one of the declared sentinel values, or if it’s null and the spec treats nulls as missing.</p>
-</div>
-<section id="parameters-6" class="level4 doc-parameters">
-<h4 class="doc-parameters anchored" data-anchor-id="parameters-6">Parameters</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code><span class="doc-parameter-name">value</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
-<dd>
-A value from the data.
-</dd>
-</dl>
-</div>
-</section>
-<section id="returns-6" class="level4 doc-returns">
-<h4 class="doc-returns anchored" data-anchor-id="returns-6">Returns</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code> <span class="doc-parameter-annotation">bool</span></code></dt>
-<dd>
-<code>True</code> if <code>value</code> is a declared sentinel value, or if <code>value</code> is null (<code>None</code> or a float <code>NaN</code>) and <code>null_is_missing=True</code>.
-</dd>
-</dl>
-</div>
-</section>
-<section id="examples-6" class="level4 doc-examples">
-<h4 class="doc-examples anchored" data-anchor-id="examples-6">Examples</h4>
-<div id="7381feb5" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> pb.MissingSpec(reasons<span class="op">=</span>{<span class="op">-</span><span class="dv">99</span>: <span class="st">"not_asked"</span>}, null_is_missing<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(spec.is_missing(<span class="op">-</span><span class="dv">99</span>))</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(spec.is_missing(<span class="va">None</span>))</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(spec.is_missing(<span class="dv">42</span>))</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>True
-False
-False</code></pre>
-</div>
-</div>
-<p>Only the sentinel <code>-99</code> counts as missing here. With <code>null_is_missing=False</code> a null doesn’t count either, so in a <code>col_vals_*()</code> method it would be handled by <code>na_pass=</code> instead.</p>
-</section>
-</section>
-<section id="reason_for" class="level3">
-<h3 class="anchored" data-anchor-id="reason_for"><span class="doc-object-name doc-function doc-label doc-label-method">reason_for()</span></h3>
-<div class="doc-subject">
-<p>Get the reason label for a specific value.</p>
-</div>
-<div class="doc-usage-source">
-<p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L269-L302" target="_blank" rel="noopener">Source</a></p>
-</div>
-<div class="doc-signature doc-function">
-<div class="sourceCode" id="cb24"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reason_for</span>(<span class="va">value</span>)</span></code></pre></div>
-</div>
-<section id="parameters-7" class="level4 doc-parameters">
-<h4 class="doc-parameters anchored" data-anchor-id="parameters-7">Parameters</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code><span class="doc-parameter-name">value</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
-<dd>
-A value from the data.
-</dd>
-</dl>
-</div>
-</section>
-<section id="returns-7" class="level4 doc-returns">
-<h4 class="doc-returns anchored" data-anchor-id="returns-7">Returns</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code> <span class="doc-parameter-annotation">str | None</span></code></dt>
-<dd>
-The reason label if <code>value</code> is a declared sentinel value, <code>null_reason</code> if <code>value</code> is null (<code>None</code> or a float <code>NaN</code>) and <code>null_is_missing=True</code>, or <code>None</code> if the value is not considered missing.
-</dd>
-</dl>
-</div>
-</section>
-<section id="examples-7" class="level4 doc-examples">
-<h4 class="doc-examples anchored" data-anchor-id="examples-7">Examples</h4>
-<div id="6d432aeb" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> pb.MissingSpec(reasons<span class="op">=</span>{<span class="op">-</span><span class="dv">99</span>: <span class="st">"not_asked"</span>, <span class="op">-</span><span class="dv">98</span>: <span class="st">"refused"</span>})</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(spec.reason_for(<span class="op">-</span><span class="dv">98</span>))</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(spec.reason_for(<span class="va">None</span>))</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(spec.reason_for(<span class="dv">42</span>))</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>refused
-unknown
-None</code></pre>
-</div>
-</div>
-<p>The sentinel <code>-98</code> gives its declared reason, and a null gets the spec’s <code>null_reason</code> (<code>"unknown"</code> by default). An ordinary value like <code>42</code> isn’t missing, so its reason is <code>None</code>.</p>
-</section>
-</section>
-<section id="sentinel_values" class="level3">
-<h3 class="anchored" data-anchor-id="sentinel_values"><span class="doc-object-name doc-function doc-label doc-label-method">sentinel_values()</span></h3>
-<div class="doc-subject">
-<p>Get all sentinel values that encode missingness.</p>
-</div>
-<div class="doc-usage-source">
-<p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L239-L267" target="_blank" rel="noopener">Source</a></p>
-</div>
-<div class="doc-signature doc-function">
-<div class="sourceCode" id="cb27"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sentinel_values</span>()</span></code></pre></div>
-</div>
-<div class="doc-text">
-<p>The sentinel values are the keys of <code>reasons</code>, in the order they were given. This is the list to use when you need the codes themselves, for example to filter them out of a table before computing a summary statistic.</p>
-</div>
-<section id="returns-8" class="level4 doc-returns">
-<h4 class="doc-returns anchored" data-anchor-id="returns-8">Returns</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code> <span class="doc-parameter-annotation">list</span></code></dt>
-<dd>
-The keys of <code>reasons</code> (the actual values in the data that represent missingness). Note that this does <em>not</em> include <code>None</code> even when <code>null_is_missing=True</code>; use <a href="../reference/MissingSpec.html#pointblank.MissingSpec.is_missing" class="gdls-link"><code>is_missing()</code></a> to test individual values.
-</dd>
-</dl>
-</div>
-</section>
-<section id="examples-8" class="level4 doc-examples">
-<h4 class="doc-examples anchored" data-anchor-id="examples-8">Examples</h4>
-<div id="6fa43481" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> pb.MissingSpec(reasons<span class="op">=</span>{<span class="op">-</span><span class="dv">99</span>: <span class="st">"not_asked"</span>, <span class="op">-</span><span class="dv">98</span>: <span class="st">"refused"</span>, <span class="op">-</span><span class="dv">97</span>: <span class="st">"refused"</span>})</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>spec.sentinel_values()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
-<pre><code>[-99, -98, -97]</code></pre>
-</div>
-</div>
-<p>All three codes are listed, including the two that share the <code>"refused"</code> reason. Nulls aren’t listed even though the spec treats them as missing (<code>null_is_missing=True</code> is the default), because they aren’t values that appear in <code>reasons</code>.</p>
-</section>
-</section>
-<section id="reasons_list" class="level3">
-<h3 class="anchored" data-anchor-id="reasons_list"><span class="doc-object-name doc-function doc-label doc-label-method">reasons_list()</span></h3>
-<div class="doc-subject">
-<p>Get the distinct reason labels defined by this spec.</p>
-</div>
-<div class="doc-usage-source">
-<p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L411-L439" target="_blank" rel="noopener">Source</a></p>
-</div>
-<div class="doc-signature doc-function">
-<div class="sourceCode" id="cb30"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reasons_list</span>()</span></code></pre></div>
-</div>
-<section id="returns-9" class="level4 doc-returns">
-<h4 class="doc-returns anchored" data-anchor-id="returns-9">Returns</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code> <span class="doc-parameter-annotation">list[str]</span></code></dt>
-<dd>
-The distinct reason labels (in first-seen order), including <code>null_reason</code> when <code>null_is_missing=True</code>.
-</dd>
-</dl>
-</div>
-</section>
-<section id="examples-9" class="level4 doc-examples">
-<h4 class="doc-examples anchored" data-anchor-id="examples-9">Examples</h4>
-<div id="153ee402" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> pb.MissingSpec(reasons<span class="op">=</span>{<span class="op">-</span><span class="dv">99</span>: <span class="st">"not_asked"</span>, <span class="op">-</span><span class="dv">98</span>: <span class="st">"refused"</span>, <span class="op">-</span><span class="dv">97</span>: <span class="st">"refused"</span>})</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>spec.reasons_list()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="13">
-<pre><code>['not_asked', 'refused', 'unknown']</code></pre>
-</div>
-</div>
-<p>The <code>"refused"</code> reason appears once even though two codes use it, and <code>"unknown"</code> comes last because it’s the <code>null_reason</code> for nulls. These are the reason labels that <code>col_pct_missing(reason=)</code> accepts and that <code>categories</code> can refer to.</p>
-</section>
-</section>
-<section id="values_for_reason" class="level3">
-<h3 class="anchored" data-anchor-id="values_for_reason"><span class="doc-object-name doc-function doc-label doc-label-method">values_for_reason()</span></h3>
-<div class="doc-subject">
-<p>Get all sentinel values that correspond to a given reason.</p>
-</div>
-<div class="doc-usage-source">
-<p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L342-L372" target="_blank" rel="noopener">Source</a></p>
-</div>
-<div class="doc-signature doc-function">
-<div class="sourceCode" id="cb33"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">values_for_reason</span>(<span class="va">reason</span>)</span></code></pre></div>
-</div>
-<section id="parameters-8" class="level4 doc-parameters">
-<h4 class="doc-parameters anchored" data-anchor-id="parameters-8">Parameters</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code><span class="doc-parameter-name">reason</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
-<dd>
-A reason label.
-</dd>
-</dl>
-</div>
-</section>
-<section id="returns-10" class="level4 doc-returns">
-<h4 class="doc-returns anchored" data-anchor-id="returns-10">Returns</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code> <span class="doc-parameter-annotation">list</span></code></dt>
-<dd>
-All sentinel values mapped to <code>reason</code>, or an empty list if no sentinel value has that reason. Nulls are never included, even when <code>reason</code> is the spec’s <code>null_reason</code>.
-</dd>
-</dl>
-</div>
-</section>
-<section id="examples-10" class="level4 doc-examples">
-<h4 class="doc-examples anchored" data-anchor-id="examples-10">Examples</h4>
-<div id="11973eaf" class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> pb.MissingSpec(</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    reasons<span class="op">=</span>{<span class="st">"."</span>: <span class="st">"system_missing"</span>, <span class="st">"._"</span>: <span class="st">"system_missing"</span>, <span class="st">".R"</span>: <span class="st">"refused"</span>}</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>spec.values_for_reason(<span class="st">"system_missing"</span>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="14">
-<pre><code>['.', '._']</code></pre>
-</div>
-</div>
-<p>Both SAS-style codes for system missing values are returned. This is the reverse of <a href="../reference/MissingSpec.html#pointblank.MissingSpec.reason_for" class="gdls-link"><code>reason_for()</code></a>, which goes from a value to its reason.</p>
-</section>
-</section>
-<section id="values_for_category" class="level3">
-<h3 class="anchored" data-anchor-id="values_for_category"><span class="doc-object-name doc-function doc-label doc-label-method">values_for_category()</span></h3>
-<div class="doc-subject">
-<p>Get all sentinel values whose reason falls in a given category.</p>
-</div>
-<div class="doc-usage-source">
-<p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/missing.py#L374-L409" target="_blank" rel="noopener">Source</a></p>
-</div>
-<div class="doc-signature doc-function">
-<div class="sourceCode" id="cb36"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">values_for_category</span>(<span class="va">category</span>)</span></code></pre></div>
-</div>
-<section id="parameters-9" class="level4 doc-parameters">
-<h4 class="doc-parameters anchored" data-anchor-id="parameters-9">Parameters</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code><span class="doc-parameter-name">category</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
-<dd>
-A category name defined in <code>categories</code>.
-</dd>
-</dl>
-</div>
-</section>
-<section id="returns-11" class="level4 doc-returns">
-<h4 class="doc-returns anchored" data-anchor-id="returns-11">Returns</h4>
-<div class="doc-definition-items">
-<dl>
-<dt><code> <span class="doc-parameter-annotation">list</span></code></dt>
-<dd>
-All sentinel values whose reason label is in the given category. Returns an empty list if <code>categories</code> is <code>None</code> or the category is undefined.
-</dd>
-</dl>
-</div>
-</section>
-<section id="examples-11" class="level4 doc-examples">
-<h4 class="doc-examples anchored" data-anchor-id="examples-11">Examples</h4>
-<div id="9fa6ea31" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> pb.MissingSpec(</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    reasons<span class="op">=</span>{<span class="op">-</span><span class="dv">99</span>: <span class="st">"not_asked"</span>, <span class="op">-</span><span class="dv">98</span>: <span class="st">"refused"</span>, <span class="op">-</span><span class="dv">97</span>: <span class="st">"dont_know"</span>},</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    categories<span class="op">=</span>{<span class="st">"item_nonresponse"</span>: [<span class="st">"refused"</span>, <span class="st">"dont_know"</span>]},</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(spec.values_for_category(<span class="st">"item_nonresponse"</span>))</span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(spec.values_for_category(<span class="st">"design"</span>))</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[-98, -97]
-[]</code></pre>
-</div>
-</div>
-<p>The <code>"item_nonresponse"</code> category covers the <code>"refused"</code> and <code>"dont_know"</code> reasons, so its values are <code>-98</code> and <code>-97</code>. The <code>"design"</code> category isn’t defined, and the result is an empty list rather than an error, so check the category name if you get no values back.</p>
 
 
-</section>
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -3695,7 +3022,7 @@ All sentinel values whose reason label is in the given category. Returns an empt
     </div>
   </div>
 </footer>
-<script src="../github-widget.js"></script>
+<script src="../repository-widget.js"></script>
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>

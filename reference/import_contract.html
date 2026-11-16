@@ -11,7 +11,7 @@
 <meta name="description" content="Import a contract or schema written in another format.">
 
 <title>import_contract() | Pointblank</title>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "import_contract - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/import_contract.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "codeRepository": "https://github.com/posit-dev/pointblank", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "import_contract - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/import_contract.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -136,7 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/import_contract.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/import_contract.html">
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2133,7 +2133,7 @@ If <code>source</code> is a path to a file that doesn’t exist.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose an API team publishes a JSON Schema for user profiles and we want to check a table of profiles against it. The schema can be passed as a dictionary (here it’s written inline, but it would usually come from <code>json.load()</code>). Because it has a <code>$schema</code> key, the format is detected without needing <code>format=</code>.</p>
-<div id="9c143582" class="cell" data-execution_count="2">
+<div id="9a38486a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2159,7 +2159,7 @@ If <code>source</code> is a path to a file that doesn’t exist.
 </div>
 </div>
 <p>The printed form gives the counts at a glance: four columns, six constraints, and nothing left untranslated. The <a href="../reference/ContractImport.html#pointblank.ContractImport.summary" class="gdls-link"><code>summary()</code></a> method gives a little more detail, including the version of the source specification.</p>
-<div id="c57a00b4" class="cell" data-execution_count="3">
+<div id="86f3955b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(imported.summary())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Contract Import Summary
@@ -2171,7 +2171,7 @@ If <code>source</code> is a path to a file that doesn’t exist.
 </div>
 </div>
 <p>Now let’s validate some data. The <a href="../reference/ContractImport.html#pointblank.ContractImport.to_validate" class="gdls-link"><code>to_validate()</code></a> method builds a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with a schema check followed by one step per constraint, and it accepts the usual <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> arguments such as <code>tbl_name=</code> and <code>label=</code>.</p>
-<div id="9b9e4b31" class="cell" data-execution_count="4">
+<div id="c06964cb" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>users <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"user_id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">0</span>],</span>
@@ -2752,7 +2752,7 @@ tr { background-color: transparent; }
 </div>
 <p>The table has the right columns and types, so the schema check passes. The remaining failures come straight from the JSON Schema rules: a <code>user_id</code> of <code>0</code> (below the minimum of <code>1</code>), a missing email (which fails both the <code>required</code> check and the <code>email</code> format check), an email without a valid domain, a lowercase country code, and a plan that isn’t in the <code>enum</code>.</p>
 <p>Files work the same way. In this next example a dbt <code>schema.yml</code> file with two models is written to the working directory. The <code>.yml</code> extension identifies it as a dbt file, and <code>model=</code> picks the model to import (without it, the first model would be used).</p>
-<div id="7a88b7c0" class="cell" data-execution_count="5">
+<div id="728bfac6" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>dbt_yml <span class="op">=</span> <span class="st">'''</span></span>
@@ -2800,7 +2800,7 @@ tr { background-color: transparent; }
 </div>
 <p>Four of the five tests were translated. The <code>relationships</code> test checks values against another model, which a single-table validation can’t do, so it was reported as a warning and the coverage is 80%. Note also that the dbt type <code>varchar(20)</code> was read as Pointblank’s <code>String</code> type.</p>
 <p>The import can also be turned into a <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> with <a href="../reference/ContractImport.html#pointblank.ContractImport.to_contract" class="gdls-link"><code>to_contract()</code></a>, which accepts any <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a> argument. Printing the contract as YAML shows that the schema, the steps, and the model’s description were all carried over.</p>
-<div id="a14befae" class="cell" data-execution_count="6">
+<div id="5f8c9251" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>orders_contract <span class="op">=</span> orders_import.to_contract(name<span class="op">=</span><span class="st">"orders"</span>, owner<span class="op">=</span><span class="st">"analytics"</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(orders_contract.to_yaml())</span></code></pre></div>
@@ -2829,7 +2829,7 @@ tr { background-color: transparent; }
 </code></pre>
 </div>
 </div>
-<p>The contract now has a name and an owner, and the dbt model’s four translated tests are its steps. From here it works like any other contract: it can be saved as YAML next to the dbt project, enforced with <a href="../reference/Contract.html#pointblank.Contract.validate" class="gdls-link"><code>Contract.validate()</code></a>, or used as a boundary in a <a href="../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link"><code>Pipeline</code></a>.</p>
+<p>The contract now has a name and an owner, and the dbt model’s four translated tests are its steps. From here it works like any other contract: it can be saved as YAML next to the dbt project, enforced with <a href="../reference/pointblank.Contract.validate.html" class="gdls-link"><code>Contract.validate()</code></a>, or used as a boundary in a <a href="../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link"><code>Pipeline</code></a>.</p>
 </section>
 <section id="see-also" class="level2 doc-see-also">
 <h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
@@ -3288,7 +3288,7 @@ tr { background-color: transparent; }
     </div>
   </div>
 </footer>
-<script src="../github-widget.js"></script>
+<script src="../repository-widget.js"></script>
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>

@@ -52,7 +52,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -98,7 +98,7 @@ ul.task-list li input[type="checkbox"] {
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/reference/glossary.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/reference/glossary.html">
@@ -154,7 +154,7 @@ ul.task-list li input[type="checkbox"] {
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -666,7 +666,7 @@ A <strong>validation step</strong> where a large language model (LLM) reads each
 </dd>
 <dt>AI Validation Editor</dt>
 <dd>
-A tool that changes an existing <strong>validation plan</strong> based on a plain-English instruction, such as “also check that the email column has no missing values”. It uses an LLM to write the revised plan. With the <a href="../../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> class you can see what changed (<a href="../../reference/EditValidation.html#pointblank.EditValidation.diff" class="gdls-link gdls-code">diff()</a> or <a href="../../reference/EditValidation.html#pointblank.EditValidation.review" class="gdls-link gdls-code">review()</a>) and then get the new plan with <a href="../../reference/EditValidation.html#pointblank.EditValidation.accept" class="gdls-link gdls-code">accept()</a>. It’s also available from the <strong>CLI</strong> as <code>pb edit</code>. See also <strong>DraftValidation</strong>. <a href="../../user-guide/advanced-validation/ai-validation-editor.html">Learn more</a>.
+A tool that changes an existing <strong>validation plan</strong> based on a plain-English instruction, such as “also check that the email column has no missing values”. It uses an LLM to write the revised plan. With the <a href="../../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> class you can see what changed (<a href="../../reference/pointblank.EditValidation.diff.html" class="gdls-link gdls-code">diff()</a> or <a href="../../reference/pointblank.EditValidation.review.html" class="gdls-link gdls-code">review()</a>) and then get the new plan with <a href="../../reference/pointblank.EditValidation.accept.html" class="gdls-link gdls-code">accept()</a>. It’s also available from the <strong>CLI</strong> as <code>pb edit</code>. See also <strong>DraftValidation</strong>. <a href="../../user-guide/advanced-validation/ai-validation-editor.html">Learn more</a>.
 </dd>
 <dt>Assertion</dt>
 <dd>
@@ -730,7 +730,7 @@ A reusable set of <strong>validation steps</strong> that isn’t tied to any par
 </dd>
 <dt>Conformance report</dt>
 <dd>
-The results of checking a set of clinical trial datasets against <strong>CDISC</strong> rules, given by <a href="../../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link gdls-code">validate_sdtmig()</a> and <a href="../../reference/validate_cdisc_submission.html#pointblank.validate_cdisc_submission" class="gdls-link gdls-code">validate_cdisc_submission()</a> as a <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a>. Its table shows one row per rule, with a status of pass, fail, error, not applicable, or not supported. The <em>findings</em> (one for each record that broke a rule, with the column and value at fault) are available as a table with <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link gdls-code">get_findings_table()</a> or as a DataFrame with <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link gdls-code">findings_df()</a>. <a href="../../user-guide/metadata-import/cdisc-submission-conformance.html">Learn more</a>.
+The results of checking a set of clinical trial datasets against <strong>CDISC</strong> rules, given by <a href="../../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link gdls-code">validate_sdtmig()</a> and <a href="../../reference/validate_cdisc_submission.html#pointblank.validate_cdisc_submission" class="gdls-link gdls-code">validate_cdisc_submission()</a> as a <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link gdls-code">ConformanceReport</a>. Its table shows one row per rule, with a status of pass, fail, error, not applicable, or not supported. The <em>findings</em> (one for each record that broke a rule, with the column and value at fault) are available as a table with <a href="../../reference/pointblank.ConformanceReport.get_findings_table.html" class="gdls-link gdls-code">get_findings_table()</a> or as a DataFrame with <a href="../../reference/pointblank.ConformanceReport.findings_df.html" class="gdls-link gdls-code">findings_df()</a>. <a href="../../user-guide/metadata-import/cdisc-submission-conformance.html">Learn more</a>.
 </dd>
 <dt>Conjointly</dt>
 <dd>
@@ -890,7 +890,7 @@ A way for AI assistants (such as the AI chat in VS Code or Positron) to use Poin
 </dd>
 <dt>Metadata import</dt>
 <dd>
-Reading a description of a dataset from a file made by another tool, and turning it into Pointblank checks. <a href="../../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link gdls-code">import_metadata()</a> reads files from SPSS, SAS, and Stata, Frictionless Data Packages, CSV on the Web (CSVW), and <strong>CDISC</strong> standards like <strong>Define-XML</strong>. You can turn the result into a validation plan with <code>to_validate(data)</code> or into a <strong>schema</strong> with <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_schema" class="gdls-link gdls-code">to_schema()</a>. <a href="../../user-guide/metadata-import/metadata-import.html">Learn more</a>.
+Reading a description of a dataset from a file made by another tool, and turning it into Pointblank checks. <a href="../../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link gdls-code">import_metadata()</a> reads files from SPSS, SAS, and Stata, Frictionless Data Packages, CSV on the Web (CSVW), and <strong>CDISC</strong> standards like <strong>Define-XML</strong>. You can turn the result into a validation plan with <code>to_validate(data)</code> or into a <strong>schema</strong> with <a href="../../reference/pointblank.MetadataImport.to_schema.html" class="gdls-link gdls-code">to_schema()</a>. <a href="../../user-guide/metadata-import/metadata-import.html">Learn more</a>.
 </dd>
 <dt>Missing values table</dt>
 <dd>
@@ -910,7 +910,7 @@ A row that’s almost the same as another, such as two copies of a web page that
 </dd>
 <dt>Null flavor</dt>
 <dd>
-A standard code from the HL7 and <strong>CDISC</strong> standards that says why a value is missing. For example, <code>"NI"</code> means no information, <code>"UNK"</code> means unknown, and <code>"ASKU"</code> means asked but unknown. <a href="../../reference/MissingSpec.html#pointblank.MissingSpec.from_cdisc_null_flavors" class="gdls-link gdls-code">MissingSpec.from_cdisc_null_flavors()</a> sets up all 14 codes for you. See also <strong>coded missing value</strong>. <a href="../../user-guide/metadata-import/cdisc-validation.html">Learn more</a>.
+A standard code from the HL7 and <strong>CDISC</strong> standards that says why a value is missing. For example, <code>"NI"</code> means no information, <code>"UNK"</code> means unknown, and <code>"ASKU"</code> means asked but unknown. <a href="../../reference/pointblank.MissingSpec.from_cdisc_null_flavors.html" class="gdls-link gdls-code">MissingSpec.from_cdisc_null_flavors()</a> sets up all 14 codes for you. See also <strong>coded missing value</strong>. <a href="../../user-guide/metadata-import/cdisc-validation.html">Learn more</a>.
 </dd>
 <dt>OpenTelemetry integration</dt>
 <dd>
@@ -1046,7 +1046,7 @@ A check that text values follow a well-known format, such as email addresses, UR
 </dd>
 <dt>Split check</dt>
 <dd>
-A check that the splits of a dataset (for example, the training, validation, and test splits used for a model) are independent and alike. <a href="../../reference/check_splits.html#pointblank.check_splits" class="gdls-link gdls-code">check_splits()</a> finds rows of one split that are also in another (<em>leakage</em>), exactly or, with <code>near=True</code>, nearly; labels that a split is missing or has on its own (with <code>label=</code>); and columns whose values are distributed differently (with <strong>drift scores</strong>). It returns a <a href="../../reference/SplitCheck.html#pointblank.SplitCheck" class="gdls-link gdls-code">SplitCheck</a>, whose <code>ok</code> is <code>True</code> if no problems were found and whose <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> lists them. <a href="../../user-guide/table-comparison/checking-splits.html">Learn more</a>.
+A check that the splits of a dataset (for example, the training, validation, and test splits used for a model) are independent and alike. <a href="../../reference/check_splits.html#pointblank.check_splits" class="gdls-link gdls-code">check_splits()</a> finds rows of one split that are also in another (<em>leakage</em>), exactly or, with <code>near=True</code>, nearly; labels that a split is missing or has on its own (with <code>label=</code>); and columns whose values are distributed differently (with <strong>drift scores</strong>). It returns a <a href="../../reference/SplitCheck.html#pointblank.SplitCheck" class="gdls-link gdls-code">SplitCheck</a>, whose <code>ok</code> is <code>True</code> if no problems were found and whose <a href="../../reference/pointblank.ConformanceReport.issues.html" class="gdls-link gdls-code">issues</a> lists them. <a href="../../user-guide/table-comparison/checking-splits.html">Learn more</a>.
 </dd>
 <dt>Status check</dt>
 <dd>
@@ -1078,7 +1078,7 @@ A set of <strong>ablation</strong> variants that try one setting at several valu
 </dd>
 <dt>Synthetic data check</dt>
 <dd>
-A comparison of synthetic data with the real data it was made from (its <em>seed</em>), made with <a href="../../reference/check_synthetic.html#pointblank.check_synthetic" class="gdls-link gdls-code">check_synthetic()</a>. It checks <em>fidelity</em> (whether each column’s values and share of missing values are like the seed’s, using <strong>drift scores</strong>), <em>diversity</em> (whether rows or text repeat more than in the seed, a sign of a generator stuck on a few kinds of rows), and <em>copies</em> (synthetic rows that are the same as a seed row, or whose text nearly is, which can give private data away). It returns a <a href="../../reference/SyntheticCheck.html#pointblank.SyntheticCheck" class="gdls-link gdls-code">SyntheticCheck</a>, whose <code>ok</code> is <code>True</code> if no problems were found and whose <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues</a> lists them. <a href="../../user-guide/table-comparison/checking-synthetic-data.html">Learn more</a>.
+A comparison of synthetic data with the real data it was made from (its <em>seed</em>), made with <a href="../../reference/check_synthetic.html#pointblank.check_synthetic" class="gdls-link gdls-code">check_synthetic()</a>. It checks <em>fidelity</em> (whether each column’s values and share of missing values are like the seed’s, using <strong>drift scores</strong>), <em>diversity</em> (whether rows or text repeat more than in the seed, a sign of a generator stuck on a few kinds of rows), and <em>copies</em> (synthetic rows that are the same as a seed row, or whose text nearly is, which can give private data away). It returns a <a href="../../reference/SyntheticCheck.html#pointblank.SyntheticCheck" class="gdls-link gdls-code">SyntheticCheck</a>, whose <code>ok</code> is <code>True</code> if no problems were found and whose <a href="../../reference/pointblank.ConformanceReport.issues.html" class="gdls-link gdls-code">issues</a> lists them. <a href="../../user-guide/table-comparison/checking-synthetic-data.html">Learn more</a>.
 </dd>
 <dt>Table comparison</dt>
 <dd>
@@ -1594,7 +1594,7 @@ A validation written in a YAML file instead of Python code. The file lists the d
     </div>
   </div>
 </footer>
-<script src="../../github-widget.js"></script>
+<script src="../../repository-widget.js"></script>
 <script src="../../copy-page.js"></script>
 <script src="../../sidebar-wrap.js"></script>
 <script src="../../sidebar-float.js"></script>

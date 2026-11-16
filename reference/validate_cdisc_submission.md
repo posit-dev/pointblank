@@ -23,14 +23,14 @@ validate_cdisc_submission(
 )
 ```
 
-CDISC CORE is CDISC's open-source engine for its conformance rules, and it has the published rules of CDISC and of the FDA and PMDA. The [validate_cdisc_submission()](../reference/validate_cdisc_submission.md#pointblank.validate_cdisc_submission) function runs CORE on a submission in a single call: it makes a [`SubmissionPackage`](../reference/SubmissionPackage.md#pointblank.SubmissionPackage) from the `source` (unless it is one already), runs CORE on it, and reads CORE's results into a [`ConformanceReport`](../reference/ConformanceReport.md#pointblank.ConformanceReport). This is the same as calling the package's [`validate_conformance()`](../reference/SubmissionPackage.md#pointblank.SubmissionPackage.validate_conformance) method with `engine="core"`.
+CDISC CORE is CDISC's open-source engine for its conformance rules, and it has the published rules of CDISC and of the FDA and PMDA. The [validate_cdisc_submission()](../reference/validate_cdisc_submission.md#pointblank.validate_cdisc_submission) function runs CORE on a submission in a single call: it makes a [`SubmissionPackage`](../reference/SubmissionPackage.md#pointblank.SubmissionPackage) from the `source` (unless it is one already), runs CORE on it, and reads CORE's results into a [`ConformanceReport`](../reference/ConformanceReport.md#pointblank.ConformanceReport). This is the same as calling the package's [`validate_conformance()`](../reference/pointblank.SubmissionPackage.validate_conformance.md) method with `engine="core"`.
 
 CORE is a separate command-line tool (`cdisc-rules-engine`) that has to be installed. If it isn't on the `PATH`, give the command with `core=` or in the `POINTBLANK_CDISC_CORE` environment variable. For checks that need no other software, use [`validate_sdtmig()`](../reference/validate_sdtmig.md#pointblank.validate_sdtmig), which runs Pointblank's bundled SDTMIG rules.
 
 ## Parameters
 
 `source: str | Path | dict | SubmissionPackage`  
-The submission to check. This can be the path of a folder of datasets (`.xpt` or Dataset-JSON files, which are read with [`SubmissionPackage.from_folder()`](../reference/SubmissionPackage.md#pointblank.SubmissionPackage.from_folder)), a dict of DataFrames keyed by dataset name, or a [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage).
+The submission to check. This can be the path of a folder of datasets (`.xpt` or Dataset-JSON files, which are read with [`SubmissionPackage.from_folder()`](../reference/pointblank.SubmissionPackage.from_folder.md)), a dict of DataFrames keyed by dataset name, or a [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage).
 
 `standard: str | None = None`  
 The CDISC standard, such as `"sdtmig"`. The default is `"sdtmig"`, or the package's `standard` if `source` is a [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage).
@@ -68,7 +68,7 @@ A directory for the XPT files that the datasets are written to and for CORE's re
 ## Returns
 
 `ConformanceReport`  
-A report of CORE's results, whose [`is_core`](../reference/ConformanceReport.md#pointblank.ConformanceReport.is_core) is `True`.
+A report of CORE's results, whose [`is_core`](../reference/pointblank.ConformanceReport.is_core.md) is `True`.
 
 ## Raises
 
@@ -105,7 +105,7 @@ for issue in report.issues(status="ISSUE REPORTED"):
 report.to_excel("study_xyz/conformance/core_report.xlsx")
 ```
 
-If CORE was installed from a checkout of its repository, it has to be run from that directory, as in `core=["python", "core.py"], core_cwd="path/to/cdisc-rules-engine"`. A report that CORE wrote on its own can be read with [`ConformanceReport.from_core_report()`](../reference/ConformanceReport.md#pointblank.ConformanceReport.from_core_report), which has an example that runs without CORE.
+If CORE was installed from a checkout of its repository, it has to be run from that directory, as in `core=["python", "core.py"], core_cwd="path/to/cdisc-rules-engine"`. A report that CORE wrote on its own can be read with [`ConformanceReport.from_core_report()`](../reference/pointblank.ConformanceReport.from_core_report.md), which has an example that runs without CORE.
 
 ## See Also
 

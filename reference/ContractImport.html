@@ -11,7 +11,7 @@
 <meta name="description" content="The result of importing a contract or schema from another format.">
 
 <title>ContractImport | Pointblank</title>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "ContractImport - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/ContractImport.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "codeRepository": "https://github.com/posit-dev/pointblank", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "ContractImport - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/ContractImport.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -136,7 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/ContractImport.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/ContractImport.html">
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2117,7 +2117,7 @@ The share of recognized rules that were translated, from <code>0.0</code> to <co
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s import a Frictionless Data Package that describes two tables. The <code>resource=</code> option selects the <code>readings</code> table, which has a primary key and a foreign key to the <code>stations</code> table.</p>
-<div id="2313d68f" class="cell" data-execution_count="2">
+<div id="e276f8c8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2160,14 +2160,14 @@ The share of recognized rules that were translated, from <code>0.0</code> to <co
 </div>
 </div>
 <p>The fields hold the details. The columns come with their Frictionless types translated to Pointblank types:</p>
-<div id="0ecb25a0" class="cell" data-execution_count="3">
+<div id="92878487" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>readings.columns</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>[('station_id', 'String'), ('reading_no', 'Int64'), ('temp_c', 'Float64')]</code></pre>
 </div>
 </div>
 <p>The constraints show how the temperature range became a pair of bounds, and how the primary key was expressed as not-null checks plus a <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct()</a> check over both key columns.</p>
-<div id="c21aee3d" class="cell" data-execution_count="4">
+<div id="0e9ed8ef" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> c <span class="kw">in</span> readings.constraints:</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(c)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2179,14 +2179,14 @@ MappedConstraint('rows_distinct', columns_subset=['station_id', 'reading_no'])</
 </div>
 </div>
 <p>The foreign key couldn’t be translated, since checking it would need the <code>stations</code> table. It shows up in <code>warnings</code>, and it’s why the coverage is below 100%.</p>
-<div id="093fea06" class="cell" data-execution_count="5">
+<div id="cb31b9d5" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>readings.warnings</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>['Foreign key constraint skipped (cross-table validation not supported): station_id → stations.station_id']</code></pre>
 </div>
 </div>
 <p>Because the fields can be changed, the import can be adjusted before it’s used. Here the temperature range is dropped (perhaps the sensors are known to report out-of-range values that are dealt with later) and the remaining checks are run against a table.</p>
-<div id="42c97426" class="cell" data-execution_count="6">
+<div id="bb7f8b61" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>readings.constraints <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> readings.constraints <span class="cf">if</span> c.kwargs.get(<span class="st">"columns"</span>) <span class="op">!=</span> <span class="st">"temp_c"</span>]</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>readings_tbl <span class="op">=</span> pl.DataFrame(</span>
@@ -2288,7 +2288,7 @@ MappedConstraint('rows_distinct', columns_subset=['station_id', 'reading_no'])</
     <td colspan="14" class="gt_heading gt_title gt_font_normal" id="pb_tbl-title" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-09|20:48:16</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">readings</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-16|22:32:35</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">readings</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -2735,7 +2735,7 @@ A <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
 <p>Here’s a Frictionless Table Schema for a table of products. Its constraints say that each <code>sku</code> is required and unique, that prices can’t be negative, and that the category must be one of three values.</p>
-<div id="097947bd" class="cell" data-execution_count="8">
+<div id="e29c02c1" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2764,7 +2764,7 @@ A <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls
 <span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>The arguments after the table go to the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> constructor. Here we name the table and set a threshold so that any failing test unit counts as a warning.</p>
-<div id="1a88c7a8" class="cell" data-execution_count="9">
+<div id="36851df6" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>imported <span class="op">=</span> pb.import_contract(product_schema)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>imported.to_validate(products, tbl_name<span class="op">=</span><span class="st">"products"</span>, thresholds<span class="op">=</span>(<span class="dv">1</span>,)).interrogate()</span></code></pre></div>
@@ -2858,7 +2858,7 @@ A <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls
     <td colspan="14" class="gt_heading gt_title gt_font_normal" id="pb_tbl-title" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-09|20:48:16</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">products</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">1</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">—</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">—</span></span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-16|22:32:35</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">products</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">1</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">—</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">—</span></span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -3243,7 +3243,7 @@ tr { background-color: transparent; }
 </div>
 <p>The report shows the schema check followed by the four imported steps. The duplicated <code>G-002</code> row, the negative price, and the <code>"film"</code> category each cause a failure.</p>
 <p>Since the <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object isn’t interrogated yet, we can add a rule that the Table Schema doesn’t have (here, that prices stay below <code>100</code>) before running everything together.</p>
-<div id="7d27aa72" class="cell" data-execution_count="10">
+<div id="b48b5958" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    imported.to_validate(products, tbl_name<span class="op">=</span><span class="st">"products"</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"price"</span>, value<span class="op">=</span><span class="dv">100</span>)</span>
@@ -3339,7 +3339,7 @@ tr { background-color: transparent; }
     <td colspan="14" class="gt_heading gt_title gt_font_normal" id="pb_tbl-title" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-09|20:48:17</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">products</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-16|22:32:36</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">products</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -3782,7 +3782,7 @@ tr { background-color: transparent; }
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>Where <a href="../reference/ContractImport.html#pointblank.ContractImport.to_validate" class="gdls-link"><code>to_validate()</code></a> checks one table right away, <a href="../reference/ContractImport.html#pointblank.ContractImport.to_contract" class="gdls-link gdls-code">to_contract()</a> produces a <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link"><code>Contract</code></a>: a declarative specification that isn’t tied to any table. A contract can be validated against many tables over time, used at either end of a <a href="../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link"><code>Pipeline</code></a>, and saved with <a href="../reference/Contract.html#pointblank.Contract.to_yaml" class="gdls-link"><code>to_yaml()</code></a> so that the translated rules can be reviewed and versioned like any other Pointblank contract.</p>
+<p>Where <a href="../reference/ContractImport.html#pointblank.ContractImport.to_validate" class="gdls-link"><code>to_validate()</code></a> checks one table right away, <a href="../reference/ContractImport.html#pointblank.ContractImport.to_contract" class="gdls-link gdls-code">to_contract()</a> produces a <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link"><code>Contract</code></a>: a declarative specification that isn’t tied to any table. A contract can be validated against many tables over time, used at either end of a <a href="../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link"><code>Pipeline</code></a>, and saved with <a href="../reference/pointblank.Contract.to_yaml.html" class="gdls-link"><code>to_yaml()</code></a> so that the translated rules can be reviewed and versioned like any other Pointblank contract.</p>
 <p>The contract’s schema is a <a href="../reference/Schema.html#pointblank.Schema" class="gdls-link"><code>Schema</code></a> built from the columns that have a type (no schema is set if none do), and its steps are <a href="../reference/Step.html#pointblank.Step" class="gdls-link"><code>Step</code></a> objects made from the constraints. If the source had a description, it becomes the contract’s description unless <code>description=</code> is given. The source’s title isn’t used, so pass it as <code>name=</code> if it should be kept.</p>
 </div>
 <section id="parameters-2" class="level4 doc-parameters">
@@ -3814,7 +3814,7 @@ A contract with the imported schema and steps.
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
 <p>Let’s import a JSON Schema that has a title and a description, then turn it into a contract. We use the schema’s title as the contract name and add some metadata that the JSON Schema doesn’t have.</p>
-<div id="be445300" class="cell" data-execution_count="12">
+<div id="8b4d8bb2" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -3842,8 +3842,8 @@ A contract with the imported schema and steps.
 <pre><code>Contract(name='sensor_reading', direction='source', version='1.0.0', schema=&lt;defined&gt;, steps=5)</code></pre>
 </div>
 </div>
-<p>The contract can now validate tables with its <a href="../reference/Contract.html#pointblank.Contract.validate" class="gdls-link"><code>validate()</code></a> method.</p>
-<div id="8271d5ee" class="cell" data-execution_count="13">
+<p>The contract can now validate tables with its <a href="../reference/pointblank.Contract.validate.html" class="gdls-link"><code>validate()</code></a> method.</p>
+<div id="d4360411" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>readings <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"sensor_id"</span>: [<span class="st">"T-001"</span>, <span class="st">"T-002"</span>, <span class="st">"T-03"</span>, <span class="va">None</span>],</span>
@@ -4390,7 +4390,7 @@ The Python code, as a string.
 <section id="examples-3" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
 <p>Let’s import a small dbt model definition and look at the code for it.</p>
-<div id="c015ae50" class="cell" data-execution_count="15">
+<div id="7daeb0ed" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>dbt_schema <span class="op">=</span> {</span>
@@ -4448,7 +4448,7 @@ validation.interrogate()</code></pre>
 </div>
 <div class="doc-text">
 <p>YAML is easier to scan than Python for people who don’t write code, so this method is handy for sharing what an import produced, such as in a code review or a ticket. The output has a <code>validation:</code> key holding a <code>steps:</code> list. That list starts with a <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link gdls-code">col_schema_match</a> step (when any column has a type) and then has one entry per constraint, each named after its validation method and holding that method’s arguments.</p>
-<p>This is a listing of the steps rather than a complete YAML validation configuration: it has no <code>tbl:</code> entry and its steps are nested under <code>validation:</code>, so it can’t be passed to <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a> as is. To keep the imported rules in a YAML file that Pointblank can read back, convert them to a contract with <a href="../reference/ContractImport.html#pointblank.ContractImport.to_contract" class="gdls-link"><code>to_contract()</code></a> and write that with <a href="../reference/Contract.html#pointblank.Contract.to_yaml" class="gdls-link"><code>Contract.to_yaml()</code></a>.</p>
+<p>This is a listing of the steps rather than a complete YAML validation configuration: it has no <code>tbl:</code> entry and its steps are nested under <code>validation:</code>, so it can’t be passed to <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" class="gdls-link"><code>yaml_interrogate()</code></a> as is. To keep the imported rules in a YAML file that Pointblank can read back, convert them to a contract with <a href="../reference/ContractImport.html#pointblank.ContractImport.to_contract" class="gdls-link"><code>to_contract()</code></a> and write that with <a href="../reference/pointblank.Contract.to_yaml.html" class="gdls-link"><code>Contract.to_yaml()</code></a>.</p>
 </div>
 <section id="returns-3" class="level4 doc-returns">
 <h4 class="doc-returns anchored" data-anchor-id="returns-3">Returns</h4>
@@ -4464,7 +4464,7 @@ The YAML text.
 <section id="examples-4" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
 <p>Here’s the YAML listing for a small Frictionless Table Schema.</p>
-<div id="25d22014" class="cell" data-execution_count="17">
+<div id="de40d1c1" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>imported <span class="op">=</span> pb.import_contract(</span>
@@ -4524,7 +4524,7 @@ The summary text. Use <code>print()</code> to display it.
 <section id="examples-5" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-5">Examples</h4>
 <p>This JSON Schema uses the <code>date</code> format for one of its properties, which has no Pointblank equivalent among the format checks.</p>
-<div id="da358936" class="cell" data-execution_count="19">
+<div id="3fb44e5e" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>imported <span class="op">=</span> pb.import_contract(</span>
@@ -4987,7 +4987,7 @@ The summary text. Use <code>print()</code> to display it.
     </div>
   </div>
 </footer>
-<script src="../github-widget.js"></script>
+<script src="../repository-widget.js"></script>
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>

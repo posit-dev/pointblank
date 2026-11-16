@@ -67,7 +67,7 @@ The Editor proposes; you dispose. Before anything runs, inspect what the model c
 
 ### As a Unified Diff
 
-[`diff()`](../../reference/EditValidation.md#pointblank.EditValidation.diff) returns a textual, line-level diff of the original plan versus the revised plan:
+[`diff()`](../../reference/pointblank.EditValidation.diff.md) returns a textual, line-level diff of the original plan versus the revised plan:
 
 ``` python
 print(edited.diff())
@@ -89,7 +89,7 @@ print(edited.diff())
 
 ### As a Structured Change List
 
-[`changed_steps()`](../../reference/EditValidation.md#pointblank.EditValidation.changed_steps) compares the two plans at the level of validation steps and returns a structured list. Unlike the textual diff, this is robust to reformatting (it compares whole steps rather than lines):
+[`changed_steps()`](../../reference/pointblank.EditValidation.changed_steps.md) compares the two plans at the level of validation steps and returns a structured list. Unlike the textual diff, this is robust to reformatting (it compares whole steps rather than lines):
 
 ``` python
 edited.changed_steps()
@@ -110,7 +110,7 @@ Each record has an `"action"` of `"add"`, `"remove"`, or `"modify"`, the `"metho
 
 ### As a Table
 
-[`review()`](../../reference/EditValidation.md#pointblank.EditValidation.review) renders the same change list as a [Great Tables](https://posit-dev.github.io/great-tables/) object, color-coding additions, removals, and modifications for quick visual review in a notebook:
+[`review()`](../../reference/pointblank.EditValidation.review.md) renders the same change list as a [Great Tables](https://posit-dev.github.io/great-tables/) object, color-coding additions, removals, and modifications for quick visual review in a notebook:
 
 ``` python
 edited.review()
@@ -126,7 +126,7 @@ edited.review()
 
 ## Accepting the Edit
 
-Once you're satisfied with the proposed change, [`accept()`](../../reference/EditValidation.md#pointblank.EditValidation.accept) executes the revised plan and returns a [Validate](../../reference/Validate.md#pointblank.Validate) object, ready to interrogate:
+Once you're satisfied with the proposed change, [`accept()`](../../reference/pointblank.EditValidation.accept.md) executes the revised plan and returns a [Validate](../../reference/Validate.md#pointblank.Validate) object, ready to interrogate:
 
 ``` python
 plan = edited.accept()          # a Validate (not yet interrogated)
@@ -135,11 +135,11 @@ plan.interrogate()              # run it
 
 [TABLE]
 
-The data bound to the plan is the `data=` you passed to [EditValidation](../../reference/EditValidation.md#pointblank.EditValidation); you can override it with `edited.accept(data=other_table)`. Nothing runs until you call [accept()](../../reference/EditValidation.md#pointblank.EditValidation.accept), and the plan isn't interrogated until you call [interrogate()](../../reference/Validate.interrogate.md#pointblank.Validate.interrogate), so there's a clear, deliberate boundary between the model's proposal and execution.
+The data bound to the plan is the `data=` you passed to [EditValidation](../../reference/EditValidation.md#pointblank.EditValidation); you can override it with `edited.accept(data=other_table)`. Nothing runs until you call [accept()](../../reference/pointblank.EditValidation.accept.md), and the plan isn't interrogated until you call [interrogate()](../../reference/Validate.interrogate.md#pointblank.Validate.interrogate), so there's a clear, deliberate boundary between the model's proposal and execution.
 
 ## Comparing Two Plans Without a Model
 
-You don't need an LLM to review the difference between two plans. When you already have a "before" and "after" (for example, two versions of a plan from source control), [`EditValidation.from_plans()`](../../reference/EditValidation.md#pointblank.EditValidation.from_plans) builds the same comparison object directly, with all of [diff()](../../reference/EditValidation.md#pointblank.EditValidation.diff), [changed_steps()](../../reference/EditValidation.md#pointblank.EditValidation.changed_steps), and [review()](../../reference/EditValidation.md#pointblank.EditValidation.review) available and no API key required. The following example is fully live:
+You don't need an LLM to review the difference between two plans. When you already have a "before" and "after" (for example, two versions of a plan from source control), [`EditValidation.from_plans()`](../../reference/pointblank.EditValidation.from_plans.md) builds the same comparison object directly, with all of [diff()](../../reference/pointblank.EditValidation.diff.md), [changed_steps()](../../reference/pointblank.EditValidation.changed_steps.md), and [review()](../../reference/pointblank.EditValidation.review.md) available and no API key required. The following example is fully live:
 
 ``` python
 before = pb.Validate(data=pb.load_dataset("small_table")).col_vals_gt(columns="d", value=100)
@@ -163,8 +163,8 @@ pb.EditValidation.from_plans(before, after).review()
 
 Two guardrails keep the flow from handing you broken code.
 
-- **Syntax and lint check.** The revised code is parsed with `ast.parse()` and checked for validation-method typos before it's returned. [`validate_syntax()`](../../reference/EditValidation.md#pointblank.EditValidation.validate_syntax) reports whether the current revision passes.
-- **Automatic re-prompt.** If the check fails, the model is automatically re-prompted with the error message to correct itself, up to `max_reprompts` times (default `1`). If the code still doesn't pass, [`accept()`](../../reference/EditValidation.md#pointblank.EditValidation.accept) refuses to run it and points you at [`to_code()`](../../reference/EditValidation.md#pointblank.EditValidation.to_code) so you can fix it by hand.
+- **Syntax and lint check.** The revised code is parsed with `ast.parse()` and checked for validation-method typos before it's returned. [`validate_syntax()`](../../reference/pointblank.EditValidation.validate_syntax.md) reports whether the current revision passes.
+- **Automatic re-prompt.** If the check fails, the model is automatically re-prompted with the error message to correct itself, up to `max_reprompts` times (default `1`). If the code still doesn't pass, [`accept()`](../../reference/pointblank.EditValidation.accept.md) refuses to run it and points you at [`to_code()`](../../reference/pointblank.EditValidation.to_code.md) so you can fix it by hand.
 
 These same guardrails are also applied to [`DraftValidation`](draft-validation.md).
 

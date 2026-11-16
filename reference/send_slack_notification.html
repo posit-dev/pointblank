@@ -11,7 +11,7 @@
 <meta name="description" content="Create an action that sends a Slack notification about a validation.">
 
 <title>send_slack_notification() | Pointblank</title>
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "send_slack_notification - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/send_slack_notification.html"}]</script>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "codeRepository": "https://github.com/posit-dev/pointblank", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "send_slack_notification - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/send_slack_notification.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -133,7 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/send_slack_notification.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/send_slack_notification.html">
@@ -189,7 +189,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2138,7 +2138,7 @@ The action, to use in <a href="../reference/Actions.html#pointblank.Actions" cla
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s validate a small table of orders, which has a missing customer name and two amounts that aren’t positive. The action has no webhook URL, so it prints the message instead of sending it. In <code>Actions(critical=)</code>, it runs for the steps that exceed the critical threshold:</p>
-<div id="c7cdc304" class="cell" data-execution_count="1">
+<div id="68684fa2" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2171,14 +2171,14 @@ Would send to Slack:
 • Level: critical
 • Step: 2
 • Column: amount
-• Time: 2026-11-09 15:49:12.917916
+• Time: 2026-11-16 22:33:15.352419
 ==============
 </code></pre>
 </div>
 </div>
 <p>Only the second step, with 40% of its test units failing, reached the critical threshold, so there is one message. The first step (20% failing) exceeded the error threshold, which has no action here.</p>
 <p>In <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a>, the same action sends a summary of the validation instead:</p>
-<div id="e34f7b52" class="cell" data-execution_count="2">
+<div id="c197bd0b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>orders,</span>
@@ -2198,14 +2198,14 @@ Would send to Slack:
 • Highest Severity: critical
 • Total Steps: 2
 • Failed Steps: 2
-• Time: 2026-11-09 15:49:12.935187
+• Time: 2026-11-16 22:33:15.368629
 ==============
 </code></pre>
 </div>
 </div>
 <p>The summary is sent once per interrogation, whether or not any step failed. Both steps failed here, and the highest threshold level reached was critical.</p>
 <p>Custom templates can add more detail. With <code>webhook_url=None</code> and <code>debug=True</code>, the function shows previews of the templates with sample values, without a validation:</p>
-<div id="1784e59a" class="cell" data-execution_count="3">
+<div id="f3889d37" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pb.send_slack_notification(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    step_msg<span class="op">=</span>(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"🚨 *Step </span><span class="sc">{step}</span><span class="st"> (</span><span class="sc">{type}</span><span class="st">)* exceeded the </span><span class="sc">{level}</span><span class="st"> threshold</span><span class="ch">\n</span><span class="st">"</span></span>
@@ -2708,7 +2708,7 @@ Would send to Slack:
     </div>
   </div>
 </footer>
-<script src="../github-widget.js"></script>
+<script src="../repository-widget.js"></script>
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>

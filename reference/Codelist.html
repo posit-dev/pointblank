@@ -11,7 +11,7 @@
 <meta name="description" content="A set of permitted values, each with a label.">
 
 <title>Codelist | Pointblank</title>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Codelist - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Codelist.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "codeRepository": "https://github.com/posit-dev/pointblank", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Codelist - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Codelist.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -136,7 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Codelist.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Codelist.html">
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2097,7 +2097,7 @@ Whether values that aren’t in the codelist may be added, as with CDISC codelis
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>The bundled Define-XML document defines a <code>Sex</code> codelist for the Demographics dataset. Let’s get it from the imported metadata:</p>
-<div id="262cb615" class="cell" data-execution_count="2">
+<div id="902752ec" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>), dataset<span class="op">=</span><span class="st">"DM"</span>)</span>
@@ -2111,7 +2111,7 @@ Whether values that aren’t in the codelist may be added, as with CDISC codelis
 </div>
 </div>
 <p>The codelist has three entries and isn’t extensible, so <code>M</code>, <code>F</code> and <code>U</code> are the only values allowed. Its values can be used in a validation step directly:</p>
-<div id="cfd8e6c6" class="cell" data-execution_count="3">
+<div id="75635ccc" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame({<span class="st">"SEX"</span>: [<span class="st">"M"</span>, <span class="st">"F"</span>, <span class="st">"F"</span>, <span class="st">"X"</span>]})</span>
@@ -2274,7 +2274,7 @@ Whether values that aren’t in the codelist may be added, as with CDISC codelis
 </div>
 </div>
 <p>The <code>"X"</code> in the last row isn’t in the codelist, so one test unit fails. A codelist can also be built by hand:</p>
-<div id="4b960e19" class="cell" data-execution_count="4">
+<div id="9e881f33" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>route <span class="op">=</span> pb.Codelist(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"ROUTE"</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="st">"Route of Administration"</span>,</span>
@@ -2305,7 +2305,7 @@ Whether values that aren’t in the codelist may be added, as with CDISC codelis
 <dd>
 <p>A single entry in a codelist.</p>
 </dd>
-<dt><a href="../reference/MetadataImport.html#pointblank.MetadataImport.get_codelist" class="gdls-link gdls-code">get_codelist()</a></dt>
+<dt><a href="../reference/pointblank.MetadataImport.get_codelist.html" class="gdls-link gdls-code">get_codelist()</a></dt>
 <dd>
 <p>Get a codelist from imported metadata.</p>
 </dd>
@@ -2363,7 +2363,7 @@ The values of all entries that aren’t deprecated.
 </section>
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="c9850eb0" class="cell" data-execution_count="5">
+<div id="2752d9f6" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>), dataset<span class="op">=</span><span class="st">"DM"</span>)</span>
@@ -2408,7 +2408,7 @@ A dictionary with the coded values as keys and their labels as values.
 </section>
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="f33d0e21" class="cell" data-execution_count="6">
+<div id="80827889" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>ae <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>), dataset<span class="op">=</span><span class="st">"AE"</span>)</span>
@@ -2449,7 +2449,7 @@ The values of the entries marked as extended. The list is empty if there are non
 </section>
 <section id="examples-3" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
-<div id="cd6c3824" class="cell" data-execution_count="7">
+<div id="03906714" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>route <span class="op">=</span> pb.Codelist(</span>
@@ -2905,7 +2905,7 @@ The values of the entries marked as extended. The list is empty if there are non
     </div>
   </div>
 </footer>
-<script src="../github-widget.js"></script>
+<script src="../repository-widget.js"></script>
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>

@@ -43,7 +43,7 @@ Validate rows using AI/LLM-powered analysis.
 
 ## Examples
 
-Let's check that each review in a table is about the product (not about the delivery or the seller), with two models as judges. A person has labeled some of the reviews in a column called `about_product`, which isn't sent to the models (only the [review](../reference/EditValidation.md#pointblank.EditValidation.review) column is).
+Let's check that each review in a table is about the product (not about the delivery or the seller), with two models as judges. A person has labeled some of the reviews in a column called `about_product`, which isn't sent to the models (only the [review](../reference/pointblank.EditValidation.review.md) column is).
 
 ``` python
 import pointblank as pb

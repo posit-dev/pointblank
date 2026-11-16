@@ -11,7 +11,7 @@
 <meta name="description" content="Export Pointblank validation results as OpenTelemetry signals.">
 
 <title>integrations.otel.OTelExporter | Pointblank</title>
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "integrations.otel.OTelExporter - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/integrations.otel.OTelExporter.html"}]</script>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "codeRepository": "https://github.com/posit-dev/pointblank", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "integrations.otel.OTelExporter - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/integrations.otel.OTelExporter.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -133,7 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/integrations.otel.OTelExporter.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/integrations.otel.OTelExporter.html">
@@ -189,7 +189,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2142,7 +2142,7 @@ If <code>enable_logging=True</code> is given without <code>logger_provider=</cod
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s validate a small table of orders, which has a missing customer name and two amounts that aren’t positive:</p>
-<div id="37e5a726" class="cell" data-execution_count="1">
+<div id="c6d4578e" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2162,7 +2162,7 @@ If <code>enable_logging=True</code> is given without <code>logger_provider=</cod
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>In production, the exporter would use providers that send to a collector. Here, the OTel SDK’s <code>InMemoryMetricReader</code> keeps the metrics in memory so we can look at them:</p>
-<div id="508e5e10" class="cell" data-execution_count="2">
+<div id="5bc4e504" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics <span class="im">import</span> MeterProvider</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics.export <span class="im">import</span> InMemoryMetricReader</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.integrations.otel <span class="im">import</span> OTelExporter</span>
@@ -2187,7 +2187,7 @@ pb.validation.test_units.total 10
 pb.validation.test_units.passed 7
 pb.validation.test_units.failed 3
 pb.validation.pass_rate 0.7
-pb.validation.duration 0.045342
+pb.validation.duration 0.012049
 pb.validation.threshold.warning 2
 pb.validation.threshold.error 2
 pb.validation.threshold.critical 1
@@ -2196,14 +2196,14 @@ pb.validation.step.duration 1</code></pre>
 </div>
 </div>
 <p>Both steps failed, and 7 of the 10 test units passed, for a pass rate of <code>0.7</code>. The first step (20% failing) exceeded the warning and error thresholds, and the second (40% failing) exceeded all three. The step duration histogram has a data point for each step, and the value printed for it is its count of one observation. Every data point has the <code>pb.tbl_name</code> and <code>env</code> attributes (and the histogram’s also have the <code>pb.step.*</code> ones):</p>
-<div id="38c3226f" class="cell" data-execution_count="3">
+<div id="9ff93d99" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">dict</span>(metrics[<span class="dv">0</span>].data.data_points[<span class="dv">0</span>].attributes)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>{'pb.tbl_name': 'orders', 'env': 'dev'}</code></pre>
 </div>
 </div>
 <p>For traces, we give the exporter a <code>TracerProvider</code> with an in-memory span exporter. This exporter sends traces only:</p>
-<div id="24069ccc" class="cell" data-execution_count="4">
+<div id="39fdf831" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace <span class="im">import</span> TracerProvider</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace.export <span class="im">import</span> SimpleSpanProcessor</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.trace.export.in_memory_span_exporter <span class="im">import</span> InMemorySpanExporter</span>
@@ -2311,7 +2311,7 @@ If the OTel packages aren’t installed.
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
 <p>Let’s send log records for the steps of a validation that exceeded a threshold. The OTel SDK’s <code>InMemoryLogRecordExporter</code> keeps the records in memory so we can look at them:</p>
-<div id="daa150f9" class="cell" data-execution_count="5">
+<div id="d1c570e8" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk._logs <span class="im">import</span> LoggerProvider</span>
@@ -2353,7 +2353,7 @@ CRITICAL Validation step 2 (col_vals_gt on 'amount') exceeded critical threshold
 </div>
 <p>Each step has one record, at the highest threshold level it exceeded. With <code>log_level="critical"</code>, only the second step’s record would be sent.</p>
 <p>A pipeline that checks several tables can use one exporter for all of them. Here, we export a second validation, of a table of customers, with a metrics-only exporter that also gets the first validation:</p>
-<div id="413d9da9" class="cell" data-execution_count="6">
+<div id="b98da1ff" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics <span class="im">import</span> MeterProvider</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> opentelemetry.sdk.metrics.export <span class="im">import</span> InMemoryMetricReader</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2819,7 +2819,7 @@ customers 3</code></pre>
     </div>
   </div>
 </footer>
-<script src="../github-widget.js"></script>
+<script src="../repository-widget.js"></script>
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>

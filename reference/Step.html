@@ -11,7 +11,7 @@
 <meta name="description" content="A single validation step, stored as data.">
 
 <title>Step | Pointblank</title>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Step - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Step.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "codeRepository": "https://github.com/posit-dev/pointblank", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "Step - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/Step.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -136,7 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Step.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Step.html">
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2091,7 +2091,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
 </section>
 <section id="writing-steps-that-can-be-saved" class="level2 doc-writing-steps-that-can-be-saved">
 <h2 class="doc-writing-steps-that-can-be-saved anchored" data-anchor-id="writing-steps-that-can-be-saved">Writing Steps That Can Be Saved</h2>
-<p>A contract’s steps are written to YAML as a mapping from the method name to its arguments, so a step can be saved only if its arguments are plain data: strings, numbers, booleans, dates, lists, and dictionaries. Step-level thresholds are the exception, since a <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> object or a tuple is converted to a dictionary of levels automatically. Other objects can’t be saved, and <a href="../reference/Contract.html#pointblank.Contract.to_yaml" class="gdls-link"><code>Contract.to_yaml()</code></a> raises a <code>ValueError</code> that names the step and argument holding one. Keep these in mind for steps you plan to save:</p>
+<p>A contract’s steps are written to YAML as a mapping from the method name to its arguments, so a step can be saved only if its arguments are plain data: strings, numbers, booleans, dates, lists, and dictionaries. Step-level thresholds are the exception, since a <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> object or a tuple is converted to a dictionary of levels automatically. Other objects can’t be saved, and <a href="../reference/pointblank.Contract.to_yaml.html" class="gdls-link"><code>Contract.to_yaml()</code></a> raises a <code>ValueError</code> that names the step and argument holding one. Keep these in mind for steps you plan to save:</p>
 <ul>
 <li>name columns with strings or lists of strings, rather than with selectors like <code>pb.starts_with()</code> or <code>pb.col()</code></li>
 <li>steps that take an expression or a function, such as <a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" class="gdls-link gdls-code">col_vals_expr</a> and <a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" class="gdls-link gdls-code">conjointly</a>, can only be used in contracts kept in Python</li>
@@ -2105,7 +2105,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s create a step that checks that ages fall between 0 and 120. Printing it shows the method name and the stored arguments.</p>
-<div id="647f8735" class="cell" data-execution_count="2">
+<div id="2a3ccf36" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>age_step <span class="op">=</span> pb.Step(<span class="st">"col_vals_between"</span>, columns<span class="op">=</span><span class="st">"age"</span>, left<span class="op">=</span><span class="dv">0</span>, right<span class="op">=</span><span class="dv">120</span>)</span>
@@ -2116,7 +2116,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
 </div>
 </div>
 <p>The two parts of the step are available as attributes:</p>
-<div id="5d774781" class="cell" data-execution_count="3">
+<div id="c130fe18" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(age_step.method)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(age_step.kwargs)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2125,7 +2125,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
 </div>
 </div>
 <p>Steps are normally used in groups. Here are three more rules for a table of patients: each patient ID must appear only once, IDs must follow a pattern, and the <code>visit</code> column must be present. Note that <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct</a> takes <code>columns_subset=</code> rather than <code>columns=</code>, because each step’s arguments are exactly those of its <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> method.</p>
-<div id="981e482e" class="cell" data-execution_count="4">
+<div id="7b9d5dee" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>patient_steps <span class="op">=</span> [</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Step(<span class="st">"rows_distinct"</span>, columns_subset<span class="op">=</span><span class="st">"patient_id"</span>),</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    pb.Step(<span class="st">"col_vals_regex"</span>, columns<span class="op">=</span><span class="st">"patient_id"</span>, pattern<span class="op">=</span><span class="vs">r"</span><span class="dv">^</span><span class="vs">PT-</span><span class="dv">\d</span><span class="op">{3}</span><span class="dv">$</span><span class="vs">"</span>),</span>
@@ -2134,7 +2134,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div>
 </div>
 <p>Placing the steps in a <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link"><code>Contract</code></a> lets us apply them to a table. The steps run in the order they’re listed.</p>
-<div id="1db44a0c" class="cell" data-execution_count="5">
+<div id="057c59ee" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>patients <span class="op">=</span> pl.DataFrame(</span>
@@ -2439,7 +2439,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
 </div>
 <p>The ID check flags <code>"PT-03"</code>, which is missing a digit, and the age check flags the value <code>130</code>. The other two steps pass.</p>
 <p>The same steps can be added to an ordinary validation by wrapping them in a <a href="../reference/Steps.html#pointblank.Steps" class="gdls-link"><code>Steps</code></a> object. That route also accepts validation methods that contracts don’t support, such as <a href="../reference/Validate.col_vals_str_len.html#pointblank.Validate.col_vals_str_len" class="gdls-link"><code>col_vals_str_len()</code></a>:</p>
-<div id="1e3d0284" class="cell" data-execution_count="6">
+<div id="797b4464" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>id_length_step <span class="op">=</span> pb.Step(<span class="st">"col_vals_str_len"</span>, columns<span class="op">=</span><span class="st">"patient_id"</span>, min_val<span class="op">=</span><span class="dv">6</span>, max_val<span class="op">=</span><span class="dv">6</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -2537,7 +2537,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
     <td colspan="14" class="gt_heading gt_title gt_font_normal" id="pb_tbl-title" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-09|20:45:23</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">patients</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" id="pb_tbl-subtitle" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-11-16|22:32:14</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">patients</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -2838,7 +2838,7 @@ A <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">S
 <div class="sourceCode" id="cb9"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_dict</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>The dictionary has a single key, the method name, whose value is a dictionary of the step’s arguments. A step with no arguments maps to an empty dictionary. This is the form each step takes in <a href="../reference/Contract.html#pointblank.Contract.to_dict" class="gdls-link"><code>Contract.to_dict()</code></a> and in contract YAML files, and <a href="../reference/Step.html#pointblank.Step.from_dict" class="gdls-link"><code>from_dict()</code></a> reverses it.</p>
+<p>The dictionary has a single key, the method name, whose value is a dictionary of the step’s arguments. A step with no arguments maps to an empty dictionary. This is the form each step takes in <a href="../reference/pointblank.Contract.to_dict.html" class="gdls-link"><code>Contract.to_dict()</code></a> and in contract YAML files, and <a href="../reference/Step.html#pointblank.Step.from_dict" class="gdls-link"><code>from_dict()</code></a> reverses it.</p>
 <p>Step-level thresholds given as a <a href="../reference/Thresholds.html#pointblank.Thresholds" class="gdls-link"><code>Thresholds</code></a> object or a tuple are converted to a dictionary of levels (e.g., <code>{"warning": 1, "error": 0.1}</code>), which the validation methods accept as well. The other arguments are copied as they are, so the result is ready for JSON or YAML only if they are plain data (see the <em>Writing Steps That Can Be Saved</em> section of <a href="../reference/Step.html#pointblank.Step" class="gdls-link"><code>Step</code></a>).</p>
 </div>
 <section id="returns-1" class="level4 doc-returns">
@@ -2855,7 +2855,7 @@ A single-key dictionary mapping the method name to its arguments.
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
 <p>Let’s convert a step that checks a value range.</p>
-<div id="0a6a2f67" class="cell" data-execution_count="7">
+<div id="3db390f2" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>step <span class="op">=</span> pb.Step(<span class="st">"col_vals_between"</span>, columns<span class="op">=</span><span class="st">"age"</span>, left<span class="op">=</span><span class="dv">0</span>, right<span class="op">=</span><span class="dv">120</span>)</span>
@@ -2866,14 +2866,14 @@ A single-key dictionary mapping the method name to its arguments.
 </div>
 </div>
 <p>A step without arguments gives an empty dictionary of arguments:</p>
-<div id="4ecc541d" class="cell" data-execution_count="8">
+<div id="193df21b" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pb.Step(<span class="st">"rows_complete"</span>).to_dict()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>{'rows_complete': {}}</code></pre>
 </div>
 </div>
 <p>Thresholds set on a step become a dictionary of the levels that are set:</p>
-<div id="06b1803c" class="cell" data-execution_count="9">
+<div id="de5d8fce" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>pb.Step(</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"col_vals_not_null"</span>, columns<span class="op">=</span><span class="st">"email"</span>, thresholds<span class="op">=</span>pb.Thresholds(warning<span class="op">=</span><span class="dv">1</span>, error<span class="op">=</span><span class="fl">0.05</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>).to_dict()</span></code></pre></div>
@@ -2941,7 +2941,7 @@ If the value for the method name is neither a dictionary nor <code>None</code>.
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
 <p>Let’s parse a few step definitions written in YAML, as they might appear in a configuration file, and turn each one into a <a href="../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">Step</a>.</p>
-<div id="aea30556" class="cell" data-execution_count="10">
+<div id="f086a0a9" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> yaml</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2964,7 +2964,7 @@ If the value for the method name is neither a dictionary nor <code>None</code>.
 </div>
 </div>
 <p>The <code>rows_complete:</code> entry has no value, so its step has no arguments. A step converted with <a href="../reference/Step.html#pointblank.Step.to_dict" class="gdls-link gdls-code">to_dict()</a> and back is equal to the original:</p>
-<div id="5515a81e" class="cell" data-execution_count="11">
+<div id="e87719ac" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>step <span class="op">=</span> pb.Step(<span class="st">"col_vals_in_set"</span>, columns<span class="op">=</span><span class="st">"status"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"open"</span>, <span class="st">"closed"</span>])</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>pb.Step.from_dict(step.to_dict()) <span class="op">==</span> step</span></code></pre></div>
@@ -3408,7 +3408,7 @@ If the value for the method name is neither a dictionary nor <code>None</code>.
     </div>
   </div>
 </footer>
-<script src="../github-widget.js"></script>
+<script src="../repository-widget.js"></script>
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>

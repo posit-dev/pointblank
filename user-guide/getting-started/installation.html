@@ -88,7 +88,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -134,7 +134,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/getting-started/installation.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/getting-started/installation.html">
@@ -190,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -724,17 +724,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using pip</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">pl</span><span class="pp">]</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[pl]"</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Or manually</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install polars<span class="op">&gt;</span>=1.24.0</span></code></pre></div>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"polars&gt;=1.33.0"</span></span></code></pre></div>
 </div>
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using pip</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">pd</span><span class="pp">]</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[pd]"</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Or manually</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pandas<span class="op">&gt;</span>=2.2.3</span></code></pre></div>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pandas&gt;=2.2.3"</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -749,32 +749,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href="">pip</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href="">uv</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false" href="">conda</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-4" role="tab" aria-controls="tabset-3-4" aria-selected="false" href="">pixi</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">sqlite</span><span class="pp">]</span>      <span class="co"># SQLite</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">duckdb</span><span class="pp">]</span>      <span class="co"># DuckDB</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">postgres</span><span class="pp">]</span>    <span class="co"># PostgreSQL</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">mysql</span><span class="pp">]</span>       <span class="co"># MySQL</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">mssql</span><span class="pp">]</span>       <span class="co"># Microsoft SQL Server</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">bigquery</span><span class="pp">]</span>    <span class="co"># BigQuery</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">pyspark</span><span class="pp">]</span>     <span class="co"># Apache Spark</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">databricks</span><span class="pp">]</span>  <span class="co"># Databricks</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">snowflake</span><span class="pp">]</span>   <span class="co"># Snowflake</span></span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[sqlite]"</span>      <span class="co"># SQLite</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[duckdb]"</span>      <span class="co"># DuckDB</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[postgres]"</span>    <span class="co"># PostgreSQL</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[mysql]"</span>       <span class="co"># MySQL</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[mssql]"</span>       <span class="co"># Microsoft SQL Server</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[bigquery]"</span>    <span class="co"># BigQuery</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[pyspark]"</span>     <span class="co"># Apache Spark</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[databricks]"</span>  <span class="co"># Databricks</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[snowflake]"</span>   <span class="co"># Snowflake</span></span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Example of installing multiple backends</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">duckdb,postgres,sqlite</span><span class="pp">]</span></span></code></pre></div>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[duckdb,postgres,sqlite]"</span></span></code></pre></div>
 </div>
 <div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">sqlite</span><span class="pp">]</span>      <span class="co"># SQLite</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">duckdb</span><span class="pp">]</span>      <span class="co"># DuckDB</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">postgres</span><span class="pp">]</span>    <span class="co"># PostgreSQL</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">mysql</span><span class="pp">]</span>       <span class="co"># MySQL</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">mssql</span><span class="pp">]</span>       <span class="co"># Microsoft SQL Server</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">bigquery</span><span class="pp">]</span>    <span class="co"># BigQuery</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">pyspark</span><span class="pp">]</span>     <span class="co"># Apache Spark</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">databricks</span><span class="pp">]</span>  <span class="co"># Databricks</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">snowflake</span><span class="pp">]</span>   <span class="co"># Snowflake</span></span>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install <span class="st">"pointblank[sqlite]"</span>      <span class="co"># SQLite</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install <span class="st">"pointblank[duckdb]"</span>      <span class="co"># DuckDB</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install <span class="st">"pointblank[postgres]"</span>    <span class="co"># PostgreSQL</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install <span class="st">"pointblank[mysql]"</span>       <span class="co"># MySQL</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install <span class="st">"pointblank[mssql]"</span>       <span class="co"># Microsoft SQL Server</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install <span class="st">"pointblank[bigquery]"</span>    <span class="co"># BigQuery</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install <span class="st">"pointblank[pyspark]"</span>     <span class="co"># Apache Spark</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install <span class="st">"pointblank[databricks]"</span>  <span class="co"># Databricks</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install <span class="st">"pointblank[snowflake]"</span>   <span class="co"># Snowflake</span></span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Example of installing multiple backends</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">duckdb,postgres,sqlite</span><span class="pp">]</span></span></code></pre></div>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install <span class="st">"pointblank[duckdb,postgres,sqlite]"</span></span></code></pre></div>
 </div>
 <div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
 <div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge pointblank-sqlite      <span class="co"># SQLite</span></span>
@@ -823,7 +823,7 @@ Note
 <section id="ai-assisted-validation-experimental" class="level2">
 <h2 class="anchored" data-anchor-id="ai-assisted-validation-experimental">AI-Assisted Validation (Experimental)</h2>
 <p>Pointblank includes experimental support for AI-assisted validation plan generation:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">generate</span><span class="pp">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[generate]"</span></span></code></pre></div>
 <p>This installs the necessary dependencies for working with LLM providers to help generate validation plans. See the <a href="../../user-guide/advanced-validation/draft-validation.html">Draft Validation</a> article for how to create validation plans from existing data.</p>
 </section>
 <section id="development-version" class="level2">
@@ -848,7 +848,7 @@ Note
 </section>
 <section id="next-steps" class="level1">
 <h1>Next Steps</h1>
-<p>Now that you’ve installed Pointblank, you’re ready to start validating your data. If you haven’t read the <a href="../../user-guide/getting-started/index.html">Introduction</a> yet, consider starting there to learn the basic concepts.</p>
+<p>Now that you’ve installed Pointblank, you’re ready to start validating your data. If you haven’t read the <a href="../../user-guide/getting-started/quickstart.html">Quickstart</a> yet, consider starting there to learn the basic concepts.</p>
 <p>If you encounter any installation issues, please <a href="https://github.com/posit-dev/pointblank/issues/new">open an issue on GitHub</a> with details about your system and the specific error messages you’re seeing. The maintainers actively monitor these issues and can help troubleshoot problems.</p>
 <p>For a quick test of your installation, try running a simple validation:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
@@ -1342,7 +1342,7 @@ Note
     </div>
   </div>
 </footer>
-<script src="../../github-widget.js"></script>
+<script src="../../repository-widget.js"></script>
 <script src="../../copy-page.js"></script>
 <script src="../../sidebar-wrap.js"></script>
 <script src="../../sidebar-float.js"></script>

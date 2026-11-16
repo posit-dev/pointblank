@@ -29,7 +29,7 @@ The rules are of these types:
 
 Four of the rules are of `"Warning"` sensitivity: the presence of TA and of `USUBJID`, and the order of the identifier variables and of the sequence variable. All the others are of `"Error"` sensitivity. A rule for a domain that isn't one of the `datasets` (such as an AE rule when there's no AE dataset) has nothing to check, so it passes. The codelist checks ignore case, so `"m"` is accepted for `SEX`. Empty strings (which is how XPT files store missing character values) are treated as nulls. SUPP- and RELREC datasets aren't checked by the rules that apply to all domains, since they have a different structure (with `RDOMAIN` in place of `DOMAIN`).
 
-The rules check each dataset on its own, so they don't check that the subjects of one dataset are in DM. For that, use the `"validate"` engine of the [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage) method [`validate_conformance()`](../reference/SubmissionPackage.md#pointblank.SubmissionPackage.validate_conformance).
+The rules check each dataset on its own, so they don't check that the subjects of one dataset are in DM. For that, use the `"validate"` engine of the [SubmissionPackage](../reference/SubmissionPackage.md#pointblank.SubmissionPackage) method [`validate_conformance()`](../reference/pointblank.SubmissionPackage.validate_conformance.md).
 
 ## Parameters
 
@@ -51,7 +51,7 @@ A study identifier, which is kept in the report's `package`. It isn't used by th
 ## Returns
 
 `ConformanceReport`  
-The report, whose [`is_rules`](../reference/ConformanceReport.md#pointblank.ConformanceReport.is_rules) is `True`. In a notebook it is shown as the table of [`get_tabular_report()`](../reference/ConformanceReport.md#pointblank.ConformanceReport.get_tabular_report).
+The report, whose [`is_rules`](../reference/pointblank.ConformanceReport.is_rules.md) is `True`. In a notebook it is shown as the table of [`get_tabular_report()`](../reference/pointblank.ConformanceReport.get_tabular_report.md).
 
 ## Raises
 
@@ -113,7 +113,7 @@ for rule in report.rules(status="fail"):
     SDTM-122 Warning Required domain(s) missing: TA
     SDTM-195 Error AGE must not be negative in DM.
 
-The three problems are each found by a rule. The other two failures are for the TS and TA datasets, which every SDTM submission needs. The failing records can be had as a DataFrame with [`findings_df()`](../reference/ConformanceReport.md#pointblank.ConformanceReport.findings_df) or as a table with [`get_findings_table()`](../reference/ConformanceReport.md#pointblank.ConformanceReport.get_findings_table).
+The three problems are each found by a rule. The other two failures are for the TS and TA datasets, which every SDTM submission needs. The failing records can be had as a DataFrame with [`findings_df()`](../reference/pointblank.ConformanceReport.findings_df.md) or as a table with [`get_findings_table()`](../reference/pointblank.ConformanceReport.get_findings_table.md).
 
 With a Define-XML, the Define-XML rules are run as well. Pointblank comes with a DM dataset as an XPT file and a Define-XML for it:
 

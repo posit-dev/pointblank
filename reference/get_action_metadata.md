@@ -67,8 +67,8 @@ validation
 
 Key pieces to note in the above example:
 
-- `log_issue()` (the custom action) collects [metadata](../reference/SubmissionPackage.md#pointblank.SubmissionPackage.metadata) by calling [get_action_metadata()](../reference/get_action_metadata.md#pointblank.get_action_metadata)
-- the [metadata](../reference/SubmissionPackage.md#pointblank.SubmissionPackage.metadata) is a dictionary that is used to craft the log message
+- `log_issue()` (the custom action) collects [metadata](../reference/pointblank.SubmissionPackage.metadata.md) by calling [get_action_metadata()](../reference/get_action_metadata.md#pointblank.get_action_metadata)
+- the [metadata](../reference/pointblank.SubmissionPackage.metadata.md) is a dictionary that is used to craft the log message
 - the action is passed as a bare function to the [Actions](../reference/Actions.md#pointblank.Actions) object within the [Validate](../reference/Validate.md#pointblank.Validate) object (placing it within `Validate(actions=)` ensures it's set as an action for every validation step)
 
 ## See Also

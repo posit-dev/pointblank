@@ -72,7 +72,7 @@ check.fidelity
       'missing_seed': 0.0,
       'missing_synthetic': 0.0}]
 
-Every problem is in [issues](../reference/ConformanceReport.md#pointblank.ConformanceReport.issues), as a message:
+Every problem is in [issues](../reference/pointblank.ConformanceReport.issues.md), as a message:
 
 ``` python
 check.issues

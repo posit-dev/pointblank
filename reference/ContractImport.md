@@ -282,7 +282,7 @@ to_contract(
 )
 ```
 
-Where [`to_validate()`](../reference/ContractImport.md#pointblank.ContractImport.to_validate) checks one table right away, [to_contract()](../reference/ContractImport.md#pointblank.ContractImport.to_contract) produces a [`Contract`](../reference/Contract.md#pointblank.Contract): a declarative specification that isn't tied to any table. A contract can be validated against many tables over time, used at either end of a [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline), and saved with [`to_yaml()`](../reference/Contract.md#pointblank.Contract.to_yaml) so that the translated rules can be reviewed and versioned like any other Pointblank contract.
+Where [`to_validate()`](../reference/ContractImport.md#pointblank.ContractImport.to_validate) checks one table right away, [to_contract()](../reference/ContractImport.md#pointblank.ContractImport.to_contract) produces a [`Contract`](../reference/Contract.md#pointblank.Contract): a declarative specification that isn't tied to any table. A contract can be validated against many tables over time, used at either end of a [`Pipeline`](../reference/Pipeline.md#pointblank.Pipeline), and saved with [`to_yaml()`](../reference/pointblank.Contract.to_yaml.md) so that the translated rules can be reviewed and versioned like any other Pointblank contract.
 
 The contract's schema is a [`Schema`](../reference/Schema.md#pointblank.Schema) built from the columns that have a type (no schema is set if none do), and its steps are [`Step`](../reference/Step.md#pointblank.Step) objects made from the constraints. If the source had a description, it becomes the contract's description unless `description=` is given. The source's title isn't used, so pass it as `name=` if it should be kept.
 
@@ -331,7 +331,7 @@ sensor_contract
 
     Contract(name='sensor_reading', direction='source', version='1.0.0', schema=<defined>, steps=5)
 
-The contract can now validate tables with its [`validate()`](../reference/Contract.md#pointblank.Contract.validate) method.
+The contract can now validate tables with its [`validate()`](../reference/pointblank.Contract.validate.md) method.
 
 ``` python
 readings = pl.DataFrame(
@@ -430,7 +430,7 @@ to_yaml()
 
 YAML is easier to scan than Python for people who don't write code, so this method is handy for sharing what an import produced, such as in a code review or a ticket. The output has a `validation:` key holding a `steps:` list. That list starts with a [col_schema_match](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match) step (when any column has a type) and then has one entry per constraint, each named after its validation method and holding that method's arguments.
 
-This is a listing of the steps rather than a complete YAML validation configuration: it has no `tbl:` entry and its steps are nested under `validation:`, so it can't be passed to [`yaml_interrogate()`](../reference/yaml_interrogate.md#pointblank.yaml_interrogate) as is. To keep the imported rules in a YAML file that Pointblank can read back, convert them to a contract with [`to_contract()`](../reference/ContractImport.md#pointblank.ContractImport.to_contract) and write that with [`Contract.to_yaml()`](../reference/Contract.md#pointblank.Contract.to_yaml).
+This is a listing of the steps rather than a complete YAML validation configuration: it has no `tbl:` entry and its steps are nested under `validation:`, so it can't be passed to [`yaml_interrogate()`](../reference/yaml_interrogate.md#pointblank.yaml_interrogate) as is. To keep the imported rules in a YAML file that Pointblank can read back, convert them to a contract with [`to_contract()`](../reference/ContractImport.md#pointblank.ContractImport.to_contract) and write that with [`Contract.to_yaml()`](../reference/pointblank.Contract.to_yaml.md).
 
 #### Returns
 

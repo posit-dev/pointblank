@@ -87,7 +87,7 @@ nycflights = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
 pb.col_summary_tbl(data=nycflights, tbl_name="nycflights")
 ```
 
-    /Users/riannone/py_projects/pointblank/.venv/lib/python3.11/site-packages/great_tables/_tbl_data.py:902: UserWarning: PyArrow Table support is currently experimental.
+    /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/great_tables/_tbl_data.py:902: UserWarning: PyArrow Table support is currently experimental.
       warnings.warn("PyArrow Table support is currently experimental.")
 
 [TABLE]

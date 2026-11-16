@@ -11,7 +11,7 @@
 <meta name="description" content="The error raised when data fails a contract with on_violation=“raise”.">
 
 <title>ContractViolationError | Pointblank</title>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "ContractViolationError - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/ContractViolationError.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "codeRepository": "https://github.com/posit-dev/pointblank", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "ContractViolationError - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/ContractViolationError.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -136,7 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/ContractViolationError.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/ContractViolationError.html">
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2052,7 +2052,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>A <a href="../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link"><code>Pipeline</code></a> raises this error when a boundary validation has any failing test units and that boundary’s <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link"><code>Contract</code></a> was created with <code>on_violation="raise"</code>. It’s raised by <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link"><code>run()</code></a>, <a href="../reference/Pipeline.html#pointblank.Pipeline.validate_source" class="gdls-link"><code>validate_source()</code></a>, and <a href="../reference/Pipeline.html#pointblank.Pipeline.validate_target" class="gdls-link"><code>validate_target()</code></a>. The message names the contract and its direction, and the error carries the failing validation, so the code that catches it can report or log the details before stopping.</p>
+<p>A <a href="../reference/Pipeline.html#pointblank.Pipeline" class="gdls-link"><code>Pipeline</code></a> raises this error when a boundary validation has any failing test units and that boundary’s <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link"><code>Contract</code></a> was created with <code>on_violation="raise"</code>. It’s raised by <a href="../reference/pointblank.Pipeline.run.html" class="gdls-link"><code>run()</code></a>, <a href="../reference/pointblank.Pipeline.validate_source.html" class="gdls-link"><code>validate_source()</code></a>, and <a href="../reference/pointblank.Pipeline.validate_target.html" class="gdls-link"><code>validate_target()</code></a>. The message names the contract and its direction, and the error carries the failing validation, so the code that catches it can report or log the details before stopping.</p>
 <p>It’s a subclass of <code>RuntimeError</code>, so <code>except RuntimeError:</code> catches it as well.</p>
 </div>
 <section id="attributes" class="level2 doc-attributes">
@@ -2069,7 +2069,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">result</span></code></dt>
 <dd>
-The <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link"><code>PipelineResult</code></a> of the run, holding everything the run produced before it stopped (the source validation, and the transformed data and target validation if they were reached). It’s <code>None</code> when the error comes from <a href="../reference/Pipeline.html#pointblank.Pipeline.validate_source" class="gdls-link gdls-code">validate_source()</a> or <a href="../reference/Pipeline.html#pointblank.Pipeline.validate_target" class="gdls-link gdls-code">validate_target()</a>.
+The <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link"><code>PipelineResult</code></a> of the run, holding everything the run produced before it stopped (the source validation, and the transformed data and target validation if they were reached). It’s <code>None</code> when the error comes from <a href="../reference/pointblank.Pipeline.validate_source.html" class="gdls-link gdls-code">validate_source()</a> or <a href="../reference/pointblank.Pipeline.validate_target.html" class="gdls-link gdls-code">validate_target()</a>.
 </dd>
 </dl>
 </div>
@@ -2077,7 +2077,7 @@ The <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s make a pipeline whose target contract must hold for the output to be published. It uses <code>on_violation="raise"</code>, so a failing output stops the run with an error.</p>
-<div id="2c72c1ac" class="cell" data-execution_count="2">
+<div id="f3f2d3c9" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2093,7 +2093,7 @@ The <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>raw_prices <span class="op">=</span> pl.DataFrame({<span class="st">"item"</span>: [<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>], <span class="st">"price"</span>: [<span class="fl">4.5</span>, <span class="fl">0.0</span>, <span class="fl">12.0</span>]})</span></code></pre></div>
 </div>
 <p>The transformation passes a zero price through, so the run raises. The error holds the result of the run, which still has the transformed data and the target validation:</p>
-<div id="45d9d7ca" class="cell" data-execution_count="3">
+<div id="7afb6de7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pipeline.run(data<span class="op">=</span>raw_prices, transform<span class="op">=</span><span class="kw">lambda</span> df: df)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> pb.ContractViolationError <span class="im">as</span> e:</span>
@@ -2262,7 +2262,7 @@ The <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="
 </div>
 </div>
 </div>
-<p>The report shows the one failing test unit in the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt</a> step, the row for item <code>"b"</code>. Nothing after the <a href="../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">run()</a> call was reached, so the prices weren’t published.</p>
+<p>The report shows the one failing test unit in the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt</a> step, the row for item <code>"b"</code>. Nothing after the <a href="../reference/pointblank.Pipeline.run.html" class="gdls-link gdls-code">run()</a> call was reached, so the prices weren’t published.</p>
 </section>
 <section id="see-also" class="level2 doc-see-also">
 <h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
@@ -2709,7 +2709,7 @@ The <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="
     </div>
   </div>
 </footer>
-<script src="../github-widget.js"></script>
+<script src="../repository-widget.js"></script>
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>

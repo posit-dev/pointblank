@@ -35,7 +35,7 @@ A [Step](../reference/Step.md#pointblank.Step) object.
 
 ## Writing Steps That Can Be Saved
 
-A contract's steps are written to YAML as a mapping from the method name to its arguments, so a step can be saved only if its arguments are plain data: strings, numbers, booleans, dates, lists, and dictionaries. Step-level thresholds are the exception, since a [`Thresholds`](../reference/Thresholds.md#pointblank.Thresholds) object or a tuple is converted to a dictionary of levels automatically. Other objects can't be saved, and [`Contract.to_yaml()`](../reference/Contract.md#pointblank.Contract.to_yaml) raises a `ValueError` that names the step and argument holding one. Keep these in mind for steps you plan to save:
+A contract's steps are written to YAML as a mapping from the method name to its arguments, so a step can be saved only if its arguments are plain data: strings, numbers, booleans, dates, lists, and dictionaries. Step-level thresholds are the exception, since a [`Thresholds`](../reference/Thresholds.md#pointblank.Thresholds) object or a tuple is converted to a dictionary of levels automatically. Other objects can't be saved, and [`Contract.to_yaml()`](../reference/pointblank.Contract.to_yaml.md) raises a `ValueError` that names the step and argument holding one. Keep these in mind for steps you plan to save:
 
 - name columns with strings or lists of strings, rather than with selectors like `pb.starts_with()` or `pb.col()`
 - steps that take an expression or a function, such as [col_vals_expr](../reference/Validate.col_vals_expr.md#pointblank.Validate.col_vals_expr) and [conjointly](../reference/Validate.conjointly.md#pointblank.Validate.conjointly), can only be used in contracts kept in Python
@@ -149,7 +149,7 @@ Usage
 to_dict()
 ```
 
-The dictionary has a single key, the method name, whose value is a dictionary of the step's arguments. A step with no arguments maps to an empty dictionary. This is the form each step takes in [`Contract.to_dict()`](../reference/Contract.md#pointblank.Contract.to_dict) and in contract YAML files, and [`from_dict()`](../reference/Step.md#pointblank.Step.from_dict) reverses it.
+The dictionary has a single key, the method name, whose value is a dictionary of the step's arguments. A step with no arguments maps to an empty dictionary. This is the form each step takes in [`Contract.to_dict()`](../reference/pointblank.Contract.to_dict.md) and in contract YAML files, and [`from_dict()`](../reference/Step.md#pointblank.Step.from_dict) reverses it.
 
 Step-level thresholds given as a [`Thresholds`](../reference/Thresholds.md#pointblank.Thresholds) object or a tuple are converted to a dictionary of levels (e.g., `{"warning": 1, "error": 0.1}`), which the validation methods accept as well. The other arguments are copied as they are, so the result is ready for JSON or YAML only if they are plain data (see the *Writing Steps That Can Be Saved* section of [`Step`](../reference/Step.md#pointblank.Step)).
 

@@ -11,7 +11,7 @@
 <meta name="description" content="Check a CDISC submission with the CDISC CORE engine.">
 
 <title>validate_cdisc_submission() | Pointblank</title>
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "validate_cdisc_submission - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/validate_cdisc_submission.html"}]</script>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "codeRepository": "https://github.com/posit-dev/pointblank", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "validate_cdisc_submission - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/validate_cdisc_submission.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -133,7 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/validate_cdisc_submission.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/validate_cdisc_submission.html">
@@ -189,7 +189,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2059,7 +2059,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>CDISC CORE is CDISC’s open-source engine for its conformance rules, and it has the published rules of CDISC and of the FDA and PMDA. The <a href="../reference/validate_cdisc_submission.html#pointblank.validate_cdisc_submission" class="gdls-link gdls-code">validate_cdisc_submission()</a> function runs CORE on a submission in a single call: it makes a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>SubmissionPackage</code></a> from the <code>source</code> (unless it is one already), runs CORE on it, and reads CORE’s results into a <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link"><code>ConformanceReport</code></a>. This is the same as calling the package’s <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.validate_conformance" class="gdls-link"><code>validate_conformance()</code></a> method with <code>engine="core"</code>.</p>
+<p>CDISC CORE is CDISC’s open-source engine for its conformance rules, and it has the published rules of CDISC and of the FDA and PMDA. The <a href="../reference/validate_cdisc_submission.html#pointblank.validate_cdisc_submission" class="gdls-link gdls-code">validate_cdisc_submission()</a> function runs CORE on a submission in a single call: it makes a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link"><code>SubmissionPackage</code></a> from the <code>source</code> (unless it is one already), runs CORE on it, and reads CORE’s results into a <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport" class="gdls-link"><code>ConformanceReport</code></a>. This is the same as calling the package’s <a href="../reference/pointblank.SubmissionPackage.validate_conformance.html" class="gdls-link"><code>validate_conformance()</code></a> method with <code>engine="core"</code>.</p>
 <p>CORE is a separate command-line tool (<code>cdisc-rules-engine</code>) that has to be installed. If it isn’t on the <code>PATH</code>, give the command with <code>core=</code> or in the <code>POINTBLANK_CDISC_CORE</code> environment variable. For checks that need no other software, use <a href="../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link"><code>validate_sdtmig()</code></a>, which runs Pointblank’s bundled SDTMIG rules.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
@@ -2068,7 +2068,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">source</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | Path | dict | SubmissionPackage</span></code></dt>
 <dd>
-<p>The submission to check. This can be the path of a folder of datasets (<code>.xpt</code> or Dataset-JSON files, which are read with <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage.from_folder" class="gdls-link"><code>SubmissionPackage.from_folder()</code></a>), a dict of DataFrames keyed by dataset name, or a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>.</p>
+<p>The submission to check. This can be the path of a folder of datasets (<code>.xpt</code> or Dataset-JSON files, which are read with <a href="../reference/pointblank.SubmissionPackage.from_folder.html" class="gdls-link"><code>SubmissionPackage.from_folder()</code></a>), a dict of DataFrames keyed by dataset name, or a <a href="../reference/SubmissionPackage.html#pointblank.SubmissionPackage" class="gdls-link gdls-code">SubmissionPackage</a>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">standard</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -2123,7 +2123,7 @@ A directory for the XPT files that the datasets are written to and for CORE’s 
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ConformanceReport</span></code></dt>
 <dd>
-A report of CORE’s results, whose <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.is_core" class="gdls-link"><code>is_core</code></a> is <code>True</code>.
+A report of CORE’s results, whose <a href="../reference/pointblank.ConformanceReport.is_core.html" class="gdls-link"><code>is_core</code></a> is <code>True</code>.
 </dd>
 </dl>
 </div>
@@ -2162,7 +2162,7 @@ If <code>source</code> isn’t a path, a dict or a <a href="../reference/Submiss
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(issue[<span class="st">"dataset"</span>], issue[<span class="st">"rule_id"</span>], issue[<span class="st">"issues"</span>], issue[<span class="st">"message"</span>])</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>report.to_excel(<span class="st">"study_xyz/conformance/core_report.xlsx"</span>)</span></code></pre></div>
-<p>If CORE was installed from a checkout of its repository, it has to be run from that directory, as in <code>core=["python", "core.py"], core_cwd="path/to/cdisc-rules-engine"</code>. A report that CORE wrote on its own can be read with <a href="../reference/ConformanceReport.html#pointblank.ConformanceReport.from_core_report" class="gdls-link"><code>ConformanceReport.from_core_report()</code></a>, which has an example that runs without CORE.</p>
+<p>If CORE was installed from a checkout of its repository, it has to be run from that directory, as in <code>core=["python", "core.py"], core_cwd="path/to/cdisc-rules-engine"</code>. A report that CORE wrote on its own can be read with <a href="../reference/pointblank.ConformanceReport.from_core_report.html" class="gdls-link"><code>ConformanceReport.from_core_report()</code></a>, which has an example that runs without CORE.</p>
 </section>
 <section id="see-also" class="level2 doc-see-also">
 <h2 class="doc-see-also anchored" data-anchor-id="see-also">See Also</h2>
@@ -2613,7 +2613,7 @@ If <code>source</code> isn’t a path, a dict or a <a href="../reference/Submiss
     </div>
   </div>
 </footer>
-<script src="../github-widget.js"></script>
+<script src="../repository-widget.js"></script>
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>

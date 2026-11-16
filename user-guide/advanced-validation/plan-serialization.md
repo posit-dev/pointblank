@@ -152,7 +152,7 @@ When you see such a warning, review the generated plan and restore the affected 
 Rendering a plan back to source is helpful whenever you want the plan to leave the current Python session:
 
 - **Sharing.** Send a colleague the exact plan as code or YAML rather than describing it.
-- **Code review.** Serialize a plan before and after a change and diff the two to see precisely what moved. You can produce this comparison directly with [`EditValidation.from_plans()`](../../reference/EditValidation.md#pointblank.EditValidation.from_plans) (no LLM required), which is also how the [AI Validation Editor](ai-validation-editor.md) presents proposed edits.
+- **Code review.** Serialize a plan before and after a change and diff the two to see precisely what moved. You can produce this comparison directly with [`EditValidation.from_plans()`](../../reference/pointblank.EditValidation.from_plans.md) (no LLM required), which is also how the [AI Validation Editor](ai-validation-editor.md) presents proposed edits.
 - **Persistence.** Store the *plan* (not just the results) alongside a validation run, so you have a durable, human-readable record of what was checked.
 - **Migrating between formats.** Move a plan from Python to YAML (or, via [`yaml_to_python()`](../../reference/yaml_to_python.md#pointblank.yaml_to_python), from YAML to Python) to fit it into a configuration-driven workflow.
 

@@ -11,7 +11,7 @@
 <meta name="description" content="Import metadata from a statistical-package file or a metadata standard.">
 
 <title>import_metadata() | Pointblank</title>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "import_metadata - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/import_metadata.html"}]</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "Pointblank", "description": "Find out if your data is what you think it is.", "codeRepository": "https://github.com/posit-dev/pointblank", "license": "https://opensource.org/licenses/MIT", "url": "https://posit-dev.github.io/pointblank", "documentation": "https://posit-dev.github.io/pointblank", "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"}}, {"@context": "https://schema.org", "@type": "WebPage", "name": "import_metadata - Pointblank", "isPartOf": {"@type": "WebSite", "name": "Pointblank"}, "url": "https://posit-dev.github.io/pointblank/reference/import_metadata.html"}]</script>
 <meta property="og:type" content="website">
 <style>
 /* Default styles provided by pandoc.
@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -136,7 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/import_metadata.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/import_metadata.html">
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2055,7 +2055,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-text">
 <p>Many datasets come with a description of their variables: the variable labels, value labels and missing-value codes stored in an SPSS, Stata or SAS file, the field types and constraints in a Frictionless or CSVW schema, or the variable definitions and codelists in a CDISC Define-XML document. The <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link gdls-code">import_metadata()</a> function reads that description (not the data itself) into a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport</code></a> object, with one <a href="../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link"><code>VariableMetadata</code></a> per variable and any codelists as <a href="../reference/Codelist.html#pointblank.Codelist" class="gdls-link"><code>Codelist</code></a> objects.</p>
-<p>The imported metadata is most useful as the starting point for validation. Its <a href="../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a> method turns the declared types and constraints into a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> plan, <a href="../reference/MetadataImport.html#pointblank.MetadataImport.to_schema" class="gdls-link"><code>to_schema()</code></a> gives a <a href="../reference/Schema.html#pointblank.Schema" class="gdls-link"><code>Schema</code></a> of the column types, and <a href="../reference/MetadataImport.html#pointblank.MetadataImport.missing_specs" class="gdls-link"><code>missing_specs()</code></a> turns declared missing-value codes into <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects. Use <a href="../reference/export_metadata.html#pointblank.export_metadata" class="gdls-link"><code>export_metadata()</code></a> to go the other way and write metadata out as a Frictionless Table Schema.</p>
+<p>The imported metadata is most useful as the starting point for validation. Its <a href="../reference/pointblank.MetadataImport.to_validate.html" class="gdls-link"><code>to_validate()</code></a> method turns the declared types and constraints into a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> plan, <a href="../reference/pointblank.MetadataImport.to_schema.html" class="gdls-link"><code>to_schema()</code></a> gives a <a href="../reference/Schema.html#pointblank.Schema" class="gdls-link"><code>Schema</code></a> of the column types, and <a href="../reference/pointblank.MetadataImport.missing_specs.html" class="gdls-link"><code>missing_specs()</code></a> turns declared missing-value codes into <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-link"><code>MissingSpec</code></a> objects. Use <a href="../reference/export_metadata.html#pointblank.export_metadata" class="gdls-link"><code>export_metadata()</code></a> to go the other way and write metadata out as a Frictionless Table Schema.</p>
 <p>A source that describes several datasets (a Define-XML document for a whole study, a Data Package with several resources, or a Controlled Terminology file with several codelists) gives a <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a> instead, which holds one <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> per dataset.</p>
 </div>
 <section id="parameters" class="level2 doc-parameters">
@@ -2170,7 +2170,7 @@ If the format needs an optional package that isn’t installed.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Pointblank bundles a few metadata files to experiment with, which can be found with <a href="../reference/load_metadata_example.html#pointblank.load_metadata_example" class="gdls-link"><code>load_metadata_example()</code></a>. Let’s import a Frictionless Data Package that describes a table of sales transactions:</p>
-<div id="cd05579f" class="cell" data-execution_count="2">
+<div id="7efcd7c7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"datapackage.json"</span>))</span>
@@ -2181,7 +2181,7 @@ If the format needs an optional package that isn’t installed.
 </div>
 </div>
 <p>The format was detected from the file’s contents. The metadata describes eight variables and one codelist (the allowed values of <code>category</code>). Each variable’s metadata can be looked up by name:</p>
-<div id="0f584458" class="cell" data-execution_count="3">
+<div id="fd0a2294" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>amount <span class="op">=</span> meta.get_variable(<span class="st">"amount"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(amount.dtype, amount.required, amount.min_val, amount.max_val)</span></code></pre></div>
@@ -2189,8 +2189,8 @@ If the format needs an optional package that isn’t installed.
 <pre><code>Float64 True 0.01 99999.99</code></pre>
 </div>
 </div>
-<p>The <code>amount</code> variable must be a non-null float from <code>0.01</code> to <code>99999.99</code>. Constraints like these can be checked against a table with <a href="../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a>, which builds a validation plan from the metadata:</p>
-<div id="52e12b23" class="cell" data-execution_count="4">
+<p>The <code>amount</code> variable must be a non-null float from <code>0.01</code> to <code>99999.99</code>. Constraints like these can be checked against a table with <a href="../reference/pointblank.MetadataImport.to_validate.html" class="gdls-link"><code>to_validate()</code></a>, which builds a validation plan from the metadata:</p>
+<div id="a6a49bf7" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datetime</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -3240,7 +3240,7 @@ tr { background-color: transparent; }
 </div>
 <p>The table has the declared column types, so the schema check in step 1 passes. Three later steps find a failing row each: the <code>amount</code> of <code>0.00</code> is below the minimum, <code>"toys"</code> isn’t one of the allowed categories, and <code>"not-an-email"</code> doesn’t match the pattern given for <code>email</code>.</p>
 <p>A Define-XML document usually describes all the datasets in a study, so importing one gives a <a href="../reference/MetadataPackage.html#pointblank.MetadataPackage" class="gdls-link"><code>MetadataPackage</code></a>:</p>
-<div id="214bffa1" class="cell" data-execution_count="5">
+<div id="78d45c1c" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>package <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>package</span></code></pre></div>
@@ -3249,7 +3249,7 @@ tr { background-color: transparent; }
 </div>
 </div>
 <p>The package holds the Demographics (<code>DM</code>) and Adverse Events (<code>AE</code>) datasets, and <code>package["DM"]</code> gives the <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> for one of them. If only one dataset is needed, the <code>dataset=</code> option of the Define-XML reader returns it directly:</p>
-<div id="2376b04d" class="cell" data-execution_count="6">
+<div id="ea04a37f" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>), dataset<span class="op">=</span><span class="st">"DM"</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dm.dataset_label)</span>
@@ -3714,7 +3714,7 @@ tr { background-color: transparent; }
     </div>
   </div>
 </footer>
-<script src="../github-widget.js"></script>
+<script src="../repository-widget.js"></script>
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>

@@ -130,7 +130,7 @@ Distinct-n is lower for more text (a word can only be new once), so it's measure
 
 ## The Results
 
-The problems found are also in the [issues](../../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) attribute, as messages, and `ok` is `True` when there are none, which makes a check of synthetic data easy to put in a test or a pipeline that makes it.
+The problems found are also in the [issues](../../reference/pointblank.ConformanceReport.issues.md) attribute, as messages, and `ok` is `True` when there are none, which makes a check of synthetic data easy to put in a test or a pipeline that makes it.
 
 ``` python
 check.issues
@@ -158,7 +158,7 @@ shape: (3, 7)
 
 The other attributes have the numbers behind the report (`fidelity`, `duplicates`, `diversity`, and `copies`), and [to_dict()](../../reference/SyntheticCheck.to_dict.md#pointblank.SyntheticCheck.to_dict) gives all of them as a dictionary that can be written as JSON.
 
-The report is in English by default, and [get_tabular_report()](../../reference/SyntheticCheck.get_tabular_report.md#pointblank.SyntheticCheck.get_tabular_report) takes `lang=` and `locale=` for another language (the messages of [issues](../../reference/ConformanceReport.md#pointblank.ConformanceReport.issues) stay in English):
+The report is in English by default, and [get_tabular_report()](../../reference/SyntheticCheck.get_tabular_report.md#pointblank.SyntheticCheck.get_tabular_report) takes `lang=` and `locale=` for another language (the messages of [issues](../../reference/pointblank.ConformanceReport.issues.md) stay in English):
 
 ``` python
 check.get_tabular_report(lang="es")

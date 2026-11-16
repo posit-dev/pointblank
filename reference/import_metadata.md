@@ -16,7 +16,7 @@ import_metadata(
 
 Many datasets come with a description of their variables: the variable labels, value labels and missing-value codes stored in an SPSS, Stata or SAS file, the field types and constraints in a Frictionless or CSVW schema, or the variable definitions and codelists in a CDISC Define-XML document. The [import_metadata()](../reference/import_metadata.md#pointblank.import_metadata) function reads that description (not the data itself) into a [`MetadataImport`](../reference/MetadataImport.md#pointblank.MetadataImport) object, with one [`VariableMetadata`](../reference/VariableMetadata.md#pointblank.VariableMetadata) per variable and any codelists as [`Codelist`](../reference/Codelist.md#pointblank.Codelist) objects.
 
-The imported metadata is most useful as the starting point for validation. Its [`to_validate()`](../reference/MetadataImport.md#pointblank.MetadataImport.to_validate) method turns the declared types and constraints into a [`Validate`](../reference/Validate.md#pointblank.Validate) plan, [`to_schema()`](../reference/MetadataImport.md#pointblank.MetadataImport.to_schema) gives a [`Schema`](../reference/Schema.md#pointblank.Schema) of the column types, and [`missing_specs()`](../reference/MetadataImport.md#pointblank.MetadataImport.missing_specs) turns declared missing-value codes into [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) objects. Use [`export_metadata()`](../reference/export_metadata.md#pointblank.export_metadata) to go the other way and write metadata out as a Frictionless Table Schema.
+The imported metadata is most useful as the starting point for validation. Its [`to_validate()`](../reference/pointblank.MetadataImport.to_validate.md) method turns the declared types and constraints into a [`Validate`](../reference/Validate.md#pointblank.Validate) plan, [`to_schema()`](../reference/pointblank.MetadataImport.to_schema.md) gives a [`Schema`](../reference/Schema.md#pointblank.Schema) of the column types, and [`missing_specs()`](../reference/pointblank.MetadataImport.missing_specs.md) turns declared missing-value codes into [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) objects. Use [`export_metadata()`](../reference/export_metadata.md#pointblank.export_metadata) to go the other way and write metadata out as a Frictionless Table Schema.
 
 A source that describes several datasets (a Define-XML document for a whole study, a Data Package with several resources, or a Controlled Terminology file with several codelists) gives a [`MetadataPackage`](../reference/MetadataPackage.md#pointblank.MetadataPackage) instead, which holds one [MetadataImport](../reference/MetadataImport.md#pointblank.MetadataImport) per dataset.
 
@@ -87,7 +87,7 @@ print(amount.dtype, amount.required, amount.min_val, amount.max_val)
 
     Float64 True 0.01 99999.99
 
-The `amount` variable must be a non-null float from `0.01` to `99999.99`. Constraints like these can be checked against a table with [`to_validate()`](../reference/MetadataImport.md#pointblank.MetadataImport.to_validate), which builds a validation plan from the metadata:
+The `amount` variable must be a non-null float from `0.01` to `99999.99`. Constraints like these can be checked against a table with [`to_validate()`](../reference/pointblank.MetadataImport.to_validate.md), which builds a validation plan from the metadata:
 
 ``` python
 import datetime

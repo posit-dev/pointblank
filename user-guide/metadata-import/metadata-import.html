@@ -88,7 +88,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -134,7 +134,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/metadata-import/metadata-import.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/metadata-import/metadata-import.html">
@@ -190,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -693,7 +693,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Pointblank’s metadata import system reads these external descriptions and converts them into validation workflows automatically. Rather than manually translating a Define-XML specification or an SPSS codebook into validation code, you can call <a href="../../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link gdls-code">import_metadata()</a> and let Pointblank generate the appropriate checks for you. The result is a <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> object that bridges between domain-specific formats and Pointblank’s validation engine.</p>
 <section id="quick-start" class="level1">
 <h1>Quick Start</h1>
-<p>The fastest path from a metadata file to a running validation uses three steps: import the metadata, provide your data, and call <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a>. Here is the basic pattern:</p>
+<p>The fastest path from a metadata file to a running validation uses three steps: import the metadata, provide your data, and call <a href="../../reference/pointblank.MetadataImport.to_validate.html" class="gdls-link"><code>to_validate()</code></a>. Here is the basic pattern:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Import metadata from any supported format</span></span>
@@ -819,11 +819,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>Each <a href="../../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link gdls-code">VariableMetadata</a> object describes a single column, including its name, data type, label, and any constraints that were defined in the source file. Constraints are automatically mapped to Pointblank validation methods when you call <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link gdls-code">to_validate()</a>.</p>
+<p>Each <a href="../../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link gdls-code">VariableMetadata</a> object describes a single column, including its name, data type, label, and any constraints that were defined in the source file. Constraints are automatically mapped to Pointblank validation methods when you call <a href="../../reference/pointblank.MetadataImport.to_validate.html" class="gdls-link gdls-code">to_validate()</a>.</p>
 </section>
 <section id="converting-to-a-schema" class="level1">
 <h1>Converting to a Schema</h1>
-<p>The <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_schema" class="gdls-link gdls-code">to_schema()</a> method produces a Pointblank <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> reflecting the column names and data types from the metadata. This is useful for structural validation (ensuring a DataFrame has the expected shape) without running value-level checks.</p>
+<p>The <a href="../../reference/pointblank.MetadataImport.to_schema.html" class="gdls-link gdls-code">to_schema()</a> method produces a Pointblank <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> reflecting the column names and data types from the metadata. This is useful for structural validation (ensuring a DataFrame has the expected shape) without running value-level checks.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(<span class="st">"clinical_data.xpt"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">"xpt"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Get just the schema (column names + types)</span></span>
@@ -839,7 +839,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="converting-to-a-validation-workflow" class="level1">
 <h1>Converting to a Validation Workflow</h1>
-<p>The <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link"><code>to_validate()</code></a> method is where all the power lives. It reads all constraints from the metadata and generates a complete <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with the appropriate validation steps. Each constraint type maps to a specific Pointblank method:</p>
+<p>The <a href="../../reference/pointblank.MetadataImport.to_validate.html" class="gdls-link"><code>to_validate()</code></a> method is where all the power lives. It reads all constraints from the metadata and generates a complete <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object with the appropriate validation steps. Each constraint type maps to a specific Pointblank method:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -930,7 +930,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Get value-to-label mapping</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>sex_labels <span class="op">=</span> meta.codelists[<span class="st">"C66731"</span>].to_dict()</span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g., {"M": "Male", "F": "Female", "U": "Unknown", ...}</span></span></code></pre></div>
-<p>When <a href="../../reference/MetadataImport.html#pointblank.MetadataImport.to_validate" class="gdls-link gdls-code">to_validate()</a> encounters a variable with a <code>codelist_ref</code>, it generates a <a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> step using the codelist’s values. For non-extensible codelists, any value outside the set is a failure. For extensible codelists, additional values are permitted (the check still runs but serves as documentation of expected values).</p>
+<p>When <a href="../../reference/pointblank.MetadataImport.to_validate.html" class="gdls-link gdls-code">to_validate()</a> encounters a variable with a <code>codelist_ref</code>, it generates a <a href="../../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" class="gdls-link gdls-code">col_vals_in_set()</a> step using the codelist’s values. For non-extensible codelists, any value outside the set is a failure. For extensible codelists, additional values are permitted (the check still runs but serves as documentation of expected values).</p>
 </section>
 <section id="handling-missing-value-codes" class="level1">
 <h1>Handling Missing Value Codes</h1>
@@ -1392,7 +1392,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </div>
   </div>
 </footer>
-<script src="../../github-widget.js"></script>
+<script src="../../repository-widget.js"></script>
 <script src="../../copy-page.js"></script>
 <script src="../../sidebar-wrap.js"></script>
 <script src="../../sidebar-float.js"></script>

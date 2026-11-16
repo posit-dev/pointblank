@@ -16,9 +16,9 @@ PipelineResult(
 )
 ```
 
-A [PipelineResult](../reference/PipelineResult.md#pointblank.PipelineResult) is what [`Pipeline.run()`](../reference/Pipeline.md#pointblank.Pipeline.run) returns. It collects everything a run produced: the interrogated validation for each boundary, the transformed data, and pass/fail properties for a quick go/no-go decision. Keeping all of it in one object means the code that runs a pipeline can decide what to do next (publish the output, stop the job, or alert someone) and still have the full reports at hand to explain the decision.
+A [PipelineResult](../reference/PipelineResult.md#pointblank.PipelineResult) is what [`Pipeline.run()`](../reference/pointblank.Pipeline.run.md) returns. It collects everything a run produced: the interrogated validation for each boundary, the transformed data, and pass/fail properties for a quick go/no-go decision. Keeping all of it in one object means the code that runs a pipeline can decide what to do next (publish the output, stop the job, or alert someone) and still have the full reports at hand to explain the decision.
 
-You don't normally create a [PipelineResult](../reference/PipelineResult.md#pointblank.PipelineResult) yourself. Get one from [run()](../reference/Pipeline.md#pointblank.Pipeline.run) and read its attributes and properties. When [run()](../reference/Pipeline.md#pointblank.Pipeline.run) raises a [`ContractViolationError`](../reference/ContractViolationError.md#pointblank.ContractViolationError) instead, the error's `result` attribute holds the [PipelineResult](../reference/PipelineResult.md#pointblank.PipelineResult).
+You don't normally create a [PipelineResult](../reference/PipelineResult.md#pointblank.PipelineResult) yourself. Get one from [run()](../reference/pointblank.Pipeline.run.md) and read its attributes and properties. When [run()](../reference/pointblank.Pipeline.run.md) raises a [`ContractViolationError`](../reference/ContractViolationError.md#pointblank.ContractViolationError) instead, the error's `result` attribute holds the [PipelineResult](../reference/PipelineResult.md#pointblank.PipelineResult).
 
 ## Attributes
 

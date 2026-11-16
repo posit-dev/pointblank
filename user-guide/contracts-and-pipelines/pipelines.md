@@ -96,7 +96,7 @@ print(pipeline)
 
 ## Running the Pipeline
 
-The [Pipeline.run()](../../reference/Pipeline.md#pointblank.Pipeline.run) method executes the full boundary enforcement workflow in a single call. This is the primary way to use a pipeline: you hand it your input data and a transform function, and it handles the validation orchestration for you. The method follows a strict three-step sequence:
+The [Pipeline.run()](../../reference/pointblank.Pipeline.run.md) method executes the full boundary enforcement workflow in a single call. This is the primary way to use a pipeline: you hand it your input data and a transform function, and it handles the validation orchestration for you. The method follows a strict three-step sequence:
 
 1.  Validate source data against the source contract
 2.  Execute your transform function (only if source validation passes)
@@ -194,7 +194,7 @@ print(result.get_report())
 
 ## Validating Boundaries Independently
 
-You don't have to use [run()](../../reference/Pipeline.md#pointblank.Pipeline.run). You can validate each boundary separately when you need more control over the workflow. The [validate_source()](../../reference/Pipeline.md#pointblank.Pipeline.validate_source) and [validate_target()](../../reference/Pipeline.md#pointblank.Pipeline.validate_target) methods each return a standard [Validate](../../reference/Validate.md#pointblank.Validate) object (not a [PipelineResult](../../reference/PipelineResult.md#pointblank.PipelineResult)), giving you direct access to the interrogation results.
+You don't have to use [run()](../../reference/pointblank.Pipeline.run.md). You can validate each boundary separately when you need more control over the workflow. The [validate_source()](../../reference/pointblank.Pipeline.validate_source.md) and [validate_target()](../../reference/pointblank.Pipeline.validate_target.md) methods each return a standard [Validate](../../reference/Validate.md#pointblank.Validate) object (not a [PipelineResult](../../reference/PipelineResult.md#pointblank.PipelineResult)), giving you direct access to the interrogation results.
 
 This pattern is particularly useful when:
 
@@ -226,7 +226,7 @@ This is useful when your transform is complex, has side effects, or when you wan
 
 ## Short-Circuiting on Source Failure
 
-By default, [Pipeline.run()](../../reference/Pipeline.md#pointblank.Pipeline.run) uses **short-circuit** behavior: if the source validation fails, the transform is never executed and the target is never validated. This is a safety mechanism that prevents invalid data from flowing into your transformation logic, where it could cause unexpected exceptions, produce corrupt output, or trigger irreversible side effects like writing bad records to a production database.
+By default, [Pipeline.run()](../../reference/pointblank.Pipeline.run.md) uses **short-circuit** behavior: if the source validation fails, the transform is never executed and the target is never validated. This is a safety mechanism that prevents invalid data from flowing into your transformation logic, where it could cause unexpected exceptions, produce corrupt output, or trigger irreversible side effects like writing bad records to a production database.
 
 Short-circuiting also saves compute resources. If your transform is expensive (large joins, ML inference, API calls), there's no reason to run it on data you already know is invalid. The pipeline fails fast and reports exactly why.
 
@@ -321,7 +321,7 @@ with warnings.catch_warnings(record=True) as w:
 
 ### Raise Mode
 
-Use `on_violation="raise"` to halt execution immediately when data is invalid. This is the strictest mode and the right choice for production pipelines where bad data must never reach downstream systems. When a validation fails with this mode, a [ContractViolationError](../../reference/ContractViolationError.md#pointblank.ContractViolationError) (a subclass of `RuntimeError`) is raised with a message identifying which contract failed. This applies to [run()](../../reference/Pipeline.md#pointblank.Pipeline.run) as well as to [validate_source()](../../reference/Pipeline.md#pointblank.Pipeline.validate_source) and [validate_target()](../../reference/Pipeline.md#pointblank.Pipeline.validate_target). The error keeps the results, so the code that catches it can still look at what went wrong:
+Use `on_violation="raise"` to halt execution immediately when data is invalid. This is the strictest mode and the right choice for production pipelines where bad data must never reach downstream systems. When a validation fails with this mode, a [ContractViolationError](../../reference/ContractViolationError.md#pointblank.ContractViolationError) (a subclass of `RuntimeError`) is raised with a message identifying which contract failed. This applies to [run()](../../reference/pointblank.Pipeline.run.md) as well as to [validate_source()](../../reference/pointblank.Pipeline.validate_source.md) and [validate_target()](../../reference/pointblank.Pipeline.validate_target.md). The error keeps the results, so the code that catches it can still look at what went wrong:
 
 ``` python
 strict_contract = pb.Contract(
@@ -342,7 +342,7 @@ except pb.ContractViolationError as e:
     Stopped: Contract 'strict_check' (source) violated: validation has failing steps.
     Source passed: False
 
-The error's `validation` attribute holds the failing validation, and when it comes from [run()](../../reference/Pipeline.md#pointblank.Pipeline.run), its `result` attribute holds the [PipelineResult](../../reference/PipelineResult.md#pointblank.PipelineResult) of the run. With `short_circuit=False`, a failing source contract with `"raise"` doesn't stop the run right away: the transformation runs and the target is validated first, and then the error is raised.
+The error's `validation` attribute holds the failing validation, and when it comes from [run()](../../reference/pointblank.Pipeline.run.md), its `result` attribute holds the [PipelineResult](../../reference/PipelineResult.md#pointblank.PipelineResult) of the run. With `short_circuit=False`, a failing source contract with `"raise"` doesn't stop the run right away: the transformation runs and the target is validated first, and then the error is raised.
 
 ### Log Mode
 
@@ -469,7 +469,7 @@ The target validation report above pinpoints the failure: the [col_vals_not_null
 
 ## Working with Pandas
 
-Pipelines work with any DataFrame library supported by Pointblank, including Pandas. The interface is identical: you pass a Pandas DataFrame to [run()](../../reference/Pipeline.md#pointblank.Pipeline.run) or [validate_source()](../../reference/Pipeline.md#pointblank.Pipeline.validate_source), and Pointblank handles the rest. This means your contracts are portable across DataFrame backends and you can define a contract once and use it to validate both Polars and Pandas data without modification.
+Pipelines work with any DataFrame library supported by Pointblank, including Pandas. The interface is identical: you pass a Pandas DataFrame to [run()](../../reference/pointblank.Pipeline.run.md) or [validate_source()](../../reference/pointblank.Pipeline.validate_source.md), and Pointblank handles the rest. This means your contracts are portable across DataFrame backends and you can define a contract once and use it to validate both Polars and Pandas data without modification.
 
 Here's the same transaction-processing workflow using Pandas DataFrames:
 
@@ -519,7 +519,7 @@ print(f"Pandas pipeline passed: {result.passed}")
 
 ## Multiple Pipeline Runs
 
-Pipelines are stateless and can be run multiple times with different data. Each call to [run()](../../reference/Pipeline.md#pointblank.Pipeline.run) produces an independent [PipelineResult](../../reference/PipelineResult.md#pointblank.PipelineResult) with no side effects on the pipeline object itself. This makes pipelines safe to reuse in loops, parallel processing, or long-running services where the same validation logic applies to many batches of data.
+Pipelines are stateless and can be run multiple times with different data. Each call to [run()](../../reference/pointblank.Pipeline.run.md) produces an independent [PipelineResult](../../reference/PipelineResult.md#pointblank.PipelineResult) with no side effects on the pipeline object itself. This makes pipelines safe to reuse in loops, parallel processing, or long-running services where the same validation logic applies to many batches of data.
 
 The example below demonstrates running a single pipeline against multiple data batches (a common pattern in batch-processing systems where data arrives in chunks):
 

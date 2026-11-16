@@ -88,7 +88,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -137,7 +137,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/metadata-import/cdisc-submission-conformance.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/metadata-import/cdisc-submission-conformance.html">
@@ -193,7 +193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -3747,7 +3747,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="the-conformance-report" class="level2">
 <h2 class="anchored" data-anchor-id="the-conformance-report">The Conformance Report</h2>
-<p>The tabular report shown above is produced by <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.get_tabular_report" class="gdls-link"><code>get_tabular_report()</code></a>. Each row is one rule from the SDTMIG 3.4 catalog; the colored bar on the left edge encodes its status:</p>
+<p>The tabular report shown above is produced by <a href="../../reference/pointblank.ConformanceReport.get_tabular_report.html" class="gdls-link"><code>get_tabular_report()</code></a>. Each row is one rule from the SDTMIG 3.4 catalog; the colored bar on the left edge encodes its status:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -3786,7 +3786,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <p>Rules are sorted by severity: failures first, then errors, then passes, then not-applicable.</p>
 <p>The header shows a <code>PASS</code> or <code>FAIL</code> badge alongside the standard, version, and a full status breakdown (e.g., <code>SDTMIG 3-4 · 346 passed · 4 failed · 12 n/a</code>).</p>
-<p>Call <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a> to get the <code>GT</code> object directly if you need to embed it in a report pipeline:</p>
+<p>Call <a href="../../reference/pointblank.ConformanceReport.get_tabular_report.html" class="gdls-link gdls-code">get_tabular_report()</a> to get the <code>GT</code> object directly if you need to embed it in a report pipeline:</p>
 <div id="a5457c1f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>gt <span class="op">=</span> report.get_tabular_report()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>gt</span></code></pre></div>
@@ -3795,7 +3795,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="findings-drill-down" class="level2">
 <h2 class="anchored" data-anchor-id="findings-drill-down">Findings Drill-Down</h2>
-<p>When rules fail, the tabular report shows how many records violated each rule but not which ones. <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link"><code>get_findings_table()</code></a> provides that drill-down: one row per failing record, showing the subject, the specific column that violated the rule, the offending value, and the 1-based row number in the source dataset.</p>
+<p>When rules fail, the tabular report shows how many records violated each rule but not which ones. <a href="../../reference/pointblank.ConformanceReport.get_findings_table.html" class="gdls-link"><code>get_findings_table()</code></a> provides that drill-down: one row per failing record, showing the subject, the specific column that violated the rule, the offending value, and the 1-based row number in the source dataset.</p>
 <p>To see it in action, introduce a few deliberate violations:</p>
 <div id="a93c1c80" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dm_with_issues <span class="op">=</span> pl.DataFrame({</span>
@@ -3971,11 +3971,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>SDTM Rule Definition</strong>: <code>Rule</code>, <code>Domain</code> and <code>Description</code> identify which rule fired and where.</li>
 <li><strong>Finding</strong>: <code>USUBJID</code> identifies the subject; <code>Column</code> and <code>Value</code> show exactly what was wrong; <code>Row</code> is the 1-based row number in the source dataset for quick lookup.</li>
 </ul>
-<p>At most 100 findings per rule are shown in the table. The true total for each rule is always visible in <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a>. To export findings to a spreadsheet or join them back to your source data, use <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link gdls-code">findings_df()</a> instead.</p>
+<p>At most 100 findings per rule are shown in the table. The true total for each rule is always visible in <a href="../../reference/pointblank.ConformanceReport.get_tabular_report.html" class="gdls-link gdls-code">get_tabular_report()</a>. To export findings to a spreadsheet or join them back to your source data, use <a href="../../reference/pointblank.ConformanceReport.findings_df.html" class="gdls-link gdls-code">findings_df()</a> instead.</p>
 </section>
 <section id="programmatic-access-with-findings_df" class="level2">
 <h2 class="anchored" data-anchor-id="programmatic-access-with-findings_df">Programmatic Access with findings_df()</h2>
-<p><a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link"><code>findings_df()</code></a> returns the same findings as a Polars DataFrame, which is better suited for filtering, grouping, exporting to CSV, or joining back to the source data:</p>
+<p><a href="../../reference/pointblank.ConformanceReport.findings_df.html" class="gdls-link"><code>findings_df()</code></a> returns the same findings as a Polars DataFrame, which is better suited for filtering, grouping, exporting to CSV, or joining back to the source data:</p>
 <div id="54f23641" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> report_with_issues.findings_df()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df</span></code></pre></div>
@@ -4110,7 +4110,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>Only <code>RECORD_CHECK</code>, <code>DATASET_CONTENTS_CHECK</code> and <code>DEFINE_CODELIST_CHECK</code> rules produce row-level findings accessible via <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.findings_df" class="gdls-link gdls-code">findings_df()</a> and <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.get_findings_table" class="gdls-link gdls-code">get_findings_table()</a>. The other types report a violation count in <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.get_tabular_report" class="gdls-link gdls-code">get_tabular_report()</a> but do not have individual record detail.</p>
+<p>Only <code>RECORD_CHECK</code>, <code>DATASET_CONTENTS_CHECK</code> and <code>DEFINE_CODELIST_CHECK</code> rules produce row-level findings accessible via <a href="../../reference/pointblank.ConformanceReport.findings_df.html" class="gdls-link gdls-code">findings_df()</a> and <a href="../../reference/pointblank.ConformanceReport.get_findings_table.html" class="gdls-link gdls-code">get_findings_table()</a>. The other types report a violation count in <a href="../../reference/pointblank.ConformanceReport.get_tabular_report.html" class="gdls-link gdls-code">get_tabular_report()</a> but do not have individual record detail.</p>
 <p>Rules that target a domain not present in your datasets have nothing to check, so they are reported as <code>pass</code>. For example, a rule that checks <code>AESTDTC</code> in the AE domain passes when no AE dataset is supplied. A <code>pass</code> therefore doesn’t mean that a domain was checked: adding more domains to the dictionary passed to <a href="../../reference/validate_sdtmig.html#pointblank.validate_sdtmig" class="gdls-link gdls-code">validate_sdtmig()</a> gives the rules for those domains something to evaluate, giving a more complete conformance picture. Only rules that need an input that wasn’t supplied (such as a Define-XML) are marked <code>not_applicable</code>.</p>
 </section>
 <section id="controlled-terminology" class="level2">
@@ -4176,7 +4176,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li><strong>Reading XPT files</strong> with <code>pyreadstat</code>: <code>pip install pyreadstat</code></li>
 <li><strong>Writing XPT files</strong> for CORE (automatic, handled internally): <code>pip install pyreadstat</code></li>
-<li><strong>Excel export</strong> with <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.to_excel" class="gdls-link gdls-code">to_excel()</a>: <code>pip install openpyxl</code></li>
+<li><strong>Excel export</strong> with <a href="../../reference/pointblank.ConformanceReport.to_excel.html" class="gdls-link gdls-code">to_excel()</a>: <code>pip install openpyxl</code></li>
 </ul>
 <div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">cdisc</span><span class="pp">]</span>    <span class="co"># adds pyreadstat</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">excel</span><span class="pp">]</span>    <span class="co"># adds openpyxl</span></span></code></pre></div>
@@ -4272,7 +4272,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   8 issues — FAIL</code></pre>
 </div>
 </div>
-<p><strong>Overall result.</strong> <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.all_passed" class="gdls-link"><code>all_passed()</code></a> returns <code>True</code> when no rules reported issues; <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.is_core" class="gdls-link gdls-code">is_core</a> confirms the report originated from the CORE engine rather than the built-in engine:</p>
+<p><strong>Overall result.</strong> <a href="../../reference/pointblank.ConformanceReport.all_passed.html" class="gdls-link"><code>all_passed()</code></a> returns <code>True</code> when no rules reported issues; <a href="../../reference/pointblank.ConformanceReport.is_core.html" class="gdls-link gdls-code">is_core</a> confirms the report originated from the CORE engine rather than the built-in engine:</p>
 <div id="758b1aed" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"All passed:"</span>, report.all_passed())</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Is CORE report:"</span>, report.is_core)</span></code></pre></div>
@@ -4281,7 +4281,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 Is CORE report: True</code></pre>
 </div>
 </div>
-<p><strong>Summary dictionary.</strong> <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.summary" class="gdls-link"><code>summary()</code></a> returns run provenance and rule counts as a plain dictionary, useful for logging, assertions in CI scripts, or building a custom status page:</p>
+<p><strong>Summary dictionary.</strong> <a href="../../reference/pointblank.ConformanceReport.summary.html" class="gdls-link"><code>summary()</code></a> returns run provenance and rule counts as a plain dictionary, useful for logging, assertions in CI scripts, or building a custom status page:</p>
 <div id="9719a319" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> report.summary()</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -4308,7 +4308,7 @@ Rule status breakdown:
 </div>
 </div>
 <p>The <a href="../../reference/Comparison.status_counts.html#pointblank.Comparison.status_counts" class="gdls-link gdls-code">status_counts</a> dictionary enumerates every status bucket CORE reported. Use it to build pass/fail thresholds or trend charts across multiple submission runs.</p>
-<p><strong>Issues.</strong> <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.issues" class="gdls-link gdls-code">issues()</a> returns one record per (dataset, rule) pair that reported at least one issue. Pass a <code>status</code> filter to separate conformance violations from execution errors:</p>
+<p><strong>Issues.</strong> <a href="../../reference/pointblank.ConformanceReport.issues.html" class="gdls-link gdls-code">issues()</a> returns one record per (dataset, rule) pair that reported at least one issue. Pass a <code>status</code> filter to separate conformance violations from execution errors:</p>
 <div id="c90858a7" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>issues <span class="op">=</span> report.issues()</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Issue entries: </span><span class="sc">{</span><span class="bu">len</span>(issues)<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -4352,7 +4352,7 @@ Execution errors:  2</code></pre>
 </div>
 </div>
 <p>Execution errors (<code>STATUS_ERROR</code>) indicate that CORE could not evaluate a rule, typically because a required variable or dataset was absent or had an unexpected format. They are distinct from conformance issues (<code>STATUS_ISSUE</code>) where the rule ran successfully but found a violation.</p>
-<p><strong>Row-level findings.</strong> <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.findings" class="gdls-link gdls-code">findings()</a> returns the row-level detail from CORE’s <code>Issue_Details</code> section, giving the exact record that triggered each rule:</p>
+<p><strong>Row-level findings.</strong> <a href="../../reference/pointblank.ConformanceReport.findings.html" class="gdls-link gdls-code">findings()</a> returns the row-level detail from CORE’s <code>Issue_Details</code> section, giving the exact record that triggered each rule:</p>
 <div id="2f68bcd4" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>findings <span class="op">=</span> report.findings()</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Row-level findings: </span><span class="sc">{</span><span class="bu">len</span>(findings)<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -4377,7 +4377,7 @@ Values:        ['TEST_DATASET']</code></pre>
 </div>
 </div>
 <p>Each finding carries the <code>USUBJID</code>, the affected variables and their values, and the 1-based row number in the source dataset, matching the information shown in the built-in engine’s findings table.</p>
-<p><strong>Per-rule run results.</strong> <a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.rules" class="gdls-link gdls-code">rules()</a> returns one <code>CoreRuleResult</code> per rule with its run status:</p>
+<p><strong>Per-rule run results.</strong> <a href="../../reference/pointblank.ConformanceReport.rules.html" class="gdls-link gdls-code">rules()</a> returns one <code>CoreRuleResult</code> per rule with its run status:</p>
 <div id="45835d29" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pointblank.metadata._cdisc_core <span class="im">import</span> STATUS_SUCCESS, STATUS_SKIPPED</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -4413,7 +4413,7 @@ Failing:      8
 <p>Both built-in and CORE reports can be exported for archiving, sharing with a biometrics team, or loading into a review tool. Two formats are supported: JSON for round-trippable machine-readable output, and Excel for spreadsheet-based review workflows.</p>
 <section id="json" class="level2">
 <h2 class="anchored" data-anchor-id="json">JSON</h2>
-<p><a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.to_json" class="gdls-link"><code>to_json()</code></a> saves the report as a JSON file. For CORE reports the structure mirrors CORE’s native output and is parseable by <code>parse_core_report()</code>:</p>
+<p><a href="../../reference/pointblank.ConformanceReport.to_json.html" class="gdls-link"><code>to_json()</code></a> saves the report as a JSON file. For CORE reports the structure mirrors CORE’s native output and is parseable by <code>parse_core_report()</code>:</p>
 <div id="78bd5865" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -4435,7 +4435,7 @@ Rules after round-trip: 430</code></pre>
 </section>
 <section id="excel" class="level2">
 <h2 class="anchored" data-anchor-id="excel">Excel</h2>
-<p><a href="../../reference/ConformanceReport.html#pointblank.ConformanceReport.to_excel" class="gdls-link gdls-code">to_excel()</a> writes the report as a workbook. Requires <code>openpyxl</code>:</p>
+<p><a href="../../reference/pointblank.ConformanceReport.to_excel.html" class="gdls-link gdls-code">to_excel()</a> writes the report as a workbook. Requires <code>openpyxl</code>:</p>
 <div id="1669b294" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>dest <span class="op">=</span> report.to_excel(<span class="st">"conformance_report.xlsx"</span>)</span></code></pre></div>
 </div>
@@ -4929,7 +4929,7 @@ Rules after round-trip: 430</code></pre>
     </div>
   </div>
 </footer>
-<script src="../../github-widget.js"></script>
+<script src="../../repository-widget.js"></script>
 <script src="../../copy-page.js"></script>
 <script src="../../sidebar-wrap.js"></script>
 <script src="../../sidebar-float.js"></script>

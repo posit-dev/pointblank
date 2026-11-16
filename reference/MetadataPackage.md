@@ -227,7 +227,7 @@ Usage
 summary()
 ```
 
-The summary gives the package's name and description (when known), the number of datasets, and the number of variables in each. Printing a [MetadataPackage](../reference/MetadataPackage.md#pointblank.MetadataPackage) with `print()` shows the same summary. For the details of a dataset, use the [`summary()`](../reference/MetadataImport.md#pointblank.MetadataImport.summary) of its entry.
+The summary gives the package's name and description (when known), the number of datasets, and the number of variables in each. Printing a [MetadataPackage](../reference/MetadataPackage.md#pointblank.MetadataPackage) with `print()` shows the same summary. For the details of a dataset, use the [`summary()`](../reference/pointblank.MetadataImport.summary.md) of its entry.
 
 #### Returns
 

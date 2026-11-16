@@ -88,7 +88,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-9957c2fee0d0d608fa13ccf548446c53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -137,7 +137,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.2.0</code><br>Released 2026-11-06">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/pipelines.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/pipelines.html">
@@ -193,7 +193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="github-widget" data-owner="posit-dev" data-repo="pointblank" data-stars="507" data-forks="38"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="507" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -795,7 +795,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="running-the-pipeline" class="level1">
 <h1>Running the Pipeline</h1>
-<p>The <a href="../../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">Pipeline.run()</a> method executes the full boundary enforcement workflow in a single call. This is the primary way to use a pipeline: you hand it your input data and a transform function, and it handles the validation orchestration for you. The method follows a strict three-step sequence:</p>
+<p>The <a href="../../reference/pointblank.Pipeline.run.html" class="gdls-link gdls-code">Pipeline.run()</a> method executes the full boundary enforcement workflow in a single call. This is the primary way to use a pipeline: you hand it your input data and a transform function, and it handles the validation orchestration for you. The method follows a strict three-step sequence:</p>
 <ol type="1">
 <li>Validate source data against the source contract</li>
 <li>Execute your transform function (only if source validation passes)</li>
@@ -2063,7 +2063,7 @@ Overall: PASSED</code></pre>
 </section>
 <section id="validating-boundaries-independently" class="level1">
 <h1>Validating Boundaries Independently</h1>
-<p>You don’t have to use <a href="../../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">run()</a>. You can validate each boundary separately when you need more control over the workflow. The <a href="../../reference/Pipeline.html#pointblank.Pipeline.validate_source" class="gdls-link gdls-code">validate_source()</a> and <a href="../../reference/Pipeline.html#pointblank.Pipeline.validate_target" class="gdls-link gdls-code">validate_target()</a> methods each return a standard <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object (not a <a href="../../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a>), giving you direct access to the interrogation results.</p>
+<p>You don’t have to use <a href="../../reference/pointblank.Pipeline.run.html" class="gdls-link gdls-code">run()</a>. You can validate each boundary separately when you need more control over the workflow. The <a href="../../reference/pointblank.Pipeline.validate_source.html" class="gdls-link gdls-code">validate_source()</a> and <a href="../../reference/pointblank.Pipeline.validate_target.html" class="gdls-link gdls-code">validate_target()</a> methods each return a standard <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object (not a <a href="../../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a>), giving you direct access to the interrogation results.</p>
 <p>This pattern is particularly useful when:</p>
 <ul>
 <li>Your transform has side effects (writing to a database, calling an API) that you don’t want triggered during validation testing</li>
@@ -2094,7 +2094,7 @@ Overall: PASSED</code></pre>
 </section>
 <section id="short-circuiting-on-source-failure" class="level1">
 <h1>Short-Circuiting on Source Failure</h1>
-<p>By default, <a href="../../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">Pipeline.run()</a> uses <strong>short-circuit</strong> behavior: if the source validation fails, the transform is never executed and the target is never validated. This is a safety mechanism that prevents invalid data from flowing into your transformation logic, where it could cause unexpected exceptions, produce corrupt output, or trigger irreversible side effects like writing bad records to a production database.</p>
+<p>By default, <a href="../../reference/pointblank.Pipeline.run.html" class="gdls-link gdls-code">Pipeline.run()</a> uses <strong>short-circuit</strong> behavior: if the source validation fails, the transform is never executed and the target is never validated. This is a safety mechanism that prevents invalid data from flowing into your transformation logic, where it could cause unexpected exceptions, produce corrupt output, or trigger irreversible side effects like writing bad records to a production database.</p>
 <p>Short-circuiting also saves compute resources. If your transform is expensive (large joins, ML inference, API calls), there’s no reason to run it on data you already know is invalid. The pipeline fails fast and reports exactly why.</p>
 <p>In the example below, the source data contains a null <code>txn_id</code> and a negative <code>amount_cents</code>, both of which violate the source contract. Because short-circuiting is enabled (the default), the transform function is never called and the target validation is skipped entirely:</p>
 <div id="e572072f" class="cell" data-execution_count="9">
@@ -2185,7 +2185,7 @@ Target validated: True</code></pre>
 </section>
 <section id="raise-mode" class="level2">
 <h2 class="anchored" data-anchor-id="raise-mode">Raise Mode</h2>
-<p>Use <code>on_violation="raise"</code> to halt execution immediately when data is invalid. This is the strictest mode and the right choice for production pipelines where bad data must never reach downstream systems. When a validation fails with this mode, a <a href="../../reference/ContractViolationError.html#pointblank.ContractViolationError" class="gdls-link gdls-code">ContractViolationError</a> (a subclass of <code>RuntimeError</code>) is raised with a message identifying which contract failed. This applies to <a href="../../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">run()</a> as well as to <a href="../../reference/Pipeline.html#pointblank.Pipeline.validate_source" class="gdls-link gdls-code">validate_source()</a> and <a href="../../reference/Pipeline.html#pointblank.Pipeline.validate_target" class="gdls-link gdls-code">validate_target()</a>. The error keeps the results, so the code that catches it can still look at what went wrong:</p>
+<p>Use <code>on_violation="raise"</code> to halt execution immediately when data is invalid. This is the strictest mode and the right choice for production pipelines where bad data must never reach downstream systems. When a validation fails with this mode, a <a href="../../reference/ContractViolationError.html#pointblank.ContractViolationError" class="gdls-link gdls-code">ContractViolationError</a> (a subclass of <code>RuntimeError</code>) is raised with a message identifying which contract failed. This applies to <a href="../../reference/pointblank.Pipeline.run.html" class="gdls-link gdls-code">run()</a> as well as to <a href="../../reference/pointblank.Pipeline.validate_source.html" class="gdls-link gdls-code">validate_source()</a> and <a href="../../reference/pointblank.Pipeline.validate_target.html" class="gdls-link gdls-code">validate_target()</a>. The error keeps the results, so the code that catches it can still look at what went wrong:</p>
 <div id="1aa8077d" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>strict_contract <span class="op">=</span> pb.Contract(</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"strict_check"</span>,</span>
@@ -2205,7 +2205,7 @@ Target validated: True</code></pre>
 Source passed: False</code></pre>
 </div>
 </div>
-<p>The error’s <code>validation</code> attribute holds the failing validation, and when it comes from <a href="../../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">run()</a>, its <code>result</code> attribute holds the <a href="../../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a> of the run. With <code>short_circuit=False</code>, a failing source contract with <code>"raise"</code> doesn’t stop the run right away: the transformation runs and the target is validated first, and then the error is raised.</p>
+<p>The error’s <code>validation</code> attribute holds the failing validation, and when it comes from <a href="../../reference/pointblank.Pipeline.run.html" class="gdls-link gdls-code">run()</a>, its <code>result</code> attribute holds the <a href="../../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a> of the run. With <code>short_circuit=False</code>, a failing source contract with <code>"raise"</code> doesn’t stop the run right away: the transformation runs and the target is validated first, and then the error is raised.</p>
 </section>
 <section id="log-mode" class="level2">
 <h2 class="anchored" data-anchor-id="log-mode">Log Mode</h2>
@@ -2324,7 +2324,7 @@ After buggy transform:
 </section>
 <section id="working-with-pandas" class="level1">
 <h1>Working with Pandas</h1>
-<p>Pipelines work with any DataFrame library supported by Pointblank, including Pandas. The interface is identical: you pass a Pandas DataFrame to <a href="../../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">run()</a> or <a href="../../reference/Pipeline.html#pointblank.Pipeline.validate_source" class="gdls-link gdls-code">validate_source()</a>, and Pointblank handles the rest. This means your contracts are portable across DataFrame backends and you can define a contract once and use it to validate both Polars and Pandas data without modification.</p>
+<p>Pipelines work with any DataFrame library supported by Pointblank, including Pandas. The interface is identical: you pass a Pandas DataFrame to <a href="../../reference/pointblank.Pipeline.run.html" class="gdls-link gdls-code">run()</a> or <a href="../../reference/pointblank.Pipeline.validate_source.html" class="gdls-link gdls-code">validate_source()</a>, and Pointblank handles the rest. This means your contracts are portable across DataFrame backends and you can define a contract once and use it to validate both Polars and Pandas data without modification.</p>
 <p>Here’s the same transaction-processing workflow using Pandas DataFrames:</p>
 <div id="d3c7cf03" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -2373,7 +2373,7 @@ After buggy transform:
 </section>
 <section id="multiple-pipeline-runs" class="level1">
 <h1>Multiple Pipeline Runs</h1>
-<p>Pipelines are stateless and can be run multiple times with different data. Each call to <a href="../../reference/Pipeline.html#pointblank.Pipeline.run" class="gdls-link gdls-code">run()</a> produces an independent <a href="../../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a> with no side effects on the pipeline object itself. This makes pipelines safe to reuse in loops, parallel processing, or long-running services where the same validation logic applies to many batches of data.</p>
+<p>Pipelines are stateless and can be run multiple times with different data. Each call to <a href="../../reference/pointblank.Pipeline.run.html" class="gdls-link gdls-code">run()</a> produces an independent <a href="../../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link gdls-code">PipelineResult</a> with no side effects on the pipeline object itself. This makes pipelines safe to reuse in loops, parallel processing, or long-running services where the same validation logic applies to many batches of data.</p>
 <p>The example below demonstrates running a single pipeline against multiple data batches (a common pattern in batch-processing systems where data arrives in chunks):</p>
 <div id="78a77db7" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Same pipeline, different data batches</span></span>
@@ -2850,7 +2850,7 @@ Batch 2: PASSED</code></pre>
     </div>
   </div>
 </footer>
-<script src="../../github-widget.js"></script>
+<script src="../../repository-widget.js"></script>
 <script src="../../copy-page.js"></script>
 <script src="../../sidebar-wrap.js"></script>
 <script src="../../sidebar-float.js"></script>
