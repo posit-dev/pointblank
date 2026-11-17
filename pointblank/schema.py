@@ -333,7 +333,8 @@ class Schema:
         Parameters
         ----------
         tbl
-            A Polars DataFrame, Pandas DataFrame, or Ibis table (DuckDB, SQLite, etc.).
+            A Polars DataFrame or LazyFrame, Pandas DataFrame, PyArrow table, PySpark DataFrame, or
+            Ibis table (DuckDB, SQLite, etc.).
         infer_constraints
             When `True` (default), inspect values to infer min/max, uniqueness, null rates, etc.
             When `False`, behave like `Schema(tbl=df)` (dtype only).
@@ -348,7 +349,8 @@ class Schema:
             instead, keeping its values in `allowed=`.
         sample_size
             If set, sample this many rows before analysis (useful for very large tables).
-            `None` means use all rows.
+            `None` means use all rows. Polars and Pandas tables are sampled at random; other tables
+            use their first `sample_size` rows.
 
         Returns
         -------
@@ -1631,7 +1633,8 @@ def schema_from_tbl(
     Parameters
     ----------
     tbl
-        A Polars DataFrame, Pandas DataFrame, or Ibis table (DuckDB, SQLite, etc.).
+        A Polars DataFrame or LazyFrame, Pandas DataFrame, PyArrow table, PySpark DataFrame, or Ibis
+        table (DuckDB, SQLite, etc.).
     infer_constraints
         When `True` (default), inspect values to infer min/max, uniqueness, null rates, etc. When
         `False`, behave like `Schema(tbl=df)` (dtype only).
@@ -1646,7 +1649,8 @@ def schema_from_tbl(
         in `allowed=`.
     sample_size
         If set, sample this many rows before analysis (useful for very large tables). `None` means
-        use all rows.
+        use all rows. Polars and Pandas tables are sampled at random; other tables use their first
+        `sample_size` rows.
 
     Returns
     -------
