@@ -87,7 +87,7 @@ class P05Stat(Stat):
     val: str
     name: ClassVar[str] = "p05"
     group = StatGroup.DESCR
-    expr: ClassVar[nw.Expr] = nw.col("_col").quantile(0.005, interpolation="linear")
+    expr: ClassVar[nw.Expr] = nw.col("_col").quantile(0.05, interpolation="linear")
     label: ClassVar[str] = _make_sublabel("P", "5")
 
 
