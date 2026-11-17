@@ -4,7 +4,7 @@ Create a Schema from an existing table with inferred Field constraints.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1616-L1696)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1618-L1700)
 
 ``` python
 schema_from_tbl(
@@ -22,7 +22,7 @@ This is the functional form of `Schema.from_table()`. It inspects the actual val
 ## Parameters
 
 `tbl: Any`  
-A Polars DataFrame, Pandas DataFrame, or Ibis table (DuckDB, SQLite, etc.).
+A Polars DataFrame or LazyFrame, Pandas DataFrame, PyArrow table, PySpark DataFrame, or Ibis table (DuckDB, SQLite, etc.).
 
 `infer_constraints: bool = True`  
 When `True` (default), inspect values to infer min/max, uniqueness, null rates, etc. When `False`, behave like `Schema(tbl=df)` (dtype only).
@@ -34,7 +34,7 @@ If a column has \<= this many unique values (int) or this fraction of total rows
 Attempt to match string columns to known generation presets (e.g., email, url, phone_number) based on column name heuristics and value validation. Default is `True`. A column whose name matches a place or organization preset (`state`, `city`, `country`, `company`, etc.) but holds a small set of repeated values is treated as categorical instead, keeping its values in `allowed=`.
 
 `sample_size: int | None = None`  
-If set, sample this many rows before analysis (useful for very large tables). `None` means use all rows.
+If set, sample this many rows before analysis (useful for very large tables). `None` means use all rows. Polars and Pandas tables are sampled at random; other tables use their first `sample_size` rows.
 
 ## Returns
 

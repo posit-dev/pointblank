@@ -2148,7 +2148,7 @@ If neither <code>source=</code> nor <code>target=</code> is given.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s build a pipeline around a transformation that prepares raw order records for reporting. The raw records store amounts in cents with lowercase currency codes. The source contract says what the transformation needs from them: an order ID on every record, no negative amounts, and a known currency.</p>
-<div id="67618529" class="cell" data-execution_count="2">
+<div id="47d1fbee" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2162,7 +2162,7 @@ If neither <code>source=</code> nor <code>target=</code> is given.
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>The target contract describes what the transformation promises to deliver: a fixed schema, one row per order, positive amounts, and uppercase currency codes.</p>
-<div id="0406ce59" class="cell" data-execution_count="3">
+<div id="3169b89a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>orders_contract <span class="op">=</span> pb.Contract(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"orders"</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    direction<span class="op">=</span><span class="st">"target"</span>,</span>
@@ -2187,7 +2187,7 @@ If neither <code>source=</code> nor <code>target=</code> is given.
 </div>
 </div>
 <p>The transformation is an ordinary function that takes a table and returns a table. This one removes zero-amount test orders, converts cents to whole currency units, and uppercases the currency codes.</p>
-<div id="31fd27e5" class="cell" data-execution_count="4">
+<div id="131e0fd9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> prepare_orders(df: pl.DataFrame) <span class="op">-&gt;</span> pl.DataFrame:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df.<span class="bu">filter</span>(pl.col(<span class="st">"amount_cents"</span>) <span class="op">&gt;</span> <span class="dv">0</span>).select(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>,</span>
@@ -2196,7 +2196,7 @@ If neither <code>source=</code> nor <code>target=</code> is given.
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <p>Now we can give the pipeline a day of raw orders and the transformation function. <a href="../reference/pointblank.Pipeline.run.html" class="gdls-link"><code>run()</code></a> validates the input, transforms it, and validates the output.</p>
-<div id="42ac1eac" class="cell" data-execution_count="5">
+<div id="f5016927" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>raw_orders <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="st">"A1"</span>, <span class="st">"A2"</span>, <span class="st">"A3"</span>, <span class="st">"A4"</span>],</span>
@@ -2217,7 +2217,7 @@ If neither <code>source=</code> nor <code>target=</code> is given.
 </div>
 </div>
 <p>Both boundaries pass, so the <a href="../reference/PipelineResult.html#pointblank.PipelineResult" class="gdls-link"><code>PipelineResult</code></a> reports <code>passed=True</code>. Its <code>transform_output</code> attribute holds the prepared table, ready to be written out:</p>
-<div id="47d86cc1" class="cell" data-execution_count="6">
+<div id="b06035c7" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>result.transform_output</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div><style>
@@ -2231,7 +2231,7 @@ If neither <code>source=</code> nor <code>target=</code> is given.
 </div>
 </div>
 <p>Each boundary validation is kept as an interrogated <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, so the full report is available. Here’s the target validation, with the label built from the pipeline label and the contract’s direction.</p>
-<div id="4b5575ba" class="cell" data-execution_count="7">
+<div id="c8c8117c" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>result.target_validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2664,7 +2664,7 @@ tr { background-color: transparent; }
 </div>
 </div>
 <p>The next day’s raw orders have problems: a record with no order ID, a negative amount, and a currency the transformation can’t handle. Since <code>short_circuit=</code> is <code>True</code> by default, the pipeline stops after the source validation fails. The source contract uses the default <code>on_violation="warn"</code>, so a warning is also issued.</p>
-<div id="a0a24b12" class="cell" data-execution_count="8">
+<div id="ae96a373" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>bad_raw_orders <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="st">"B1"</span>, <span class="va">None</span>, <span class="st">"B3"</span>, <span class="st">"B4"</span>],</span>
@@ -2686,7 +2686,7 @@ transform output: None</code></pre>
 </div>
 </div>
 <p>The transformation never ran, so there’s no output and no target validation. The source validation shows why the input was rejected, with one failing test unit in each step:</p>
-<div id="4f7fb874" class="cell" data-execution_count="9">
+<div id="a92aa63a" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>result.source_validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

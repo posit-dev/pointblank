@@ -4,7 +4,7 @@ Check that `evaluate=` gives the same result twice for the same table and seed.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3290-L3392)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3290-L3394)
 
 ``` python
 Ablation.check_determinism(
@@ -30,9 +30,10 @@ The largest difference in a metric that still counts as the same. Differences fr
 
 ## Examples
 
-Here's an `evaluate()` function that forgets to use its seed, so that its bootstrap sample is different every time.
+Here's an `evaluate()` function that forgets to use its seed, so that its model starts from a different random weight every time.
 
 ``` python
+import random
 import warnings
 import pointblank as pb
 import polars as pl
@@ -41,8 +42,8 @@ temps = [20 + (k * 37 % 11 - 5) * 0.6 for k in range(300)]
 readings = pl.DataFrame({"temp": temps})
 
 def evaluate(train, *, seed):
-    sample = train.sample(fraction=1.0, with_replacement=True)
-    return abs(sample["temp"].mean() - 20)
+    weight = random.Random().uniform(0.9, 1.1)
+    return abs(train["temp"].mean() * weight - 20)
 
 validation = (
     pb.Validate(data=readings)
@@ -61,9 +62,9 @@ print(caught[0].message)
 ```
 
     False
-    `evaluate=` isn't deterministic: given the full table and the seed 0 twice, it returned different results (score: 0.0519999999999996 and 0.06599999999999895). Use the seed for every source of randomness in training, or the ablation's comparisons will be noisier than they need to be.
+    `evaluate=` isn't deterministic: given the full table and the seed 0 twice, it returned different results (score: 0.3703596325854477 and 0.4427812409472409). Use the seed for every source of randomness in training, or the ablation's comparisons will be noisier than they need to be.
 
-Passing `seed=seed` to `sample()` would fix it, and the check would then return `True`.
+Creating the generator with `random.Random(seed)` would fix it, and the check would then return `True`.
 
 ## See Also
 

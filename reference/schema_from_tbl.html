@@ -2041,7 +2041,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1616-L1696" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1618-L1700" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">schema_from_tbl</span>(</span>
@@ -2062,7 +2062,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">tbl</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>A Polars DataFrame, Pandas DataFrame, or Ibis table (DuckDB, SQLite, etc.).</p>
+<p>A Polars DataFrame or LazyFrame, Pandas DataFrame, PyArrow table, PySpark DataFrame, or Ibis table (DuckDB, SQLite, etc.).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">infer_constraints</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
@@ -2078,7 +2078,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">sample_size</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
-If set, sample this many rows before analysis (useful for very large tables). <code>None</code> means use all rows.
+If set, sample this many rows before analysis (useful for very large tables). <code>None</code> means use all rows. Polars and Pandas tables are sampled at random; other tables use their first <code>sample_size</code> rows.
 </dd>
 </dl>
 </div>
@@ -2096,7 +2096,7 @@ A Schema populated with Field objects containing inferred constraints, ready for
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="a4fb3c0f" class="cell" data-execution_count="1">
+<div id="959aae19" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2119,7 +2119,7 @@ A Schema populated with Field objects containing inferred constraints, ready for
 </div>
 <p>The inferred schema has a field for each column. The <code>user_id</code> and <code>age</code> fields take their ranges from the data and are marked unique (every value in those columns is distinct), the <code>email</code> column is matched to the <code>"email"</code> preset by its name and values, and <code>status</code> has few enough distinct values to become a categorical field with an <code>allowed=</code> list.</p>
 <p>Let’s generate synthetic data matching the original’s characteristics:</p>
-<div id="5073366d" class="cell" data-execution_count="2">
+<div id="27e37f6c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pb.preview(schema.generate(n<span class="op">=</span><span class="dv">10</span>, seed<span class="op">=</span><span class="dv">23</span>))</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
