@@ -114,7 +114,7 @@ def check_splits(
     pb.config(report_incl_header=False, report_incl_footer_timings=False)
     ```
 
-    Here are the training and test splits of a dataset of support tickets, labelled with their
+    Here are the training and test splits of a dataset of support tickets, labeled with their
     topic. Two of the test tickets are copies of training tickets: one exactly, and one with
     different case and punctuation.
 
@@ -263,7 +263,7 @@ class SplitCheck:
 
     Examples
     --------
-    Here are the training and test splits of a small dataset of animals, labelled as pets or
+    Here are the training and test splits of a small dataset of animals, labeled as pets or
     wild animals. One test row is also in the training split.
 
     ```{python}

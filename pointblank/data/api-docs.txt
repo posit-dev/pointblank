@@ -13199,7 +13199,7 @@ col_vals_in_language(self, columns: 'str | list[str]', expected: 'str | list[str
         ```
 
         The document in French fails step 1, which expects English for every row. In step 2,
-        each row is checked against its own label, and the last document fails: it's labelled
+        each row is checked against its own label, and the last document fails: it's labeled
         as French, but it's in English.
         
 
@@ -19266,7 +19266,7 @@ scorers.langid(expected: 'str | list[str] | None' = None, backend: 'str | Callab
         with one of them as `expected_column=`).
     expected_column
         A column with the expected language of each row, instead of `expected=` (for a
-        multilingual corpus, where each document is labelled with its language). The column must
+        multilingual corpus, where each document is labeled with its language). The column must
         be one of the columns of the step.
     name
         A name for the scorer, for the score cache and the report. By default, it's made from the
@@ -19326,7 +19326,7 @@ scorers.langid(expected: 'str | list[str] | None' = None, backend: 'str | Callab
     ).interrogate()
     ```
 
-    The third review is labelled as English, but it's in French, so it fails.
+    The third review is labeled as English, but it's in French, so it fails.
     
 
 scorers.perplexity(fn: 'Callable[..., Any] | None' = None, kenlm_model: 'str | None' = None, column: 'str | None' = None, per_row: 'bool' = True, name: 'str | None' = None, version: 'str | None' = None, batch_size: 'int | None' = None) -> 'Scorer'
@@ -19605,7 +19605,7 @@ check_splits(train: 'Any' = None, valid: 'Any' = None, test: 'Any' = None, *, sp
 
     Examples
     --------
-    Here are the training and test splits of a dataset of support tickets, labelled with their
+    Here are the training and test splits of a dataset of support tickets, labeled with their
     topic. Two of the test tickets are copies of training tickets: one exactly, and one with
     different case and punctuation.
 
@@ -19680,7 +19680,7 @@ SplitCheck(values: 'dict[str, dict[str, list[Any]]]', schema: 'dict[str, Any]', 
 
     Examples
     --------
-    Here are the training and test splits of a small dataset of animals, labelled as pets or
+    Here are the training and test splits of a small dataset of animals, labeled as pets or
     wild animals. One test row is also in the training split.
 
     ```python
