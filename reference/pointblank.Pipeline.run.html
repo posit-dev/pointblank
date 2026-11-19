@@ -298,7 +298,7 @@ If a boundary fails and its contract has <code>on_violation="raise"</code>. If b
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s set up a pipeline for a customer table. The raw data must have an ID and a sign-up date for every customer, and the cleaned output must have one row per customer and a two-letter country code.</p>
-<div id="12b1e8a6" class="cell" data-execution_count="2">
+<div id="691b99e1" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -326,7 +326,7 @@ If a boundary fails and its contract has <code>on_violation="raise"</code>. If b
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>The raw table meets the source contract, but our transformation has a bug: it uppercases the country codes but forgets to remove the duplicated record for customer 3.</p>
-<div id="ade0f6ba" class="cell" data-execution_count="3">
+<div id="f5c2ac5c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clean_customers(df):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df.with_columns(pl.col(<span class="st">"country"</span>).<span class="bu">str</span>.to_uppercase())</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -343,7 +343,7 @@ target passed: False</code></pre>
 </div>
 </div>
 <p>The input was fine and the output wasn’t, which points to the transformation. In the target validation, the <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct</a> step flags both rows for customer 3. The default <code>on_violation="warn"</code> setting also issued a warning.</p>
-<div id="b441c2bf" class="cell" data-execution_count="4">
+<div id="a3220524" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>result.target_validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -552,7 +552,7 @@ target passed: False</code></pre>
 </div>
 </div>
 <p>During development, it’s often useful to see the problems at both boundaries in a single run, even when the input is bad. A pipeline with <code>short_circuit=False</code> always runs the transformation and the target validation. Here, the input is missing a sign-up date, and the corrected transformation runs anyway:</p>
-<div id="89833433" class="cell" data-execution_count="5">
+<div id="c099b909" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>dev_pipeline <span class="op">=</span> pb.Pipeline(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    source<span class="op">=</span>pipeline.source, target<span class="op">=</span>pipeline.target, short_circuit<span class="op">=</span><span class="va">False</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>)</span>
