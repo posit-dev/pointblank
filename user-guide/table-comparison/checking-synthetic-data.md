@@ -1,6 +1,6 @@
 # Checking Synthetic Data
 
-Synthetic data is made to stand in for real data: to train a model when there's too little real data, to share a dataset whose real rows are private, or to test a pipeline. It's made by a generator (a generative model, an LLM, or a program that perturbs real rows) from real data, its *seed*. It's only useful if it's like the seed, and only safe to share if it doesn't copy it. Generators fail in ways that are easy to miss by looking at a few rows: they favour the most common values, drop values they find hard, repeat a few kinds of rows (*mode collapse*), and memorize rows of the seed.
+Synthetic data is made to stand in for real data: to train a model when there's too little real data, to share a dataset whose real rows are private, or to test a pipeline. It's made by a generator (a generative model, an LLM, or a program that perturbs real rows) from real data, its *seed*. It's only useful if it's like the seed, and only safe to share if it doesn't copy it. Generators fail in ways that are easy to miss by looking at a few rows: they favor the most common values, drop values they find hard, repeat a few kinds of rows (*mode collapse*), and memorize rows of the seed.
 
 The [`check_synthetic()`](../../reference/check_synthetic.md#pointblank.check_synthetic) function compares synthetic data with its seed for all of these at once: the fidelity of each column's distribution, the diversity of the rows and of the text, and the rows that copy a seed row.
 

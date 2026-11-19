@@ -39,7 +39,7 @@ The problems found, as messages: overlapping rows, missing or unseen labels, and
 
 ## Examples
 
-Here are the training and test splits of a small dataset of animals, labelled as pets or wild animals. One test row is also in the training split.
+Here are the training and test splits of a small dataset of animals, labeled as pets or wild animals. One test row is also in the training split.
 
 ``` python
 import pointblank as pb

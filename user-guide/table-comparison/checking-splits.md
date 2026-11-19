@@ -6,7 +6,7 @@ The [`check_splits()`](../../reference/check_splits.md#pointblank.check_splits) 
 
 ## The Splits
 
-Let's make three splits of a dataset of support tickets, labelled with their topic, for a model that sorts new tickets by topic. Each ticket also records how many days the customer waited. The test split was collected later than the others, and it shows: there are no tickets about returns, the waits are longer, and two tickets were copied from the training split (one as it is, and one in capital letters with different punctuation).
+Let's make three splits of a dataset of support tickets, labeled with their topic, for a model that sorts new tickets by topic. Each ticket also records how many days the customer waited. The test split was collected later than the others, and it shows: there are no tickets about returns, the waits are longer, and two tickets were copied from the training split (one as it is, and one in capital letters with different punctuation).
 
 ``` python
 import random

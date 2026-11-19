@@ -30,7 +30,7 @@ The [Ablation](../reference/Ablation.md#pointblank.Ablation) object, with the re
 
 ## Details
 
-The results are the same whatever `max_workers=` is: the evaluations are made in a different order, but each gets the same table and seed, and the results are put back in order. If an evaluation fails, the evaluations that haven't started are cancelled and the error is raised. With a cache, the results that were already made are kept, so running again picks up where the run stopped.
+The results are the same whatever `max_workers=` is: the evaluations are made in a different order, but each gets the same table and seed, and the results are put back in order. If an evaluation fails, the evaluations that haven't started are canceled and the error is raised. With a cache, the results that were already made are kept, so running again picks up where the run stopped.
 
 ## Examples
 

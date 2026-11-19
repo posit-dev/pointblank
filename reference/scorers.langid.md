@@ -36,7 +36,7 @@ The path of the fastText model (e.g., `lid.176.bin`), with `backend="fasttext"`.
 The column with the text to score. It can be left out if the step has one column (or two, with one of them as `expected_column=`).
 
 `expected_column: str | None = None`  
-A column with the expected language of each row, instead of `expected=` (for a multilingual corpus, where each document is labelled with its language). The column must be one of the columns of the step.
+A column with the expected language of each row, instead of `expected=` (for a multilingual corpus, where each document is labeled with its language). The column must be one of the columns of the step.
 
 `name: str | None = None`  
 A name for the scorer, for the score cache and the report. By default, it's made from the expected languages (or `expected_column=`), the backend, and the model.
@@ -98,4 +98,4 @@ pb.Validate(data=tbl).col_vals_scored(
 
 [TABLE]
 
-The third review is labelled as English, but it's in French, so it fails.
+The third review is labeled as English, but it's in French, so it fails.

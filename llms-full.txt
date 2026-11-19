@@ -13212,7 +13212,7 @@ docs = pl.DataFrame(
 ```
 
 The document in French fails step 1, which expects English for every row. In step 2,
-each row is checked against its own label, and the last document fails: it's labelled
+each row is checked against its own label, and the last document fails: it's labeled
 as French, but it's in English.
 
 col_vals_token_len(self, columns: 'str | list[str]', tokenizer: 'str | Any', min_val: 'int | None' = None, max_val: 'int | None' = None, na_pass: 'bool' = False, cache: 'bool | str | Path' = True, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
@@ -17523,7 +17523,7 @@ column
     with one of them as `expected_column=`).
 expected_column
     A column with the expected language of each row, instead of `expected=` (for a
-    multilingual corpus, where each document is labelled with its language). The column must
+    multilingual corpus, where each document is labeled with its language). The column must
     be one of the columns of the step.
 name
     A name for the scorer, for the score cache and the report. By default, it's made from the
@@ -17590,7 +17590,7 @@ pb.Validate(data=tbl).col_vals_scored(
 ).interrogate()
 ```
 
-The third review is labelled as English, but it's in French, so it fails.
+The third review is labeled as English, but it's in French, so it fails.
 
 perplexity(fn: 'Callable[..., Any] | None' = None, kenlm_model: 'str | None' = None, column: 'str | None' = None, per_row: 'bool' = True, name: 'str | None' = None, version: 'str | None' = None, batch_size: 'int | None' = None) -> 'Scorer'
 
@@ -25766,7 +25766,7 @@ import pointblank as pb
 pb.config(report_incl_header=False, report_incl_footer_timings=False)
 ```
 
-Here are the training and test splits of a dataset of support tickets, labelled with their
+Here are the training and test splits of a dataset of support tickets, labeled with their
 topic. Two of the test tickets are copies of training tickets: one exactly, and one with
 different case and punctuation.
 
@@ -25840,7 +25840,7 @@ issues
 
 Examples
 --------
-Here are the training and test splits of a small dataset of animals, labelled as pets or
+Here are the training and test splits of a small dataset of animals, labeled as pets or
 wild animals. One test row is also in the training split.
 
 ```{python}
@@ -28171,7 +28171,7 @@ Details
 -------
 The results are the same whatever `max_workers=` is: the evaluations are made in a
 different order, but each gets the same table and seed, and the results are put back in
-order. If an evaluation fails, the evaluations that haven't started are cancelled and the
+order. If an evaluation fails, the evaluations that haven't started are canceled and the
 error is raised. With a cache, the results that were already made are kept, so running
 again picks up where the run stopped.
 
@@ -47671,7 +47671,7 @@ distributions of the columns.
 
 ## The Splits
 
-Let's make three splits of a dataset of support tickets, labelled with their topic, for a model that
+Let's make three splits of a dataset of support tickets, labeled with their topic, for a model that
 sorts new tickets by topic. Each ticket also records how many days the customer waited. The test
 split was collected later than the others, and it shows: there are no tickets about returns, the
 waits are longer, and two tickets were copied from the training split (one as it is, and one in
@@ -47810,7 +47810,7 @@ Synthetic data is made to stand in for real data: to train a model when there's 
 data, to share a dataset whose real rows are private, or to test a pipeline. It's made by a
 generator (a generative model, an LLM, or a program that perturbs real rows) from real data, its
 *seed*. It's only useful if it's like the seed, and only safe to share if it doesn't copy it.
-Generators fail in ways that are easy to miss by looking at a few rows: they favour the most common
+Generators fail in ways that are easy to miss by looking at a few rows: they favor the most common
 values, drop values they find hard, repeat a few kinds of rows (*mode collapse*), and memorize rows
 of the seed.
 

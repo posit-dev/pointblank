@@ -123,4 +123,4 @@ docs = pl.DataFrame(
 
 [TABLE]
 
-The document in French fails step 1, which expects English for every row. In step 2, each row is checked against its own label, and the last document fails: it's labelled as French, but it's in English.
+The document in French fails step 1, which expects English for every row. In step 2, each row is checked against its own label, and the last document fails: it's labeled as French, but it's in English.

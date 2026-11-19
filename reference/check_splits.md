@@ -73,7 +73,7 @@ The results, with a report from [`get_tabular_report()`](../reference/SplitCheck
 
 ## Examples
 
-Here are the training and test splits of a dataset of support tickets, labelled with their topic. Two of the test tickets are copies of training tickets: one exactly, and one with different case and punctuation.
+Here are the training and test splits of a dataset of support tickets, labeled with their topic. Two of the test tickets are copies of training tickets: one exactly, and one with different case and punctuation.
 
 ``` python
 import pointblank as pb
