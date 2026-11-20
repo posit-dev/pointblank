@@ -612,6 +612,9 @@ reference:
         - validate_yaml
         - yaml_to_python
         - yaml_ablation
+        - hydra_compose
+        - hydra_interrogate
+        - hydra_steps
 
     - title: Utility Functions
       desc: >
@@ -770,8 +773,11 @@ reference:
 
     - title: Integrations
       desc: >
-        Classes for integrating Pointblank with external observability and monitoring systems. Use
-        `OTelExporter` to export validation results as OpenTelemetry metrics, traces, and logs.
+        Classes for integrating Pointblank with external observability, monitoring, and workflow
+        systems. Use `OTelExporter` to export validation results as OpenTelemetry metrics, traces,
+        and logs, and `ValidationModel` to run a composed validation as a ccflow model.
       contents:
         - name: integrations.otel.OTelExporter
           members: true
+        - name: integrations.ccflow.ValidationModel
+        - name: integrations.ccflow.ValidationResult

@@ -1,0 +1,148 @@
+---
+title: Sharing Checks in a Package
+toc-expand: 2
+bread-crumbs: true
+---
+
+This guide shows you how to distribute check collections (and options for the other config
+groups) in a Python package. Anyone who installs the package can select them in a
+[composed configuration](hydra-composition.qmd), with no setup in their own project.
+
+The package needs a directory of config files and an entry point that tells Hydra where that
+directory is. It can also have Python code for the collections to use.
+
+## Lay Out the Config Tree
+
+Put the config files in a directory inside your package, arranged by config group. Within each
+group, put them in a directory named after your package or organization (`acme/` here), so that
+your options can't be confused with someone else's.
+
+```
+acme_checks/
+├── __init__.py
+└── conf/
+    ├── __init__.py
+    └── pointblank/
+        ├── checks/
+        │   └── acme/
+        │       ├── ids.yaml
+        │       └── emails.yaml
+        └── thresholds/
+            └── acme/
+                └── no_failures.yaml
+```
+
+The `conf/` directory needs an `__init__.py` (which can be empty), since Hydra finds the
+directory by importing it.
+
+## Write the Collections
+
+A check collection starts with a `# @package checks.<name>` header. Include the name of your
+package or organization in `<name>`: two selected collections with the same name are an error.
+
+```yaml
+# acme_checks/conf/pointblank/checks/acme/ids.yaml
+# @package checks.acme_ids
+steps:
+  - col_vals_not_null:
+      columns: ${vars.id_column}
+  - rows_distinct:
+      columns_subset: ${vars.id_column}
+```
+
+Use `${vars.<name>}` for anything that differs between the tables the checks will be used on,
+and list those variables in your package's documentation. A config that selects the collection
+has to define each of them.
+
+Options for the other groups use the header of their group (see the
+[table of config groups](yaml-reference.qmd#config-groups)):
+
+```yaml
+# acme_checks/conf/pointblank/thresholds/acme/no_failures.yaml
+# @package thresholds
+critical: 1
+```
+
+## Include a Check Written in Python
+
+A collection can use a function from your package by its import path. Write a function that
+returns the check, with the settings of the check as its parameters:
+
+```python
+# acme_checks/checks.py
+import pointblank as pb
+
+
+def min_rows(n: int):
+    """Make a check that passes when the table has at least `n` rows."""
+
+    def check(tbl) -> bool:
+        return pb.get_row_count(tbl) >= n
+
+    return check
+```
+
+In the collection, give the function as the `_target_` of the `expr` of a `specially` step, with
+its arguments as the other keys:
+
+```yaml
+# acme_checks/conf/pointblank/checks/acme/size.yaml
+# @package checks.acme_size
+steps:
+  - specially:
+      expr:
+        _target_: acme_checks.checks.min_rows
+        n: ${vars.min_rows}
+```
+
+Anyone who selects the collection runs this code, without having to allow it.
+
+## Register the Config Tree
+
+Add an entry point to the `hydra.lernaplugins` group in `pyproject.toml`, with `pkg:` followed
+by the import path of the config directory. Depend on `pointblank[hydra]`, which installs what's
+needed to find the entry point.
+
+```toml
+[project]
+name = "acme-checks"
+dependencies = ["pointblank[hydra]"]
+
+[project.entry-points."hydra.lernaplugins"]
+acme-checks = "pkg:acme_checks.conf"
+```
+
+Check that your build includes the YAML files in the wheel and in the source distribution.
+
+## Try It Before Installing
+
+To test the config tree without building the package, pass its directory with `--config-dir`:
+
+```bash
+pb compose pointblank/tbl=small_table 'pointblank/checks=[acme/ids]' +vars.id_column=a \
+  --config-dir acme_checks/conf
+```
+
+## Select the Options from Another Project
+
+With the package installed, its options are selected like any others, by their path within the
+group:
+
+```yaml
+defaults:
+  - override /pointblank/thresholds: acme/no_failures
+  - override /pointblank/checks:
+      - acme/ids
+      - acme/emails
+  - _self_
+
+vars:
+  id_column: customer_id
+  email_column: email
+
+tbl: customers.csv
+```
+
+If an installed package and the project's own directory both have an option at the same path,
+the one from the package is used. Keeping your options in a directory of their own, as above,
+avoids that.

@@ -116,6 +116,7 @@ from pointblank.validate import (
     read_file,
     write_file,
 )
+from pointblank.hydra import hydra_compose, hydra_interrogate, hydra_steps
 from pointblank.yaml import (
     validate_yaml,
     yaml_ablation,
@@ -213,6 +214,10 @@ __all__ = [
     "validate_yaml",
     "yaml_to_python",
     "yaml_ablation",
+    # Hydra composition of YAML configurations
+    "hydra_compose",
+    "hydra_interrogate",
+    "hydra_steps",
     # Contract import/export
     "ContractAdapter",
     "ContractImport",

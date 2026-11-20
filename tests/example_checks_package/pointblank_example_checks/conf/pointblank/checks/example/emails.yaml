@@ -1,0 +1,7 @@
+# @package checks.example_emails
+steps:
+  - col_vals_not_null:
+      columns: ${vars.email_column}
+  - col_vals_within_spec:
+      columns: ${vars.email_column}
+      spec: email

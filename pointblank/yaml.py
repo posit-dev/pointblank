@@ -362,6 +362,14 @@ def _process_python_expressions(
             code = value["python"]
             return _eval_python_code(code, namespaces=namespaces, python_mode=python_mode)
 
+        # A `_target_` is only made into an object in a config that's composed with Hydra
+        if "_target_" in value:
+            raise YAMLValidationError(
+                f"This YAML config has a `_target_` ('{value['_target_']}'), which is only "
+                "supported in a composed configuration (one with a `defaults:` list). Run the "
+                "composed configuration it came from instead."
+            )
+
         # Recursively process dictionary values
         return {
             k: _process_python_expressions(v, namespaces=namespaces, python_mode=python_mode)
