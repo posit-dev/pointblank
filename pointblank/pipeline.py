@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Callable
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from narwhals.typing import IntoDataFrame
 
     from pointblank.contract import Contract
@@ -1342,7 +1344,12 @@ class Pipeline:
         )
 
     @classmethod
-    def from_yaml(cls, path: str) -> Pipeline:
+    def from_yaml(
+        cls,
+        path: str,
+        overrides: Iterable[str] | None = None,
+        config_dir: str | None = None,
+    ) -> Pipeline:
         """Read a pipeline from a YAML file.
 
         Storing a pipeline in YAML keeps the definition of what valid input and output look like
@@ -1371,10 +1378,21 @@ class Pipeline:
         The transformation, actions, and final actions aren't part of the file. Pass the
         transformation to [`run()`](`pointblank.Pipeline.run`) as usual.
 
+        A file with a `defaults:` list is composed with Hydra first (this needs the `hydra`
+        extra). In such a file, each contract can have a `checks:` list that names the selected
+        check collections whose steps it starts with, and a selected thresholds preset becomes
+        the thresholds of the pipeline. See [`hydra_compose()`](`pointblank.hydra_compose`) for
+        how a file is composed.
+
         Parameters
         ----------
         path
             The path to the YAML file.
+        overrides
+            Hydra overrides for a file that has a `defaults:` list, such as
+            `"pointblank/thresholds=strict"`.
+        config_dir
+            A directory to add to the search path of a file that has a `defaults:` list.
 
         Returns
         -------
@@ -1468,6 +1486,17 @@ class Pipeline:
 
         if data is None:
             raise ValueError(f"YAML file is empty: {path}")
+
+        if "defaults" in data:
+            from pointblank.hydra import _compose_pipeline
+
+            return cls.from_dict(_compose_pipeline(yaml_path, overrides, config_dir))
+
+        if overrides or config_dir is not None:
+            raise ValueError(
+                "`overrides=` and `config_dir=` can only be used with a YAML file that has a "
+                "`defaults:` list."
+            )
 
         return cls.from_dict(data)
 

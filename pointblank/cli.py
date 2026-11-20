@@ -32,6 +32,7 @@ class OrderedGroup(click.Group):
             # Validation
             "validate",
             "run",
+            "compose",
             "compare",
             "make-template",
             # Data Manipulation
@@ -4647,12 +4648,47 @@ validation = (
         )
 
 
+def _validation_file_or_override(
+    ctx: click.Context, param: click.Parameter, value: str | None
+) -> str | None:
+    """Check that the first argument is a file that exists, unless it's a Hydra override."""
+    if value is None or ("=" in value and not Path(value).exists()):
+        return value
+    return click.Path(exists=True).convert(value, param, ctx)
+
+
+def _split_file_and_overrides(
+    validation_file: str | None, overrides: tuple[str, ...]
+) -> tuple[str | None, list[str]]:
+    """Move the first argument into the overrides when no file was given."""
+    if validation_file is not None and not Path(validation_file).exists():
+        return None, [validation_file, *overrides]
+    return validation_file, list(overrides)
+
+
+def _has_defaults_list(yaml_file: str) -> bool:
+    """Whether a YAML config has a `defaults:` list, which makes it one to compose with Hydra."""
+    import yaml
+
+    try:
+        config = yaml.safe_load(Path(yaml_file).read_text(encoding="utf-8"))
+    except yaml.YAMLError:
+        return False
+    return isinstance(config, dict) and "defaults" in config
+
+
 @cli.command()
-@click.argument("validation_file", type=click.Path(exists=True), required=False)
+@click.argument("validation_file", required=False, callback=_validation_file_or_override)
+@click.argument("overrides", nargs=-1)
 @click.option(
     "--data",
     type=str,
     help="Data source to replace in validation objects (Python scripts and YAML configs)",
+)
+@click.option(
+    "--config-dir",
+    type=click.Path(exists=True, file_okay=False),
+    help="Directory of config groups to add to the search path of a composed YAML config",
 )
 @click.option("--output-html", type=click.Path(), help="Save HTML validation report to file")
 @click.option("--output-json", type=click.Path(), help="Save JSON validation summary to file")
@@ -4685,7 +4721,9 @@ validation = (
 )
 def run(
     validation_file: str | None,
+    overrides: tuple[str, ...],
     data: str | None,
+    config_dir: str | None,
     output_html: str | None,
     output_json: str | None,
     show_extract: bool,
@@ -4711,6 +4749,13 @@ def run(
     for YAML you trust, since the code runs with full access to your system (as a
     Python script does).
 
+    A YAML config with a 'defaults:' list is composed with Hydra (this needs the 'hydra'
+    extra). OVERRIDES select config group options or set values, and --config-dir adds a
+    directory of config groups. Without a VALIDATION_FILE, the config is made up of the
+    groups selected in OVERRIDES. Use 'pb compose' to see the composed config. A composed
+    config can name Python objects with '_target_', which are imported and called without
+    --allow-python, so only run composed configs that you trust.
+
     To get started quickly, use 'pb make-template' to create templates.
 
     DATA can be:
@@ -4733,24 +4778,41 @@ def run(
     pb run validation_script.py --show-extract --fail-on error
     pb run validation_config.yaml --write-extract extracts_folder --fail-on critical
     pb run trusted_config.yaml --allow-python  # Run Python code in the YAML
+    pb run composed_config.yaml pointblank/thresholds=strict thresholds.warning=0.2
+    pb run pointblank/tbl=small_table pointblank/checks=[ids] --config-dir config
     """
     try:
+        validation_file, overrides = _split_file_and_overrides(validation_file, overrides)
+
         # Handle missing validation_file with concise help
-        if validation_file is None:
+        if validation_file is None and not overrides:
             _show_concise_help("run", None)
             return
 
-        # Detect file type based on extension
-        file_path = Path(validation_file)
-        file_extension = file_path.suffix.lower()
+        if validation_file is None:
+            # Only overrides were given, so the config is composed from them alone
+            is_yaml_file, is_python_file, is_composed = True, False, True
+        else:
+            # Detect file type based on extension
+            file_path = Path(validation_file)
+            file_extension = file_path.suffix.lower()
 
-        is_yaml_file = file_extension in [".yaml", ".yml"]
-        is_python_file = file_extension == ".py"
+            is_yaml_file = file_extension in [".yaml", ".yml"]
+            is_python_file = file_extension == ".py"
 
-        if not is_yaml_file and not is_python_file:
+            if not is_yaml_file and not is_python_file:
+                console.print(
+                    f"[red]Error:[/red] Unsupported file type '{file_extension}'. "
+                    "Only .py (Python scripts) and .yaml/.yml (YAML configs) are supported."
+                )
+                sys.exit(1)
+
+            is_composed = is_yaml_file and _has_defaults_list(validation_file)
+
+        if (overrides or config_dir) and not is_composed:
             console.print(
-                f"[red]Error:[/red] Unsupported file type '{file_extension}'. "
-                "Only .py (Python scripts) and .yaml/.yml (YAML configs) are supported."
+                "[red]Error:[/red] Overrides and --config-dir can only be used with a YAML "
+                "config that has a 'defaults:' list, or without a validation file."
             )
             sys.exit(1)
 
@@ -4770,7 +4832,31 @@ def run(
 
             with console.status("[bold green]Running YAML validation..."):
                 try:
-                    if cli_data is not None:
+                    if is_composed:
+                        from pointblank.hydra import _instantiate_targets, hydra_compose
+
+                        config = hydra_compose(
+                            validation_file, overrides=overrides, config_dir=config_dir
+                        )
+
+                        if cli_data is not None:
+                            console.print(
+                                "[yellow]Replacing data source in YAML config with CLI data[/yellow]"
+                            )
+                            # The config's table isn't used, so a target that would load it
+                            # isn't instantiated
+                            config["tbl"] = None
+
+                        config = _instantiate_targets(config)
+
+                        if cli_data is not None:
+                            config["tbl"] = cli_data
+
+                        validation = YAMLValidator().execute_workflow(
+                            config, allow_python=allow_python
+                        )
+
+                    elif cli_data is not None:
                         # Load and modify YAML config to use CLI data
                         console.print(
                             "[yellow]Replacing data source in YAML config with CLI data[/yellow]"
@@ -5146,6 +5232,50 @@ def run(
     except Exception as e:
         console.print(f"[red]Error:[/red] {e}")
         sys.exit(1)
+
+
+@cli.command()
+@click.argument("validation_file", required=False, callback=_validation_file_or_override)
+@click.argument("overrides", nargs=-1)
+@click.option(
+    "--config-dir",
+    type=click.Path(exists=True, file_okay=False),
+    help="Directory of config groups to add to the search path",
+)
+def compose(
+    validation_file: str | None, overrides: tuple[str, ...], config_dir: str | None
+) -> None:
+    """
+    Compose a YAML configuration with Hydra and print the result.
+
+    VALIDATION_FILE is a YAML config whose 'defaults:' list selects options from config
+    groups. OVERRIDES select other options or set values. Without a VALIDATION_FILE, the
+    config is made up of the groups selected in OVERRIDES.
+
+    The output is a plain YAML config with nothing left to compose, so 'pb run' gives the
+    same result for it as for the composed config. This needs the 'hydra' extra.
+
+    Examples:
+
+    \b
+    pb compose composed_config.yaml
+    pb compose composed_config.yaml pointblank/thresholds=strict > plain_config.yaml
+    pb compose pointblank/tbl=small_table pointblank/checks=[ids] --config-dir config
+    """
+    import yaml
+
+    from pointblank.hydra import hydra_compose
+    from pointblank.yaml import YAMLValidationError
+
+    validation_file, override_list = _split_file_and_overrides(validation_file, overrides)
+
+    try:
+        config = hydra_compose(validation_file, overrides=override_list, config_dir=config_dir)
+    except (YAMLValidationError, ImportError) as e:
+        console.print(f"[red]Error:[/red] {e}")
+        sys.exit(1)
+
+    click.echo(yaml.safe_dump(config, sort_keys=False), nl=False)
 
 
 def _print_unified_diff(diff: str) -> None:
