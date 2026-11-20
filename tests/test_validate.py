@@ -32,6 +32,8 @@ def multiply_column_by_20(df):
 
 def _strip_report_nondeterminism(html_str: str) -> str:
     """Strip non-deterministic content (timestamps, durations, footers) from report HTML."""
+    # Remove great-tables' default stylesheet, which changes between great-tables releases
+    html_str = re.sub(r"<style>.*?</style>", "", html_str, count=1, flags=re.DOTALL)
     # Remove tfoot-based sourcenotes (great_tables < 0.22)
     html_str = re.sub(r'<tfoot class="gt_sourcenotes">.*?</tfoot>', "", html_str, flags=re.DOTALL)
     # Remove tr-based sourcenotes (great_tables >= 0.22)
