@@ -2094,7 +2094,7 @@ A study identifier. It is shown by <a href="../reference/pointblank.SubmissionPa
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s build a package from a Demographics (DM) and an Adverse Events (AE) dataset. One of the adverse events belongs to subject <code>STUDY01-009</code>, who isn’t in DM:</p>
-<div id="77cd6007" class="cell" data-execution_count="1">
+<div id="1591db42" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2127,14 +2127,14 @@ A study identifier. It is shown by <a href="../reference/pointblank.SubmissionPa
 </div>
 </div>
 <p>The dataset names are stored in uppercase, so <code>"dm"</code> became <code>DM</code>. The package can find the subject in AE that has no DM record:</p>
-<div id="a0e1e72c" class="cell" data-execution_count="2">
+<div id="6aa469d5" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>study.orphan_ids(<span class="st">"AE"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>{'STUDY01-009'}</code></pre>
 </div>
 </div>
 <p>The validation checks the whole package. The <code>"validate"</code> engine builds a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link"><code>Validate</code></a> for each dataset, with the structural checks from the SDTM templates and the checks across datasets:</p>
-<div id="fc5d4776" class="cell" data-execution_count="3">
+<div id="44ac1953" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> study.validate_conformance(engine<span class="op">=</span><span class="st">"validate"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(report)</span></code></pre></div>
