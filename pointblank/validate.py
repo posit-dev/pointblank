@@ -25066,7 +25066,12 @@ class Validate:
                     columns=["tbl", "eval", "w_upd", "e_upd", "c_upd", "extract_upd"],
                 )
                 .cols_align(align="right", columns=["test_units", "pass", "fail"])
-                .cols_align(align=before, columns=["type_upd", "columns_upd", "values_upd"])
+                # Align the all-empty columns explicitly: great-tables' auto-alignment of them
+                # changed in 1.2.0
+                .cols_align(
+                    align=before,
+                    columns=["status_color", "i", "type_upd", "columns_upd", "values_upd"],
+                )
                 .cols_move_to_start(columns=column_order)
                 .tab_options(table_font_size="90%")
                 .tab_source_note(
