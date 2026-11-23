@@ -125,6 +125,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script defer="" src="../gd-lightbox-compare.js"></script>
 <link rel="stylesheet" href="../gd-lightbox-annotate.css">
 <script defer="" src="../gd-lightbox-annotate.js"></script>
+<meta name="gd-logo-dark" content="pointblank_logo_small.dark.svg">
 <link rel="icon" type="image/x-icon" href="https://posit-dev.github.io/pointblank/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/svg+xml" href="https://posit-dev.github.io/pointblank/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="https://posit-dev.github.io/pointblank/favicon-32x32.png">
@@ -159,8 +160,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
-    <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
+    <img src="../pointblank_logo_small.light.svg" alt="Pointblank" class="navbar-logo light-content">
+    <img src="../pointblank_logo_small.light.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
   </div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
@@ -2050,7 +2051,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s the summary for the numeric columns of the <code>small_table</code> dataset.</p>
-<div id="fcf415dd" class="cell" data-execution_count="2">
+<div id="679ba62c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2076,7 +2077,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Column <code>c</code> is the only one with missing values. The <code>min</code> and <code>max</code> columns are strings, because they also hold the dates from the date columns.</p>
 <p>Since this is an ordinary DataFrame, the profile can lead to further checks. This finds the columns with one distinct value fewer than the table has rows:</p>
-<div id="89ca5c73" class="cell" data-execution_count="3">
+<div id="523e589b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>summary.<span class="bu">filter</span>(pl.col(<span class="st">"n_unique"</span>) <span class="op">==</span> small_table.height <span class="op">-</span> <span class="dv">1</span>).get_column(<span class="st">"colname"</span>).to_list()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>['date_time', 'b', 'd']</code></pre>

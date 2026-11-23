@@ -125,6 +125,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script defer="" src="../gd-lightbox-compare.js"></script>
 <link rel="stylesheet" href="../gd-lightbox-annotate.css">
 <script defer="" src="../gd-lightbox-annotate.js"></script>
+<meta name="gd-logo-dark" content="pointblank_logo_small.dark.svg">
 <link rel="icon" type="image/x-icon" href="https://posit-dev.github.io/pointblank/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/svg+xml" href="https://posit-dev.github.io/pointblank/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="https://posit-dev.github.io/pointblank/favicon-32x32.png">
@@ -159,8 +160,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo light-content">
-    <img src="../pointblank_logo_small.svg" alt="Pointblank" class="navbar-logo dark-content">
+    <img src="../pointblank_logo_small.light.svg" alt="Pointblank" class="navbar-logo light-content">
+    <img src="../pointblank_logo_small.light.svg" alt="Pointblank" class="navbar-logo dark-content">
     </a>
   </div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
@@ -312,7 +313,7 @@ If the file is empty, if it has no contract <code>name</code>, or if a field has
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s write the contract file shown above to a temporary directory, then load it.</p>
-<div id="8c17df9f" class="cell" data-execution_count="2">
+<div id="f8b93043" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -347,7 +348,7 @@ If the file is empty, if it has no contract <code>name</code>, or if a field has
 </div>
 </div>
 <p>The loaded contract works like one defined in Python. Here it is applied to a small payments table:</p>
-<div id="dd7230c3" class="cell" data-execution_count="3">
+<div id="7bc5b5d5" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>payments <span class="op">=</span> pl.DataFrame({<span class="st">"payment_id"</span>: [<span class="st">"T1"</span>, <span class="st">"T2"</span>, <span class="st">"T3"</span>], <span class="st">"amount"</span>: [<span class="fl">50.0</span>, <span class="fl">0.0</span>, <span class="fl">12.5</span>]})</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>payments_contract.validate(payments)</span></code></pre></div>

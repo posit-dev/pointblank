@@ -1,0 +1,629 @@
+/* The homepage's showcase (with assets/homepage.js) */
+
+.gd-homepage {
+  --pbh-accent: #e20000;
+  --pbh-accent-hover: #b80000;
+  --pbh-accent-text: #c00000;
+  --pbh-accent-soft: rgba(226, 0, 0, 0.07);
+  --pbh-accent-line: rgba(226, 0, 0, 0.35);
+  --pbh-surface: var(--gd-bg-secondary, #f7f7f9);
+  --pbh-border: var(--gd-border-color, #e3e3e8);
+  --pbh-muted: var(--gd-text-muted, #6c6c78);
+  --pbh-radius: 12px;
+}
+
+/* The hero's animated backdrop (assets/backdrop.js): across the page, from under the navbar to
+   below the hero (fading out there), behind the page's content */
+
+.gd-homepage .gd-hero > #pbh-backdrop {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent);
+}
+
+.gd-homepage .gd-hero > #pbh-backdrop.pbh-on {
+  opacity: 1;
+}
+
+/* (In dark mode, the page's background is <html>'s alone, so that the backdrop shows over it) */
+body.quarto-dark.gd-homepage,
+body.quarto-dark.gd-homepage :is(#quarto-content, main.content, #quarto-document-content) {
+  background-color: transparent;
+}
+
+@media print {
+  .gd-homepage .gd-hero > #pbh-backdrop {
+    display: none;
+  }
+}
+
+.gd-homepage .gd-hero-tagline {
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+/* The lead and the calls to action (the links' rules start with `.gd-homepage a`, to win over the
+   dark theme's color for links in paragraphs) */
+
+.gd-homepage #quarto-document-content > p:first-of-type {
+  font-size: 1.15rem;
+  line-height: 1.6;
+}
+
+.pbh-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 1.4rem 0 2.6rem;
+}
+
+.pbh-cta > p {
+  display: contents;
+}
+
+.gd-homepage a.pbh-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.05rem;
+  border: 1px solid var(--pbh-border);
+  border-radius: 999px;
+  color: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: border-color 0.15s, background-color 0.15s, transform 0.15s;
+}
+
+.gd-homepage a.pbh-btn:hover {
+  border-color: var(--pbh-accent);
+  color: inherit;
+  transform: translateY(-1px);
+}
+
+.gd-homepage a.pbh-btn-primary {
+  background: var(--pbh-accent);
+  border-color: var(--pbh-accent);
+  color: #fff;
+}
+
+.gd-homepage a.pbh-btn-primary:hover {
+  background: var(--pbh-accent-hover);
+  border-color: var(--pbh-accent-hover);
+  color: #fff;
+}
+
+.pbh-install {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.85rem;
+  border: 1px dashed var(--pbh-border);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.gd-homepage .pbh-install code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  font-size: 0.9em;
+}
+
+.pbh-install:hover,
+.pbh-install.pbh-copied {
+  border-color: var(--pbh-accent);
+}
+
+.pbh-install .bi,
+.pbh-prompt {
+  color: var(--pbh-muted);
+}
+
+.pbh-copied .bi {
+  color: var(--pbh-accent);
+}
+
+/* The section headings */
+
+.gd-homepage h2.pbh-heading {
+  margin-top: 3.2rem;
+  border-bottom: none;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.gd-homepage h2.pbh-heading::after {
+  content: "";
+  display: block;
+  width: 2.4rem;
+  height: 3px;
+  margin-top: 0.45rem;
+  border-radius: 3px;
+  background: var(--pbh-accent);
+}
+
+.pbh-more {
+  display: inline-block;
+  margin-right: 1.2rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* The stepper, and the switch between views of what failed: tabs (or chips) over panels */
+
+.pbh-stepper,
+.pbh-switch {
+  margin: 1.2rem 0 1rem;
+}
+
+.pbh-tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  padding: 0.3rem;
+  border: 1px solid var(--pbh-border);
+  border-radius: 999px;
+  background: var(--pbh-surface);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.pbh-tab {
+  position: relative;
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-width: max-content;
+  padding: 0.45rem 0.8rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pbh-muted);
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.pbh-tab:hover {
+  color: var(--gd-text-primary, #222);
+}
+
+.pbh-tab:focus-visible,
+.pbh-chip:focus-visible {
+  outline: 2px solid var(--pbh-accent);
+  outline-offset: 1px;
+}
+
+.pbh-tab-num {
+  display: inline-grid;
+  place-items: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.pbh-tab.pbh-done .pbh-tab-num {
+  border-color: var(--pbh-accent-line);
+  color: var(--pbh-accent);
+}
+
+.pbh-tab[aria-selected="true"] {
+  background: var(--gd-bg-primary, #fff);
+  color: var(--gd-text-primary, #222);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.pbh-tab[aria-selected="true"] .pbh-tab-num {
+  border-color: var(--pbh-accent);
+  background: var(--pbh-accent);
+  color: #fff;
+}
+
+.pbh-tab-progress {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 3px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--pbh-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0;
+}
+
+.pbh-playing .pbh-tab[aria-selected="true"] .pbh-tab-progress {
+  opacity: 0.7;
+  animation: pbh-progress var(--pbh-dwell, 5s) linear forwards;
+}
+
+@keyframes pbh-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.pbh-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.9rem;
+}
+
+.pbh-chip {
+  padding: 0.32rem 0.85rem;
+  border: 1px solid var(--pbh-border);
+  border-radius: 999px;
+  background: var(--gd-bg-primary, #fff);
+  color: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+}
+
+.pbh-chip:hover {
+  border-color: var(--pbh-accent);
+}
+
+.pbh-chip[aria-selected="true"] {
+  border-color: var(--pbh-accent);
+  background: var(--pbh-accent);
+  color: #fff;
+}
+
+/* The panels are stacked in one place, so that each is laid out all along; the stepper is as tall
+   as the one shown. The others are see-through (and inert), not hidden, since a report's SVG icons
+   can refer to definitions in an earlier report, which a hidden report's would leave out */
+
+.pbh-panels {
+  position: relative;
+  overflow: hidden;
+  transition: height 0.35s ease;
+}
+
+.pbh-stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.pbh-ready .pbh-panel {
+  grid-area: 1 / 1;
+  min-width: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.pbh-ready .pbh-panel.pbh-active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  z-index: 1;
+}
+
+.pbh-panel > p {
+  margin-bottom: 0.8rem;
+  color: var(--pbh-muted);
+}
+
+.pbh-panel .cell {
+  border: 1px solid var(--pbh-border);
+  border-radius: var(--pbh-radius);
+  overflow: hidden;
+  background: var(--gd-bg-primary, #fff);
+}
+
+/* (A margin, not padding, around the output: the reports are scaled to the output's width) */
+.pbh-panel .cell-output-display {
+  margin: 1rem 1rem 0.6rem;
+  overflow-x: auto;
+}
+
+.pbh-panel .cell-output-display.scale-to-fit {
+  width: auto;
+}
+
+.pbh-panel .cell-code {
+  position: relative;
+  margin: 0;
+  border-radius: 0;
+}
+
+.pbh-stepper .pbh-panel .cell-code {
+  border-top: 1px solid var(--pbh-border);
+}
+
+.pbh-switch .pbh-panel .cell-code {
+  border-bottom: 1px solid var(--pbh-border);
+}
+
+.pbh-panel .cell-code pre {
+  max-height: 15.5rem;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  overflow-y: auto;
+}
+
+.pbh-panel .cell-code pre code {
+  display: block;
+  min-width: max-content;
+}
+
+.pbh-panel .cell-code pre code > span {
+  display: block;
+  margin-left: -0.6rem;
+  padding-left: 0.6rem;
+  border-left: 3px solid transparent;
+}
+
+.pbh-panel .cell-code pre code > span.pbh-new {
+  border-left-color: var(--pbh-accent);
+  background: var(--pbh-accent-soft);
+}
+
+.pbh-panel .cell-code pre code > span.pbh-folded {
+  display: none;
+}
+
+.pbh-panel .cell-code pre code > span.pbh-fold-mark {
+  height: 1.5em;
+  overflow: hidden;
+  color: transparent;
+  cursor: pointer;
+  user-select: none;
+}
+
+.pbh-panel .cell-code pre code > span.pbh-fold-mark * {
+  color: transparent !important;
+}
+
+.pbh-panel .cell-code pre code > span.pbh-fold-mark::before {
+  content: "⋯ " attr(data-fold);
+  display: block;
+  color: var(--pbh-muted);
+  font-style: italic;
+}
+
+.pbh-panel .cell-code pre code > span.pbh-fold-mark:hover::before,
+.pbh-panel .cell-code pre code > span.pbh-fold-mark:focus-visible::before {
+  color: var(--pbh-accent);
+}
+
+.pbh-panel .cell-code pre code > span.pbh-fold-mark:focus-visible {
+  outline: 2px solid var(--pbh-accent);
+  outline-offset: -2px;
+}
+
+.pbh-new-count {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.9rem;
+  z-index: 2;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: var(--pbh-accent);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+/* The backends */
+
+.pbh-backends {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0.6rem;
+}
+
+.pbh-backends > p {
+  display: contents;
+}
+
+.pbh-backend {
+  padding: 0.32rem 0.8rem;
+  border: 1px solid var(--pbh-border);
+  border-radius: 8px;
+  background: var(--pbh-surface);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* The features */
+
+.pbh-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr));
+  gap: 1rem;
+  margin: 1.2rem 0 1rem;
+}
+
+.pbh-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.1rem 1.15rem 0.9rem;
+  border: 1px solid var(--pbh-border);
+  border-radius: var(--pbh-radius);
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.pbh-card:hover {
+  border-color: var(--pbh-accent-line);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.pbh-card > p {
+  margin-bottom: 0.6rem;
+  font-size: 0.93rem;
+}
+
+.pbh-card > p:last-child {
+  margin-top: auto;
+  margin-bottom: 0;
+}
+
+.pbh-card > p:last-child a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.gd-homepage .pbh-card h4 {
+  margin: 0.5rem 0 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.pbh-card-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 10px;
+  background: var(--pbh-accent-soft);
+  color: var(--pbh-accent);
+  font-size: 1.15rem;
+}
+
+/* Getting started, with the main parts of the docs beside it */
+
+.pbh-start {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.pbh-start-text > :last-child {
+  margin-bottom: 0;
+}
+
+.pbh-start-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 12rem;
+  margin-right: 1rem;
+}
+
+.pbh-start-links > p {
+  display: contents;
+}
+
+.gd-homepage .pbh-start-links a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--pbh-border);
+  border-radius: 10px;
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.gd-homepage .pbh-start-links a:hover {
+  border-color: var(--pbh-accent);
+  transform: translateX(2px);
+}
+
+.pbh-start-links .bi {
+  color: var(--pbh-accent);
+}
+
+/* Dark mode */
+
+body.quarto-dark.gd-homepage,
+html.quarto-dark .gd-homepage {
+  --pbh-accent-text: #ff5a4f;
+  --pbh-accent-soft: rgba(255, 70, 60, 0.15);
+  --pbh-accent-line: rgba(255, 70, 60, 0.5);
+  --pbh-surface: var(--gd-bg-secondary, #1d1f24);
+  --pbh-border: var(--gd-border-color, #33363d);
+}
+
+body.quarto-dark .pbh-tab[aria-selected="true"],
+html.quarto-dark .pbh-tab[aria-selected="true"] {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+body.quarto-dark .pbh-card:hover,
+html.quarto-dark .pbh-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+/* (Reports and previews are drawn for a light page, so they keep one) */
+body.quarto-dark .pbh-panel .cell,
+html.quarto-dark .pbh-panel .cell {
+  background: #fff;
+  color: #222;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pbh-panels,
+  .pbh-ready .pbh-panel,
+  .pbh-ready .pbh-panel.pbh-active,
+  .pbh-card,
+  .gd-homepage a.pbh-btn,
+  .gd-homepage .pbh-start-links a,
+  .gd-homepage .gd-hero > #pbh-backdrop {
+    transition: none;
+  }
+
+  .pbh-playing .pbh-tab[aria-selected="true"] .pbh-tab-progress {
+    animation: none;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .pbh-tab {
+    padding: 0.4rem 0.6rem;
+  }
+
+  .pbh-tab-name {
+    display: none;
+  }
+
+  .pbh-tab[aria-selected="true"] .pbh-tab-name {
+    display: inline;
+  }
+
+  .pbh-panel .cell-output-display {
+    margin: 0.6rem 0.5rem 0.4rem;
+  }
+
+  .pbh-new-count {
+    display: none;
+  }
+
+  .pbh-start {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pbh-start-links {
+    margin-right: 0;
+  }
+}
