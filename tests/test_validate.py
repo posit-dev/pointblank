@@ -1229,6 +1229,22 @@ def test_validation_langs_all_working(lang) -> None:
     assert isinstance(validation.get_tabular_report(), GT.GT)
 
 
+def test_expectation_texts_differ_from_failure_texts() -> None:
+    from pointblank._constants_translations import EXPECT_FAIL_TEXT
+
+    # A step's brief (the expectation) mustn't be the text for its failure, in any language
+    same = [
+        (key, lang)
+        for key, texts in EXPECT_FAIL_TEXT.items()
+        if key.endswith("_expectation_text")
+        for lang, text in texts.items()
+        if EXPECT_FAIL_TEXT.get(key.replace("_expectation_text", "_failure_text"), {}).get(lang)
+        == text
+    ]
+
+    assert same == []
+
+
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
 def test_validation_check_column_input(request, tbl_fixture) -> None:
     tbl = request.getfixturevalue(tbl_fixture)
@@ -11293,6 +11309,48 @@ def test_validation_report_briefs_global_local_html(snapshot) -> None:
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "validation_report_briefs_global_local.html")
+
+
+def _report_briefs(validation: Validate) -> list[str]:
+    html_str = validation.get_tabular_report().as_raw_html()
+    return re.findall(
+        r"font-family: 'IBM Plex Sans'; text-wrap: balance;[^>]*>(.*?)</div>", html_str, re.DOTALL
+    )
+
+
+def test_validation_report_briefs_before_interrogation() -> None:
+    validation = (
+        Validate(data=load_dataset(), brief="Step {step}: {auto}")
+        .col_vals_gt(columns="d", value=1000)
+        .col_vals_regex(columns="b", pattern=r"^\d-[a-z]{3}", brief="**Pattern** in {col}")
+        .col_vals_in_set(columns="f", set=["low", "high"], brief=True)
+        .rows_distinct()
+        .col_vals_lt(columns="c", value=5, brief=False)
+    )
+
+    # The templates are filled in and the autobriefs made, as they are by `interrogate()`
+    briefs = _report_briefs(validation)
+    assert len(briefs) == 4
+    assert not any("{" in brief for brief in briefs)
+    assert (
+        "Step 1: Expect that values in <code>d</code> should be &gt; <code>1000</code>" in briefs[0]
+    )
+    assert "<strong>Pattern</strong> in b" in briefs[1]
+
+    assert _report_briefs(validation.interrogate()) == briefs
+
+
+def test_validation_report_briefs_before_interrogation_column_selector() -> None:
+    validation = Validate(data=load_dataset(), brief="Step {step}: {auto}").col_vals_gt(
+        columns=starts_with("a"), value=0
+    )
+
+    # The selector's columns aren't known until interrogation, so only the step number is shown
+    assert _report_briefs(validation) == ['<p style="font-size: inherit; margin: 0;">Step 1:</p>\n']
+
+    briefs = _report_briefs(validation.interrogate())
+    assert len(briefs) == 1
+    assert "Step 1: Expect that values in <code>a</code>" in briefs[0]
 
 
 @pytest.mark.parametrize("interrogate", [True, False])
