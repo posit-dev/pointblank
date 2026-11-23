@@ -11260,6 +11260,54 @@ def test_validation_report_segments_with_pre_html(snapshot) -> None:
     snapshot.assert_match(edited_report_html_str, "validation_report_segments_with_pre.html")
 
 
+def _report_segment_labels(validation: Validate) -> list[str]:
+    html_str = validation.get_tabular_report().as_raw_html()
+    return re.findall(r"SEGMENT&nbsp;&nbsp;</span></strong><span>(.*?)</span>", html_str)
+
+
+@pytest.mark.parametrize(
+    "segments, labels_before, labels_after",
+    [
+        ("f", ["f"], ["f / high", "f / low", "f / mid"]),
+        (["f"], ["f"], ["f / high", "f / low", "f / mid"]),
+        (("f", "high"), ["f / high"], ["f / high"]),
+        (("f", ["high", "low"]), ["f / ['high', 'low']"], ["f / high", "f / low"]),
+        (
+            ("f", seg_group([["high"], ["low", "mid"]])),
+            ["f / ['high'], ['low', 'mid']"],
+            ["f / ['high']", "f / ['low', 'mid']"],
+        ),
+        (["f", ("a", 1)], ["f, a / 1"], ["f / high", "f / low", "f / mid", "a / 1"]),
+    ],
+)
+def test_validation_report_segments_before_interrogation(
+    segments, labels_before, labels_after
+) -> None:
+    validation = Validate(data=load_dataset()).col_vals_gt(
+        columns="d", value=1000, segments=segments
+    )
+
+    # Before interrogation, the label shows the `segments=` spec
+    assert _report_segment_labels(validation) == labels_before
+
+    # After interrogation, each segment's step shows its column and value
+    assert _report_segment_labels(validation.interrogate()) == labels_after
+
+
+def test_validation_report_segments_not_evaluated() -> None:
+    # A step whose segments couldn't be evaluated (here, a column that isn't in the table) keeps its
+    # spec, which is shown as given
+    validation = (
+        Validate(data=load_dataset())
+        .col_vals_gt(columns="d", value=1000, segments="z")
+        .col_vals_gt(columns="d", value=1000, segments=["zz", "zzz"])
+        .interrogate()
+    )
+
+    assert [step.eval_error for step in validation.validation_info] == [True, True]
+    assert _report_segment_labels(validation) == ["z", "zz, zzz"]
+
+
 def test_validation_report_briefs_html(snapshot) -> None:
     validation = (
         Validate(
