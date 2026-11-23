@@ -30232,11 +30232,30 @@ def _create_health_score_html(
     )
 
 
+def _segment_label(segments: Any) -> str:
+    """
+    Get the text of a step's SEGMENT label in the validation report.
+
+    An interrogated segmented step has a `(column, value)` pair, shown as `column / value`. A step
+    that hasn't been split into its segments (before interrogation, or when its segments couldn't
+    be evaluated) still has the `segments=` spec as given, so the spec is shown: a column name as
+    is, a `(column, value)` tuple as `column / value`, and a list as its items separated by commas.
+    """
+    if isinstance(segments, list):
+        return ", ".join(_segment_label(x) for x in segments)
+    if isinstance(segments, tuple) and len(segments) == 2:
+        column, value = segments
+        if isinstance(value, Segment):
+            value = ", ".join(str(x) for x in value.segments)
+        return f"{column} / {value}"
+    return str(segments)
+
+
 def _transform_assertion_str(
     assertion_str: list[str],
     brief_str: list[str | None],
     autobrief_str: list[str],
-    segmentation_str: list[tuple | None],
+    segmentation_str: list[Any],
     lang: str,
     assertion_arg_str: list[str | None] | None = None,
 ) -> list[str]:
@@ -30316,16 +30335,15 @@ def _transform_assertion_str(
     if segmentation_str:
         for i in range(len(type_upd)):
             if segmentation_str[i] is not None:
-                # Get the column name and value from the segmentation expression
-                column_name = segmentation_str[i][0]
-                column_value = segmentation_str[i][1]
+                # Get the label text from the segment (or the `segments=` spec)
+                segment_label = html_module.escape(_segment_label(segmentation_str[i]), quote=False)
                 # Create the segmentation div
                 segmentation_div = (
                     "<div style='margin-top: 0px; margin-bottom: 0px; "
                     "white-space: pre; font-size: 8px; color: darkblue; padding-bottom: 4px; "
                     "'>"
                     "<strong><span style='font-family: Helvetica, arial, sans-serif;'>"
-                    f"SEGMENT&nbsp;&nbsp;</span></strong><span>{column_name} / {column_value}"
+                    f"SEGMENT&nbsp;&nbsp;</span></strong><span>{segment_label}"
                     "</span>"
                     "</div>"
                 )
