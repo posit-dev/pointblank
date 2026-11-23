@@ -48,6 +48,11 @@ def _text(gt_tbl) -> str:
     return html_lib.unescape(re.sub(r"\s+", " ", text)).strip()
 
 
+def _html(gt_tbl) -> str:
+    """Raw report HTML without great-tables' default stylesheet, which changes between releases."""
+    return re.sub(r"<style>.*?</style>", "", gt_tbl.as_raw_html(), count=1, flags=re.DOTALL)
+
+
 # ----------------------------------------------------------------------------------------------
 # The translation table
 # ----------------------------------------------------------------------------------------------
@@ -148,7 +153,7 @@ def test_step_report_follows_validation_language():
 @pytest.mark.parametrize("lang", ["en", "fr", "ar"])
 def test_report_html_snapshot(comparison, lang, snapshot):
     snapshot.assert_match(
-        comparison.get_tabular_report(lang=lang).as_raw_html(), f"comparison_report_{lang}.html"
+        _html(comparison.get_tabular_report(lang=lang)), f"comparison_report_{lang}.html"
     )
 
 
@@ -156,10 +161,10 @@ def test_report_html_snapshot_positional_and_multiset(snapshot):
     s = pl.DataFrame({"a": [1, 2, 3, 3], "b": ["w", "x", "y", "y"]})
     t = pl.DataFrame({"a": [1, 2, 9], "b": ["w", "X", "y"]})
     snapshot.assert_match(
-        pb.compare(s, t).get_tabular_report().as_raw_html(), "comparison_report_positional.html"
+        _html(pb.compare(s, t).get_tabular_report()), "comparison_report_positional.html"
     )
     snapshot.assert_match(
-        pb.compare(s, t, keys="*").get_tabular_report().as_raw_html(),
+        _html(pb.compare(s, t, keys="*").get_tabular_report()),
         "comparison_report_multiset.html",
     )
 
@@ -167,7 +172,7 @@ def test_report_html_snapshot_positional_and_multiset(snapshot):
 def test_report_html_snapshot_identical(snapshot):
     df = pl.DataFrame({"id": [1, 2], "v": ["a", "b"]})
     snapshot.assert_match(
-        pb.compare(df, df, keys="id").get_tabular_report().as_raw_html(),
+        _html(pb.compare(df, df, keys="id").get_tabular_report()),
         "comparison_report_identical.html",
     )
 
@@ -178,6 +183,4 @@ def test_step_report_html_snapshot(snapshot):
         .tbl_match(tbl_compare=SOURCE, keys="id", tolerance={"amount": 0.1}, schema="common")
         .interrogate()
     )
-    snapshot.assert_match(
-        validation.get_step_report(i=1).as_raw_html(), "tbl_match_step_report.html"
-    )
+    snapshot.assert_match(_html(validation.get_step_report(i=1)), "tbl_match_step_report.html")
