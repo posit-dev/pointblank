@@ -95,7 +95,7 @@ order_contract.validate(orders)
 
 [TABLE]
 
-## The [Step](../../reference/Step.md#pointblank.Step) Class
+## The `Step` Class
 
 Each validation rule in a contract is represented by a [Step](../../reference/Step.md#pointblank.Step), which is a declarative description of a single validation method call. Steps store the method name and its arguments as plain data:
 
@@ -184,7 +184,7 @@ The `on_violation` parameter controls what happens when validation fails (used b
 - `"raise"`: raise a `RuntimeError` (halts execution)
 - `"log"`: log via the `pointblank.contract` logger
 
-## Using [to_validate()](../../reference/pointblank.Contract.to_validate.md) for Custom Workflows
+## Using `to_validate()` for Custom Workflows
 
 If you need more control, [`to_validate()`](../../reference/pointblank.Contract.to_validate.md) gives you back an un-interrogated [Validate](../../reference/Validate.md#pointblank.Validate) object that you can extend with additional checks:
 

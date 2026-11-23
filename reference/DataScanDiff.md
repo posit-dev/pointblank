@@ -85,8 +85,8 @@ Compare two tables row by row.
 
 | Name | Description |
 |----|----|
-| [has_changes](#has_changes) | Return `True` if any schema or statistical changes were detected. |
-| [row_count_diff](#row_count_diff) | Return `(baseline_row_count, current_row_count)`. |
+| [has_changes](#pointblank.DataScanDiff.has_changes) | Return `True` if any schema or statistical changes were detected. |
+| [row_count_diff](#pointblank.DataScanDiff.row_count_diff) | Return `(baseline_row_count, current_row_count)`. |
 
 ### has_changes
 
@@ -150,8 +150,8 @@ The baseline has three rows and the current scan five. The [`has_changes`](../re
 
 | Name | Description |
 |----|----|
-| [get_tabular_report()](#get_tabular_report) | Generate a GT table summarizing the differences between the two scans. |
-| [to_dict()](#to_dict) | Export the comparison results as a dictionary. |
+| [get_tabular_report()](#pointblank.DataScanDiff.get_tabular_report) | Generate a GT table summarizing the differences between the two scans. |
+| [to_dict()](#pointblank.DataScanDiff.to_dict) | Export the comparison results as a dictionary. |
 
 ### get_tabular_report()
 

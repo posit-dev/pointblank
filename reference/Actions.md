@@ -67,7 +67,7 @@ The first two placeholders can also be used in uppercase (e.g., `{TYPE}` or `{LE
 
 For example, the string `"{LEVEL}: '{type}' threshold exceeded for column {col}."` will be displayed as `"WARNING: 'col_vals_gt' threshold exceeded for column a."` when the 'warning' threshold is exceeded in a 'col_vals_gt' validation step involving column `a`.
 
-## Crafting Callables With [get_action_metadata()](../reference/get_action_metadata.md#pointblank.get_action_metadata)
+## Crafting Callables With `get_action_metadata()`
 
 When creating a callable function to be used as an action, you can use the [`get_action_metadata()`](../reference/get_action_metadata.md#pointblank.get_action_metadata) function to retrieve metadata about the step where the action is executed. This metadata contains information about the validation step, including the step type, level, step number, column name, and associated value. You can use this information to craft your action message or to take specific actions based on the metadata provided.
 
@@ -125,7 +125,7 @@ validation = (
 validation
 ```
 
-    Data quality issue found (2026-11-19 01:40:19.795977).
+    Data quality issue found (2026-11-23 17:26:01.129357).
 
 [TABLE]
 

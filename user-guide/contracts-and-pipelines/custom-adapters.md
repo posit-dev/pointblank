@@ -92,7 +92,7 @@ pb.list_adapters()
 
 The [list_adapters()](../../reference/list_adapters.md#pointblank.list_adapters) output confirms your adapter is registered alongside the built-in ones, showing its supported file extensions and whether it handles import, export, or both.
 
-## The [ContractAdapter](../../reference/ContractAdapter.md#pointblank.ContractAdapter) Base Class
+## The `ContractAdapter` Base Class
 
 Here are the class attributes and methods you can define:
 
@@ -303,7 +303,7 @@ result.to_validate(data=events).interrogate()
 
 The validation report shows each imported constraint as a separate step, just as if you had written the validation by hand. From the user's perspective, there is no difference between validation steps that came from a custom adapter and those written directly in Python.
 
-## The [MappedConstraint](../../reference/adapters.MappedConstraint.md#pointblank.adapters.MappedConstraint) Class
+## The `MappedConstraint` Class
 
 Each constraint from the external format gets mapped to a [MappedConstraint](../../reference/adapters.MappedConstraint.md#pointblank.adapters.MappedConstraint), which is a simple data container holding:
 

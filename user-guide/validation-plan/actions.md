@@ -89,8 +89,8 @@ action_str = "[{LEVEL}: {TYPE}]: Step {step} has failed validation. ({time})"
 )
 ```
 
-    [CRITICAL: COL_VALS_GT]: Step 2 has failed validation. (2026-11-19 01:44:17.785747+00:00)
-    [CRITICAL: COL_VALS_GE]: Step 3 has failed validation. (2026-11-19 01:44:17.882650+00:00)
+    [CRITICAL: COL_VALS_GT]: Step 2 has failed validation. (2026-11-23 17:28:34.874839+00:00)
+    [CRITICAL: COL_VALS_GE]: Step 3 has failed validation. (2026-11-23 17:28:34.936583+00:00)
 
 [TABLE]
 
@@ -122,7 +122,7 @@ def duration_issue():
 )
 ```
 
-    Data quality issue found (2026-11-19 01:44:18.663219).
+    Data quality issue found (2026-11-23 17:28:35.364529).
 
 [TABLE]
 
@@ -134,7 +134,7 @@ This is an example where actions can be defined locally for an individual valida
 
 While string templates provide helpful placeholders to access information about validation steps, callable functions offer more flexibility through access to detailed metadata. When using functions as actions, you can retrieve comprehensive information about the validation context, allowing for complex logic and dynamic responses to validation issues.
 
-### Using [get_action_metadata()](../../reference/get_action_metadata.md#pointblank.get_action_metadata) in Callables
+### Using `get_action_metadata()` in Callables
 
 To access information about the validation step where an action was triggered, we can call [get_action_metadata()](../../reference/get_action_metadata.md#pointblank.get_action_metadata) in the body of a function to be used within [Actions](../../reference/Actions.md#pointblank.Actions). This provides useful context about the validation step that triggered the action.
 
@@ -353,7 +353,7 @@ Because the 'critical' threshold was exceeded in Step 2, we see the printed aler
 
 All actions will be executed in the order they are provided after all validation steps have completed.
 
-### Using [get_validation_summary()](../../reference/get_validation_summary.md#pointblank.get_validation_summary) in Final Actions
+### Using `get_validation_summary()` in Final Actions
 
 When creating a callable function to use with [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions), you can access information about the overall validation results using the [get_validation_summary()](../../reference/get_validation_summary.md#pointblank.get_validation_summary) function. This gives you a dictionary with comprehensive information about the validation:
 

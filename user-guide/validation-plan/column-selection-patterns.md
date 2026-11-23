@@ -214,7 +214,7 @@ Let's look at examples using the `small_table` dataset:
 | 12 | 2016-01-28 02:51:00 | 2016-01-28 | 2 | 7-dmx-010 | 8 | 108.34 | False | low |
 | 13 | 2016-01-30 11:23:00 | 2016-01-30 | 1 | 3-dka-303 | None | 2230.09 | True | high |
 
-### Using [col()](../../reference/col.md#pointblank.col) to Specify a Comparison Column
+### Using `col()` to Specify a Comparison Column
 
 While we typically use validation methods to compare column values against fixed values:
 
@@ -276,7 +276,7 @@ The following validation methods accept a [col()](../../reference/col.md#pointbl
 - [`Validate.col_vals_eq()`](../../reference/Validate.col_vals_eq.md#pointblank.Validate.col_vals_eq)
 - [`Validate.col_vals_ne()`](../../reference/Validate.col_vals_ne.md#pointblank.Validate.col_vals_ne)
 
-### Using [col()](../../reference/col.md#pointblank.col) in Range Checks
+### Using `col()` in Range Checks
 
 For range validations via [`Validate.col_vals_between()`](../../reference/Validate.col_vals_between.md#pointblank.Validate.col_vals_between) and [`Validate.col_vals_outside()`](../../reference/Validate.col_vals_outside.md#pointblank.Validate.col_vals_outside) you can use a mix of column references and fixed values:
 

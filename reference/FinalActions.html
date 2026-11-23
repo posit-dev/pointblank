@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1aa5e9f6d206be91d862d26944677737.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -189,7 +189,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="506" data-forks="39"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2008,7 +2008,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#types-of-actions" id="toc-types-of-actions" class="nav-link" data-scroll-target="#types-of-actions">Types Of Actions</a></li>
-  <li><a href="#crafting-callables-with-get_validation_summary" id="toc-crafting-callables-with-get_validation_summary" class="nav-link" data-scroll-target="#crafting-callables-with-get_validation_summary">Crafting Callables With get_validation_summary()</a></li>
+  <li><a href="#crafting-callables-with-get_validation_summary" id="toc-crafting-callables-with-get_validation_summary" class="nav-link" data-scroll-target="#crafting-callables-with-get_validation_summary">Crafting Callables With <code>get_validation_summary()</code></a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
@@ -2036,6 +2036,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<div id="pointblank.FinalActions">
+
+</div>
 <div class="doc-subject">
 <p>Define actions to be taken after validation is complete.</p>
 </div>
@@ -2081,14 +2084,14 @@ An <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-
 <p>The actions are executed at the end of the validation workflow. When providing a string, it will simply be printed to the console. A callable will also be executed at the time of validation completion. Several strings and callables can be provided to the <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> class, and they will be executed in the order they are provided.</p>
 </section>
 <section id="crafting-callables-with-get_validation_summary" class="level2 doc-crafting-callables-with-getvalidationsummary">
-<h2 class="doc-crafting-callables-with-getvalidationsummary anchored" data-anchor-id="crafting-callables-with-get_validation_summary">Crafting Callables With <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link gdls-code">get_validation_summary()</a></h2>
+<h2 class="doc-crafting-callables-with-getvalidationsummary anchored" data-anchor-id="crafting-callables-with-get_validation_summary">Crafting Callables With <code>get_validation_summary()</code></h2>
 <p>When creating a callable function to be used as a final action, you can use the <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function to retrieve the summary of the validation results. This summary contains information about the validation workflow, including the number of test units, the number of failing test units, and the threshold levels that were exceeded. You can use this information to craft your final action message or to take specific actions based on the validation results.</p>
 </section>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Final actions provide a powerful way to respond to the overall results of a validation workflow. They’re especially useful for sending notifications, generating reports, or taking corrective actions based on the complete validation outcome.</p>
 <p>The following example shows how to create a final action that checks for critical failures and sends an alert. The <code>d</code> column of the <code>small_table</code> dataset has many values that aren’t greater than <code>1000</code>, so the step reaches the ‘critical’ threshold:</p>
-<div id="8144683b" class="cell" data-execution_count="1">
+<div id="0ae24d77" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> send_alert():</span>
@@ -2112,7 +2115,7 @@ An <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-
 </div>
 <p>In this example, the <code>send_alert()</code> function is defined to check the validation summary for critical failures. Since some were found, the alert message was printed. The function is passed to the <a href="../reference/FinalActions.html#pointblank.FinalActions" class="gdls-link gdls-code">FinalActions</a> class, which ensures it will be executed after all validation steps are complete. Note that we used the <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" class="gdls-link"><code>get_validation_summary()</code></a> function to retrieve the summary of the validation results to help craft the alert message.</p>
 <p>Multiple final actions can be provided in a sequence. They will be executed in the order they are specified after all validation steps have completed. Here, a string message is followed by the <code>send_alert()</code> function and a second function that prints a count of the failing steps:</p>
-<div id="c8f7eacc" class="cell" data-execution_count="2">
+<div id="e43c6705" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_counts():</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>summary[<span class="st">'n_failing_steps'</span>]<span class="sc">}</span><span class="ss"> of </span><span class="sc">{</span>summary[<span class="st">'n_steps'</span>]<span class="sc">}</span><span class="ss"> steps had failures"</span>)</span>
@@ -2597,6 +2600,7 @@ ALERT: Critical validation failures found in small_table
 <script src="../wide-layout.js"></script>
 <script src="../keyboard-nav.js"></script>
 <script src="../copy-code.js"></script>
+<script src="../heading-anchors.js"></script>
 <script src="../details.js"></script>
 <script src="../mermaid-renderer.js"></script>
 <script src="../reference-switcher.js"></script>

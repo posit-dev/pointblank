@@ -88,7 +88,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1aa5e9f6d206be91d862d26944677737.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -193,7 +193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="506" data-forks="39"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -659,7 +659,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#creating-your-first-contract" id="toc-creating-your-first-contract" class="nav-link active" data-scroll-target="#creating-your-first-contract">Creating Your First Contract</a></li>
   <li><a href="#adding-a-schema" id="toc-adding-a-schema" class="nav-link" data-scroll-target="#adding-a-schema">Adding a Schema</a></li>
-  <li><a href="#the-step-class" id="toc-the-step-class" class="nav-link" data-scroll-target="#the-step-class">The Step Class</a>
+  <li><a href="#the-step-class" id="toc-the-step-class" class="nav-link" data-scroll-target="#the-step-class">The <code>Step</code> Class</a>
   <ul class="collapse">
   <li><a href="#available-methods" id="toc-available-methods" class="nav-link" data-scroll-target="#available-methods">Available Methods</a></li>
   </ul></li>
@@ -668,7 +668,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#direction" id="toc-direction" class="nav-link" data-scroll-target="#direction">Direction</a></li>
   <li><a href="#violation-handling" id="toc-violation-handling" class="nav-link" data-scroll-target="#violation-handling">Violation Handling</a></li>
   </ul></li>
-  <li><a href="#using-to_validate-for-custom-workflows" id="toc-using-to_validate-for-custom-workflows" class="nav-link" data-scroll-target="#using-to_validate-for-custom-workflows">Using to_validate() for Custom Workflows</a></li>
+  <li><a href="#using-to_validate-for-custom-workflows" id="toc-using-to_validate-for-custom-workflows" class="nav-link" data-scroll-target="#using-to_validate-for-custom-workflows">Using <code>to_validate()</code> for Custom Workflows</a></li>
   <li><a href="#contract-equality-and-composition" id="toc-contract-equality-and-composition" class="nav-link" data-scroll-target="#contract-equality-and-composition">Contract Equality and Composition</a></li>
   <li><a href="#example-validating-with-failures" id="toc-example-validating-with-failures" class="nav-link" data-scroll-target="#example-validating-with-failures">Example: Validating with Failures</a></li>
   <li><a href="#whats-next" id="toc-whats-next" class="nav-link" data-scroll-target="#whats-next">What’s Next</a></li>
@@ -1689,7 +1689,7 @@ tr { background-color: transparent; }
 </div>
 </section>
 <section id="the-step-class" class="level1">
-<h1>The <a href="../../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">Step</a> Class</h1>
+<h1>The <code>Step</code> Class</h1>
 <p>Each validation rule in a contract is represented by a <a href="../../reference/Step.html#pointblank.Step" class="gdls-link gdls-code">Step</a>, which is a declarative description of a single validation method call. Steps store the method name and its arguments as plain data:</p>
 <div id="84ec6f09" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># These are equivalent ways to express a validation rule:</span></span>
@@ -1818,7 +1818,7 @@ col_vals_gt
 </section>
 </section>
 <section id="using-to_validate-for-custom-workflows" class="level1">
-<h1>Using <a href="../../reference/pointblank.Contract.to_validate.html" class="gdls-link gdls-code">to_validate()</a> for Custom Workflows</h1>
+<h1>Using <code>to_validate()</code> for Custom Workflows</h1>
 <p>If you need more control, <a href="../../reference/pointblank.Contract.to_validate.html" class="gdls-link"><code>to_validate()</code></a> gives you back an un-interrogated <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object that you can extend with additional checks:</p>
 <div id="7beaeba0" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Start from the contract, then add ad-hoc checks</span></span>
@@ -3633,6 +3633,7 @@ tr { background-color: transparent; }
 <script src="../../wide-layout.js"></script>
 <script src="../../keyboard-nav.js"></script>
 <script src="../../copy-code.js"></script>
+<script src="../../heading-anchors.js"></script>
 <script src="../../details.js"></script>
 <script src="../../mermaid-renderer.js"></script>
 <script src="../../reference-switcher.js"></script>

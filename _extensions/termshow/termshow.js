@@ -989,11 +989,16 @@
     frame.lines.forEach((lineIdx, rowIdx) => {
       const line = rows[lineIdx];
       const y = fmt(rowIdx * cellH);
-      for (const [col, len, color] of line[0]) {
-        parts.push(
-          '<rect x="' + fmt(col * cellW) + '" y="' + y + '" ' +
-          'width="' + fmt(len * cellW) + '" height="' + fmt(cellH) + '" fill="' + color + '"/>'
-        );
+      // Crisp edges, so that adjacent backgrounds leave no seam when scaled
+      if (line[0].length) {
+        parts.push('<g shape-rendering="crispEdges">');
+        for (const [col, len, color] of line[0]) {
+          parts.push(
+            '<rect x="' + fmt(col * cellW) + '" y="' + y + '" ' +
+            'width="' + fmt(len * cellW) + '" height="' + fmt(cellH) + '" fill="' + color + '"/>'
+          );
+        }
+        parts.push('</g>');
       }
       for (const [col, text, color, classes] of line[1]) {
         const cls = classes ? 'gd-tp-text ' + classes : 'gd-tp-text';

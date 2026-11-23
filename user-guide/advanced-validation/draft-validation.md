@@ -4,7 +4,7 @@ Draft validation in Pointblank leverages large language models (LLMs) to automat
 
 The [DraftValidation](../../reference/DraftValidation.md#pointblank.DraftValidation) class connects to various LLM providers to analyze your data's characteristics and generate a complete validation plan tailored to its structure and content.
 
-## How [DraftValidation](../../reference/DraftValidation.md#pointblank.DraftValidation) Works
+## How `DraftValidation` Works
 
 When you use [DraftValidation](../../reference/DraftValidation.md#pointblank.DraftValidation), the process works through these steps:
 
@@ -364,7 +364,7 @@ The prompt also contains constraints to ensure consistent, high-quality results,
 
 ## Best Practices and Troubleshooting
 
-### When to Use [DraftValidation](../../reference/DraftValidation.md#pointblank.DraftValidation)
+### When to Use `DraftValidation`
 
 Drafting a validation is most useful when:
 

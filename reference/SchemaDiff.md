@@ -125,9 +125,9 @@ Check a table against an expected schema.
 
 ## Attributes
 
-| Name                | Description                    |
-|---------------------|--------------------------------|
-| [matches](#matches) | Whether the two schemas match. |
+| Name                                      | Description                    |
+|-------------------------------------------|--------------------------------|
+| [matches](#pointblank.SchemaDiff.matches) | Whether the two schemas match. |
 
 ### matches
 
@@ -169,9 +169,9 @@ If column order doesn't matter for the use at hand, use `schema="common"` to com
 
 ## Methods
 
-| Name                  | Description                                     |
-|-----------------------|-------------------------------------------------|
-| [to_dict()](#to_dict) | Convert the schema differences to a dictionary. |
+| Name | Description |
+|----|----|
+| [to_dict()](#pointblank.SchemaDiff.to_dict) | Convert the schema differences to a dictionary. |
 
 ### to_dict()
 

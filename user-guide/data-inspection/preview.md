@@ -4,7 +4,7 @@ In many cases, it's *good* to look at your data tables. Before validating a tabl
 
 To make this common task a little better, you can use the [preview()](../../reference/preview.md#pointblank.preview) function in Pointblank. It has been designed to work with every table that the package supports (i.e., DataFrames and Ibis-backend tables, the latter of which are largely database tables). Plus, what's shown in the output is consistent, no matter what type of data you're looking at.
 
-## Viewing a Table with [preview()](../../reference/preview.md#pointblank.preview)
+## Viewing a Table with `preview()`
 
 Let's look at how [preview()](../../reference/preview.md#pointblank.preview) works. It requires only a table and, for this first example, let's use the `nycflights` dataset:
 

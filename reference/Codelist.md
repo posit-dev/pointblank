@@ -112,9 +112,9 @@ Get a codelist from imported metadata.
 
 | Name | Description |
 |----|----|
-| [to_set()](#to_set) | Get the permitted values of the codelist. |
-| [to_dict()](#to_dict) | Get a mapping of each value to its label. |
-| [extended_values()](#extended_values) | Get the values that were added to an extensible codelist. |
+| [to_set()](#pointblank.Codelist.to_set) | Get the permitted values of the codelist. |
+| [to_dict()](#pointblank.Codelist.to_dict) | Get a mapping of each value to its label. |
+| [extended_values()](#pointblank.Codelist.extended_values) | Get the values that were added to an extensible codelist. |
 
 ### to_set()
 

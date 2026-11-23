@@ -31,7 +31,7 @@ Final actions can be defined in two different ways:
 
 The actions are executed at the end of the validation workflow. When providing a string, it will simply be printed to the console. A callable will also be executed at the time of validation completion. Several strings and callables can be provided to the [FinalActions](../reference/FinalActions.md#pointblank.FinalActions) class, and they will be executed in the order they are provided.
 
-## Crafting Callables With [get_validation_summary()](../reference/get_validation_summary.md#pointblank.get_validation_summary)
+## Crafting Callables With `get_validation_summary()`
 
 When creating a callable function to be used as a final action, you can use the [`get_validation_summary()`](../reference/get_validation_summary.md#pointblank.get_validation_summary) function to retrieve the summary of the validation results. This summary contains information about the validation workflow, including the number of test units, the number of failing test units, and the threshold levels that were exceeded. You can use this information to craft your final action message or to take specific actions based on the validation results.
 

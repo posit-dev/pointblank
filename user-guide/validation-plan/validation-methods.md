@@ -337,7 +337,7 @@ validation
 
 [MissingSpec](../../reference/MissingSpec.md#pointblank.MissingSpec) also offers pre-built factories for common standards (e.g., `pb.MissingSpec.from_cdisc_null_flavors()`, `pb.MissingSpec.from_sas()`, `pb.MissingSpec.from_spss()`), and importing metadata from SPSS/Stata/SAS files can auto-generate specs via [`MetadataImport.missing_specs()`](../../reference/MetadataImport.md#pointblank.MetadataImport). For a fuller treatment of structured-missingness *reporting*, see the *Missing Values Reporting* article.
 
-### Referential Integrity with [col_vals_in_table()](../../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table)
+### Referential Integrity with `col_vals_in_table()`
 
 When your data spans multiple tables, you often need to verify that foreign key values in one table actually exist in another. The [`col_vals_in_table()`](../../reference/Validate.col_vals_in_table.md#pointblank.Validate.col_vals_in_table) method handles this directly, checking each row's value (or composite key) against a reference table.
 
@@ -553,7 +553,7 @@ The [`Validate.col_schema_match()`](../../reference/Validate.col_schema_match.md
 
 These parameters all default to `True`, providing strict schema validation. Setting any to `False` relaxes the validation requirements, making the checks more flexible when exact matching isn't necessary or practical for your use case.
 
-### Comparing Tables with [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match)
+### Comparing Tables with `tbl_match()`
 
 The [`Validate.tbl_match()`](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) validation method provides a comprehensive way to verify that two tables are identical. It performs a progressive series of checks, from least to most stringent:
 
@@ -837,7 +837,7 @@ baseline_data = pl.DataFrame({"revenue": [95, 205, 145, 180, 130]})
 
 When `value=None` (the default) and reference data is set, aggregate methods automatically compare against the same column in the reference data.
 
-## 6. Custom Validations with [specially()](../../reference/Validate.specially.md#pointblank.Validate.specially)
+## 6. Custom Validations with `specially()`
 
 While Pointblank provides over 40 built-in validation methods, there are times when you need to implement custom validation logic that goes beyond these standard checks. The [`Validate.specially()`](../../reference/Validate.specially.md#pointblank.Validate.specially) method gives you complete flexibility to create bespoke validations for domain-specific business rules, complex multi-column checks, or cross-dataset referential integrity constraints.
 
@@ -1070,7 +1070,7 @@ def make_foreign_key_validator(reference_table, key_columns):
 
 Factory functions like `make_foreign_key_validator()` make your validation code more maintainable and reusable. Once defined, you can use the same factory to validate different foreign key relationships across your entire data pipeline, ensuring consistency in how these constraints are checked. This pattern is particularly valuable in production environments where you validate multiple related tables.
 
-### When to Use [specially()](../../reference/Validate.specially.md#pointblank.Validate.specially)
+### When to Use `specially()`
 
 The [specially()](../../reference/Validate.specially.md#pointblank.Validate.specially) method is ideal for:
 

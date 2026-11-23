@@ -34,7 +34,7 @@ Whether column names should be treated as case-sensitive. The default is `False`
 `Matches`  
 A `Matches` object, which can be used to select columns that match the specified pattern.
 
-## Relevant Validation Methods Where [matches()](../reference/matches.md#pointblank.matches) Can Be Used
+## Relevant Validation Methods Where `matches()` Can Be Used
 
 This selector function can be used in the `columns=` argument of the following validation methods:
 

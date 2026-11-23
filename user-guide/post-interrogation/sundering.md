@@ -114,7 +114,7 @@ It gives us the same rows as in the DataFrame obtained from using `validation.ge
 
 You can think of sundered data as a filtered version of the original dataset based on validation results. While the simple example illustrates how this process works on a basic level, the value of the method is better seen in a slightly more complex example.
 
-## Using [get_sundered_data()](../../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data) with a More Comprehensive Validation
+## Using `get_sundered_data()` with a More Comprehensive Validation
 
 The previous example used exactly one validation step. You're likely to use more than that in standard practice so let's see how [`Validate.get_sundered_data()`](../../reference/Validate.get_sundered_data.md#pointblank.Validate.get_sundered_data) works in those common situations. Here's a validation with three steps:
 

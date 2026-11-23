@@ -32,7 +32,7 @@ pip install pointblank[generate]
 
 The same six providers are supported (`anthropic`, `openai`, `ollama`, `bedrock`, `azure-openai`, and `cohere`), the model is specified in `provider:model` form, and API keys are resolved from the `api_key=` argument, environment variables, or a `.env` file exactly as described on the Draft Validation page.
 
-## Editing a Plan with [EditValidation](../../reference/EditValidation.md#pointblank.EditValidation)
+## Editing a Plan with `EditValidation`
 
 Suppose you have an existing plan:
 

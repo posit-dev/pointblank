@@ -88,7 +88,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1aa5e9f6d206be91d862d26944677737.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -193,7 +193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="506" data-forks="39"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -658,9 +658,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul class="collapse">
   <li><a href="#the-adapter-architecture" id="toc-the-adapter-architecture" class="nav-link active" data-scroll-target="#the-adapter-architecture">The Adapter Architecture</a></li>
-  <li><a href="#the-contractadapter-base-class" id="toc-the-contractadapter-base-class" class="nav-link" data-scroll-target="#the-contractadapter-base-class">The ContractAdapter Base Class</a></li>
+  <li><a href="#the-contractadapter-base-class" id="toc-the-contractadapter-base-class" class="nav-link" data-scroll-target="#the-contractadapter-base-class">The <code>ContractAdapter</code> Base Class</a></li>
   <li><a href="#building-an-import-adapter" id="toc-building-an-import-adapter" class="nav-link" data-scroll-target="#building-an-import-adapter">Building an Import Adapter</a></li>
-  <li><a href="#the-mappedconstraint-class" id="toc-the-mappedconstraint-class" class="nav-link" data-scroll-target="#the-mappedconstraint-class">The MappedConstraint Class</a></li>
+  <li><a href="#the-mappedconstraint-class" id="toc-the-mappedconstraint-class" class="nav-link" data-scroll-target="#the-mappedconstraint-class">The <code>MappedConstraint</code> Class</a></li>
   <li><a href="#handling-unmappable-constraints" id="toc-handling-unmappable-constraints" class="nav-link" data-scroll-target="#handling-unmappable-constraints">Handling Unmappable Constraints</a></li>
   <li><a href="#auto-detection-tips" id="toc-auto-detection-tips" class="nav-link" data-scroll-target="#auto-detection-tips">Auto-Detection Tips</a></li>
   <li><a href="#best-practices" id="toc-best-practices" class="nav-link" data-scroll-target="#best-practices">Best Practices</a></li>
@@ -777,7 +777,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The <a href="../../reference/list_adapters.html#pointblank.list_adapters" class="gdls-link gdls-code">list_adapters()</a> output confirms your adapter is registered alongside the built-in ones, showing its supported file extensions and whether it handles import, export, or both.</p>
 </section>
 <section id="the-contractadapter-base-class" class="level1">
-<h1>The <a href="../../reference/ContractAdapter.html#pointblank.ContractAdapter" class="gdls-link gdls-code">ContractAdapter</a> Base Class</h1>
+<h1>The <code>ContractAdapter</code> Base Class</h1>
 <p>Here are the class attributes and methods you can define:</p>
 <table class="caption-top table">
 <thead>
@@ -1546,7 +1546,7 @@ tr { background-color: transparent; }
 <p>The validation report shows each imported constraint as a separate step, just as if you had written the validation by hand. From the user’s perspective, there is no difference between validation steps that came from a custom adapter and those written directly in Python.</p>
 </section>
 <section id="the-mappedconstraint-class" class="level1">
-<h1>The <a href="../../reference/adapters.MappedConstraint.html#pointblank.adapters.MappedConstraint" class="gdls-link gdls-code">MappedConstraint</a> Class</h1>
+<h1>The <code>MappedConstraint</code> Class</h1>
 <p>Each constraint from the external format gets mapped to a <a href="../../reference/adapters.MappedConstraint.html#pointblank.adapters.MappedConstraint" class="gdls-link gdls-code">MappedConstraint</a>, which is a simple data container holding:</p>
 <ul>
 <li><code>method</code>: the Pointblank <a href="../../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> method name (e.g., <code>"col_vals_gt"</code>)</li>
@@ -2070,6 +2070,7 @@ tr { background-color: transparent; }
 <script src="../../wide-layout.js"></script>
 <script src="../../keyboard-nav.js"></script>
 <script src="../../copy-code.js"></script>
+<script src="../../heading-anchors.js"></script>
 <script src="../../details.js"></script>
 <script src="../../mermaid-renderer.js"></script>
 <script src="../../reference-switcher.js"></script>

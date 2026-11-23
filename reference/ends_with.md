@@ -34,7 +34,7 @@ Whether column names should be treated as case-sensitive. The default is `False`
 `EndsWith`  
 An `EndsWith` object, which can be used to select columns that end with the specified text.
 
-## Relevant Validation Methods Where [ends_with()](../reference/ends_with.md#pointblank.ends_with) Can Be Used
+## Relevant Validation Methods Where `ends_with()` Can Be Used
 
 This selector function can be used in the `columns=` argument of the following validation methods:
 

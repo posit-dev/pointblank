@@ -74,7 +74,7 @@ If you look at the far right of the validation report you'll find there's a `CSV
 
 Access to CSV data for the test unit errors is useful when the validation report is shared with other data quality stakeholders, since it is easily accessible and doesn't require further use of Pointblank. The stakeholder can simply open the downloaded CSV in their preferred spreadsheet software, import it into a different analysis environment like R or Julia, or process it with any tool that supports CSV files. This cross-platform compatibility makes the CSV export particularly valuable in mixed-language data teams where different members might be working with different tools.
 
-### [get_data_extracts()](../../reference/Validate.get_data_extracts.md#pointblank.Validate.get_data_extracts)
+### `get_data_extracts()`
 
 For programmatic access to data extracts, Pointblank provides the [`Validate.get_data_extracts()`](../../reference/Validate.get_data_extracts.md#pointblank.Validate.get_data_extracts) method. This allows you to work with extract data directly in your Python workflow:
 
@@ -146,7 +146,7 @@ limited_report
 
 Step reports are particularly valuable when you want to quickly inspect the failing data without extracting it into a separate DataFrame. They provide a bridge between the high-level validation report and the detailed data extracts.
 
-## Viewing Data Extracts with [preview()](../../reference/preview.md#pointblank.preview)
+## Viewing Data Extracts with `preview()`
 
 To get a consistent HTML representation of any data extract (regardless of the table type), we can use the [preview()](../../reference/preview.md#pointblank.preview) function:
 
@@ -320,7 +320,7 @@ if len(d_value_failures) > 0:
 
 These analysis techniques help you thoroughly investigate data quality issues by examining failing data from multiple perspectives. Rather than treating failures as isolated incidents, you can identify patterns that might indicate systematic problems in your data pipeline.
 
-### Detailed Analysis with [col_summary_tbl()](../../reference/col_summary_tbl.md#pointblank.col_summary_tbl)
+### Detailed Analysis with `col_summary_tbl()`
 
 For a more comprehensive view of the statistical properties of your extract data, you can use the [col_summary_tbl()](../../reference/col_summary_tbl.md#pointblank.col_summary_tbl) function:
 

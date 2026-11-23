@@ -95,7 +95,7 @@ for var_name, codes in meta.missing_value_codes.items():
 
 Missing value codes are preserved in the [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) object so downstream tools can handle them appropriately. When validation is generated, these codes are documented in the metadata rather than generating explicit exclusion rules, since the correct handling depends on your analysis context.
 
-#### Turning missing codes into [MissingSpec](../../reference/MissingSpec.md#pointblank.MissingSpec) objects
+#### Turning missing codes into `MissingSpec` objects
 
 To put these codes to work in validation and reporting, convert them into [`MissingSpec`](../../reference/MissingSpec.md#pointblank.MissingSpec) objects. The [`MetadataImport.missing_specs()`](../../reference/MetadataImport.md#pointblank.MetadataImport) method does this for every variable that declares missing values, returning a `{column: MissingSpec}` mapping (the reason labels are derived from the variables' value labels):
 

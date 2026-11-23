@@ -39,7 +39,7 @@ Pointblank can import metadata from a range of domain-specific standards. Each f
 
 The format can be specified explicitly or auto-detected from the file extension in many cases. For ambiguous formats (like XML files that could be Define-XML or Controlled Terminology), Pointblank inspects the file content to determine the correct reader.
 
-## The [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) Object
+## The `MetadataImport` Object
 
 Every call to [import_metadata()](../../reference/import_metadata.md#pointblank.import_metadata) returns a [MetadataImport](../../reference/MetadataImport.md#pointblank.MetadataImport) instance. This object holds all the information extracted from the source file, organized into a structure that Pointblank can work with. Understanding its components helps you get the most out of imported metadata.
 

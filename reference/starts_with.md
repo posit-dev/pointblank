@@ -34,7 +34,7 @@ Whether column names should be treated as case-sensitive. The default is `False`
 `StartsWith`  
 A `StartsWith` object, which can be used to select columns that start with the specified text.
 
-## Relevant Validation Methods Where [starts_with()](../reference/starts_with.md#pointblank.starts_with) Can Be Used
+## Relevant Validation Methods Where `starts_with()` Can Be Used
 
 This selector function can be used in the `columns=` argument of the following validation methods:
 

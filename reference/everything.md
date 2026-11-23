@@ -17,7 +17,7 @@ Many validation methods have a `columns=` argument that can be used to specify t
 `Everything`  
 An `Everything` object, which can be used to select all columns.
 
-## Relevant Validation Methods Where [everything()](../reference/everything.md#pointblank.everything) Can Be Used
+## Relevant Validation Methods Where `everything()` Can Be Used
 
 This selector function can be used in the `columns=` argument of the following validation methods:
 

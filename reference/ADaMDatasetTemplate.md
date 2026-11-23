@@ -84,9 +84,9 @@ The equivalent for SDTM domains.
 
 | Name | Description |
 |----|----|
-| [required_variables](#required_variables) | The names of the required variables, in order. |
-| [conditional_variables](#conditional_variables) | The names of the conditionally required variables, in order. |
-| [population_flags](#population_flags) | The names of the population flag variables, in order. |
+| [required_variables](#pointblank.ADaMDatasetTemplate.required_variables) | The names of the required variables, in order. |
+| [conditional_variables](#pointblank.ADaMDatasetTemplate.conditional_variables) | The names of the conditionally required variables, in order. |
+| [population_flags](#pointblank.ADaMDatasetTemplate.population_flags) | The names of the population flag variables, in order. |
 
 ### required_variables
 
@@ -156,9 +156,9 @@ pb.get_adam_dataset("ADSL").population_flags
 
 ## Methods
 
-| Name                            | Description                          |
-|---------------------------------|--------------------------------------|
-| [get_variable()](#get_variable) | Get the specification of a variable. |
+| Name | Description |
+|----|----|
+| [get_variable()](#pointblank.ADaMDatasetTemplate.get_variable) | Get the specification of a variable. |
 
 ### get_variable()
 

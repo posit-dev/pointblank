@@ -70,7 +70,7 @@ flowchart LR
 
 The [ContractImport](../../reference/ContractImport.md#pointblank.ContractImport) object is your bridge between the external world and Pointblank. It doesn't execute anything on its own. Rather, it holds the *translated specification* and lets you choose how to use it. This separation is intentional: you can inspect the translation results, check for any warnings, and decide how to proceed before committing to a particular output format.
 
-## The [ContractImport](../../reference/ContractImport.md#pointblank.ContractImport) Object
+## The `ContractImport` Object
 
 After calling [import_contract()](../../reference/import_contract.md#pointblank.import_contract), you get back a [ContractImport](../../reference/ContractImport.md#pointblank.ContractImport) with these key attributes and methods:
 

@@ -26,7 +26,7 @@
 - [Contract](https://posit-dev.github.io/pointblank/reference/Contract.html): A declarative boundary contract for pipeline data
 - [Step](https://posit-dev.github.io/pointblank/reference/Step.html): A single validation step, stored as data
 - [Steps](https://posit-dev.github.io/pointblank/reference/Steps.html): A reusable collection of validation step definitions
-- [Validate.add_steps](https://posit-dev.github.io/pointblank/reference/Validate.add_steps.html)
+- [Validate.add_steps](https://posit-dev.github.io/pointblank/reference/Validate.add_steps.html): Add the steps from one or more `Steps` collections to the validation
 - [Pipeline](https://posit-dev.github.io/pointblank/reference/Pipeline.html): Enforce data contracts at both ends of a data transformation
 - [PipelineResult](https://posit-dev.github.io/pointblank/reference/PipelineResult.html): The outcome of running a data pipeline
 - [ContractViolationError](https://posit-dev.github.io/pointblank/reference/ContractViolationError.html): The error raised when data fails a contract with `on_violation="raise"`
@@ -41,98 +41,98 @@
 - [register_adapter](https://posit-dev.github.io/pointblank/reference/register_adapter.html): Register a contract adapter so that it can be used for import and export
 - [ContractImport](https://posit-dev.github.io/pointblank/reference/ContractImport.html): The result of importing a contract or schema from another format
 - [ContractAdapter](https://posit-dev.github.io/pointblank/reference/ContractAdapter.html): The base class for adapters that translate contracts to and from other formats
-- [adapters.MappedConstraint](https://posit-dev.github.io/pointblank/reference/adapters.MappedConstraint.html)
+- [adapters.MappedConstraint](https://posit-dev.github.io/pointblank/reference/adapters.MappedConstraint.html): A rule from an external format, translated into a Pointblank validation step
 
 #### Validation Steps
 > Validation steps are sequential validations on the target data. Call `Validate`'s validation methods to build up a validation plan: a collection of steps that provides good validation coverage.
 
 
-- [Validate.col_vals_gt](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html)
-- [Validate.col_vals_lt](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_lt.html)
-- [Validate.col_vals_ge](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_ge.html)
-- [Validate.col_vals_le](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_le.html)
-- [Validate.col_vals_eq](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_eq.html)
-- [Validate.col_vals_ne](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_ne.html)
-- [Validate.col_vals_between](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_between.html)
-- [Validate.col_vals_outside](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_outside.html)
-- [Validate.col_vals_in_set](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_set.html)
-- [Validate.col_vals_not_in_set](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_in_set.html)
-- [Validate.col_vals_increasing](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_increasing.html)
-- [Validate.col_vals_decreasing](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_decreasing.html)
-- [Validate.col_vals_null](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_null.html)
-- [Validate.col_vals_not_null](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html)
-- [Validate.col_vals_regex](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html)
-- [Validate.col_vals_within_spec](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_within_spec.html)
-- [Validate.col_vals_str_len](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_str_len.html)
-- [Validate.col_vals_in_table](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_table.html)
-- [Validate.col_vals_expr](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html)
-- [Validate.col_exists](https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html)
-- [Validate.col_pct_null](https://posit-dev.github.io/pointblank/reference/Validate.col_pct_null.html)
-- [Validate.col_pct_missing](https://posit-dev.github.io/pointblank/reference/Validate.col_pct_missing.html)
-- [Validate.col_missing_coded](https://posit-dev.github.io/pointblank/reference/Validate.col_missing_coded.html)
-- [Validate.col_missing_only_coded](https://posit-dev.github.io/pointblank/reference/Validate.col_missing_only_coded.html)
-- [Validate.col_missing_consistent](https://posit-dev.github.io/pointblank/reference/Validate.col_missing_consistent.html)
-- [Validate.rows_distinct](https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html)
-- [Validate.rows_complete](https://posit-dev.github.io/pointblank/reference/Validate.rows_complete.html)
-- [Validate.col_schema_match](https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html)
-- [Validate.row_count_match](https://posit-dev.github.io/pointblank/reference/Validate.row_count_match.html)
-- [Validate.col_count_match](https://posit-dev.github.io/pointblank/reference/Validate.col_count_match.html)
-- [Validate.data_freshness](https://posit-dev.github.io/pointblank/reference/Validate.data_freshness.html)
-- [Validate.tbl_match](https://posit-dev.github.io/pointblank/reference/Validate.tbl_match.html)
-- [Validate.tbl_reconcile](https://posit-dev.github.io/pointblank/reference/Validate.tbl_reconcile.html)
-- [Validate.conjointly](https://posit-dev.github.io/pointblank/reference/Validate.conjointly.html)
-- [Validate.specially](https://posit-dev.github.io/pointblank/reference/Validate.specially.html)
-- [Validate.prompt](https://posit-dev.github.io/pointblank/reference/Validate.prompt.html)
-- [Validate.col_vals_scored](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_scored.html)
-- [Validate.rows_near_distinct](https://posit-dev.github.io/pointblank/reference/Validate.rows_near_distinct.html)
-- [Validate.rows_not_contaminated](https://posit-dev.github.io/pointblank/reference/Validate.rows_not_contaminated.html)
-- [Validate.col_vals_chat_format](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_chat_format.html)
-- [Validate.col_vals_text_quality](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_text_quality.html)
-- [Validate.col_vals_in_language](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_language.html)
-- [Validate.col_vals_token_len](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_token_len.html)
-- [Validate.col_vals_no_pii](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_no_pii.html)
+- [Validate.col_vals_gt](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html): Are column data greater than a fixed value or data in another column?
+- [Validate.col_vals_lt](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_lt.html): Are column data less than a fixed value or data in another column?
+- [Validate.col_vals_ge](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_ge.html): Are column data greater than or equal to a fixed value or data in another column?
+- [Validate.col_vals_le](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_le.html): Are column data less than or equal to a fixed value or data in another column?
+- [Validate.col_vals_eq](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_eq.html): Are column data equal to a fixed value or data in another column?
+- [Validate.col_vals_ne](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_ne.html): Are column data not equal to a fixed value or data in another column?
+- [Validate.col_vals_between](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_between.html): Do column data lie between two specified values or data in other columns?
+- [Validate.col_vals_outside](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_outside.html): Do column data lie outside of two specified values or data in other columns?
+- [Validate.col_vals_in_set](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_set.html): Validate whether column values are in a set of values
+- [Validate.col_vals_not_in_set](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_in_set.html): Validate whether column values are not in a set of values
+- [Validate.col_vals_increasing](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_increasing.html): Are column data increasing by row?
+- [Validate.col_vals_decreasing](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_decreasing.html): Are column data decreasing by row?
+- [Validate.col_vals_null](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_null.html): Validate whether values in a column are Null
+- [Validate.col_vals_not_null](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html): Validate whether values in a column are not Null
+- [Validate.col_vals_regex](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html): Validate whether column values match a regular expression pattern
+- [Validate.col_vals_within_spec](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_within_spec.html): Validate whether column values fit within a specification
+- [Validate.col_vals_str_len](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_str_len.html): Validate whether the length of string values falls within specified bounds
+- [Validate.col_vals_in_table](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_table.html): Validate that column values exist in a reference table (referential integrity)
+- [Validate.col_vals_expr](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html): Validate column values using a custom expression
+- [Validate.col_exists](https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html): Validate whether one or more columns exist in the table
+- [Validate.col_pct_null](https://posit-dev.github.io/pointblank/reference/Validate.col_pct_null.html): Validate whether a column has a specific percentage of Null values
+- [Validate.col_pct_missing](https://posit-dev.github.io/pointblank/reference/Validate.col_pct_missing.html): Validate that the percentage of *structured* missing values stays within a limit
+- [Validate.col_missing_coded](https://posit-dev.github.io/pointblank/reference/Validate.col_missing_coded.html): Validate that all missing values in a column are *coded* (no uncoded nulls)
+- [Validate.col_missing_only_coded](https://posit-dev.github.io/pointblank/reference/Validate.col_missing_only_coded.html): Validate that a column contains only documented codes and legitimate values
+- [Validate.col_missing_consistent](https://posit-dev.github.io/pointblank/reference/Validate.col_missing_consistent.html): Validate that related columns share a consistent missingness pattern for a given reason
+- [Validate.rows_distinct](https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html): Validate whether rows in the table are distinct
+- [Validate.rows_complete](https://posit-dev.github.io/pointblank/reference/Validate.rows_complete.html): Validate whether row data are complete by having no missing values
+- [Validate.col_schema_match](https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html): Do columns in the table (and their types) match a predefined schema?
+- [Validate.row_count_match](https://posit-dev.github.io/pointblank/reference/Validate.row_count_match.html): Validate whether the row count of the table matches a specified count
+- [Validate.col_count_match](https://posit-dev.github.io/pointblank/reference/Validate.col_count_match.html): Validate whether the column count of the table matches a specified count
+- [Validate.data_freshness](https://posit-dev.github.io/pointblank/reference/Validate.data_freshness.html): Validate that data in a datetime column is not older than a specified maximum age
+- [Validate.tbl_match](https://posit-dev.github.io/pointblank/reference/Validate.tbl_match.html): Validate whether the target table matches a comparison table
+- [Validate.tbl_reconcile](https://posit-dev.github.io/pointblank/reference/Validate.tbl_reconcile.html): Validate that aggregates of the target table reconcile with a comparison table
+- [Validate.conjointly](https://posit-dev.github.io/pointblank/reference/Validate.conjointly.html): Perform multiple row-wise validations for joint validity
+- [Validate.specially](https://posit-dev.github.io/pointblank/reference/Validate.specially.html): Perform a specialized validation with customized logic
+- [Validate.prompt](https://posit-dev.github.io/pointblank/reference/Validate.prompt.html): Validate rows using AI/LLM-powered analysis
+- [Validate.col_vals_scored](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_scored.html): Validate whether rows have a score from a model within bounds
+- [Validate.rows_near_distinct](https://posit-dev.github.io/pointblank/reference/Validate.rows_near_distinct.html): Validate whether the text of rows has no near duplicates
+- [Validate.rows_not_contaminated](https://posit-dev.github.io/pointblank/reference/Validate.rows_not_contaminated.html): Validate whether the text of rows doesn't overlap with a reference, such as a benchmark
+- [Validate.col_vals_chat_format](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_chat_format.html): Validate whether column values are well-formed chat conversations
+- [Validate.col_vals_text_quality](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_text_quality.html): Validate whether text passes the heuristic quality filters of web text
+- [Validate.col_vals_in_language](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_language.html): Validate whether text is in the expected language
+- [Validate.col_vals_token_len](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_token_len.html): Validate whether the length of text in tokens is within bounds
+- [Validate.col_vals_no_pii](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_no_pii.html): Validate whether text has no personal information
 
 #### Aggregation Steps
 > These validation methods check aggregated column values (sums, averages, standard deviations) against fixed values or column references.
 
 
-- [Validate.col_sum_gt](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_gt.html)
-- [Validate.col_sum_lt](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_lt.html)
-- [Validate.col_sum_ge](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_ge.html)
-- [Validate.col_sum_le](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_le.html)
-- [Validate.col_sum_eq](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_eq.html)
-- [Validate.col_avg_gt](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_gt.html)
-- [Validate.col_avg_lt](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_lt.html)
-- [Validate.col_avg_ge](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_ge.html)
-- [Validate.col_avg_le](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_le.html)
-- [Validate.col_avg_eq](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_eq.html)
-- [Validate.col_sd_gt](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_gt.html)
-- [Validate.col_sd_lt](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_lt.html)
-- [Validate.col_sd_ge](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_ge.html)
-- [Validate.col_sd_le](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_le.html)
-- [Validate.col_sd_eq](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_eq.html)
+- [Validate.col_sum_gt](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_gt.html): Does the column sum satisfy a greater than comparison?
+- [Validate.col_sum_lt](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_lt.html): Does the column sum satisfy a less than comparison?
+- [Validate.col_sum_ge](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_ge.html): Does the column sum satisfy a greater than or equal to comparison?
+- [Validate.col_sum_le](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_le.html): Does the column sum satisfy a less than or equal to comparison?
+- [Validate.col_sum_eq](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_eq.html): Does the column sum satisfy an equal to comparison?
+- [Validate.col_avg_gt](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_gt.html): Does the column average satisfy a greater than comparison?
+- [Validate.col_avg_lt](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_lt.html): Does the column average satisfy a less than comparison?
+- [Validate.col_avg_ge](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_ge.html): Does the column average satisfy a greater than or equal to comparison?
+- [Validate.col_avg_le](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_le.html): Does the column average satisfy a less than or equal to comparison?
+- [Validate.col_avg_eq](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_eq.html): Does the column average satisfy an equal to comparison?
+- [Validate.col_sd_gt](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_gt.html): Does the column standard deviation satisfy a greater than comparison?
+- [Validate.col_sd_lt](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_lt.html): Does the column standard deviation satisfy a less than comparison?
+- [Validate.col_sd_ge](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_ge.html): Does the column standard deviation satisfy a greater than or equal to comparison?
+- [Validate.col_sd_le](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_le.html): Does the column standard deviation satisfy a less than or equal to comparison?
+- [Validate.col_sd_eq](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_eq.html): Does the column standard deviation satisfy an equal to comparison?
 
 #### Scorers
 > Scorers give each row a score with a model, for `Validate.col_vals_scored()`. Any function of a batch of rows is a scorer; `from_function()` gives one a name, a version, and a batch size, and the adapters use models from common packages (embeddings, rerankers, text classifiers, language identification, and perplexity). Scores are cached by the scorer's name and version, in memory or on disk.
 
 
-- [scorers.Scorer](https://posit-dev.github.io/pointblank/reference/scorers.Scorer.html)
-- [scorers.from_function](https://posit-dev.github.io/pointblank/reference/scorers.from_function.html)
-- [scorers.embedding_similarity](https://posit-dev.github.io/pointblank/reference/scorers.embedding_similarity.html)
-- [scorers.reranker](https://posit-dev.github.io/pointblank/reference/scorers.reranker.html)
-- [scorers.classifier](https://posit-dev.github.io/pointblank/reference/scorers.classifier.html)
-- [scorers.langid](https://posit-dev.github.io/pointblank/reference/scorers.langid.html)
-- [scorers.perplexity](https://posit-dev.github.io/pointblank/reference/scorers.perplexity.html)
-- [scorers.text_stat](https://posit-dev.github.io/pointblank/reference/scorers.text_stat.html)
-- [scorers.token_count](https://posit-dev.github.io/pointblank/reference/scorers.token_count.html)
-- [scorers.clear_cache](https://posit-dev.github.io/pointblank/reference/scorers.clear_cache.html)
+- [scorers.Scorer](https://posit-dev.github.io/pointblank/reference/scorers.Scorer.html): The protocol of the scorers used by `Validate.col_vals_scored()`
+- [scorers.from_function](https://posit-dev.github.io/pointblank/reference/scorers.from_function.html): Make a scorer from a function, with a name, a version, and a batch size
+- [scorers.embedding_similarity](https://posit-dev.github.io/pointblank/reference/scorers.embedding_similarity.html): Score text by its similarity to reference texts, with an embedding model
+- [scorers.reranker](https://posit-dev.github.io/pointblank/reference/scorers.reranker.html): Score how relevant a document is to a query, with a reranking model
+- [scorers.classifier](https://posit-dev.github.io/pointblank/reference/scorers.classifier.html): Score text with a text-classification model from Hugging Face
+- [scorers.langid](https://posit-dev.github.io/pointblank/reference/scorers.langid.html): Score text by how likely it is to be in the expected languages
+- [scorers.perplexity](https://posit-dev.github.io/pointblank/reference/scorers.perplexity.html): Score text by its perplexity under a language model
+- [scorers.text_stat](https://posit-dev.github.io/pointblank/reference/scorers.text_stat.html): Score text by a simple statistic, like its number of words or its share of bullet lines
+- [scorers.token_count](https://posit-dev.github.io/pointblank/reference/scorers.token_count.html): Score text by its number of tokens
+- [scorers.clear_cache](https://posit-dev.github.io/pointblank/reference/scorers.clear_cache.html): Clear the scores that `Validate.col_vals_scored()` keeps in memory
 
 #### RAG Checks
 > Checks of the data of a retrieval-augmented generation (RAG) system. Each function makes a `Steps` collection of ordinary validation steps: `rag.corpus_checks()` checks the chunks of the corpus (text, unique ids, metadata, length, near duplicates, and freshness), and `rag.eval_checks()` checks the evaluation set (queries, near-duplicate queries, gold documents in the corpus, and the relevance of the gold passages).
 
 
-- [rag.corpus_checks](https://posit-dev.github.io/pointblank/reference/rag.corpus_checks.html)
-- [rag.eval_checks](https://posit-dev.github.io/pointblank/reference/rag.eval_checks.html)
+- [rag.corpus_checks](https://posit-dev.github.io/pointblank/reference/rag.corpus_checks.html): Make validation steps that check the corpus of a RAG system
+- [rag.eval_checks](https://posit-dev.github.io/pointblank/reference/rag.eval_checks.html): Make validation steps that check the evaluation set of a RAG system
 
 #### Column Selection
 > Use the `col()` function along with column selection helpers to flexibly select columns for validation. Combine `col()` with `starts_with()`, `~~pointblank.matches()`, etc. for selecting multiple target columns.
@@ -158,38 +158,38 @@
 > The validation plan is executed when `interrogate()` is called. After interrogation, view validation reports, extract metrics, or split data based on results.
 
 
-- [Validate.interrogate](https://posit-dev.github.io/pointblank/reference/Validate.interrogate.html)
-- [Validate.set_tbl](https://posit-dev.github.io/pointblank/reference/Validate.set_tbl.html)
-- [Validate.get_tabular_report](https://posit-dev.github.io/pointblank/reference/Validate.get_tabular_report.html)
-- [Validate.get_step_report](https://posit-dev.github.io/pointblank/reference/Validate.get_step_report.html)
-- [Validate.get_json_report](https://posit-dev.github.io/pointblank/reference/Validate.get_json_report.html)
-- [Validate.get_dataframe_report](https://posit-dev.github.io/pointblank/reference/Validate.get_dataframe_report.html)
-- [Validate.to_code](https://posit-dev.github.io/pointblank/reference/Validate.to_code.html)
-- [Validate.to_yaml](https://posit-dev.github.io/pointblank/reference/Validate.to_yaml.html)
-- [Validate.to_json_schema](https://posit-dev.github.io/pointblank/reference/Validate.to_json_schema.html)
-- [Validate.to_data_card](https://posit-dev.github.io/pointblank/reference/Validate.to_data_card.html)
-- [Validate.suggest_improvements](https://posit-dev.github.io/pointblank/reference/Validate.suggest_improvements.html)
-- [Validate.from_prompt](https://posit-dev.github.io/pointblank/reference/Validate.from_prompt.html)
-- [Validate.get_sundered_data](https://posit-dev.github.io/pointblank/reference/Validate.get_sundered_data.html)
-- [Validate.get_row_flags](https://posit-dev.github.io/pointblank/reference/Validate.get_row_flags.html)
-- [Validate.get_data_extracts](https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html)
-- [Validate.calibrate_prompt](https://posit-dev.github.io/pointblank/reference/Validate.calibrate_prompt.html)
-- [Validate.all_passed](https://posit-dev.github.io/pointblank/reference/Validate.all_passed.html)
-- [Validate.assert_passing](https://posit-dev.github.io/pointblank/reference/Validate.assert_passing.html)
-- [Validate.assert_below_threshold](https://posit-dev.github.io/pointblank/reference/Validate.assert_below_threshold.html)
-- [Validate.assert_dimension_scores](https://posit-dev.github.io/pointblank/reference/Validate.assert_dimension_scores.html)
-- [Validate.above_threshold](https://posit-dev.github.io/pointblank/reference/Validate.above_threshold.html)
-- [Validate.get_dimension_scores](https://posit-dev.github.io/pointblank/reference/Validate.get_dimension_scores.html)
-- [Validate.get_health_score](https://posit-dev.github.io/pointblank/reference/Validate.get_health_score.html)
-- [Validate.get_scorecard](https://posit-dev.github.io/pointblank/reference/Validate.get_scorecard.html)
-- [Validate.n](https://posit-dev.github.io/pointblank/reference/Validate.n.html)
-- [Validate.n_passed](https://posit-dev.github.io/pointblank/reference/Validate.n_passed.html)
-- [Validate.n_failed](https://posit-dev.github.io/pointblank/reference/Validate.n_failed.html)
-- [Validate.f_passed](https://posit-dev.github.io/pointblank/reference/Validate.f_passed.html)
-- [Validate.f_failed](https://posit-dev.github.io/pointblank/reference/Validate.f_failed.html)
-- [Validate.warning](https://posit-dev.github.io/pointblank/reference/Validate.warning.html)
-- [Validate.error](https://posit-dev.github.io/pointblank/reference/Validate.error.html)
-- [Validate.critical](https://posit-dev.github.io/pointblank/reference/Validate.critical.html)
+- [Validate.interrogate](https://posit-dev.github.io/pointblank/reference/Validate.interrogate.html): Execute each validation step against the table and store the results
+- [Validate.set_tbl](https://posit-dev.github.io/pointblank/reference/Validate.set_tbl.html): Set or replace the table associated with the Validate object
+- [Validate.get_tabular_report](https://posit-dev.github.io/pointblank/reference/Validate.get_tabular_report.html): Validation report as a GT table
+- [Validate.get_step_report](https://posit-dev.github.io/pointblank/reference/Validate.get_step_report.html): Get a detailed report for a single validation step
+- [Validate.get_json_report](https://posit-dev.github.io/pointblank/reference/Validate.get_json_report.html): Get a report of the validation results as a JSON-formatted string
+- [Validate.get_dataframe_report](https://posit-dev.github.io/pointblank/reference/Validate.get_dataframe_report.html): Get a report of the validation results as a DataFrame
+- [Validate.to_code](https://posit-dev.github.io/pointblank/reference/Validate.to_code.html): Render this validation plan as canonical Pointblank Python code
+- [Validate.to_yaml](https://posit-dev.github.io/pointblank/reference/Validate.to_yaml.html): Serialize this validation plan to a `yaml_interrogate()`-compatible YAML config
+- [Validate.to_json_schema](https://posit-dev.github.io/pointblank/reference/Validate.to_json_schema.html): Export this validation plan as a JSON Schema document
+- [Validate.to_data_card](https://posit-dev.github.io/pointblank/reference/Validate.to_data_card.html): Write a data card for the table, with the evidence of the validation
+- [Validate.suggest_improvements](https://posit-dev.github.io/pointblank/reference/Validate.suggest_improvements.html): Propose AI-generated improvements to this validation plan
+- [Validate.from_prompt](https://posit-dev.github.io/pointblank/reference/Validate.from_prompt.html): Build a validation plan for this table from a natural-language prompt
+- [Validate.get_sundered_data](https://posit-dev.github.io/pointblank/reference/Validate.get_sundered_data.html): Get the data that passed or failed the validation steps
+- [Validate.get_row_flags](https://posit-dev.github.io/pointblank/reference/Validate.get_row_flags.html): Get the target table with columns flagging the validation steps each row failed
+- [Validate.get_data_extracts](https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html): Get the rows that failed for each validation step
+- [Validate.calibrate_prompt](https://posit-dev.github.io/pointblank/reference/Validate.calibrate_prompt.html): Measure how well a `prompt()` step agrees with labels given by a person
+- [Validate.all_passed](https://posit-dev.github.io/pointblank/reference/Validate.all_passed.html): Determine if every validation step passed perfectly, with no failing test units
+- [Validate.assert_passing](https://posit-dev.github.io/pointblank/reference/Validate.assert_passing.html): Raise an `AssertionError` if all tests are not passing
+- [Validate.assert_below_threshold](https://posit-dev.github.io/pointblank/reference/Validate.assert_below_threshold.html): Raise an `AssertionError` if validation steps exceed a specified threshold level
+- [Validate.assert_dimension_scores](https://posit-dev.github.io/pointblank/reference/Validate.assert_dimension_scores.html): Raise an `AssertionError` if any dimension's health score falls below a minimum
+- [Validate.above_threshold](https://posit-dev.github.io/pointblank/reference/Validate.above_threshold.html): Check if any validation steps exceed a specified threshold level
+- [Validate.get_dimension_scores](https://posit-dev.github.io/pointblank/reference/Validate.get_dimension_scores.html): Get per-dimension health scores from the validation results
+- [Validate.get_health_score](https://posit-dev.github.io/pointblank/reference/Validate.get_health_score.html): Get the overall data quality health score from the validation results
+- [Validate.get_scorecard](https://posit-dev.github.io/pointblank/reference/Validate.get_scorecard.html): Get a data quality scorecard as a GT table
+- [Validate.n](https://posit-dev.github.io/pointblank/reference/Validate.n.html): Provides a dictionary of the number of test units for each validation step
+- [Validate.n_passed](https://posit-dev.github.io/pointblank/reference/Validate.n_passed.html): Provides a dictionary of the number of test units that passed for each validation step
+- [Validate.n_failed](https://posit-dev.github.io/pointblank/reference/Validate.n_failed.html): Provides a dictionary of the number of test units that failed for each validation step
+- [Validate.f_passed](https://posit-dev.github.io/pointblank/reference/Validate.f_passed.html): Provides a dictionary of the fraction of test units that passed for each validation step
+- [Validate.f_failed](https://posit-dev.github.io/pointblank/reference/Validate.f_failed.html): Provides a dictionary of the fraction of test units that failed for each validation step
+- [Validate.warning](https://posit-dev.github.io/pointblank/reference/Validate.warning.html): Get the 'warning' level status for each validation step
+- [Validate.error](https://posit-dev.github.io/pointblank/reference/Validate.error.html): Get the 'error' level status for each validation step
+- [Validate.critical](https://posit-dev.github.io/pointblank/reference/Validate.critical.html): Get the 'critical' level status for each validation step
 
 #### Inspection and Assistance
 > Functions for getting to grips with a new data table. Use `DataScan` for a quick overview, `preview()` for first/last rows, `col_summary_tbl()` for column summaries, and `missing_vals_tbl()` for missing value analysis.
@@ -208,15 +208,15 @@
 #### DataScan Methods
 > Methods for the DataScan class
 
-- [DataScan.get_tabular_report](https://posit-dev.github.io/pointblank/reference/DataScan.get_tabular_report.html)
-- [DataScan.summary_data](https://posit-dev.github.io/pointblank/reference/DataScan.summary_data.html)
-- [DataScan.compare](https://posit-dev.github.io/pointblank/reference/DataScan.compare.html)
-- [DataScan.save_to_json](https://posit-dev.github.io/pointblank/reference/DataScan.save_to_json.html)
-- [DataScan.load_from_json](https://posit-dev.github.io/pointblank/reference/DataScan.load_from_json.html)
-- [DataScan.to_json](https://posit-dev.github.io/pointblank/reference/DataScan.to_json.html)
-- [DataScan.from_json](https://posit-dev.github.io/pointblank/reference/DataScan.from_json.html)
-- [DataScan.to_dict](https://posit-dev.github.io/pointblank/reference/DataScan.to_dict.html)
-- [DataScan.from_dict](https://posit-dev.github.io/pointblank/reference/DataScan.from_dict.html)
+- [DataScan.get_tabular_report](https://posit-dev.github.io/pointblank/reference/DataScan.get_tabular_report.html): Get a tabular report of the scan
+- [DataScan.summary_data](https://posit-dev.github.io/pointblank/reference/DataScan.summary_data.html): The column statistics as a DataFrame
+- [DataScan.compare](https://posit-dev.github.io/pointblank/reference/DataScan.compare.html): Compare this scan against a baseline and return the differences
+- [DataScan.save_to_json](https://posit-dev.github.io/pointblank/reference/DataScan.save_to_json.html): Save the profile to a JSON file
+- [DataScan.load_from_json](https://posit-dev.github.io/pointblank/reference/DataScan.load_from_json.html): Load a `DataScan` from a JSON file produced by `save_to_json()`
+- [DataScan.to_json](https://posit-dev.github.io/pointblank/reference/DataScan.to_json.html): Export the profile as a JSON string
+- [DataScan.from_json](https://posit-dev.github.io/pointblank/reference/DataScan.from_json.html): Restore a `DataScan` from a JSON string
+- [DataScan.to_dict](https://posit-dev.github.io/pointblank/reference/DataScan.to_dict.html): Export the profile as a structured dictionary
+- [DataScan.from_dict](https://posit-dev.github.io/pointblank/reference/DataScan.from_dict.html): Restore a `DataScan` from a dictionary
 
 #### Table Comparison
 > Compare two tables row by row. `~~pointblank.compare()` aligns the rows of a source and a target table (by key, by position, or as multisets) and reports missing, extra, and changed rows, plus schema differences. The result is a `Comparison` object with counts, row samples, and a tabular report. The same comparison is available as a validation step through `Validate.tbl_match()`, and `Validate.tbl_reconcile()` compares aggregates (e.g., totals per group) instead of rows.
@@ -229,17 +229,17 @@
 #### Comparison Methods
 > Methods for the Comparison class
 
-- [Comparison.identical](https://posit-dev.github.io/pointblank/reference/Comparison.identical.html)
-- [Comparison.schema_ok](https://posit-dev.github.io/pointblank/reference/Comparison.schema_ok.html)
-- [Comparison.status_counts](https://posit-dev.github.io/pointblank/reference/Comparison.status_counts.html)
-- [Comparison.n](https://posit-dev.github.io/pointblank/reference/Comparison.n.html)
-- [Comparison.n_passed](https://posit-dev.github.io/pointblank/reference/Comparison.n_passed.html)
-- [Comparison.n_failed](https://posit-dev.github.io/pointblank/reference/Comparison.n_failed.html)
-- [Comparison.rows](https://posit-dev.github.io/pointblank/reference/Comparison.rows.html)
-- [Comparison.column_summary](https://posit-dev.github.io/pointblank/reference/Comparison.column_summary.html)
-- [Comparison.get_tabular_report](https://posit-dev.github.io/pointblank/reference/Comparison.get_tabular_report.html)
-- [Comparison.to_dict](https://posit-dev.github.io/pointblank/reference/Comparison.to_dict.html)
-- [Comparison.to_json](https://posit-dev.github.io/pointblank/reference/Comparison.to_json.html)
+- [Comparison.identical](https://posit-dev.github.io/pointblank/reference/Comparison.identical.html): Whether the tables match under the comparison settings
+- [Comparison.schema_ok](https://posit-dev.github.io/pointblank/reference/Comparison.schema_ok.html): Whether the schema check passed
+- [Comparison.status_counts](https://posit-dev.github.io/pointblank/reference/Comparison.status_counts.html): The number of test units with each row status
+- [Comparison.n](https://posit-dev.github.io/pointblank/reference/Comparison.n.html): The number of test units (aligned rows)
+- [Comparison.n_passed](https://posit-dev.github.io/pointblank/reference/Comparison.n_passed.html): The number of test units that passed
+- [Comparison.n_failed](https://posit-dev.github.io/pointblank/reference/Comparison.n_failed.html): The number of test units that failed
+- [Comparison.rows](https://posit-dev.github.io/pointblank/reference/Comparison.rows.html): Get a sample of rows with a given status
+- [Comparison.column_summary](https://posit-dev.github.io/pointblank/reference/Comparison.column_summary.html): Get a per-column summary of value mismatches
+- [Comparison.get_tabular_report](https://posit-dev.github.io/pointblank/reference/Comparison.get_tabular_report.html): Get a tabular report of the comparison
+- [Comparison.to_dict](https://posit-dev.github.io/pointblank/reference/Comparison.to_dict.html): Get the comparison results as a JSON-serializable dict
+- [Comparison.to_json](https://posit-dev.github.io/pointblank/reference/Comparison.to_json.html): Get the comparison results as a JSON string
 
 #### Split Checks
 > Check the splits of a dataset (training, validation, and test) before training a model: `check_splits()` finds the rows of a later split that are also in an earlier one (exactly or nearly the same), labels that a split is missing or that only it has, and columns whose distribution changes between splits. The result is a `SplitCheck` object with the issues found, the overlapping rows, and a tabular report.
@@ -247,9 +247,9 @@
 
 - [check_splits](https://posit-dev.github.io/pointblank/reference/check_splits.html): Check the splits of a dataset for leaks, label coverage, and drift
 - [SplitCheck](https://posit-dev.github.io/pointblank/reference/SplitCheck.html): The results of [`check_splits()`](`pointblank.check_splits`)
-- [SplitCheck.get_overlap](https://posit-dev.github.io/pointblank/reference/SplitCheck.get_overlap.html)
-- [SplitCheck.get_tabular_report](https://posit-dev.github.io/pointblank/reference/SplitCheck.get_tabular_report.html)
-- [SplitCheck.to_dict](https://posit-dev.github.io/pointblank/reference/SplitCheck.to_dict.html)
+- [SplitCheck.get_overlap](https://posit-dev.github.io/pointblank/reference/SplitCheck.get_overlap.html): Get the rows of a split that are also in an earlier split
+- [SplitCheck.get_tabular_report](https://posit-dev.github.io/pointblank/reference/SplitCheck.get_tabular_report.html): Get a tabular report of the checks of the splits
+- [SplitCheck.to_dict](https://posit-dev.github.io/pointblank/reference/SplitCheck.to_dict.html): Get the results as a dictionary (that can be written as JSON)
 
 #### Synthetic Data Checks
 > Check synthetic data against the real data it was made from (its seed): `check_synthetic()` compares the distribution and the share of missing values of each column, measures the diversity of the rows and of the text, and finds synthetic rows that copy a seed row (exactly or nearly). The result is a `SyntheticCheck` object with the issues found, the copied rows, and a tabular report.
@@ -257,9 +257,9 @@
 
 - [check_synthetic](https://posit-dev.github.io/pointblank/reference/check_synthetic.html): Check synthetic data against its seed for fidelity, diversity, and copies
 - [SyntheticCheck](https://posit-dev.github.io/pointblank/reference/SyntheticCheck.html): The results of [`check_synthetic()`](`pointblank.check_synthetic`)
-- [SyntheticCheck.get_copies](https://posit-dev.github.io/pointblank/reference/SyntheticCheck.get_copies.html)
-- [SyntheticCheck.get_tabular_report](https://posit-dev.github.io/pointblank/reference/SyntheticCheck.get_tabular_report.html)
-- [SyntheticCheck.to_dict](https://posit-dev.github.io/pointblank/reference/SyntheticCheck.to_dict.html)
+- [SyntheticCheck.get_copies](https://posit-dev.github.io/pointblank/reference/SyntheticCheck.get_copies.html): Get the synthetic rows that copy a seed row
+- [SyntheticCheck.get_tabular_report](https://posit-dev.github.io/pointblank/reference/SyntheticCheck.get_tabular_report.html): Get a tabular report of the checks of the synthetic data
+- [SyntheticCheck.to_dict](https://posit-dev.github.io/pointblank/reference/SyntheticCheck.to_dict.html): Get the results as a dictionary (that can be written as JSON)
 
 #### Table Pre-checks
 > Helper functions for use with the `active=` parameter of validation methods. These inspect the target table before a step runs and conditionally skip the step when preconditions are not met.
@@ -280,33 +280,33 @@
 
 - [Ablation](https://posit-dev.github.io/pointblank/reference/Ablation.html): Measure how the rows that fail validation steps affect a model trained on the data
 - [AblationVariant](https://posit-dev.github.io/pointblank/reference/AblationVariant.html): A version of the training table evaluated in an ablation
-- [ablation.Stratified](https://posit-dev.github.io/pointblank/reference/ablation.Stratified.html)
-- [ablation.sklearn_evaluator](https://posit-dev.github.io/pointblank/reference/ablation.sklearn_evaluator.html)
+- [ablation.Stratified](https://posit-dev.github.io/pointblank/reference/ablation.Stratified.html): A control that removes random rows in proportion to groups of the table
+- [ablation.sklearn_evaluator](https://posit-dev.github.io/pointblank/reference/ablation.sklearn_evaluator.html): Make an `evaluate=` function that trains a scikit-learn model and scores it on held-out data
 
 #### Ablation Methods
 > Methods for the Ablation class
 
-- [Ablation.drop_steps](https://posit-dev.github.io/pointblank/reference/Ablation.drop_steps.html)
-- [Ablation.drop_each](https://posit-dev.github.io/pointblank/reference/Ablation.drop_each.html)
-- [Ablation.drop_all](https://posit-dev.github.io/pointblank/reference/Ablation.drop_all.html)
-- [Ablation.drop_all_but_each](https://posit-dev.github.io/pointblank/reference/Ablation.drop_all_but_each.html)
-- [Ablation.drop_groups](https://posit-dev.github.io/pointblank/reference/Ablation.drop_groups.html)
-- [Ablation.sweep_score](https://posit-dev.github.io/pointblank/reference/Ablation.sweep_score.html)
-- [Ablation.sweep_step](https://posit-dev.github.io/pointblank/reference/Ablation.sweep_step.html)
-- [Ablation.inject](https://posit-dev.github.io/pointblank/reference/Ablation.inject.html)
-- [Ablation.shapley](https://posit-dev.github.io/pointblank/reference/Ablation.shapley.html)
-- [Ablation.plan](https://posit-dev.github.io/pointblank/reference/Ablation.plan.html)
-- [Ablation.run](https://posit-dev.github.io/pointblank/reference/Ablation.run.html)
-- [Ablation.check_determinism](https://posit-dev.github.io/pointblank/reference/Ablation.check_determinism.html)
-- [Ablation.export](https://posit-dev.github.io/pointblank/reference/Ablation.export.html)
-- [Ablation.load_results](https://posit-dev.github.io/pointblank/reference/Ablation.load_results.html)
-- [Ablation.get_effects](https://posit-dev.github.io/pointblank/reference/Ablation.get_effects.html)
-- [Ablation.get_shapley](https://posit-dev.github.io/pointblank/reference/Ablation.get_shapley.html)
-- [Ablation.suggest_thresholds](https://posit-dev.github.io/pointblank/reference/Ablation.suggest_thresholds.html)
-- [Ablation.get_tabular_report](https://posit-dev.github.io/pointblank/reference/Ablation.get_tabular_report.html)
-- [Ablation.annotate](https://posit-dev.github.io/pointblank/reference/Ablation.annotate.html)
-- [Ablation.to_dict](https://posit-dev.github.io/pointblank/reference/Ablation.to_dict.html)
-- [Ablation.to_json](https://posit-dev.github.io/pointblank/reference/Ablation.to_json.html)
+- [Ablation.drop_steps](https://posit-dev.github.io/pointblank/reference/Ablation.drop_steps.html): Add a variant that removes the rows failing any of the given steps
+- [Ablation.drop_each](https://posit-dev.github.io/pointblank/reference/Ablation.drop_each.html): Add a variant for each step, removing only the rows that failed that step
+- [Ablation.drop_all](https://posit-dev.github.io/pointblank/reference/Ablation.drop_all.html): Add a variant that removes the rows failing any step
+- [Ablation.drop_all_but_each](https://posit-dev.github.io/pointblank/reference/Ablation.drop_all_but_each.html): Add a variant for each step, removing the rows that failed every other step
+- [Ablation.drop_groups](https://posit-dev.github.io/pointblank/reference/Ablation.drop_groups.html): Add a variant for each group of rows, removing the rows of that group
+- [Ablation.sweep_score](https://posit-dev.github.io/pointblank/reference/Ablation.sweep_score.html): Add a variant for each cutoff of a score, removing the rows on the wrong side of it
+- [Ablation.sweep_step](https://posit-dev.github.io/pointblank/reference/Ablation.sweep_step.html): Add a variant for each value of a step's parameter, removing the rows that fail it
+- [Ablation.inject](https://posit-dev.github.io/pointblank/reference/Ablation.inject.html): Add a variant for each rate of a defect, put into clean rows of the table
+- [Ablation.shapley](https://posit-dev.github.io/pointblank/reference/Ablation.shapley.html): Split the effect of removing the steps' rows fairly among the steps (Shapley values)
+- [Ablation.plan](https://posit-dev.github.io/pointblank/reference/Ablation.plan.html): Show the versions of the table that the ablation will evaluate
+- [Ablation.run](https://posit-dev.github.io/pointblank/reference/Ablation.run.html): Evaluate the full table, each variant, and each control
+- [Ablation.check_determinism](https://posit-dev.github.io/pointblank/reference/Ablation.check_determinism.html): Check that `evaluate=` gives the same result twice for the same table and seed
+- [Ablation.export](https://posit-dev.github.io/pointblank/reference/Ablation.export.html): Write out the versions of the table to evaluate, for training them elsewhere
+- [Ablation.load_results](https://posit-dev.github.io/pointblank/reference/Ablation.load_results.html): Read the results of evaluations made elsewhere, and compute the effects
+- [Ablation.get_effects](https://posit-dev.github.io/pointblank/reference/Ablation.get_effects.html): Get the results of the ablation as a table
+- [Ablation.get_shapley](https://posit-dev.github.io/pointblank/reference/Ablation.get_shapley.html): Get the Shapley values of the steps as a table
+- [Ablation.suggest_thresholds](https://posit-dev.github.io/pointblank/reference/Ablation.suggest_thresholds.html): Suggest thresholds for the steps, from what their failing test units cost the model
+- [Ablation.get_tabular_report](https://posit-dev.github.io/pointblank/reference/Ablation.get_tabular_report.html): Get a tabular report of the ablation's results
+- [Ablation.annotate](https://posit-dev.github.io/pointblank/reference/Ablation.annotate.html): Add the results of the ablation to the steps of the validation, as notes
+- [Ablation.to_dict](https://posit-dev.github.io/pointblank/reference/Ablation.to_dict.html): Get the settings and results of the ablation as a JSON-serializable dict
+- [Ablation.to_json](https://posit-dev.github.io/pointblank/reference/Ablation.to_json.html): Get the settings and results of the ablation as a JSON string
 
 #### YAML
 > Functions for using YAML to orchestrate validation workflows.
@@ -403,4 +403,4 @@
 > Classes for integrating Pointblank with external observability and monitoring systems. Use `OTelExporter` to export validation results as OpenTelemetry metrics, traces, and logs.
 
 
-- [integrations.otel.OTelExporter](https://posit-dev.github.io/pointblank/reference/integrations.otel.OTelExporter.html)
+- [integrations.otel.OTelExporter](https://posit-dev.github.io/pointblank/reference/integrations.otel.OTelExporter.html): Export Pointblank validation results as OpenTelemetry signals

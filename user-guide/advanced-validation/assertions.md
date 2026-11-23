@@ -40,7 +40,7 @@ Pointblank offers two types of assertions:
 1.  Full Passing Assertions: using [`Validate.assert_passing()`](../../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing) to verify that every single test unit passes
 2.  Threshold-Based Assertions: using [`Validate.assert_below_threshold()`](../../reference/Validate.assert_below_threshold.md#pointblank.Validate.assert_below_threshold) to verify that failure rates stay within acceptable thresholds
 
-### [assert_passing()](../../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing)
+### `assert_passing()`
 
 The [`Validate.assert_passing()`](../../reference/Validate.assert_passing.md#pointblank.Validate.assert_passing) method is the strictest form of assertion, requiring every single validation test unit to pass:
 
@@ -60,7 +60,7 @@ except AssertionError as e:
     AssertionError: The following assertions failed:
     - Step 1: Expect that values in `value` should be > `0`.
 
-### [assert_below_threshold()](../../reference/Validate.assert_below_threshold.md#pointblank.Validate.assert_below_threshold)
+### `assert_below_threshold()`
 
 The [`Validate.assert_below_threshold()`](../../reference/Validate.assert_below_threshold.md#pointblank.Validate.assert_below_threshold) method is more flexible as it allows some failures as long as they stay below specified threshold levels. Pointblank uses three severity thresholds that increase in order of seriousness:
 
@@ -136,7 +136,7 @@ This is particularly useful when:
 
 In addition to assertion methods that raise exceptions, Pointblank provides status check methods that return boolean values:
 
-### [all_passed()](../../reference/Validate.all_passed.md#pointblank.Validate.all_passed)
+### `all_passed()`
 
 The [`Validate.all_passed()`](../../reference/Validate.all_passed.md#pointblank.Validate.all_passed) method will return `True` only if every single test unit in every validation step passed:
 
@@ -153,7 +153,7 @@ if not validation.all_passed():
 
     Validation failed: some values are not positive
 
-### [warning()](../../reference/Validate.warning.md#pointblank.Validate.warning), [error()](../../reference/Validate.error.md#pointblank.Validate.error), and [critical()](../../reference/Validate.critical.md#pointblank.Validate.critical)
+### `warning()`, `error()`, and `critical()`
 
 The methods [`Validate.warning()`](../../reference/Validate.warning.md#pointblank.Validate.warning), [`Validate.error()`](../../reference/Validate.error.md#pointblank.Validate.error), and [`Validate.critical()`](../../reference/Validate.critical.md#pointblank.Validate.critical) all return information about whether validation steps exceeded that specific threshold level.
 

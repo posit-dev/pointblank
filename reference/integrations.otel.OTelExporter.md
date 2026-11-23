@@ -132,7 +132,7 @@ for metric in metrics:
     pb.validation.test_units.passed 7
     pb.validation.test_units.failed 3
     pb.validation.pass_rate 0.7
-    pb.validation.duration 0.015669
+    pb.validation.duration 0.012119
     pb.validation.threshold.warning 2
     pb.validation.threshold.error 2
     pb.validation.threshold.critical 1
@@ -185,7 +185,7 @@ Run actions after an interrogation.
 
 | Name | Description |
 |----|----|
-| [export()](#export) | Send the results of an interrogated validation as OTel signals. |
+| [export()](#pointblank.integrations.otel.OTelExporter.export) | Send the results of an interrogated validation as OTel signals. |
 
 ### export()
 

@@ -34,7 +34,7 @@ The offset from the start of the column list. The default is `0`. If `offset` is
 `FirstN`  
 A `FirstN` object, which can be used to select the first `n` columns.
 
-## Relevant Validation Methods Where [first_n()](../reference/first_n.md#pointblank.first_n) Can Be Used
+## Relevant Validation Methods Where `first_n()` Can Be Used
 
 This selector function can be used in the `columns=` argument of the following validation methods:
 

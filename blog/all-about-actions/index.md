@@ -201,7 +201,7 @@ validation_4
 
 The metadata dictionary contains essential fields for a given validation step, including the step number, column name, validation type, severity level, and failure explanation. This gives you complete flexibility to create highly customized responses based on the specific nature of the validation failure.
 
-## Final Actions with [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions)
+## Final Actions with `FinalActions`
 
 While regular [`Actions`](../../reference/Actions.md#pointblank.Actions) are great for responding to individual validation steps, sometimes you need to take action based on the overall validation results. This is where the new [FinalActions](../../reference/FinalActions.md#pointblank.FinalActions) feature from `v0.8.1` comes in.
 

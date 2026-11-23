@@ -263,7 +263,7 @@ That completes the end-to-end walkthrough. The same three signal types (metrics,
 
 This section documents every [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) option and how the log-level filter works.
 
-### [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter) Parameters
+### `OTelExporter` Parameters
 
 The table below lists all constructor parameters for [OTelExporter](../../reference/integrations.otel.OTelExporter.md#pointblank.integrations.otel.OTelExporter).
 

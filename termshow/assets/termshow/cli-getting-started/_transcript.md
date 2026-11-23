@@ -144,7 +144,7 @@ Validation Result: Rows Distinct
   Passing Rows        11
   Failing Rows        2
   Result              ✗ FAILED
-  Duplicate Rows      2 found0m
+  Duplicate Rows      2 found
 
 
 ╭────────────────────────────────────────────────────────────╮

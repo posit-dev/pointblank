@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1aa5e9f6d206be91d862d26944677737.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -189,7 +189,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="506" data-forks="39"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2043,6 +2043,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<div id="pointblank.ADaMDatasetTemplate">
+
+</div>
 <div class="doc-subject">
 <p>The structural template for an ADaM dataset.</p>
 </div>
@@ -2097,7 +2100,7 @@ The names of the variables that together identify a record. The default is an em
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s look at the template for the Basic Data Structure (BDS), the structure of analysis datasets such as ADVS (vital signs) and ADLB (laboratory results):</p>
-<div id="0bea7842" class="cell" data-execution_count="1">
+<div id="32ecd4d9" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>bds <span class="op">=</span> pb.get_adam_dataset(<span class="st">"BDS"</span>)</span>
@@ -2112,7 +2115,7 @@ One or more records per subject per analysis parameter per analysis timepoint. U
 </div>
 </div>
 <p>A BDS dataset has a record for each analysis parameter (<code>PARAMCD</code>) at each visit and date, for each subject. The template’s properties list the required and conditionally required variables:</p>
-<div id="b8f2e283" class="cell" data-execution_count="2">
+<div id="fd38d950" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(bds.required_variables)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(bds.conditional_variables)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2150,19 +2153,22 @@ One or more records per subject per analysis parameter per analysis timepoint. U
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#required_variables" class="doc-attribute doc-label doc-label-property">required_variables</a></td>
+<td><a href="#pointblank.ADaMDatasetTemplate.required_variables" class="doc-attribute doc-label doc-label-property">required_variables</a></td>
 <td>The names of the required variables, in order.</td>
 </tr>
 <tr class="even">
-<td><a href="#conditional_variables" class="doc-attribute doc-label doc-label-property">conditional_variables</a></td>
+<td><a href="#pointblank.ADaMDatasetTemplate.conditional_variables" class="doc-attribute doc-label doc-label-property">conditional_variables</a></td>
 <td>The names of the conditionally required variables, in order.</td>
 </tr>
 <tr class="odd">
-<td><a href="#population_flags" class="doc-attribute doc-label doc-label-property">population_flags</a></td>
+<td><a href="#pointblank.ADaMDatasetTemplate.population_flags" class="doc-attribute doc-label doc-label-property">population_flags</a></td>
 <td>The names of the population flag variables, in order.</td>
 </tr>
 </tbody>
 </table>
+<div id="pointblank.ADaMDatasetTemplate.required_variables">
+
+</div>
 <section id="required_variables" class="level3">
 <h3 class="anchored" data-anchor-id="required_variables"><span class="doc-object-name doc-attribute doc-label doc-label-property">required_variables</span></h3>
 <div class="doc-subject">
@@ -2176,7 +2182,7 @@ One or more records per subject per analysis parameter per analysis timepoint. U
 </div>
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="ab24ad85" class="cell" data-execution_count="3">
+<div id="76f30757" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>pb.get_adam_dataset(<span class="st">"ADTTE"</span>).required_variables</span></code></pre></div>
@@ -2185,6 +2191,9 @@ One or more records per subject per analysis parameter per analysis timepoint. U
 </div>
 </div>
 <p>A time-to-event dataset (ADTTE) needs the parameter, the time to the event (<code>AVAL</code>), the start and event dates, and the censoring indicator (<code>CNSR</code>). This is a property, so it’s used without parentheses.</p>
+<div id="pointblank.ADaMDatasetTemplate.conditional_variables">
+
+</div>
 </section>
 </section>
 <section id="conditional_variables" class="level3">
@@ -2200,7 +2209,7 @@ One or more records per subject per analysis parameter per analysis timepoint. U
 </div>
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="427abc98" class="cell" data-execution_count="4">
+<div id="b44fe6b8" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>adsl <span class="op">=</span> pb.get_adam_dataset(<span class="st">"ADSL"</span>)</span>
@@ -2215,6 +2224,9 @@ TRTEDT -&gt; Required if treatment end used in derivations</code></pre>
 </div>
 </div>
 <p>These are the first four conditional variables of ADSL, with the condition for each one. This is a property, so it’s used without parentheses.</p>
+<div id="pointblank.ADaMDatasetTemplate.population_flags">
+
+</div>
 </section>
 </section>
 <section id="population_flags" class="level3">
@@ -2230,7 +2242,7 @@ TRTEDT -&gt; Required if treatment end used in derivations</code></pre>
 </div>
 <section id="examples-3" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
-<div id="8c67a282" class="cell" data-execution_count="5">
+<div id="362df1b0" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>pb.get_adam_dataset(<span class="st">"ADSL"</span>).population_flags</span></code></pre></div>
@@ -2253,11 +2265,14 @@ TRTEDT -&gt; Required if treatment end used in derivations</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#get_variable" class="doc-function doc-label doc-label-method">get_variable()</a></td>
+<td><a href="#pointblank.ADaMDatasetTemplate.get_variable" class="doc-function doc-label doc-label-method">get_variable()</a></td>
 <td>Get the specification of a variable.</td>
 </tr>
 </tbody>
 </table>
+<div id="pointblank.ADaMDatasetTemplate.get_variable">
+
+</div>
 <section id="get_variable" class="level3">
 <h3 class="anchored" data-anchor-id="get_variable"><span class="doc-object-name doc-function doc-label doc-label-method">get_variable()</span></h3>
 <div class="doc-subject">
@@ -2294,7 +2309,7 @@ The specification of the variable, or <code>None</code> if the template has no v
 </section>
 <section id="examples-4" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
-<div id="cb8c7c5a" class="cell" data-execution_count="6">
+<div id="ce5c8a13" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>adtte <span class="op">=</span> pb.get_adam_dataset(<span class="st">"ADTTE"</span>)</span>
@@ -2305,7 +2320,7 @@ The specification of the variable, or <code>None</code> if the template has no v
 </div>
 </div>
 <p><code>CNSR</code> is the required censoring indicator of a time-to-event dataset. A name that isn’t in the template gives <code>None</code>:</p>
-<div id="14b843e7" class="cell" data-execution_count="7">
+<div id="eebf87f8" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(adtte.get_variable(<span class="st">"AESEQ"</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>None</code></pre>
@@ -2758,6 +2773,7 @@ The specification of the variable, or <code>None</code> if the template has no v
 <script src="../wide-layout.js"></script>
 <script src="../keyboard-nav.js"></script>
 <script src="../copy-code.js"></script>
+<script src="../heading-anchors.js"></script>
 <script src="../details.js"></script>
 <script src="../mermaid-renderer.js"></script>
 <script src="../reference-switcher.js"></script>

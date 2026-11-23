@@ -42,7 +42,7 @@ Missing Values / External source: worldcities.csv / polars
  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   city_name              str            ●       ●       ●       ●       ●       ●       ●       ●       ●       ●
   latitude               f64            ●       ●       ●       ●       ●       ●       ●       ●       ●       ●
-  longitude              f64            ●       ●       ●       ●       ●       ●0m       ●       ●       ●       ●
+  longitude              f64            ●       ●       ●       ●       ●       ●       ●       ●       ●       ●
   country                str            ●       ●       ●       ●       ●       ●       ●       ●       ●       ●
   population             i64           <1%     <1%     18%      ●       ●       ●       ●       ●       ●       ●
 
@@ -63,14 +63,14 @@ Validation Result: Column Values Not Null
   Total Rows Tested   41,001
   Passing Rows        40,263
   Failing Rows        738
-  Result           0m   ✗ FAILED
+  Result              ✗ FAILED
   Null Values         738 found
 
 
 ╭──────────────────────────────────────────────────────────────────────────────────────╮
 │ ✗ Validation FAILED: 738 null values found in column 'population' in worldcities.csv │
 │ 💡 Tip: Use --show-extract to see the failing rows                                   │
-╰──────────────────────────────────────────────────────────────────────────────────────╯[0m
+╰──────────────────────────────────────────────────────────────────────────────────────╯
 >
 > # Step 4: Check for missing city names (and show the problematic rows)
 > pb validate worldcities.csv --check col-vals-not-null --column city_name --show-extract
@@ -112,7 +112,7 @@ Greater Than Or Equal
   Column              latitude
   Comparison Value    >= -90.0
   Total Rows Tested   41,001
-  Passing Rows       37m 41,001
+  Passing Rows        41,001
   Failing Rows        0
   Result              ✓ PASSED
   Values Status       All values >= -90.0
@@ -132,7 +132,7 @@ Less Than Or Equal
   Column              latitude
   Comparison Value    <= 90.0
   Total Rows Tested   41,001
-  Passing Rows        41,001             0m
+  Passing Rows        41,001
   Failing Rows        0
   Result              ✓ PASSED
   Values Status       All values <= 90.0
@@ -181,12 +181,12 @@ Steps: 6 / P: 4 (4 AP) / W: 2 / E: 0 / C: 0 / warning
 
       Step                Column       Values        Units   Pass        Fail       W   E   C   Ext
  ───────────────────────────────────────────────────────────────────────────────────────────────────
-  1   col_schema_match    —            —          33m   1       1/1.00      0/0.00     ○   ○   —    —
+  1   col_schema_match    —            —             1       1/1.00      0/0.00     ○   ○   —    —
   2   col_vals_not_null   city_name    —             41K     41K/1.00    0/0.00     ○   ○   —    —
   3   col_vals_not_null   population   —             41K     40K/0.98    738/0.02   ●   ○   —    ✓
   4   col_vals_gt         population   0             41K     41K/>0.99   3/<0.01    ●   ○   —    ✓
   5   col_vals_between    latitude     [-90, 90]     41K     41K/1.00    0/0.00     ○   ○   —    —
-  6   col_vals_between   36m longitude    [-180, 180]   41K     41K/1.00    0/0.00     ○   ○   —    —
+  6   col_vals_between    longitude    [-180, 180]   41K     41K/1.00    0/0.00     ○   ○   —    —
 
 ╭───────────────────────────────────────────╮
 │ ✗ Validation failed with warning severity │
@@ -201,12 +201,12 @@ Steps: 6 / P: 4 (4 AP) / W: 2 / E: 0 / C: 0 / warning
 
       Step                Column       Values        Units   Pass        Fail       W   E   C   Ext
  ───────────────────────────────────────────────────────────────────────────────────────────────────
-  1   col_schema_match    —            —          33m   1       1/1.00      0/0.00     ○   ○   —    —
+  1   col_schema_match    —            —             1       1/1.00      0/0.00     ○   ○   —    —
   2   col_vals_not_null   city_name    —             41K     41K/1.00    0/0.00     ○   ○   —    —
   3   col_vals_not_null   population   —             41K     40K/0.98    738/0.02   ●   ○   —    ✓
   4   col_vals_gt         population   0             41K     41K/>0.99   3/<0.01    ●   ○   —    ✓
   5   col_vals_between    latitude     [-90, 90]     41K     41K/1.00    0/0.00     ○   ○   —    —
-  6   col_vals_between   36m longitude    [-180, 180]   41K     41K/1.00    0/0.00     ○   ○   —    —
+  6   col_vals_between    longitude    [-180, 180]   41K     41K/1.00    0/0.00     ○   ○   —    —
 
 ╭───────────────────────────────────────────╮
 │ ✗ Validation failed with warning severity │
@@ -221,11 +221,11 @@ Showing first 10 of 500 failing rows
            city_name      latitude   longitude   country                population
            <str>          <f64>      <f64>       <str>                  <i64>
  ──────────────────────────────────────────────────────────────────────────────────
-     844   Gaza        36m   31.5069    34.456      Gaza Strip             None
+     844   Gaza           31.5069    34.456      Gaza Strip             None
      852   Al Quds        31.7764    35.2269     West Bank              None
      854   Basse-Terre    16.0       -61.7167    Guadeloupe             None
      860   Marigot        18.0706    -63.0847    Saint Martin           None
-     861   [36mPhilipsburg    18.0256    -63.0492    Sint Maarten           None
+     861   Philipsburg    18.0256    -63.0492    Sint Maarten           None
      862   Road Town      18.4167    -64.6167    Virgin Islands, Bri…   None
      863   Gustavia       17.8958    -62.8508    Saint Barthelemy       None
      864   Saint-Pierre   46.7811    -56.1764    Saint Pierre And Mi…   None
@@ -240,7 +240,7 @@ Showing all 3 failing rows
            city_name    latitude   longitude   country      population
            <str>        <f64>      <f64>       <str>        <i64>
  ──────────────────────────────────────────────────────────────────────
-   40381   Logashkino   70.8536    153.8744 [36m   Russia       0
+   40381   Logashkino   70.8536    153.8744    Russia       0
    40947   Ağdam        40.9053    45.5564     Azerbaijan   0
    41001   Nordvik      74.0165    111.51      Russia       0
 

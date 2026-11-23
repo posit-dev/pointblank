@@ -183,7 +183,7 @@ Get the metadata of a variable by name.
 
 | Name | Description |
 |----|----|
-| [to_missing_spec()](#to_missing_spec) | Build a [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) from this variable's missing values. |
+| [to_missing_spec()](#pointblank.VariableMetadata.to_missing_spec) | Build a [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) from this variable's missing values. |
 
 ### to_missing_spec()
 

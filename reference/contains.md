@@ -34,7 +34,7 @@ Whether column names should be treated as case-sensitive. The default is `False`
 `Contains`  
 A `Contains` object, which can be used to select columns that contain the specified text.
 
-## Relevant Validation Methods Where [contains()](../reference/contains.md#pointblank.contains) Can Be Used
+## Relevant Validation Methods Where `contains()` Can Be Used
 
 This selector function can be used in the `columns=` argument of the following validation methods:
 

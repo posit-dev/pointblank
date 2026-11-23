@@ -135,9 +135,9 @@ The test used to decide whether a boundary passes.
 
 | Name | Description |
 |----|----|
-| [passed](#passed) | Whether the whole pipeline run passed. |
-| [source_passed](#source_passed) | Whether the source boundary validation passed. |
-| [target_passed](#target_passed) | Whether the target boundary validation passed. |
+| [passed](#pointblank.PipelineResult.passed) | Whether the whole pipeline run passed. |
+| [source_passed](#pointblank.PipelineResult.source_passed) | Whether the source boundary validation passed. |
+| [target_passed](#pointblank.PipelineResult.target_passed) | Whether the target boundary validation passed. |
 
 ### passed
 
@@ -167,7 +167,7 @@ This is `True` when every test unit in the target validation passed. It's also `
 
 | Name | Description |
 |----|----|
-| [get_report()](#get_report) | Summarize both boundary validations as plain text. |
+| [get_report()](#pointblank.PipelineResult.get_report) | Summarize both boundary validations as plain text. |
 
 ### get_report()
 

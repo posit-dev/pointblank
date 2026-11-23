@@ -132,10 +132,10 @@ Add steps from a [Steps](../reference/Steps.md#pointblank.Steps) object to a val
 
 ## Methods
 
-| Name                      | Description                       |
-|---------------------------|-----------------------------------|
-| [to_dict()](#to_dict)     | Convert the step to a dictionary. |
-| [from_dict()](#from_dict) | Create a step from a dictionary.  |
+| Name | Description |
+|----|----|
+| [to_dict()](#pointblank.Step.to_dict) | Convert the step to a dictionary. |
+| [from_dict()](#pointblank.Step.from_dict) | Create a step from a dictionary. |
 
 ### to_dict()
 

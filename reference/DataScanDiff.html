@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1aa5e9f6d206be91d862d26944677737.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="506" data-forks="39"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2047,6 +2047,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<div id="pointblank.DataScanDiff">
+
+</div>
 <div class="doc-subject">
 <p>The result of comparing two <a href="../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> profiles.</p>
 </div>
@@ -2105,7 +2108,7 @@ Per-column diff details for all columns that appear in either scan, with the bas
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>In this example, a table gains a row and a <code>note</code> column, and its <code>score</code> column changes from integers to strings.</p>
-<div id="bd55925c" class="cell" data-execution_count="2">
+<div id="18fe392f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2123,7 +2126,7 @@ Per-column diff details for all columns that appear in either scan, with the bas
 </div>
 </div>
 <p>The schema changes are available directly as lists. For a look at each column, go through <code>column_diffs</code>:</p>
-<div id="2a779c66" class="cell" data-execution_count="3">
+<div id="8fde3626" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> diff.column_diffs:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(col.colname, col.status, col.coltype_baseline, <span class="st">"-&gt;"</span>, col.coltype_current)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2158,15 +2161,18 @@ note added None -&gt; String</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#has_changes" class="doc-attribute doc-label doc-label-property">has_changes</a></td>
+<td><a href="#pointblank.DataScanDiff.has_changes" class="doc-attribute doc-label doc-label-property">has_changes</a></td>
 <td>Return <code>True</code> if any schema or statistical changes were detected.</td>
 </tr>
 <tr class="even">
-<td><a href="#row_count_diff" class="doc-attribute doc-label doc-label-property">row_count_diff</a></td>
+<td><a href="#pointblank.DataScanDiff.row_count_diff" class="doc-attribute doc-label doc-label-property">row_count_diff</a></td>
 <td>Return <code>(baseline_row_count, current_row_count)</code>.</td>
 </tr>
 </tbody>
 </table>
+<div id="pointblank.DataScanDiff.has_changes">
+
+</div>
 <section id="has_changes" class="level3">
 <h3 class="anchored" data-anchor-id="has_changes"><span class="doc-object-name doc-attribute doc-label doc-label-property">has_changes</span></h3>
 <div class="doc-subject">
@@ -2181,7 +2187,7 @@ note added None -&gt; String</code></pre>
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
 <p>Here, a log of job runs grows from three rows to five, but every status is still <code>"ok"</code>.</p>
-<div id="abbbdff1" class="cell" data-execution_count="5">
+<div id="d4f0cc51" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2196,6 +2202,9 @@ note added None -&gt; String</code></pre>
 </div>
 </div>
 <p>The table has more rows, but nothing about its columns changed (they have the same values in the same proportions), so <a href="../reference/DataScanDiff.html#pointblank.DataScanDiff.has_changes" class="gdls-link gdls-code">has_changes</a> is <code>False</code>. A single <code>"failed"</code> status in the new rows would have changed the number of distinct values and made it <code>True</code>.</p>
+<div id="pointblank.DataScanDiff.row_count_diff">
+
+</div>
 </section>
 </section>
 <section id="row_count_diff" class="level3">
@@ -2212,7 +2221,7 @@ note added None -&gt; String</code></pre>
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
 <p>Let’s compare two versions of a log of job runs, where the newer one has two more rows.</p>
-<div id="e7e3f9b4" class="cell" data-execution_count="7">
+<div id="b9e63d5c" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2243,15 +2252,18 @@ note added None -&gt; String</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#get_tabular_report" class="doc-function doc-label doc-label-method">get_tabular_report()</a></td>
+<td><a href="#pointblank.DataScanDiff.get_tabular_report" class="doc-function doc-label doc-label-method">get_tabular_report()</a></td>
 <td>Generate a GT table summarizing the differences between the two scans.</td>
 </tr>
 <tr class="even">
-<td><a href="#to_dict" class="doc-function doc-label doc-label-method">to_dict()</a></td>
+<td><a href="#pointblank.DataScanDiff.to_dict" class="doc-function doc-label doc-label-method">to_dict()</a></td>
 <td>Export the comparison results as a dictionary.</td>
 </tr>
 </tbody>
 </table>
+<div id="pointblank.DataScanDiff.get_tabular_report">
+
+</div>
 <section id="get_tabular_report" class="level3">
 <h3 class="anchored" data-anchor-id="get_tabular_report"><span class="doc-object-name doc-function doc-label doc-label-method">get_tabular_report()</span></h3>
 <div class="doc-subject">
@@ -2289,7 +2301,7 @@ A styled Great Tables report showing schema and statistical drift.
 <section id="examples-3" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
 <p>Let’s compare a scan of the <code>small_table</code> dataset with a scan of an older version, where the <code>f</code> column only had <code>"low"</code> and <code>"high"</code> values and there was no <code>e</code> column.</p>
-<div id="eb149684" class="cell" data-execution_count="9">
+<div id="5be6a9bc" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2303,69 +2315,69 @@ A styled Great Tables report showing schema and statistical drift.
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>diff.get_tabular_report()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
-<div id="kzbikemaoe" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="kiervfsglv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#kzbikemaoe table {
+#kiervfsglv table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#kzbikemaoe thead, tbody, tfoot, tr, td, th { border-style: none; }
- tr { background-color: transparent; }
-#kzbikemaoe p { margin: 0; padding: 0; }
- #kzbikemaoe .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #kzbikemaoe .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #kzbikemaoe .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #kzbikemaoe .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #kzbikemaoe .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #kzbikemaoe .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #kzbikemaoe .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #kzbikemaoe .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #kzbikemaoe .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #kzbikemaoe .gt_column_spanner_outer:first-child { padding-left: 0; }
- #kzbikemaoe .gt_column_spanner_outer:last-child { padding-right: 0; }
- #kzbikemaoe .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #kzbikemaoe .gt_spanner_row { border-bottom-style: hidden; }
- #kzbikemaoe .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #kzbikemaoe .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #kzbikemaoe .gt_from_md> :first-child { margin-top: 0; }
- #kzbikemaoe .gt_from_md> :last-child { margin-bottom: 0; }
- #kzbikemaoe .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #kzbikemaoe .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #kzbikemaoe .gt_indent_1 { text-indent: 5px; }
- #kzbikemaoe .gt_indent_2 { text-indent: calc(5px * 2); }
- #kzbikemaoe .gt_indent_3 { text-indent: calc(5px * 3); }
- #kzbikemaoe .gt_indent_4 { text-indent: calc(5px * 4); }
- #kzbikemaoe .gt_indent_5 { text-indent: calc(5px * 5); }
- #kzbikemaoe .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #kzbikemaoe .gt_row_group_first td { border-top-width: 2px; }
- #kzbikemaoe .gt_row_group_first th { border-top-width: 2px; }
- #kzbikemaoe .gt_striped { color: #333333; background-color: #F4F4F4; }
- #kzbikemaoe .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #kzbikemaoe .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #kzbikemaoe .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #kzbikemaoe .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #kzbikemaoe .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #kzbikemaoe .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #kzbikemaoe .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #kzbikemaoe .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #kzbikemaoe .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #kzbikemaoe .gt_left { text-align: left; }
- #kzbikemaoe .gt_center { text-align: center; }
- #kzbikemaoe .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #kzbikemaoe .gt_font_normal { font-weight: normal; }
- #kzbikemaoe .gt_font_bold { font-weight: bold; }
- #kzbikemaoe .gt_font_italic { font-style: italic; }
- #kzbikemaoe .gt_super { font-size: 65%; }
- #kzbikemaoe .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #kzbikemaoe .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #kzbikemaoe .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #kzbikemaoe .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #kzbikemaoe .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #kzbikemaoe .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#kiervfsglv thead, #kiervfsglv tbody, #kiervfsglv tfoot, #kiervfsglv tr, #kiervfsglv td, #kiervfsglv th { border-style: none; }
+#kiervfsglv tr { background-color: transparent; }
+#kiervfsglv p { margin: 0; padding: 0; }
+ #kiervfsglv .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #kiervfsglv .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #kiervfsglv .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #kiervfsglv .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #kiervfsglv .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #kiervfsglv .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #kiervfsglv .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #kiervfsglv .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 6px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #kiervfsglv .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #kiervfsglv .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #kiervfsglv .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #kiervfsglv .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #kiervfsglv .gt_spanner_row { border-bottom-style: hidden; }
+ #kiervfsglv .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #kiervfsglv .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #kiervfsglv .gt_from_md> :first-child { margin-top: 0; }
+ #kiervfsglv .gt_from_md> :last-child { margin-bottom: 0; }
+ #kiervfsglv .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #kiervfsglv .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #kiervfsglv .gt_indent_1 { text-indent: 5px; }
+ #kiervfsglv .gt_indent_2 { text-indent: calc(5px * 2); }
+ #kiervfsglv .gt_indent_3 { text-indent: calc(5px * 3); }
+ #kiervfsglv .gt_indent_4 { text-indent: calc(5px * 4); }
+ #kiervfsglv .gt_indent_5 { text-indent: calc(5px * 5); }
+ #kiervfsglv .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #kiervfsglv .gt_row_group_first td { border-top-width: 2px; }
+ #kiervfsglv .gt_row_group_first th { border-top-width: 2px; }
+ #kiervfsglv .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #kiervfsglv .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #kiervfsglv .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #kiervfsglv .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #kiervfsglv .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #kiervfsglv .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #kiervfsglv .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #kiervfsglv .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #kiervfsglv .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #kiervfsglv .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #kiervfsglv .gt_left { text-align: left; }
+ #kiervfsglv .gt_center { text-align: center; }
+ #kiervfsglv .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #kiervfsglv .gt_font_normal { font-weight: normal; }
+ #kiervfsglv .gt_font_bold { font-weight: bold; }
+ #kiervfsglv .gt_font_italic { font-style: italic; }
+ #kiervfsglv .gt_super { font-size: 65%; }
+ #kiervfsglv .gt_footnotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #kiervfsglv .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #kiervfsglv .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #kiervfsglv .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #kiervfsglv .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #kiervfsglv .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table class="gt_table" aria-labelledby="title" aria-describedby="subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
@@ -2459,6 +2471,9 @@ A styled Great Tables report showing schema and statistical drift.
 </div>
 </div>
 <p>The <code>e</code> column shows as added, and the other columns have changed statistics, since the older version had two fewer rows. The PSI of <code>f</code> (about 1.15) comes from the <code>"mid"</code> values that are only in the current version. The <code>date_time</code>, <code>date</code>, and <code>b</code> columns get a similar PSI, but for a different reason: nearly all of their values are distinct, so removing any rows changes their value frequencies a lot. The PSI of a non-numeric column means most for columns with a few distinct values, like <code>f</code>. Like other GT tables, the report can be saved as HTML with <code>write_raw_html()</code>, to share with others who want to review the changes.</p>
+<div id="pointblank.DataScanDiff.to_dict">
+
+</div>
 </section>
 </section>
 <section id="to_dict" class="level3">
@@ -2490,7 +2505,7 @@ A dictionary with these keys: <code>"row_count"</code> (a dictionary with the <c
 <section id="examples-4" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
 <p>Let’s compare two versions of a table of orders. The newer version has one more order, a refund for -15.5.</p>
-<div id="9133b28b" class="cell" data-execution_count="11">
+<div id="994e1012" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2508,7 +2523,7 @@ A dictionary with these keys: <code>"row_count"</code> (a dictionary with the <c
 </div>
 </div>
 <p>There are no schema changes. The changed statistics of <code>amount</code> include its minimum:</p>
-<div id="6fabb2f0" class="cell" data-execution_count="12">
+<div id="d7c8b048" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>diff_dict[<span class="st">"stat_diffs"</span>][<span class="st">"amount"</span>][<span class="st">"min"</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>{'baseline': 15.5, 'current': -15.5}</code></pre>
@@ -2961,6 +2976,7 @@ A dictionary with these keys: <code>"row_count"</code> (a dictionary with the <c
 <script src="../wide-layout.js"></script>
 <script src="../keyboard-nav.js"></script>
 <script src="../copy-code.js"></script>
+<script src="../heading-anchors.js"></script>
 <script src="../details.js"></script>
 <script src="../mermaid-renderer.js"></script>
 <script src="../reference-switcher.js"></script>

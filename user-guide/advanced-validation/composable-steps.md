@@ -28,7 +28,7 @@ validation = (
 
 This works but reads *inside-out*. With more than two or three groups, the nesting becomes hard to follow. The step definitions are also coupled to whichever [Validate](../../reference/Validate.md#pointblank.Validate) object they happen to be called on.
 
-## Building Step Libraries with [Steps](../../reference/Steps.md#pointblank.Steps)
+## Building Step Libraries with `Steps`
 
 The [Steps](../../reference/Steps.md#pointblank.Steps) class lets you record validation steps without binding them to data, thresholds, or any other [Validate](../../reference/Validate.md#pointblank.Validate) configuration. You use the same method names and parameters you already know from [Validate](../../reference/Validate.md#pointblank.Validate) ([col_vals_gt()](../../reference/Validate.col_vals_gt.md#pointblank.Validate.col_vals_gt), [col_vals_not_null()](../../reference/Validate.col_vals_not_null.md#pointblank.Validate.col_vals_not_null), [col_vals_regex()](../../reference/Validate.col_vals_regex.md#pointblank.Validate.col_vals_regex), etc.), but instead of running the checks, [Steps](../../reference/Steps.md#pointblank.Steps) stores them for later use.
 
@@ -74,7 +74,7 @@ print(f"Number of steps: {len(completeness)}")
 
 In a Jupyter notebook or other rich-display environment, [Steps](../../reference/Steps.md#pointblank.Steps) renders as an HTML summary table.
 
-## Composing Plans with [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps)
+## Composing Plans with `add_steps()`
 
 The [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) method on [Validate](../../reference/Validate.md#pointblank.Validate) accepts one or more [Steps](../../reference/Steps.md#pointblank.Steps) objects and appends their recorded steps to the validation plan:
 
@@ -159,7 +159,7 @@ price_checks = (
 
 The selector `starts_with("amt_")` is recorded verbatim in the [Steps](../../reference/Steps.md#pointblank.Steps) object and resolved when the steps are applied to the [Validate](../../reference/Validate.md#pointblank.Validate) plan. This means the same [Steps](../../reference/Steps.md#pointblank.Steps) object adapts to tables with different numbers of matching columns.
 
-## Overrides in [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps)
+## Overrides in `add_steps()`
 
 A shared step library represents a general-purpose set of checks, but individual pipelines often need to tweak how those checks are applied: tighter thresholds in production, certain checks disabled during development, or column names that differ across teams. Rather than creating a separate [Steps](../../reference/Steps.md#pointblank.Steps) object for every variation, [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) supports keyword arguments that modify the imported steps at the point of use, without changing the original [Steps](../../reference/Steps.md#pointblank.Steps) object.
 
@@ -273,7 +273,7 @@ transactions = pl.DataFrame(
 
 The remapping applies to the `columns=`, `column=`, and `columns_subset=` parameters. Column selectors (like [starts_with()](../../reference/starts_with.md#pointblank.starts_with)) pass through unchanged since they resolve dynamically against the target table.
 
-## Importing Steps from a [Validate](../../reference/Validate.md#pointblank.Validate) Object
+## Importing Steps from a `Validate` Object
 
 You don't always start from a [Steps](../../reference/Steps.md#pointblank.Steps) object. Sometimes you already have a [Validate](../../reference/Validate.md#pointblank.Validate) object with steps defined on it, perhaps loaded from a YAML file with `Validate.from_yaml()`, generated from a prompt with [Validate.from_prompt()](../../reference/Validate.from_prompt.md#pointblank.Validate.from_prompt), or simply built up in another part of your codebase. Rather than re-expressing those steps from scratch, you can pass the [Validate](../../reference/Validate.md#pointblank.Validate) object directly to [add_steps()](../../reference/Validate.add_steps.md#pointblank.Validate.add_steps) and its step definitions will be extracted and applied:
 
@@ -300,7 +300,7 @@ When a [Validate](../../reference/Validate.md#pointblank.Validate) object is pas
 >
 > When a [Validate](../../reference/Validate.md#pointblank.Validate) object used multi-column lists (e.g., `columns=["id", "name"]`), those columns were already expanded into separate internal entries. The extracted steps will be individual single-column steps, not the original grouped call.
 
-## [Steps](../../reference/Steps.md#pointblank.Steps) vs. [Step](../../reference/Step.md#pointblank.Step): When to Use Which
+## `Steps` vs. `Step`: When to Use Which
 
 Pointblank has two similarly named classes that serve different purposes:
 

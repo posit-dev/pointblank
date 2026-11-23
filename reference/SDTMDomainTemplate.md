@@ -94,9 +94,9 @@ The equivalent for ADaM datasets.
 
 | Name | Description |
 |----|----|
-| [required_variables](#required_variables) | The names of the required variables, in order. |
-| [expected_variables](#expected_variables) | The names of the expected variables, in order. |
-| [identifier_variables](#identifier_variables) | The names of the variables with the Identifier role, in order. |
+| [required_variables](#pointblank.SDTMDomainTemplate.required_variables) | The names of the required variables, in order. |
+| [expected_variables](#pointblank.SDTMDomainTemplate.expected_variables) | The names of the expected variables, in order. |
+| [identifier_variables](#pointblank.SDTMDomainTemplate.identifier_variables) | The names of the variables with the Identifier role, in order. |
 
 ### required_variables
 
@@ -176,9 +176,9 @@ Besides the identifiers that all domains share, the Adverse Events (AE) template
 
 ## Methods
 
-| Name                            | Description                          |
-|---------------------------------|--------------------------------------|
-| [get_variable()](#get_variable) | Get the specification of a variable. |
+| Name | Description |
+|----|----|
+| [get_variable()](#pointblank.SDTMDomainTemplate.get_variable) | Get the specification of a variable. |
 
 ### get_variable()
 

@@ -208,9 +208,9 @@ List the registered adapters.
 
 | Name | Description |
 |----|----|
-| [detect()](#detect) | Decide whether a source is in this adapter's format. |
-| [import_contract()](#import_contract) | Read a source in this format and translate it into Pointblank terms. |
-| [export_contract()](#export_contract) | Translate a Pointblank contract or validation into this format. |
+| [detect()](#pointblank.ContractAdapter.detect) | Decide whether a source is in this adapter's format. |
+| [import_contract()](#pointblank.ContractAdapter.import_contract) | Read a source in this format and translate it into Pointblank terms. |
+| [export_contract()](#pointblank.ContractAdapter.export_contract) | Translate a Pointblank contract or validation into this format. |
 
 ### detect()
 

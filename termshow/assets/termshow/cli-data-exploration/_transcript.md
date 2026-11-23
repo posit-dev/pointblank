@@ -49,10 +49,10 @@ Missing Values / External source: worldcities.csv / polars
 
   Column                 Type           1       2       3       4       5       6       7       8       9      10
  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  city_name           [36m   str            ●       ●       ●       ●       ●       ●       ●       ●       ●       ●
-  latitude               f64            ●       ●       ●       ●       ●       ●    [36m   ●       ●       ●       ●
+  city_name              str            ●       ●       ●       ●       ●       ●       ●       ●       ●       ●
+  latitude               f64            ●       ●       ●       ●       ●       ●       ●       ●       ●       ●
   longitude              f64            ●       ●       ●       ●       ●       ●       ●       ●       ●       ●
-  country                str            ●     36m  ●       ●       ●       ●       ●       ●       ●       ●       ●
+  country                str            ●       ●       ●       ●       ●       ●       ●       ●       ●       ●
   population             i64           <1%     <1%     18%      ●       ●       ●       ●       ●       ●       ●
 
 Symbols: ● = no missing vals in sector, ● = all vals completely missing, x% = percentage missing
@@ -69,8 +69,7 @@ Column Summary / External source: worldcities.csv / polars
   Column               Type         NA       UQ      Mean        SD       Min       Med       Max      Q₁        Q₃     IQR
  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   city_name            str           0    37499      9.39      4.09         2         8        49       7        11       4
-  latitude             f64           0    33282      30.9      23.5     -54.9   33m   39.9      81.7    19.2      47.4    28.
-2
+  latitude             f64           0    33282      30.9      23.5     -54.9      39.9      81.7    19.2      47.4    28.2
   longitude            f64           0    35480     -4.23      68.8    -179.6      3.33     179.4   -71.8      26.0    97.8
   country              str           0      237      8.39      3.31         4         7        45       6        12       6
   population           i64         738    26623    111.8k    724.9k         0     15.8k     38.0M   8194…     39.8k   31.6k

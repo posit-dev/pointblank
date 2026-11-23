@@ -29,7 +29,7 @@ Validation Result: Rows Distinct
   Passing Rows        11
   Failing Rows        2
   Result              ✗ FAILED
-  Duplicate Rows      2 found0m
+  Duplicate Rows      2 found
 
 
 ╭────────────────────────────────────────────────────────────╮
@@ -52,7 +52,7 @@ Validation Result: Column Values Not Null
   Total Rows Tested   13
   Passing Rows        11
   Failing Rows        2
-  Result           0m   ✗ FAILED
+  Result              ✗ FAILED
   Null Values         2 found
 
 
@@ -76,7 +76,7 @@ Validation Result: Column Values Not Null
   Total Rows Tested   13
   Passing Rows        11
   Failing Rows        2
-  Result           0m   ✗ FAILED
+  Result              ✗ FAILED
   Null Values         2 found
 
 

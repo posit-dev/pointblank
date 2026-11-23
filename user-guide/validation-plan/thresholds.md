@@ -159,7 +159,7 @@ In this example, the second validation step uses its own 'warning' threshold of 
 
 Pointblank offers multiple ways to define thresholds to accommodate different coding styles and requirements.
 
-### 1. Using the [Thresholds](../../reference/Thresholds.md#pointblank.Thresholds) Class (Recommended)
+### 1. Using the `Thresholds` Class (Recommended)
 
 The most explicit and flexible approach is using the [Thresholds](../../reference/Thresholds.md#pointblank.Thresholds) class:
 

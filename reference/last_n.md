@@ -34,7 +34,7 @@ The offset from the end of the column list. The default is `0`. If `offset` is g
 `LastN`  
 A `LastN` object, which can be used to select the last `n` columns.
 
-## Relevant Validation Methods Where [last_n()](../reference/last_n.md#pointblank.last_n) Can Be Used
+## Relevant Validation Methods Where `last_n()` Can Be Used
 
 This selector function can be used in the `columns=` argument of the following validation methods:
 

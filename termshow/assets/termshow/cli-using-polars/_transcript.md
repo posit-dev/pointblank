@@ -17,7 +17,7 @@ Data Preview / Polars expression / polars
        1   Tokyo         35.6897    139.6922    Japan          37977000
        2   Jakarta       -6.2146    106.8451    Indonesia      34540000
        3   Delhi         28.66      77.23       India          29617000
-       4   Mumbai        18.9667    72.8333     India          23355000  36m
+       4   Mumbai        18.9667    72.8333     India          23355000
        5   Manila        14.6       120.9833    Philippines    23088000
        6   Shanghai      31.1667    121.4667    China          22120000
        7   São Paulo     -23.5504   -46.6339    Brazil         22046000
@@ -46,7 +46,7 @@ Data Preview / Polars expression / polars
        5   Manila      Philippines   23088000
        ⋮   ───         ───           ───
      719   Zaoyang     China         1004741
-     720   Shuizhai    China         1003698   36m
+     720   Shuizhai    China         1003698
      721   Dnipro      Ukraine       1002111
      722   Kota        India         1001694
      723   Quetta      Pakistan      1001205
@@ -66,8 +66,8 @@ Missing Values / Data source / polars
   Column                 Type           1       2       3       4       5       6       7       8       9      10
  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   city_name              str            ●       ●       ●       ●       ●       ●       ●       ●       ●       ●
-  country             36m   str            ●       ●       ●       ●       ●       ●       ●       ●       ●       ●
-  population             i64           <1%     <1%     18%      ●       ●       ●       ●     0m  ●       ●       ●
+  country                str            ●       ●       ●       ●       ●       ●       ●       ●       ●       ●
+  population             i64           <1%     <1%     18%      ●       ●       ●       ●       ●       ●       ●
 
 Symbols: ● = no missing vals in sector, ● = all vals completely missing, x% = percentage missing
 >
@@ -108,8 +108,7 @@ Column Summary / Polars expression (serialized to Parquet) from `pb pl` / polars
   Column               Type         NA       UQ      Mean        SD       Min       Med       Max      Q₁        Q₃     IQR
  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   city_name            str           0     7921      9.08      3.19         3         9        30       7        11       4
-  latitude             f64           0     9457   [0m   36.8      6.84      8.17      38.9      64.9    33.3      41.4    8.0
-9
+  latitude             f64           0     9457      36.8      6.84      8.17      38.9      64.9    33.3      41.4    8.09
   longitude            f64           0     9601     -51.2      78.9    -161.8     -80.6     133.0   -92.6     -72.7    20.0
 
 >

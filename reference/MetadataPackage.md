@@ -96,10 +96,10 @@ The metadata for a single dataset.
 
 | Name | Description |
 |----|----|
-| [get_domain()](#get_domain) | Get the metadata of a dataset by name. |
-| [keys()](#keys) | Get the names of the datasets in the package. |
-| [values()](#values) | Get the metadata of the datasets in the package. |
-| [summary()](#summary) | Get a text summary of the package. |
+| [get_domain()](#pointblank.MetadataPackage.get_domain) | Get the metadata of a dataset by name. |
+| [keys()](#pointblank.MetadataPackage.keys) | Get the names of the datasets in the package. |
+| [values()](#pointblank.MetadataPackage.values) | Get the metadata of the datasets in the package. |
+| [summary()](#pointblank.MetadataPackage.summary) | Get a text summary of the package. |
 
 ### get_domain()
 

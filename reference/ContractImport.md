@@ -170,11 +170,11 @@ The Pointblank contract that [to_contract()](../reference/ContractImport.md#poin
 
 | Name | Description |
 |----|----|
-| [to_validate()](#to_validate) | Build a validation plan for a table from the imported rules. |
-| [to_contract()](#to_contract) | Turn the imported rules into a reusable contract. |
-| [to_python()](#to_python) | Write the imported rules as Pointblank Python code. |
-| [to_yaml()](#to_yaml) | List the imported validation steps as YAML. |
-| [summary()](#summary) | Describe what was imported and what was left out. |
+| [to_validate()](#pointblank.ContractImport.to_validate) | Build a validation plan for a table from the imported rules. |
+| [to_contract()](#pointblank.ContractImport.to_contract) | Turn the imported rules into a reusable contract. |
+| [to_python()](#pointblank.ContractImport.to_python) | Write the imported rules as Pointblank Python code. |
+| [to_yaml()](#pointblank.ContractImport.to_yaml) | List the imported validation steps as YAML. |
+| [summary()](#pointblank.ContractImport.summary) | Describe what was imported and what was left out. |
 
 ### to_validate()
 

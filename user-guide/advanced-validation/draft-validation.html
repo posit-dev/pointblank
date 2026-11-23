@@ -88,7 +88,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1aa5e9f6d206be91d862d26944677737.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -190,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="506" data-forks="39"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -654,7 +654,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul class="collapse">
-  <li><a href="#how-draftvalidation-works" id="toc-how-draftvalidation-works" class="nav-link active" data-scroll-target="#how-draftvalidation-works">How DraftValidation Works</a></li>
+  <li><a href="#how-draftvalidation-works" id="toc-how-draftvalidation-works" class="nav-link active" data-scroll-target="#how-draftvalidation-works">How <code class="qd-no-link">DraftValidation</code> Works</a></li>
   <li><a href="#requirements-and-setup" id="toc-requirements-and-setup" class="nav-link" data-scroll-target="#requirements-and-setup">Requirements and Setup</a>
   <ul class="collapse">
   <li><a href="#supported-llm-providers" id="toc-supported-llm-providers" class="nav-link" data-scroll-target="#supported-llm-providers">Supported LLM Providers</a></li>
@@ -677,7 +677,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#best-practices-and-troubleshooting" id="toc-best-practices-and-troubleshooting" class="nav-link" data-scroll-target="#best-practices-and-troubleshooting">Best Practices and Troubleshooting</a>
   <ul class="collapse">
-  <li><a href="#when-to-use-draftvalidation" id="toc-when-to-use-draftvalidation" class="nav-link" data-scroll-target="#when-to-use-draftvalidation">When to Use DraftValidation</a></li>
+  <li><a href="#when-to-use-draftvalidation" id="toc-when-to-use-draftvalidation" class="nav-link" data-scroll-target="#when-to-use-draftvalidation">When to Use <code class="qd-no-link">DraftValidation</code></a></li>
   <li><a href="#recommended-workflow-and-common-issues" id="toc-recommended-workflow-and-common-issues" class="nav-link" data-scroll-target="#recommended-workflow-and-common-issues">Recommended Workflow and Common Issues</a></li>
   </ul></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
@@ -709,7 +709,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Draft validation in Pointblank leverages large language models (LLMs) to automatically generate validation plans for your data. This feature is especially useful when starting validation on a new dataset or when you need to quickly establish baseline validation coverage.</p>
 <p>The <a href="../../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class connects to various LLM providers to analyze your data’s characteristics and generate a complete validation plan tailored to its structure and content.</p>
 <section id="how-draftvalidation-works" class="level1">
-<h1>How <a href="../../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> Works</h1>
+<h1>How <code class="qd-no-link">DraftValidation</code> Works</h1>
 <p>When you use <a href="../../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a>, the process works through these steps:</p>
 <ol type="1">
 <li>a statistical summary of your data is generated using the <a href="../../reference/DataScan.html#pointblank.DataScan" class="gdls-link gdls-code">DataScan</a> class</li>
@@ -1040,7 +1040,7 @@ validation
 <section id="best-practices-and-troubleshooting" class="level1">
 <h1>Best Practices and Troubleshooting</h1>
 <section id="when-to-use-draftvalidation" class="level2">
-<h2 class="anchored" data-anchor-id="when-to-use-draftvalidation">When to Use <a href="../../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a></h2>
+<h2 class="anchored" data-anchor-id="when-to-use-draftvalidation">When to Use <code class="qd-no-link">DraftValidation</code></h2>
 <p>Drafting a validation is most useful when:</p>
 <ul>
 <li>working with a new dataset for the first time</li>
@@ -1530,6 +1530,7 @@ validation
 <script src="../../wide-layout.js"></script>
 <script src="../../keyboard-nav.js"></script>
 <script src="../../copy-code.js"></script>
+<script src="../../heading-anchors.js"></script>
 <script src="../../details.js"></script>
 <script src="../../mermaid-renderer.js"></script>
 <script src="../../reference-switcher.js"></script>

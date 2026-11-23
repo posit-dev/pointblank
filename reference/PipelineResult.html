@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1aa5e9f6d206be91d862d26944677737.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="506" data-forks="39"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2047,6 +2047,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<div id="pointblank.PipelineResult">
+
+</div>
 <div class="doc-subject">
 <p>The outcome of running a data pipeline.</p>
 </div>
@@ -2093,7 +2096,7 @@ The table returned by the transformation function, or <code>None</code> if the r
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s run a small pipeline that turns raw temperature readings in Fahrenheit into Celsius. The source contract requires a station for every reading, and the target contract requires temperatures in a plausible range.</p>
-<div id="8ff36d8c" class="cell" data-execution_count="2">
+<div id="a01f9f50" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2125,7 +2128,7 @@ The table returned by the transformation function, or <code>None</code> if the r
 </div>
 </div>
 <p>Printing the result shows which boundaries were validated and whether the run passed. In a scheduled job, <a href="../reference/PipelineResult.html#pointblank.PipelineResult.passed" class="gdls-link gdls-code">passed</a> is the natural thing to branch on:</p>
-<div id="82b1bfb0" class="cell" data-execution_count="3">
+<div id="95fe09cb" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> result.passed:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(result.transform_output)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -2144,7 +2147,7 @@ The table returned by the transformation function, or <code>None</code> if the r
 </div>
 </div>
 <p>For a plain-text summary of both boundaries, suitable for a log or a notification, use <a href="../reference/PipelineResult.html#pointblank.PipelineResult.get_report" class="gdls-link"><code>get_report()</code></a>:</p>
-<div id="7ab9d8bb" class="cell" data-execution_count="4">
+<div id="303eb5f6" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result.get_report())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Pipeline Boundary Validation Results
@@ -2166,7 +2169,7 @@ Overall: PASSED</code></pre>
 </div>
 </div>
 <p>The full validation report for either boundary is in <code>source_validation</code> or <code>target_validation</code>:</p>
-<div id="17e76f75" class="cell" data-execution_count="5">
+<div id="0126c2ab" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>result.target_validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2179,8 +2182,8 @@ Overall: PASSED</code></pre>
           -moz-osx-font-smoothing: grayscale;
         }
 
-#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
- tr { background-color: transparent; }
+#pb_tbl thead, #pb_tbl tbody, #pb_tbl tfoot, #pb_tbl tr, #pb_tbl td, #pb_tbl th { border-style: none; }
+#pb_tbl tr { background-color: transparent; }
 #pb_tbl p { margin: 0; padding: 0; }
  #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
  #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
@@ -2189,7 +2192,7 @@ Overall: PASSED</code></pre>
  #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
  #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
  #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 6px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
  #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
  #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
  #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
@@ -2226,7 +2229,7 @@ Overall: PASSED</code></pre>
  #pb_tbl .gt_font_bold { font-weight: bold; }
  #pb_tbl .gt_font_italic { font-style: italic; }
  #pb_tbl .gt_super { font-size: 65%; }
- #pb_tbl .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_footnotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
  #pb_tbl .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
  #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
  #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
@@ -2352,19 +2355,22 @@ Overall: PASSED</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#passed" class="doc-attribute doc-label doc-label-property">passed</a></td>
+<td><a href="#pointblank.PipelineResult.passed" class="doc-attribute doc-label doc-label-property">passed</a></td>
 <td>Whether the whole pipeline run passed.</td>
 </tr>
 <tr class="even">
-<td><a href="#source_passed" class="doc-attribute doc-label doc-label-property">source_passed</a></td>
+<td><a href="#pointblank.PipelineResult.source_passed" class="doc-attribute doc-label doc-label-property">source_passed</a></td>
 <td>Whether the source boundary validation passed.</td>
 </tr>
 <tr class="odd">
-<td><a href="#target_passed" class="doc-attribute doc-label doc-label-property">target_passed</a></td>
+<td><a href="#pointblank.PipelineResult.target_passed" class="doc-attribute doc-label doc-label-property">target_passed</a></td>
 <td>Whether the target boundary validation passed.</td>
 </tr>
 </tbody>
 </table>
+<div id="pointblank.PipelineResult.passed">
+
+</div>
 <section id="passed" class="level3">
 <h3 class="anchored" data-anchor-id="passed"><span class="doc-object-name doc-attribute doc-label doc-label-property">passed</span></h3>
 <div class="doc-subject">
@@ -2375,6 +2381,9 @@ Overall: PASSED</code></pre>
 </div>
 <div class="doc-text">
 <p>This is <code>True</code> only when both <a href="../reference/PipelineResult.html#pointblank.PipelineResult.source_passed" class="gdls-link"><code>source_passed</code></a> and <a href="../reference/PipelineResult.html#pointblank.PipelineResult.target_passed" class="gdls-link"><code>target_passed</code></a> are <code>True</code>, meaning that every test unit at each validated boundary passed. A run that stopped early because the source failed is <code>False</code>. Thresholds don’t affect it, so a single failing test unit is enough to make it <code>False</code>.</p>
+</div>
+<div id="pointblank.PipelineResult.source_passed">
+
 </div>
 </section>
 <section id="source_passed" class="level3">
@@ -2387,6 +2396,9 @@ Overall: PASSED</code></pre>
 </div>
 <div class="doc-text">
 <p>This is <code>True</code> when every test unit in the source validation passed, or when the pipeline has no source contract. Thresholds don’t affect it.</p>
+</div>
+<div id="pointblank.PipelineResult.target_passed">
+
 </div>
 </section>
 <section id="target_passed" class="level3">
@@ -2413,11 +2425,14 @@ Overall: PASSED</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#get_report" class="doc-function doc-label doc-label-method">get_report()</a></td>
+<td><a href="#pointblank.PipelineResult.get_report" class="doc-function doc-label doc-label-method">get_report()</a></td>
 <td>Summarize both boundary validations as plain text.</td>
 </tr>
 </tbody>
 </table>
+<div id="pointblank.PipelineResult.get_report">
+
+</div>
 <section id="get_report" class="level3">
 <h3 class="anchored" data-anchor-id="get_report"><span class="doc-object-name doc-function doc-label doc-label-method">get_report()</span></h3>
 <div class="doc-subject">
@@ -2447,7 +2462,7 @@ A multi-line summary. Use <code>print()</code> to display it.
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
 <p>Let’s run a pipeline whose target contract catches a mistake in the transformation: it should keep only active accounts, but the filter was left out.</p>
-<div id="78b29570" class="cell" data-execution_count="6">
+<div id="9fd8b1d9" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2939,6 +2954,7 @@ Overall: FAILED</code></pre>
 <script src="../wide-layout.js"></script>
 <script src="../keyboard-nav.js"></script>
 <script src="../copy-code.js"></script>
+<script src="../heading-anchors.js"></script>
 <script src="../details.js"></script>
 <script src="../mermaid-renderer.js"></script>
 <script src="../reference-switcher.js"></script>

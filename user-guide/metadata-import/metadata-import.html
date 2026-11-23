@@ -88,7 +88,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-151fdbb47a8651509f971c0db08fab16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1aa5e9f6d206be91d862d26944677737.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -190,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="506" data-forks="39"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="39"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -656,7 +656,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#quick-start" id="toc-quick-start" class="nav-link active" data-scroll-target="#quick-start">Quick Start</a></li>
   <li><a href="#supported-formats" id="toc-supported-formats" class="nav-link" data-scroll-target="#supported-formats">Supported Formats</a></li>
-  <li><a href="#the-metadataimport-object" id="toc-the-metadataimport-object" class="nav-link" data-scroll-target="#the-metadataimport-object">The MetadataImport Object</a></li>
+  <li><a href="#the-metadataimport-object" id="toc-the-metadataimport-object" class="nav-link" data-scroll-target="#the-metadataimport-object">The <code>MetadataImport</code> Object</a></li>
   <li><a href="#converting-to-a-schema" id="toc-converting-to-a-schema" class="nav-link" data-scroll-target="#converting-to-a-schema">Converting to a Schema</a></li>
   <li><a href="#converting-to-a-validation-workflow" id="toc-converting-to-a-validation-workflow" class="nav-link" data-scroll-target="#converting-to-a-validation-workflow">Converting to a Validation Workflow</a></li>
   <li><a href="#format-auto-detection" id="toc-format-auto-detection" class="nav-link" data-scroll-target="#format-auto-detection">Format Auto-Detection</a></li>
@@ -770,7 +770,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The format can be specified explicitly or auto-detected from the file extension in many cases. For ambiguous formats (like XML files that could be Define-XML or Controlled Terminology), Pointblank inspects the file content to determine the correct reader.</p>
 </section>
 <section id="the-metadataimport-object" class="level1">
-<h1>The <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> Object</h1>
+<h1>The <code>MetadataImport</code> Object</h1>
 <p>Every call to <a href="../../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link gdls-code">import_metadata()</a> returns a <a href="../../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a> instance. This object holds all the information extracted from the source file, organized into a structure that Pointblank can work with. Understanding its components helps you get the most out of imported metadata.</p>
 <p>The key attributes are:</p>
 <table class="caption-top table">
@@ -1403,6 +1403,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../wide-layout.js"></script>
 <script src="../../keyboard-nav.js"></script>
 <script src="../../copy-code.js"></script>
+<script src="../../heading-anchors.js"></script>
 <script src="../../details.js"></script>
 <script src="../../mermaid-renderer.js"></script>
 <script src="../../reference-switcher.js"></script>

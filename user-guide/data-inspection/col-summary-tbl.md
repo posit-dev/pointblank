@@ -4,7 +4,7 @@ While previewing a table with [preview()](../../reference/preview.md#pointblank.
 
 Pointblank provides a function to make it extremely easy to view column-level summaries in a single table. That function is called [col_summary_tbl()](../../reference/col_summary_tbl.md#pointblank.col_summary_tbl) and, just like [preview()](../../reference/preview.md#pointblank.preview) does, it supports the use of any table that Pointblank can use for validation. And no matter what the input data is, the resultant reporting table is consistent in its design and construction.
 
-## Trying out [col_summary_tbl()](../../reference/col_summary_tbl.md#pointblank.col_summary_tbl)
+## Trying out `col_summary_tbl()`
 
 The function only requires a table. Let's use the `small_table` dataset (a very simple table) to start us off:
 
@@ -52,7 +52,7 @@ We see that in the first two rows of our summary table there are summaries of th
 
 One column, `e`, is of the `Boolean` type. Because columns of this type could only have `True`, `False`, or missing values, we provide summary data for missingness (under `NA`) and proportions of `True` and `False` values (under `UQ`).
 
-## Using [DataScan](../../reference/DataScan.md#pointblank.DataScan) Directly
+## Using `DataScan` Directly
 
 The [col_summary_tbl()](../../reference/col_summary_tbl.md#pointblank.col_summary_tbl) function is a convenience wrapper around the [`DataScan`](../../reference/DataScan.md#pointblank.DataScan) class. When you need more than a visual report (for example, to save the profile for later comparison), you can work with [DataScan](../../reference/DataScan.md#pointblank.DataScan) directly:
 
