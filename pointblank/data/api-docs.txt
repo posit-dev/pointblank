@@ -100,7 +100,7 @@ Validate(data: 'IntoDataFrame', reference: 'IntoFrame | None' = None, tbl_name: 
         `None` (the default) then briefs aren't globally set.
     lang
         The language to use for various reporting elements. By default, `None` will select English
-        (`"en"`) as the but other options include French (`"fr"`), German (`"de"`), Italian
+        (`"en"`), but other options include French (`"fr"`), German (`"de"`), Italian
         (`"it"`), Spanish (`"es"`), and several more. Have a look at the *Reporting Languages*
         section for the full list of supported languages and information on how the language setting
         is utilized.
@@ -326,8 +326,8 @@ Validate(data: 'IntoDataFrame', reference: 'IntoFrame | None' = None, tbl_name: 
     - Persian (`"fa"`)
 
     Automatically generated briefs (produced by using `brief=True` or `brief="...{auto}..."`) will
-    be written in the selected language. The language setting will also used when generating the
-    validation report table through
+    be written in the selected language. The language setting will also be used when generating
+    the validation report table through
     [`get_tabular_report()`](`pointblank.Validate.get_tabular_report`) (or printing the `Validate`
     object in a notebook environment).
 
