@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
         # `locked` resolves the newest versions allowed by `pyproject.toml` (`uv.lock` isn't
         # committed); `minimum` resolves the lowest allowed version of every direct dependency so
         # that the declared floors are actually tested; `latest` upgrades Polars and Narwhals so
@@ -40,7 +40,7 @@ jobs:
           distribution: "temurin"
           java-version: "11"
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v10.3.3
       - name: Resolve the minimum supported versions of the direct dependencies
         if: matrix.deps == 'minimum'
         run: |
