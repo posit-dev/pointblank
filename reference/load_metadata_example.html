@@ -2122,7 +2122,7 @@ The path to the bundled file, which can be passed directly to <a href="../refere
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Get the path to the bundled Define-XML document:</p>
-<div id="2ca2ae8b" class="cell" data-execution_count="1">
+<div id="1ce04d6b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>define_path <span class="op">=</span> pb.load_metadata_example(<span class="st">"define.xml"</span>)</span>
@@ -2135,7 +2135,7 @@ True</code></pre>
 </div>
 </div>
 <p>The result is a <code>pathlib.Path</code> to a file inside the installed package. Pass it to <a href="../reference/import_metadata.html#pointblank.import_metadata" class="gdls-link"><code>import_metadata()</code></a> to read the metadata:</p>
-<div id="c58a2007" class="cell" data-execution_count="2">
+<div id="5a80e7b4" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>package <span class="op">=</span> pb.import_metadata(define_path)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> package.keys():</span>

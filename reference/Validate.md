@@ -4,7 +4,7 @@ Workflow for defining a set of validations on a table and interrogating for resu
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5812-L27114)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5812-L27123)
 
 ``` python
 Validate(
@@ -58,7 +58,7 @@ The actions to take when the validation process is complete and the final result
 A global setting for briefs, which are optional brief descriptions for validation steps (they be displayed in the reporting table). For such a global setting, templating elements like `"{step}"` (to insert the step number) or `"{auto}"` (to include an automatically generated brief) are useful. If `True` then each brief will be automatically generated. If `None` (the default) then briefs aren't globally set.
 
 `lang: str | None = None`  
-The language to use for various reporting elements. By default, `None` will select English (`"en"`) as the but other options include French (`"fr"`), German (`"de"`), Italian (`"it"`), Spanish (`"es"`), and several more. Have a look at the *Reporting Languages* section for the full list of supported languages and information on how the language setting is utilized.
+The language to use for various reporting elements. By default, `None` will select English (`"en"`), but other options include French (`"fr"`), German (`"de"`), Italian (`"it"`), Spanish (`"es"`), and several more. Have a look at the *Reporting Languages* section for the full list of supported languages and information on how the language setting is utilized.
 
 `locale: str | None = None`  
 An optional locale ID to use for formatting values in the reporting table according the locale's rules. Examples include `"en-US"` for English (United States) and `"fr-FR"` for French (France). More simply, this can be a language identifier without a designation of territory, like `"es"` for Spanish.
@@ -241,7 +241,7 @@ Various pieces of reporting in Pointblank can be localized to a specific languag
 - Thai (`"th"`)
 - Persian (`"fa"`)
 
-Automatically generated briefs (produced by using `brief=True` or `brief="...{auto}..."`) will be written in the selected language. The language setting will also used when generating the validation report table through [`get_tabular_report()`](../reference/Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report) (or printing the [Validate](../reference/Validate.md#pointblank.Validate) object in a notebook environment).
+Automatically generated briefs (produced by using `brief=True` or `brief="...{auto}..."`) will be written in the selected language. The language setting will also be used when generating the validation report table through [`get_tabular_report()`](../reference/Validate.get_tabular_report.md#pointblank.Validate.get_tabular_report) (or printing the [Validate](../reference/Validate.md#pointblank.Validate) object in a notebook environment).
 
 ## Examples
 

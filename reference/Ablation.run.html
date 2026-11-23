@@ -2091,7 +2091,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an ablation of a table of temperature readings, some of them recorded in tenths of a degree. The <code>evaluate()</code> function also returns the number of rows it was given, which is a second metric in the results. With <code>max_workers=4</code>, the run makes four evaluations at a time.</p>
-<div id="5701b0c7" class="cell" data-execution_count="2">
+<div id="54a0fcd8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2127,8 +2127,8 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
           -moz-osx-font-smoothing: grayscale;
         }
 
-#pb_ablation_report thead, #pb_ablation_report tbody, #pb_ablation_report tfoot, #pb_ablation_report tr, #pb_ablation_report td, #pb_ablation_report th { border-style: none; }
-#pb_ablation_report tr { background-color: transparent; }
+#pb_ablation_report thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
 #pb_ablation_report p { margin: 0; padding: 0; }
  #pb_ablation_report .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
  #pb_ablation_report .gt_caption { padding-top: 4px; padding-bottom: 4px; }
@@ -2137,7 +2137,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
  #pb_ablation_report .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
  #pb_ablation_report .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
  #pb_ablation_report .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #pb_ablation_report .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 6px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_ablation_report .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
  #pb_ablation_report .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
  #pb_ablation_report .gt_column_spanner_outer:first-child { padding-left: 0; }
  #pb_ablation_report .gt_column_spanner_outer:last-child { padding-right: 0; }
@@ -2174,7 +2174,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
  #pb_ablation_report .gt_font_bold { font-weight: bold; }
  #pb_ablation_report .gt_font_italic { font-style: italic; }
  #pb_ablation_report .gt_super { font-size: 65%; }
- #pb_ablation_report .gt_footnotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_ablation_report .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
  #pb_ablation_report .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
  #pb_ablation_report .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
  #pb_ablation_report .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
@@ -2220,7 +2220,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 </div>
 </div>
 <p>After the run, the <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gdls-code">Ablation</a> object shows its report, for the metric named in <code>metric=</code>. Removing the 12 readings in tenths helps. The other metric has a report of its own, from <code>get_tabular_report(metric="n_train")</code>, and both are in the results of <a href="../reference/Ablation.get_effects.html#pointblank.Ablation.get_effects" class="gdls-link"><code>get_effects()</code></a>:</p>
-<div id="7f5f8fb3" class="cell" data-execution_count="3">
+<div id="05ac4b6b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ablation.get_effects().select(<span class="st">"variant"</span>, <span class="st">"metric"</span>, <span class="st">"mean"</span>, <span class="st">"delta_vs_control"</span>, <span class="st">"verdict"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div><style>
@@ -2235,7 +2235,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 </div>
 <p>The full table has 300 rows, and the variant and its control have 288. There’s no verdict for <code>n_train</code>, since verdicts are only for the metric in <code>metric=</code>.</p>
 <p>Making the evaluations at the same time doesn’t change the results, since each evaluation gets the same table and seed either way. Here’s the same ablation, run one evaluation after another:</p>
-<div id="367dea7e" class="cell" data-execution_count="4">
+<div id="c2dbdda2" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>serial <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Ablation(validation, evaluate<span class="op">=</span>evaluate, metric<span class="op">=</span><span class="st">"error"</span>, higher_is_better<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .drop_each()</span>

@@ -2090,7 +2090,7 @@ The problems found, as messages: major changes in distribution (a PSI of at leas
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s a seed of four people, and four synthetic people made from it. The second synthetic person is the same as the second real one.</p>
-<div id="6e4430c9" class="cell" data-execution_count="1">
+<div id="0eadc6d1" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2104,7 +2104,7 @@ The problems found, as messages: major changes in distribution (a PSI of at leas
 </div>
 </div>
 <p>One synthetic row (a quarter of them) is a copy. The ages are compared too. Four rows are too few for a PSI, so the level of the change is <code>None</code>, but there’s still a KS statistic:</p>
-<div id="dd460324" class="cell" data-execution_count="2">
+<div id="aa100bac" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>check.fidelity</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>[{'column': 'age',
@@ -2118,7 +2118,7 @@ The problems found, as messages: major changes in distribution (a PSI of at leas
 </div>
 </div>
 <p>Every problem is in <a href="../reference/pointblank.ConformanceReport.issues.html" class="gdls-link gdls-code">issues</a>, as a message:</p>
-<div id="90839eaf" class="cell" data-execution_count="3">
+<div id="edeef144" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>check.issues</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>['1 row of the synthetic data (25.0%) copies a seed row (1 the same).']</code></pre>

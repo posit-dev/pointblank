@@ -87,6 +87,9 @@ nycflights = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
 pb.col_summary_tbl(data=nycflights, tbl_name="nycflights")
 ```
 
+    /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/great_tables/_tbl_data.py:902: UserWarning: PyArrow Table support is currently experimental.
+      warnings.warn("PyArrow Table support is currently experimental.")
+
 [TABLE]
 
 The `tbl_name=` value appears in the report's title, which helps tell reports apart when several tables are summarized. An Ibis table is read into memory before its statistics are computed, so a very large table might be better summarized from a sample. To keep the summary rather than just display it (to query it, save it, or compare it with a later version of the table), create a [`DataScan`](../reference/DataScan.md#pointblank.DataScan) instead, which produces this same report through its [`get_tabular_report()`](../reference/DataScan.get_tabular_report.md#pointblank.DataScan.get_tabular_report) method.

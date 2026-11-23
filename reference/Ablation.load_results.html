@@ -2091,7 +2091,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an ablation of a table of temperature readings, exported for training elsewhere.</p>
-<div id="793824ab" class="cell" data-execution_count="2">
+<div id="378ad8ba" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -2111,7 +2111,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>directory <span class="op">=</span> ablation.export(tempfile.mkdtemp())</span></code></pre></div>
 </div>
 <p>Here, the ‘training’ happens in the same session, reading each table from the manifest and filling in the template, but it could be done anywhere.</p>
-<div id="a47794c1" class="cell" data-execution_count="3">
+<div id="c7eaf13d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>manifest <span class="op">=</span> json.loads((directory <span class="op">/</span> <span class="st">"manifest.json"</span>).read_text())</span>
@@ -2143,8 +2143,8 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
           -moz-osx-font-smoothing: grayscale;
         }
 
-#pb_ablation_report thead, #pb_ablation_report tbody, #pb_ablation_report tfoot, #pb_ablation_report tr, #pb_ablation_report td, #pb_ablation_report th { border-style: none; }
-#pb_ablation_report tr { background-color: transparent; }
+#pb_ablation_report thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
 #pb_ablation_report p { margin: 0; padding: 0; }
  #pb_ablation_report .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 100%; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
  #pb_ablation_report .gt_caption { padding-top: 4px; padding-bottom: 4px; }
@@ -2153,7 +2153,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
  #pb_ablation_report .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
  #pb_ablation_report .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
  #pb_ablation_report .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #pb_ablation_report .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 6px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_ablation_report .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
  #pb_ablation_report .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
  #pb_ablation_report .gt_column_spanner_outer:first-child { padding-left: 0; }
  #pb_ablation_report .gt_column_spanner_outer:last-child { padding-right: 0; }
@@ -2190,7 +2190,7 @@ The <a href="../reference/Ablation.html#pointblank.Ablation" class="gdls-link gd
  #pb_ablation_report .gt_font_bold { font-weight: bold; }
  #pb_ablation_report .gt_font_italic { font-style: italic; }
  #pb_ablation_report .gt_super { font-size: 65%; }
- #pb_ablation_report .gt_footnotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_ablation_report .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
  #pb_ablation_report .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
  #pb_ablation_report .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
  #pb_ablation_report .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
