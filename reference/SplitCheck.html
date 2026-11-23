@@ -2086,7 +2086,7 @@ The problems found, as messages: overlapping rows, missing or unseen labels, and
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here are the training and test splits of a small dataset of animals, labeled as pets or wild animals. One test row is also in the training split.</p>
-<div id="7a035e64" class="cell" data-execution_count="1">
+<div id="f9f4e40e" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2107,14 +2107,14 @@ The problems found, as messages: overlapping rows, missing or unseen labels, and
 </div>
 </div>
 <p>One of the two test rows is the same as a training row. The test split also has no wild animals, which shows in the check of the labels:</p>
-<div id="9218e52e" class="cell" data-execution_count="2">
+<div id="139a5c87" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>check.labels[<span class="st">"missing"</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>{'test': ['wild']}</code></pre>
 </div>
 </div>
 <p>Every problem is in <a href="../reference/pointblank.ConformanceReport.issues.html" class="gdls-link gdls-code">issues</a>, as a message:</p>
-<div id="a9da429c" class="cell" data-execution_count="3">
+<div id="e5b693e5" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>check.issues</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>["1 row of 'test' (50.0%) is also in 'train' (1 the same).",
