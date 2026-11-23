@@ -38,7 +38,7 @@ classifiers = [
 dependencies = [
     "commonmark>=0.9.1",
     "importlib-metadata",
-    "great-tables>=1.1.0",  # 1.1.0 escapes unformatted cells; `fmt_passthrough()` needs 1.0.0+
+    "great-tables>=1.1.0,!=1.2.0",  # 1.1.0 escapes unformatted cells; `fmt_passthrough()` needs 1.0.0+; 1.2.0's `fmt()` breaks on Polars < 1.37
     "narwhals>=2.8.0",      # The lowest version tested (the dev group and the `minimum` CI job)
     "typing_extensions>=3.10.0.0",
     "requests>=2.31.0",
