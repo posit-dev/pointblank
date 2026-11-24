@@ -5934,7 +5934,7 @@ class Validate:
         `None` (the default) then briefs aren't globally set.
     lang
         The language to use for various reporting elements. By default, `None` will select English
-        (`"en"`) as the but other options include French (`"fr"`), German (`"de"`), Italian
+        (`"en"`), but other options include French (`"fr"`), German (`"de"`), Italian
         (`"it"`), Spanish (`"es"`), and several more. Have a look at the *Reporting Languages*
         section for the full list of supported languages and information on how the language setting
         is utilized.
@@ -6160,8 +6160,8 @@ class Validate:
     - Persian (`"fa"`)
 
     Automatically generated briefs (produced by using `brief=True` or `brief="...{auto}..."`) will
-    be written in the selected language. The language setting will also used when generating the
-    validation report table through
+    be written in the selected language. The language setting will also be used when generating
+    the validation report table through
     [`get_tabular_report()`](`pointblank.Validate.get_tabular_report`) (or printing the `Validate`
     object in a notebook environment).
 
@@ -16279,7 +16279,7 @@ class Validate:
         ```
 
         The document in French fails step 1, which expects English for every row. In step 2,
-        each row is checked against its own label, and the last document fails: it's labelled
+        each row is checked against its own label, and the last document fails: it's labeled
         as French, but it's in English.
         """
 
@@ -25101,7 +25101,12 @@ class Validate:
                     columns=["tbl", "eval", "w_upd", "e_upd", "c_upd", "extract_upd"],
                 )
                 .cols_align(align="right", columns=["test_units", "pass", "fail"])
-                .cols_align(align=before, columns=["type_upd", "columns_upd", "values_upd"])
+                # Align the all-empty columns explicitly: great-tables' auto-alignment of them
+                # changed in 1.2.0
+                .cols_align(
+                    align=before,
+                    columns=["status_color", "i", "type_upd", "columns_upd", "values_upd"],
+                )
                 .cols_move_to_start(columns=column_order)
                 .tab_options(table_font_size="90%")
                 .tab_source_note(
@@ -25151,11 +25156,20 @@ class Validate:
             )
         ]
 
+        # Before interrogation, the briefs' templates are filled in (and the autobriefs made) here
+        if interrogation_performed:
+            brief_str = validation_info_dict["brief"]
+            autobrief_str = validation_info_dict["autobrief"]
+        else:
+            brief_str, autobrief_str = _plan_briefs(
+                validation_info=self.validation_info, lang=lang, locale=locale
+            )
+
         # Add the `type_upd` entry to the dictionary
         validation_info_dict["type_upd"] = _transform_assertion_str(
             assertion_str=validation_info_dict["assertion_type"],
-            brief_str=validation_info_dict["brief"],
-            autobrief_str=validation_info_dict["autobrief"],
+            brief_str=brief_str,
+            autobrief_str=autobrief_str,
             segmentation_str=validation_info_dict["segments"],
             lang=lang,
             assertion_arg_str=assertion_arg_str,
@@ -27786,6 +27800,60 @@ def _process_brief(
     return brief
 
 
+def _plan_briefs(
+    validation_info: list[_ValidationInfo], lang: str, locale: str | None
+) -> tuple[list[str | None], list[str | None]]:
+    """
+    Get the briefs and autobriefs of steps that haven't been interrogated, for a report.
+
+    `interrogate()` fills in the briefs' templates and makes the autobriefs, so before it's run
+    they're done here, from the steps as they're defined. A step whose columns are given by a
+    selector or an expression only gets its step number filled in (and no autobrief), since its
+    columns aren't known until `interrogate()` evaluates them.
+    """
+    briefs = []
+    autobriefs = []
+
+    for step, validation in enumerate(validation_info, start=1):
+        column = validation.column
+        columns_known = (
+            column is None
+            or isinstance(column, str)
+            or (isinstance(column, list) and all(isinstance(x, str) for x in column))
+        )
+
+        brief = validation.brief
+        if brief is not None and columns_known:
+            brief = _process_brief(
+                brief=brief,
+                step=step,
+                col=column,
+                values=validation.values,
+                thresholds=validation.thresholds,
+                segment=None,
+                assertion_type=validation.assertion_type,
+                lang=lang,
+            )
+        elif brief is not None:
+            brief = brief.replace("{step}", str(step)).replace("{i}", str(step))
+        briefs.append(brief)
+
+        autobriefs.append(
+            _create_autobrief_or_failure_text(
+                assertion_type=validation.assertion_type,
+                lang=lang,
+                column=column,
+                values=validation.values,
+                for_failure=False,
+                locale=locale,
+            )
+            if columns_known
+            else None
+        )
+
+    return briefs, autobriefs
+
+
 def _parse_max_age(
     max_age: str | datetime.timedelta, param_name: str = "max_age"
 ) -> datetime.timedelta:
@@ -30199,11 +30267,30 @@ def _create_health_score_html(
     )
 
 
+def _segment_label(segments: Any) -> str:
+    """
+    Get the text of a step's SEGMENT label in the validation report.
+
+    An interrogated segmented step has a `(column, value)` pair, shown as `column / value`. A step
+    that hasn't been split into its segments (before interrogation, or when its segments couldn't
+    be evaluated) still has the `segments=` spec as given, so the spec is shown: a column name as
+    is, a `(column, value)` tuple as `column / value`, and a list as its items separated by commas.
+    """
+    if isinstance(segments, list):
+        return ", ".join(_segment_label(x) for x in segments)
+    if isinstance(segments, tuple) and len(segments) == 2:
+        column, value = segments
+        if isinstance(value, Segment):
+            value = ", ".join(str(x) for x in value.segments)
+        return f"{column} / {value}"
+    return str(segments)
+
+
 def _transform_assertion_str(
     assertion_str: list[str],
     brief_str: list[str | None],
     autobrief_str: list[str],
-    segmentation_str: list[tuple | None],
+    segmentation_str: list[Any],
     lang: str,
     assertion_arg_str: list[str | None] | None = None,
 ) -> list[str]:
@@ -30232,31 +30319,23 @@ def _transform_assertion_str(
     # Make every None value in `brief_str` an empty string
     brief_str = ["" if x is None else x for x in brief_str]
 
-    # If the `autobrief_str` list contains only None values, then set `brief_str` to a
-    # list of empty strings (this is the case when `interrogate()` hasn't be called)`
-    if all(x is None for x in autobrief_str):
-        autobrief_str = [""] * len(brief_str)
+    # Replace the template text `{auto}` in `brief_str` with the corresponding `autobrief_str`
+    # entry (or with nothing, for a step without an autobrief); a brief that's left blank isn't shown
+    brief_str = [
+        brief.replace("{auto}", "" if autobrief is None else autobrief).strip()
+        for brief, autobrief in zip(brief_str, autobrief_str)
+    ]
 
-    else:
-        # If the template text `{auto}` is in the `brief_str` then replace it with
-        # the corresponding `autobrief_str` entry
-        brief_str = [
-            brief_str[i].replace("{auto}", autobrief_str[i])
-            if "{auto}" in brief_str[i]
-            else brief_str[i]
-            for i in range(len(brief_str))
-        ]
+    # Use Markdown-to-HTML conversion to format the `brief_str` text
+    brief_str = [commonmark.commonmark(x) for x in brief_str]
 
-        # Use Markdown-to-HTML conversion to format the `brief_str` text
-        brief_str = [commonmark.commonmark(x) for x in brief_str]
-
-        # Add inline styles to <p> tags for proper rendering in all environments
-        # In some sandboxed HTML environments (e.g., Streamlit), <p> tags don't inherit
-        # font-size from parent divs, so we add inline styles directly to the <p> tags
-        brief_str = [
-            re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', x) if x.strip() else x
-            for x in brief_str
-        ]
+    # Add inline styles to <p> tags for proper rendering in all environments
+    # In some sandboxed HTML environments (e.g., Streamlit), <p> tags don't inherit
+    # font-size from parent divs, so we add inline styles directly to the <p> tags
+    brief_str = [
+        re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', x) if x.strip() else x
+        for x in brief_str
+    ]
 
     # Declare the text size based on the number of characters in the assertion string (counted
     # before any HTML escaping)
@@ -30291,16 +30370,15 @@ def _transform_assertion_str(
     if segmentation_str:
         for i in range(len(type_upd)):
             if segmentation_str[i] is not None:
-                # Get the column name and value from the segmentation expression
-                column_name = segmentation_str[i][0]
-                column_value = segmentation_str[i][1]
+                # Get the label text from the segment (or the `segments=` spec)
+                segment_label = html_module.escape(_segment_label(segmentation_str[i]), quote=False)
                 # Create the segmentation div
                 segmentation_div = (
                     "<div style='margin-top: 0px; margin-bottom: 0px; "
                     "white-space: pre; font-size: 8px; color: darkblue; padding-bottom: 4px; "
                     "'>"
                     "<strong><span style='font-family: Helvetica, arial, sans-serif;'>"
-                    f"SEGMENT&nbsp;&nbsp;</span></strong><span>{column_name} / {column_value}"
+                    f"SEGMENT&nbsp;&nbsp;</span></strong><span>{segment_label}"
                     "</span>"
                     "</div>"
                 )

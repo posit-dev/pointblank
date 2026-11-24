@@ -32,6 +32,8 @@ def multiply_column_by_20(df):
 
 def _strip_report_nondeterminism(html_str: str) -> str:
     """Strip non-deterministic content (timestamps, durations, footers) from report HTML."""
+    # Remove great-tables' default stylesheet, which changes between great-tables releases
+    html_str = re.sub(r"<style>.*?</style>", "", html_str, count=1, flags=re.DOTALL)
     # Remove tfoot-based sourcenotes (great_tables < 0.22)
     html_str = re.sub(r'<tfoot class="gt_sourcenotes">.*?</tfoot>', "", html_str, flags=re.DOTALL)
     # Remove tr-based sourcenotes (great_tables >= 0.22)
@@ -1225,6 +1227,22 @@ def test_validation_langs_all_working(lang) -> None:
     )
 
     assert isinstance(validation.get_tabular_report(), GT.GT)
+
+
+def test_expectation_texts_differ_from_failure_texts() -> None:
+    from pointblank._constants_translations import EXPECT_FAIL_TEXT
+
+    # A step's brief (the expectation) mustn't be the text for its failure, in any language
+    same = [
+        (key, lang)
+        for key, texts in EXPECT_FAIL_TEXT.items()
+        if key.endswith("_expectation_text")
+        for lang, text in texts.items()
+        if EXPECT_FAIL_TEXT.get(key.replace("_expectation_text", "_failure_text"), {}).get(lang)
+        == text
+    ]
+
+    assert same == []
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
@@ -11242,6 +11260,54 @@ def test_validation_report_segments_with_pre_html(snapshot) -> None:
     snapshot.assert_match(edited_report_html_str, "validation_report_segments_with_pre.html")
 
 
+def _report_segment_labels(validation: Validate) -> list[str]:
+    html_str = validation.get_tabular_report().as_raw_html()
+    return re.findall(r"SEGMENT&nbsp;&nbsp;</span></strong><span>(.*?)</span>", html_str)
+
+
+@pytest.mark.parametrize(
+    "segments, labels_before, labels_after",
+    [
+        ("f", ["f"], ["f / high", "f / low", "f / mid"]),
+        (["f"], ["f"], ["f / high", "f / low", "f / mid"]),
+        (("f", "high"), ["f / high"], ["f / high"]),
+        (("f", ["high", "low"]), ["f / ['high', 'low']"], ["f / high", "f / low"]),
+        (
+            ("f", seg_group([["high"], ["low", "mid"]])),
+            ["f / ['high'], ['low', 'mid']"],
+            ["f / ['high']", "f / ['low', 'mid']"],
+        ),
+        (["f", ("a", 1)], ["f, a / 1"], ["f / high", "f / low", "f / mid", "a / 1"]),
+    ],
+)
+def test_validation_report_segments_before_interrogation(
+    segments, labels_before, labels_after
+) -> None:
+    validation = Validate(data=load_dataset()).col_vals_gt(
+        columns="d", value=1000, segments=segments
+    )
+
+    # Before interrogation, the label shows the `segments=` spec
+    assert _report_segment_labels(validation) == labels_before
+
+    # After interrogation, each segment's step shows its column and value
+    assert _report_segment_labels(validation.interrogate()) == labels_after
+
+
+def test_validation_report_segments_not_evaluated() -> None:
+    # A step whose segments couldn't be evaluated (here, a column that isn't in the table) keeps its
+    # spec, which is shown as given
+    validation = (
+        Validate(data=load_dataset())
+        .col_vals_gt(columns="d", value=1000, segments="z")
+        .col_vals_gt(columns="d", value=1000, segments=["zz", "zzz"])
+        .interrogate()
+    )
+
+    assert [step.eval_error for step in validation.validation_info] == [True, True]
+    assert _report_segment_labels(validation) == ["z", "zz, zzz"]
+
+
 def test_validation_report_briefs_html(snapshot) -> None:
     validation = (
         Validate(
@@ -11291,6 +11357,48 @@ def test_validation_report_briefs_global_local_html(snapshot) -> None:
 
     # Use the snapshot fixture to create and save the snapshot
     snapshot.assert_match(edited_report_html_str, "validation_report_briefs_global_local.html")
+
+
+def _report_briefs(validation: Validate) -> list[str]:
+    html_str = validation.get_tabular_report().as_raw_html()
+    return re.findall(
+        r"font-family: 'IBM Plex Sans'; text-wrap: balance;[^>]*>(.*?)</div>", html_str, re.DOTALL
+    )
+
+
+def test_validation_report_briefs_before_interrogation() -> None:
+    validation = (
+        Validate(data=load_dataset(), brief="Step {step}: {auto}")
+        .col_vals_gt(columns="d", value=1000)
+        .col_vals_regex(columns="b", pattern=r"^\d-[a-z]{3}", brief="**Pattern** in {col}")
+        .col_vals_in_set(columns="f", set=["low", "high"], brief=True)
+        .rows_distinct()
+        .col_vals_lt(columns="c", value=5, brief=False)
+    )
+
+    # The templates are filled in and the autobriefs made, as they are by `interrogate()`
+    briefs = _report_briefs(validation)
+    assert len(briefs) == 4
+    assert not any("{" in brief for brief in briefs)
+    assert (
+        "Step 1: Expect that values in <code>d</code> should be &gt; <code>1000</code>" in briefs[0]
+    )
+    assert "<strong>Pattern</strong> in b" in briefs[1]
+
+    assert _report_briefs(validation.interrogate()) == briefs
+
+
+def test_validation_report_briefs_before_interrogation_column_selector() -> None:
+    validation = Validate(data=load_dataset(), brief="Step {step}: {auto}").col_vals_gt(
+        columns=starts_with("a"), value=0
+    )
+
+    # The selector's columns aren't known until interrogation, so only the step number is shown
+    assert _report_briefs(validation) == ['<p style="font-size: inherit; margin: 0;">Step 1:</p>\n']
+
+    briefs = _report_briefs(validation.interrogate())
+    assert len(briefs) == 1
+    assert "Step 1: Expect that values in <code>a</code>" in briefs[0]
 
 
 @pytest.mark.parametrize("interrogate", [True, False])

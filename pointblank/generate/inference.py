@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import re
 from typing import TYPE_CHECKING, Any
 
@@ -493,7 +494,8 @@ def infer_fields_from_table(
     Parameters
     ----------
     tbl
-        A Polars DataFrame, Pandas DataFrame, or Ibis table (DuckDB, SQLite, etc.).
+        A Polars DataFrame or LazyFrame, Pandas DataFrame, PyArrow table, PySpark DataFrame, or Ibis
+        table (DuckDB, SQLite, etc.).
     categorical_threshold
         If a column has <= this many unique values (int) or this fraction of rows (float in 0..1),
         treat as categorical with `allowed=`.
@@ -529,7 +531,8 @@ def infer_fields_from_table(
         except Exception:
             raise TypeError(
                 f"Cannot infer fields from table type '{table_type}'. "
-                "Supported types: Polars DataFrame, Pandas DataFrame, Ibis table."
+                "Supported types: Polars DataFrame or LazyFrame, Pandas DataFrame, PyArrow table, "
+                "PySpark DataFrame, Ibis table."
             )
 
     # Infer a Field for each column
@@ -537,7 +540,8 @@ def infer_fields_from_table(
     result: list[tuple[str, Field]] = []
 
     for i, (name, dtype_str) in enumerate(zip(col_names, col_dtypes)):
-        values = col_values[i]
+        # Count NaN as missing, as the null checks do, whatever the backend
+        values = [None if _is_nan(v) else v for v in col_values[i]]
         null_count = sum(1 for v in values if v is None)
         category = _classify_dtype(dtype_str)
 
@@ -575,10 +579,21 @@ def infer_fields_from_table(
 # ---------------------------------------------------------------------------
 
 
+def _is_nan(value: Any) -> bool:
+    """Return True for a float NaN (Python floats and NumPy `float64`, which subclasses `float`)."""
+    return isinstance(value, float) and math.isnan(value)
+
+
 def _extract_polars(
     tbl: Any, sample_size: int | None
 ) -> tuple[list[str], list[str], list[list[Any]]]:
-    """Extract column info from a Polars DataFrame."""
+    """Extract column info from a Polars DataFrame or LazyFrame."""
+    import polars as pl
+
+    # Collect a LazyFrame first, so that it's sampled the same way as a DataFrame
+    if isinstance(tbl, pl.LazyFrame):
+        tbl = tbl.collect()
+
     if sample_size is not None and len(tbl) > sample_size:
         tbl = tbl.sample(n=sample_size, seed=23)
 
@@ -634,8 +649,6 @@ def _extract_narwhals(
     nw_df: Any, sample_size: int | None
 ) -> tuple[list[str], list[str], list[list[Any]]]:
     """Extract column info from a Narwhals-wrapped DataFrame."""
-    import narwhals as nw
-
     if sample_size is not None:
         nw_df = nw_df.head(sample_size)
 
@@ -647,15 +660,8 @@ def _extract_narwhals(
     col_names = list(schema.keys())
     col_dtypes = [str(v) for v in schema.values()]
 
-    # Convert to native and extract values
-    native = nw.to_native(nw_df)
-    col_values = []
-    for c in col_names:
-        if hasattr(native, "to_list"):
-            # Polars-like
-            col_values.append(native[c].to_list())
-        else:
-            # Pandas-like
-            col_values.append(native[c].tolist())
+    # Extract values through Narwhals, which works for any eager backend (e.g., PyArrow, whose
+    # columns have neither `to_list()` nor `tolist()`)
+    col_values = [nw_df[c].to_list() for c in col_names]
 
     return col_names, col_dtypes, col_values
