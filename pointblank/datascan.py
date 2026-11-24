@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 import json
 import numbers
+import re
 from dataclasses import dataclass
 from html import escape as html_escape
 from importlib.metadata import version
@@ -10,10 +11,18 @@ from typing import TYPE_CHECKING, Any, cast
 
 import narwhals as nw
 from great_tables import GT, google_font, html, loc, style
+from great_tables.vals import fmt_number
 from narwhals.dataframe import LazyFrame
 
 from pointblank._utils_html import _create_table_dims_html, _create_table_type_html, _fmt_frac
-from pointblank.scan_profile import ColumnProfile, _as_physical, _DataProfile, _TypeMap
+from pointblank.scan_profile import (
+    ColumnProfile,
+    _as_physical,
+    _DataProfile,
+    _DateProfile,
+    _StringProfile,
+    _TypeMap,
+)
 from pointblank.scan_profile_stats import COLUMN_ORDER_REGISTRY
 
 if TYPE_CHECKING:
@@ -335,11 +344,15 @@ class DataScan:
         the quickest way to get an overview of a table you haven't seen before, and it's what
         [`col_summary_tbl()`](`pointblank.col_summary_tbl`) returns.
 
-        Each row starts with an icon for the column's type. Statistics that don't apply to any
-        column are left out, and those that don't apply to a particular column are shown as `-`.
-        Statistics for string columns describe the lengths of the strings (as the note below the
-        table says). Boolean columns show the percentages of `True` and `False` values in place of
-        the number of distinct values. Columns of unsupported types are listed with an
+        Each row starts with an icon for the column's type. The `NA` and `Unique` columns give the
+        number of missing values and the number of distinct values, each with its fraction of the
+        rows below it. Statistics that don't apply to any column are left out, and those that don't
+        apply to a particular column are shown as an em dash (`—`). Statistics for string columns
+        describe the lengths of the strings (as the note below the table says). For date, datetime
+        and time columns, `Min` and `Max` give the earliest and latest values, with the date and
+        the time on lines of their own; the time is shown to the second, and hovering over a value
+        shows it in full. Boolean columns show the percentages of `True` and `False` values in
+        place of the number of distinct values. Columns of unsupported types are listed with an
         *unsupported type* badge and no statistics.
 
         Parameters
@@ -467,38 +480,36 @@ class DataScan:
             __frac_n_missing=nw.col("n_missing") / nw.lit(self.profile.row_count),
         )
 
-        ## Pull out type indicies:
-        # TODO: The stat types should get an enum? or something?
-        # TODO: This all assumes the dates are separated by dashes, is that even true?
-        # TODO: This all assumes date_stats are strings already, not ints or anything else.
-        any_dates: bool = formatted_data.select(
-            __tmp_idx=nw.col("coltype").str.contains("Date", literal=True)
-        )["__tmp_idx"].any()
-        if any_dates:
-            date_stats = [c for c in present_stat_cols if c in ("min", "max")]
-
+        # The Min and Max columns usually hold text (in `data` they are a mix of numbers and
+        # dates, or of integers and floats), so their cells are made here from each column's
+        # profile (the rows of `data` follow the order of `column_profiles`): a date-like value
+        # goes over one or two lines, and a number is formatted as `fmt_number()` would format it
+        _backend = cast(Any, self.profile.implementation)
+        for stat_name in [c for c in ("min", "max") if c in present_stat_cols]:
+            cells: list[str | None] = []
+            for prof in self.profile.column_profiles:
+                val = next((s.val for s in prof.statistics if s.name == stat_name), None)
+                if val is None:
+                    cells.append(None)
+                elif isinstance(prof, _DateProfile):
+                    cells.append(_fmt_date_bound(val))
+                elif isinstance(val, numbers.Number):
+                    cells.append(
+                        fmt_number(
+                            val,
+                            decimals=2,
+                            drop_trailing_zeros=True,
+                            drop_trailing_dec_mark=True,
+                        )[0]
+                    )
+                else:
+                    cells.append(html_escape(str(val)))
             formatted_data = formatted_data.with_columns(
-                nw.when(nw.col("coltype").str.contains(r"\bDate\b", literal=False))
-                .then(nw.col(c).cast(nw.String).str.replace_all("-", "<br>"))
-                .otherwise(nw.col(c).cast(nw.String))
-                for c in date_stats
-            )
-
-        any_datetimes: bool = formatted_data.select(
-            __tmp_idx=nw.col("coltype").str.contains("Datetime", literal=True)
-        )["__tmp_idx"].any()
-        if any_datetimes:
-            datetime_idx = [c for c in present_stat_cols if c in ("min", "max")]
-            formatted_data = formatted_data.with_columns(
-                nw.when(nw.col("coltype").str.contains(r"\bDatetime\b", literal=False))
-                .then(nw.col(c).cast(nw.String).str.replace_all("-", "<br>"))
-                .otherwise(nw.col(c).cast(nw.String))
-                for c in datetime_idx
+                nw.new_series(stat_name, values=cells, dtype=nw.String(), backend=_backend)
             )
 
         # format fractions:
         # this is an anti-pattern but there's no serious alternative
-        _backend = cast(Any, self.profile.implementation)
         for _fmt_col in ("__frac_n_unique", "__frac_n_missing"):
             _formatted: list[str | None] = _fmt_frac(formatted_data[_fmt_col])
             formatted: nw.Series = nw.new_series(_fmt_col, values=_formatted, backend=_backend)
@@ -586,7 +597,6 @@ class DataScan:
         gt_tbl = (
             GT(formatted_data.to_native())
             .tab_header(title=html(combined_title))
-            .tab_source_note(source_note="String columns statistics regard the string's length.")
             .cols_align(align="right", columns=list(present_stat_cols))
             .opt_table_font(font=google_font("IBM Plex Sans"))
             .opt_align_table_header(align="left")
@@ -633,7 +643,14 @@ class DataScan:
         )
 
         # TODO: this is more proactive than it should be
-        gt_tbl = gt_tbl.sub_missing(missing_text="-")
+        gt_tbl = gt_tbl.sub_missing(missing_text="—")
+
+        # The statistics of a string column are of its strings' lengths, so this is noted when there
+        # are any
+        if any(isinstance(prof, _StringProfile) for prof in self.profile.column_profiles):
+            gt_tbl = gt_tbl.tab_source_note(
+                source_note="For string columns, the statistics describe the lengths of the strings."
+            )
 
         # If the version of `great_tables` is `>=0.17.0` then disable Quarto table processing
         if version("great_tables") >= "0.17.0":
@@ -1260,6 +1277,32 @@ def _html_escape_expr(expr: nw.Expr) -> nw.Expr:
         .str.replace_all("<", "&lt;", literal=True)
         .str.replace_all(">", "&gt;", literal=True)
     )
+
+
+# The style of the date line in a Min or Max cell (a date has ten characters, which are too wide for
+# the column at the size of the other statistics)
+_DATE_LINE_STYLE = "font-size: 8px;"
+
+
+def _fmt_date_bound(value: Any) -> str:
+    """
+    Get the HTML of a Min or Max cell of a date, datetime or time column.
+
+    The date and the time go on lines of their own, so a datetime takes two lines and a date or a
+    time one. The time is shown to the second: fractional seconds and a UTC offset (the column's
+    type gives the time zone) are left out, but the full value is shown on hover.
+    """
+    text = str(value)
+    match = re.fullmatch(r"(\d{4}-\d{2}-\d{2})?[ T]?(\d{2}:\d{2}:\d{2})?.*", text)
+    date, time = match.groups() if match else (None, None)
+    if date is None and time is None:
+        return html_escape(text)
+    lines = []
+    if date is not None:
+        lines.append(f"<div style='{_DATE_LINE_STYLE}'>{date}</div>")
+    if time is not None:
+        lines.append(f"<div>{time}</div>")
+    return f"<div title='{html_escape(text)}' style='white-space: nowrap;'>{''.join(lines)}</div>"
 
 
 def _assign_type_from_coltype(prof: ColumnProfile) -> None:
@@ -1997,7 +2040,7 @@ class DataScanDiff:
 
 def _format_stat_value(val: Any) -> str:
     if val is None:
-        return "-"
+        return "—"
     if isinstance(val, float):
         return f"{val:.4g}"
     return str(val)
