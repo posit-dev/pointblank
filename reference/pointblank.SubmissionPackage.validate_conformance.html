@@ -368,7 +368,7 @@ If one of the <code>ct_packages</code> isn’t bundled with Pointblank.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s make a package with a DM and an AE dataset. A <code>SEX</code> value in DM isn’t in the SEX codelist, and the second subject in AE (<code>STUDY01-009</code>) has no record in DM:</p>
-<div id="cddbcc2d" class="cell" data-execution_count="1">
+<div id="26254790" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -407,7 +407,7 @@ If one of the <code>ct_packages</code> isn’t bundled with Pointblank.
 </div>
 </div>
 <p>Of the 362 rules, 11 fail. The 12 that are not applicable need a Define-XML. Here are the failing ones:</p>
-<div id="8d60851b" class="cell" data-execution_count="2">
+<div id="a318ccc8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule <span class="kw">in</span> report.rules(status<span class="op">=</span><span class="st">"fail"</span>):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(rule.rule_id, rule.dataset, rule.message)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -425,7 +425,7 @@ SDTM-289 AE AESER must be present in AE.</code></pre>
 </div>
 </div>
 <p>Most of them are about variables that the datasets lack, such as <code>RACE</code> and <code>AESER</code>, and SDTM-121 and SDTM-122 fail since the package has no Trial Summary (TS) or Trial Arms (TA) dataset. SDTM-007 finds the <code>SEX</code> value of <code>"FEMALE"</code>. The rules don’t look for orphan records, though, so for those the <code>"validate"</code> engine is needed:</p>
-<div id="34a93ef1" class="cell" data-execution_count="3">
+<div id="66adfcff" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> study.validate_conformance(engine<span class="op">=</span><span class="st">"validate"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> issue <span class="kw">in</span> report.issues():</span>
