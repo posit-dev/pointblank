@@ -4,7 +4,7 @@ The number of test units that failed.
 
 `Comparison.n_failed: int`
 
-A test unit fails if its status is `"changed"`, `"missing"`, `"extra"`, or `"dup_key"`. If the schema check failed (see [`schema_ok`](../reference/Comparison.schema_ok.md#pointblank.Comparison.schema_ok)), every test unit fails, so `n_failed` equals [`n`](../reference/Comparison.n.md#pointblank.Comparison.n). It's always `n - n_passed`.
+A test unit fails if its status is `"changed"`, `"missing"`, `"extra"`, or `"dup_key"`. If the schema check failed (see [`schema_ok`](../reference/Comparison.schema_ok.md#pointblank.Comparison.schema_ok)), or if a positional or multiset comparison has no columns to compare, every test unit fails, so `n_failed` equals [`n`](../reference/Comparison.n.md#pointblank.Comparison.n). It's always `n - n_passed`.
 
 A count of zero failures, along with a passing schema check, is what makes a comparison [`identical`](../reference/Comparison.identical.md#pointblank.Comparison.identical). To see how the failures break down by status, use [`status_counts`](../reference/Comparison.status_counts.md#pointblank.Comparison.status_counts).
 

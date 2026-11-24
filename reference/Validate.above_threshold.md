@@ -4,7 +4,7 @@ Check if any validation steps exceed a specified threshold level.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21356-L21492)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21357-L21493)
 
 ``` python
 Validate.above_threshold(

@@ -4,7 +4,7 @@ Compare two tables row by row and report how they differ.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L321-L586)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L321-L593)
 
 ``` python
 compare(
@@ -66,7 +66,7 @@ Per-column transformations applied to both sides before comparing, as a dict map
 Should a null in the source and a null in the target count as equal? By default, they do. NaN values in floating-point columns are treated as null.
 
 `schema: Literal["strict", "common"] = "strict"`  
-How schema differences affect the result. With `"strict"` (the default), any schema difference (other than renames given in `column_map=`) means the tables don't match, and every row counts as failing. With `"common"`, only the shared columns are compared and schema differences are reported without failing rows.
+How schema differences affect the result. With `"strict"` (the default), any schema difference (other than renames given in `column_map=`) means the tables don't match, and every row counts as failing. With `"common"`, only the shared columns are compared and schema differences are reported without failing rows. Without `keys=`, there must be at least one shared column for any row to pass.
 
 `dup_keys: Literal["flag", "compare"] = "flag"`  
 Rows whose key appears more than once in either table can't be aligned unambiguously, so they always get the `"dup_key"` status. With `"flag"` (the default), they are only flagged and counted. With `"compare"`, the report also compares the duplicated rows pairwise (every source row against every target row with the same key) to show which columns differ.
@@ -101,6 +101,8 @@ Every aligned row is one *test unit* and gets exactly one status:
 Rows with a null in a key column can't be matched: they count as `"missing"` (source) or `"extra"` (target).
 
 In multiset mode (`keys="*"`), a row is either present in the other table or not, so there are no `"changed"` or `"dup_key"` rows. Each distinct row matches as many times as it occurs in both tables, and any surplus copies count as `"missing"` or `"extra"`.
+
+Without keys (positional or multiset mode), rows are aligned through their values alone, so the comparison needs at least one column in common. If there's none (e.g., two unrelated tables compared with `schema="common"`), the rows keep their statuses but none of them pass, the same as with a failed strict schema check. With `keys=`, a comparison of the keys alone is still meaningful (it checks which keys are present in both tables), so it passes as usual.
 
 ## Large Tables
 

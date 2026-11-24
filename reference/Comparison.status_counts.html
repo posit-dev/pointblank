@@ -2043,12 +2043,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-text">
 <p>Where <a href="../reference/Comparison.n_passed.html#pointblank.Comparison.n_passed" class="gdls-link"><code>n_passed</code></a> and <a href="../reference/Comparison.n_failed.html#pointblank.Comparison.n_failed" class="gdls-link"><code>n_failed</code></a> say how many rows differ, <a href="../reference/Comparison.status_counts.html#pointblank.Comparison.status_counts" class="gdls-link gdls-code">status_counts</a> says how they differ. The statuses are described in the <em>Test Units and Row Statuses</em> section of <a href="../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a>. The counts are computed when the comparison is made, so reading them doesn’t touch the tables again.</p>
-<p>The counts are the row statuses alone and aren’t affected by the schema check. If the schema check fails, there can be <code>"match"</code> rows even though no test units pass.</p>
+<p>The counts are the row statuses alone and aren’t affected by the schema check. If the schema check fails (or there are no columns to compare), there can be <code>"match"</code> rows even though no test units pass.</p>
 </div>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>In this example, station <code>S3</code> appears twice in the source table.</p>
-<div id="4f590e67" class="cell" data-execution_count="2">
+<div id="ec542841" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>

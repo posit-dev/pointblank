@@ -4,7 +4,7 @@ Get a detailed report for a single validation step.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L26056-L26448)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L26057-L26449)
 
 ``` python
 Validate.get_step_report(

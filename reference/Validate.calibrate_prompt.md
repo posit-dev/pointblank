@@ -4,7 +4,7 @@ Measure how well a [prompt()](../reference/Validate.prompt.md#pointblank.Validat
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22267-L22417)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22268-L22418)
 
 ``` python
 Validate.calibrate_prompt(

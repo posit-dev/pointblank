@@ -4,7 +4,7 @@ Validate whether the target table matches a comparison table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18001-L18367)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L18001-L18368)
 
 ``` python
 Validate.tbl_match(
@@ -62,7 +62,7 @@ Per-column transformations applied to both tables before comparing, as a dict ma
 Should two null values count as equal? By default, they do. NaN values in floating-point columns are treated as null.
 
 `schema: Literal["strict", "common"] = "strict"`  
-How schema differences affect the result. With `"strict"` (the default), any schema difference (other than renames given in `column_map=`) means the tables don't match, and every test unit fails. With `"common"`, only the shared columns are compared and schema differences are reported without failing any test units.
+How schema differences affect the result. With `"strict"` (the default), any schema difference (other than renames given in `column_map=`) means the tables don't match, and every test unit fails. With `"common"`, only the shared columns are compared and schema differences are reported without failing any test units. Without `keys=`, there must be at least one shared column for any test unit to pass.
 
 `dup_keys: Literal["flag", "compare"] = "flag"`  
 Rows whose key appears more than once in either table always fail. With `"flag"` (the default), the step report lists the duplicated keys. With `"compare"`, the step report also compares the duplicated rows pairwise to show which columns differ.

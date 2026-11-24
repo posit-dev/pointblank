@@ -16253,7 +16253,8 @@ get the failing rows. The same comparison is available outside of a validation w
 :   How schema differences affect the result. With `"strict"` (the default), any schema
     difference (other than renames given in `column_map=`) means the tables don't match,
     and every test unit fails. With `"common"`, only the shared columns are compared and
-    schema differences are reported without failing any test units.
+    schema differences are reported without failing any test units. Without `keys=`,
+    there must be at least one shared column for any test unit to pass.
 
 <code>[dup_keys]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [Literal[[&quot;flag&quot;]{.st}, [&quot;compare&quot;]{.st}]]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [[&quot;flag&quot;]{.st}]{.doc-parameter-default}</code>
 
@@ -32116,7 +32117,8 @@ unit that thresholds and actions can respond to. On the command line, it's avail
 :   How schema differences affect the result. With `"strict"` (the default), any schema
     difference (other than renames given in `column_map=`) means the tables don't match, and
     every row counts as failing. With `"common"`, only the shared columns are compared and
-    schema differences are reported without failing rows.
+    schema differences are reported without failing rows. Without `keys=`, there must be at
+    least one shared column for any row to pass.
 
 <code>[dup_keys]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [Literal[[&quot;flag&quot;]{.st}, [&quot;compare&quot;]{.st}]]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [[&quot;flag&quot;]{.st}]{.doc-parameter-default}</code>
 
@@ -32173,6 +32175,12 @@ Rows with a null in a key column can't be matched: they count as `"missing"` (so
 In multiset mode (`keys="*"`), a row is either present in the other table or not, so there are
 no `"changed"` or `"dup_key"` rows. Each distinct row matches as many times as it occurs in
 both tables, and any surplus copies count as `"missing"` or `"extra"`.
+
+Without keys (positional or multiset mode), rows are aligned through their values alone, so the
+comparison needs at least one column in common. If there's none (e.g., two unrelated tables
+compared with `schema="common"`), the rows keep their statuses but none of them pass, the same
+as with a failed strict schema check. With `keys=`, a comparison of the keys alone is still
+meaningful (it checks which keys are present in both tables), so it passes as usual.
 
 ## Large Tables {.doc-large-tables}
 
@@ -32733,7 +32741,9 @@ comparison, so `if comparison:` is the same as `if comparison.identical:`.
 "Identical" is relative to the settings given to [`compare()`](`pointblank.compare`).
 Columns left out with `columns=` aren't checked, values within `tolerance=` count as equal,
 values are compared after any `normalize=` operations, and with `schema="common"`, the
-tables can have different columns.
+tables can have different columns. They need at least one column in common, though: a
+positional or multiset comparison with no columns to compare is never identical, even
+when both tables are empty.
 :::
 
 ## Examples {.doc-examples}
@@ -32849,7 +32859,8 @@ Where [`n_passed`](`pointblank.Comparison.n_passed`) and
 are computed when the comparison is made, so reading them doesn't touch the tables again.
 
 The counts are the row statuses alone and aren't affected by the schema check. If the
-schema check fails, there can be `"match"` rows even though no test units pass.
+schema check fails (or there are no columns to compare), there can be `"match"` rows even
+though no test units pass.
 :::
 
 ## Examples {.doc-examples}
@@ -32952,7 +32963,9 @@ A test unit passes if its status is `"match"`, which means the row is in both ta
 the same values in every compared column (within any tolerance set in
 [`compare()`](`pointblank.compare`)). If the schema check failed (see
 [`schema_ok`](`pointblank.Comparison.schema_ok`)), no test unit passes and `n_passed` is
-`0`, whatever the row statuses are.
+`0`, whatever the row statuses are. The same holds for a positional or multiset comparison
+that has no columns to compare (when the tables have no columns in common): rows aligned
+without keys can't be checked against anything, so none of them pass.
 
 `n_passed` and [`n_failed`](`pointblank.Comparison.n_failed`) are the counts that
 [`Validate.tbl_match()`](`pointblank.Validate.tbl_match`) uses for its test units, so they
@@ -32996,9 +33009,9 @@ The number of test units that failed.
 ::: {.doc-text}
 
 A test unit fails if its status is `"changed"`, `"missing"`, `"extra"`, or `"dup_key"`. If
-the schema check failed (see [`schema_ok`](`pointblank.Comparison.schema_ok`)), every test
-unit fails, so `n_failed` equals [`n`](`pointblank.Comparison.n`). It's always
-`n - n_passed`.
+the schema check failed (see [`schema_ok`](`pointblank.Comparison.schema_ok`)), or if a
+positional or multiset comparison has no columns to compare, every test unit fails, so
+`n_failed` equals [`n`](`pointblank.Comparison.n`). It's always `n - n_passed`.
 
 A count of zero failures, along with a passing schema check, is what makes a comparison
 [`identical`](`pointblank.Comparison.identical`). To see how the failures break down by
@@ -59636,6 +59649,12 @@ pb.compare(
 
 To compare just some of the columns, list them in `columns=`. The schema check is then limited to
 the keys and those columns.
+
+A comparison without keys (by position or as multisets) aligns rows through their values alone, so
+it needs at least one shared column. If the tables have none, the report marks the comparison
+*NO COLUMNS COMPARED*, and no row passes, even with `schema="common"`. A keyed comparison whose only
+shared columns are the keys is still useful, since it checks which keys are present in both tables,
+so its rows pass as usual.
 
 ## Duplicate Keys
 

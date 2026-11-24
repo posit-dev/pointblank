@@ -201,6 +201,8 @@ pb.compare(
 
 To compare just some of the columns, list them in `columns=`. The schema check is then limited to the keys and those columns.
 
+A comparison without keys (by position or as multisets) aligns rows through their values alone, so it needs at least one shared column. If the tables have none, the report marks the comparison *NO COLUMNS COMPARED*, and no row passes, even with `schema="common"`. A keyed comparison whose only shared columns are the keys is still useful, since it checks which keys are present in both tables, so its rows pass as usual.
+
 ## Duplicate Keys
 
 A key that appears more than once in either table can't be aligned unambiguously, so its rows get the `dup_key` status (they always count as failing). By default the report lists the duplicated keys with their number of occurrences in each table. With `dup_keys="compare"`, the report also compares the duplicated rows pairwise to show which columns differ between them.

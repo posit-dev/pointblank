@@ -4,7 +4,7 @@ Get the overall data quality health score from the validation results.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L23569-L23657)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L23570-L23658)
 
 ``` python
 Validate.get_health_score(by=None)

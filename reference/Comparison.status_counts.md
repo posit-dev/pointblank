@@ -6,7 +6,7 @@ The number of test units with each row status.
 
 Where [`n_passed`](../reference/Comparison.n_passed.md#pointblank.Comparison.n_passed) and [`n_failed`](../reference/Comparison.n_failed.md#pointblank.Comparison.n_failed) say how many rows differ, [status_counts](../reference/Comparison.status_counts.md#pointblank.Comparison.status_counts) says how they differ. The statuses are described in the *Test Units and Row Statuses* section of [`compare()`](../reference/compare.md#pointblank.compare). The counts are computed when the comparison is made, so reading them doesn't touch the tables again.
 
-The counts are the row statuses alone and aren't affected by the schema check. If the schema check fails, there can be `"match"` rows even though no test units pass.
+The counts are the row statuses alone and aren't affected by the schema check. If the schema check fails (or there are no columns to compare), there can be `"match"` rows even though no test units pass.
 
 ## Examples
 

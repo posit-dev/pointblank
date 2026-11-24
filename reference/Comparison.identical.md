@@ -6,7 +6,7 @@ Whether the tables match under the comparison settings.
 
 A comparison is identical if the schema check passed (see [`schema_ok`](../reference/Comparison.schema_ok.md#pointblank.Comparison.schema_ok)) and no test unit failed. This is the single answer to "are these tables the same?", and it's also the truth value of the comparison, so `if comparison:` is the same as `if comparison.identical:`.
 
-"Identical" is relative to the settings given to [`compare()`](../reference/compare.md#pointblank.compare). Columns left out with `columns=` aren't checked, values within `tolerance=` count as equal, values are compared after any `normalize=` operations, and with `schema="common"`, the tables can have different columns.
+"Identical" is relative to the settings given to [`compare()`](../reference/compare.md#pointblank.compare). Columns left out with `columns=` aren't checked, values within `tolerance=` count as equal, values are compared after any `normalize=` operations, and with `schema="common"`, the tables can have different columns. They need at least one column in common, though: a positional or multiset comparison with no columns to compare is never identical, even when both tables are empty.
 
 ## Examples
 

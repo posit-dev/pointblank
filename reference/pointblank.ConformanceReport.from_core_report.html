@@ -290,7 +290,7 @@ A report of CORE’s results, whose <a href="../reference/pointblank.Conformance
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s write a short report by hand in CORE’s format, for three rules on a DM and an AE dataset. One rule found an AE record whose subject isn’t in DM, one rule passed and one was skipped:</p>
-<div id="f59312b4" class="cell" data-execution_count="1">
+<div id="c5347892" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>core_json <span class="op">=</span> {</span>
@@ -342,7 +342,7 @@ A report of CORE’s results, whose <a href="../reference/pointblank.Conformance
 </div>
 </div>
 <p>The rule statuses are CORE’s own. A real report would usually be read from a file, with <code>json.load()</code>. The failing record is in <a href="../reference/pointblank.ConformanceReport.findings.html" class="gdls-link"><code>findings()</code></a>:</p>
-<div id="f2ee3735" class="cell" data-execution_count="2">
+<div id="2dd44600" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>report.findings()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>[CoreFinding(rule_id='CORE-000201', message='USUBJID is not found in DM.USUBJID', dataset='ae.xpt', executability=None, usubjid='STUDY01-009', row=2, seq=1, variables=['USUBJID'], values=['STUDY01-009'])]</code></pre>

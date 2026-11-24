@@ -4,7 +4,7 @@ The result of comparing a source table with a target table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L785-L2540)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L792-L2558)
 
 ``` python
 Comparison()

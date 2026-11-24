@@ -2042,13 +2042,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><code><span class="doc-parameter-name">Comparison.n_passed</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span></code></p>
 </div>
 <div class="doc-text">
-<p>A test unit passes if its status is <code>"match"</code>, which means the row is in both tables with the same values in every compared column (within any tolerance set in <a href="../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a>). If the schema check failed (see <a href="../reference/Comparison.schema_ok.html#pointblank.Comparison.schema_ok" class="gdls-link"><code>schema_ok</code></a>), no test unit passes and <code>n_passed</code> is <code>0</code>, whatever the row statuses are.</p>
+<p>A test unit passes if its status is <code>"match"</code>, which means the row is in both tables with the same values in every compared column (within any tolerance set in <a href="../reference/compare.html#pointblank.compare" class="gdls-link"><code>compare()</code></a>). If the schema check failed (see <a href="../reference/Comparison.schema_ok.html#pointblank.Comparison.schema_ok" class="gdls-link"><code>schema_ok</code></a>), no test unit passes and <code>n_passed</code> is <code>0</code>, whatever the row statuses are. The same holds for a positional or multiset comparison that has no columns to compare (when the tables have no columns in common): rows aligned without keys can’t be checked against anything, so none of them pass.</p>
 <p><code>n_passed</code> and <a href="../reference/Comparison.n_failed.html#pointblank.Comparison.n_failed" class="gdls-link"><code>n_failed</code></a> are the counts that <a href="../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link"><code>Validate.tbl_match()</code></a> uses for its test units, so they work with the same thresholds and fractions as any other validation step.</p>
 </div>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Two of these four stations have the same reading in both tables.</p>
-<div id="4034025a" class="cell" data-execution_count="2">
+<div id="8ad0bd65" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
