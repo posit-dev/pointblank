@@ -138,6 +138,38 @@ class TestFloatInference:
         assert field.nullable is True
         assert field.null_probability == pytest.approx(0.4, abs=0.01)
 
+    def test_nan_counts_as_missing(self):
+        # The null checks count NaN as missing, so inference does too (#561)
+        df = pl.DataFrame({"val": [1.0, 2.0, 3.0, float("nan"), float("nan")]})
+        schema = Schema.from_table(df)
+        field = _get_field(schema, "val")
+        assert isinstance(field, FloatField)
+        assert field.nullable is True
+        assert field.null_probability == pytest.approx(0.4, abs=0.01)
+
+    def test_nan_and_null_count_together(self):
+        df = pl.DataFrame({"val": [float("nan"), 2.0, None, 4.0]})
+        schema = Schema.from_table(df)
+        field = _get_field(schema, "val")
+        assert field.nullable is True
+        assert field.null_probability == pytest.approx(0.5, abs=0.01)
+
+    def test_nan_is_ignored_for_min_max(self):
+        df = pl.DataFrame({"val": [float("nan"), 2.5, 1.5, float("nan")]})
+        schema = Schema.from_table(df)
+        field = _get_field(schema, "val")
+        assert field.min_val == pytest.approx(1.5)
+        assert field.max_val == pytest.approx(2.5)
+
+    def test_nan_schema_agrees_with_col_vals_not_null(self):
+        import pointblank as pb
+
+        df = pl.DataFrame({"val": [1.0, float("nan"), 3.0]})
+        field = _get_field(schema_from_tbl(df), "val")
+        validation = pb.Validate(df).col_vals_not_null(columns="val").interrogate()
+        assert validation.n_failed(i=1, scalar=True) == 1
+        assert field.nullable is True
+
 
 # ---------------------------------------------------------------------------
 # String inference
@@ -840,3 +872,75 @@ class TestIbisTableInference:
         assert isinstance(field_id, IntField)
         field_val = _get_field(schema, "value")
         assert isinstance(field_val, FloatField)
+
+
+# ---------------------------------------------------------------------------
+# Polars LazyFrame, PyArrow, and PySpark inference
+# ---------------------------------------------------------------------------
+
+
+def _mixed_polars_df() -> pl.DataFrame:
+    return pl.DataFrame(
+        {
+            "id": [1, 2, 3, 4, 5],
+            "score": [1.5, float("nan"), 3.0, None, 2.0],
+            "status": ["a", "b", "a", "b", "a"],
+            "flag": [True, False, True, True, None],
+        }
+    )
+
+
+class TestOtherTableTypes:
+    def test_polars_lazyframe(self):
+        """A LazyFrame gives the same schema as the DataFrame it collects to."""
+        df = _mixed_polars_df()
+        assert schema_from_tbl(df.lazy()).columns == schema_from_tbl(df).columns
+
+    def test_polars_lazyframe_sample_size(self):
+        """A LazyFrame is sampled the same way as a DataFrame."""
+        df = pl.DataFrame({"x": [float(i) for i in range(100)]})
+        lazy_schema = schema_from_tbl(df.lazy(), sample_size=10)
+        assert lazy_schema.columns == schema_from_tbl(df, sample_size=10).columns
+
+    def test_pyarrow_table(self):
+        """A PyArrow table gives the same schema as the equivalent Polars DataFrame."""
+        pa = pytest.importorskip("pyarrow")
+        df = _mixed_polars_df()
+        assert schema_from_tbl(pa.table(df.to_dict(as_series=False))).columns == (
+            schema_from_tbl(df).columns
+        )
+
+    def test_pyarrow_table_sample_size(self):
+        """A PyArrow table is sampled by taking its first rows."""
+        pa = pytest.importorskip("pyarrow")
+        tbl = pa.table({"x": [float(i) for i in range(100)]})
+        field = _get_field(schema_from_tbl(tbl, sample_size=10), "x")
+        assert field.min_val == pytest.approx(0.0)
+        assert field.max_val == pytest.approx(9.0)
+
+    def test_pyspark_dataframe(self):
+        """A PySpark DataFrame is inferred, with NaN and null counted as missing."""
+        import os
+
+        if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() in ("true", "1", "yes"):
+            pytest.skip("PySpark tests disabled via SKIP_PYSPARK_TESTS environment variable")
+        pyspark_sql = pytest.importorskip("pyspark.sql")
+        try:
+            spark = (
+                pyspark_sql.SparkSession.builder.master("local[1]")
+                .config("spark.ui.enabled", "false")
+                .getOrCreate()
+            )
+        except Exception as e:
+            pytest.skip(f"PySpark session could not be created: {e}")
+
+        sdf = spark.createDataFrame(
+            [(1, 1.5), (2, float("nan")), (3, 3.0), (4, None)], schema="id long, score double"
+        )
+        schema = schema_from_tbl(sdf)
+        assert isinstance(_get_field(schema, "id"), IntField)
+        field = _get_field(schema, "score")
+        assert isinstance(field, FloatField)
+        assert field.null_probability == pytest.approx(0.5, abs=0.01)
+        assert field.min_val == pytest.approx(1.5)
+        assert field.max_val == pytest.approx(3.0)

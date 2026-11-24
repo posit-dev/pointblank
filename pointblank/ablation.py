@@ -3175,7 +3175,7 @@ class Ablation:
         -------
         The results are the same whatever `max_workers=` is: the evaluations are made in a
         different order, but each gets the same table and seed, and the results are put back in
-        order. If an evaluation fails, the evaluations that haven't started are cancelled and the
+        order. If an evaluation fails, the evaluations that haven't started are canceled and the
         error is raised. With a cache, the results that were already made are kept, so running
         again picks up where the run stopped.
 
@@ -3315,10 +3315,11 @@ class Ablation:
 
         Examples
         --------
-        Here's an `evaluate()` function that forgets to use its seed, so that its bootstrap
-        sample is different every time.
+        Here's an `evaluate()` function that forgets to use its seed, so that its model starts
+        from a different random weight every time.
 
         ```{python}
+        import random
         import warnings
         import pointblank as pb
         import polars as pl
@@ -3327,8 +3328,8 @@ class Ablation:
         readings = pl.DataFrame({"temp": temps})
 
         def evaluate(train, *, seed):
-            sample = train.sample(fraction=1.0, with_replacement=True)
-            return abs(sample["temp"].mean() - 20)
+            weight = random.Random().uniform(0.9, 1.1)
+            return abs(train["temp"].mean() * weight - 20)
 
         validation = (
             pb.Validate(data=readings)
@@ -3346,7 +3347,8 @@ class Ablation:
         print(caught[0].message)
         ```
 
-        Passing `seed=seed` to `sample()` would fix it, and the check would then return `True`.
+        Creating the generator with `random.Random(seed)` would fix it, and the check would then
+        return `True`.
 
         See Also
         --------

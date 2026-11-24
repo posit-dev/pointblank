@@ -14,15 +14,18 @@ dynamic: true
 
 # Logo
 logo:
-  light: assets/pointblank_logo_small.svg
-  dark: assets/pointblank_logo_small.svg
+  light: assets/pointblank_logo_small.light.svg
+  dark: assets/pointblank_logo_small.dark.svg
 
 # Homepage
-# Use a simple index.qmd as the landing page
 homepage: index
 hero:
-  logo: assets/pointblank_logo.svg
-  logo_height: 250px
+  logo:
+    light: assets/pointblank_logo.light.svg
+    dark: assets/pointblank_logo.dark.svg
+  logo_height: 150px
+  name: false
+  tagline: "Data Validation Everyone Can Read"
 
 # Scale-to-fit for Pointblank validation report tables
 scale_to_fit:

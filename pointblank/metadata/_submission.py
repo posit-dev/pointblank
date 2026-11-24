@@ -3307,7 +3307,7 @@ def validate_sdtmig(
     validate_sdtm : Build a validation plan for one dataset from an SDTM template.
     """
 
-    # Normalise version separator (accept "3.4" or "3-4")
+    # Normalize version separator (accept "3.4" or "3-4")
     _ver = version.replace(".", "-")
     pkg = SubmissionPackage(
         datasets=datasets,

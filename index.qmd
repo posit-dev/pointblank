@@ -4,68 +4,336 @@ jupyter: python3
 html-table-processing: none
 ---
 
-Pointblank is a data validation framework for Python that makes data quality checks beautiful,
-powerful, and stakeholder-friendly. Instead of cryptic error messages, get stunning interactive
-reports that turn data issues into conversations.
+Pointblank checks your tables for the problems that matter (missing values, out-of-range numbers,
+malformed text, duplicate rows) and **reports what it finds** in tables that analysts, engineers,
+and stakeholders can all read.
 
-Here's what a validation looks like (click "Show the code" to see how it's done):
-
-```{python}
-#| code-fold: true
-#| code-summary: "Show the code"
-
-import pointblank as pb
-import polars as pl
-
-validation = (
-    pb.Validate(
-        data=pb.load_dataset(dataset="game_revenue", tbl_type="polars"),
-        tbl_name="game_revenue",
-        label="Comprehensive validation of game revenue data",
-        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35),
-        brief=True
-    )
-    .col_vals_regex(columns="player_id", pattern=r"^[A-Z]{12}[0-9]{3}$")
-    .col_vals_gt(columns="session_duration", value=20)
-    .col_vals_ge(columns="item_revenue", value=0.20)
-    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
-    .col_vals_in_set(
-        columns="acquisition",
-        set=["google", "facebook", "organic", "crosspromo", "other_campaign"]
-    )
-    .col_vals_not_in_set(columns="country", set=["Mongolia", "Germany"])
-    .col_vals_between(
-        columns="session_duration",
-        left=10, right=50,
-        pre=lambda df: df.select(pl.median("session_duration")),
-        brief="Expect that the median of `session_duration` should be between `10` and `50`."
-    )
-    .rows_distinct(columns_subset=["player_id", "session_id", "time"])
-    .row_count_match(count=2000)
-    .col_count_match(count=11)
-    .col_vals_not_null(columns="item_type")
-    .col_exists(columns="start_day")
-    .interrogate()
-)
-
-validation.get_tabular_report(title="Game Revenue Validation Report")
+```{=html}
+<link rel="stylesheet" href="assets/homepage.css">
+<script src="assets/homepage.js" defer></script>
+<script src="assets/backdrop.js" defer></script>
 ```
 
-That's the kind of report you get from Pointblank: clear, interactive, and designed for everyone on
-your team.
+::: {.pbh-cta}
+[Get started](/user-guide/getting-started/quickstart.qmd){.pbh-btn .pbh-btn-primary}
+[See the demos](/examples/){.pbh-btn}
+[Browse the reference](/reference/index.qmd){.pbh-btn}
 
-## What is Data Validation?
+```{=html}
+<button type="button" class="pbh-install" data-copy="pip install pointblank" aria-label="Copy the install command">
+  <code><span class="pbh-prompt">$</span> pip install pointblank</code>
+  <i class="bi bi-clipboard" aria-hidden="true"></i>
+</button>
+```
+:::
 
-Data validation makes sure your data is what you think it is before it reaches analysis, reports, or downstream systems. Pointblank gives you a structured way to declare what good data looks like, run those checks against a real table, and communicate the results to technical and non-technical audiences alike. You build a plan with a fluent, chainable API that draws on more than 45 validation methods, set warning, error, and critical thresholds, attach actions that fire when a threshold is crossed, and get back a report anyone on the team can read. Because Pointblank runs on [Narwhals](https://narwhals-dev.github.io/narwhals/) and [Ibis](https://ibis-project.org) under the hood, the same plan executes unchanged across Polars, Pandas, DuckDB, Spark, Snowflake, BigQuery, Databricks, PostgreSQL, MySQL, SQLite, and Parquet.
+## A validation, one part at a time {.pbh-heading}
 
-## More than a checker
+A validation is a table, a plan of checks, and a report. Step through this one to see what each
+part adds, with the new lines of code highlighted.
 
-The reporting goes well beyond a single pass or fail. Any step can be opened in a focused [step report](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/step-reports.html) that drills into the exact rows that failed, and those [failing rows can be pulled out](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/extracts.html) as their own table for debugging. The source data can even be [split into passing and failing pieces](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/sundering.html) for quarantine or reprocessing. Reports are localized in 40 languages, and results roll up into [quality dimensions and a single health score](https://posit-dev.github.io/pointblank/user-guide/post-interrogation/quality-dimensions-and-scoring.html), so completeness, validity, uniqueness, consistency, timeliness, and volume become one number you can watch over time.
+::::: {.pbh-stepper #pbh-stepper}
 
-![A step report drills into the specific rows behind a failing validation step.](https://posit-dev.github.io/pointblank/assets/pointblank-step-report.png)
+:::: {.pbh-step}
+[Data]{.pbh-step-name}
 
-Authoring a plan does not have to start from an empty file. Pointblank can [draft a starting plan from a natural-language prompt](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/draft-validation.html), and from there you can [revise and iterate on it in plain English](https://posit-dev.github.io/pointblank/user-guide/advanced-validation/ai-validation-editor.html) or ask it to suggest improvements. When your standards already live somewhere else, you can bring them with you. Pointblank will [import contracts](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/importing-contracts.html) written as JSON Schema or Frictionless, pull column metadata straight from [SPSS, SAS, and Stata](https://posit-dev.github.io/pointblank/user-guide/metadata-import/statistical-packages.html) files, and for clinical work validate against [CDISC SDTM and ADaM](https://posit-dev.github.io/pointblank/user-guide/metadata-import/cdisc-validation.html) templates or read a Define-XML specification. It can also model structured missingness, encoding [why a value is absent](https://posit-dev.github.io/pointblank/user-guide/data-inspection/missing-vals-tbl.html) instead of treating every gap identically.
+Start with a table: Polars, Pandas, a DuckDB or Spark table, a database table, or a CSV or Parquet
+file. [`pb.preview()`](`preview`) shows its first and last rows and its column types.
 
-![Point Pointblank at a table and let it draft a starting validation plan for you.](https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png)
+```{python}
+import pointblank as pb
 
-Getting all of this into production is where Pointblank earns its place. You can define reusable [data contracts](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/contracts.html) and enforce them at [both the source and target](https://posit-dev.github.io/pointblank/user-guide/contracts-and-pipelines/pipelines.html) of a transformation, keep plans as [YAML](https://posit-dev.github.io/pointblank/user-guide/yaml/yaml-validation-workflows.html) for version control and review, and run the whole thing from a [command-line interface](https://posit-dev.github.io/pointblank/user-guide/the-pointblank-cli/cli-data-validation.html) inside CI. Pointblank also speaks to machines: it ships an [MCP server](https://posit-dev.github.io/pointblank/user-guide/integrations/mcp-quick-start.html) and llms.txt files for AI agents, emits [OpenTelemetry](https://posit-dev.github.io/pointblank/user-guide/integrations/otel-integration.html) traces and metrics for observability, and can [generate synthetic test data](https://posit-dev.github.io/pointblank/user-guide/test-data-generation/generating-test-data.html) when you need something to validate against.
+small_table = pb.load_dataset("small_table")
+
+pb.preview(small_table)
+```
+::::
+
+:::: {.pbh-step}
+[Plan]{.pbh-step-name}
+
+Say what good data looks like, one check per step. There are checks for values, text patterns,
+sets, missing values, duplicates, row counts, schemas, and more. Before the checks are run, the
+report shows the plan.
+
+```{python}
+(
+    pb.Validate(
+        data=small_table,
+        tbl_name="small_table",
+        label="Checks on the sales data",
+    )
+    .col_vals_gt(columns="d", value=1000)
+    .col_vals_not_null(columns="c")
+    .col_vals_regex(columns="b", pattern=r"^\d-[a-z]{3}-\d{3}$")
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
+    .rows_distinct()
+)
+```
+::::
+
+:::: {.pbh-step}
+[Thresholds]{.pbh-step-name}
+
+Decide how much failure is too much. Thresholds set the share of failing rows that counts as a
+warning, an error, or a critical problem, and actions can run when one is reached.
+
+```{python}
+(
+    pb.Validate(
+        data=small_table,
+        tbl_name="small_table",
+        label="Checks on the sales data",
+        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+    )
+    .col_vals_gt(columns="d", value=1000)
+    .col_vals_not_null(columns="c")
+    .col_vals_regex(columns="b", pattern=r"^\d-[a-z]{3}-\d{3}$")
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
+    .rows_distinct()
+)
+```
+::::
+
+:::: {.pbh-step}
+[Report]{.pbh-step-name}
+
+Run the checks with [`interrogate()`](`Validate.interrogate`). The report shows every step: how
+many rows passed and failed, which thresholds were reached, and a CSV of the failing rows. With
+`brief=True`, each step also says in plain words what it checks.
+
+```{python}
+(
+    pb.Validate(
+        data=small_table,
+        tbl_name="small_table",
+        label="Checks on the sales data",
+        brief=True,
+        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+    )
+    .col_vals_gt(columns="d", value=1000)
+    .col_vals_not_null(columns="c")
+    .col_vals_regex(columns="b", pattern=r"^\d-[a-z]{3}-\d{3}$")
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
+    .rows_distinct()
+    .interrogate()
+)
+```
+::::
+
+:::::
+
+[Validation reports](/user-guide/post-interrogation/validation-reports.qmd){.pbh-more}
+[Thresholds](/user-guide/validation-plan/thresholds.qmd){.pbh-more}
+[Validation methods](/user-guide/validation-plan/validation-methods.qmd){.pbh-more}
+
+```{python}
+#| include: false
+validation = (
+    pb.Validate(
+        data=small_table,
+        tbl_name="small_table",
+        label="Checks on the sales data",
+        brief=True,
+        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+    )
+    .col_vals_gt(columns="d", value=1000)
+    .col_vals_not_null(columns="c")
+    .col_vals_regex(columns="b", pattern=r"^\d-[a-z]{3}-\d{3}$")
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
+    .rows_distinct()
+    .interrogate()
+)
+```
+
+## See exactly what failed {.pbh-heading}
+
+A failing step is a starting point, not a dead end. Open any step in a report of its own, pull out
+the rows that failed, or split the table into its passing and failing rows.
+
+::::: {.pbh-switch #pbh-switch}
+
+:::: {.pbh-option}
+[A step's own report]{.pbh-option-name}
+
+The rows where `c` is missing, with the failing values highlighted.
+
+```{python}
+validation.get_step_report(i=2)
+```
+::::
+
+:::: {.pbh-option}
+[The failing rows]{.pbh-option-name}
+
+The rows where `d` isn't over 1,000, as a table of their own.
+
+```{python}
+pb.preview(validation.get_data_extracts(i=1, frame=True))
+```
+::::
+
+:::: {.pbh-option}
+[Split the table]{.pbh-option-name}
+
+Every row that failed any step, ready for a quarantine table.
+
+```{python}
+pb.preview(validation.get_sundered_data(type="fail"))
+```
+::::
+
+:::::
+
+[Step reports](/user-guide/post-interrogation/step-reports.qmd){.pbh-more}
+[Data extracts](/user-guide/post-interrogation/extracts.qmd){.pbh-more}
+[Sundering data](/user-guide/post-interrogation/sundering.qmd){.pbh-more}
+
+## Runs where your data lives {.pbh-heading}
+
+Pointblank works through [Narwhals](https://narwhals-dev.github.io/narwhals/) and
+[Ibis](https://ibis-project.org), so the same plan runs unchanged on DataFrames and in databases,
+and the checks happen where the data is.
+
+::: {.pbh-backends}
+[Polars]{.pbh-backend}
+[Pandas]{.pbh-backend}
+[PyArrow]{.pbh-backend}
+[DuckDB]{.pbh-backend}
+[PySpark]{.pbh-backend}
+[Snowflake]{.pbh-backend}
+[BigQuery]{.pbh-backend}
+[Databricks]{.pbh-backend}
+[PostgreSQL]{.pbh-backend}
+[MySQL]{.pbh-backend}
+[SQL Server]{.pbh-backend}
+[SQLite]{.pbh-backend}
+[CSV and Parquet]{.pbh-backend}
+:::
+
+[Installation](/user-guide/getting-started/installation.qmd){.pbh-more}
+
+## And when you need more {.pbh-heading}
+
+Validation is the core, and everything else builds on it.
+
+:::: {.pbh-cards}
+
+::: {.pbh-card}
+[<i class="bi bi-file-earmark-check"></i>]{.pbh-card-icon}
+
+#### Contracts and pipelines
+
+Reusable data contracts, checked where data comes in and where it goes out. Import JSON Schema and
+Frictionless.
+
+[Data contracts →](/user-guide/contracts-and-pipelines/contracts.qmd)
+:::
+
+::: {.pbh-card}
+[<i class="bi bi-terminal"></i>]{.pbh-card-icon}
+
+#### YAML and the CLI
+
+Keep plans in YAML for review, and run them with `pb` in CI, with exit codes and extracts.
+
+[YAML workflows →](/user-guide/yaml/yaml-validation-workflows.qmd)
+:::
+
+::: {.pbh-card}
+[<i class="bi bi-stars"></i>]{.pbh-card-icon}
+
+#### Plans drafted by AI
+
+Get a first plan from a model that looked at your table, then revise it in plain English.
+
+[Drafting plans →](/user-guide/advanced-validation/draft-validation.qmd)
+:::
+
+::: {.pbh-card}
+[<i class="bi bi-layout-split"></i>]{.pbh-card-icon}
+
+#### Comparing tables
+
+Find the rows and values that differ between two tables, even across backends and large files.
+
+[Comparing tables →](/user-guide/table-comparison/comparing-tables.qmd)
+:::
+
+::: {.pbh-card}
+[<i class="bi bi-cpu"></i>]{.pbh-card-icon}
+
+#### Data for machine learning
+
+Check training splits, synthetic data, and text, then measure which failing rows hurt a model.
+
+[Data ablation →](/user-guide/post-interrogation/data-ablation.qmd)
+:::
+
+::: {.pbh-card}
+[<i class="bi bi-search"></i>]{.pbh-card-icon}
+
+#### Look before you validate
+
+Previews, column summaries, and missing-value maps to see what a table holds.
+
+[Data inspection →](/user-guide/data-inspection/preview.qmd)
+:::
+
+::: {.pbh-card}
+[<i class="bi bi-magic"></i>]{.pbh-card-icon}
+
+#### Test data
+
+Generate realistic data from a schema, in 100+ locales, as a pytest fixture.
+
+[Generating test data →](/user-guide/test-data-generation/generating-test-data.qmd)
+:::
+
+::: {.pbh-card}
+[<i class="bi bi-heart-pulse"></i>]{.pbh-card-icon}
+
+#### Clinical and metadata standards
+
+CDISC SDTM and ADaM, Define-XML, and metadata from SPSS, SAS, and Stata files.
+
+[Metadata import →](/user-guide/metadata-import/metadata-import.qmd)
+:::
+
+::: {.pbh-card}
+[<i class="bi bi-plug"></i>]{.pbh-card-icon}
+
+#### Agents and observability
+
+An MCP server and Agent Skills for AI assistants, and OpenTelemetry traces and metrics.
+
+[MCP quick start →](/user-guide/integrations/mcp-quick-start.qmd)
+:::
+
+::::
+
+## Get started {.pbh-heading}
+
+:::: {.pbh-start}
+
+::: {.pbh-start-text}
+Install Pointblank from PyPI:
+
+```bash
+pip install pointblank
+```
+
+Then make your first validation in the
+[Quickstart](/user-guide/getting-started/quickstart.qmd), or look through the
+[Demos](/examples/) for ideas. Reports come in
+[40 languages](/user-guide/post-interrogation/validation-reports.qmd#reports-in-other-languages).
+:::
+
+::: {.pbh-start-links}
+[<i class="bi bi-rocket-takeoff"></i> Quickstart](/user-guide/getting-started/quickstart.qmd)
+[<i class="bi bi-book"></i> User Guide](/user-guide/getting-started/index.qmd)
+[<i class="bi bi-collection-play"></i> Demos](/examples/)
+[<i class="bi bi-code-square"></i> API Reference](/reference/index.qmd)
+:::
+
+::::

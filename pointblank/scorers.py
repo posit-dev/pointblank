@@ -1112,7 +1112,7 @@ def langid(
         with one of them as `expected_column=`).
     expected_column
         A column with the expected language of each row, instead of `expected=` (for a
-        multilingual corpus, where each document is labelled with its language). The column must
+        multilingual corpus, where each document is labeled with its language). The column must
         be one of the columns of the step.
     name
         A name for the scorer, for the score cache and the report. By default, it's made from the
@@ -1179,7 +1179,7 @@ def langid(
     ).interrogate()
     ```
 
-    The third review is labelled as English, but it's in French, so it fails.
+    The third review is labeled as English, but it's in French, so it fails.
     """
     return _LangId(expected, backend, model, column, expected_column, name, version, batch_size)
 

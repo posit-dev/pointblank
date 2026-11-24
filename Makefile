@@ -98,10 +98,9 @@ dist: clean ## builds source and wheel package
 	python3 setup.py bdist_wheel
 	ls -l dist
 
-docs-build:
-	cd docs \
-	  && quartodoc build --verbose \
-	  && quarto render
+.PHONY: docs-build
+docs-build: ## Build the documentation site with great-docs
+	@uv run great-docs build --jobs auto
 
 docs-pdf: ## Build PDF version of User Guide (HTML to PDF preserving graphics)
 	@echo "Preparing PDF document (stripping YAML from includes)..."
