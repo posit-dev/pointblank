@@ -247,7 +247,7 @@ def test_all_stat_subclasses_instantiate():
     s_nunique = NUnique(val=10)
     assert s_nunique.name == "n_unique"
     assert s_nunique.group == StatGroup.STRUCTURE
-    assert s_nunique.label == "UQ"
+    assert s_nunique.label == "Unique"
 
 
 def test_column_order_registry_length():
