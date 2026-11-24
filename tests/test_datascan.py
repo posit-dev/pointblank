@@ -151,7 +151,7 @@ case1 = _Case(
             "n_missing": [0, 0],
             "median": [None, 3.1],
             "iqr": [None, 2.4],
-            "p05": [None, 1.516],
+            "p05": [None, 1.66],
             "n_unique": [2, 5],
             "q_3": [None, 4.7],
             "min": [None, 1.5],
@@ -180,6 +180,29 @@ def test_deterministic_calculations(case: _Case) -> None:
     should_be_clean = case.should_be.drop("freqs")
 
     pt.assert_frame_equal(should_be_clean, output_clean, check_dtypes=True, **check_settings)
+
+
+@pytest.mark.parametrize("backend", ["polars", "pandas", "duckdb"])
+def test_datascan_quantiles_match_their_labels(backend):
+    # `P5` and `P95` are the 5th and 95th percentiles, as documented
+    df_pl = pl.DataFrame({"num": list(range(1, 101)), "text": ["a" * n for n in range(1, 101)]})
+    if backend == "pandas":
+        tbl = df_pl.to_pandas()
+    elif backend == "duckdb":
+        ibis = pytest.importorskip("ibis")
+        tbl = ibis.memtable(df_pl.to_arrow())
+    else:
+        tbl = df_pl
+
+    scanner = DataScan(data=tbl)
+
+    for profile in scanner.profile.column_profiles:
+        stats = {s.name: s.val for s in profile.statistics}
+        assert stats["p05"] == pytest.approx(5.95)
+        assert stats["q_1"] == pytest.approx(25.75)
+        assert stats["median"] == pytest.approx(50.5)
+        assert stats["q_3"] == pytest.approx(75.25)
+        assert stats["p95"] == pytest.approx(95.05)
 
 
 @given(happy_path_df | happy_path_ldf | _arrow_strat() | _pandas_strat())
