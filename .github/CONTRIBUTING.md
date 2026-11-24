@@ -69,4 +69,4 @@ for method in load_validation_method_grid():  # -> `col_sum_*`, `col_mean_*`, et
 At this point, the methods will exist AND the docs/signature are loaded properly in the type checker and IDE/LSPs, which is very important for usability.
 ### Linting and Type Checking
 
-We use `ruff` for linting, the settings used are fairly loose and objective. Linting is run in pre-commit in CI. You can run it locally with `make lint`. Type checking is currently not enforced, but we intend on gradually typing the codebase. You can run `make type` to run Astral's new experimental type checker `ty`. Feel free to leverage type hints and occasionally type checking but it's not obligatory at this time.
+We use `ruff` for linting, the settings used are fairly loose and objective. Linting is run in pre-commit in CI. You can run it locally with `make lint`. Type checking is currently not enforced, but we intend on gradually typing the codebase. `make lint` also runs the `pyrefly` type checker over the `pointblank` package. Feel free to leverage type hints and occasionally type checking but it's not obligatory at this time.

@@ -49,9 +49,10 @@ pre-commit: ## Run pre-commit hooks
 	@uvx pre-commit run --all-files
 
 .PHONY: lint
-lint: ## Run ruff formatter and linter
+lint: ## Run ruff formatter and linter, then the pyrefly type checker
 	@uv run ruff format
 	@uv run ruff check --fix
+	@uv run pyrefly check pointblank
 
 .PHONY: install-pre-commit
 install-pre-commit: # Install pre-commit hooks
@@ -60,10 +61,6 @@ install-pre-commit: # Install pre-commit hooks
 .PHONY: run-pre-commit
 run-pre-commit: # Run pre-commit hooks
 	@uvx pre-commit run --all-files
-
-
-type: ## Run experimental type checking
-	@uv run ty check pointblank
 
 
 check:
