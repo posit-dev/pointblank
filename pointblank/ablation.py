@@ -1162,7 +1162,7 @@ class Ablation:
             steps = self._all_steps(method="drop_each")
         else:
             steps = self._check_steps(steps, method="drop_each")
-        for i in steps:
+        for i in cast(tuple[int, ...], steps):
             self._add_spec(
                 _named(
                     msg("abl_name_step", i=str(i)), id=f"step_{i}", strategy="drop_each", steps=(i,)
@@ -1260,7 +1260,7 @@ class Ablation:
             steps = self._check_steps(steps, method="drop_all")
             spec = _named(
                 msg("abl_name_all_of_steps", steps=steps),
-                id="all_" + "_".join(str(i) for i in steps),
+                id="all_" + "_".join(str(i) for i in cast(tuple[int, ...], steps)),
                 strategy="drop_all",
                 steps=steps,
             )
@@ -1670,7 +1670,7 @@ class Ablation:
                 "percent": True,
             }
             ranked = sorted(scores.items(), key=lambda kv: (-kv[1] if highest else kv[1], kv[0]))
-            for q in quantiles:
+            for q in cast(list[float], quantiles):
                 n = math.floor(q * n_scored + 0.5)
                 spec_id = f"{sweep_id}_{_number_text(q)}"
                 self._sweep_rows[spec_id] = frozenset(k for k, _ in ranked[:n])
@@ -2427,7 +2427,7 @@ class Ablation:
     def _ineligible_reason(self, i: int) -> str:
         if i in self._skipped:
             return self._skipped[i]
-        step = next((v for v in self.validation.validation_info if v.i == i), None)
+        step = next((v for v in cast(list[Any], self.validation.validation_info) if v.i == i), None)
         if step is None:
             return f"the validation has no step {i}"
         if not step.active:
@@ -2944,7 +2944,7 @@ class Ablation:
         if self.holdout_validation is None:
             return None
         steps = []
-        for info in self.holdout_validation.validation_info:
+        for info in cast(list[Any], self.holdout_validation.validation_info):
             failed = info.eval_error or info.n is None
             steps.append(
                 {
@@ -4063,7 +4063,7 @@ class Ablation:
         def series(version_id: str, metric: str) -> list[float]:
             return [self._values[(version_id, r)][metric] for r in repeats]
 
-        for metric in self._metrics:
+        for metric in cast(list[str], self._metrics):
             full = series("full", metric)
             rows.append(
                 _effect_row(
@@ -4168,7 +4168,7 @@ class Ablation:
         ]
         rows = []
         self._shapley_total = {}
-        for metric in self._metrics:
+        for metric in cast(list[str], self._metrics):
             full = [self._values[("full", r)][metric] for r in repeats]
             per_repeat: dict[int, list[float]] = {i: [] for i in players}
             totals = []
@@ -4316,7 +4316,7 @@ class Ablation:
             raise TypeError(
                 f"`validation=` must be a `Validate` object, got {type(target).__name__} instead."
             )
-        info = {step.i: step for step in target.validation_info}
+        info = {step.i: step for step in cast(list[Any], target.validation_info)}
         if target is not self.validation:
             for i, step in self._steps.items():
                 other = info.get(i)
@@ -4331,7 +4331,11 @@ class Ablation:
                     )
 
         ctx = report_localizer(None, None, default=target)
-        effects = [row for row in self._effects if row["metric"] == self._primary]
+        effects = [
+            row
+            for row in cast(list[dict[str, Any]], self._effects)
+            if row["metric"] == self._primary
+        ]
         fmt = _NumberFormat([row["mean"] for row in effects], ctx)
         alone = {}
         on_top: dict[int, list[dict[str, Any]]] = {}
@@ -4501,7 +4505,7 @@ class Ablation:
         Ablation.get_shapley : Get the Shapley values of the steps as a table.
         """
         self._check_run()
-        rows = self._effects
+        rows = cast(list[dict[str, Any]], self._effects)
         lib = _select_df_lib(preference="polars")
 
         if lib.__name__ == "polars":
@@ -4739,7 +4743,7 @@ class Ablation:
             raise ValueError(f"`tolerance=` must be greater than 0, got {tolerance!r}.")
         effects = {
             row["variant"]: row
-            for row in self._effects
+            for row in cast(list[dict[str, Any]], self._effects)
             if row["metric"] == self._primary and row["strategy"] == "inject"
         }
         by_sweep: dict[str, list[dict[str, Any]]] = {}
@@ -4910,7 +4914,10 @@ class Ablation:
             "variants": [v._to_dict() for v in self._versions(resolved)],
             "same_as": dict(resolved.same_as),
             "runs": [{**run, "metrics": dict(run["metrics"])} for run in self._runs],
-            "effects": [{**row, "steps": list(row["steps"])} for row in self._effects],
+            "effects": [
+                {**row, "steps": list(row["steps"])}
+                for row in cast(list[dict[str, Any]], self._effects)
+            ],
             "shapley": (
                 [dict(row) for row in self._shapley_values]
                 if self._shapley_values is not None
@@ -5111,7 +5118,7 @@ class Ablation:
         self._check_run()
         if metric is None:
             metric = self._primary
-        elif metric not in self._metrics:
+        elif metric not in cast(list[str], self._metrics):
             raise ValueError(
                 f"There's no metric {metric!r} in the results (the metrics are "
                 f"{', '.join(map(repr, cast(list[str], self._metrics)))})."
@@ -5121,7 +5128,9 @@ class Ablation:
 
         # The groups of steps of `shapley()` are shown through the Shapley values
         effects = [
-            row for row in self._effects if row["metric"] == metric and row["strategy"] != "shapley"
+            row
+            for row in cast(list[dict[str, Any]], self._effects)
+            if row["metric"] == metric and row["strategy"] != "shapley"
         ]
         baseline, variant_rows = effects[0], effects[1:]
         has_left_out = any(row["left_out"] is not None for row in variant_rows)

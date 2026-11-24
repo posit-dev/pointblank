@@ -700,7 +700,7 @@ def _reconcile(
         unknown = set(agg) - set(measures_list)
         if unknown:
             raise ValueError(f"`agg=` refers to columns not in `measures=`: {sorted(unknown)}.")
-        plan = {m: _as_list(agg.get(m, "sum")) for m in measures_list}
+        plan = {m: cast(list[str], _as_list(agg.get(m, "sum"))) for m in measures_list}
     else:
         plan = {m: [agg] for m in measures_list}
     for aggs in plan.values():

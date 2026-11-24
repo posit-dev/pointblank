@@ -1915,7 +1915,7 @@ class ConformanceReport:
 
         issues: list[dict] = []
         for name, v in self.validations.items():
-            for s in v.validation_info:
+            for s in cast(list[Any], v.validation_info):
                 n_failed = int(s.n_failed or 0)
                 if n_failed == 0:
                     continue

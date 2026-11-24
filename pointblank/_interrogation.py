@@ -295,7 +295,7 @@ class ConjointlyValidation:
             raise StepEvaluationError("conjointly() needs at least one expression.")
 
         resolved = []
-        for i, expr_fn in enumerate(self.expressions, start=1):
+        for i, expr_fn in enumerate(cast(list[Any], self.expressions), start=1):
             error = None
             try:
                 result = expr_fn(self.data_tbl)

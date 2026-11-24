@@ -4850,7 +4850,7 @@ def _validation_info_to_step(
         params["value"] = vi.values
     elif at in _SERIALIZE_RANGE_METHODS:
         _columns_param()
-        left, right = vi.values
+        left, right = cast(tuple[Any, Any], vi.values)
         params["left"] = left
         params["right"] = right
         if vi.inclusive is not None and tuple(vi.inclusive) != (True, True):
@@ -4906,7 +4906,7 @@ def _validation_info_to_step(
                 params[key] = values[key]
     elif at == "col_missing_consistent":
         values = cast(dict[str, Any], vi.values or {})
-        params["columns"] = [_column_to_name(c) or c for c in vi.column]
+        params["columns"] = [_column_to_name(c) or c for c in cast(list[Any], vi.column)]
         params["missing"] = values.get("spec")
         params["when_reason"] = values.get("when_reason")
     elif at in _SERIALIZE_SEQUENCE_METHODS:
@@ -7322,7 +7322,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -7645,7 +7645,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -7968,7 +7968,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -8289,7 +8289,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -8613,7 +8613,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -8937,7 +8937,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -9289,7 +9289,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -9642,7 +9642,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -10008,7 +10008,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -10342,7 +10342,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -10589,7 +10589,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -10841,7 +10841,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -11120,7 +11120,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -11394,7 +11394,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -11692,7 +11692,7 @@ class Validate:
         values = {"pattern": pattern, "inverse": inverse}
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -12004,7 +12004,7 @@ class Validate:
         values = {"spec": spec}
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -12216,7 +12216,7 @@ class Validate:
         values = {"min_val": min_val, "max_val": max_val}
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -12686,7 +12686,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -12998,7 +12998,7 @@ class Validate:
         bound_finder: Callable[[int], AbsoluteBounds] = partial(_derive_bounds, tol=tol)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -13205,7 +13205,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -13400,7 +13400,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -13607,7 +13607,7 @@ class Validate:
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -15974,7 +15974,7 @@ class Validate:
             "content_key": content_key,
         }
 
-        for column in columns:
+        for column in cast("Collection[Column] | Collection[str]", columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,

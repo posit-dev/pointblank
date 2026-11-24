@@ -548,7 +548,7 @@ class OTelExporter:
         root_context = otel_trace.set_span_in_context(root_span)
 
         # Create child spans for each validation step
-        for vi in validation.validation_info:
+        for vi in cast(list[Any], validation.validation_info):
             child_attrs: dict[str, Any] = {
                 **attrs,
                 "pb.step.i": vi.i or 0,
@@ -589,7 +589,7 @@ class OTelExporter:
             child_span.end(end_time=step_end_ns)
 
         # Record threshold breach events on the root span
-        for vi in validation.validation_info:
+        for vi in cast(list[Any], validation.validation_info):
             for level in ("warning", "error", "critical"):
                 if getattr(vi, level, False):
                     root_span.add_event(
@@ -620,7 +620,7 @@ class OTelExporter:
         log_level_order = {level: rank for rank, level in enumerate(_LOG_LEVELS)}
         min_level = log_level_order[self.log_level]
 
-        for vi in validation.validation_info:
+        for vi in cast(list[Any], validation.validation_info):
             # Find the highest exceeded threshold for this step
             highest_level = None
             for level in ("critical", "error", "warning"):

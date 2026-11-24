@@ -320,7 +320,7 @@ class _Card:
         ctx = self.ctx
         effects = [
             row
-            for row in ablation._effects
+            for row in cast(list[dict[str, Any]], ablation._effects)
             if row["metric"] == ablation._primary and row["strategy"] != "shapley"
         ]
         full, variants = effects[0], effects[1:]
