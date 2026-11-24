@@ -201,7 +201,7 @@ async def list_available_backends(ctx: Context) -> Dict[str, Any]:
     """Returns information about available DataFrame backends and their capabilities."""
     backends = get_available_backends()
 
-    backend_info = {}
+    backend_info: dict[str, Any] = {}
     for b in backends:
         if b == "pandas":
             backend_info["pandas"] = {
@@ -1037,7 +1037,7 @@ async def server_health_check(ctx: Context) -> Dict[str, Any]:
         except Exception:
             pass
 
-    health_info = {
+    health_info: dict[str, Any] = {
         "timestamp": datetime.now().isoformat(),
         "server_status": "healthy",
         "system_info": {

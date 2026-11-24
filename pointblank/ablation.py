@@ -1159,10 +1159,10 @@ class Ablation:
         Ablation.shapley : Share the effect of the validation among its steps.
         """
         if steps is None:
-            steps = self._all_steps(method="drop_each")
+            resolved_steps = self._all_steps(method="drop_each")
         else:
-            steps = self._check_steps(steps, method="drop_each")
-        for i in cast(tuple[int, ...], steps):
+            resolved_steps = self._check_steps(steps, method="drop_each")
+        for i in resolved_steps:
             self._add_spec(
                 _named(
                     msg("abl_name_step", i=str(i)), id=f"step_{i}", strategy="drop_each", steps=(i,)
@@ -1254,15 +1254,17 @@ class Ablation:
         Ablation.drop_steps : Remove the rows failing any of the given steps.
         """
         if steps is None:
-            steps = self._all_steps(method="drop_all")
-            spec = _named(msg("abl_name_all_steps"), id="all", strategy="drop_all", steps=steps)
-        else:
-            steps = self._check_steps(steps, method="drop_all")
+            resolved_steps = self._all_steps(method="drop_all")
             spec = _named(
-                msg("abl_name_all_of_steps", steps=steps),
-                id="all_" + "_".join(str(i) for i in cast(tuple[int, ...], steps)),
+                msg("abl_name_all_steps"), id="all", strategy="drop_all", steps=resolved_steps
+            )
+        else:
+            resolved_steps = self._check_steps(steps, method="drop_all")
+            spec = _named(
+                msg("abl_name_all_of_steps", steps=resolved_steps),
+                id="all_" + "_".join(str(i) for i in resolved_steps),
                 strategy="drop_all",
-                steps=steps,
+                steps=resolved_steps,
             )
         self._add_spec(spec)
         return self

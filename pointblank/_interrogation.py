@@ -3444,7 +3444,7 @@ def data_freshness(
 
     nw_frame = nw.from_native(data_tbl)
 
-    result = {
+    result: dict[str, Any] = {
         "passed": False,
         "max_datetime": None,
         "reference_time": None,

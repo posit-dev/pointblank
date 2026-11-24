@@ -301,7 +301,7 @@ def assistant(
             api_key=api_key,
         )
 
-    if provider == "openai":  # pragma: no cover
+    elif provider == "openai":  # pragma: no cover
         from chatlas import ChatOpenAI  # pragma: no cover
 
         chat = ChatOpenAI(  # pragma: no cover
@@ -310,7 +310,7 @@ def assistant(
             api_key=api_key,
         )
 
-    if provider == "ollama":  # pragma: no cover
+    elif provider == "ollama":  # pragma: no cover
         from chatlas import ChatOllama
 
         chat = ChatOllama(  # pragma: no cover
@@ -318,7 +318,7 @@ def assistant(
             system_prompt=system_prompt,
         )
 
-    if provider == "bedrock":  # pragma: no cover
+    elif provider == "bedrock":  # pragma: no cover
         from chatlas import ChatBedrockAnthropic  # pragma: no cover
 
         chat = ChatBedrockAnthropic(  # pragma: no cover
@@ -326,13 +326,17 @@ def assistant(
             system_prompt=system_prompt,
         )
 
-    if provider in ("azure-openai", "cohere"):  # pragma: no cover
+    elif provider in ("azure-openai", "cohere"):  # pragma: no cover
         chat = _create_chat_instance(  # pragma: no cover
             provider=provider,
             model_name=model_name,
             api_key=api_key,
             system_prompt=system_prompt,
         )
+    else:  # pragma: no cover
+        raise ValueError(  # pragma: no cover
+            f"Unsupported provider: {provider}. Supported providers are {MODEL_PROVIDERS}."
+        )  # pragma: no cover
 
     if display == "browser":  # pragma: no cover
         return chat.app()  # pragma: no cover

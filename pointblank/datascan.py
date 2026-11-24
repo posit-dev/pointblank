@@ -1450,9 +1450,9 @@ def _extract_categorical_freqs(scan: DataScan, colname: str) -> dict[str, int] |
     """Extract value frequency counts from a scan's raw data."""
     if scan.nw_data is None:
         stats = {s.name: s.val for s in _get_col_profile(scan, colname).statistics}
-        freqs = stats.get("freqs")
-        if isinstance(freqs, dict):
-            return freqs
+        stat_freqs: Any = stats.get("freqs")
+        if isinstance(stat_freqs, dict):
+            return stat_freqs
         return None
 
     try:

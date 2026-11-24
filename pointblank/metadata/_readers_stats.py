@@ -183,11 +183,11 @@ def _read_spss_metadata(path: Path, **kwargs: Any) -> MetadataImport:
                 )
 
         # Missing values
-        missing_vals = None
+        missing_vals: list[float | int | str] | None = None
         if hasattr(meta, "missing_ranges") and col_name in meta.missing_ranges:
             raw_missing = meta.missing_ranges[col_name]
             if raw_missing:
-                missing_vals: list[float | int | str] = []
+                missing_vals = []
                 mv_codes = []
                 for item in raw_missing:
                     if isinstance(item, dict):

@@ -398,7 +398,7 @@ class Schema:
         # Build Schema with Field objects as column values
         instance = cls.__new__(cls)
         instance.tbl = None
-        instance.columns = [(name, field_obj) for name, field_obj in field_tuples]
+        instance.columns = cast("Any", [(name, field_obj) for name, field_obj in field_tuples])
         return instance
 
     def _validate_schema_inputs(self) -> None:

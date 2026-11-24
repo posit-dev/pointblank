@@ -307,7 +307,7 @@ class _FunctionScorer(_Adapter):
             raise TypeError("`per_row=` must be `True` or `False`.")
         self._fn = fn
         self._per_row = per_row
-        params = {"fn": fn}
+        params: dict[str, Any] = {"fn": fn}
         if per_row:
             params["per_row"] = True
         super().__init__(params, {}, name, version, batch_size)

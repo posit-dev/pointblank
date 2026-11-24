@@ -188,11 +188,11 @@ def _generate_from_preset(preset: str, generator: LocaleGenerator) -> str:
         "locale_code": generator.locale_code,
     }
 
-    generator = preset_mapping.get(preset)
-    if generator is None:
+    gen_method: Any = preset_mapping.get(preset)
+    if gen_method is None:
         raise ValueError(f"Unknown preset: {preset}")
 
-    return str(generator())
+    return str(gen_method())
 
 
 def _generate_from_pattern(pattern: str, rng: random.Random) -> str:

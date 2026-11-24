@@ -8,7 +8,7 @@ from pointblank.adapters._base import ContractAdapter, ContractImport, MappedCon
 from pointblank.adapters._registry import register_adapter
 
 # Mapping from Frictionless field types to Pointblank/Narwhals dtype strings
-_FRICTIONLESS_TYPE_MAP: dict[str, str] = {
+_FRICTIONLESS_TYPE_MAP: dict[str, str | None] = {
     "integer": "Int64",
     "number": "Float64",
     "string": "String",

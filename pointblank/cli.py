@@ -1434,8 +1434,6 @@ def preview(
     Tables with >15 columns automatically show first 7 and last 7 columns with indicators.
     """
     try:
-        import sys
-
         # Handle piped input
         if data_source is None:
             if not sys.stdin.isatty():  # pragma: no cover
@@ -1671,7 +1669,6 @@ def scan(
     - Piped data from pb pl command
     """
     try:
-        import sys
         import time
 
         start_time = time.time()
@@ -1708,6 +1705,7 @@ def scan(
             # Check if this is a piped data source and create friendly display name
             is_piped_data = _is_piped_data_source(data_source)
 
+            display_source = data_source
             if is_piped_data:
                 if data_source.endswith(".parquet"):
                     display_source = "Parquet file via `pb pl`"
@@ -1806,8 +1804,6 @@ def missing(data_source: str | None, output_html: str | None) -> None:
     - Piped data from pb pl command
     """
     try:
-        import sys
-
         # Handle piped input
         if data_source is None:
             if not sys.stdin.isatty():  # pragma: no cover
@@ -2036,8 +2032,6 @@ def validate(
     pb validate data.csv --check rows-distinct --check rows-complete
     """
     try:
-        import sys
-
         # Handle --list-checks option early (doesn't need data source)
         if list_checks:
             console.print("[bold bright_cyan]Available Validation Checks:[/bold bright_cyan]")
@@ -2089,7 +2083,6 @@ def validate(
             console.print(
                 "  [bright_blue]pb validate data.csv --check col-vals-gt --column age --value 18[/bright_blue]"
             )
-            import sys
 
             sys.exit(0)
 
@@ -2123,7 +2116,6 @@ def validate(
                 return
 
         # Handle backward compatibility and parameter conversion
-        import sys
 
         # Convert parameter tuples to lists, handling default case
         if not checks:
@@ -2383,7 +2375,6 @@ def validate(
         # Exit with appropriate code if requested
         if exit_code and not all_passed:
             console.print("[dim]Exiting with non-zero code due to validation failure[/dim]")
-            import sys
 
             sys.exit(1)
 
@@ -5781,7 +5772,6 @@ def _handle_pl_info(result: Any, expression: str, output_html: str | None) -> No
 def _handle_pl_pipe(result: Any, pipe_format: str) -> None:
     """Handle piped output from Polars results."""
     try:
-        import sys
         import tempfile
 
         # Create a temporary file to store the data

@@ -802,7 +802,7 @@ def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
 
     # If `columns` is Column value or a string, place it in a list for iteration
     if isinstance(columns, (Column, str)):
-        columns: list[Column] | list[str] = [columns]
+        columns: list[Column] | list[str] = cast("list[Column] | list[str]", [columns])
 
     return columns
 

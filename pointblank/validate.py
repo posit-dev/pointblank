@@ -743,6 +743,7 @@ def load_dataset(
         )
 
     data_path = files("pointblank.data") / f"{dataset}.zip"
+    tbl: Any = dataset
 
     if tbl_type == "polars":
         if not _is_lib_present(lib_name="polars"):
@@ -753,7 +754,7 @@ def load_dataset(
 
         import polars as pl
 
-        dataset = pl.read_csv(ZipFile(data_path).read(f"{dataset}.csv"), try_parse_dates=True)
+        tbl = pl.read_csv(ZipFile(data_path).read(f"{dataset}.csv"), try_parse_dates=True)
 
     if tbl_type == "pandas":
         if not _is_lib_present(lib_name="pandas"):
@@ -764,7 +765,7 @@ def load_dataset(
 
         import pandas as pd
 
-        dataset = pd.read_csv(data_path, parse_dates=_DATASET_DATE_COLUMNS[dataset])
+        tbl = pd.read_csv(data_path, parse_dates=_DATASET_DATE_COLUMNS[dataset])
 
     if tbl_type == "duckdb":  # pragma: no cover
         if not _is_lib_present(lib_name="ibis"):
@@ -790,9 +791,9 @@ def load_dataset(
             conn.create_table(dataset, conn.table(dataset, database="pb_dataset_file"))
             conn.detach("pb_dataset_file")
 
-            dataset = conn.table(dataset)
+            tbl = conn.table(dataset)
 
-    return dataset
+    return tbl
 
 
 def read_file(filepath: str | Path) -> Validate:
@@ -1467,7 +1468,7 @@ def write_file(
 
     # Handle data table preservation
     if not keep_tbl:
-        validation_copy.data = None
+        validation_copy.data = cast(Any, None)
     else:
         # Check if the data is a database table that cannot be serialized
         if validation_copy.data is not None:
@@ -1484,7 +1485,7 @@ def write_file(
                 "databricks",
                 "bigquery",
             ]:
-                validation_copy.data = None
+                validation_copy.data = cast(Any, None)
                 if not quiet:  # pragma: no cover
                     print(
                         f"Note: Database table removed from saved validation "
@@ -7316,13 +7317,13 @@ class Validate:
             else _normalize_thresholds_creation(thresholds)
         )
 
-        columns = _resolve_columns(columns)
+        resolved_columns = _resolve_columns(columns)
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -7638,14 +7639,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -7961,14 +7961,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -8282,14 +8281,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -8606,14 +8604,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -8930,14 +8927,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -9282,14 +9278,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -9635,14 +9630,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -10001,14 +9995,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -10335,14 +10328,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -10582,14 +10574,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -10834,14 +10825,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -11113,14 +11103,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -11387,14 +11376,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -11682,8 +11670,7 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
@@ -11692,7 +11679,7 @@ class Validate:
         values = {"pattern": pattern, "inverse": inverse}
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -11994,8 +11981,7 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
@@ -12004,7 +11990,7 @@ class Validate:
         values = {"spec": spec}
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -12206,8 +12192,7 @@ class Validate:
             columns = col(columns)  # pragma: no cover
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
@@ -12216,7 +12201,7 @@ class Validate:
         values = {"min_val": min_val, "max_val": max_val}
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -12679,14 +12664,13 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -12989,8 +12973,7 @@ class Validate:
             columns = col(columns)
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
@@ -12998,7 +12981,7 @@ class Validate:
         bound_finder: Callable[[int], AbsoluteBounds] = partial(_derive_bounds, tol=tol)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -13198,14 +13181,13 @@ class Validate:
             columns = col(columns)  # pragma: no cover
 
         # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -13394,13 +13376,13 @@ class Validate:
             else _normalize_thresholds_creation(thresholds)
         )
 
-        columns = _resolve_columns(columns)
+        resolved_columns = _resolve_columns(columns)
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -13601,13 +13583,13 @@ class Validate:
             else _normalize_thresholds_creation(thresholds)
         )
 
-        columns = _resolve_columns(columns)
+        resolved_columns = _resolve_columns(columns)
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -15959,8 +15941,7 @@ class Validate:
         # A column selector is resolved to its columns at interrogation, like `col_vals_regex()`
         if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
             columns = col(columns)
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        resolved_columns = [columns] if isinstance(columns, (Column, str)) else columns
 
         brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
@@ -15974,7 +15955,7 @@ class Validate:
             "content_key": content_key,
         }
 
-        for column in cast("Collection[Column] | Collection[str]", columns):
+        for column in cast("Collection[Column] | Collection[str]", resolved_columns):
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
@@ -32381,7 +32362,7 @@ def _step_report_row_based(
         preview_tbl_has_target_column = column in preview_tbl_columns
         if assertion_type in ("col_vals_scored", "rows_near_distinct", "rows_not_contaminated"):
             # The columns that were checked
-            column = [c for c in column if c in preview_tbl_columns]
+            column = cast(Any, [c for c in column if c in preview_tbl_columns])
             preview_tbl_has_target_column = bool(column)
 
         if preview_tbl_has_target_column:
@@ -32481,13 +32462,13 @@ def _step_report_row_based(
         extract_tbl_has_target_column = column in extract_tbl_columns
         if assertion_type == "col_vals_scored":
             # The columns that were scored, and their scores
-            column = [c for c in [*column, "pb_score_"] if c in extract_tbl_columns]
+            column = cast(Any, [c for c in [*column, "pb_score_"] if c in extract_tbl_columns])
             extract_tbl_has_target_column = bool(column)
         elif assertion_type in _TEXT_CHECK_RESULT_COLUMNS:
             # The columns that were checked, and the column of the results that says why
             checked = [column] if isinstance(column, str) else list(column)
             added = _TEXT_CHECK_RESULT_COLUMNS[assertion_type]
-            column = [c for c in [*checked, added] if c in extract_tbl_columns]
+            column = cast(Any, [c for c in [*checked, added] if c in extract_tbl_columns])
             extract_tbl_has_target_column = bool(column)
 
         if extract_tbl_has_target_column:
