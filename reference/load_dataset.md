@@ -4,7 +4,7 @@ Load a dataset hosted in the library as specified table type.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L619-L794)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L620-L795)
 
 ``` python
 load_dataset(

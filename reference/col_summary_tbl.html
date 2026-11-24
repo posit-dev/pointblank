@@ -2135,76 +2135,76 @@ A GT object that displays the column-level summaries of the table.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>It’s easy to get a column-level summary of a table using the <a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a> function. Here’s an example using the <code>small_table</code> dataset (itself loaded using the <a href="../reference/load_dataset.html#pointblank.load_dataset" class="gdls-link"><code>load_dataset()</code></a> function):</p>
-<div id="c36764ba" class="cell" data-execution_count="1">
+<div id="5b0b8edd" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(data<span class="op">=</span>small_table)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div id="cqtlsrypsf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="vklbukfyyx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#cqtlsrypsf table {
+#vklbukfyyx table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#cqtlsrypsf thead, tbody, tfoot, tr, td, th { border-style: none; }
+#vklbukfyyx thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#cqtlsrypsf p { margin: 0; padding: 0; }
- #cqtlsrypsf .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #cqtlsrypsf .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #cqtlsrypsf .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #cqtlsrypsf .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #cqtlsrypsf .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #cqtlsrypsf .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #cqtlsrypsf .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #cqtlsrypsf .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #cqtlsrypsf .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #cqtlsrypsf .gt_column_spanner_outer:first-child { padding-left: 0; }
- #cqtlsrypsf .gt_column_spanner_outer:last-child { padding-right: 0; }
- #cqtlsrypsf .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #cqtlsrypsf .gt_spanner_row { border-bottom-style: hidden; }
- #cqtlsrypsf .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #cqtlsrypsf .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #cqtlsrypsf .gt_from_md> :first-child { margin-top: 0; }
- #cqtlsrypsf .gt_from_md> :last-child { margin-bottom: 0; }
- #cqtlsrypsf .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #cqtlsrypsf .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #cqtlsrypsf .gt_indent_1 { text-indent: 5px; }
- #cqtlsrypsf .gt_indent_2 { text-indent: calc(5px * 2); }
- #cqtlsrypsf .gt_indent_3 { text-indent: calc(5px * 3); }
- #cqtlsrypsf .gt_indent_4 { text-indent: calc(5px * 4); }
- #cqtlsrypsf .gt_indent_5 { text-indent: calc(5px * 5); }
- #cqtlsrypsf .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #cqtlsrypsf .gt_row_group_first td { border-top-width: 2px; }
- #cqtlsrypsf .gt_row_group_first th { border-top-width: 2px; }
- #cqtlsrypsf .gt_striped { color: #333333; background-color: #F4F4F4; }
- #cqtlsrypsf .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #cqtlsrypsf .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #cqtlsrypsf .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #cqtlsrypsf .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #cqtlsrypsf .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #cqtlsrypsf .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #cqtlsrypsf .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #cqtlsrypsf .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #cqtlsrypsf .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #cqtlsrypsf .gt_left { text-align: left; }
- #cqtlsrypsf .gt_center { text-align: center; }
- #cqtlsrypsf .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #cqtlsrypsf .gt_font_normal { font-weight: normal; }
- #cqtlsrypsf .gt_font_bold { font-weight: bold; }
- #cqtlsrypsf .gt_font_italic { font-style: italic; }
- #cqtlsrypsf .gt_super { font-size: 65%; }
- #cqtlsrypsf .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #cqtlsrypsf .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #cqtlsrypsf .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #cqtlsrypsf .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #cqtlsrypsf .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #cqtlsrypsf .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#vklbukfyyx p { margin: 0; padding: 0; }
+ #vklbukfyyx .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #vklbukfyyx .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #vklbukfyyx .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #vklbukfyyx .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #vklbukfyyx .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #vklbukfyyx .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #vklbukfyyx .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #vklbukfyyx .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #vklbukfyyx .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #vklbukfyyx .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #vklbukfyyx .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #vklbukfyyx .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #vklbukfyyx .gt_spanner_row { border-bottom-style: hidden; }
+ #vklbukfyyx .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #vklbukfyyx .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #vklbukfyyx .gt_from_md> :first-child { margin-top: 0; }
+ #vklbukfyyx .gt_from_md> :last-child { margin-bottom: 0; }
+ #vklbukfyyx .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #vklbukfyyx .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #vklbukfyyx .gt_indent_1 { text-indent: 5px; }
+ #vklbukfyyx .gt_indent_2 { text-indent: calc(5px * 2); }
+ #vklbukfyyx .gt_indent_3 { text-indent: calc(5px * 3); }
+ #vklbukfyyx .gt_indent_4 { text-indent: calc(5px * 4); }
+ #vklbukfyyx .gt_indent_5 { text-indent: calc(5px * 5); }
+ #vklbukfyyx .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #vklbukfyyx .gt_row_group_first td { border-top-width: 2px; }
+ #vklbukfyyx .gt_row_group_first th { border-top-width: 2px; }
+ #vklbukfyyx .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #vklbukfyyx .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #vklbukfyyx .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #vklbukfyyx .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #vklbukfyyx .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #vklbukfyyx .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #vklbukfyyx .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #vklbukfyyx .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #vklbukfyyx .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #vklbukfyyx .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #vklbukfyyx .gt_left { text-align: left; }
+ #vklbukfyyx .gt_center { text-align: center; }
+ #vklbukfyyx .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #vklbukfyyx .gt_font_normal { font-weight: normal; }
+ #vklbukfyyx .gt_font_bold { font-weight: bold; }
+ #vklbukfyyx .gt_font_italic { font-style: italic; }
+ #vklbukfyyx .gt_super { font-size: 65%; }
+ #vklbukfyyx .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #vklbukfyyx .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #vklbukfyyx .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #vklbukfyyx .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #vklbukfyyx .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #vklbukfyyx .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" aria-labelledby="title" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
@@ -2318,7 +2318,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">3.77</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">2.09</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">1</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">1.06</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">1.6</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">2</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">3</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">4</td>
@@ -2370,7 +2370,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">5.73</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">2.72</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">2</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">2.05</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">2.5</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">3</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">7</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">8</td>
@@ -2396,7 +2396,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">2,304.7</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">2,631.36</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">108.34</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">118.88</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">213.7</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">837.93</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">1,035.64</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">3,291.03</td>
@@ -2468,7 +2468,7 @@ A GT object that displays the column-level summaries of the table.
 </div>
 </div>
 <p>This table used above was a Polars DataFrame, but the <a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl" class="gdls-link gdls-code">col_summary_tbl()</a> function works with any table supported by <code>pointblank</code>, including Pandas DataFrames and Ibis backend tables. Here’s an example using a DuckDB table handled by Ibis:</p>
-<div id="226eff16" class="cell" data-execution_count="2">
+<div id="3ca5ca96" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nycflights <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(data<span class="op">=</span>nycflights, tbl_name<span class="op">=</span><span class="st">"nycflights"</span>)</span></code></pre></div>
@@ -2477,69 +2477,69 @@ A GT object that displays the column-level summaries of the table.
   warnings.warn("PyArrow Table support is currently experimental.")</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="2">
-<div id="qxtdxkyijh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="kwvqcauwxm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#qxtdxkyijh table {
+#kwvqcauwxm table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#qxtdxkyijh thead, tbody, tfoot, tr, td, th { border-style: none; }
+#kwvqcauwxm thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#qxtdxkyijh p { margin: 0; padding: 0; }
- #qxtdxkyijh .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #qxtdxkyijh .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #qxtdxkyijh .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #qxtdxkyijh .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #qxtdxkyijh .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #qxtdxkyijh .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #qxtdxkyijh .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #qxtdxkyijh .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #qxtdxkyijh .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #qxtdxkyijh .gt_column_spanner_outer:first-child { padding-left: 0; }
- #qxtdxkyijh .gt_column_spanner_outer:last-child { padding-right: 0; }
- #qxtdxkyijh .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #qxtdxkyijh .gt_spanner_row { border-bottom-style: hidden; }
- #qxtdxkyijh .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #qxtdxkyijh .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #qxtdxkyijh .gt_from_md> :first-child { margin-top: 0; }
- #qxtdxkyijh .gt_from_md> :last-child { margin-bottom: 0; }
- #qxtdxkyijh .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #qxtdxkyijh .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #qxtdxkyijh .gt_indent_1 { text-indent: 5px; }
- #qxtdxkyijh .gt_indent_2 { text-indent: calc(5px * 2); }
- #qxtdxkyijh .gt_indent_3 { text-indent: calc(5px * 3); }
- #qxtdxkyijh .gt_indent_4 { text-indent: calc(5px * 4); }
- #qxtdxkyijh .gt_indent_5 { text-indent: calc(5px * 5); }
- #qxtdxkyijh .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #qxtdxkyijh .gt_row_group_first td { border-top-width: 2px; }
- #qxtdxkyijh .gt_row_group_first th { border-top-width: 2px; }
- #qxtdxkyijh .gt_striped { color: #333333; background-color: #F4F4F4; }
- #qxtdxkyijh .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #qxtdxkyijh .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #qxtdxkyijh .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #qxtdxkyijh .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #qxtdxkyijh .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #qxtdxkyijh .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #qxtdxkyijh .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #qxtdxkyijh .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #qxtdxkyijh .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #qxtdxkyijh .gt_left { text-align: left; }
- #qxtdxkyijh .gt_center { text-align: center; }
- #qxtdxkyijh .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #qxtdxkyijh .gt_font_normal { font-weight: normal; }
- #qxtdxkyijh .gt_font_bold { font-weight: bold; }
- #qxtdxkyijh .gt_font_italic { font-style: italic; }
- #qxtdxkyijh .gt_super { font-size: 65%; }
- #qxtdxkyijh .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #qxtdxkyijh .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #qxtdxkyijh .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #qxtdxkyijh .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #qxtdxkyijh .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #qxtdxkyijh .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#kwvqcauwxm p { margin: 0; padding: 0; }
+ #kwvqcauwxm .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #kwvqcauwxm .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #kwvqcauwxm .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #kwvqcauwxm .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #kwvqcauwxm .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #kwvqcauwxm .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #kwvqcauwxm .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #kwvqcauwxm .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #kwvqcauwxm .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #kwvqcauwxm .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #kwvqcauwxm .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #kwvqcauwxm .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #kwvqcauwxm .gt_spanner_row { border-bottom-style: hidden; }
+ #kwvqcauwxm .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #kwvqcauwxm .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #kwvqcauwxm .gt_from_md> :first-child { margin-top: 0; }
+ #kwvqcauwxm .gt_from_md> :last-child { margin-bottom: 0; }
+ #kwvqcauwxm .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #kwvqcauwxm .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #kwvqcauwxm .gt_indent_1 { text-indent: 5px; }
+ #kwvqcauwxm .gt_indent_2 { text-indent: calc(5px * 2); }
+ #kwvqcauwxm .gt_indent_3 { text-indent: calc(5px * 3); }
+ #kwvqcauwxm .gt_indent_4 { text-indent: calc(5px * 4); }
+ #kwvqcauwxm .gt_indent_5 { text-indent: calc(5px * 5); }
+ #kwvqcauwxm .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #kwvqcauwxm .gt_row_group_first td { border-top-width: 2px; }
+ #kwvqcauwxm .gt_row_group_first th { border-top-width: 2px; }
+ #kwvqcauwxm .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #kwvqcauwxm .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #kwvqcauwxm .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #kwvqcauwxm .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #kwvqcauwxm .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #kwvqcauwxm .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #kwvqcauwxm .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #kwvqcauwxm .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #kwvqcauwxm .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #kwvqcauwxm .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #kwvqcauwxm .gt_left { text-align: left; }
+ #kwvqcauwxm .gt_center { text-align: center; }
+ #kwvqcauwxm .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #kwvqcauwxm .gt_font_normal { font-weight: normal; }
+ #kwvqcauwxm .gt_font_bold { font-weight: bold; }
+ #kwvqcauwxm .gt_font_italic { font-style: italic; }
+ #kwvqcauwxm .gt_super { font-size: 65%; }
+ #kwvqcauwxm .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #kwvqcauwxm .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #kwvqcauwxm .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #kwvqcauwxm .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #kwvqcauwxm .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #kwvqcauwxm .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" aria-labelledby="title" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
@@ -2653,7 +2653,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">15.71</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">8.77</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">1</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">2</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">8</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">16</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">23</td>
@@ -2679,7 +2679,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">1,349.11</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">488.28</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">1</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">514</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">624</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">907</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">1,401</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">1,744</td>
@@ -2705,7 +2705,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">1,344.25</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">467.34</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">106</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">545</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">630</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">906</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">1,359</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">1,729</td>
@@ -2731,7 +2731,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">12.64</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">40.21</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">−43</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">−13</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">−9</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">−5</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">−2</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">11</td>
@@ -2757,7 +2757,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">1,502.05</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">533.26</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">1</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">10</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">736</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">1,104</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">1,535</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">1,940</td>
@@ -2783,7 +2783,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">1,536.38</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">497.46</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">1</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">15</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">815</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">1,124</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">1,556</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">1,945</td>
@@ -2809,7 +2809,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">6.9</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">44.63</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">−86</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">−48</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">−32</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">−17</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">−5</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">14</td>
@@ -2861,7 +2861,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">1,971.92</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">1,632.47</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">1</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">4</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">91</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">553</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">1,496</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">3,465</td>
@@ -2965,7 +2965,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">150.69</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">93.69</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">20</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">31</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">40</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">82</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">129</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">192</td>
@@ -2991,7 +2991,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">1,039.91</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">733.23</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">17</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">116</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">199</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">502</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">872</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">1,389</td>
@@ -3017,7 +3017,7 @@ A GT object that displays the column-level summaries of the table.
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="mean" class="gt_row gt_center">13.18</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="std" class="gt_row gt_center">4.66</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="min" class="gt_row gt_center">1</td>
-    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">5</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="p05" class="gt_row gt_center">6</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_1" class="gt_row gt_center">9</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="median" class="gt_row gt_center">13</td>
     <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" headers="q_3" class="gt_row gt_center">17</td>

@@ -4,7 +4,7 @@ Validate that related columns share a consistent missingness pattern for a given
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14063-L14270)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14101-L14308)
 
 ``` python
 Validate.col_missing_consistent(

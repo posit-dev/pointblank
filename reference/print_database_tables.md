@@ -4,7 +4,7 @@ List all tables in a database from a connection string.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5708-L5761)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5746-L5799)
 
 ``` python
 print_database_tables(connection_string)
