@@ -25,7 +25,7 @@ import threading
 import weakref
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Any, Callable, Protocol, runtime_checkable
+from typing import Any, Callable, cast, Protocol, runtime_checkable
 
 __all__ = [
     "Scorer",
@@ -1778,7 +1778,8 @@ def _store(scorer: Any, cache: Any):
                 # An object that can't be weakly referenced isn't cached
                 return None
     check_cache(scorer, cache)
-    return _DiskStore(cache, name, version)
+    # `check_cache()` above requires a scorer with a stable name for an on-disk cache
+    return _DiskStore(cache, cast(str, name), version)
 
 
 # ---------------------------------------------------------------------------------------------

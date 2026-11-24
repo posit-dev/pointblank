@@ -5,7 +5,7 @@ Checks of the splits of a dataset (e.g., for training, validating, and testing a
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import narwhals as nw
 
@@ -377,7 +377,7 @@ class SplitCheck:
                 "missing": {},
                 "unseen": {},
                 "psi": {},
-                "drift": [self._check_drift(self.label, name) for name in names[1:]],
+                "drift": [self._check_drift(cast(str, self.label), name) for name in names[1:]],
             }
         counts = {name: _counts(self._values[name][self.label]) for name in names}
         reference = counts[names[0]]

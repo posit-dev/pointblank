@@ -6,7 +6,7 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 from importlib.resources import files
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeGuard
 
 if TYPE_CHECKING:
     pass
@@ -998,7 +998,7 @@ FREQUENCY_TIERS: dict[str, float] = {
 _TIER_KEYS = frozenset(FREQUENCY_TIERS)
 
 
-def _is_tiered(data: Any) -> bool:
+def _is_tiered(data: Any) -> TypeGuard[dict[str, list[Any]]]:
     """Return True if *data* is a dict whose keys are frequency tier names."""
     return isinstance(data, dict) and bool(_TIER_KEYS & set(data.keys()))  # type: ignore[operator]
 
@@ -1778,7 +1778,7 @@ class LocaleGenerator:
         self._current_location = self._get_location()
         return self._current_location
 
-    def _get_current_location(self) -> dict[str, str]:
+    def _get_current_location(self) -> dict[str, Any]:
         """Get the current cached location, or select a new one."""
         # If row locations are active, use those
         if self._row_locations is not None and self._current_row is not None:

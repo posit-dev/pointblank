@@ -35,7 +35,7 @@ def _aggregate(
     column: nw.DataFrame | nw.LazyFrame,
     label: str,
     native: Callable[[nw.DataFrame | nw.LazyFrame, nw.dtypes.DType], Any],
-    exact: Callable[[list[decimal.Decimal]], decimal.Decimal],
+    exact: Callable[[list[decimal.Decimal]], decimal.Decimal | int],
 ) -> float:
     """Compute the aggregate of a 1-column table as a Python number.
 

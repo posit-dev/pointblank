@@ -182,6 +182,10 @@ ignore = [
     "E702", # multiple statements on one line (semicolon)
 ]
 
+[tool.pyrefly]
+preset = "default"
+project-includes = ["pointblank"]
+
 [tool.coverage.report]
 exclude_also = ["if TYPE_CHECKING:"]
 

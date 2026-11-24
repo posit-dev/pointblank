@@ -10,7 +10,7 @@ left out like any step of a validation.
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 from pointblank._text import check_bound
 from pointblank.steps import Steps
@@ -465,16 +465,18 @@ def eval_checks(
         )
     if corpus is not None:
         steps.col_vals_in_table(
-            columns=gold_doc_id,
+            # `gold_doc_id=` is required with `corpus=` (checked above)
+            columns=cast(str, gold_doc_id),
             ref_table=corpus,
-            ref_column=corpus_id or gold_doc_id,
+            ref_column=corpus_id or cast(str, gold_doc_id),
             brief="Every gold document is in the corpus.",
             **common,
         )
     if passage is not None:
         steps.col_vals_scored(
             columns=[query, passage],
-            scorer=scorer,
+            # `scorer=` is required with `passage=` (checked above)
+            scorer=cast(Callable[..., Any], scorer),
             min_val=min_relevance,
             brief=f"Every passage in `{passage}` is relevant to its query.",
             **common,

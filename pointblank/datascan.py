@@ -2014,7 +2014,9 @@ class DataScanDiff:
                 type_baseline="Type (Baseline)",
                 type_current="Type (Current)",
                 stat_changes="Changed Statistics",
-                **({"drift": "Drift Scores"} if has_any_drift else {}),
+                # The extra label is passed as Any: pyrefly matches an unpacked dict's values to
+                # the `cases=` parameter of `cols_label()`, which the labels never are
+                **cast(Any, {"drift": "Drift Scores"} if has_any_drift else {}),
             )
             .opt_table_font(font=google_font("IBM Plex Sans"))
             .opt_align_table_header(align="left")

@@ -5,7 +5,7 @@ Data cards: a Hugging Face dataset card or a datasheet, made from a validation (
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from pointblank._report_text import ENGLISH, Localizer, msg
 
@@ -159,10 +159,11 @@ class _Card:
         # As in the Hugging Face template, for what the card can't say
         self.more_info = ctx.t("card_more_info")
 
-        self.columns = Schema(tbl=validation.data).columns
+        # A schema built from a table always has its columns
+        self.columns = cast(list[tuple[str, ...]], Schema(tbl=validation.data).columns)
         self.n_rows = get_row_count(validation.data)
         self.null_counts = _null_counts(validation.data)
-        self.steps = validation.validation_info
+        self.steps = cast(list[Any], validation.validation_info)
 
     # Facts -------------------------------------------------------------------------------------
 
@@ -241,7 +242,8 @@ class _Card:
             validated.append(ctx.t("card_not_evaluated", n=skipped))
         parts = [ctx.sentences(validated)]
         if evaluated:
-            health = validation.get_health_score()
+            # Without `by=`, the health score is the overall score (a single float)
+            health = cast(float, validation.get_health_score())
             scores = validation.get_dimension_scores()
             parts.append(ctx.t("card_health", score=_score(health, ctx)))
             if scores:

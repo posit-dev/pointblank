@@ -27,7 +27,7 @@ from enum import Enum
 from functools import partial
 from importlib.metadata import version
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Literal, NoReturn, ParamSpec, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Literal, NoReturn, ParamSpec, TypeVar, cast
 from zipfile import ZipFile
 from zoneinfo import ZoneInfo
 
@@ -2854,7 +2854,7 @@ def _generate_display_table(
     col_width_dict = {k: v for k, v in zip(col_names, col_widths)}
 
     # For each of the values in the dictionary, prepend the column name to the data type
-    col_dtype_labels_dict = {
+    col_dtype_labels_dict: dict[str, Any] = {
         k: html(
             f"<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; "
             f"padding-bottom: 2px; margin-bottom: 2px;'>{k}</div><div style='white-space: nowrap; "
@@ -3107,7 +3107,7 @@ def _build_structured_missing_tbl(
     # fixed columns are relabeled. The total row count is already shown in the header, so there's no
     # redundant "Total N" column. Raw nulls appear in a fixed "Null" column (styled like "Complete"),
     # not as a reason.
-    cols_labels = {"columns": "Column", "complete": "Complete"}
+    cols_labels: dict[str, Any] = {"columns": "Column", "complete": "Complete"}
     if has_null_col:
         cols_labels["null"] = "Null"
 
@@ -4403,7 +4403,7 @@ class _ValidationInfo:
         value: float | Column | ReferenceColumn,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
+        brief: str | bool | None = False,
         actions: Actions | None = None,
         active: bool | Callable = True,
         dimension: str | None = None,
@@ -4457,7 +4457,7 @@ class _ValidationInfo:
     n_passed: int | None = None
     n_failed: int | None = None
     f_passed: int | None = None
-    f_failed: int | None = None
+    f_failed: float | None = None
     warning: bool | None = None
     error: bool | None = None
     critical: bool | None = None
@@ -5828,7 +5828,7 @@ def _extract_steps_from_validate(validation: Validate) -> list:
 
         step = _validation_info_to_step(
             vi,
-            global_thresholds=validation.thresholds,
+            global_thresholds=validation._normalized_thresholds(),
             global_actions=validation.actions,
             warnings_out=[],
             keep_objects=True,
@@ -6448,6 +6448,22 @@ class Validate:
     consumers: str | list[str] | None = None
     version: str | None = None
 
+    def _normalized_thresholds(self) -> Thresholds:
+        # `__post_init__()` normalizes the `thresholds=` value to a `Thresholds` object
+        return cast(Thresholds, self.thresholds)
+
+    def _normalized_brief(self) -> str | None:
+        # `__post_init__()` transforms any `brief=` shorthand, leaving a string or None
+        return cast("str | None", self.brief)
+
+    def _normalized_lang(self) -> str:
+        # `__post_init__()` normalizes the `lang=` value to a reporting language code
+        return cast(str, self.lang)
+
+    def _normalized_locale(self) -> str:
+        # `__post_init__()` sets `locale=` to a string (defaulting to `lang=`)
+        return cast(str, self.locale)
+
     def __post_init__(self) -> None:
         # Process data through the centralized data processing pipeline
         self.data = _process_data(self.data)
@@ -6635,9 +6651,9 @@ class Validate:
                 columns=column,
                 value=resolved_value,
                 tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
+                thresholds=self._normalized_thresholds() if thresholds is None else thresholds,
                 actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
+                brief=self._normalized_brief() if brief is None else brief,
                 active=active,
                 dimension=dimension,
             )
@@ -7295,13 +7311,15 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         columns = _resolve_columns(columns)
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -7609,7 +7627,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -7622,7 +7642,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -7930,7 +7950,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -7943,7 +7965,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -8249,7 +8271,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -8262,7 +8286,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -8571,7 +8595,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -8584,7 +8610,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -8893,7 +8919,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -8906,7 +8934,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -9243,7 +9271,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -9256,7 +9286,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -9594,7 +9624,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -9607,7 +9639,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -9958,7 +9990,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -9971,7 +10005,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -10290,7 +10324,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -10303,7 +10339,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -10535,7 +10571,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -10548,7 +10586,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -10785,7 +10823,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -10798,7 +10838,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -11062,7 +11102,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -11075,7 +11117,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -11334,7 +11376,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -11347,7 +11391,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -11627,7 +11671,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -11640,7 +11686,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Package up the `pattern=` and boolean params into a dictionary for later interrogation
         values = {"pattern": pattern, "inverse": inverse}
@@ -11937,7 +11983,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -11950,7 +11998,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Package up the `spec=` param into a dictionary for later interrogation
         values = {"spec": spec}
@@ -12147,7 +12195,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -12160,7 +12210,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Package up `min_val=` and `max_val=` into a dictionary for later interrogation
         values = {"min_val": min_val, "max_val": max_val}
@@ -12426,11 +12476,13 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -12616,7 +12668,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -12629,7 +12683,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -12924,7 +12978,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -12937,7 +12993,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         bound_finder: Callable[[int], AbsoluteBounds] = partial(_derive_bounds, tol=tol)
 
@@ -13131,7 +13187,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -13144,7 +13202,7 @@ class Validate:
             columns = [columns]
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -13331,13 +13389,15 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         columns = _resolve_columns(columns)
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -13536,13 +13596,15 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         columns = _resolve_columns(columns)
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -13813,13 +13875,15 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         columns_subset = _resolve_columns_subset(columns_subset)
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -14074,13 +14138,15 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         columns_subset = _resolve_columns_subset(columns_subset)
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -14279,11 +14345,13 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -14839,11 +14907,13 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Package up the AI-specific parameters as a dictionary for later use
         ai_config = {
@@ -15147,11 +15217,13 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         values = {
             "scorer": scorer,
@@ -15388,9 +15460,11 @@ class Validate:
         _check_active_input(param=active, param_name="active")
 
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         values = {"method": method, "threshold": threshold, "ngram": ngram, "num_perm": num_perm}
 
@@ -15632,9 +15706,11 @@ class Validate:
         _check_active_input(param=active, param_name="active")
 
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         values = {
             "reference": list(reference) if isinstance(reference, tuple) else reference,
@@ -15875,7 +15951,9 @@ class Validate:
         _check_active_input(param=active, param_name="active")
 
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # A column selector is resolved to its columns at interrogation, like `col_vals_regex()`
@@ -15884,7 +15962,7 @@ class Validate:
         if isinstance(columns, (Column, str)):
             columns = [columns]
 
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         values = {
             "roles": roles,
@@ -16856,7 +16934,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Package up the `schema=` and boolean params into a dictionary for later interrogation
@@ -16870,7 +16950,7 @@ class Validate:
         }
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -17106,7 +17186,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `count` is a DataFrame or table then use the row count of the DataFrame as
@@ -17121,7 +17203,7 @@ class Validate:
         values = {"count": count, "inverse": inverse, "abs_tol_bounds": bounds}
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -17569,7 +17651,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Package up the parameters for later interrogation
@@ -17592,7 +17676,7 @@ class Validate:
         }
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -17770,7 +17854,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `count` is a DataFrame or table then use the column count of the DataFrame as
@@ -17782,7 +17868,7 @@ class Validate:
         values = {"count": count, "inverse": inverse}
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -17952,7 +18038,9 @@ class Validate:
             )
 
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Package ref_table, ref_column, and target columns into values dict
@@ -17962,7 +18050,7 @@ class Validate:
             "columns": columns,
         }
 
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Store the column(s) for display; a composite key is stored as the full list, like
         # `rows_distinct(columns_subset=...)` (the interrogation function uses `values`)
@@ -18312,7 +18400,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Package up the `tbl_compare` and comparison settings for later interrogation; only
@@ -18336,7 +18426,7 @@ class Validate:
                 values[name] = setting
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -18618,7 +18708,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Package up the `tbl_compare` and reconciliation settings for later interrogation
@@ -18636,7 +18728,7 @@ class Validate:
                 values[name] = setting
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -18898,11 +18990,13 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         # Package the validation expressions for later evaluation
         values = {"expressions": exprs}
@@ -19264,11 +19358,13 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self._normalized_thresholds()
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
-        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+        brief = self._normalized_brief() if brief is None else _transform_auto_brief(brief=brief)
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -19442,12 +19538,12 @@ class Validate:
 
             start_time = datetime.datetime.now(datetime.timezone.utc)
 
-            assertion_type = validation.assertion_type
+            assertion_type = cast(str, validation.assertion_type)  # every step has a type
             column = validation.column
             value = validation.values
             inclusive = validation.inclusive
             na_pass = validation.na_pass
-            threshold = validation.thresholds
+            threshold = cast(Thresholds, validation.thresholds)  # steps are normalized on creation
             segment = validation.segments
 
             # Get compatible data types for this assertion type
@@ -19464,7 +19560,7 @@ class Validate:
                 thresholds=threshold,
                 segment=segment,
                 assertion_type=assertion_type,
-                lang=self.lang,
+                lang=self._normalized_lang(),
             )
 
             # Generate the autobrief description for the validation step; it's important to perform
@@ -19477,11 +19573,11 @@ class Validate:
 
             autobrief = _create_autobrief_or_failure_text(
                 assertion_type=assertion_type,
-                lang=self.lang,
+                lang=self._normalized_lang(),
                 column=column,
                 values=value,
                 for_failure=False,
-                locale=self.locale,
+                locale=self._normalized_locale(),
                 n_rows=n_rows,
             )
 
@@ -19502,7 +19598,7 @@ class Validate:
                 validation._add_note(
                     key="expr",
                     markdown=_create_expr_source_note_html(
-                        expr_source=validation.expr_source, locale=self.locale
+                        expr_source=validation.expr_source, locale=self._normalized_locale()
                     ),
                     text=f"Expression: {validation.expr_source}",
                 )
@@ -19532,7 +19628,7 @@ class Validate:
 
                     # --- "Step skipped" prefix (translated) ---
                     step_skipped = NOTES_TEXT.get("active_check_step_skipped", {}).get(
-                        self.locale, "Step skipped"
+                        self._normalized_locale(), "Step skipped"
                     )
 
                     if isinstance(reason_info, dict):
@@ -19551,7 +19647,7 @@ class Validate:
                                 fmt_params[k] = str(v)  # pragma: no cover
 
                         template = NOTES_TEXT.get(reason_key, {}).get(
-                            self.locale,
+                            self._normalized_locale(),
                             NOTES_TEXT.get(reason_key, {}).get("en", ""),
                         )
                         reason_text_body = template.format(**fmt_params)
@@ -19567,7 +19663,7 @@ class Validate:
                         )
                         exc_msg = str(active_exc)
                         template = NOTES_TEXT.get("active_check_callable_raised_error", {}).get(
-                            self.locale,
+                            self._normalized_locale(),
                             NOTES_TEXT.get("active_check_callable_raised_error", {}).get("en", ""),
                         )
                         reason_text_body = template.format(fn_name=f"`{fn_name}`", exc_msg=exc_msg)
@@ -19585,7 +19681,7 @@ class Validate:
                             active_fn, "__qualname__", "callable"
                         )
                         template = NOTES_TEXT.get("active_check_callable_returned_false", {}).get(
-                            self.locale,
+                            self._normalized_locale(),
                             NOTES_TEXT.get("active_check_callable_returned_false", {}).get(
                                 "en", ""
                             ),
@@ -19612,10 +19708,10 @@ class Validate:
                 # plain `active=False` — attach a note explaining the explicit deactivation
                 if not validation.notes or "active_check" not in validation.notes:
                     step_skipped = NOTES_TEXT.get("active_check_step_skipped", {}).get(
-                        self.locale, "Step skipped"
+                        self._normalized_locale(), "Step skipped"
                     )
                     body_template = NOTES_TEXT.get("step_set_inactive", {}).get(
-                        self.locale,
+                        self._normalized_locale(),
                         NOTES_TEXT.get("step_set_inactive", {}).get("en", ""),
                     )
                     body_text = body_template.format(param="`active=`", value="`False`")
@@ -19708,7 +19804,7 @@ class Validate:
                             original_cols=original_cols,
                             processed_rows=processed_rows,
                             processed_cols=processed_cols,
-                            locale=self.locale,
+                            locale=self._normalized_locale(),
                         )
                         note_text = _create_preprocessing_note_text(
                             original_rows=original_rows,
@@ -19719,7 +19815,9 @@ class Validate:
 
                     else:
                         # No dimension change - just indicate preprocessing was applied
-                        note_html = _create_preprocessing_no_change_note_html(locale=self.locale)
+                        note_html = _create_preprocessing_no_change_note_html(
+                            locale=self._normalized_locale()
+                        )
                         note_text = _create_preprocessing_no_change_note_text()
 
                     validation._add_note(
@@ -19741,7 +19839,7 @@ class Validate:
                         if column in processed_column_names and column not in original_column_names:
                             note_html = _create_synthetic_target_column_note_html(
                                 column_name=column,
-                                locale=self.locale,
+                                locale=self._normalized_locale(),
                             )
                             note_text = _create_synthetic_target_column_note_text(
                                 column_name=column,
@@ -19800,9 +19898,9 @@ class Validate:
             # Set the number of test units
             # ------------------------------------------------
 
-            validation.n = NumberOfTestUnits(df=data_tbl_step, column=column).get_test_units(
-                tbl_type=tbl_type
-            )
+            validation.n = NumberOfTestUnits(
+                df=data_tbl_step, column=cast(Any, column)
+            ).get_test_units(tbl_type=tbl_type)
 
             # Check if preprocessing or segmentation resulted in zero rows
             # Only apply this check to row-based validations, not table-level validations
@@ -19856,6 +19954,10 @@ class Validate:
                         "col_vals_within_spec",
                         "col_vals_str_len",
                     ]:
+                        column = cast(str, column)
+                        na_pass = cast(
+                            Any, na_pass
+                        )  # not passed for some of these step types, so it may be None
                         # Process table for column validation; a column of a type the method
                         # can't check (e.g., a string column in `col_vals_gt()`) is an evaluation
                         # error rather than a crash
@@ -19949,7 +20051,7 @@ class Validate:
                                 column=column,
                                 low=value[0],
                                 high=value[1],
-                                inclusive=inclusive,
+                                inclusive=cast(tuple[bool, bool], inclusive),
                                 na_pass=na_pass,
                             )
 
@@ -19959,7 +20061,7 @@ class Validate:
                                 column=column,
                                 low=value[0],
                                 high=value[1],
-                                inclusive=inclusive,
+                                inclusive=cast(tuple[bool, bool], inclusive),
                                 na_pass=na_pass,
                             )
 
@@ -19973,19 +20075,25 @@ class Validate:
 
                         elif assertion_type == "col_vals_regex":
                             results_tbl = interrogate_regex(
-                                tbl=tbl, column=column, values=value, na_pass=na_pass
+                                tbl=tbl, column=column, values=cast(Any, value), na_pass=na_pass
                             )
 
                         elif assertion_type == "col_vals_within_spec":
                             from pointblank._interrogation import interrogate_within_spec
 
                             results_tbl = interrogate_within_spec(
-                                tbl=tbl, column=column, values=value, na_pass=na_pass
+                                tbl=tbl,
+                                column=column,
+                                values=cast(dict[str, Any], value),
+                                na_pass=na_pass,
                             )
 
                         elif assertion_type == "col_vals_str_len":
                             results_tbl = interrogate_str_len(
-                                tbl=tbl, column=column, values=value, na_pass=na_pass
+                                tbl=tbl,
+                                column=column,
+                                values=cast(dict[str, Any], value),
+                                na_pass=na_pass,
                             )
 
                         # Apply structured-missingness exclusion: any row whose value is a
@@ -19997,6 +20105,7 @@ class Validate:
                             )
 
                     elif assertion_type == "col_pct_null":
+                        column = cast(str, column)
                         pct_null_result = col_pct_null_details(
                             data_tbl=data_tbl_step,
                             column=column,
@@ -20016,6 +20125,7 @@ class Validate:
                         results_tbl = None
 
                     elif assertion_type == "col_pct_missing":
+                        column = cast(str, column)
                         pct_missing_result = col_pct_missing_details(
                             data_tbl=data_tbl_step,
                             column=column,
@@ -20051,7 +20161,7 @@ class Validate:
                     elif assertion_type == "col_missing_consistent":
                         results_tbl = interrogate_missing_consistent(
                             tbl=data_tbl_step,
-                            columns=column,
+                            columns=cast(list[str], column),
                             sentinels=value["sentinels"],
                             count_null=value["count_null"],
                         )
@@ -20063,7 +20173,7 @@ class Validate:
                         results_tbl = interrogate_prompt(
                             tbl=data_tbl_step,
                             columns_subset=column,
-                            ai_config=value,
+                            ai_config=cast(dict[str, Any], value),
                             info=prompt_info,
                         )
                         if prompt_info:
@@ -20079,10 +20189,14 @@ class Validate:
                                 )
 
                     elif assertion_type == "col_vals_scored":
+                        na_pass = cast(bool, na_pass)
                         from pointblank._interrogation import interrogate_scored
 
                         results_tbl, validation.val_info = interrogate_scored(
-                            tbl=data_tbl_step, columns=column, config=value, na_pass=na_pass
+                            tbl=data_tbl_step,
+                            columns=cast(list[str], column),
+                            config=cast(dict[str, Any], value),
+                            na_pass=na_pass,
                         )
                         scored_note_html, scored_note_text = _create_scored_note(
                             validation.val_info, na_pass=na_pass
@@ -20095,10 +20209,12 @@ class Validate:
                         from pointblank._interrogation import interrogate_near_distinct
 
                         results_tbl, validation.val_info = interrogate_near_distinct(
-                            tbl=data_tbl_step, columns=column, config=value
+                            tbl=data_tbl_step,
+                            columns=cast(list[str], column),
+                            config=cast(dict[str, Any], value),
                         )
                         near_note_html, near_note_text = _create_near_distinct_note(
-                            validation.val_info, value
+                            validation.val_info, cast(dict[str, Any], value)
                         )
                         validation._add_note(
                             key="near_duplicates", markdown=near_note_html, text=near_note_text
@@ -20109,8 +20225,11 @@ class Validate:
 
                         results_tbl, validation.val_info = interrogate_not_contaminated(
                             tbl=data_tbl_step,
-                            columns=column,
-                            config={**value, "ngram": _contamination_ngram(value)},
+                            columns=cast(list[str], column),
+                            config={
+                                **cast(dict[str, Any], value),
+                                "ngram": _contamination_ngram(cast(dict[str, Any], value)),
+                            },
                         )
                         contam_note_html, contam_note_text = _create_contamination_note(
                             validation.val_info
@@ -20122,6 +20241,8 @@ class Validate:
                         )
 
                     elif assertion_type == "col_vals_chat_format":
+                        column = cast(str, column)
+                        na_pass = cast(bool, na_pass)
                         from pointblank._interrogation import interrogate_chat_format
 
                         results_tbl, validation.val_info = interrogate_chat_format(
@@ -20141,6 +20262,7 @@ class Validate:
                         )
 
                     elif assertion_type == "col_exists":
+                        column = cast(str, column)
                         col_exists_result = col_exists_details(
                             data_tbl=data_tbl_step,
                             column=column,
@@ -20185,7 +20307,7 @@ class Validate:
 
                         # Add a note with the schema expectation and results
                         schema_note_html = _create_col_schema_match_note_html(
-                            schema_info=schema_validation_info, locale=self.locale
+                            schema_info=schema_validation_info, locale=self._normalized_locale()
                         )
                         schema_note_text = _create_col_schema_match_note_text(
                             schema_info=schema_validation_info
@@ -20237,6 +20359,7 @@ class Validate:
                         results_tbl = None
 
                     elif assertion_type == "data_freshness":
+                        column = cast(str, column)
                         from pointblank._interrogation import data_freshness as data_freshness_check
 
                         freshness_result = data_freshness_check(
@@ -20269,7 +20392,7 @@ class Validate:
                         if freshness_result.get("tz_warning_key"):  # pragma: no cover
                             tz_key = freshness_result["tz_warning_key"]  # pragma: no cover
                             tz_warning_text = NOTES_TEXT.get(tz_key, {}).get(  # pragma: no cover
-                                self.locale, NOTES_TEXT.get(tz_key, {}).get("en", "")
+                                self._normalized_locale(), NOTES_TEXT.get(tz_key, {}).get("en", "")
                             )
                             validation._add_note(  # pragma: no cover
                                 key="tz_warning",
@@ -20282,7 +20405,7 @@ class Validate:
                             column_empty_text = NOTES_TEXT.get(
                                 "data_freshness_column_empty", {}
                             ).get(
-                                self.locale,
+                                self._normalized_locale(),
                                 NOTES_TEXT.get("data_freshness_column_empty", {}).get(
                                     "en", "The datetime column is empty (no values to check)."
                                 ),
@@ -20320,7 +20443,7 @@ class Validate:
                                 details_key = "data_freshness_details_fail"
 
                             details_template = NOTES_TEXT.get(details_key, {}).get(
-                                self.locale,
+                                self._normalized_locale(),
                                 NOTES_TEXT.get(details_key, {}).get(
                                     "en",
                                     "Most recent data: `{max_dt}` (age: {age}, max allowed: {max_age})",
@@ -20431,6 +20554,7 @@ class Validate:
                         results_tbl = None
 
                     elif assertion_type == "col_vals_in_table":
+                        na_pass = cast(bool, na_pass)
                         from pointblank._interrogation import interrogate_in_table
 
                         ref_table = value["ref_table"]
@@ -20460,7 +20584,7 @@ class Validate:
 
                         # Produce a 1-column Narwhals DataFrame
                         # Note: lazy frames are materialized in agg() to compute aggregates
-                        vec = nw.from_native(data_tbl_step).select(column)
+                        vec = nw.from_native(data_tbl_step).select(cast(Any, column))
                         real = agg(vec)
 
                         raw_value = value["value"]
@@ -20560,14 +20684,14 @@ class Validate:
                         # Add a note for column not found errors (target column)
                         if is_column_not_found:
                             note_html = _create_column_not_found_note_html(
-                                column_name=column,
+                                column_name=cast(Any, column),
                                 available_columns=list(data_tbl_step.columns)
                                 if hasattr(data_tbl_step, "columns")
                                 else [],
-                                locale=self.locale,
+                                locale=self._normalized_locale(),
                             )
                             note_text = _create_column_not_found_note_text(
-                                column_name=column,
+                                column_name=cast(Any, column),
                                 available_columns=list(data_tbl_step.columns)
                                 if hasattr(data_tbl_step, "columns")
                                 else [],
@@ -20614,7 +20738,7 @@ class Validate:
                                     available_columns=list(data_tbl_step.columns)
                                     if hasattr(data_tbl_step, "columns")
                                     else [],
-                                    locale=self.locale,
+                                    locale=self._normalized_locale(),
                                 )
                                 note_text = _create_comparison_column_not_found_note_text(
                                     column_name=missing_col_name,
@@ -20723,16 +20847,18 @@ class Validate:
                     validation,
                     level,
                     threshold._threshold_result(
-                        fraction_failing=validation.f_failed, test_units=validation.n, level=level
+                        fraction_failing=cast(float, validation.f_failed),
+                        test_units=validation.n,
+                        level=level,
                     ),
                 )
 
             # Add note for local thresholds (if they differ from global thresholds)
-            if threshold != self.thresholds:
+            if threshold != self._normalized_thresholds():
                 if threshold != Thresholds():
                     # Local thresholds are set - generate threshold note
                     threshold_note_html = _create_local_threshold_note_html(
-                        thresholds=threshold, locale=self.locale
+                        thresholds=threshold, locale=self._normalized_locale()
                     )
                     threshold_note_text = _create_local_threshold_note_text(thresholds=threshold)
 
@@ -20743,9 +20869,11 @@ class Validate:
                         text=threshold_note_text,
                     )
 
-                elif self.thresholds != Thresholds():
+                elif self._normalized_thresholds() != Thresholds():
                     # Thresholds explicitly reset to empty when global thresholds exist
-                    reset_note_html = _create_threshold_reset_note_html(locale=self.locale)
+                    reset_note_html = _create_threshold_reset_note_html(
+                        locale=self._normalized_locale()
+                    )
                     reset_note_text = _create_threshold_reset_note_text()
 
                     # Add the note to the validation step
@@ -20761,11 +20889,11 @@ class Validate:
                 # Generate failure text for the validation step
                 failure_text = _create_autobrief_or_failure_text(
                     assertion_type=assertion_type,
-                    lang=self.lang,
+                    lang=self._normalized_lang(),
                     column=column,
                     values=value,
                     for_failure=True,
-                    locale=self.locale,
+                    locale=self._normalized_locale(),
                     n_rows=n_rows,
                 )
 
@@ -20811,7 +20939,7 @@ class Validate:
                                         type=assertion_type,
                                         time=str(start_time),
                                         level=level,
-                                        lang=self.lang,
+                                        lang=self._normalized_lang(),
                                     )
 
                                     print(act)
@@ -20855,7 +20983,7 @@ class Validate:
                                         type=assertion_type,
                                         time=str(start_time),
                                         level=level,
-                                        lang=self.lang,
+                                        lang=self._normalized_lang(),
                                     )
 
                                     print(act)
@@ -20972,7 +21100,7 @@ class Validate:
                     # (stored here in `column`), if supplied
                     if column is not None:
                         column_names = column
-                        column_names_subset = ["_row_num_"] + column
+                        column_names_subset = ["_row_num_"] + cast(list[str], column)
                         validation_extract_nw = validation_extract_nw.select(column_names_subset)
 
                     # Use cast-to-string + fill_null before grouping to avoid issues with
@@ -21012,7 +21140,7 @@ class Validate:
                 # PyArrow table by default)
                 if is_narwhals_lazyframe(validation_extract_nw):
                     validation_extract_nw = validation_extract_nw.collect(
-                        backend=_extract_collect_backend()
+                        backend=cast(Literal["polars", "pandas"] | None, _extract_collect_backend())
                     )
                 validation.extract = nw.to_native(validation_extract_nw)
 
@@ -22587,7 +22715,7 @@ class Validate:
                 continue
             step = _validation_info_to_step(
                 vi,
-                global_thresholds=self.thresholds,
+                global_thresholds=self._normalized_thresholds(),
                 global_actions=self.actions,
                 warnings_out=warnings_out,
             )
@@ -22700,20 +22828,25 @@ class Validate:
             validate_args.append((f"tbl_name={json.dumps(self.tbl_name)}", None))
         if self.label is not None:
             validate_args.append((f"label={json.dumps(self.label)}", None))
-        global_thresholds = _thresholds_as_dict(self.thresholds)
+        global_thresholds = _thresholds_as_dict(self._normalized_thresholds())
         if global_thresholds:
-            validate_args.append((f"thresholds={_render_thresholds_code(self.thresholds)}", None))
+            validate_args.append(
+                (f"thresholds={_render_thresholds_code(self._normalized_thresholds())}", None)
+            )
         if self.actions is not None:
             warnings_out.append(
                 "Table-level `actions=` cannot be serialized to code and were omitted."
             )
-        if self.brief is not None and self.brief is not False:
-            brief_val = True if self.brief == "{auto}" else self.brief
+        if self._normalized_brief() is not None and self._normalized_brief() is not False:
+            brief_val = True if self._normalized_brief() == "{auto}" else self._normalized_brief()
             validate_args.append((f"brief={_render_code_value(brief_val)}", None))
-        if self.lang is not None and self.lang != "en":
-            validate_args.append((f"lang={json.dumps(self.lang)}", None))
-        if self.locale is not None and self.locale != self.lang:
-            validate_args.append((f"locale={json.dumps(self.locale)}", None))
+        if self._normalized_lang() is not None and self._normalized_lang() != "en":
+            validate_args.append((f"lang={json.dumps(self._normalized_lang())}", None))
+        if (
+            self._normalized_locale() is not None
+            and self._normalized_locale() != self._normalized_lang()
+        ):
+            validate_args.append((f"locale={json.dumps(self._normalized_locale())}", None))
         for attr in ("owner", "version"):
             value = getattr(self, attr)
             if value is not None:
@@ -22849,15 +22982,20 @@ class Validate:
             config["tbl_name"] = self.tbl_name
         if self.label is not None:
             config["label"] = self.label
-        global_thresholds = _thresholds_as_dict(self.thresholds)
+        global_thresholds = _thresholds_as_dict(self._normalized_thresholds())
         if global_thresholds:
             config["thresholds"] = global_thresholds
-        if self.brief is not None and self.brief is not False:
-            config["brief"] = True if self.brief == "{auto}" else self.brief
-        if self.lang is not None and self.lang != "en":
-            config["lang"] = self.lang
-        if self.locale is not None and self.locale != self.lang:
-            config["locale"] = self.locale
+        if self._normalized_brief() is not None and self._normalized_brief() is not False:
+            config["brief"] = (
+                True if self._normalized_brief() == "{auto}" else self._normalized_brief()
+            )
+        if self._normalized_lang() is not None and self._normalized_lang() != "en":
+            config["lang"] = self._normalized_lang()
+        if (
+            self._normalized_locale() is not None
+            and self._normalized_locale() != self._normalized_lang()
+        ):
+            config["locale"] = self._normalized_locale()
         for attr in ("owner", "version"):
             value = getattr(self, attr)
             if value is not None:
@@ -23004,7 +23142,7 @@ class Validate:
 
         # Enrich with column type information from the data when available
         if self.data is not None and "properties" in schema_doc:
-            self._enrich_schema_types(schema_doc)
+            self._enrich_schema_types(cast(dict[str, Any], schema_doc))
 
         # Write the enriched version if a path was given and we enriched it
         if path is not None and self.data is not None:
@@ -23169,7 +23307,7 @@ class Validate:
         from pointblank._data_card import make_data_card
 
         return make_data_card(
-            self,
+            cast(Any, self),
             format=format,
             path=path,
             ablation=ablation,
@@ -23252,7 +23390,7 @@ class Validate:
                 "All columns already have some coverage; look for additional high-value checks "
                 "such as uniqueness of key columns, tighter ranges, or row/column count checks."
             )
-        if _thresholds_as_dict(self.thresholds) == {}:
+        if _thresholds_as_dict(self._normalized_thresholds()) == {}:
             lines.append(
                 "No failure thresholds are set on the plan; add sensible warning/error "
                 "thresholds via `pb.Thresholds(...)`."
@@ -23396,7 +23534,7 @@ class Validate:
             data=self.data,
             tbl_name=self.tbl_name,
             label=self.label,
-            thresholds=self.thresholds,
+            thresholds=self._normalized_thresholds(),
         )
         empty_code = empty_plan.to_code()
 
@@ -23864,7 +24002,7 @@ class Validate:
         # Select the DataFrame library
         df_lib = _select_df_lib(preference="polars")
 
-        lang = self.lang or "en"
+        lang = self._normalized_lang() or "en"
 
         if by is not None:
             segment_steps = self._steps_by_segment(by)
@@ -23928,7 +24066,9 @@ class Validate:
                 df_lib=df_lib,
             )
         else:
-            gt_tbl = self._dimension_scorecard(dimension_scores, lang=lang, df_lib=df_lib)
+            gt_tbl = self._dimension_scorecard(
+                cast(dict[str, float], dimension_scores), lang=lang, df_lib=df_lib
+            )
 
         health_label = _get_report_text("report_health_score", lang)
         subtitle_html = (
@@ -24953,13 +25093,13 @@ class Validate:
                 tbl_info = "narwhals"  # pragma: no cover
 
         # Get the thresholds object
-        thresholds = self.thresholds
+        thresholds = self._normalized_thresholds()
 
         # Get the language for the report
-        lang = self.lang
+        lang = self._normalized_lang()
 
         # Get the locale for the report
-        locale = self.locale
+        locale = self._normalized_locale()
 
         # Define the order of columns
         column_order = [
@@ -25172,7 +25312,7 @@ class Validate:
         validation_info_dict["type_upd"] = _transform_assertion_str(
             assertion_str=validation_info_dict["assertion_type"],
             brief_str=brief_str,
-            autobrief_str=autobrief_str,
+            autobrief_str=cast(list[str], autobrief_str),
             segmentation_str=validation_info_dict["segments"],
             lang=lang,
             assertion_arg_str=assertion_arg_str,
@@ -25800,7 +25940,7 @@ class Validate:
         )
 
         # Create the label, table type, and thresholds HTML fragments
-        label_html = _create_label_html(label=self.label, start_time=self.time_start)
+        label_html = _create_label_html(label=self.label, start_time=cast(str, self.time_start))
         table_type_html = _create_table_type_html(tbl_type=tbl_info, tbl_name=self.tbl_name)
         thresholds_html = _create_thresholds_html(
             thresholds=thresholds, locale=locale, df_lib=df_lib
@@ -25987,7 +26127,7 @@ class Validate:
             # Add governance metadata as source note if any metadata is present
             governance_html = _create_governance_metadata_html(
                 owner=self.owner,
-                consumers=self.consumers,
+                consumers=cast(list[str] | None, self.consumers),
                 version=self.version,
             )
             if governance_html:
@@ -26249,8 +26389,8 @@ class Validate:
         validation_info_dict = _validation_info_as_dict(validation_info=self.validation_info)
 
         # Obtain the language and locale
-        lang = self.lang
-        locale = self.locale
+        lang = self._normalized_lang()
+        locale = self._normalized_locale()
 
         # Filter the dictionary to include only the information for the selected step
         validation_step = {
@@ -26334,7 +26474,7 @@ class Validate:
                 n_failed=n_failed,
                 all_passed=all_passed,
                 extract=extract,
-                tbl_preview=tbl_preview,
+                tbl_preview=cast(GT, tbl_preview),
                 header=header,
                 limit=limit,
                 lang=lang,
@@ -26353,7 +26493,7 @@ class Validate:
                 n_failed=n_failed,
                 all_passed=all_passed,
                 extract=extract,
-                tbl_preview=tbl_preview,
+                tbl_preview=cast(GT, tbl_preview),
                 header=header,
                 limit=limit,
                 lang=lang,
@@ -26711,7 +26851,7 @@ class Validate:
                     "critical",
                 ]
                 for col in inactive_null_cols:
-                    df[col] = df[col].where(df["active"], pd.NA)
+                    df[col] = df[col].where(df["active"], cast(Any, pd.NA))
 
                 return df.drop(
                     columns=["input_brief", "autobrief", "original_pre", "original_segments"]
@@ -26871,7 +27011,9 @@ class Validate:
 
                 # Evaluate the column expression
                 if isinstance(column_expr, ColumnSelectorNarwhals):
-                    columns_resolved = ColumnSelectorNarwhals(column_expr).resolve(table=table)
+                    columns_resolved = ColumnSelectorNarwhals(cast(Any, column_expr)).resolve(
+                        table=table
+                    )
                 else:
                     columns_resolved = column_expr.resolve(columns=columns, table=table)
 
@@ -26895,7 +27037,7 @@ class Validate:
                 note_html = _create_no_columns_resolved_note_html(
                     column_expr=str(column_expr),
                     available_columns=columns,
-                    locale=self.locale,
+                    locale=self._normalized_locale(),
                 )
                 note_text = _create_no_columns_resolved_note_text(
                     column_expr=str(column_expr),
@@ -26962,7 +27104,7 @@ class Validate:
                 continue
 
             # Evaluate the segments expression
-            seg_tuples = []
+            seg_tuples: Any = []
 
             try:
                 # Get the table for this step, it can either be:
@@ -27022,7 +27164,7 @@ class Validate:
                 new_validation.segments_spec = segments_expr
 
                 no_segments_text = NOTES_TEXT.get("no_segments_found", {}).get(
-                    self.locale, NOTES_TEXT.get("no_segments_found", {}).get("en", "")
+                    self._normalized_locale(), NOTES_TEXT.get("no_segments_found", {}).get("en", "")
                 )
                 new_validation._add_note(
                     key="no_segments",
@@ -27843,7 +27985,7 @@ def _plan_briefs(
 
         autobriefs.append(
             _create_autobrief_or_failure_text(
-                assertion_type=validation.assertion_type,
+                assertion_type=cast(str, validation.assertion_type),
                 lang=lang,
                 column=column,
                 values=validation.values,
@@ -28309,7 +28451,8 @@ def _process_action_str(
 def _create_autobrief_or_failure_text(
     assertion_type: str,
     lang: str,
-    column: str,
+    # a column name for column-based steps; a list or None for row-based steps
+    column: Any,
     values: Any,
     for_failure: bool,
     locale: str | None = None,
@@ -28537,7 +28680,7 @@ def _create_text_comparison(
     assertion_type: str,
     lang: str,
     column: str | list[str],
-    values: str | None,
+    values: Any,
     for_failure: bool = False,
 ) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
@@ -28745,7 +28888,7 @@ def _create_text_col_schema_match(lang: str, for_failure: bool) -> str:
 
 
 def _create_text_rows_distinct(
-    lang: str, columns_subset: list[str] | None, for_failure: bool = False
+    lang: str, columns_subset: list[str] | str | None, for_failure: bool = False
 ) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
@@ -28763,7 +28906,7 @@ def _create_text_rows_distinct(
 
 
 def _create_text_rows_complete(
-    lang: str, columns_subset: list[str] | None, for_failure: bool = False
+    lang: str, columns_subset: list[str] | str | None, for_failure: bool = False
 ) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
@@ -28798,7 +28941,7 @@ def _create_text_col_count_match(lang: str, value: dict, for_failure: bool = Fal
 
 def _create_text_data_freshness(
     lang: str,
-    column: str | None,
+    column: str,
     value: dict,
     for_failure: bool = False,
 ) -> str:
@@ -28806,7 +28949,7 @@ def _create_text_data_freshness(
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
-    max_age_text = _format_timedelta(value.get("max_age"))
+    max_age_text = _format_timedelta(cast(datetime.timedelta, value.get("max_age")))
 
     if for_failure:
         age = value.get("age")
@@ -28833,7 +28976,7 @@ def _create_text_data_freshness(
 
 def _create_text_col_pct_null(
     lang: str,
-    column: str | None,
+    column: str,
     value: dict,
     for_failure: bool = False,
     locale: str | None = None,
@@ -28942,7 +29085,7 @@ def _create_text_col_pct_null(
 
 def _create_text_col_pct_missing(
     lang: str,
-    column: str | None,
+    column: str,
     value: dict,
     for_failure: bool = False,
     locale: str | None = None,
@@ -28963,7 +29106,7 @@ def _create_text_col_pct_missing(
     )
 
 
-def _create_text_col_missing_coded(lang: str, column: str | None, for_failure: bool = False) -> str:
+def _create_text_col_missing_coded(lang: str, column: str, for_failure: bool = False) -> str:
     """Create autobrief/failure text for col_missing_coded validation."""
     type_ = _expect_failure_type(for_failure=for_failure)
 
@@ -28974,9 +29117,7 @@ def _create_text_col_missing_coded(lang: str, column: str | None, for_failure: b
     )
 
 
-def _create_text_col_missing_only_coded(
-    lang: str, column: str | None, for_failure: bool = False
-) -> str:
+def _create_text_col_missing_only_coded(lang: str, column: str, for_failure: bool = False) -> str:
     """Create autobrief/failure text for col_missing_only_coded validation."""
     type_ = _expect_failure_type(for_failure=for_failure)
 
@@ -29590,7 +29731,7 @@ def _tbl_match_spec_badge(values: Any) -> str:
     )
 
 
-def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
+def _validation_info_as_dict(validation_info: list[_ValidationInfo]) -> dict:
     """
     Convert a `_ValidationInfo` object to a dictionary.
 
@@ -32105,8 +32246,8 @@ def _step_report_row_based(
     assertion_type: str,
     i: int,
     column: str,
-    column_position: int,
-    columns_subset: list[str] | None,
+    column_position: int | list[int] | None,
+    columns_subset: Any,
     values: Any,
     inclusive: tuple[bool, bool] | None,
     n: int,
@@ -32296,7 +32437,7 @@ def _step_report_row_based(
             header = "{title}{details}"
 
         # Use commonmark to convert the header text to HTML
-        header = commonmark.commonmark(header)
+        header = cast(str, commonmark.commonmark(header))
 
         # Place any templated text in the header
         header = header.format(title=title, details=details)
@@ -32419,7 +32560,7 @@ def _step_report_row_based(
             header = "{title}{details}"
 
         # Use commonmark to convert the header text to HTML
-        header = commonmark.commonmark(header)
+        header = cast(str, commonmark.commonmark(header))
 
         # Place any templated text in the header
         header = header.format(title=title, details=details)
@@ -32433,8 +32574,8 @@ def _step_report_row_based(
 def _step_report_rows_distinct(
     i: int,
     column: list[str],
-    column_position: list[int],
-    columns_subset: list[str] | None,
+    column_position: int | list[int] | None,
+    columns_subset: Any,
     n: int,
     n_failed: int,
     all_passed: bool,
@@ -32493,7 +32634,7 @@ def _step_report_rows_distinct(
             header = "{title}{details}"
 
         # Use commonmark to convert the header text to HTML
-        header = commonmark.commonmark(header)
+        header = cast(str, commonmark.commonmark(header))
 
         # Place any templated text in the header
         header = header.format(title=title, details=details)
@@ -32568,7 +32709,7 @@ def _step_report_rows_distinct(
             header = "{title}{details}"
 
         # Use commonmark to convert the header text to HTML
-        header = commonmark.commonmark(header)
+        header = cast(str, commonmark.commonmark(header))
 
         # Place any templated text in the header
         header = header.format(title=title, details=details)
@@ -32822,7 +32963,7 @@ def _step_report_summary(
         GT(report_data, id="pb_step_tbl")
         .opt_table_font(font=google_font(name="IBM Plex Sans"))
         .opt_align_table_header(align="left")
-        .cols_label(**{key: label for key, label, _, _ in cells}, status="")
+        .cols_label(**cast(Any, {key: label for key, label, _, _ in cells}), status="")
         .cols_align(align="center")
         .fmt_markdown(columns=value_columns + ["status"])
         .tab_style(
@@ -32915,7 +33056,7 @@ def _step_report_summary(
         header = "{title}{details}"
 
     # Use commonmark to convert the header text to HTML
-    header = commonmark.commonmark(header)
+    header = cast(str, commonmark.commonmark(header))
 
     # Place any templated text in the header
     header = header.format(title=title, details=details)
@@ -33192,7 +33333,7 @@ def _step_report_tbl_match(
         header = "{title}{details}"
 
     # Use commonmark to convert the header text to HTML, then place any templated text
-    header = commonmark.commonmark(header)
+    header = cast(str, commonmark.commonmark(header))
     header = header.format(title=title, details=details)
 
     return step_report.tab_header(title=md(header))
@@ -33570,7 +33711,7 @@ def _step_report_schema(
         header = "{title}{details}"
 
     # Use commonmark to convert the header text to HTML
-    header = commonmark.commonmark(header)
+    header = cast(str, commonmark.commonmark(header))
 
     # Place any templated text in the header
     header = header.format(title=title, details=details)

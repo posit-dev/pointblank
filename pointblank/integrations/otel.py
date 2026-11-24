@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 if TYPE_CHECKING:
     from opentelemetry.sdk.metrics import MeterProvider
@@ -484,7 +484,7 @@ class OTelExporter:
         meter = self._get_meter()
         self._ensure_instruments(meter)
 
-        vi_list = validation.validation_info
+        vi_list = cast(list[Any], validation.validation_info)
 
         steps_total = len(vi_list)
         steps_passed = sum(1 for v in vi_list if v.all_passed)
@@ -535,7 +535,7 @@ class OTelExporter:
 
         root_attrs = {
             **attrs,
-            "pb.steps.total": len(validation.validation_info),
+            "pb.steps.total": len(cast(list[Any], validation.validation_info)),
             "pb.all_passed": validation.all_passed(),
             "pb.duration_s": (validation.time_end - validation.time_start).total_seconds(),
         }

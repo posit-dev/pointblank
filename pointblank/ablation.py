@@ -16,7 +16,7 @@ import statistics
 import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 import narwhals as nw
 
@@ -1057,21 +1057,23 @@ class Ablation:
         Ablation.drop_each : Remove the rows failing each step, one step at a time.
         Ablation.drop_all : Remove the rows failing any step.
         """
-        steps = self._check_steps(steps, method="drop_steps")
+        checked = self._check_steps(steps, method="drop_steps")
         text = None
         if name is None:
             text = (
-                msg("abl_name_step", i=str(steps[0]))
-                if len(steps) == 1
-                else msg("abl_name_steps", steps=steps)
+                msg("abl_name_step", i=str(checked[0]))
+                if len(checked) == 1
+                else msg("abl_name_steps", steps=checked)
             )
             name = ENGLISH.r(text)
-            spec_id = "steps_" + "_".join(str(i) for i in steps)
+            spec_id = "steps_" + "_".join(str(i) for i in checked)
         else:
             if not isinstance(name, str) or not name:
                 raise TypeError("`name=` must be a non-empty string.")
             spec_id = name
-        self._add_spec(_Spec(id=spec_id, name=name, strategy="drop_steps", steps=steps, text=text))
+        self._add_spec(
+            _Spec(id=spec_id, name=name, strategy="drop_steps", steps=checked, text=text)
+        )
         return self
 
     def drop_each(self, steps: int | list[int] | None = None) -> Ablation:
@@ -1998,7 +2000,9 @@ class Ablation:
             )
         if name is not None and (not isinstance(name, str) or not name):
             raise TypeError("`name=` must be a non-empty string.")
-        label = name or (_function_name(corruption) if kind == "function" else kind)
+        label = name or (
+            _function_name(cast(Callable[..., Any], corruption)) if kind == "function" else kind
+        )
 
         if step is not None:
             if not _is_int(step):
@@ -2048,7 +2052,7 @@ class Ablation:
         frame = _with_row_index(self.validation.data, name=_INDEX)
         dtype = None
         if kind != "duplicate":
-            frame = frame.select(_INDEX, column)
+            frame = frame.select(_INDEX, cast(str, column))
             dtype = frame.collect_schema()[column]
             if kind == "truncate" and dtype != nw.String:
                 raise TypeError(
@@ -2105,7 +2109,7 @@ class Ablation:
             chosen = pool[:n]
             new_values = _corrupted_values(kind, corruption, [values.get(k) for k in chosen])
             if new_values:
-                _check_corrupted_values(new_values, column, dtype, implementation, kind)
+                _check_corrupted_values(new_values, cast(str, column), dtype, implementation, kind)
             pairs = sorted(zip(chosen, new_values or [None] * n), key=lambda pair: pair[0])
             injection = _Injection(
                 kind=kind,
@@ -4195,7 +4199,7 @@ class Ablation:
                     per_repeat[i].append(phi)
             self._shapley_total[metric] = statistics.fmean(totals)
 
-            family = []
+            family: list[dict[str, Any]] = []
             for i in players:
                 mean, lower, upper, p = _paired(
                     per_repeat[i], [0.0] * self.repeats, self.conf_level, self._bootstrap()
@@ -5110,8 +5114,10 @@ class Ablation:
         elif metric not in self._metrics:
             raise ValueError(
                 f"There's no metric {metric!r} in the results (the metrics are "
-                f"{', '.join(map(repr, self._metrics))})."
+                f"{', '.join(map(repr, cast(list[str], self._metrics)))})."
             )
+        # `_check_run()` guarantees the metrics and the primary metric have been set
+        metric = cast(str, metric)
 
         # The groups of steps of `shapley()` are shown through the Shapley values
         effects = [
@@ -6120,7 +6126,7 @@ def _apply_injection(frame: Any, injection: _Injection) -> Any:
     rows = list(injection.rows)
     if injection.kind == "duplicate":
         return nw.concat([frame, frame.filter(nw.col(_INDEX).is_in(rows))])
-    column = injection.column
+    column = cast(str, injection.column)  # only "duplicate" injections lack a column, handled above
     if injection.kind == "null":
         return frame.with_columns(
             nw.when(~nw.col(_INDEX).is_in(rows)).then(nw.col(column)).alias(column)
@@ -6515,7 +6521,7 @@ def sklearn_evaluator(
         holdout=holdout_nw.to_native(),
         target=target,
         features=features,
-        kinds={c: _feature_kind(schema[c]) for c in features},
+        kinds={c: cast(str, _feature_kind(schema[c])) for c in features},
         estimator=estimator,
         task=task,
         scoring=scoring,

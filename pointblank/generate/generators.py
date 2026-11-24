@@ -10,7 +10,7 @@ import re
 import string
 from dataclasses import replace as dc_replace
 from datetime import date, datetime, time, timedelta
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 from pointblank._utils import _is_lib_present
 from pointblank.countries import LocaleGenerator
@@ -459,7 +459,7 @@ def generate_column(
     preset = getattr(field, "preset", None)
     if preset is not None:
         # Use config country
-        locale_gen = _get_locale_generator(config.country, config.seed, config.weighted)
+        locale_gen = _get_locale_generator(cast(Any, config.country), config.seed, config.weighted)
 
     # Generate values
     if field.unique:
@@ -686,7 +686,7 @@ def _get_coherence_groups(fields: dict[str, Field]) -> dict[str | None, dict[str
     hand-written `customer_city` column joins the `"customer_"` profile). All remaining preset
     fields form the `None` group. Groups are ordered by their first column in the schema.
     """
-    prefixes = sorted(
+    prefixes: list[str] = sorted(
         {
             group
             for field in fields.values()

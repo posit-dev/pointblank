@@ -16,7 +16,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any, cast, Sequence
 
 if TYPE_CHECKING:
     from great_tables import GT
@@ -1801,7 +1801,7 @@ class ConformanceReport:
 
         out: dict[str, dict] = {}
         for name, v in self.validations.items():
-            steps = v.validation_info
+            steps = cast(list[Any], v.validation_info)
             n_steps = len(steps)
             n_steps_failed = sum(1 for s in steps if not s.all_passed)
             n_failed = sum(int(s.n_failed or 0) for s in steps)

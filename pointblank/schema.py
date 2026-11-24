@@ -280,7 +280,13 @@ class Schema:
     def __init__(
         self,
         columns: (
-            str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None
+            str
+            | list[str]
+            | list[tuple[str, str]]
+            | list[tuple[str]]
+            | list[tuple[str] | tuple[str, Any]]
+            | dict[str, str]
+            | None
         ) = None,
         tbl: Any | None = None,
         **kwargs,
@@ -832,6 +838,7 @@ def _process_columns(
     | list[str]
     | list[tuple[str, str]]
     | list[tuple[str]]
+    | list[tuple[str] | tuple[str, Any]]
     | dict[str, str]
     | None = None,
     **kwargs,

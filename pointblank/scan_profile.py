@@ -5,7 +5,7 @@ from collections import defaultdict
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, cast, ClassVar
 
 import narwhals as nw
 from narwhals.dataframe import DataFrame
@@ -90,7 +90,7 @@ class _TypeMap(Enum):
         return cls.fetch_prof_map()[_type]
 
     @classmethod
-    def fetch_icon(cls, _type: _TypeMap) -> str:
+    def fetch_icon(cls, _type: _TypeMap | None) -> str:
         icon_map = {
             cls.NUMERIC: "numeric",
             cls.STRING: "string",
@@ -337,7 +337,8 @@ class _DataProfile:  # TODO: feels redundant and weird
                         if d.get(key) is not None:  # pragma: no cover
                             d[key] = str(d[key])  # pragma: no cover
 
-        return nw.from_dict(transpose_dicts(cols), backend=self.implementation)
+        # the narwhals stub's `backend=` Literal omits SQLFRAME, so it's typed loosely here
+        return nw.from_dict(transpose_dicts(cols), backend=cast(Any, self.implementation))
 
     def __repr__(self) -> str:  # pragma: no cover
         return f"<_DataProfile(table_name={self.table_name}, row_count={self.row_count}, columns={self.columns})>"

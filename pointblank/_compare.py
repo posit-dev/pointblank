@@ -2536,8 +2536,9 @@ class Comparison:
         from pointblank._compare_report import _comparison_report
         from pointblank.validate import _normalize_reporting_language
 
-        lang = _normalize_reporting_language(lang=lang)
-        return _comparison_report(self, limit=limit, title=title, lang=lang, locale=locale)
+        # The stub for `validate` doesn't declare this helper, so its result is typed loosely here
+        lang_code: str = _normalize_reporting_language(lang=lang)
+        return _comparison_report(self, limit=limit, title=title, lang=lang_code, locale=locale)
 
 
 # ----------------------------------------------------------------------------------------------

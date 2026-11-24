@@ -4,7 +4,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, cast, Literal
 
 import click
 from rich.console import Console
@@ -2260,9 +2260,10 @@ def validate(
             # Add each check to the validation chain
             for i, check in enumerate(checks_list):
                 # Get corresponding mapped parameters for this check
-                column = mapped_columns[i] if i < len(mapped_columns) else None
+                # A missing parameter is None here, which the validation step reports
+                column: Any = mapped_columns[i] if i < len(mapped_columns) else None
                 set_val = mapped_sets[i] if i < len(mapped_sets) else None
-                value = mapped_values[i] if i < len(mapped_values) else None
+                value: Any = mapped_values[i] if i < len(mapped_values) else None
 
                 if check == "rows-distinct":
                     validation = validation.rows_distinct()
@@ -2339,8 +2340,11 @@ def validate(
                 )
 
                 # Check if this validation failed
-                if hasattr(validation, "validation_info") and len(validation.validation_info) > i:
-                    step_info = validation.validation_info[i]
+                if (
+                    hasattr(validation, "validation_info")
+                    and len(cast(list[Any], validation.validation_info)) > i
+                ):
+                    step_info = cast(list[Any], validation.validation_info)[i]
                     if (step_info.n_failed or 0) > 0:
                         any_failed = True
 
@@ -2748,8 +2752,8 @@ def compare(
     tolerance: tuple[str, ...],
     normalize: tuple[str, ...],
     null_unequal: bool,
-    schema: str,
-    dup_keys: str,
+    schema: Literal["strict", "common"],
+    dup_keys: Literal["flag", "compare"],
     order_by: str | None,
     partitions: int | None,
     engine: str,
@@ -3591,7 +3595,7 @@ def _rich_print_missing_table(gt_table: Any, original_data: Any = None) -> None:
 
 def _map_parameters_to_checks(
     checks_list: list[str], columns_list: list[str], sets_list: list[str], values_list: list[float]
-) -> tuple[list[str], list[str], list[float]]:
+) -> tuple[list[str | None], list[str | None], list[float | None]]:
     """
     Map parameters to checks intelligently, handling flexible parameter ordering.
 
@@ -3608,9 +3612,9 @@ def _map_parameters_to_checks(
         Tuple of (mapped_columns, mapped_sets, mapped_values) where each list
         has the same length as checks_list
     """
-    mapped_columns = []
-    mapped_sets = []
-    mapped_values = []
+    mapped_columns: list[str | None] = []
+    mapped_sets: list[str | None] = []
+    mapped_values: list[float | None] = []
 
     # Keep track of which parameters we've used
     column_index = 0
@@ -3703,9 +3707,9 @@ def _not_evaluated_message(check: str, source: str) -> str:
 def _display_validation_result(
     validation: Any,
     checks_list: list[str],
-    columns_list: list[str],
-    sets_list: list[str],
-    values_list: list[float],
+    columns_list: list[str | None],
+    sets_list: list[str | None],
+    values_list: list[float | None],
     data_source: str,
     step_index: int,
     total_checks: int,
@@ -4762,7 +4766,7 @@ def run(
                 console.print(f"[green]✓[/green] Loaded data override: {data}")
 
         # Process based on file type
-        validations = []
+        validations: list[Any] = []
 
         if is_yaml_file:
             # Handle YAML configuration file
@@ -5913,7 +5917,7 @@ def _edit_with_vscode() -> str | None:
         Path(temp_file).unlink(missing_ok=True)
 
 
-def _show_concise_help(command_name: str, ctx: click.Context) -> None:
+def _show_concise_help(command_name: str, ctx: click.Context | None) -> None:
     """Show concise help for a command when required arguments are missing."""
 
     if command_name == "info":
