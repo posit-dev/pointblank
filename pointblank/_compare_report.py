@@ -219,6 +219,10 @@ def _header_html(cmp: Comparison, lang: str = "en", locale: str | None = None) -
         )
         if not cmp.schema_ok:
             verdict += " &middot; " + _badge(ctx.t("schema_differs"), STATUS_COLORS["missing"])
+        if cmp._nothing_compared:
+            verdict += " &middot; " + _badge(ctx.t("no_columns_compared"), STATUS_COLORS["missing"])
+            verdict += f" <span style='color:#666;'>{ctx.t('no_columns_note')}</span>"
+        elif not cmp.schema_ok:
             verdict += f" <span style='color:#666;'>{ctx.t('strict_schema_note')}</span>"
 
     lines = [tables_line, verdict, _status_bar(cmp, ctx), _legend(cmp, ctx)]

@@ -18080,7 +18080,8 @@ class Validate:
             How schema differences affect the result. With `"strict"` (the default), any schema
             difference (other than renames given in `column_map=`) means the tables don't match,
             and every test unit fails. With `"common"`, only the shared columns are compared and
-            schema differences are reported without failing any test units.
+            schema differences are reported without failing any test units. Without `keys=`,
+            there must be at least one shared column for any test unit to pass.
         dup_keys
             Rows whose key appears more than once in either table always fail. With `"flag"` (the
             default), the step report lists the duplicated keys. With `"compare"`, the step report

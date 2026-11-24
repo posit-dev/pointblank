@@ -141,6 +141,21 @@ def test_schema_and_column_map_options(tmp_path, files):
     assert common["compared_columns"] == ["amount"]
 
 
+def test_tables_without_common_columns(tmp_path, files):
+    src, _ = files
+    unrelated = tmp_path / "unrelated.csv"
+    pl.DataFrame({"sku": ["A", "B", "C", "D"], "price": [1.0, 2.0, 3.0, 4.0]}).write_csv(unrelated)
+
+    result = _run(src, str(unrelated), "--schema", "common")
+    assert result.exit_code == 1
+    assert "No columns compared" in result.output
+    assert "Schema differs" not in result.output
+
+    data = json.loads(_run(src, str(unrelated), "--schema", "common", "--format", "json").output)
+    assert data["identical"] is False
+    assert data["n_passed"] == 0
+
+
 def test_builtin_dataset(files):
     result = _run("small_table", "small_table", "--format", "json")
     assert result.exit_code == 0

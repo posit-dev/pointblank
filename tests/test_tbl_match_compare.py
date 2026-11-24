@@ -73,6 +73,32 @@ def test_empty_tables_have_a_single_test_unit():
     v = pb.Validate(empty).tbl_match(other).interrogate()
     assert (_step(v).n, _step(v).n_failed, _step(v).all_passed) == (1, 1, False)
 
+    # Two empty tables with no columns in common don't match, even under `schema="common"`
+    unrelated = pl.DataFrame({"z": []}, schema={"z": pl.Float64})
+    v = pb.Validate(empty).tbl_match(unrelated, schema="common").interrogate()
+    assert (_step(v).n, _step(v).n_failed, _step(v).all_passed) == (1, 1, False)
+
+
+@pytest.mark.parametrize("keys", [None, "*"])
+def test_tables_without_common_columns_fail_under_common_schema(keys):
+    data = pl.DataFrame({"sku": ["A", "B", "C"], "price": [1.0, 2.0, 3.0]})
+    other = pl.DataFrame({"id": [1, 2, 3], "name": ["a", "b", "c"]})
+
+    v = pb.Validate(data).tbl_match(other, keys=keys, schema="common").interrogate()
+
+    assert (_step(v).n, _step(v).n_passed, _step(v).n_failed) == (3, 0, 3)
+    assert v.all_passed() is False
+
+
+def test_sundering_without_common_columns():
+    data = pl.DataFrame({"sku": ["A", "B", "C"], "price": [1.0, 2.0, 3.0]})
+    other = pl.DataFrame({"id": [1, 2, 3], "name": ["a", "b", "c"]})
+
+    v = pb.Validate(data).tbl_match(other, schema="common").interrogate()
+
+    assert len(v.get_sundered_data(type="pass")) == 0
+    assert len(v.get_sundered_data(type="fail")) == 3
+
 
 # ----------------------------------------------------------------------------------------------
 # Row-level test units and comparison settings
