@@ -32,6 +32,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering",
 ]
@@ -124,7 +125,7 @@ dev = [
     "nbformat>=5.10.4",
     "pandas>=2.2.3",
     "polars>=1.33.0",
-    "pre-commit==2.15.0",
+    "pre-commit==4.6.2",  # 4.7+ requires Python 3.11
     "pyarrow",
     "pyarrow-stubs>=19.4",
     "pyspark==3.5.6",
