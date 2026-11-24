@@ -15,7 +15,7 @@ import polars as pl
 import polars.testing as pt
 import pointblank as pb
 
-from pointblank.datascan import DataScan, col_summary_tbl
+from pointblank.datascan import DataScan, _fmt_date_bound, col_summary_tbl
 from pointblank.validate import get_data_path, _process_github_url
 from pointblank._datascan_utils import (
     _compact_0_1_fmt,
@@ -748,10 +748,10 @@ def test_col_summary_tbl_skipped_columns_with_integer_stats(tbl_type):
 
 
 @pytest.mark.parametrize("tbl_type", ["polars", "pandas", "pyarrow"])
-def test_col_summary_tbl_empty_cells_show_dash(tbl_type):
+def test_col_summary_tbl_empty_cells_show_em_dash(tbl_type):
     # Empty statistic cells (a date column's mean, the `std` of a single string, a skipped
-    # column's row) show `-` on every backend; they used to show `None` on PyArrow, in a pandas
-    # skipped row, and in a `std` column that also had a number
+    # column's row) show an em dash on every backend; they used to show `None` on PyArrow, in a
+    # pandas skipped row, and in a `std` column that also had a number
     df_pl = pl.DataFrame(
         {
             "tags": [["a"], None],
@@ -772,10 +772,96 @@ def test_col_summary_tbl_empty_cells_show_dash(tbl_type):
         return html[html.index("<tbody") :]
 
     assert ">None<" not in body(tbl)
-    assert body(tbl).count(">-<") > 0
-    assert body(tbl).count(">-<") == body(df_pl).count(">-<")
+    assert body(tbl).count(">—<") > 0
+    assert body(tbl).count(">—<") == body(df_pl).count(">—<")
     # The `std` of `n` is still a number, so it's formatted (0.7071...)
     assert ">0.71<" in body(tbl)
+
+
+@pytest.mark.parametrize(
+    "value, title, lines",
+    [
+        (datetime.date(2016, 1, 4), "2016-01-04", ["2016-01-04"]),
+        (datetime.datetime(2016, 1, 4, 0, 32), "2016-01-04 00:32:00", ["2016-01-04", "00:32:00"]),
+        # Fractional seconds and the UTC offset are only in the title
+        (
+            datetime.datetime(2016, 1, 4, 0, 32, 5, 123456),
+            "2016-01-04 00:32:05.123456",
+            ["2016-01-04", "00:32:05"],
+        ),
+        (
+            datetime.datetime(
+                2016, 1, 4, 0, 32, tzinfo=datetime.timezone(-datetime.timedelta(hours=5))
+            ),
+            "2016-01-04 00:32:00-05:00",
+            ["2016-01-04", "00:32:00"],
+        ),
+        (datetime.time(11, 23, 1, 250000), "11:23:01.250000", ["11:23:01"]),
+        # A scan restored from JSON has the values as strings
+        ("2016-01-04T00:32:00", "2016-01-04T00:32:00", ["2016-01-04", "00:32:00"]),
+    ],
+)
+def test_fmt_date_bound(value, title, lines):
+    expected_lines = [f"<div style='font-size: 8px;'>{lines[0]}</div>"] if "-" in lines[0] else []
+    expected_lines += [f"<div>{line}</div>" for line in lines if ":" in line]
+    assert _fmt_date_bound(value) == (
+        f"<div title='{title}' style='white-space: nowrap;'>{''.join(expected_lines)}</div>"
+    )
+
+
+def test_fmt_date_bound_other_text_is_escaped():
+    assert _fmt_date_bound("<unknown>") == "&lt;unknown&gt;"
+
+
+@pytest.mark.parametrize("source", ["polars", "pandas", "pyarrow", "json"])
+def test_col_summary_tbl_date_and_number_bounds(source):
+    df_pl = pl.DataFrame(
+        {
+            "dt": [datetime.datetime(2016, 1, 4, 0, 32), datetime.datetime(2016, 1, 30, 11, 23)],
+            "x": [1 / 3, 12345.6789],
+        }
+    )
+    if source == "json":
+        scan = DataScan.from_json(DataScan(df_pl).to_json())
+    else:
+        scan = DataScan(
+            {"polars": df_pl, "pandas": df_pl.to_pandas(), "pyarrow": df_pl.to_arrow()}[source]
+        )
+    html = scan.get_tabular_report().as_raw_html()
+
+    # The date and the time of a datetime are on lines of their own
+    assert "<div style='font-size: 8px;'>2016-01-04</div><div>00:32:00</div>" in html
+    assert "<div style='font-size: 8px;'>2016-01-30</div><div>11:23:00</div>" in html
+
+    # The Min and Max columns hold text because of the datetime column, but their numbers are
+    # still formatted (they were shown unrounded, as `0.3333333333333333` and `12345.6789`)
+    assert ">0.33<" in html
+    assert ">12,345.68<" in html
+    assert "0.3333" not in html
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+def test_col_summary_tbl_number_bounds_without_dates(tbl_type):
+    # With integer, float and Boolean columns, the Min and Max columns also hold text, and the
+    # maximum of `d` was shown without its thousands separator (as `9999.99`)
+    tbl = nw.from_native(pb.load_dataset("small_table", tbl_type=tbl_type))
+    html = col_summary_tbl(tbl.select("a", "c", "d", "e").to_native()).as_raw_html()
+    assert ">9,999.99<" in html
+    assert ">108.34<" in html
+    assert "9999.99" not in html
+
+
+def test_col_summary_tbl_labels_and_string_note():
+    note = "For string columns, the statistics describe the lengths of the strings."
+
+    html = col_summary_tbl(pb.load_dataset("small_table")).as_raw_html()
+    assert ">Unique<" in html
+    assert ">UQ<" not in html
+    assert note in html
+
+    # The note about string lengths is only there when a string column is
+    html = col_summary_tbl(pl.DataFrame({"n": [1, 2], "d": [1.5, None]})).as_raw_html()
+    assert note not in html
 
 
 @pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
