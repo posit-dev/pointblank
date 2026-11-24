@@ -160,7 +160,7 @@ class NUnique(Stat):
     name: ClassVar[str] = "n_unique"
     group = StatGroup.STRUCTURE
     expr: ClassVar[nw.Expr] = nw.col("_col").n_unique().cast(nw.Int64)
-    label: ClassVar[str] = "UQ"
+    label: ClassVar[str] = "Unique"
 
 
 COLUMN_ORDER_REGISTRY: tuple[type[Stat], ...] = (
