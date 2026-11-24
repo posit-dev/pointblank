@@ -2112,7 +2112,7 @@ A missing-value specification that can be passed to validation methods (via <cod
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose a survey records the respondent’s age, with three codes for an age that wasn’t given: <code>-99</code> when the question wasn’t asked, <code>-98</code> when the respondent refused, and <code>-97</code> when they didn’t know. The last two are both <em>item nonresponse</em> (the question was asked but not answered), so we’ll group them in a category:</p>
-<div id="1064061d" class="cell" data-execution_count="2">
+<div id="45e5cad9" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2131,7 +2131,7 @@ refused
 </div>
 </div>
 <p>The spec lists its sentinel values, gives the reason for any of them, and finds the values in a category. Here’s some survey data that uses these codes, along with a null and an age of <code>150</code> that’s a genuine error:</p>
-<div id="b819ba5f" class="cell" data-execution_count="3">
+<div id="84b88d0e" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>survey <span class="op">=</span> pl.DataFrame({<span class="st">"age"</span>: [<span class="dv">34</span>, <span class="op">-</span><span class="dv">98</span>, <span class="dv">51</span>, <span class="op">-</span><span class="dv">99</span>, <span class="va">None</span>, <span class="dv">27</span>, <span class="dv">150</span>, <span class="op">-</span><span class="dv">97</span>, <span class="dv">45</span>, <span class="dv">62</span>]})</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>pb.preview(survey)</span></code></pre></div>
@@ -2263,7 +2263,7 @@ refused
 </div>
 </div>
 <p>We’ll check the ages with and without the spec, and then limit the item nonresponse to 10% of the rows:</p>
-<div id="e6a7b017" class="cell" data-execution_count="4">
+<div id="37aa5e6b" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>survey)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"age"</span>, left<span class="op">=</span><span class="dv">0</span>, right<span class="op">=</span><span class="dv">120</span>)</span>
