@@ -2544,7 +2544,14 @@ def _rich_print_comparison(cmp: Any, limit: int) -> None:
         verdict = (
             f"[bold red]DIFFERENT[/bold red]: {cmp.n_failed:,} of {cmp.n:,} rows fail ({pct:.1f}%)"
         )
-        if not cmp.schema_ok:
+        if cmp._nothing_compared:
+            if not cmp.schema_ok:
+                verdict += "\n[red]Schema differs[/red]"
+            verdict += (
+                "\n[red]No columns compared[/red] "
+                "(no shared columns to compare: all rows count as failing)"
+            )
+        elif not cmp.schema_ok:
             verdict += (
                 "\n[red]Schema differs[/red] (strict schema check: all rows count as failing)"
             )
