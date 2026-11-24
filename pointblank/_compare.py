@@ -412,7 +412,8 @@ def compare(
         How schema differences affect the result. With `"strict"` (the default), any schema
         difference (other than renames given in `column_map=`) means the tables don't match, and
         every row counts as failing. With `"common"`, only the shared columns are compared and
-        schema differences are reported without failing rows.
+        schema differences are reported without failing rows. Without `keys=`, there must be at
+        least one shared column for any row to pass.
     dup_keys
         Rows whose key appears more than once in either table can't be aligned unambiguously, so
         they always get the `"dup_key"` status. With `"flag"` (the default), they are only flagged
@@ -453,6 +454,12 @@ def compare(
     In multiset mode (`keys="*"`), a row is either present in the other table or not, so there are
     no `"changed"` or `"dup_key"` rows. Each distinct row matches as many times as it occurs in
     both tables, and any surplus copies count as `"missing"` or `"extra"`.
+
+    Without keys (positional or multiset mode), rows are aligned through their values alone, so the
+    comparison needs at least one column in common. If there's none (e.g., two unrelated tables
+    compared with `schema="common"`), the rows keep their statuses but none of them pass, the same
+    as with a failed strict schema check. With `keys=`, a comparison of the keys alone is still
+    meaningful (it checks which keys are present in both tables), so it passes as usual.
 
     Large Tables
     ------------
@@ -1317,6 +1324,12 @@ class Comparison:
         return self.schema_mode == "common" or self.schema_diff.matches
 
     @property
+    def _nothing_compared(self) -> bool:
+        # Without keys, rows are aligned only through their values, so with no column to compare
+        # every row would "match" any other row. Keyed rows still check that the keys are present.
+        return self.mode != "keyed" and not self.compared_columns
+
+    @property
     def n_passed(self) -> int:
         """The number of test units that passed.
 
@@ -1324,7 +1337,9 @@ class Comparison:
         the same values in every compared column (within any tolerance set in
         [`compare()`](`pointblank.compare`)). If the schema check failed (see
         [`schema_ok`](`pointblank.Comparison.schema_ok`)), no test unit passes and `n_passed` is
-        `0`, whatever the row statuses are.
+        `0`, whatever the row statuses are. The same holds for a positional or multiset comparison
+        that has no columns to compare (when the tables have no columns in common): rows aligned
+        without keys can't be checked against anything, so none of them pass.
 
         `n_passed` and [`n_failed`](`pointblank.Comparison.n_failed`) are the counts that
         [`Validate.tbl_match()`](`pointblank.Validate.tbl_match`) uses for its test units, so they
@@ -1365,16 +1380,16 @@ class Comparison:
         Half of the test units passed. The two changed rows are available with
         [`rows("changed")`](`pointblank.Comparison.rows`).
         """
-        return self.n_match if self.schema_ok else 0
+        return self.n_match if self.schema_ok and not self._nothing_compared else 0
 
     @property
     def n_failed(self) -> int:
         """The number of test units that failed.
 
         A test unit fails if its status is `"changed"`, `"missing"`, `"extra"`, or `"dup_key"`. If
-        the schema check failed (see [`schema_ok`](`pointblank.Comparison.schema_ok`)), every test
-        unit fails, so `n_failed` equals [`n`](`pointblank.Comparison.n`). It's always
-        `n - n_passed`.
+        the schema check failed (see [`schema_ok`](`pointblank.Comparison.schema_ok`)), or if a
+        positional or multiset comparison has no columns to compare, every test unit fails, so
+        `n_failed` equals [`n`](`pointblank.Comparison.n`). It's always `n - n_passed`.
 
         A count of zero failures, along with a passing schema check, is what makes a comparison
         [`identical`](`pointblank.Comparison.identical`). To see how the failures break down by
@@ -1437,7 +1452,9 @@ class Comparison:
         "Identical" is relative to the settings given to [`compare()`](`pointblank.compare`).
         Columns left out with `columns=` aren't checked, values within `tolerance=` count as equal,
         values are compared after any `normalize=` operations, and with `schema="common"`, the
-        tables can have different columns.
+        tables can have different columns. They need at least one column in common, though: a
+        positional or multiset comparison with no columns to compare is never identical, even
+        when both tables are empty.
 
         Returns
         -------
@@ -1484,7 +1501,7 @@ class Comparison:
         A result of `True` here means "the same within 0.05 degrees", not "exactly the same". The
         settings belong with the result, and the comparison report lists them in its header.
         """
-        return self.schema_ok and self.n_failed == 0
+        return self.schema_ok and not self._nothing_compared and self.n_failed == 0
 
     @property
     def status_counts(self) -> dict[str, int]:
@@ -1497,7 +1514,8 @@ class Comparison:
         are computed when the comparison is made, so reading them doesn't touch the tables again.
 
         The counts are the row statuses alone and aren't affected by the schema check. If the
-        schema check fails, there can be `"match"` rows even though no test units pass.
+        schema check fails (or there are no columns to compare), there can be `"match"` rows even
+        though no test units pass.
 
         Returns
         -------
@@ -2153,7 +2171,7 @@ class Comparison:
         matched = self._joined.filter(nw.col(_STATUS) == nw.lit("match")).select(
             *[nw.col(tk + _TGT_SUFFIX).alias(tmp) for tk, tmp in zip(self._tgt_keys, temp_keys)]
         )
-        if not self.schema_ok or len(matched) == 0:
+        if not self.schema_ok or self._nothing_compared or len(matched) == 0:
             # No row passes (and empty frames can't take a literal column on every backend)
             return tgt.select(*columns).with_columns(nw.lit(False).alias("pb_is_good_")).to_native()
         out = (
