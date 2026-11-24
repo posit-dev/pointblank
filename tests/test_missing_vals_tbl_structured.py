@@ -100,6 +100,48 @@ class TestStructuredMissingTbl:
         # complete = 3 (null + 2 reals) of 4 = 75%
         assert "3 (75%)" in html
 
+    @pytest.mark.parametrize("backend", ["polars", "pandas", "duckdb"])
+    def test_nan_counted_as_null(self, backend):
+        # A NaN in a float column is a null under `null_is_missing=True`, as in `col_pct_missing()`
+        data = {"x": [1.0, -99.0, float("nan"), None, 5.0, 7.0]}
+        if backend == "polars":
+            tbl = pl.DataFrame(data, nan_to_null=False)
+        elif backend == "pandas":
+            tbl = pd.DataFrame(data)
+        else:
+            ibis = pytest.importorskip("ibis")
+            tbl = ibis.duckdb.connect().create_table(
+                "tbl", pl.DataFrame(data, nan_to_null=False).to_arrow()
+            )
+        spec = pb.MissingSpec(reasons={-99.0: "refused"})
+        gt = pb.missing_vals_tbl(tbl, missing={"x": spec})
+        record = gt._tbl_data.row(0, named=True)
+        assert record["complete"] == "3 (50%)"
+        assert record["refused"] == "1 (17%)"
+        assert record["null"] == "2 (33%)"
+
+        # The same share of missing values as `col_pct_missing()` finds
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_missing(columns="x", missing=spec, max_pct=1)
+            .interrogate()
+        )
+        assert validation.validation_info[0].val_info["n_missing"] == 3
+
+    def test_nan_counted_as_null_heatmap(self):
+        tbl = pl.DataFrame({"x": [1.0, float("nan"), None, 4.0]}, nan_to_null=False)
+        spec = pb.MissingSpec(reasons={-99.0: "refused"})
+        gt = pb.missing_vals_tbl(tbl, missing={"x": spec}, as_heatmap=True)
+        record = gt._tbl_data.row(0, named=True)
+        assert record["complete"] == 0.5
+        assert record["null"] == 0.5
+
+    def test_nan_complete_when_null_not_missing(self):
+        tbl = pl.DataFrame({"x": [1.0, -99.0, float("nan"), None]}, nan_to_null=False)
+        spec = pb.MissingSpec(reasons={-99.0: "refused"}, null_is_missing=False)
+        gt = pb.missing_vals_tbl(tbl, missing={"x": spec})
+        assert gt._tbl_data.row(0, named=True)["complete"] == "3 (75%)"
+
     def test_pandas_input(self, specs):
         tbl = pd.DataFrame(
             {

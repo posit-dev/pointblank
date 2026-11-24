@@ -80,6 +80,7 @@ from pointblank._interrogation import (
     SpeciallyValidation,
     StepEvaluationError,
     _first_line,
+    _safe_is_nan_or_null_expr,
     apply_missing_exclusion,
     col_count_match_details,
     col_exists_details,
@@ -3048,7 +3049,9 @@ def _build_structured_missing_tbl(
                 _is_in(column, spec.values_for_reason(r), schema[column]).cast(nw.Int32).sum()
             )
         if spec.null_is_missing:
-            select_exprs["__null__"] = nw.col(column).is_null().cast(nw.Int32).sum()
+            # A NaN in a float column is a null too, as in the checks that take a `MissingSpec`
+            null_expr = _safe_is_nan_or_null_expr(data, nw.col(column), column)
+            select_exprs["__null__"] = null_expr.cast(nw.Int32).sum()
 
         out = nw_frame.select(**select_exprs)
         if is_lazy:  # pragma: no cover
