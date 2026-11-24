@@ -4,7 +4,7 @@ Display a table that shows the missing values in the input table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L3198-L3783)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L3199-L3796)
 
 ``` python
 missing_vals_tbl(
@@ -16,7 +16,7 @@ missing_vals_tbl(
 
 The [missing_vals_tbl()](../reference/missing_vals_tbl.md#pointblank.missing_vals_tbl) function generates a table that shows the missing values in the input table. The table is displayed using the Great Tables API, which allows for further customization of the table's appearance if so desired.
 
-By default, missingness is treated as binary (a value is either Null or it isn't) and the function renders a sector-based heatmap of the proportion of Null values across the rows of each column. When a `missing=` mapping of columns to [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) objects is supplied, the function instead renders a *structured missingness* breakdown: one row per column with the count and percentage of complete values and of each missing *reason* (e.g., `refused`, `not_asked`). Declared (coded) reasons are grouped under a "Missing Reasons" spanner and keep their raw input form as labels; actual `Null`/`None`/`NA` values (which are not part of the spec) are tallied in a fixed "Null" column at the far right (styled like "Complete"), so they aren't mistaken for declared reasons.
+By default, missingness is treated as binary (a value is either Null or it isn't) and the function renders a sector-based heatmap of the proportion of Null values across the rows of each column. A `NaN` in a floating-point column counts as Null, as it does in [`col_vals_null()`](../reference/Validate.col_vals_null.md#pointblank.Validate.col_vals_null) and the other checks for missing values. When a `missing=` mapping of columns to [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) objects is supplied, the function instead renders a *structured missingness* breakdown: one row per column with the count and percentage of complete values and of each missing *reason* (e.g., `refused`, `not_asked`). Declared (coded) reasons are grouped under a "Missing Reasons" spanner and keep their raw input form as labels; actual `Null`/`None`/`NA`/`NaN` values (which are not part of the spec) are tallied in a fixed "Null" column at the far right (styled like "Complete"), so they aren't mistaken for declared reasons.
 
 Note that supplying `missing=` produces a *different report* than the default view: it is a distinct visualization (a per-reason breakdown table, or a per-reason heatmap with `as_heatmap=True`), not an annotated version of the default sector heatmap. The report titles differ accordingly ("Missing Values" for the default, "Missing Values by Reason" or "Missing Pattern Heatmap" for the structured views), and the shared header/title styling makes the family resemblance clear.
 

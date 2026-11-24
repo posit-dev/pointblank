@@ -2064,7 +2064,7 @@ A dictionary with two keys. <code>"metadata"</code> holds the table name, the ro
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s scan a small table of sensor readings, where one reading is missing.</p>
-<div id="60708ec1" class="cell" data-execution_count="2">
+<div id="c3dcd4f0" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2083,7 +2083,7 @@ A dictionary with two keys. <code>"metadata"</code> holds the table name, the ro
 </div>
 </div>
 <p>Each column has its own entry, with the statistics in a nested dictionary:</p>
-<div id="85761114" class="cell" data-execution_count="3">
+<div id="e743c0c0" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>profile[<span class="st">"columns"</span>][<span class="dv">1</span>][<span class="st">"statistics"</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>{'n_missing': 1,
@@ -2093,7 +2093,7 @@ A dictionary with two keys. <code>"metadata"</code> holds the table name, the ro
  'std': 0.6506407098647716,
  'min': 20.8,
  'max': 22.1,
- 'p05': 20.806,
+ 'p05': 20.86,
  'q_1': 21.1,
  'q_3': 21.75,
  'p95': 22.03,

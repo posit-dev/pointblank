@@ -294,7 +294,7 @@ If the dictionary has neither a <code>"source"</code> nor a <code>"target"</code
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s a pipeline definition written as JSON. It only has a target contract, so it acts as an output guard.</p>
-<div id="2c4bc10b" class="cell" data-execution_count="2">
+<div id="6d85fcae" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -324,7 +324,7 @@ If the dictionary has neither a <code>"source"</code> nor a <code>"target"</code
 </div>
 </div>
 <p>The target contract didn’t specify a direction, so it was given <code>"target"</code>. The pipeline can now check an export:</p>
-<div id="046249fd" class="cell" data-execution_count="3">
+<div id="e2691c99" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>invoices <span class="op">=</span> pl.DataFrame({<span class="st">"invoice_id"</span>: [<span class="st">"I-1"</span>, <span class="st">"I-2"</span>, <span class="st">"I-3"</span>], <span class="st">"total"</span>: [<span class="fl">120.0</span>, <span class="fl">0.0</span>, <span class="fl">75.5</span>]})</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>export_pipeline.validate_target(invoices)</span></code></pre></div>

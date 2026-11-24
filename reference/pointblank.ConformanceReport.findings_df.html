@@ -291,7 +291,7 @@ If the report isn’t of the built-in rules. For a CDISC CORE report, use <a hre
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s check a small DM dataset with the built-in rules and get its failing records:</p>
-<div id="4247d2d8" class="cell" data-execution_count="1">
+<div id="f4bff4e1" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -323,7 +323,7 @@ If the report isn’t of the built-in rules. For a CDISC CORE report, use <a hre
 </div>
 </div>
 <p>Since <code>row_index</code> is 0-based, it can be used to get the failing records from the dataset:</p>
-<div id="0b190a43" class="cell" data-execution_count="2">
+<div id="705c2ee6" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dm[findings[<span class="st">"row_index"</span>].unique().sort().to_list()]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div><style>

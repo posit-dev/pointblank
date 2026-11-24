@@ -291,7 +291,7 @@ If a step argument can’t be represented in YAML (for example, a column selecto
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s define a contract for a table of web sessions and get its YAML representation.</p>
-<div id="0e625f80" class="cell" data-execution_count="1">
+<div id="4f619e21" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>sessions_contract <span class="op">=</span> pb.Contract(</span>
@@ -336,7 +336,7 @@ If a step argument can’t be represented in YAML (for example, a column selecto
 </div>
 <p>The output lists the metadata first, including <code>on_violation</code> because it isn’t the default, then the schema and the steps. Each step is written as its method name with the arguments nested below it.</p>
 <p>To save the contract, pass a file path. The parent directory is created if needed, and the YAML text is still returned. Reading the file back gives a contract equal to the original:</p>
-<div id="e3399d3b" class="cell" data-execution_count="2">
+<div id="065fac11" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>

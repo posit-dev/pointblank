@@ -4,7 +4,7 @@ Workflow for defining a set of validations on a table and interrogating for resu
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5850-L27161)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5863-L27174)
 
 ``` python
 Validate(

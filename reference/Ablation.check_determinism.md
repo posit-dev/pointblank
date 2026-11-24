@@ -62,7 +62,7 @@ print(caught[0].message)
 ```
 
     False
-    `evaluate=` isn't deterministic: given the full table and the seed 0 twice, it returned different results (score: 1.7073007139430167 and 0.5379324927484568). Use the seed for every source of randomness in training, or the ablation's comparisons will be noisier than they need to be.
+    `evaluate=` isn't deterministic: given the full table and the seed 0 twice, it returned different results (score: 0.5843117754084943 and 0.22633707005505954). Use the seed for every source of randomness in training, or the ablation's comparisons will be noisier than they need to be.
 
 Creating the generator with `random.Random(seed)` would fix it, and the check would then return `True`.
 

@@ -2083,7 +2083,7 @@ The largest difference in a metric that still counts as the same. Differences fr
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an <code>evaluate()</code> function that forgets to use its seed, so that its model starts from a different random weight every time.</p>
-<div id="983ccf30" class="cell" data-execution_count="1">
+<div id="5be09ca6" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
@@ -2112,7 +2112,7 @@ The largest difference in a metric that still counts as the same. Differences fr
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(caught[<span class="dv">0</span>].message)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>False
-`evaluate=` isn't deterministic: given the full table and the seed 0 twice, it returned different results (score: 1.7073007139430167 and 0.5379324927484568). Use the seed for every source of randomness in training, or the ablation's comparisons will be noisier than they need to be.</code></pre>
+`evaluate=` isn't deterministic: given the full table and the seed 0 twice, it returned different results (score: 0.5843117754084943 and 0.22633707005505954). Use the seed for every source of randomness in training, or the ablation's comparisons will be noisier than they need to be.</code></pre>
 </div>
 </div>
 <p>Creating the generator with <code>random.Random(seed)</code> would fix it, and the check would then return <code>True</code>.</p>
