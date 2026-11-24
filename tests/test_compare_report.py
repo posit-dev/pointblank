@@ -133,6 +133,32 @@ def test_singular_forms(comparison):
     assert "The 1 row matches." in _text(pb.compare(one, one, keys="id").get_tabular_report())
 
 
+def test_verdict_flags_comparisons_without_common_columns():
+    src = pl.DataFrame({"id": [1, 2, 3], "name": ["a", "b", "c"]})
+    tgt = pl.DataFrame({"sku": ["A", "B", "C"], "price": [1.0, 2.0, 3.0]})
+
+    common = _text(pb.compare(src, tgt, schema="common").get_tabular_report())
+    assert "DIFFERENT" in common
+    assert "NO COLUMNS COMPARED" in common
+    assert "no shared columns to compare" in common
+    assert "SCHEMA DIFFERS" not in common
+
+    # Under the strict check, both badges show, with the more specific note
+    strict = _text(pb.compare(src, tgt, keys="*").get_tabular_report())
+    assert "SCHEMA DIFFERS" in strict
+    assert "NO COLUMNS COMPARED" in strict
+    assert "strict schema check" not in strict
+
+    french = _text(pb.compare(src, tgt, schema="common").get_tabular_report(lang="fr"))
+    assert COMPARISON_REPORT_TEXT["no_columns_compared"]["fr"] in french
+
+    # A keyed comparison of the keys alone is still meaningful
+    keyed = pl.DataFrame({"id": [1, 2, 3], "sku": ["A", "B", "C"]})
+    text = _text(pb.compare(src, keyed, keys="id", schema="common").get_tabular_report())
+    assert "IDENTICAL" in text
+    assert "NO COLUMNS COMPARED" not in text
+
+
 def test_step_report_follows_validation_language():
     validation = (
         pb.Validate(data=TARGET, lang="fr", locale="fr")
