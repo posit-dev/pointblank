@@ -1090,12 +1090,12 @@ def interrogate_between(
     result_tbl = nw_tbl.with_columns(
         pb_is_good_1=_safe_is_nan_or_null_expr(nw_tbl, nw.col(column), column),  # val is missing
         pb_is_good_2=(  # lb is missing in Column
-            _safe_is_nan_or_null_expr(nw_tbl, nw.col(low.name), low.name)
+            _safe_is_nan_or_null_expr(nw_tbl, nw.col(cast(Any, low).name), cast(Any, low).name)
             if isinstance(low, Column)
             else nw.lit(False)
         ),
         pb_is_good_3=(  # ub is missing in Column
-            _safe_is_nan_or_null_expr(nw_tbl, nw.col(high.name), high.name)
+            _safe_is_nan_or_null_expr(nw_tbl, nw.col(cast(Any, high).name), cast(Any, high).name)
             if isinstance(high, Column)
             else nw.lit(False)
         ),
@@ -1177,12 +1177,12 @@ def interrogate_outside(
     result_tbl = nw_tbl.with_columns(
         pb_is_good_1=_safe_is_nan_or_null_expr(nw_tbl, nw.col(column), column),  # val is missing
         pb_is_good_2=(  # lb is missing in Column
-            _safe_is_nan_or_null_expr(nw_tbl, nw.col(low.name), low.name)
+            _safe_is_nan_or_null_expr(nw_tbl, nw.col(cast(Any, low).name), cast(Any, low).name)
             if isinstance(low, Column)
             else nw.lit(False)
         ),
         pb_is_good_3=(  # ub is missing in Column
-            _safe_is_nan_or_null_expr(nw_tbl, nw.col(high.name), high.name)
+            _safe_is_nan_or_null_expr(nw_tbl, nw.col(cast(Any, high).name), cast(Any, high).name)
             if isinstance(high, Column)
             else nw.lit(False)
         ),
@@ -1637,7 +1637,7 @@ def interrogate_within_spec(
     # LazyFrame is collected here (it can't be indexed by column) and given back as a LazyFrame
     is_polars_lazy = is_polars_lazyframe(native_tbl)
     if is_polars_lazy:
-        nw_tbl = nw_tbl.collect()
+        nw_tbl = cast(Any, nw_tbl).collect()
 
     # Get the column data as a list
     col_data: Any = nw_tbl.select(column).to_native()
@@ -1859,7 +1859,7 @@ def interrogate_within_spec_db(  # pragma: no cover
     # Validate check digit using ibis.cases()
     check_digit_valid = ibis.cases(
         (expected_check == 10, actual_check_char == "X"),
-        (expected_check < 10, actual_check_char == expected_check.cast(str)),
+        (expected_check < 10, actual_check_char == cast(Any, expected_check).cast(str)),
         else_=False,
     )
 
@@ -2392,7 +2392,9 @@ def _interrogate_comparison_base(
     compare_expr = _safe_modify_datetime_compare_val(nw_tbl, column, compare_expr)
     compare_expr = _align_decimal_compare_val(nw_tbl, column, compare_expr)
 
-    compared_columns = [column, compare.name] if isinstance(compare, Column) else [column]
+    compared_columns = (
+        [column, cast(Any, compare).name] if isinstance(compare, Column) else [column]
+    )
     eval_tbl = _with_pandas_object_columns_converted(nw_tbl, compared_columns)
 
     # Create the comparison expression based on the operator
@@ -2416,7 +2418,9 @@ def _interrogate_comparison_base(
 
     column_missing = _safe_is_nan_or_null_expr(eval_tbl, nw.col(column), column)
     compare_missing = (
-        _safe_is_nan_or_null_expr(eval_tbl, nw.col(compare.name), compare.name)
+        _safe_is_nan_or_null_expr(
+            eval_tbl, nw.col(cast(Any, compare).name), cast(Any, compare).name
+        )
         if isinstance(compare, Column)
         else nw.lit(False)
     )
@@ -2443,7 +2447,9 @@ def _interrogate_comparison_base(
 
     if eval_tbl is not nw_tbl:
         # Keep the original (unconverted) columns in the results table
-        return nw_tbl.to_native().assign(pb_is_good_=result_tbl["pb_is_good_"].to_native())
+        return cast(Any, nw_tbl.to_native()).assign(
+            pb_is_good_=result_tbl["pb_is_good_"].to_native()
+        )
 
     return result_tbl.to_native()
 
@@ -2679,7 +2685,7 @@ def interrogate_prompt(  # pragma: no cover
     # AI validation inherently needs materialized data (sends rows to LLM)
     # Collect lazy frames here since this cannot operate lazily
     if _is_lazy_frame(tbl):
-        tbl = tbl.collect()
+        tbl = cast(Any, tbl).collect()
 
     # Convert to narwhals early for consistent row counting
     nw_tbl = nw.from_native(tbl)
@@ -2889,7 +2895,7 @@ def interrogate_scored(
 
     was_polars_lazy = is_polars_lazyframe(nw_tbl.to_native())
     if was_polars_lazy:
-        nw_tbl = nw_tbl.collect()
+        nw_tbl = cast(Any, nw_tbl).collect()
 
     if isinstance(nw_tbl, nw.DataFrame):
         rows = nw_tbl.select(columns).rows(named=True)
@@ -3101,7 +3107,7 @@ def _with_row_text_values(
 
     was_polars_lazy = is_polars_lazyframe(nw_tbl.to_native())
     if was_polars_lazy:
-        nw_tbl = nw_tbl.collect()
+        nw_tbl = cast(Any, nw_tbl).collect()
 
     if isinstance(nw_tbl, nw.DataFrame):
         rows = nw_tbl.select(columns).rows(named=True)
@@ -3332,7 +3338,7 @@ def interrogate_chat_format(
 
     was_polars_lazy = is_polars_lazyframe(nw_tbl.to_native())
     if was_polars_lazy:
-        nw_tbl = nw_tbl.collect()
+        nw_tbl = cast(Any, nw_tbl).collect()
 
     reasons_count: dict[str, int] = {}
     if isinstance(nw_tbl, nw.DataFrame):
@@ -3454,7 +3460,7 @@ def data_freshness(
         max_val_result = nw_frame.select(nw.col(column).max())
         if is_narwhals_lazyframe(max_val_result):  # pragma: no cover
             max_val_result = max_val_result.collect()
-        max_datetime_raw = max_val_result.item()
+        max_datetime_raw = cast(Any, max_val_result).item()
 
         if max_datetime_raw is None:
             result["column_empty"] = True

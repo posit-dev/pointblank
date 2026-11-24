@@ -530,8 +530,8 @@ class OTelExporter:
         tracer = self._get_tracer()
 
         assert validation.time_start is not None and validation.time_end is not None
-        start_ns = int(validation.time_start.timestamp() * 1e9)
-        end_ns = int(validation.time_end.timestamp() * 1e9)
+        start_ns = int(cast(Any, validation.time_start).timestamp() * 1e9)
+        end_ns = int(cast(Any, validation.time_end).timestamp() * 1e9)
 
         root_attrs = {
             **attrs,

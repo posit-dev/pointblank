@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import narwhals as nw
 
@@ -415,22 +415,22 @@ class Schema:
         # Collect column names and dtypes from the DataFrame and store as a list of tuples
         if _is_narwhals_table(self.tbl):
             if _is_lazy_frame(data=self.tbl):
-                schema_dict = dict(self.tbl.collect_schema())
+                schema_dict = dict(cast("Any", self.tbl).collect_schema())
             else:
-                schema_dict = dict(self.tbl.schema.items())
+                schema_dict = dict(cast("Any", self.tbl).schema.items())
             schema_dict = {k: str(v) for k, v in schema_dict.items()}
             self.columns = list(schema_dict.items())
 
         elif table_type == "pandas":
-            schema_dict = dict(self.tbl.dtypes)
+            schema_dict = dict(cast("Any", self.tbl).dtypes)
             schema_dict = {k: str(v) for k, v in schema_dict.items()}
             self.columns = list(schema_dict.items())
 
         elif table_type == "polars":
             if _is_lazy_frame(data=self.tbl):
-                schema_dict = dict(self.tbl.collect_schema())
+                schema_dict = dict(cast("Any", self.tbl).collect_schema())
             else:
-                schema_dict = dict(self.tbl.schema.items())
+                schema_dict = dict(cast("Any", self.tbl).schema.items())
             schema_dict = {k: str(v) for k, v in schema_dict.items()}
             self.columns = list(schema_dict.items())
 
@@ -445,7 +445,7 @@ class Schema:
             self.columns = list(schema_dict.items())  # pragma: no cover
 
         elif table_type in IBIS_BACKENDS:
-            schema_dict = dict(self.tbl.schema().items())
+            schema_dict = dict(cast("Any", self.tbl).schema().items())
             schema_dict = {k: str(v) for k, v in schema_dict.items()}
             self.columns = list(schema_dict.items())
 

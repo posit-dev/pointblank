@@ -1439,7 +1439,7 @@ def _extract_numeric_values(scan: DataScan, colname: str) -> list[float] | None:
         return None
 
     try:
-        col = scan.nw_data.get_column(colname)
+        col = cast(Any, scan.nw_data).get_column(colname)
         vals = col.drop_nulls().to_list()
         return [float(v) for v in vals if v is not None]
     except Exception:
@@ -1456,7 +1456,7 @@ def _extract_categorical_freqs(scan: DataScan, colname: str) -> dict[str, int] |
         return None
 
     try:
-        col = scan.nw_data.get_column(colname).drop_nulls()
+        col = cast(Any, scan.nw_data).get_column(colname).drop_nulls()
         vals = col.to_list()
         freqs: dict[str, int] = {}
         for v in vals:

@@ -15,6 +15,7 @@ _ROW_INDEX = "pb_index_"
 
 
 class _RowPreservingFunction:
+    __wrapped__: Any
     """
     A `pre=` function marked as keeping the table's rows (see `row_preserving()`).
 

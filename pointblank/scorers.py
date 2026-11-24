@@ -654,7 +654,7 @@ class _Reranker(_Adapter):
         for record in batch:
             query, document = self._columns(record)
             pairs.append((str(record[query]), str(record[document])))
-        client = self._get_client()
+        client = cast(Any, self._get_client())
         if self._provider == "sentence-transformers":
             return client.predict(pairs)
         scores: list[float | None] = [None] * len(pairs)

@@ -5,7 +5,7 @@ import itertools
 import math
 import statistics
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 
 import narwhals as nw
 
@@ -50,7 +50,7 @@ def _aggregate(
     if _is_pandas_object_column(column, name):
         # Narwhals infers a dtype for these (e.g., an all-null column is `String`), so check the
         # values themselves
-        values = column.get_column(name).drop_nulls().to_list()
+        values = cast(Any, column).get_column(name).drop_nulls().to_list()
         non_number = next(
             (v for v in values if not isinstance(v, (int, float, decimal.Decimal))), None
         )

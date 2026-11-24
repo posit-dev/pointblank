@@ -550,7 +550,7 @@ def _count_null_values_in_column(
 
     if is_narwhals_lazyframe(result):
         return int(result.collect().item())
-    return int(result.item())
+    return int(cast(Any, result).item())
 
 
 def _count_validation_units(
@@ -598,7 +598,7 @@ def _count_validation_units(
     if is_narwhals_lazyframe(result):
         result = result.collect()
 
-    row = result.rows(named=True)[0]
+    row = cast(Any, result).rows(named=True)[0]
 
     n = int(row["n"])
     n_passed = int(row["n_passed"] or 0)
@@ -963,7 +963,7 @@ def _get_caller_arg_source(method_name: str, arg_name: str, arg_index: int = 0) 
 
     try:
         # The frame of the code that called the method that called this function
-        caller = frame.f_back.f_back
+        caller = cast(Any, frame).f_back.f_back
 
         if caller.f_globals.get("__name__", "").split(".")[0] == "pointblank":
             return None

@@ -2275,7 +2275,7 @@ def validate(
                     validation = validation.col_exists(columns=column)
                 elif check == "col-vals-in-set":
                     # Parse the comma-separated set values
-                    allowed_values = [v.strip() for v in set_val.split(",")]
+                    allowed_values = [v.strip() for v in cast(str, set_val).split(",")]
                     validation = validation.col_vals_in_set(columns=column, set=allowed_values)
                 elif check == "col-vals-gt":
                     validation = validation.col_vals_gt(columns=column, value=value)

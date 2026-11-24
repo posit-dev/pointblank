@@ -227,7 +227,7 @@ class _Card:
         ctx = self.ctx
         validation = self.validation
         when = validation.time_end or validation.time_start
-        date = when.strftime("%Y-%m-%d")
+        date = cast(Any, when).strftime("%Y-%m-%d")
         steps = self.steps
         if not steps:
             return ctx.t("card_validated_no_steps", version=self.version, date=date)
@@ -296,7 +296,7 @@ class _Card:
         for values in scores.values():
             dimensions += [name for name in values if name not in dimensions]
         rows = []
-        for segment, value in health.items():
+        for segment, value in cast(dict[Any, Any], health).items():
             label = ctx.list_sep.join(map(str, segment)) if isinstance(segment, tuple) else segment
             row = [label, _score(value, ctx)]
             row += [

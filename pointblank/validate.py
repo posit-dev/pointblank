@@ -4860,17 +4860,17 @@ def _validation_info_to_step(
         params["set"] = list(vi.values) if vi.values is not None else []
     elif at == "col_vals_regex":
         _columns_param()
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["pattern"] = values.get("pattern", "")
         if values.get("inverse"):
             params["inverse"] = True
     elif at == "col_vals_within_spec":
         _columns_param()
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["spec"] = values.get("spec", "")
     elif at == "col_vals_str_len":
         _columns_param()
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         if values.get("min_val") is not None:
             params["min_val"] = values["min_val"]
         if values.get("max_val") is not None:
@@ -4879,7 +4879,7 @@ def _validation_info_to_step(
         _columns_param()
     elif at == "col_pct_null":
         _columns_param()
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["p"] = values.get("p")
         # The tolerance is only held by the bound-finding partial
         tol = getattr(values.get("bound_finder"), "keywords", {}).get("tol", 0)
@@ -4887,7 +4887,7 @@ def _validation_info_to_step(
             params["tol"] = tol
     elif at == "col_pct_missing":
         _columns_param()
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["missing"] = values.get("spec")
         params["max_pct"] = values.get("max_pct")
         for key in ("reason", "category"):
@@ -4899,13 +4899,13 @@ def _validation_info_to_step(
         params["missing"] = vi.values
     elif at == "col_missing_only_coded":
         _columns_param()
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["missing"] = values.get("spec")
         for key in ("allowed", "min_val", "max_val"):
             if values.get(key) is not None:
                 params[key] = values[key]
     elif at == "col_missing_consistent":
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["columns"] = [_column_to_name(c) or c for c in vi.column]
         params["missing"] = values.get("spec")
         params["when_reason"] = values.get("when_reason")
@@ -4930,7 +4930,7 @@ def _validation_info_to_step(
             ),
         )
     elif at == "data_freshness":
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["column"] = _column_to_name(vi.column) or vi.column
         max_age = values.get("max_age_str")
         if max_age is None and values.get("max_age") is not None:  # pragma: no cover
@@ -4949,7 +4949,7 @@ def _validation_info_to_step(
             allow_future_str = values.get("allow_future_str")
             params["allow_future"] = allow_future_str or _timedelta_to_duration_str(allow_future)
     elif at == "col_schema_match":
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["schema"] = values.get("schema")
         for key in (
             "complete",
@@ -4961,7 +4961,7 @@ def _validation_info_to_step(
             if values.get(key, True) is not True:
                 params[key] = values[key]
     elif at == "row_count_match":
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["count"] = values.get("count")
         # The tolerance is held as absolute bounds (integers), which `tol=` reads as absolute row
         # counts, so they reproduce the same check
@@ -4971,7 +4971,7 @@ def _validation_info_to_step(
         if values.get("inverse"):
             params["inverse"] = True
     elif at == "col_count_match":
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["count"] = values.get("count")
         if values.get("inverse"):
             params["inverse"] = True
@@ -4979,7 +4979,7 @@ def _validation_info_to_step(
         if vi.column is not None:
             _columns_param(key="columns_subset")
     elif at in ("tbl_match", "tbl_reconcile"):
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         tbl_compare = values.get("tbl_compare")
         if isinstance(tbl_compare, str):
             # A file path or connection string round-trips as-is
@@ -5010,7 +5010,7 @@ def _validation_info_to_step(
             if name in values:
                 params[name] = values[name]
     elif at == "col_vals_in_table":
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["columns"] = values.get("columns", vi.column)
         ref_table = values.get("ref_table")
         if isinstance(ref_table, (str, Path)):
@@ -5028,7 +5028,7 @@ def _validation_info_to_step(
         params["ref_column"] = values.get("ref_column")
     elif at == "conjointly":
         params["expressions"] = _placeholder(
-            (vi.values or {}).get("expressions"),
+            cast(dict[str, Any], vi.values or {}).get("expressions"),
             code="lambda df: df",
             note=(
                 "Step 'conjointly' uses callable expressions that cannot be serialized to "
@@ -5037,7 +5037,7 @@ def _validation_info_to_step(
             yaml_value=["lambda df: df"],
         )
     elif at == "prompt":
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["prompt"] = values.get("prompt")
         if values.get("judges"):
             params["model"] = list(values["judges"])
@@ -5066,7 +5066,7 @@ def _validation_info_to_step(
     elif at == "col_vals_scored":
         from pointblank.scorers import _Adapter
 
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         columns = vi.column if isinstance(vi.column, (list, tuple)) else [vi.column]
         params["columns"] = columns[0] if len(columns) == 1 else list(columns)
         scorer = values.get("scorer")
@@ -5093,14 +5093,14 @@ def _validation_info_to_step(
         if not values.get("keep_scores", True):
             params["keep_scores"] = False
     elif at == "rows_near_distinct":
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["columns"] = _columns_literal(vi.column)
         defaults = {"method": "minhash", "threshold": 0.85, "ngram": 5, "num_perm": 128}
         for key, default in defaults.items():
             if values.get(key, default) != default:
                 params[key] = values[key]
     elif at == "rows_not_contaminated":
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         params["columns"] = _columns_literal(vi.column)
         reference = _literal_reference(values.get("reference"))
         if reference is not None:
@@ -5123,7 +5123,7 @@ def _validation_info_to_step(
                 params[key] = values[key]
     elif at == "col_vals_chat_format":
         _columns_param()
-        values = vi.values or {}
+        values = cast(dict[str, Any], vi.values or {})
         defaults = {
             "roles": ["system", "user", "assistant"],
             "alternate": True,
@@ -5355,7 +5355,7 @@ def _render_zoned_datetime_code(value: datetime.datetime) -> str:
     args = [str(part) for part in parts]
     if value.fold:
         args.append("fold=1")
-    args.append(f"tzinfo=ZoneInfo({json.dumps(value.tzinfo.key)})")
+    args.append(f"tzinfo=ZoneInfo({json.dumps(cast(Any, value.tzinfo).key)})")
     return f"datetime.datetime({', '.join(args)})"
 
 
@@ -19540,7 +19540,7 @@ class Validate:
 
             assertion_type = cast(str, validation.assertion_type)  # every step has a type
             column = validation.column
-            value = validation.values
+            value = cast(Any, validation.values)
             inclusive = validation.inclusive
             na_pass = validation.na_pass
             threshold = cast(Thresholds, validation.thresholds)  # steps are normalized on creation
@@ -20015,8 +20015,12 @@ class Validate:
                             from pointblank._interrogation import interrogate_increasing
 
                             # Extract direction options from val_info
-                            allow_stationary = validation.val_info.get("allow_stationary", False)
-                            decreasing_tol = validation.val_info.get("decreasing_tol", 0.0)
+                            allow_stationary = cast(dict[str, Any], validation.val_info).get(
+                                "allow_stationary", False
+                            )
+                            decreasing_tol = cast(dict[str, Any], validation.val_info).get(
+                                "decreasing_tol", 0.0
+                            )
 
                             results_tbl = interrogate_increasing(
                                 tbl=tbl,
@@ -20024,7 +20028,7 @@ class Validate:
                                 allow_stationary=allow_stationary,
                                 decreasing_tol=decreasing_tol,
                                 na_pass=na_pass,
-                                order_by=validation.val_info.get("order_by"),
+                                order_by=cast(dict[str, Any], validation.val_info).get("order_by"),
                                 missing=validation.missing,
                             )
 
@@ -20032,8 +20036,12 @@ class Validate:
                             from pointblank._interrogation import interrogate_decreasing
 
                             # Extract direction options from val_info
-                            allow_stationary = validation.val_info.get("allow_stationary", False)
-                            increasing_tol = validation.val_info.get("increasing_tol", 0.0)
+                            allow_stationary = cast(dict[str, Any], validation.val_info).get(
+                                "allow_stationary", False
+                            )
+                            increasing_tol = cast(dict[str, Any], validation.val_info).get(
+                                "increasing_tol", 0.0
+                            )
 
                             results_tbl = interrogate_decreasing(
                                 tbl=tbl,
@@ -20041,7 +20049,7 @@ class Validate:
                                 allow_stationary=allow_stationary,
                                 increasing_tol=increasing_tol,
                                 na_pass=na_pass,
-                                order_by=validation.val_info.get("order_by"),
+                                order_by=cast(dict[str, Any], validation.val_info).get("order_by"),
                                 missing=validation.missing,
                             )
 
@@ -21034,6 +21042,7 @@ class Validate:
                 ):
                     validation_extract_nw = validation_extract_nw.sort("_row_num_")
 
+                validation_extract_nw = cast(Any, validation_extract_nw)
                 # Apply any sampling or limiting to the number of rows to extract
                 if get_first_n is not None:
                     validation_extract_nw = validation_extract_nw.head(get_first_n)
@@ -27507,7 +27516,7 @@ def _has_kept_scores(validation: _ValidationInfo) -> bool:
     """
     if validation.assertion_type != "col_vals_scored":
         return False
-    if not (validation.values or {}).get("keep_scores", True):
+    if not cast(dict[str, Any], validation.values or {}).get("keep_scores", True):
         return False
     return "pb_score_" in nw.from_native(validation.tbl_checked).collect_schema().names()
 
@@ -30466,7 +30475,7 @@ def _transform_assertion_str(
     # Replace the template text `{auto}` in `brief_str` with the corresponding `autobrief_str`
     # entry (or with nothing, for a step without an autobrief); a brief that's left blank isn't shown
     brief_str = [
-        brief.replace("{auto}", "" if autobrief is None else autobrief).strip()
+        cast(str, brief).replace("{auto}", "" if autobrief is None else autobrief).strip()
         for brief, autobrief in zip(brief_str, autobrief_str)
     ]
 
@@ -30477,7 +30486,9 @@ def _transform_assertion_str(
     # In some sandboxed HTML environments (e.g., Streamlit), <p> tags don't inherit
     # font-size from parent divs, so we add inline styles directly to the <p> tags
     brief_str = [
-        re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', x) if x.strip() else x
+        re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', x)
+        if cast(str, x).strip()
+        else x
         for x in brief_str
     ]
 
@@ -30491,7 +30502,7 @@ def _transform_assertion_str(
     # Define the brief's HTML div tag for each row
     brief_divs = [
         f"<div style=\"font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;{rtl_css_style}\">{brief}</div>"
-        if brief.strip()
+        if cast(str, brief).strip()
         else ""
         for brief in brief_str
     ]

@@ -2725,7 +2725,7 @@ class Ablation:
     def _strata_rows(self) -> list[list[int]]:
         """The numbers of the rows in each group of a `Stratified` control."""
         if self._strata is None:
-            by = list(self.control.by)
+            by = list(cast(Any, self.control).by)
             frame = _with_row_index(self.validation.data, name=_INDEX).select(_INDEX, *by)
             if isinstance(frame, nw.LazyFrame):
                 frame = frame.collect()
@@ -2748,7 +2748,7 @@ class Ablation:
         always, n_random, key = self._resolve().control_draws[control_id]
         stratified = isinstance(self.control, Stratified)
         if stratified:
-            key = f"stratified:{json.dumps(list(self.control.by))}:{key}"
+            key = f"stratified:{json.dumps(list(cast(Any, self.control).by))}:{key}"
         rng = random.Random(f"pointblank-ablation:{self.seed}:{repeat}:{key}")
 
         if stratified:
@@ -2881,7 +2881,7 @@ class Ablation:
     def _cache_put(self, key: str, result: Any, variant: AblationVariant, seed: int) -> None:
         import tempfile
 
-        self.cache.mkdir(parents=True, exist_ok=True)
+        cast(Any, self.cache).mkdir(parents=True, exist_ok=True)
         entry = {
             "result": result,
             "variant": variant.id,
@@ -4175,7 +4175,7 @@ class Ablation:
             for r in repeats:
                 # The value of each group of steps: its effect in this repeat
                 value: dict[tuple[int, ...], float] = {(): 0.0}
-                for coalition, variant_id in resolved.shapley.items():
+                for coalition, variant_id in cast(Any, resolved.shapley).items():
                     control_id = resolved.variant_control.get(variant_id)
                     reference = self._values[(control_id, r)][metric] if control_id else full[r]
                     value[coalition] = self._values[(variant_id, r)][metric] - reference

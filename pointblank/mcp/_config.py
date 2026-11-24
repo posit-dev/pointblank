@@ -19,7 +19,7 @@ try:
 
     HAS_PANDAS = True
 except ImportError:
-    pd = None
+    pd: Any = None
     HAS_PANDAS = False
 
 # Try to import other DataFrame libraries
@@ -28,7 +28,7 @@ try:
 
     HAS_POLARS = True
 except ImportError:
-    pl = None
+    pl: Any = None
     HAS_POLARS = False
 
 # Maximum file size for loading (500 MB)
