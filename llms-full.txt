@@ -31364,11 +31364,15 @@ and type, the number and fraction of missing and distinct values, and its statis
 the quickest way to get an overview of a table you haven't seen before, and it's what
 [`col_summary_tbl()`](`pointblank.col_summary_tbl`) returns.
 
-Each row starts with an icon for the column's type. Statistics that don't apply to any
-column are left out, and those that don't apply to a particular column are shown as `-`.
-Statistics for string columns describe the lengths of the strings (as the note below the
-table says). Boolean columns show the percentages of `True` and `False` values in place of
-the number of distinct values. Columns of unsupported types are listed with an
+Each row starts with an icon for the column's type. The `NA` and `Unique` columns give the
+number of missing values and the number of distinct values, each with its fraction of the
+rows below it. Statistics that don't apply to any column are left out, and those that don't
+apply to a particular column are shown as an em dash (`—`). Statistics for string columns
+describe the lengths of the strings (as the note below the table says). For date, datetime
+and time columns, `Min` and `Max` give the earliest and latest values, with the date and
+the time on lines of their own; the time is shown to the second, and hovering over a value
+shows it in full. Boolean columns show the percentages of `True` and `False` values in
+place of the number of distinct values. Columns of unsupported types are listed with an
 *unsupported type* badge and no statistics.
 :::
 
@@ -59048,26 +59052,24 @@ column summary table.
 ## Numeric Data
 
 Three columns in `small_table` are numeric: `a` (`Int64`), `c` (`Int64`), and `d` (`Float64`). The
-common measures of the missing count/proportion (`NA`) and the unique value count/proportion (`UQ`)
-are provided for the numeric data type. For these two measures, the top number is the absolute count
-of missing values and the count of unique values. The bottom number is a proportion of the absolute
-count divided by the row count; this makes each proportion a value between `0` and `1` (bounds
-included).
+common measures of the missing count/proportion (`NA`) and the unique value count/proportion
+(`Unique`) are provided for the numeric data type. For these two measures, the top number is the
+absolute count of missing values and the count of distinct values (if there are missing values, they
+count as one more distinct value). The bottom number is a proportion of the absolute count divided
+by the row count; this makes each proportion a value between `0` and `1` (bounds included).
 
-The next two columns represent the mean (`Mean`) and the standard deviation (`SD`). The minumum
-(`Min`), maximum, (`Max`) and a set of quantiles occupy the next few columns (includes `P5`, `Q1`,
+The next two columns represent the mean (`Mean`) and the standard deviation (`SD`). The minimum
+(`Min`), maximum (`Max`), and a set of quantiles occupy the next few columns (includes `P5`, `Q1`,
 `Med` for median, `Q3`, and `P95`). Finally, the interquartile range (`IQR`: `Q3` - `Q1`) is the
-last measure provided.
+last measure provided. A statistic that doesn't apply to a column is shown as an em dash (`—`).
 
 ## String Data
 
 String data is present in `small_table`, being in columns `b` and `f`. The missing value (`NA`) and
-uniqueness (`UQ`) measures are accounted for here. The statistical measures are all based on string
-lengths, so what happens is that all strings in a column are converted to those numeric values and a
-subset of stats values is presented. To avoid some understandable confusion when reading the table,
-the stats values in each of the cells with values are annotated with the text `"SL"`. It makes less
-sense to provide a full suite of quantile values so only the minimum (`Min`), median (`Med`), and
-maximum (`Max`) are provided.
+uniqueness (`Unique`) measures are accounted for here. The other statistics are all based on string
+lengths: each string in a column is converted to its number of characters, and the same statistics
+as for numeric columns are computed on those numbers (a note below the table says so). Here, every
+string in `b` has 9 characters, which suggests a fixed-format code.
 
 ## Date/Datetime Data and Boolean Data
 
@@ -59076,12 +59078,13 @@ We see that in the first two rows of our summary table there are summaries of th
 left of the column names) are:
 
 1. the missing count/proportion (`NA`)
-2. the unique value count/proportion (`UQ`)
-3. the minimum and maximum dates/datetimes
+2. the unique value count/proportion (`Unique`)
+3. the minimum and maximum dates/datetimes (the date and the time are on lines of their own, and the
+time is shown to the second; hover over a value to see it in full)
 
 One column, `e`, is of the `Boolean` type. Because columns of this type could only have `True`,
 `False`, or missing values, we provide summary data for missingness (under `NA`) and proportions of
-`True` and `False` values (under `UQ`).
+`True` and `False` values (under `Unique`).
 
 ## Using `DataScan` Directly
 

@@ -4,7 +4,7 @@ Restore a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a dictio
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L892-L992)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L909-L1009)
 
 ``` python
 DataScan.from_dict(d)

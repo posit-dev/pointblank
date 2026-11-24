@@ -4,7 +4,7 @@ Restore a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a JSON s
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L994-L1049)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1011-L1066)
 
 ``` python
 DataScan.from_json(json_string)

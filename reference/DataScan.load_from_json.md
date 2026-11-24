@@ -4,7 +4,7 @@ Load a [DataScan](../reference/DataScan.md#pointblank.DataScan) from a JSON file
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1051-L1121)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1068-L1138)
 
 ``` python
 DataScan.load_from_json(input_file)

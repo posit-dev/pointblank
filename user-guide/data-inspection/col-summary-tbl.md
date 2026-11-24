@@ -34,23 +34,23 @@ The numeric category (`N`) takes data types such as floats and integers. The `S`
 
 ## Numeric Data
 
-Three columns in `small_table` are numeric: `a` (`Int64`), `c` (`Int64`), and `d` (`Float64`). The common measures of the missing count/proportion (`NA`) and the unique value count/proportion (`UQ`) are provided for the numeric data type. For these two measures, the top number is the absolute count of missing values and the count of unique values. The bottom number is a proportion of the absolute count divided by the row count; this makes each proportion a value between `0` and `1` (bounds included).
+Three columns in `small_table` are numeric: `a` (`Int64`), `c` (`Int64`), and `d` (`Float64`). The common measures of the missing count/proportion (`NA`) and the unique value count/proportion (`Unique`) are provided for the numeric data type. For these two measures, the top number is the absolute count of missing values and the count of distinct values (if there are missing values, they count as one more distinct value). The bottom number is a proportion of the absolute count divided by the row count; this makes each proportion a value between `0` and `1` (bounds included).
 
-The next two columns represent the mean (`Mean`) and the standard deviation (`SD`). The minumum (`Min`), maximum, (`Max`) and a set of quantiles occupy the next few columns (includes `P5`, `Q1`, `Med` for median, `Q3`, and `P95`). Finally, the interquartile range (`IQR`: `Q3` - `Q1`) is the last measure provided.
+The next two columns represent the mean (`Mean`) and the standard deviation (`SD`). The minimum (`Min`), maximum (`Max`), and a set of quantiles occupy the next few columns (includes `P5`, `Q1`, `Med` for median, `Q3`, and `P95`). Finally, the interquartile range (`IQR`: `Q3` - `Q1`) is the last measure provided. A statistic that doesn't apply to a column is shown as an em dash (`--`).
 
 ## String Data
 
-String data is present in `small_table`, being in columns `b` and `f`. The missing value (`NA`) and uniqueness (`UQ`) measures are accounted for here. The statistical measures are all based on string lengths, so what happens is that all strings in a column are converted to those numeric values and a subset of stats values is presented. To avoid some understandable confusion when reading the table, the stats values in each of the cells with values are annotated with the text `"SL"`. It makes less sense to provide a full suite of quantile values so only the minimum (`Min`), median (`Med`), and maximum (`Max`) are provided.
+String data is present in `small_table`, being in columns `b` and `f`. The missing value (`NA`) and uniqueness (`Unique`) measures are accounted for here. The other statistics are all based on string lengths: each string in a column is converted to its number of characters, and the same statistics as for numeric columns are computed on those numbers (a note below the table says so). Here, every string in `b` has 9 characters, which suggests a fixed-format code.
 
 ## Date/Datetime Data and Boolean Data
 
 We see that in the first two rows of our summary table there are summaries of the `date_time` and `date` columns. The summaries we provide for a date/datetime category (notice the green `D` to the left of the column names) are:
 
 1.  the missing count/proportion (`NA`)
-2.  the unique value count/proportion (`UQ`)
-3.  the minimum and maximum dates/datetimes
+2.  the unique value count/proportion (`Unique`)
+3.  the minimum and maximum dates/datetimes (the date and the time are on lines of their own, and the time is shown to the second; hover over a value to see it in full)
 
-One column, `e`, is of the `Boolean` type. Because columns of this type could only have `True`, `False`, or missing values, we provide summary data for missingness (under `NA`) and proportions of `True` and `False` values (under `UQ`).
+One column, `e`, is of the `Boolean` type. Because columns of this type could only have `True`, `False`, or missing values, we provide summary data for missingness (under `NA`) and proportions of `True` and `False` values (under `Unique`).
 
 ## Using `DataScan` Directly
 

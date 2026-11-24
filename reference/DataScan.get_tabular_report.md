@@ -4,7 +4,7 @@ Get a tabular report of the scan.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L330-L642)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L339-L659)
 
 ``` python
 DataScan.get_tabular_report(
@@ -15,7 +15,7 @@ DataScan.get_tabular_report(
 
 The report presents the profile of each column as one row of a table: the column's name and type, the number and fraction of missing and distinct values, and its statistics. It's the quickest way to get an overview of a table you haven't seen before, and it's what [`col_summary_tbl()`](../reference/col_summary_tbl.md#pointblank.col_summary_tbl) returns.
 
-Each row starts with an icon for the column's type. Statistics that don't apply to any column are left out, and those that don't apply to a particular column are shown as `-`. Statistics for string columns describe the lengths of the strings (as the note below the table says). Boolean columns show the percentages of `True` and `False` values in place of the number of distinct values. Columns of unsupported types are listed with an *unsupported type* badge and no statistics.
+Each row starts with an icon for the column's type. The `NA` and `Unique` columns give the number of missing values and the number of distinct values, each with its fraction of the rows below it. Statistics that don't apply to any column are left out, and those that don't apply to a particular column are shown as an em dash (`--`). Statistics for string columns describe the lengths of the strings (as the note below the table says). For date, datetime and time columns, `Min` and `Max` give the earliest and latest values, with the date and the time on lines of their own; the time is shown to the second, and hovering over a value shows it in full. Boolean columns show the percentages of `True` and `False` values in place of the number of distinct values. Columns of unsupported types are listed with an *unsupported type* badge and no statistics.
 
 ## Parameters
 

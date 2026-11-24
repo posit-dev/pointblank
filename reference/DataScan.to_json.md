@@ -4,7 +4,7 @@ Export the profile as a JSON string.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L792-L837)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L809-L854)
 
 ``` python
 DataScan.to_json()
