@@ -15695,7 +15695,7 @@ def _missing_vals_tbl_sectors(gt) -> dict[str, list[float]]:
     return {rec["columns"]: [rec[str(i)] for i in range(1, 11)] for rec in records}
 
 
-@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+@pytest.mark.parametrize("tbl_type", ["polars", "polars_lazy", "pandas", "pyarrow", "duckdb"])
 def test_missing_vals_tbl_counts_nan_as_missing(tbl_type) -> None:
     # Ten rows give one row per sector; NaN in rows 2 and 5 and a null in row 3
     data = pl.DataFrame(
@@ -15707,8 +15707,12 @@ def test_missing_vals_tbl_counts_nan_as_missing(tbl_type) -> None:
     )
     if tbl_type == "polars":
         tbl = data
+    elif tbl_type == "polars_lazy":
+        tbl = data.lazy()
     elif tbl_type == "pandas":
         tbl = data.to_pandas()
+    elif tbl_type == "pyarrow":
+        tbl = data.to_arrow()
     else:
         tbl = ibis.duckdb.connect().create_table("tbl", data.to_arrow())
 
@@ -15724,6 +15728,22 @@ def test_missing_vals_tbl_counts_nan_as_missing(tbl_type) -> None:
     # The same missing values as `col_vals_not_null()` finds
     validation = Validate(data=tbl).col_vals_not_null(columns="x").interrogate()
     assert validation.n_failed(i=1, scalar=True) == 3
+
+
+def test_missing_vals_tbl_lazy_and_arrow_input_header() -> None:
+    # A LazyFrame and a PyArrow table are converted for the heatmap (both failed before), but the
+    # header shows the type of the table that was passed in: Polars for the LazyFrame, and no
+    # table type for PyArrow (which has no label) rather than the Polars it was converted to
+    data = pl.DataFrame({"x": [1.0, None, 3.0]})
+    polars_label = ">Polars</span>"
+
+    html = missing_vals_tbl(data.lazy()).as_raw_html()
+    assert polars_label in html
+    assert "1 in total" in html
+
+    html = missing_vals_tbl(data.to_arrow()).as_raw_html()
+    assert polars_label not in html
+    assert "1 in total" in html
 
 
 # TODO: Fix this test: great_tables has internal pandas dependencies that cannot be mocked
