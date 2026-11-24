@@ -57,6 +57,8 @@ jobs:
         run: |
           make test
         env:
+          # PySpark 3.5 can't serialize its functions on Python 3.14 (empty means don't skip)
+          SKIP_PYSPARK_TESTS: ${{ matrix.python-version == '3.14' && '1' || '' }}
           # Optimize PySpark for CI environment
           PYSPARK_DRIVER_MEMORY: 1g
           PYSPARK_EXECUTOR_MEMORY: 1g
