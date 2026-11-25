@@ -19689,11 +19689,7 @@ class Validate:
                     # Capture original table dimensions before preprocessing
                     original_rows = get_row_count(data_tbl_step)
                     original_cols = get_column_count(data_tbl_step)
-                    original_column_names = set(
-                        data_tbl_step.columns
-                        if hasattr(data_tbl_step, "columns")
-                        else list(data_tbl_step.columns)
-                    )
+                    original_column_names = set(_get_column_names_safe(data_tbl_step))
 
                     # A function marked with `row_preserving()` is given the table with its row
                     # numbers, so that the rows it returns can be matched to the table's rows
@@ -19753,11 +19749,7 @@ class Validate:
                     # Check if target column is synthetic (exists in processed but not original)
                     # Only check for single column names (not lists used in rows_distinct, etc.)
                     if column is not None and isinstance(column, str):
-                        processed_column_names = set(
-                            data_tbl_step.columns
-                            if hasattr(data_tbl_step, "columns")
-                            else list(data_tbl_step.columns)
-                        )
+                        processed_column_names = set(_get_column_names_safe(data_tbl_step))
 
                         # Check if the target column is in the processed table but not in original
                         if column in processed_column_names and column not in original_column_names:
@@ -29178,7 +29170,7 @@ def _seg_expr_from_string(data_tbl: Any, segments_expr: str) -> tuple[str, str]:
     # values are tracked separately since Pandas represents them as `nan` or `pd.NA` rather than
     # `None`, which can't be sorted alongside the other values and wouldn't match the `is_null()`
     # filter used in `_apply_segments()`
-    if tbl_type in ["polars", "pandas", "pyspark"]:
+    if tbl_type in ["polars", "pandas", "pyspark", "pyarrow"]:
         # Use Narwhals for supported DataFrame types
         data_nw = nw.from_native(data_tbl)
         unique_vals = data_nw.select(nw.col(segments_expr)).unique()
@@ -29287,8 +29279,8 @@ def _apply_segments(data_tbl: Any, segments_expr: tuple[str, str]) -> Any:
     # Unpack the segments expression tuple for more convenient and explicit variable names
     column, segment = segments_expr
 
-    if tbl_type in ["pandas", "polars", "pyspark"]:
-        # If the table is a Pandas, Polars, or PySpark DataFrame, transform to a Narwhals table
+    if tbl_type in ["pandas", "polars", "pyspark", "pyarrow"]:
+        # If the table is a Pandas, Polars, PySpark or PyArrow table, transform to a Narwhals table
         # and perform the filtering operation
 
         # Transform to Narwhals table if a DataFrame
