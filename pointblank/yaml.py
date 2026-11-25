@@ -9,7 +9,7 @@ import operator
 import re
 from importlib import import_module
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterable, Literal, Mapping, Optional, Union
+from typing import TYPE_CHECKING, Any, Iterable, Literal, Mapping, Optional, Union, cast
 from zoneinfo import ZoneInfo
 
 import narwhals as nw
@@ -92,12 +92,12 @@ _DECLARATIVE_VALUE_CALLS = {
 
 # Operators that combine column selectors (e.g., `pb.starts_with("a") & pb.ends_with("z")`) or
 # negate a number
-_DECLARATIVE_BINARY_OPS = {
+_DECLARATIVE_BINARY_OPS: dict[type, Any] = {
     ast.BitAnd: operator.and_,
     ast.BitOr: operator.or_,
     ast.Sub: operator.sub,
 }
-_DECLARATIVE_UNARY_OPS = {
+_DECLARATIVE_UNARY_OPS: dict[type, Any] = {
     ast.Invert: operator.invert,
     ast.USub: operator.neg,
 }
@@ -128,7 +128,7 @@ def _eval_declarative_node(node: ast.AST) -> Any:
         return {ast.List: list, ast.Tuple: tuple, ast.Set: set}[type(node)](items)
     if isinstance(node, ast.Dict) and None not in node.keys:
         return {
-            _eval_declarative_node(k): _eval_declarative_node(v)
+            _eval_declarative_node(cast(ast.expr, k)): _eval_declarative_node(v)
             for k, v in zip(node.keys, node.values)
         }
     if isinstance(node, ast.BinOp) and type(node.op) in _DECLARATIVE_BINARY_OPS:
@@ -638,7 +638,8 @@ class YAMLValidator:
             # If _process_data returns the original string unchanged,
             # then it's not a file path, so try load_dataset with specified library
             if processed_data is processed_tbl_spec and isinstance(processed_tbl_spec, str):
-                return load_dataset(processed_tbl_spec, tbl_type=df_library)
+                # `load_dataset()` types its name as a Literal, but any string reaches here
+                return load_dataset(cast(Any, processed_tbl_spec), tbl_type=df_library)
             else:
                 return processed_data  # pragma: no cover
 
@@ -769,7 +770,7 @@ class YAMLValidator:
                     )
 
                 # Convert YAML column specs to `Schema` format
-                schema_columns = []
+                schema_columns: list[tuple[Any, ...]] = []
                 for col_spec in columns_spec:
                     if isinstance(col_spec, list):
                         if len(col_spec) == 1:

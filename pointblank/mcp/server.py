@@ -14,6 +14,7 @@ from typing import (
     Dict,
     Optional,
     Union,
+    cast,
 )
 
 from fastmcp import Context, FastMCP
@@ -157,7 +158,7 @@ async def load_dataframe(
     ] = "auto",
 ) -> DataFrameInfo:
     """Load a DataFrame from file into the server's context."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
 
     available_backends = get_available_backends()
     if not available_backends:
@@ -200,7 +201,7 @@ async def list_available_backends(ctx: Context) -> Dict[str, Any]:
     """Returns information about available DataFrame backends and their capabilities."""
     backends = get_available_backends()
 
-    backend_info = {}
+    backend_info: dict[str, Any] = {}
     for b in backends:
         if b == "pandas":
             backend_info["pandas"] = {
@@ -230,7 +231,7 @@ async def list_available_backends(ctx: Context) -> Dict[str, Any]:
 )
 async def list_loaded_dataframes(ctx: Context) -> Dict[str, Any]:
     """Returns information about all DataFrames currently loaded in the server."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
 
     dataframes_info = {}
     for df_id, df in app_ctx.loaded_dataframes.items():
@@ -270,7 +271,7 @@ async def delete_dataframe(
     df_id: Annotated[str, "ID of the DataFrame to delete."],
 ) -> Dict[str, str]:
     """Removes a DataFrame from the server context and frees up memory."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     df_id = validate_resource_id(df_id, "DataFrame")
 
     if df_id not in app_ctx.loaded_dataframes:
@@ -301,7 +302,7 @@ async def profile_dataframe(
     ] = 0,
 ) -> Dict[str, Any]:
     """Run Pointblank DataScan on a loaded DataFrame and return column-level statistics."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     df_id = validate_resource_id(df_id, "DataFrame")
 
     if df_id not in app_ctx.loaded_dataframes:
@@ -346,7 +347,7 @@ async def profile_dataframe(
 )
 async def list_active_validators(ctx: Context) -> Dict[str, Any]:
     """Returns information about all active validators in the server."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
 
     validators_info = {}
     for validator_id, validator in app_ctx.active_validators.items():
@@ -383,7 +384,7 @@ async def delete_validator(
     validator_id: Annotated[str, "ID of the validator to delete."],
 ) -> Dict[str, str]:
     """Removes a validator from the server context."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     validator_id = validate_resource_id(validator_id, "Validator")
 
     if validator_id not in app_ctx.active_validators:
@@ -421,7 +422,7 @@ def create_validator(
     locale: Optional[str] = None,
 ) -> ValidatorInfo:
     """Creates a Pointblank Validator for a previously loaded DataFrame."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     df_id = validate_resource_id(df_id, "DataFrame")
 
     if df_id not in app_ctx.loaded_dataframes:
@@ -485,7 +486,7 @@ def add_validation_step(
     ],
 ) -> ValidationStepInfo:
     """Adds a validation step to an existing Pointblank Validator."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     validator_id = validate_resource_id(validator_id, "Validator")
 
     if validator_id not in app_ctx.active_validators:
@@ -533,7 +534,7 @@ async def apply_validation_template(
     ],
 ) -> Dict[str, Any]:
     """Applies a pre-built validation template with common data quality checks."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     validator_id = validate_resource_id(validator_id, "Validator")
 
     if validator_id not in app_ctx.active_validators:
@@ -615,7 +616,7 @@ async def get_validation_step_output(
     ] = None,
 ) -> ValidationOutput:
     """Retrieves validation output and saves it to a CSV file."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     validator_id = validate_resource_id(validator_id, "Validator")
 
     if validator_id not in app_ctx.active_validators:
@@ -677,7 +678,7 @@ async def interrogate_validator(
     validator_id: Annotated[str, "ID of the Validator to interrogate."],
 ) -> Dict[str, Any]:
     """Runs validations and returns a JSON summary with HTML report and Python code."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     validator_id = validate_resource_id(validator_id, "Validator")
 
     if validator_id not in app_ctx.active_validators:
@@ -733,7 +734,7 @@ async def preview_table(
     show_row_numbers: bool = True,
 ) -> str:
     """Display a preview of the DataFrame showing rows from top and bottom."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     dataframe_id = validate_resource_id(dataframe_id, "DataFrame")
 
     if dataframe_id not in app_ctx.loaded_dataframes:
@@ -758,7 +759,7 @@ async def preview_table(
 @mcp.tool()
 async def missing_values_table(ctx: Context, dataframe_id: str) -> str:
     """Generate a table showing missing values analysis for the DataFrame."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     dataframe_id = validate_resource_id(dataframe_id, "DataFrame")
 
     if dataframe_id not in app_ctx.loaded_dataframes:
@@ -778,9 +779,11 @@ async def missing_values_table(ctx: Context, dataframe_id: str) -> str:
 
 
 @mcp.tool()
-async def column_summary_table(ctx: Context, dataframe_id: str, table_name: str = None) -> str:
+async def column_summary_table(
+    ctx: Context, dataframe_id: str, table_name: str | None = None
+) -> str:
     """Generate a comprehensive column-level summary of the DataFrame."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     dataframe_id = validate_resource_id(dataframe_id, "DataFrame")
 
     if dataframe_id not in app_ctx.loaded_dataframes:
@@ -816,7 +819,7 @@ async def draft_validation_plan(
     api_key: Annotated[Optional[str], "API key for the model provider."] = None,
 ) -> Dict[str, Any]:
     """Uses Pointblank's DraftValidation to generate an AI-powered validation plan."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     dataframe_id = validate_resource_id(dataframe_id, "DataFrame")
 
     if dataframe_id not in app_ctx.loaded_dataframes:
@@ -874,7 +877,7 @@ def validation_assistant(
     Analyzes your data's structure (types, null counts, value ranges, cardinality)
     to produce actionable Pointblank validation code tailored to your dataset.
     """
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     dataframe_id = validate_resource_id(dataframe_id, "DataFrame")
 
     if dataframe_id not in app_ctx.loaded_dataframes:
@@ -909,7 +912,12 @@ def validation_assistant(
 
         null_pct = round(null_count / rows * 100, 1) if rows > 0 else 0
 
-        col_info = {"name": col, "dtype": dtype, "null_count": null_count, "null_pct": null_pct}
+        col_info: dict[str, Any] = {
+            "name": col,
+            "dtype": dtype,
+            "null_count": null_count,
+            "null_pct": null_pct,
+        }
 
         # Numeric analysis
         is_numeric = any(t in dtype.lower() for t in ["int", "float", "decimal", "numeric"])
@@ -1026,7 +1034,7 @@ def validation_assistant(
 )
 async def server_health_check(ctx: Context) -> Dict[str, Any]:
     """Returns server health information."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context
+    app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
 
     dataframes_count = len(app_ctx.loaded_dataframes)
     validators_count = len(app_ctx.active_validators)
@@ -1041,7 +1049,7 @@ async def server_health_check(ctx: Context) -> Dict[str, Any]:
         except Exception:
             pass
 
-    health_info = {
+    health_info: dict[str, Any] = {
         "timestamp": datetime.now().isoformat(),
         "server_status": "healthy",
         "system_info": {

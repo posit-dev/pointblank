@@ -1,4 +1,5 @@
 import ast
+import builtins
 import inspect
 import itertools
 import subprocess
@@ -15,6 +16,53 @@ sys.path.append(str(project_root))
 from tests.test_agg_doctests import _TEST_FUNCTION_REGISTRY
 
 VALIDATE_PYI_PATH = Path("pointblank/validate.pyi")
+VALIDATE_PY_PATH = Path("pointblank/validate.py")
+
+
+def _private_function_stubs(stub: str) -> str:
+    """Stub the private functions of `validate.py` that other modules import.
+
+    `stubgen` omits these since they aren't in `__all__`. Annotations that use names the stub doesn't
+    have are written as `Any`.
+    """
+    imported = {
+        alias.name
+        for path in Path("pointblank").rglob("*.py")
+        for node in ast.walk(ast.parse(path.read_text()))
+        if isinstance(node, ast.ImportFrom) and node.module == "pointblank.validate"
+        for alias in node.names
+        if alias.name.startswith("_")
+    }
+
+    known = set(dir(builtins))
+    for node in ast.parse(stub).body:
+        if isinstance(node, (ast.ImportFrom, ast.Import)):
+            known |= {alias.asname or alias.name for alias in node.names}
+        elif isinstance(node, (ast.ClassDef, ast.FunctionDef)):
+            known.add(node.name)
+
+    def _annotation(annotation: ast.expr | None) -> ast.expr | None:
+        names = (
+            {n.id for n in ast.walk(annotation) if isinstance(n, ast.Name)} if annotation else set()
+        )
+        return annotation if names <= known else ast.Name("Any")
+
+    stubs = []
+    for node in ast.parse(VALIDATE_PY_PATH.read_text()).body:
+        if not isinstance(node, ast.FunctionDef) or node.name not in imported - known:
+            continue
+        args = node.args
+        for arg in [*args.posonlyargs, *args.args, *args.kwonlyargs, args.vararg, args.kwarg]:
+            if arg is not None:
+                arg.annotation = _annotation(arg.annotation)
+        args.defaults = [ast.Constant(...) for _ in args.defaults]
+        args.kw_defaults = [d and ast.Constant(...) for d in args.kw_defaults]
+        node.returns = _annotation(node.returns)
+        node.decorator_list = []
+        node.body = [ast.Expr(ast.Constant(...))]
+        stubs.append(ast.unparse(node))
+
+    return "\n".join(stubs)
 
 
 def _extract_body(func) -> str:
@@ -111,6 +159,16 @@ if "# === GENERATED START ===" in content:
     content = content[: content.find("# === GENERATED START ===")].rstrip()
 else:
     content = content.rstrip()
+
+# Add the private functions ahead of the first class or function
+private_stubs = _private_function_stubs(content)
+if private_stubs:
+    first = next(
+        n for n in ast.parse(content).body if isinstance(n, (ast.ClassDef, ast.FunctionDef))
+    )
+    lineno = min([first.lineno, *(d.lineno for d in first.decorator_list)]) - 1
+    lines = content.splitlines()
+    content = "\n".join([*lines[:lineno], private_stubs, *lines[lineno:]])
 
 # Ensure content ends with newline before appending generated section
 content += "\n"

@@ -10,7 +10,7 @@ import re
 import string
 from dataclasses import replace as dc_replace
 from datetime import date, datetime, time, timedelta
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 from pointblank._utils import _is_lib_present
 from pointblank.countries import LocaleGenerator
@@ -188,11 +188,11 @@ def _generate_from_preset(preset: str, generator: LocaleGenerator) -> str:
         "locale_code": generator.locale_code,
     }
 
-    generator = preset_mapping.get(preset)
-    if generator is None:
+    gen_method: Any = preset_mapping.get(preset)
+    if gen_method is None:
         raise ValueError(f"Unknown preset: {preset}")
 
-    return str(generator())
+    return str(gen_method())
 
 
 def _generate_from_pattern(pattern: str, rng: random.Random) -> str:
@@ -459,7 +459,7 @@ def generate_column(
     preset = getattr(field, "preset", None)
     if preset is not None:
         # Use config country
-        locale_gen = _get_locale_generator(config.country, config.seed, config.weighted)
+        locale_gen = _get_locale_generator(cast(Any, config.country), config.seed, config.weighted)
 
     # Generate values
     if field.unique:
@@ -685,7 +685,7 @@ def _get_coherence_groups(fields: dict[str, Field]) -> dict[str | None, dict[str
     hand-written `customer_city` column joins the `"customer_"` profile). All remaining preset
     fields form the `None` group. Groups are ordered by their first column in the schema.
     """
-    prefixes = sorted(
+    prefixes: list[str] = sorted(
         {
             group
             for field in fields.values()
@@ -811,7 +811,9 @@ def _generate_single_country(
                 )
                 # Only replace if the bounds actually changed
                 if new_min != cur_min or new_max != cur_max:
-                    fields[col_name] = dc_replace(col_field, min_val=new_min, max_val=new_max)
+                    fields[col_name] = dc_replace(
+                        cast(Any, col_field), min_val=new_min, max_val=new_max
+                    )
 
     # Each coherence group (e.g., the `customer_` and `seller_` profiles) gets its own row
     # context. The first group uses the base seed, so a schema with a single group generates the
@@ -935,7 +937,7 @@ def _check_numeric_values(col_name: str, field: Field, values: list[Any]) -> Non
             if (
                 isinstance(value, bool)
                 or not isinstance(value, numbers.Integral)
-                or not min_val <= value <= max_val
+                or not min_val <= int(value) <= max_val
             ):
                 raise ValueError(
                     f"Column '{col_name}' has the dtype {field.dtype}, but it got the value "

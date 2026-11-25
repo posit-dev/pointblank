@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import narwhals as nw
 
@@ -280,7 +280,13 @@ class Schema:
     def __init__(
         self,
         columns: (
-            str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None
+            str
+            | list[str]
+            | list[tuple[str, str]]
+            | list[tuple[str]]
+            | list[tuple[str] | tuple[str, Any]]
+            | dict[str, str]
+            | None
         ) = None,
         tbl: Any | None = None,
         **kwargs,
@@ -392,7 +398,7 @@ class Schema:
         # Build Schema with Field objects as column values
         instance = cls.__new__(cls)
         instance.tbl = None
-        instance.columns = [(name, field_obj) for name, field_obj in field_tuples]
+        instance.columns = cast("Any", [(name, field_obj) for name, field_obj in field_tuples])
         return instance
 
     def _validate_schema_inputs(self) -> None:
@@ -409,27 +415,28 @@ class Schema:
         # Collect column names and dtypes from the DataFrame and store as a list of tuples
         if _is_narwhals_table(self.tbl):
             if _is_lazy_frame(data=self.tbl):
-                schema_dict = dict(self.tbl.collect_schema())
+                schema_dict = dict(cast("Any", self.tbl).collect_schema())
             else:
-                schema_dict = dict(self.tbl.schema.items())
+                schema_dict = dict(cast("Any", self.tbl).schema.items())
             schema_dict = {k: str(v) for k, v in schema_dict.items()}
             self.columns = list(schema_dict.items())
 
         elif table_type == "pandas":
-            schema_dict = dict(self.tbl.dtypes)
+            schema_dict = dict(cast("Any", self.tbl).dtypes)
             schema_dict = {k: str(v) for k, v in schema_dict.items()}
             self.columns = list(schema_dict.items())
 
         elif table_type == "polars":
             if _is_lazy_frame(data=self.tbl):
-                schema_dict = dict(self.tbl.collect_schema())
+                schema_dict = dict(cast("Any", self.tbl).collect_schema())
             else:
-                schema_dict = dict(self.tbl.schema.items())
+                schema_dict = dict(cast("Any", self.tbl).schema.items())
             schema_dict = {k: str(v) for k, v in schema_dict.items()}
             self.columns = list(schema_dict.items())
 
         elif table_type == "pyspark":  # pragma: no cover
             # Convert PySpark DataFrame to Narwhals to get schema
+            # pyrefly: ignore[no-matching-overload]  # `self.tbl` is a PySpark DataFrame in this branch
             nw_df = nw.from_native(self.tbl)  # pragma: no cover
             if _is_lazy_frame(data=nw_df):  # pragma: no cover
                 schema_dict = dict(nw_df.collect_schema())  # pragma: no cover
@@ -439,7 +446,7 @@ class Schema:
             self.columns = list(schema_dict.items())  # pragma: no cover
 
         elif table_type in IBIS_BACKENDS:
-            schema_dict = dict(self.tbl.schema().items())
+            schema_dict = dict(cast("Any", self.tbl).schema().items())
             schema_dict = {k: str(v) for k, v in schema_dict.items()}
             self.columns = list(schema_dict.items())
 
@@ -832,6 +839,7 @@ def _process_columns(
     | list[str]
     | list[tuple[str, str]]
     | list[tuple[str]]
+    | list[tuple[str] | tuple[str, Any]]
     | dict[str, str]
     | None = None,
     **kwargs,

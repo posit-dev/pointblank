@@ -16,7 +16,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any, cast, Sequence
 
 if TYPE_CHECKING:
     from great_tables import GT
@@ -1644,9 +1644,9 @@ class ConformanceReport:
         [`rules()`](`pointblank.ConformanceReport.rules`), as in `report.rules(status="fail")`.
         """
         if self.is_core:
-            return self.core.all_passed
+            return cast("ParsedCoreReport", self.core).all_passed
         if self.is_rules:
-            return self.native_result.all_passed
+            return cast("NativeConformanceResult", self.native_result).all_passed
         return all(v.all_passed() for v in self.validations.values())
 
     def __getitem__(self, name: str) -> Validate:
@@ -1773,7 +1773,7 @@ class ConformanceReport:
         variables or datasets.
         """
         if self.is_core:
-            core = self.core
+            core = cast("ParsedCoreReport", self.core)
             return {
                 "standard": core.standard,
                 "version": core.version,
@@ -1787,7 +1787,7 @@ class ConformanceReport:
             }
 
         if self.is_rules:
-            nr = self.native_result
+            nr = cast("NativeConformanceResult", self.native_result)
             return {
                 "standard": nr.standard,
                 "version": nr.version,
@@ -1890,13 +1890,15 @@ class ConformanceReport:
         threshold.
         """
         if self.is_rules:
-            return self.native_result.issues()
+            return cast("NativeConformanceResult", self.native_result).issues()
 
         if self.is_core:
             # Look up each rule's run status by rule id.
-            status_by_rule = {r.rule_id: r.status for r in self.core.rules}
+            status_by_rule = {
+                r.rule_id: r.status for r in cast("ParsedCoreReport", self.core).rules
+            }
             out: list[dict] = []
-            for item in self.core.issue_summary:
+            for item in cast("ParsedCoreReport", self.core).issue_summary:
                 item_status = status_by_rule.get(item.rule_id)
                 if status is not None and item_status != status:
                     continue
@@ -1992,9 +1994,9 @@ class ConformanceReport:
         a dataset is missing, so they have no failing records.
         """
         if self.is_core:
-            return list(self.core.findings)
+            return list(cast("ParsedCoreReport", self.core).findings)
         if self.is_rules:
-            return self.native_result.findings()
+            return cast("NativeConformanceResult", self.native_result).findings()
         return []
 
     def rules(self, status: str | None = None):
@@ -2057,10 +2059,10 @@ class ConformanceReport:
         """
         if self.is_core:
             if status is None:
-                return list(self.core.rules)
-            return [r for r in self.core.rules if r.status == status]
+                return list(cast("ParsedCoreReport", self.core).rules)
+            return [r for r in cast("ParsedCoreReport", self.core).rules if r.status == status]
         if self.is_rules:
-            return self.native_result.rules(status=status)
+            return cast("NativeConformanceResult", self.native_result).rules(status=status)
         return []
 
     @property
@@ -2093,7 +2095,7 @@ class ConformanceReport:
         the package doesn't have.
         """
         if self.is_core:
-            return len(self.core.datasets)
+            return len(cast("ParsedCoreReport", self.core).datasets)
         if self.is_rules and self.package is not None:
             return len(self.package.datasets)
         return len(self.validations)
@@ -2162,7 +2164,7 @@ class ConformanceReport:
         dest.parent.mkdir(parents=True, exist_ok=True)
 
         if self.is_core:
-            core = self.core
+            core = cast("ParsedCoreReport", self.core)
             data: dict = {
                 "Conformance_Details": core.details,
                 "Dataset_Details": core.datasets,
@@ -2301,7 +2303,7 @@ class ConformanceReport:
 
         with pd.ExcelWriter(dest, engine="openpyxl") as writer:
             if self.is_core:
-                core = self.core
+                core = cast("ParsedCoreReport", self.core)
                 if core.issue_summary:
                     pd.DataFrame(
                         [
@@ -2349,7 +2351,7 @@ class ConformanceReport:
                         [{"Key": k, "Value": v} for k, v in core.details.items()]
                     ).to_excel(writer, sheet_name="Conformance_Details", index=False)
             elif self.is_rules:
-                nr = self.native_result
+                nr = cast("NativeConformanceResult", self.native_result)
                 pd.DataFrame(
                     [
                         {
@@ -2458,7 +2460,7 @@ class ConformanceReport:
             )
 
         rows: list[dict] = []
-        for rule_result in self.native_result.rule_results:
+        for rule_result in cast("NativeConformanceResult", self.native_result).rule_results:
             for f in rule_result.row_findings:
                 rows.append(
                     {
@@ -2573,7 +2575,7 @@ class ConformanceReport:
         )
 
         # Build header matching the tabular conformance report style
-        nr = self.native_result
+        nr = cast("NativeConformanceResult", self.native_result)
         counts = nr.status_counts()
         _LABEL = {
             "pass": "passed",
@@ -2723,7 +2725,7 @@ class ConformanceReport:
                 "Use validate_conformance(engine='native') to obtain one."
             )
 
-        nr = self.native_result
+        nr = cast("NativeConformanceResult", self.native_result)
 
         _STATUS_COLORS = {
             "pass": "#4CA64C",
@@ -2892,7 +2894,7 @@ class ConformanceReport:
             return self.get_tabular_report()._repr_html_()
 
         if self.is_core:
-            core = self.core
+            core = cast("ParsedCoreReport", self.core)
             parts = [f"<h2>CDISC Conformance Report (CORE){agency}</h2>"]
             status = "PASS" if core.all_passed else "FAIL"
             parts.append(
@@ -2930,7 +2932,7 @@ class ConformanceReport:
 
     def __repr__(self) -> str:
         if self.is_rules:
-            nr = self.native_result
+            nr = cast("NativeConformanceResult", self.native_result)
             lines = ["ConformanceReport (Built-in Rules)"]
             if self.agency:
                 lines.append(f"  Agency: {self.agency}")
@@ -2943,7 +2945,7 @@ class ConformanceReport:
             return "\n".join(lines)
 
         if self.is_core:
-            core = self.core
+            core = cast("ParsedCoreReport", self.core)
             lines = ["ConformanceReport (CORE)"]
             if self.agency:
                 lines.append(f"  Agency: {self.agency}")

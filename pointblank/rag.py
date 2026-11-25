@@ -10,15 +10,14 @@ left out like any step of a validation.
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 from pointblank._text import check_bound
 from pointblank.steps import Steps
 
 if TYPE_CHECKING:
     from pointblank._typing import SegmentSpec
-    from pointblank.actions import Actions
-    from pointblank.thresholds import Thresholds
+    from pointblank.thresholds import Actions, Thresholds
 
 __all__ = ["corpus_checks", "eval_checks"]
 
@@ -248,6 +247,8 @@ def corpus_checks(
     check_bound(min_tokens, "min_tokens")
     check_bound(max_tokens, "max_tokens")
     threshold = _near_threshold(near_duplicates)
+    reference: Any = None
+    cutoff: Any = None
     if updated_at is not None:
         _check_column_name(updated_at, "updated_at")
         if max_age is None:
@@ -465,16 +466,18 @@ def eval_checks(
         )
     if corpus is not None:
         steps.col_vals_in_table(
-            columns=gold_doc_id,
+            # `gold_doc_id=` is required with `corpus=` (checked above)
+            columns=cast(str, gold_doc_id),
             ref_table=corpus,
-            ref_column=corpus_id or gold_doc_id,
+            ref_column=corpus_id or cast(str, gold_doc_id),
             brief="Every gold document is in the corpus.",
             **common,
         )
     if passage is not None:
         steps.col_vals_scored(
             columns=[query, passage],
-            scorer=scorer,
+            # `scorer=` is required with `passage=` (checked above)
+            scorer=cast(Callable[..., Any], scorer),
             min_val=min_relevance,
             brief=f"Every passage in `{passage}` is relevant to its query.",
             **common,

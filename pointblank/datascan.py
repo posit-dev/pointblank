@@ -495,11 +495,14 @@ class DataScan:
                     cells.append(_fmt_date_bound(val))
                 elif isinstance(val, numbers.Number):
                     cells.append(
-                        fmt_number(
-                            val,
-                            decimals=2,
-                            drop_trailing_zeros=True,
-                            drop_trailing_dec_mark=True,
+                        cast(
+                            list[str],
+                            fmt_number(
+                                val,
+                                decimals=2,
+                                drop_trailing_zeros=True,
+                                drop_trailing_dec_mark=True,
+                            ),
                         )[0]
                     )
                 else:
@@ -1439,7 +1442,7 @@ def _extract_numeric_values(scan: DataScan, colname: str) -> list[float] | None:
         return None
 
     try:
-        col = scan.nw_data.get_column(colname)
+        col = cast(Any, scan.nw_data).get_column(colname)
         vals = col.drop_nulls().to_list()
         return [float(v) for v in vals if v is not None]
     except Exception:
@@ -1450,13 +1453,13 @@ def _extract_categorical_freqs(scan: DataScan, colname: str) -> dict[str, int] |
     """Extract value frequency counts from a scan's raw data."""
     if scan.nw_data is None:
         stats = {s.name: s.val for s in _get_col_profile(scan, colname).statistics}
-        freqs = stats.get("freqs")
-        if isinstance(freqs, dict):
-            return freqs
+        stat_freqs: Any = stats.get("freqs")
+        if isinstance(stat_freqs, dict):
+            return stat_freqs
         return None
 
     try:
-        col = scan.nw_data.get_column(colname).drop_nulls()
+        col = cast(Any, scan.nw_data).get_column(colname).drop_nulls()
         vals = col.to_list()
         freqs: dict[str, int] = {}
         for v in vals:
@@ -2014,7 +2017,9 @@ class DataScanDiff:
                 type_baseline="Type (Baseline)",
                 type_current="Type (Current)",
                 stat_changes="Changed Statistics",
-                **({"drift": "Drift Scores"} if has_any_drift else {}),
+                # The extra label is passed as Any: pyrefly matches an unpacked dict's values to
+                # the `cases=` parameter of `cols_label()`, which the labels never are
+                **cast(Any, {"drift": "Drift Scores"} if has_any_drift else {}),
             )
             .opt_table_font(font=google_font("IBM Plex Sans"))
             .opt_align_table_header(align="left")

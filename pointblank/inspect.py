@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 
 def has_columns(*columns: str | list[str]) -> Callable[[Any], bool]:
@@ -134,16 +134,16 @@ def has_columns(*columns: str | list[str]) -> Callable[[Any], bool]:
 
         if not result:
             missing = sorted(col for col in columns if col not in tbl_columns)
-            _check._reason = {
+            cast(Any, _check)._reason = {
                 "key": "active_check_missing_columns",
                 "params": {"columns": missing},
             }
         else:
-            _check._reason = None
+            cast(Any, _check)._reason = None
 
         return result
 
-    _check._reason = None
+    cast(Any, _check)._reason = None
     return _check
 
 
@@ -319,8 +319,8 @@ def has_rows(
                     "params": {},
                 }
 
-        _check._reason = reason
+        cast(Any, _check)._reason = reason
         return result
 
-    _check._reason = None
+    cast(Any, _check)._reason = None
     return _check

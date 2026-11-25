@@ -11,7 +11,7 @@ import sys
 import textwrap
 from collections import defaultdict
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Collection
+from typing import TYPE_CHECKING, Any, Collection, cast
 
 import narwhals as nw
 from great_tables import GT
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
     from narwhals.dtypes import DType
-    from narwhals.typing import IntoFrame, IntoFrameT
+    from narwhals.typing import Frame, IntoFrame, IntoFrameT
 
     from pointblank._typing import AbsoluteBounds, Tolerance
 
@@ -49,7 +49,7 @@ def transpose_dicts(list_of_dicts: list[dict[str, Any]]) -> dict[str, list[Any]]
 
 
 # TODO: doctest
-def _derive_single_bound(ref: int, tol: int | float, integer: bool = True) -> int | float:
+def _derive_single_bound(ref: int | float, tol: int | float, integer: bool = True) -> int | float:
     """Derive a single bound using the reference.
 
     A `tol` below `1` is relative to `ref`; otherwise it's an absolute amount. With
@@ -67,15 +67,17 @@ def _derive_single_bound(ref: int, tol: int | float, integer: bool = True) -> in
 
 
 # TODO: doctest
-def _derive_bounds(ref: int, tol: Tolerance, integer: bool = True) -> AbsoluteBounds:
+def _derive_bounds(ref: int | float, tol: Tolerance, integer: bool = True) -> AbsoluteBounds:
     """Validate and extract the absolute bounds of the tolerance."""
     if isinstance(tol, tuple):
+        # pyrefly: ignore[bad-return]  # float bounds when integer=False (AbsoluteBounds is the integer form)
         return (
             _derive_single_bound(ref, tol[0], integer=integer),
             _derive_single_bound(ref, tol[1], integer=integer),
         )
 
     bound = _derive_single_bound(ref, tol, integer=integer)
+    # pyrefly: ignore[bad-return]  # float bounds when integer=False (AbsoluteBounds is the integer form)
     return bound, bound
 
 
@@ -317,7 +319,7 @@ def _copy_dataframe(df: IntoFrameT) -> IntoFrameT:
 
 
 # TODO: Should straight up remove this
-def _convert_to_narwhals(df: IntoFrame) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
+def _convert_to_narwhals(df: IntoFrame | Frame) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
     # Convert the DataFrame to a format that narwhals can work with
     result = nw.from_native(df)
     assert is_narwhals_dataframe(result) or is_narwhals_lazyframe(result)
@@ -516,7 +518,8 @@ def _count_true_values_in_column(
     if is_narwhals_lazyframe(tbl_filtered):
         return int(tbl_filtered.select(nw.len()).collect().item())
 
-    return len(tbl_filtered)
+    # Not a LazyFrame (checked above), so it's a DataFrame
+    return len(cast(nw.DataFrame[Any], tbl_filtered))
 
 
 def _count_null_values_in_column(
@@ -549,7 +552,7 @@ def _count_null_values_in_column(
 
     if is_narwhals_lazyframe(result):
         return int(result.collect().item())
-    return int(result.item())
+    return int(cast(Any, result).item())
 
 
 def _count_validation_units(
@@ -597,7 +600,7 @@ def _count_validation_units(
     if is_narwhals_lazyframe(result):
         result = result.collect()
 
-    row = result.rows(named=True)[0]
+    row = cast(Any, result).rows(named=True)[0]
 
     n = int(row["n"])
     n_passed = int(row["n_passed"] or 0)
@@ -801,7 +804,7 @@ def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
 
     # If `columns` is Column value or a string, place it in a list for iteration
     if isinstance(columns, (Column, str)):
-        columns: list[Column] | list[str] = [columns]
+        return cast("list[Column] | list[str]", [columns])
 
     return columns
 
@@ -815,6 +818,8 @@ def _resolve_columns_subset(
         return col(columns_subset)
     if isinstance(columns_subset, str):
         return [columns_subset]
+    # (a collection of names is passed through as given, so it can be a tuple or another collection)
+    # pyrefly: ignore[bad-return]  # a collection of names is passed through as given
     return columns_subset
 
 
@@ -962,7 +967,7 @@ def _get_caller_arg_source(method_name: str, arg_name: str, arg_index: int = 0) 
 
     try:
         # The frame of the code that called the method that called this function
-        caller = frame.f_back.f_back
+        caller = cast(Any, frame).f_back.f_back
 
         if caller.f_globals.get("__name__", "").split(".")[0] == "pointblank":
             return None
@@ -1014,9 +1019,9 @@ def _get_caller_arg_source(method_name: str, arg_name: str, arg_index: int = 0) 
         arg_source = _get_source_span(
             source=source,
             start=start,
-            end=end,
+            end=cast(tuple[int, int], end),
             # Parentheses beyond the end of the method name belong to the call itself
-            limit=(call.func.end_lineno, call.func.end_col_offset),
+            limit=cast(tuple[int, int], (call.func.end_lineno, call.func.end_col_offset)),
             expand_parens=not keywords,
         )
 

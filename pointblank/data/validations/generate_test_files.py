@@ -11,6 +11,8 @@ import sys
 from pathlib import Path
 
 import polars as pl
+
+# pyrefly: ignore[missing-import]  # sibling script module, not an installed package
 from preprocessing_functions import (
     add_computed_column,
     complex_preprocessing,

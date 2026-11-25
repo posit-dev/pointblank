@@ -16,7 +16,7 @@ import statistics
 import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 import narwhals as nw
 
@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from great_tables import GT
 
     from pointblank.thresholds import Thresholds
-    from pointblank.validate import Validate
+    from pointblank.validate import Validate, _ValidationInfo
 
 __all__ = [
     "Ablation",
@@ -346,6 +346,8 @@ class _Spec:
     @property
     def base(self) -> tuple[int, ...]:
         """For a `drop_all_but_each()` variant, all the steps (including the one left out)."""
+        if self.left_out is None:
+            return tuple(sorted(self.steps))
         return tuple(sorted((*self.steps, self.left_out)))
 
 
@@ -924,7 +926,9 @@ class Ablation:
             self._holdout_n_rows = get_row_count(self.holdout_validation.data)
 
         self._n_rows = get_row_count(validation.data)
-        self._steps = {step.i: step for step in steps}
+        self._steps: dict[int, _ValidationInfo] = {
+            step.i: step for step in steps if step.i is not None
+        }
         self._skipped = dict(skipped)
         self._pass_variant = evaluate is not None and _accepts_keyword(evaluate, "variant")
 
@@ -1057,21 +1061,23 @@ class Ablation:
         Ablation.drop_each : Remove the rows failing each step, one step at a time.
         Ablation.drop_all : Remove the rows failing any step.
         """
-        steps = self._check_steps(steps, method="drop_steps")
+        checked = self._check_steps(steps, method="drop_steps")
         text = None
         if name is None:
             text = (
-                msg("abl_name_step", i=str(steps[0]))
-                if len(steps) == 1
-                else msg("abl_name_steps", steps=steps)
+                msg("abl_name_step", i=str(checked[0]))
+                if len(checked) == 1
+                else msg("abl_name_steps", steps=checked)
             )
             name = ENGLISH.r(text)
-            spec_id = "steps_" + "_".join(str(i) for i in steps)
+            spec_id = "steps_" + "_".join(str(i) for i in checked)
         else:
             if not isinstance(name, str) or not name:
                 raise TypeError("`name=` must be a non-empty string.")
             spec_id = name
-        self._add_spec(_Spec(id=spec_id, name=name, strategy="drop_steps", steps=steps, text=text))
+        self._add_spec(
+            _Spec(id=spec_id, name=name, strategy="drop_steps", steps=checked, text=text)
+        )
         return self
 
     def drop_each(self, steps: int | list[int] | None = None) -> Ablation:
@@ -1157,10 +1163,10 @@ class Ablation:
         Ablation.shapley : Share the effect of the validation among its steps.
         """
         if steps is None:
-            steps = self._all_steps(method="drop_each")
+            resolved_steps = self._all_steps(method="drop_each")
         else:
-            steps = self._check_steps(steps, method="drop_each")
-        for i in steps:
+            resolved_steps = self._check_steps(steps, method="drop_each")
+        for i in resolved_steps:
             self._add_spec(
                 _named(
                     msg("abl_name_step", i=str(i)), id=f"step_{i}", strategy="drop_each", steps=(i,)
@@ -1252,15 +1258,17 @@ class Ablation:
         Ablation.drop_steps : Remove the rows failing any of the given steps.
         """
         if steps is None:
-            steps = self._all_steps(method="drop_all")
-            spec = _named(msg("abl_name_all_steps"), id="all", strategy="drop_all", steps=steps)
-        else:
-            steps = self._check_steps(steps, method="drop_all")
+            resolved_steps = self._all_steps(method="drop_all")
             spec = _named(
-                msg("abl_name_all_of_steps", steps=steps),
-                id="all_" + "_".join(str(i) for i in steps),
+                msg("abl_name_all_steps"), id="all", strategy="drop_all", steps=resolved_steps
+            )
+        else:
+            resolved_steps = self._check_steps(steps, method="drop_all")
+            spec = _named(
+                msg("abl_name_all_of_steps", steps=resolved_steps),
+                id="all_" + "_".join(str(i) for i in resolved_steps),
                 strategy="drop_all",
-                steps=steps,
+                steps=resolved_steps,
             )
         self._add_spec(spec)
         return self
@@ -1637,7 +1645,7 @@ class Ablation:
             base_id, base_name = f"step_{score}", msg("abl_name_step", i=str(score))
             missing_label = msg("abl_note_no_score_step", step=str(score))
             if remove is None:
-                bounds = step.values or {}
+                bounds = step.values if isinstance(step.values, dict) else {}
                 only_max = bounds.get("min_val") is None and bounds.get("max_val") is not None
                 remove = "highest" if only_max else "lowest"
 
@@ -1668,7 +1676,7 @@ class Ablation:
                 "percent": True,
             }
             ranked = sorted(scores.items(), key=lambda kv: (-kv[1] if highest else kv[1], kv[0]))
-            for q in quantiles:
+            for q in cast(list[float], quantiles):
                 n = math.floor(q * n_scored + 0.5)
                 spec_id = f"{sweep_id}_{_number_text(q)}"
                 self._sweep_rows[spec_id] = frozenset(k for k, _ in ranked[:n])
@@ -1998,7 +2006,9 @@ class Ablation:
             )
         if name is not None and (not isinstance(name, str) or not name):
             raise TypeError("`name=` must be a non-empty string.")
-        label = name or (_function_name(corruption) if kind == "function" else kind)
+        label = name or (
+            _function_name(cast(Callable[..., Any], corruption)) if kind == "function" else kind
+        )
 
         if step is not None:
             if not _is_int(step):
@@ -2048,8 +2058,8 @@ class Ablation:
         frame = _with_row_index(self.validation.data, name=_INDEX)
         dtype = None
         if kind != "duplicate":
-            frame = frame.select(_INDEX, column)
-            dtype = frame.collect_schema()[column]
+            frame = frame.select(_INDEX, cast(str, column))
+            dtype = frame.collect_schema()[cast(str, column)]
             if kind == "truncate" and dtype != nw.String:
                 raise TypeError(
                     f'`corruption="truncate"` needs a text column, but {column!r} is {dtype}.'
@@ -2059,7 +2069,7 @@ class Ablation:
         if isinstance(frame, nw.LazyFrame):
             frame = frame.collect()
         rows = [int(k) for k in frame[_INDEX].to_list()]
-        values = dict(zip(rows, frame[column].to_list())) if kind != "duplicate" else {}
+        values = dict(zip(rows, frame[cast(str, column)].to_list())) if kind != "duplicate" else {}
 
         # The clean rows: those that fail none of the steps (and have a value to corrupt)
         dirty = frozenset().union(*self._failed_rows(sorted(self._steps)).values())
@@ -2105,7 +2115,7 @@ class Ablation:
             chosen = pool[:n]
             new_values = _corrupted_values(kind, corruption, [values.get(k) for k in chosen])
             if new_values:
-                _check_corrupted_values(new_values, column, dtype, implementation, kind)
+                _check_corrupted_values(new_values, cast(str, column), dtype, implementation, kind)
             pairs = sorted(zip(chosen, new_values or [None] * n), key=lambda pair: pair[0])
             injection = _Injection(
                 kind=kind,
@@ -2320,15 +2330,15 @@ class Ablation:
     def _check_sweep_values(self, values: Any, arg: str) -> list[float]:
         if not isinstance(values, (list, tuple, range)):
             raise TypeError(f"`{arg}=` must be a list of numbers, got {type(values).__name__}.")
-        values = list(values)
-        if not values:
+        items: list[float] = list(values)
+        if not items:
             raise ValueError(f"`{arg}=` must have at least one value.")
-        for v in values:
+        for v in items:
             if not _is_number(v) or not math.isfinite(float(v)):
                 raise TypeError(f"The values of `{arg}=` must be finite numbers, got {v!r}.")
-        if len(set(values)) != len(values):
+        if len(set(items)) != len(items):
             raise ValueError(f"The values of `{arg}=` must be different from each other.")
-        return values
+        return items
 
     def _step_scores(self, i: int) -> dict[int, float]:
         """The scores of a `col_vals_scored()` step, by row number (rows with no score left out)."""
@@ -2721,7 +2731,7 @@ class Ablation:
     def _strata_rows(self) -> list[list[int]]:
         """The numbers of the rows in each group of a `Stratified` control."""
         if self._strata is None:
-            by = list(self.control.by)
+            by = list(cast(Any, self.control).by)
             frame = _with_row_index(self.validation.data, name=_INDEX).select(_INDEX, *by)
             if isinstance(frame, nw.LazyFrame):
                 frame = frame.collect()
@@ -2744,7 +2754,7 @@ class Ablation:
         always, n_random, key = self._resolve().control_draws[control_id]
         stratified = isinstance(self.control, Stratified)
         if stratified:
-            key = f"stratified:{json.dumps(list(self.control.by))}:{key}"
+            key = f"stratified:{json.dumps(list(cast(Any, self.control).by))}:{key}"
         rng = random.Random(f"pointblank-ablation:{self.seed}:{repeat}:{key}")
 
         if stratified:
@@ -2865,6 +2875,8 @@ class Ablation:
 
     def _cache_get(self, key: str) -> Any:
         """The result of an evaluation in the cache (`None` if it isn't there)."""
+        if self.cache is None:
+            return None
         try:
             with open(self.cache / f"{key}.json", encoding="utf-8") as f:
                 entry = json.load(f)
@@ -2877,7 +2889,10 @@ class Ablation:
     def _cache_put(self, key: str, result: Any, variant: AblationVariant, seed: int) -> None:
         import tempfile
 
-        self.cache.mkdir(parents=True, exist_ok=True)
+        cache = self.cache
+        if cache is None:
+            raise RuntimeError("The evaluation cache isn't set.")
+        cache.mkdir(parents=True, exist_ok=True)
         entry = {
             "result": result,
             "variant": variant.id,
@@ -2885,11 +2900,11 @@ class Ablation:
             "evaluate_version": self.evaluate_version,
         }
         # Write to a temporary file first, so that an interrupted run never leaves a partial entry
-        fd, tmp = tempfile.mkstemp(dir=self.cache, prefix=f".{key}.", suffix=".tmp")
+        fd, tmp = tempfile.mkstemp(dir=cache, prefix=f".{key}.", suffix=".tmp")
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as f:
                 json.dump(entry, f)
-            os.replace(tmp, self.cache / f"{key}.json")
+            os.replace(tmp, cache / f"{key}.json")
         except BaseException:
             Path(tmp).unlink(missing_ok=True)
             raise
@@ -3798,7 +3813,8 @@ class Ablation:
         kwargs: dict[str, Any] = {"seed": seed}
         if self._pass_variant:
             kwargs["variant"] = variant
-        return self.evaluate(self._training_input(variant, removed), **kwargs)
+        evaluate = cast(Callable[..., Any], self.evaluate)
+        return evaluate(self._training_input(variant, removed), **kwargs)
 
     def _training_input(self, variant: AblationVariant, removed: frozenset[int]) -> Any:
         """What `evaluate=` is given: the training table, or the numbers of its kept rows."""
@@ -3856,11 +3872,12 @@ class Ablation:
 
         if executor == "process":
             # Not forked: forking a process that uses threads (as Polars does) can deadlock
+            initargs: tuple[Any, ...] = (self.evaluate,)
             pool: Any = ProcessPoolExecutor(
                 max_workers=max_workers,
                 mp_context=multiprocessing.get_context("spawn"),
                 initializer=_set_worker_evaluate,
-                initargs=(self.evaluate,),
+                initargs=initargs,
             )
         else:
             pool = ThreadPoolExecutor(max_workers=max_workers)
@@ -4059,7 +4076,7 @@ class Ablation:
         def series(version_id: str, metric: str) -> list[float]:
             return [self._values[(version_id, r)][metric] for r in repeats]
 
-        for metric in self._metrics:
+        for metric in cast(list[str], self._metrics):
             full = series("full", metric)
             rows.append(
                 _effect_row(
@@ -4155,6 +4172,8 @@ class Ablation:
         """The Shapley value of each step of `shapley()`, for each metric."""
         resolved = self._resolve()
         info = self._shapley
+        if info is None:
+            raise RuntimeError("The Shapley values weren't requested.")
         players = info["steps"]
         k = len(players)
         repeats = range(self.repeats)
@@ -4164,14 +4183,14 @@ class Ablation:
         ]
         rows = []
         self._shapley_total = {}
-        for metric in self._metrics:
+        for metric in cast(list[str], self._metrics):
             full = [self._values[("full", r)][metric] for r in repeats]
             per_repeat: dict[int, list[float]] = {i: [] for i in players}
             totals = []
             for r in repeats:
                 # The value of each group of steps: its effect in this repeat
                 value: dict[tuple[int, ...], float] = {(): 0.0}
-                for coalition, variant_id in resolved.shapley.items():
+                for coalition, variant_id in cast(Any, resolved.shapley).items():
                     control_id = resolved.variant_control.get(variant_id)
                     reference = self._values[(control_id, r)][metric] if control_id else full[r]
                     value[coalition] = self._values[(variant_id, r)][metric] - reference
@@ -4195,7 +4214,7 @@ class Ablation:
                     per_repeat[i].append(phi)
             self._shapley_total[metric] = statistics.fmean(totals)
 
-            family = []
+            family: list[dict[str, Any]] = []
             for i in players:
                 mean, lower, upper, p = _paired(
                     per_repeat[i], [0.0] * self.repeats, self.conf_level, self._bootstrap()
@@ -4327,7 +4346,11 @@ class Ablation:
                     )
 
         ctx = report_localizer(None, None, default=target)
-        effects = [row for row in self._effects if row["metric"] == self._primary]
+        effects = [
+            row
+            for row in cast(list[dict[str, Any]], self._effects)
+            if row["metric"] == self._primary
+        ]
         fmt = _NumberFormat([row["mean"] for row in effects], ctx)
         alone = {}
         on_top: dict[int, list[dict[str, Any]]] = {}
@@ -4497,7 +4520,7 @@ class Ablation:
         Ablation.get_shapley : Get the Shapley values of the steps as a table.
         """
         self._check_run()
-        rows = self._effects
+        rows = cast(list[dict[str, Any]], self._effects)
         lib = _select_df_lib(preference="polars")
 
         if lib.__name__ == "polars":
@@ -4735,7 +4758,7 @@ class Ablation:
             raise ValueError(f"`tolerance=` must be greater than 0, got {tolerance!r}.")
         effects = {
             row["variant"]: row
-            for row in self._effects
+            for row in cast(list[dict[str, Any]], self._effects)
             if row["metric"] == self._primary and row["strategy"] == "inject"
         }
         by_sweep: dict[str, list[dict[str, Any]]] = {}
@@ -4752,6 +4775,8 @@ class Ablation:
         skipped: dict[int, list[str]] = {}
         for sweep_id, points in by_sweep.items():
             step = self._injections[points[0]["variant"]].step
+            if step is None:  # pragma: no cover (`by_sweep` has only variants with a step)
+                continue
             label = ENGLISH.r(self._sweeps[sweep_id]["label"])
             shares = [self._caught_share(row["variant"]) for row in points]
             harms = [
@@ -4760,7 +4785,7 @@ class Ablation:
             ]
             used = [(x, d) for x, d in zip(shares, harms) if x > 0]
             reason = None
-            cost = None
+            cost: float = 0.0
             if not used:
                 reason = f"the {label} make none of its test units fail"
             else:
@@ -4807,6 +4832,8 @@ class Ablation:
         from pointblank.validate import Validate, _validation_info_to_step
 
         injection = self._injections[variant_id]
+        if injection.step is None:  # pragma: no cover (inject variants have a step)
+            raise RuntimeError("The injected variant has no step.")
         info = self._steps[injection.step]
         found = _validation_info_to_step(info, None, None, [], keep_objects=True)
         if found is None:  # pragma: no cover
@@ -4906,7 +4933,10 @@ class Ablation:
             "variants": [v._to_dict() for v in self._versions(resolved)],
             "same_as": dict(resolved.same_as),
             "runs": [{**run, "metrics": dict(run["metrics"])} for run in self._runs],
-            "effects": [{**row, "steps": list(row["steps"])} for row in self._effects],
+            "effects": [
+                {**row, "steps": list(row["steps"])}
+                for row in cast(list[dict[str, Any]], self._effects)
+            ],
             "shapley": (
                 [dict(row) for row in self._shapley_values]
                 if self._shapley_values is not None
@@ -5107,15 +5137,19 @@ class Ablation:
         self._check_run()
         if metric is None:
             metric = self._primary
-        elif metric not in self._metrics:
+        elif metric not in cast(list[str], self._metrics):
             raise ValueError(
                 f"There's no metric {metric!r} in the results (the metrics are "
-                f"{', '.join(map(repr, self._metrics))})."
+                f"{', '.join(map(repr, cast(list[str], self._metrics)))})."
             )
+        # `_check_run()` guarantees the metrics and the primary metric have been set
+        metric = cast(str, metric)
 
         # The groups of steps of `shapley()` are shown through the Shapley values
         effects = [
-            row for row in self._effects if row["metric"] == metric and row["strategy"] != "shapley"
+            row
+            for row in cast(list[dict[str, Any]], self._effects)
+            if row["metric"] == metric and row["strategy"] != "shapley"
         ]
         baseline, variant_rows = effects[0], effects[1:]
         has_left_out = any(row["left_out"] is not None for row in variant_rows)
@@ -5336,13 +5370,15 @@ class Ablation:
     def _group_order(self, variant: AblationVariant) -> tuple[int, float]:
         """Where a variant is listed in the plan and the report: by its group, then its value."""
         if variant.sweep is not None:
+            if variant.value is None:
+                raise ValueError("A sweep variant needs the value of its sweep point.")
             return (2 + list(self._sweeps).index(variant.sweep), variant.value)
         if variant.strategy == "shapley":
             return (2 + len(self._sweeps), float(len(variant.steps)))
         return (int(variant.left_out is not None), 0.0)
 
     def _group_label(self, variant: AblationVariant, ctx: Localizer = ENGLISH) -> str:
-        if variant.strategy == "inject":
+        if variant.strategy == "inject" and variant.sweep is not None:
             return ctx.t("abl_group_injected", label=self._sweeps[variant.sweep]["label"])
         if variant.sweep is not None:
             return ctx.t("abl_group_sweep", label=self._sweeps[variant.sweep]["label"])
@@ -5354,6 +5390,8 @@ class Ablation:
 
     def _shapley_note(self, total: str, ctx: Localizer = ENGLISH) -> str:
         info = self._shapley
+        if info is None:
+            raise RuntimeError("The Shapley values weren't requested.")
         k = len(info["steps"])
         if info["exact"]:
             how = ctx.t("abl_shapley_exact", k=k)
@@ -6120,7 +6158,7 @@ def _apply_injection(frame: Any, injection: _Injection) -> Any:
     rows = list(injection.rows)
     if injection.kind == "duplicate":
         return nw.concat([frame, frame.filter(nw.col(_INDEX).is_in(rows))])
-    column = injection.column
+    column = cast(str, injection.column)  # only "duplicate" injections lack a column, handled above
     if injection.kind == "null":
         return frame.with_columns(
             nw.when(~nw.col(_INDEX).is_in(rows)).then(nw.col(column)).alias(column)
@@ -6178,7 +6216,7 @@ def _worker_evaluate(train: Any, seed: int, variant: AblationVariant | None) -> 
     kwargs: dict[str, Any] = {"seed": seed}
     if variant is not None:
         kwargs["variant"] = variant
-    return _WORKER_EVALUATE(train, **kwargs)
+    return cast(Callable[..., Any], _WORKER_EVALUATE)(train, **kwargs)
 
 
 def _unique_slugs(ids: Any) -> dict[str, str]:
@@ -6515,7 +6553,7 @@ def sklearn_evaluator(
         holdout=holdout_nw.to_native(),
         target=target,
         features=features,
-        kinds={c: _feature_kind(schema[c]) for c in features},
+        kinds={c: cast(str, _feature_kind(schema[c])) for c in features},
         estimator=estimator,
         task=task,
         scoring=scoring,

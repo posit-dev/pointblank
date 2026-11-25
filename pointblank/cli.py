@@ -4,7 +4,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, cast, Literal
 
 import click
 from rich.console import Console
@@ -97,7 +97,7 @@ def _load_data_source(data_source: str) -> Any:
 
 def _is_piped_data_source(data_source: str) -> bool:
     """Check if the data source is from a piped pb command."""
-    return (
+    return bool(
         data_source
         and ("pb_pipe_" in data_source)
         and (data_source.startswith("/var/folders/") or data_source.startswith("/tmp/"))
@@ -1434,8 +1434,6 @@ def preview(
     Tables with >15 columns automatically show first 7 and last 7 columns with indicators.
     """
     try:
-        import sys
-
         # Handle piped input
         if data_source is None:
             if not sys.stdin.isatty():  # pragma: no cover
@@ -1671,7 +1669,6 @@ def scan(
     - Piped data from pb pl command
     """
     try:
-        import sys
         import time
 
         start_time = time.time()
@@ -1708,6 +1705,7 @@ def scan(
             # Check if this is a piped data source and create friendly display name
             is_piped_data = _is_piped_data_source(data_source)
 
+            display_source = data_source
             if is_piped_data:
                 if data_source.endswith(".parquet"):
                     display_source = "Parquet file via `pb pl`"
@@ -1806,8 +1804,6 @@ def missing(data_source: str | None, output_html: str | None) -> None:
     - Piped data from pb pl command
     """
     try:
-        import sys
-
         # Handle piped input
         if data_source is None:
             if not sys.stdin.isatty():  # pragma: no cover
@@ -2036,8 +2032,6 @@ def validate(
     pb validate data.csv --check rows-distinct --check rows-complete
     """
     try:
-        import sys
-
         # Handle --list-checks option early (doesn't need data source)
         if list_checks:
             console.print("[bold bright_cyan]Available Validation Checks:[/bold bright_cyan]")
@@ -2089,7 +2083,6 @@ def validate(
             console.print(
                 "  [bright_blue]pb validate data.csv --check col-vals-gt --column age --value 18[/bright_blue]"
             )
-            import sys
 
             sys.exit(0)
 
@@ -2123,7 +2116,6 @@ def validate(
                 return
 
         # Handle backward compatibility and parameter conversion
-        import sys
 
         # Convert parameter tuples to lists, handling default case
         if not checks:
@@ -2260,9 +2252,10 @@ def validate(
             # Add each check to the validation chain
             for i, check in enumerate(checks_list):
                 # Get corresponding mapped parameters for this check
-                column = mapped_columns[i] if i < len(mapped_columns) else None
+                # A missing parameter is None here, which the validation step reports
+                column: Any = mapped_columns[i] if i < len(mapped_columns) else None
                 set_val = mapped_sets[i] if i < len(mapped_sets) else None
-                value = mapped_values[i] if i < len(mapped_values) else None
+                value: Any = mapped_values[i] if i < len(mapped_values) else None
 
                 if check == "rows-distinct":
                     validation = validation.rows_distinct()
@@ -2274,7 +2267,7 @@ def validate(
                     validation = validation.col_exists(columns=column)
                 elif check == "col-vals-in-set":
                     # Parse the comma-separated set values
-                    allowed_values = [v.strip() for v in set_val.split(",")]
+                    allowed_values = [v.strip() for v in cast(str, set_val).split(",")]
                     validation = validation.col_vals_in_set(columns=column, set=allowed_values)
                 elif check == "col-vals-gt":
                     validation = validation.col_vals_gt(columns=column, value=value)
@@ -2379,7 +2372,6 @@ def validate(
         # Exit with appropriate code if requested
         if exit_code and not all_passed:
             console.print("[dim]Exiting with non-zero code due to validation failure[/dim]")
-            import sys
 
             sys.exit(1)
 
@@ -2777,8 +2769,8 @@ def compare(
     tolerance: tuple[str, ...],
     normalize: tuple[str, ...],
     null_unequal: bool,
-    schema: str,
-    dup_keys: str,
+    schema: Literal["strict", "common"],
+    dup_keys: Literal["flag", "compare"],
     order_by: str | None,
     partitions: int | None,
     engine: str,
@@ -3620,7 +3612,7 @@ def _rich_print_missing_table(gt_table: Any, original_data: Any = None) -> None:
 
 def _map_parameters_to_checks(
     checks_list: list[str], columns_list: list[str], sets_list: list[str], values_list: list[float]
-) -> tuple[list[str], list[str], list[float]]:
+) -> tuple[list[str | None], list[str | None], list[float | None]]:
     """
     Map parameters to checks intelligently, handling flexible parameter ordering.
 
@@ -3637,9 +3629,9 @@ def _map_parameters_to_checks(
         Tuple of (mapped_columns, mapped_sets, mapped_values) where each list
         has the same length as checks_list
     """
-    mapped_columns = []
-    mapped_sets = []
-    mapped_values = []
+    mapped_columns: list[str | None] = []
+    mapped_sets: list[str | None] = []
+    mapped_values: list[float | None] = []
 
     # Keep track of which parameters we've used
     column_index = 0
@@ -3732,9 +3724,9 @@ def _not_evaluated_message(check: str, source: str) -> str:
 def _display_validation_result(
     validation: Any,
     checks_list: list[str],
-    columns_list: list[str],
-    sets_list: list[str],
-    values_list: list[float],
+    columns_list: list[str | None],
+    sets_list: list[str | None],
+    values_list: list[float | None],
     data_source: str,
     step_index: int,
     total_checks: int,
@@ -4791,7 +4783,7 @@ def run(
                 console.print(f"[green]✓[/green] Loaded data override: {data}")
 
         # Process based on file type
-        validations = []
+        validations: list[Any] = []
 
         if is_yaml_file:
             # Handle YAML configuration file
@@ -5806,7 +5798,6 @@ def _handle_pl_info(result: Any, expression: str, output_html: str | None) -> No
 def _handle_pl_pipe(result: Any, pipe_format: str) -> None:
     """Handle piped output from Polars results."""
     try:
-        import sys
         import tempfile
 
         # Create a temporary file to store the data
@@ -5942,7 +5933,7 @@ def _edit_with_vscode() -> str | None:
         Path(temp_file).unlink(missing_ok=True)
 
 
-def _show_concise_help(command_name: str, ctx: click.Context) -> None:
+def _show_concise_help(command_name: str, ctx: click.Context | None) -> None:
     """Show concise help for a command when required arguments are missing."""
 
     if command_name == "info":

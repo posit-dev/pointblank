@@ -5,7 +5,7 @@ import json
 import os
 import re
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import narwhals as nw
 
@@ -707,7 +707,7 @@ def _reconcile(
         unknown = set(agg) - set(measures_list)
         if unknown:
             raise ValueError(f"`agg=` refers to columns not in `measures=`: {sorted(unknown)}.")
-        plan = {m: _as_list(agg.get(m, "sum")) for m in measures_list}
+        plan = {m: cast(list[str], _as_list(agg.get(m, "sum"))) for m in measures_list}
     else:
         plan = {m: [agg] for m in measures_list}
     for aggs in plan.values():
@@ -913,6 +913,50 @@ class Comparison:
     # For `tbl_reconcile()`: the aggregations and grouping keys (else `None`)
     aggregation: dict[str, list[str]] | None = None
 
+    # Instance attributes set by `_build()`, `_build_partitioned()`, `_build_multiset()` and the
+    # count and join helpers. Declared here so that every attribute a `Comparison` can have is
+    # visible to the type checker; these are annotations only, not class attributes.
+    source_name: str
+    target_name: str
+    keys: list[str]
+    mode: str
+    schema_mode: str
+    dup_keys_mode: str
+    null_equal: bool
+    column_map: dict[str, str]
+    schema_diff: SchemaDiff
+    compared_columns: list[str]
+    _specs: list[_ColumnSpec]
+    _src_columns: list[str]
+    _tgt_columns: list[str]
+    _order_by: list[str] | None
+    _tgt_input: Any
+    _key_casts: dict[str, Any]
+    _parts: list[Comparison] | None
+    partitions: int
+    _null_keys_match: bool
+    _sample_cache: dict[tuple[str, int], Any]
+    _display_tgt_keys: list[str]
+    _join_keys: list[str]
+    _tgt_keys: list[str]
+    _src: Any
+    _tgt: Any
+    _src_main: Any
+    _tgt_main: Any
+    _joined: Any
+    _dup_frame: Any
+    _n_null_src: int
+    _n_null_tgt: int
+    n_match: int
+    n_changed: int
+    n_missing: int
+    n_extra: int
+    n_dup_key: int
+    n_dup_key_values: int
+    n_source_rows: int
+    n_target_rows: int
+    column_mismatches: dict[str, int]
+
     def __init__(self) -> None:  # pragma: no cover
         raise TypeError("Create a `Comparison` with `pb.compare()`.")
 
@@ -949,14 +993,14 @@ class Comparison:
         self.mode = "multiset" if multiset else ("keyed" if keys else "positional")
         self._order_by = order_by
         self._tgt_input = tgt
-        self._key_casts: dict[str, Any] = {}
-        self._parts: list[Comparison] | None = None
+        self._key_casts = {}
+        self._parts = None
         self.partitions = 1
         self._null_keys_match = bool(null_keys_match) and bool(keys) and keys != ["*"]
         self.schema_mode = schema
         self.dup_keys_mode = dup_keys
         self.null_equal = null_equal
-        self._sample_cache: dict[tuple[str, int], Any] = {}
+        self._sample_cache = {}
 
         src_schema = dict(src.collect_schema().items())
         tgt_schema = dict(tgt.collect_schema().items())
@@ -2051,7 +2095,7 @@ class Comparison:
                     break
                 piece = nw.from_native(part._failing_rows(remaining))
                 frame = piece if frame is None else _concat_eager(frame, piece)
-            return frame.to_native()
+            return cast(Any, frame).to_native()
         if self.mode == "multiset":
             parts = []
             for status in ("missing", "extra"):
@@ -2554,8 +2598,8 @@ class Comparison:
         from pointblank._compare_report import _comparison_report
         from pointblank.validate import _normalize_reporting_language
 
-        lang = _normalize_reporting_language(lang=lang)
-        return _comparison_report(self, limit=limit, title=title, lang=lang, locale=locale)
+        lang_code = _normalize_reporting_language(lang=lang)
+        return _comparison_report(self, limit=limit, title=title, lang=lang_code, locale=locale)
 
 
 # ----------------------------------------------------------------------------------------------
@@ -2743,6 +2787,7 @@ def _to_polars_lazy(frame: Any) -> Any:
     native = eager.to_native()
     if eager.implementation == nw.Implementation.PANDAS:
         return nw.from_native(pl.from_pandas(native)).lazy()
+    # pyrefly: ignore[no-matching-overload]  # `pl.from_arrow` is typed as a DataFrame or a Series; a table gives a DataFrame
     return nw.from_native(pl.from_arrow(eager.to_arrow())).lazy()
 
 

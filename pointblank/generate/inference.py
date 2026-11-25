@@ -45,7 +45,7 @@ def _normalize_col_name(name: str) -> str:
 # Maps regex patterns (matched against normalized column names) to preset names.
 # Order matters: more specific patterns should come first. Matches across camelCase, PascalCase,
 # snake_case, dot.case, and abbreviations.
-_NAME_TO_PRESET: list[tuple[re.Pattern[str], str]] = [
+_NAME_TO_PRESET: list[tuple[re.Pattern[str], str | None]] = [
     # Identifiers
     (re.compile(r"(?:^|_)(?:uu|gu)?id$"), None),  # bare "id" columns → role, not preset
     (re.compile(r"(?:^|_)uuid(?:$|_|\d)"), "uuid4"),

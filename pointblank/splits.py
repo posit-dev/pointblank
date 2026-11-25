@@ -5,7 +5,7 @@ Checks of the splits of a dataset (e.g., for training, validating, and testing a
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import narwhals as nw
 
@@ -359,8 +359,11 @@ class SplitCheck:
 
     def _label_kind(self) -> str:
         first = next(iter(self._values))
-        labels = self._values[first][self.label]
-        if _is_numeric(self._schema[self.label]) and _n_distinct(labels) > MAX_CATEGORIES:
+        labels = self._values[first][cast(str, self.label)]
+        if (
+            _is_numeric(self._schema[cast(str, self.label)])
+            and _n_distinct(labels) > MAX_CATEGORIES
+        ):
             return "numeric"
         return "categorical"
 
@@ -377,9 +380,9 @@ class SplitCheck:
                 "missing": {},
                 "unseen": {},
                 "psi": {},
-                "drift": [self._check_drift(self.label, name) for name in names[1:]],
+                "drift": [self._check_drift(cast(str, self.label), name) for name in names[1:]],
             }
-        counts = {name: _counts(self._values[name][self.label]) for name in names}
+        counts = {name: _counts(self._values[name][cast(str, self.label)]) for name in names}
         reference = counts[names[0]]
         missing = {}
         unseen = {}
@@ -503,7 +506,7 @@ class SplitCheck:
         first = names[0] if first is None else first
         if second is None and first in names[:-1]:
             second = names[names.index(first) + 1]
-        if (first, second) not in self._pairs:
+        if second is None or (first, second) not in self._pairs:
             raise ValueError(
                 f"There's no pair of splits {first!r} and {second!r}: the splits are "
                 f"{', '.join(map(repr, names))}, and `first=` must come before `second=`."

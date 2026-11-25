@@ -5,7 +5,7 @@ Data cards: a Hugging Face dataset card or a datasheet, made from a validation (
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from pointblank._report_text import ENGLISH, Localizer, msg
 
@@ -159,7 +159,8 @@ class _Card:
         # As in the Hugging Face template, for what the card can't say
         self.more_info = ctx.t("card_more_info")
 
-        self.columns = Schema(tbl=validation.data).columns
+        # A schema built from a table always has its columns
+        self.columns = cast(list[tuple[str, ...]], Schema(tbl=validation.data).columns)
         self.n_rows = get_row_count(validation.data)
         self.null_counts = _null_counts(validation.data)
         self.steps = validation.validation_info
@@ -226,7 +227,7 @@ class _Card:
         ctx = self.ctx
         validation = self.validation
         when = validation.time_end or validation.time_start
-        date = when.strftime("%Y-%m-%d")
+        date = cast(Any, when).strftime("%Y-%m-%d")
         steps = self.steps
         if not steps:
             return ctx.t("card_validated_no_steps", version=self.version, date=date)
@@ -241,7 +242,8 @@ class _Card:
             validated.append(ctx.t("card_not_evaluated", n=skipped))
         parts = [ctx.sentences(validated)]
         if evaluated:
-            health = validation.get_health_score()
+            # Without `by=`, the health score is the overall score (a single float)
+            health = cast(float, validation.get_health_score())
             scores = validation.get_dimension_scores()
             parts.append(ctx.t("card_health", score=_score(health, ctx)))
             if scores:
@@ -294,7 +296,7 @@ class _Card:
         for values in scores.values():
             dimensions += [name for name in values if name not in dimensions]
         rows = []
-        for segment, value in health.items():
+        for segment, value in cast(dict[Any, Any], health).items():
             label = ctx.list_sep.join(map(str, segment)) if isinstance(segment, tuple) else segment
             row = [label, _score(value, ctx)]
             row += [
@@ -318,7 +320,7 @@ class _Card:
         ctx = self.ctx
         effects = [
             row
-            for row in ablation._effects
+            for row in cast(list[dict[str, Any]], ablation._effects)
             if row["metric"] == ablation._primary and row["strategy"] != "shapley"
         ]
         full, variants = effects[0], effects[1:]

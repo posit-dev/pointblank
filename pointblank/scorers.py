@@ -25,7 +25,7 @@ import threading
 import weakref
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Any, Callable, Protocol, runtime_checkable
+from typing import Any, Callable, cast, Protocol, runtime_checkable
 
 __all__ = [
     "Scorer",
@@ -307,7 +307,7 @@ class _FunctionScorer(_Adapter):
             raise TypeError("`per_row=` must be `True` or `False`.")
         self._fn = fn
         self._per_row = per_row
-        params = {"fn": fn}
+        params: dict[str, Any] = {"fn": fn}
         if per_row:
             params["per_row"] = True
         super().__init__(params, {}, name, version, batch_size)
@@ -445,11 +445,12 @@ class _EmbeddingSimilarity(_Adapter):
         }
         super().__init__(params, settings, name, version, batch_size)
 
-    def _encoder(self):
+    def _encoder(self) -> Callable[..., Any]:
         if self._encode is None:
             embedder = self._embedder
             if isinstance(embedder, str):
                 try:
+                    # pyrefly: ignore[missing-import]  # optional dependency
                     from sentence_transformers import SentenceTransformer
                 except ImportError as e:
                     raise _install_hint(
@@ -460,7 +461,7 @@ class _EmbeddingSimilarity(_Adapter):
                 self._encode = embedder.encode
             else:
                 self._encode = embedder
-        return self._encode
+        return cast(Callable[..., Any], self._encode)
 
     def __call__(self, batch):
         texts = [_text_of(record, self._column, self._kind) for record in batch]
@@ -630,6 +631,7 @@ class _Reranker(_Adapter):
         if self._client is None:
             if self._provider == "cohere":
                 try:
+                    # pyrefly: ignore[missing-import]  # optional dependency
                     import cohere
                 except ImportError as e:
                     raise _install_hint('reranker(provider="cohere")', "cohere", e) from e
@@ -639,6 +641,7 @@ class _Reranker(_Adapter):
                     self._client = cohere.ClientV2()
             elif isinstance(self._model, str):
                 try:
+                    # pyrefly: ignore[missing-import]  # optional dependency
                     from sentence_transformers import CrossEncoder
                 except ImportError as e:
                     raise _install_hint(
@@ -654,7 +657,7 @@ class _Reranker(_Adapter):
         for record in batch:
             query, document = self._columns(record)
             pairs.append((str(record[query]), str(record[document])))
-        client = self._get_client()
+        client = cast(Any, self._get_client())
         if self._provider == "sentence-transformers":
             return client.predict(pairs)
         scores: list[float | None] = [None] * len(pairs)
@@ -832,6 +835,7 @@ class _Classifier(_Adapter):
         if self._pipeline is None:
             if isinstance(self._hf_model, str):
                 try:
+                    # pyrefly: ignore[missing-import]  # optional dependency
                     from transformers import pipeline
                 except ImportError as e:
                     raise _install_hint("classifier() with a model name", "transformers", e) from e
@@ -1040,7 +1044,10 @@ class _LangId(_Adapter):
         if self._rank is None:
             if self._backend == "langid":
                 try:
+                    # pyrefly: ignore[missing-import]  # optional dependency
                     from langid.langid import LanguageIdentifier
+
+                    # pyrefly: ignore[missing-import]  # optional dependency
                     from langid.langid import model as langid_model
                 except ImportError as e:
                     raise _install_hint("langid()", "langid", e) from e
@@ -1048,6 +1055,7 @@ class _LangId(_Adapter):
                 self._rank = identifier.rank
             elif self._backend == "fasttext":
                 try:
+                    # pyrefly: ignore[missing-import]  # optional dependency
                     import fasttext
                 except ImportError as e:
                     raise _install_hint('langid(backend="fasttext")', "fasttext", e) from e
@@ -1224,14 +1232,15 @@ class _Perplexity(_Adapter):
         if self._kenlm_path is not None:
             if self._kenlm is None:
                 try:
+                    # pyrefly: ignore[missing-import]  # optional dependency
                     import kenlm
                 except ImportError as e:
                     raise _install_hint("perplexity(kenlm_model=)", "kenlm", e) from e
                 self._kenlm = kenlm.Model(self._kenlm_path)
             return [self._kenlm.perplexity(text) for text in texts]
         if self._per_row:
-            return [self._fn(text) for text in texts]
-        return self._fn(texts)
+            return [cast(Callable[..., Any], self._fn)(text) for text in texts]
+        return cast(Callable[..., Any], self._fn)(texts)
 
 
 def perplexity(
@@ -1495,6 +1504,7 @@ class _TokenCount(_Adapter):
             self._encode = str.split
         elif isinstance(tokenizer, str) and tokenizer.startswith("tiktoken:"):
             try:
+                # pyrefly: ignore[missing-import]  # optional dependency
                 import tiktoken
             except ImportError as e:
                 raise _install_hint(f"token_count({tokenizer!r})", "tiktoken", e) from e
@@ -1507,6 +1517,7 @@ class _TokenCount(_Adapter):
             self._encode = functools.partial(enc.encode, disallowed_special=())
         elif isinstance(tokenizer, str):
             try:
+                # pyrefly: ignore[missing-import]  # optional dependency
                 from transformers import AutoTokenizer
             except ImportError as e:
                 raise _install_hint(f"token_count({tokenizer!r})", "transformers", e) from e
@@ -1778,7 +1789,8 @@ def _store(scorer: Any, cache: Any):
                 # An object that can't be weakly referenced isn't cached
                 return None
     check_cache(scorer, cache)
-    return _DiskStore(cache, name, version)
+    # `check_cache()` above requires a scorer with a stable name for an on-disk cache
+    return _DiskStore(cache, cast(str, name), version)
 
 
 # ---------------------------------------------------------------------------------------------

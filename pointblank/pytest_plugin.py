@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import hashlib
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pytest
 
@@ -113,7 +113,7 @@ def generate_dataset(request: pytest.FixtureRequest):
 
         # Record the seed that was actually used so callers can inspect it
         # after a failure (e.g., `generate_dataset.last_seed`).
-        _generate.last_seed = seed
+        cast(Any, _generate).last_seed = seed
 
         return _generate_dataset(
             schema,

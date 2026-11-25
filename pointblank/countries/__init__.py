@@ -6,7 +6,7 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 from importlib.resources import files
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeGuard
 
 if TYPE_CHECKING:
     pass
@@ -998,7 +998,7 @@ FREQUENCY_TIERS: dict[str, float] = {
 _TIER_KEYS = frozenset(FREQUENCY_TIERS)
 
 
-def _is_tiered(data: Any) -> bool:
+def _is_tiered(data: Any) -> TypeGuard[dict[str, list[Any]]]:
     """Return True if *data* is a dict whose keys are frequency tier names."""
     return isinstance(data, dict) and bool(_TIER_KEYS & set(data.keys()))  # type: ignore[operator]
 
@@ -1778,7 +1778,7 @@ class LocaleGenerator:
         self._current_location = self._get_location()
         return self._current_location
 
-    def _get_current_location(self) -> dict[str, str]:
+    def _get_current_location(self) -> dict[str, Any]:
         """Get the current cached location, or select a new one."""
         # If row locations are active, use those
         if self._row_locations is not None and self._current_row is not None:
@@ -2033,7 +2033,7 @@ class LocaleGenerator:
         nanp_exchange = self._nanp_exchange() if is_nanp else None
         for ch in result:
             if ch == "#":
-                if is_nanp and hash_count < 3:
+                if is_nanp and nanp_exchange is not None and hash_count < 3:
                     chars.append(nanp_exchange[hash_count])
                 else:
                     chars.append(str(self.rng.randint(0, 9)))
@@ -2312,8 +2312,10 @@ class LocaleGenerator:
 
                 # 70% chance to use city-relevant company if available
                 if city_companies and self.rng.random() < 0.7:
+                    # pyrefly: ignore[bad-return]  # a well-known entry may have no name
                     return self.rng.choice(city_companies)
                 elif all_companies:
+                    # pyrefly: ignore[bad-return]  # a well-known entry may have no name
                     return self.rng.choice(all_companies)
 
         # Generate a fictional company name

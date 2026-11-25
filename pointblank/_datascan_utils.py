@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from math import floor, log10
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from great_tables.vals import fmt_integer, fmt_number, fmt_scientific
 
@@ -17,15 +17,15 @@ def _round_to_sig_figs(value: float, sig_figs: int) -> float:
 
 def _compact_integer_fmt(value: float | int) -> str:
     if value == 0:
-        formatted: str = "0"
+        formatted: Any = "0"
     elif abs(value) >= 1 and abs(value) < 10_000:
         formatted = fmt_integer(value, use_seps=False)
         assert isinstance(formatted, list) and isinstance(formatted[0], str)
-        formatted: str = formatted[0]
+        formatted: Any = formatted[0]
     else:
         formatted = fmt_scientific(value, decimals=1, exp_style="E1")
         assert isinstance(formatted, list) and isinstance(formatted[0], str)
-        formatted: str = formatted[0]
+        formatted: Any = formatted[0]
 
     return formatted
 
@@ -36,23 +36,23 @@ def _compact_decimal_fmt(value: float | int) -> str:
     elif abs(value) < 1 and abs(value) >= 0.01:
         formatted = fmt_number(value, decimals=2)
         assert isinstance(formatted, list) and isinstance(formatted[0], str)
-        formatted: str = formatted[0]
+        formatted: Any = formatted[0]
     elif abs(value) < 0.01:
         formatted = fmt_scientific(value, decimals=1, exp_style="E1")
         assert isinstance(formatted, list) and isinstance(formatted[0], str)
-        formatted: str = formatted[0]
+        formatted: Any = formatted[0]
     elif abs(value) >= 1 and abs(value) < 1000:
         formatted = fmt_number(value, n_sigfig=3)
         assert isinstance(formatted, list) and isinstance(formatted[0], str)
-        formatted: str = formatted[0]
+        formatted: Any = formatted[0]
     elif abs(value) >= 1000 and abs(value) < 10_000:
         formatted = fmt_number(value, decimals=0, use_seps=False)
         assert isinstance(formatted, list) and isinstance(formatted[0], str)
-        formatted: str = formatted[0]
+        formatted: Any = formatted[0]
     else:
         formatted = fmt_scientific(value, decimals=1, exp_style="E1")
         assert isinstance(formatted, list) and isinstance(formatted[0], str)
-        formatted: str = formatted[0]
+        formatted: Any = formatted[0]
 
     return formatted
 

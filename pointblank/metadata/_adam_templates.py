@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
-from typing import Any
+from typing import Any, Callable
 
 __all__ = [
     "ADaMDatasetTemplate",
@@ -914,7 +914,7 @@ def _adtte_template() -> ADaMDatasetTemplate:
 
 
 # Registry of all ADaM dataset templates
-_ADAM_TEMPLATES: dict[str, callable] = {
+_ADAM_TEMPLATES: dict[str, Callable[..., Any]] = {
     "ADSL": _adsl_template,
     "BDS": _bds_template,
     "ADAE": _adae_template,

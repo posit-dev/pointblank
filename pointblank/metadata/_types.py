@@ -5,6 +5,8 @@ from dataclasses import field as dataclass_field
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    import datetime
+
     from pointblank.schema import Schema
     from pointblank.validate import Validate
 
@@ -690,7 +692,7 @@ class MetadataImport:
     dataset_name: str | None = None
     dataset_label: str | None = None
     dataset_description: str | None = None
-    creation_date: str | None = None
+    creation_date: str | datetime.datetime | None = None
     study_id: str | None = None
     domain: str | None = None
 

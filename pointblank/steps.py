@@ -10,11 +10,10 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from pointblank._typing import SegmentSpec, Tolerance
-    from pointblank.actions import Actions
     from pointblank.column import Column, ColumnSelector, ColumnSelectorNarwhals
     from pointblank.missing import MissingSpec
     from pointblank.schema import Schema
-    from pointblank.thresholds import Thresholds
+    from pointblank.thresholds import Actions, Thresholds
 
 __all__ = ["Steps"]
 
@@ -247,7 +246,7 @@ class Steps:
             "role_key": "role",
             "content_key": "content",
         }
-        if key in _METHOD_DEFAULTS.get(method, {}):
+        if method is not None and key in _METHOD_DEFAULTS.get(method, {}):
             return value == _METHOD_DEFAULTS[method][key]
         if value is None:
             return True

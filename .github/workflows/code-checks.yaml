@@ -25,3 +25,13 @@ jobs:
           git diff --exit-code pointblank/validate.pyi || \
             (echo "validate.pyi is out of date — run 'make pyi' and commit the result" && exit 1)
       - uses: pre-commit/action@v3.0.1
+
+  typecheck:
+    name: "Run pyrefly"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v10.3.3
+      - name: Type check
+        run: uv run --python 3.13 pyrefly check
