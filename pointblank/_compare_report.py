@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import datetime
+import decimal
 import html as html_lib
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -225,14 +227,19 @@ def _header_html(cmp: Comparison, lang: str = "en", locale: str | None = None) -
         elif not cmp.schema_ok:
             verdict += f" <span style='color:#666;'>{ctx.t('strict_schema_note')}</span>"
 
-    lines = [tables_line, verdict, _status_bar(cmp, ctx), _legend(cmp, ctx)]
+    lines = [tables_line, verdict]
+    if not cmp.identical:
+        # (an identical comparison is all matches, which the verdict already says)
+        lines += [_status_bar(cmp, ctx), _legend(cmp, ctx)]
     spec = _spec_badges(cmp, ctx)
     if spec:
         lines.append(spec)
 
     direction = " direction:rtl; text-align:right;" if ctx.rtl else ""
     return (
-        f"<div style='font-size:13px; line-height:1.9;{direction}'>" + "<br>".join(lines) + "</div>"
+        f"<div style='font-size:13px; line-height:1.9;{direction}'>"
+        + "".join(f"<div>{line}</div>" for line in lines)
+        + "</div>"
     )
 
 
@@ -252,7 +259,7 @@ def _status_bar(cmp: Comparison, ctx: _Ctx) -> str:
         )
     return (
         "<div style='display:flex; width:100%; max-width:600px; height:8px; border-radius:2px; "
-        "overflow:hidden; background:#EEE; margin-top:4px;'>" + "".join(segments) + "</div>"
+        "overflow:hidden; background:#EEE; margin:6px 0;'>" + "".join(segments) + "</div>"
     )
 
 
@@ -265,8 +272,10 @@ def _legend(cmp: Comparison, ctx: _Ctx) -> str:
             f"<span style='display:inline-block; width:9px; height:9px; border-radius:2px; "
             f"background:{STATUS_COLORS[status]}; margin-right:4px; margin-left:4px;'></span>"
         )
+        # Statuses with no rows are dimmed, so the ones that occur stand out
+        dim = " color:#999; opacity:0.6;" if count == 0 else ""
         parts.append(
-            f"<span style='white-space:nowrap; margin-right:12px;'>{dot}"
+            f"<span style='white-space:nowrap; margin-right:12px;{dim}'>{dot}"
             f"{ctx.t(f'status_{status}')} <strong>{ctx.int(count)}</strong></span>"
         )
     return "".join(parts)
@@ -421,12 +430,14 @@ def _changed_rows(cmp: Comparison, limit: int, ctx: _Ctx) -> list[dict[str, str]
                 continue
             old = row[f"{spec.source}_source"]
             new = row[f"{spec.source}_target"]
+            old_text, new_text = _pair_texts(old, new)
             chips.append(
                 "<span style='white-space:nowrap; margin-right:14px;'>"
                 f"<span style='color:#666;'>{html_lib.escape(spec.source)}:</span> "
-                f"<span style='text-decoration:line-through; color:#999;'>{_fmt_value(old)}</span>"
+                "<span style='color:#555; text-decoration:line-through; "
+                f"text-decoration-color:#AAA;'>{_fmt_pair_value(old_text, old)}</span>"
                 f" &rarr; <span style='background:#FDF1DC; padding:0 3px; border-radius:2px;'>"
-                f"{_fmt_value(new)}</span>{_fmt_delta(old, new)}</span>"
+                f"{_fmt_pair_value(new_text, new)}</span>{_fmt_delta(old, new)}</span>"
             )
         out.append(
             {"group": group, "item": _key_label(row, key_cols, ctx), "detail": " ".join(chips)}
@@ -447,8 +458,10 @@ def _missing_extra_rows(
     out = []
     for row in frame.rows(named=True):
         if cmp.mode == "multiset":
-            # Distinct rows, with how many surplus copies one table has over the other
-            item = f"&times;{ctx.int(abs(row['n_source'] - row['n_target']))}"
+            # Distinct rows, with how many surplus copies one table has over the other (when
+            # there's more than one)
+            copies = abs(row["n_source"] - row["n_target"])
+            item = f"&times;{ctx.int(copies)}" if copies > 1 else ""
             exclude = {"n_source", "n_target"}
         else:
             item = _key_label(row, key_cols, ctx)
@@ -530,39 +543,137 @@ def _is_null(value: Any) -> bool:
     return value is None or (isinstance(value, float) and value != value)
 
 
-def _fmt_value(value: Any) -> str:
+def _is_number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and not _is_null(value)
+
+
+def _float_text(value: float, digits: int = 6) -> str:
+    """A float with `digits` significant digits, in positional notation unless it's very large or
+    small (so that 1234567.0 is `1234567` rather than `1.23457e+06`)."""
+    if value == 0 or not math.isfinite(value):
+        return f"{value:g}"
+    magnitude = math.floor(math.log10(abs(value)))
+    if not -5 <= magnitude < 15:
+        return f"{value:.{digits}g}"
+    text = f"{value:.{max(digits - 1 - magnitude, 0)}f}"
+    return text.rstrip("0").rstrip(".") if "." in text else text
+
+
+def _clip(text: str, width: int, start: int = 0) -> str:
+    """At most `width` characters of `text` from `start`, with an ellipsis where it's cut."""
+    if len(text) <= width:
+        return text
+    if start <= 0:
+        return text[: width - 1] + "…"
+    tail = text[min(start, len(text) - (width - 1)) :]
+    if len(tail) <= width - 1:
+        return "…" + tail
+    return "…" + tail[: width - 2] + "…"
+
+
+def _value_text(value: Any, width: int = _MAX_VALUE_CHARS) -> str:
+    """The plain-text display of a value (`NULL` for nulls)."""
     if _is_null(value):
-        return "<span style='color:#999; font-style:italic;'>NULL</span>"
+        return "NULL"
     if isinstance(value, float):
-        text = f"{value:.6g}"
+        text = _float_text(value)
     elif isinstance(value, datetime.datetime):
         text = value.isoformat(sep=" ")
     else:
         text = str(value)
-    if len(text) > _MAX_VALUE_CHARS:
-        text = text[: _MAX_VALUE_CHARS - 1] + "…"
+    return _clip(text, width)
+
+
+def _visible_whitespace(text: str) -> str:
+    """A quoted string with escaped tabs and newlines, and spaces shown as `␣`."""
+    return repr(text).replace(" ", "␣")
+
+
+def _pair_texts(old: Any, new: Any, width: int = _MAX_VALUE_CHARS) -> tuple[str, str]:
+    """
+    The plain-text display of a changed value, before and after. Unlike formatting each value on
+    its own, this makes sure that the difference is visible: floats get as many digits as it takes
+    to tell them apart, long strings are shown around the first difference, and strings that differ
+    only in whitespace are quoted with their whitespace escaped.
+    """
+    if _is_null(old) or _is_null(new):
+        return _value_text(old, width), _value_text(new, width)
+    if isinstance(old, float) and isinstance(new, float):
+        for digits in range(6, 17):
+            a, b = _float_text(old, digits), _float_text(new, digits)
+            if a != b:
+                return a, b
+        return repr(old), repr(new)
+    if isinstance(old, str) and isinstance(new, str):
+        if old != new and old.split() == new.split():
+            return _clip(_visible_whitespace(old), width), _clip(_visible_whitespace(new), width)
+        first = next(
+            (i for i, (a, b) in enumerate(zip(old, new)) if a != b), min(len(old), len(new))
+        )
+        if first >= width - 1 and max(len(old), len(new)) > width:
+            # The difference would be cut off, so show the text around it
+            start = max(first - width // 3, 1)
+            return _clip(old, width, start), _clip(new, width, start)
+    return _value_text(old, width), _value_text(new, width)
+
+
+def _duration_text(seconds: float) -> str:
+    """A signed duration in its two largest units, e.g. `+3h`, `-1d 2h`, or `+250ms`."""
+    sign = "-" if seconds < 0 else "+"
+    s = abs(seconds)
+    if 0 < s < 1e-3:
+        return f"{sign}{s * 1e6:g}µs"
+    if 0 < s < 1:
+        return f"{sign}{s * 1e3:g}ms"
+    parts = []
+    for unit, size in (("d", 86400), ("h", 3600), ("m", 60)):
+        if s >= size:
+            n = int(s // size)
+            parts.append(f"{n}{unit}")
+            s -= n * size
+    if s or not parts:
+        parts.append(f"{s:g}s")
+    return sign + " ".join(parts[:2])
+
+
+def _delta_text(old: Any, new: Any) -> str | None:
+    """The difference between two numbers, datetimes, dates, or durations (`None` otherwise)."""
+    if _is_number(old) and _is_number(new):
+        delta = new - old
+        if isinstance(delta, int):
+            return f"{delta:+d}"
+        text = _float_text(delta)
+        return text if text.startswith("-") else "+" + text
+    if isinstance(old, decimal.Decimal) and isinstance(new, decimal.Decimal):
+        return f"{new - old:+f}"
+    temporal = (datetime.datetime, datetime.timedelta)
+    if isinstance(old, temporal) and type(old) is type(new):
+        try:
+            return _duration_text((new - old).total_seconds())
+        except TypeError:  # e.g., timezone-aware and naive datetimes
+            return None
+    if isinstance(old, datetime.date) and type(old) is type(new):
+        return f"{(new - old).days:+,}d"
+    return None
+
+
+def _fmt_value(value: Any) -> str:
+    if _is_null(value):
+        return "<span style='color:#999; font-style:italic;'>NULL</span>"
+    return html_lib.escape(_value_text(value))
+
+
+def _fmt_pair_value(text: str, value: Any) -> str:
+    if _is_null(value):
+        return _fmt_value(value)
     return html_lib.escape(text)
 
 
 def _fmt_delta(old: Any, new: Any) -> str:
-    numeric = (int, float)
-    if (
-        isinstance(old, numeric)
-        and isinstance(new, numeric)
-        and not isinstance(old, bool)
-        and not isinstance(new, bool)
-        and not _is_null(old)
-        and not _is_null(new)
-    ):
-        delta = new - old
-        return f" <span style='color:#888; font-size:11px;'>({delta:+.6g})</span>"
-    if isinstance(old, datetime.datetime) and isinstance(new, datetime.datetime):
-        try:
-            seconds = (new - old).total_seconds()
-        except TypeError:  # pragma: no cover
-            return ""
-        return f" <span style='color:#888; font-size:11px;'>({seconds:+g}s)</span>"
-    return ""
+    delta = _delta_text(old, new)
+    if delta is None:
+        return ""
+    return f" <span style='color:#888; font-size:11px;'>({html_lib.escape(delta)})</span>"
 
 
 def _key_label(row: dict[str, Any], key_cols: list[str], ctx: _Ctx) -> str:

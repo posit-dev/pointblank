@@ -304,6 +304,25 @@ def test_step_report():
     assert "Custom:" in html
 
 
+def test_step_report_names_the_comparison_table_like_compare(tmp_path):
+    v = (
+        pb.Validate(TARGET)
+        .tbl_match(SOURCE, keys="id")
+        .tbl_reconcile(SOURCE, measures="id", agg="count")
+        .interrogate()
+    )
+    for i in (1, 2):
+        comparison = _step(v, i).val_info["comparison"]
+        assert (comparison.source_name, comparison.target_name) == ("source", "target")
+
+    # A file path names the source, as in `compare()`
+    path = tmp_path / "expected.csv"
+    SOURCE.write_csv(path)
+    v = pb.Validate(TARGET, tbl_name="orders").tbl_match(str(path), keys="id").interrogate()
+    comparison = _step(v).val_info["comparison"]
+    assert (comparison.source_name, comparison.target_name) == (str(path), "orders")
+
+
 def test_step_report_dup_keys_compare():
     s = pl.DataFrame({"id": [1, 1], "v": [1, 2]})
     t = pl.DataFrame({"id": [1], "v": [1]})

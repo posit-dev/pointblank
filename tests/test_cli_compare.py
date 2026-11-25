@@ -156,6 +156,16 @@ def test_tables_without_common_columns(tmp_path, files):
     assert data["n_passed"] == 0
 
 
+def test_changed_values_stay_distinguishable(tmp_path):
+    src, tgt = tmp_path / "source.csv", tmp_path / "target.csv"
+    pl.DataFrame({"id": [1], "v": [1234567.891]}).write_csv(src)
+    pl.DataFrame({"id": [1], "v": [1234568.0]}).write_csv(tgt)
+
+    result = _run(str(src), str(tgt), "-k", "id")
+    assert "1234567.9" in result.output
+    assert "e+06" not in result.output
+
+
 def test_builtin_dataset(files):
     result = _run("small_table", "small_table", "--format", "json")
     assert result.exit_code == 0

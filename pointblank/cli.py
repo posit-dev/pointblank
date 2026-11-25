@@ -2497,15 +2497,16 @@ def _compare_load_source(data_source: str, duckdb_con: Any = None) -> Any:
     return data_source
 
 
-def _fmt_compare_value(value: Any, width: int = 30) -> str:
+def _fmt_compare_value(value: Any, width: int = 30, text: str | None = None) -> str:
+    """A value for the terminal summary (`text=` gives its display text, e.g. from
+    `_pair_texts()`, which keeps the difference between a changed pair of values visible)."""
     from rich.markup import escape
 
-    if value is None or (isinstance(value, float) and value != value):
+    from pointblank._compare_report import _is_null, _value_text
+
+    if _is_null(value):
         return "[dim italic]NULL[/dim italic]"
-    text = f"{value:.6g}" if isinstance(value, float) else str(value)
-    if len(text) > width:
-        text = text[: width - 1] + "…"
-    return escape(text)
+    return escape(text if text is not None else _value_text(value, width))
 
 
 def _compare_section(title: str) -> None:
@@ -2521,6 +2522,8 @@ def _compare_sample_title(title: str, shown: int, total: int) -> str:
 def _rich_print_comparison(cmp: Any, limit: int) -> None:
     """Print a terminal summary of a `Comparison`."""
     from rich.markup import escape
+
+    from pointblank._compare_report import _pair_texts
 
     status_style = {
         "match": "green",
@@ -2632,11 +2635,13 @@ def _rich_print_comparison(cmp: Any, limit: int) -> None:
             key = ", ".join(_fmt_compare_value(row[k]) for k in key_cols)
             for i, spec in enumerate(cmp._specs):
                 if row.get(f"__pb_d_{i}"):
+                    old, new = row[f"{spec.source}_source"], row[f"{spec.source}_target"]
+                    old_text, new_text = _pair_texts(old, new, width=30)
                     changed_tbl.add_row(
                         key,
                         escape(spec.source),
-                        _fmt_compare_value(row[f"{spec.source}_source"]),
-                        _fmt_compare_value(row[f"{spec.source}_target"]),
+                        _fmt_compare_value(old, text=old_text),
+                        _fmt_compare_value(new, text=new_text),
                     )
                     key = ""
         console.print(changed_tbl)

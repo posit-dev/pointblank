@@ -20369,7 +20369,13 @@ class Validate:
 
                         # The comparison table is the source (expected data) and the table under
                         # validation is the target; each aligned row (`tbl_match()`) or key group
-                        # (`tbl_reconcile()`) is one test unit
+                        # (`tbl_reconcile()`) is one test unit. As in `compare()`, a file path
+                        # names the source in the report.
+                        source_name = (
+                            str(tbl_compare)
+                            if isinstance(tbl_compare, (str, os.PathLike))
+                            else "source"
+                        )
                         try:
                             if assertion_type == "tbl_reconcile":
                                 comparison = _reconcile(
@@ -20381,7 +20387,7 @@ class Validate:
                                     tolerance=value.get("tolerance"),
                                     column_map=value.get("column_map"),
                                     partitions=value.get("partitions"),
-                                    source_name="tbl_compare",
+                                    source_name=source_name,
                                     target_name=self.tbl_name or "target",
                                 )
                             else:
@@ -20398,7 +20404,7 @@ class Validate:
                                     dup_keys=value.get("dup_keys", "flag"),
                                     order_by=value.get("order_by"),
                                     partitions=value.get("partitions"),
-                                    source_name="tbl_compare",
+                                    source_name=source_name,
                                     target_name=self.tbl_name or "target",
                                     # Without keys, tables with no inherent row order (PySpark,
                                     # databases) are compared in the order their rows are

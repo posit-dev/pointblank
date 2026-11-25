@@ -5,6 +5,8 @@ reports): translations, locale-aware numbers, right-to-left layout, and HTML sna
 
 from __future__ import annotations
 
+import datetime as dt
+import decimal
 import html as html_lib
 import re
 import string
@@ -131,6 +133,94 @@ def test_singular_forms(comparison):
 
     one = pl.DataFrame({"id": [1]})
     assert "The 1 row matches." in _text(pb.compare(one, one, keys="id").get_tabular_report())
+
+
+# ----------------------------------------------------------------------------------------------
+# Values and the header
+# ----------------------------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "old, new, expected",
+    [
+        # Floats get as many digits as it takes to tell them apart, in positional notation
+        (1234567.891, 1234568.0, ("1234567.9", "1234568")),
+        (40.5, 45.5, ("40.5", "45.5")),
+        (0.1 + 0.2, 0.3, ("0.30000000000000004", "0.3")),
+        (2.5e9, 2.5e9 + 0.5, ("2500000000", "2500000000.5")),
+        (1e20, 1.0000001e20, ("1e+20", "1.0000001e+20")),
+        # Long strings are shown around a difference that would be cut off
+        ("x" * 60 + "1", "x" * 60 + "2", ("…" + "x" * 38 + "1", "…" + "x" * 38 + "2")),
+        ("short", "s" * 50, ("short", "s" * 39 + "…")),
+        # Differences in whitespace alone are made visible
+        ("abc", "abc ", ("'abc'", "'abc␣'")),
+        ("a\tb", "a b", ("'a\\tb'", "'a␣b'")),
+        (None, 1.5, ("NULL", "1.5")),
+    ],
+)
+def test_changed_values_show_the_difference(old, new, expected):
+    from pointblank._compare_report import _pair_texts
+
+    assert _pair_texts(old, new) == expected
+
+
+@pytest.mark.parametrize(
+    "old, new, expected",
+    [
+        (40.5, 45.5, "+5"),
+        (1234567.891, 1234568.0, "+0.109"),
+        (3, 300, "+297"),
+        (10, 4, "-6"),
+        (dt.datetime(2024, 6, 1, 12), dt.datetime(2024, 6, 1, 15), "+3h"),
+        (dt.datetime(2024, 6, 1, 12), dt.datetime(2024, 6, 1, 10, 30), "-1h 30m"),
+        (dt.datetime(2024, 6, 1), dt.datetime(2024, 6, 2, 2, 3), "+1d 2h"),
+        (dt.datetime(2024, 6, 1), dt.datetime(2024, 6, 1, 0, 0, 0, 250_000), "+250ms"),
+        (dt.date(2024, 1, 1), dt.date(2024, 3, 1), "+60d"),
+        (dt.timedelta(hours=1), dt.timedelta(hours=1, seconds=90), "+1m 30s"),
+        (decimal.Decimal("1.50"), decimal.Decimal("2.25"), "+0.75"),
+        # No delta for other values, or values that can't be subtracted
+        (True, False, None),
+        ("a", "b", None),
+        (dt.datetime(2024, 1, 1), dt.datetime(2024, 1, 1, tzinfo=dt.timezone.utc), None),
+    ],
+)
+def test_changed_value_deltas(old, new, expected):
+    from pointblank._compare_report import _delta_text
+
+    assert _delta_text(old, new) == expected
+
+
+def test_large_float_changes_are_visible_in_the_report():
+    s = pl.DataFrame({"id": [1], "v": [1234567.891]})
+    t = pl.DataFrame({"id": [1], "v": [1234568.0]})
+    text = _text(pb.compare(s, t, keys="id").get_tabular_report())
+
+    assert "1234567.9 → 1234568 (+0.109)" in text
+    assert "e+06" not in text
+
+
+def test_header_dims_absent_statuses_and_is_compact_when_identical(comparison):
+    df = pl.DataFrame({"id": [1, 2], "v": ["a", "b"]})
+    identical = pb.compare(df, df, keys="id").get_tabular_report().as_raw_html()
+    assert "IDENTICAL" in identical
+    # No status bar or legend: the verdict already says that every row matches
+    assert "match <strong>" not in identical
+    assert "<br>" not in identical
+
+    changed = pb.compare(df, df.with_columns(v=pl.lit("z")), keys="id")
+    html_str = changed.get_tabular_report().as_raw_html()
+    legend = re.findall(r"<span style='white-space:nowrap; margin-right:12px;([^']*)'>", html_str)
+    # match, changed, missing, extra: only `changed` has rows
+    assert ["opacity" in style for style in legend] == [True, False, True, True]
+
+
+def test_multiset_rows_show_surplus_copies_only_when_more_than_one():
+    s = pl.DataFrame({"a": [1, 1, 1, 2]})
+    t = pl.DataFrame({"a": [1, 3]})
+    html_str = pb.compare(s, t, keys="*").get_tabular_report().as_raw_html()
+
+    assert "&times;2" in html_str
+    assert "&times;1" not in html_str
 
 
 def test_verdict_flags_comparisons_without_common_columns():
