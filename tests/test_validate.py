@@ -24236,7 +24236,7 @@ def test_tbl_match_step_report_fixed_width(header) -> None:
     for step in validation.validation_info:
         html = validation.get_step_report(i=step.i, header=header).as_raw_html()
 
-        table_style = re.search(r'<table style="([^"]*)" class="gt_table"', html).group(1)
+        table_style = re.search(r"\.gt_table \{([^}]*)\}", html).group(1)
 
         assert "width: 900px" in table_style
 
