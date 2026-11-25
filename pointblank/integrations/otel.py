@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any, Callable, cast
+from typing import TYPE_CHECKING, Any, Callable
 
 if TYPE_CHECKING:
     from opentelemetry.sdk.metrics import MeterProvider
@@ -484,7 +484,7 @@ class OTelExporter:
         meter = self._get_meter()
         self._ensure_instruments(meter)
 
-        vi_list = cast(list[Any], validation.validation_info)
+        vi_list = validation.validation_info
 
         steps_total = len(vi_list)
         steps_passed = sum(1 for v in vi_list if v.all_passed)
@@ -499,7 +499,6 @@ class OTelExporter:
         pass_rate = units_passed / units_total if units_total > 0 else 1.0
 
         assert validation.time_start is not None and validation.time_end is not None
-        # pyrefly: ignore[unsupported-operation]  # the stub types these fields as `...`
         duration = (validation.time_end - validation.time_start).total_seconds()
 
         self._counter_steps_total.add(steps_total, attrs)
@@ -531,14 +530,13 @@ class OTelExporter:
         tracer = self._get_tracer()
 
         assert validation.time_start is not None and validation.time_end is not None
-        start_ns = int(cast(Any, validation.time_start).timestamp() * 1e9)
-        end_ns = int(cast(Any, validation.time_end).timestamp() * 1e9)
+        start_ns = int(validation.time_start.timestamp() * 1e9)
+        end_ns = int(validation.time_end.timestamp() * 1e9)
 
         root_attrs = {
             **attrs,
-            "pb.steps.total": len(cast(list[Any], validation.validation_info)),
+            "pb.steps.total": len(validation.validation_info),
             "pb.all_passed": validation.all_passed(),
-            # pyrefly: ignore[unsupported-operation]  # the stub types these fields as `...`
             "pb.duration_s": (validation.time_end - validation.time_start).total_seconds(),
         }
 
@@ -550,7 +548,7 @@ class OTelExporter:
         root_context = otel_trace.set_span_in_context(root_span)
 
         # Create child spans for each validation step
-        for vi in cast(list[Any], validation.validation_info):
+        for vi in validation.validation_info:
             child_attrs: dict[str, Any] = {
                 **attrs,
                 "pb.step.i": vi.i or 0,
@@ -591,7 +589,7 @@ class OTelExporter:
             child_span.end(end_time=step_end_ns)
 
         # Record threshold breach events on the root span
-        for vi in cast(list[Any], validation.validation_info):
+        for vi in validation.validation_info:
             for level in ("warning", "error", "critical"):
                 if getattr(vi, level, False):
                     root_span.add_event(
@@ -622,7 +620,7 @@ class OTelExporter:
         log_level_order = {level: rank for rank, level in enumerate(_LOG_LEVELS)}
         min_level = log_level_order[self.log_level]
 
-        for vi in cast(list[Any], validation.validation_info):
+        for vi in validation.validation_info:
             # Find the highest exceeded threshold for this step
             highest_level = None
             for level in ("critical", "error", "warning"):
