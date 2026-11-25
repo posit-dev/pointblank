@@ -13664,6 +13664,14 @@ def test_preview_no_fail_duckdb_table() -> None:
     preview(small_table, n_head=2, n_tail=2)
 
 
+def test_preview_no_fail_pyarrow_table() -> None:
+    tbl = pa.table({"a": [1, 2, None]})
+
+    result = preview(tbl)
+
+    assert hasattr(result, "_build_data")
+
+
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 def test_preview_no_fail_pyspark_table() -> None:
     # Create a simple PySpark DataFrame to test the preview functionality
