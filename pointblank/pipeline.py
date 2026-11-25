@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, cast
+from typing import TYPE_CHECKING, Any, Callable
 
 if TYPE_CHECKING:
     from narwhals.typing import IntoDataFrame
@@ -267,11 +267,7 @@ class PipelineResult:
 def _append_validation_summary(lines: list[str], validation: Validate) -> None:
     """Append a summary of a Validate object to the lines list."""
     try:
-        n_steps = (
-            len(cast(list[Any], validation.validation_info))
-            if hasattr(validation, "validation_info")
-            else 0
-        )
+        n_steps = len(validation.validation_info) if hasattr(validation, "validation_info") else 0
         # n_passed() returns dict[int, int] when called without scalar=True
         passed_dict = validation.n_passed() if hasattr(validation, "n_passed") else {}
         failed_dict = validation.n_failed() if hasattr(validation, "n_failed") else {}
