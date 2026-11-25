@@ -611,7 +611,7 @@ async def get_validation_step_output(
     output_path: Annotated[str, "Path to save the output file. Must end with .csv."],
     sundered_type: Annotated[str, "Retrieve all 'pass' or 'fail' rows."] = "fail",
     step_index: Annotated[
-        Optional[int], "Specific step index (0-based). Overrides sundered_type."
+        Optional[int], "Specific step number (1-based). Overrides sundered_type."
     ] = None,
 ) -> ValidationOutput:
     """Retrieves validation output and saves it to a CSV file."""
@@ -624,27 +624,32 @@ async def get_validation_step_output(
 
     p_output_path = validate_output_path(output_path, {".csv"})
 
-    if step_index is not None and step_index < 0:
-        raise ValueError("The 'step_index' cannot be a negative number.")
+    n_steps = len(validator.validation_info)
+    if step_index is not None and not 1 <= step_index <= n_steps:
+        raise ValueError(
+            f"The 'step_index' must be a step number from 1 to {n_steps} (it's 1-based), "
+            f"not {step_index}."
+        )
 
     if not getattr(validator, "time_processed", None):
         await ctx.warning(
             f"Validator '{validator_id}' has not been interrogated. Interrogating now."
         )
+        validator.interrogate()
 
     message = ""
     data_extract_df = None
 
     if step_index is not None:
         data_extract_df = validator.get_data_extracts(i=step_index, frame=True)
-        if data_extract_df is None or data_extract_df.empty:
+        if data_extract_df is None or len(data_extract_df) == 0:
             message = f"No data extract available for step {step_index}."
             data_extract_df = None
         else:
             message = f"Data extract for step {step_index} retrieved."
     else:
         data_extract_df = validator.get_sundered_data(type=sundered_type)
-        if data_extract_df is None or data_extract_df.empty:
+        if data_extract_df is None or len(data_extract_df) == 0:
             message = f"No sundered data available for type '{sundered_type}'."
             data_extract_df = None
         else:

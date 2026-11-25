@@ -94,8 +94,8 @@ def prompt_get_validation_step_output(
     validator_id: Annotated[str, "Example ID of the Validator."] = "validator_123",
     step_index: Annotated[
         Optional[int],
-        "Example step index for the first mode of operation.",
-    ] = 0,
+        "Example step number (1-based) for the first mode of operation.",
+    ] = 1,
     sundered_type: Annotated[
         Optional[str], "Example sundered type ('pass' or 'fail') for the second mode of operation."
     ] = "fail",
