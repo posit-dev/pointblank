@@ -1022,7 +1022,7 @@ def _check_for_unpicklable_objects(validation: Validate) -> tuple[dict[str, str]
                     # Functions defined in __main__ or without a module are risky
                     # These might pickle now but fail when loaded elsewhere
                     function_sources[func_name] = source_code  # pragma: no cover
-                    validation_info._pb_function_name = func_name  # pragma: no cover
+                    cast(Any, validation_info)._pb_function_name = func_name  # pragma: no cover
 
             except (OSError, TypeError):  # pragma: no cover
                 # If we can't get source, check if it's at least picklable
@@ -1556,6 +1556,7 @@ def write_file(
                     for info in preprocessing_funcs:
                         if (
                             hasattr(info, "pre")
+                            and info.pre is not None
                             and hasattr(info.pre, "__module__")
                             and info.pre.__module__ not in ["__main__", None]
                         ):
@@ -6598,13 +6599,13 @@ class Validate:
             )
 
         # TODO: Add functionality to obtain the column names and types from the table
-        self.col_names = None
-        self.col_types = None
+        self.col_names: list[str] | None = None
+        self.col_types: list[str] | None = None
 
-        self.time_start = None
-        self.time_end = None
+        self.time_start: datetime.datetime | None = None
+        self.time_end: datetime.datetime | None = None
 
-        self.validation_info = []
+        self.validation_info: list[_ValidationInfo] = []
 
     def _add_agg_validation(
         self,
@@ -22882,25 +22883,24 @@ class Validate:
             validate_args.append((f"tbl_name={json.dumps(self.tbl_name)}", None))
         if self.label is not None:
             validate_args.append((f"label={json.dumps(self.label)}", None))
-        global_thresholds = _thresholds_as_dict(self._normalized_thresholds())
+        thresholds = self._normalized_thresholds()
+        brief = self._normalized_brief()
+        lang = self._normalized_lang()
+        locale = self._normalized_locale()
+        global_thresholds = _thresholds_as_dict(thresholds)
         if global_thresholds:
-            validate_args.append(
-                (f"thresholds={_render_thresholds_code(self._normalized_thresholds())}", None)
-            )
+            validate_args.append((f"thresholds={_render_thresholds_code(thresholds)}", None))
         if self.actions is not None:
             warnings_out.append(
                 "Table-level `actions=` cannot be serialized to code and were omitted."
             )
-        if self._normalized_brief() is not None and self._normalized_brief() is not False:
-            brief_val = True if self._normalized_brief() == "{auto}" else self._normalized_brief()
+        if brief is not None and brief is not False:
+            brief_val = True if brief == "{auto}" else brief
             validate_args.append((f"brief={_render_code_value(brief_val)}", None))
-        if self._normalized_lang() is not None and self._normalized_lang() != "en":
-            validate_args.append((f"lang={json.dumps(self._normalized_lang())}", None))
-        if (
-            self._normalized_locale() is not None
-            and self._normalized_locale() != self._normalized_lang()
-        ):
-            validate_args.append((f"locale={json.dumps(self._normalized_locale())}", None))
+        if lang is not None and lang != "en":
+            validate_args.append((f"lang={json.dumps(lang)}", None))
+        if locale is not None and locale != lang:
+            validate_args.append((f"locale={json.dumps(locale)}", None))
         for attr in ("owner", "version"):
             value = getattr(self, attr)
             if value is not None:
@@ -23036,20 +23036,18 @@ class Validate:
             config["tbl_name"] = self.tbl_name
         if self.label is not None:
             config["label"] = self.label
+        brief = self._normalized_brief()
+        lang = self._normalized_lang()
+        locale = self._normalized_locale()
         global_thresholds = _thresholds_as_dict(self._normalized_thresholds())
         if global_thresholds:
             config["thresholds"] = global_thresholds
-        if self._normalized_brief() is not None and self._normalized_brief() is not False:
-            config["brief"] = (
-                True if self._normalized_brief() == "{auto}" else self._normalized_brief()
-            )
-        if self._normalized_lang() is not None and self._normalized_lang() != "en":
-            config["lang"] = self._normalized_lang()
-        if (
-            self._normalized_locale() is not None
-            and self._normalized_locale() != self._normalized_lang()
-        ):
-            config["locale"] = self._normalized_locale()
+        if brief is not None and brief is not False:
+            config["brief"] = True if brief == "{auto}" else brief
+        if lang is not None and lang != "en":
+            config["lang"] = lang
+        if locale is not None and locale != lang:
+            config["locale"] = locale
         for attr in ("owner", "version"):
             value = getattr(self, attr)
             if value is not None:
@@ -26559,7 +26557,8 @@ class Validate:
         elif assertion_type == "col_schema_match":
             step_report = _step_report_schema(
                 step=i,
-                schema_info=val_info,
+                # (a `col_schema_match()` step always has its schema details)
+                schema_info=cast(dict[str, Any], val_info),
                 header=header,
                 lang=lang,
                 debug_return_df=debug_return_df,
@@ -27011,7 +27010,10 @@ class Validate:
         """
 
         # Get the largest value of `i_o` in the `validation_info`
-        max_i_o = max([validation.i_o for validation in self.validation_info], default=0)
+        max_i_o = max(
+            [validation.i_o for validation in self.validation_info if validation.i_o is not None],
+            default=0,
+        )
 
         # Set the `i_o` attribute to the largest value of `i_o` plus 1
         validation_info.i_o = max_i_o + 1
@@ -27255,7 +27257,7 @@ class Validate:
 
         return self
 
-    def _get_validation_dict(self, i: int | list[int] | None, attr: str) -> dict[int, int]:
+    def _get_validation_dict(self, i: int | list[int] | None, attr: str) -> dict[int, Any]:
         """
         Utility function to get a dictionary of validation attributes for each validation step.
 
@@ -27269,19 +27271,17 @@ class Validate:
 
         Returns
         -------
-        dict[int, int]
+        dict[int, Any]
             A dictionary of the attribute values for each validation step.
         """
         if isinstance(i, int):
             i = [i]
 
-        if i is None:
-            return {validation.i: getattr(validation, attr) for validation in self.validation_info}
-
+        # (every step is numbered when it's added, so `validation.i` is an int)
         return {
-            validation.i: getattr(validation, attr)
+            cast(int, validation.i): getattr(validation, attr)
             for validation in self.validation_info
-            if validation.i in i
+            if i is None or validation.i in i
         }
 
     def _execute_final_actions(self) -> None:
@@ -33412,7 +33412,8 @@ def _pl_concat_horizontal(frames: list[Any]) -> Any:
     import polars as pl
 
     polars_version = tuple(int(part) for part in re.findall(r"\d+", version("polars"))[:3])
-    how = "horizontal_extend" if polars_version >= (1, 42, 1) else "horizontal"
+    # (typed loosely since the Polars stubs before 1.42.1 don't list `"horizontal_extend"`)
+    how: Any = "horizontal_extend" if polars_version >= (1, 42, 1) else "horizontal"
     return pl.concat(frames, how=how)
 
 
