@@ -73,6 +73,32 @@ def test_empty_tables_have_a_single_test_unit():
     v = pb.Validate(empty).tbl_match(other).interrogate()
     assert (_step(v).n, _step(v).n_failed, _step(v).all_passed) == (1, 1, False)
 
+    # Two empty tables with no columns in common don't match, even under `schema="common"`
+    unrelated = pl.DataFrame({"z": []}, schema={"z": pl.Float64})
+    v = pb.Validate(empty).tbl_match(unrelated, schema="common").interrogate()
+    assert (_step(v).n, _step(v).n_failed, _step(v).all_passed) == (1, 1, False)
+
+
+@pytest.mark.parametrize("keys", [None, "*"])
+def test_tables_without_common_columns_fail_under_common_schema(keys):
+    data = pl.DataFrame({"sku": ["A", "B", "C"], "price": [1.0, 2.0, 3.0]})
+    other = pl.DataFrame({"id": [1, 2, 3], "name": ["a", "b", "c"]})
+
+    v = pb.Validate(data).tbl_match(other, keys=keys, schema="common").interrogate()
+
+    assert (_step(v).n, _step(v).n_passed, _step(v).n_failed) == (3, 0, 3)
+    assert v.all_passed() is False
+
+
+def test_sundering_without_common_columns():
+    data = pl.DataFrame({"sku": ["A", "B", "C"], "price": [1.0, 2.0, 3.0]})
+    other = pl.DataFrame({"id": [1, 2, 3], "name": ["a", "b", "c"]})
+
+    v = pb.Validate(data).tbl_match(other, schema="common").interrogate()
+
+    assert len(v.get_sundered_data(type="pass")) == 0
+    assert len(v.get_sundered_data(type="fail")) == 3
+
 
 # ----------------------------------------------------------------------------------------------
 # Row-level test units and comparison settings
@@ -276,6 +302,25 @@ def test_step_report():
     # A custom header template
     html = v.get_step_report(i=1, header="Custom: {title}").as_raw_html()
     assert "Custom:" in html
+
+
+def test_step_report_names_the_comparison_table_like_compare(tmp_path):
+    v = (
+        pb.Validate(TARGET)
+        .tbl_match(SOURCE, keys="id")
+        .tbl_reconcile(SOURCE, measures="id", agg="count")
+        .interrogate()
+    )
+    for i in (1, 2):
+        comparison = _step(v, i).val_info["comparison"]
+        assert (comparison.source_name, comparison.target_name) == ("source", "target")
+
+    # A file path names the source, as in `compare()`
+    path = tmp_path / "expected.csv"
+    SOURCE.write_csv(path)
+    v = pb.Validate(TARGET, tbl_name="orders").tbl_match(str(path), keys="id").interrogate()
+    comparison = _step(v).val_info["comparison"]
+    assert (comparison.source_name, comparison.target_name) == (str(path), "orders")
 
 
 def test_step_report_dup_keys_compare():

@@ -37,7 +37,7 @@ from great_tables import GT, from_column, google_font, html, loc, md, style, val
 from great_tables.gt import _get_column_of_values
 from great_tables.vals import fmt_integer, fmt_number
 from importlib.resources import files
-from narwhals.dependencies import is_narwhals_lazyframe, is_polars_lazyframe
+from narwhals.dependencies import is_narwhals_lazyframe, is_polars_lazyframe, is_pyarrow_table
 
 from pointblank._agg import (
     is_valid_agg,
@@ -80,6 +80,7 @@ from pointblank._interrogation import (
     SpeciallyValidation,
     StepEvaluationError,
     _first_line,
+    _ibis_backend_supports_is_nan,
     _safe_is_nan_or_null_expr,
     apply_missing_exclusion,
     col_count_match_details,
@@ -2528,6 +2529,16 @@ def _generate_display_table(
     if "pyspark" not in tbl_type:
         data = copy.deepcopy(data)
 
+    # Do we have a DataFrame library to work with? We need at least one to display
+    # the table using Great Tables
+    _check_any_df_lib(method_used="preview_tbl")
+
+    # Display a PyArrow table through Polars (or Pandas), but keep its type for the header
+    input_tbl_type = tbl_type
+    if is_pyarrow_table(data):
+        df_lib = _select_df_lib(preference="polars")
+        data = df_lib.from_arrow(data) if df_lib.__name__ == "polars" else data.to_pandas()
+
     # Does the data table already have a leading row number column? (Column names of lazy tables
     # are read from the schema, which avoids resolving the full query)
     data_columns = (
@@ -2544,10 +2555,6 @@ def _generate_display_table(
     # Check that the n_head and n_tail aren't greater than the limit
     if limit is not None and n_head + n_tail > limit:
         raise ValueError(f"The sum of `n_head=` and `n_tail=` cannot exceed the limit ({limit}).")
-
-    # Do we have a DataFrame library to work with? We need at least one to display
-    # the table using Great Tables
-    _check_any_df_lib(method_used="preview_tbl")
 
     # Set flag for whether the full dataset is shown, or just the head and tail; if the table
     # is very small, the value likely will be `True`
@@ -2924,7 +2931,9 @@ def _generate_display_table(
         col_dtype_labels_dict = {"_row_num_": ""} | col_dtype_labels_dict
 
     # Create the label, table type, and thresholds HTML fragments
-    table_type_html = _create_table_type_html(tbl_type=tbl_type, tbl_name=None, font_size="10px")
+    table_type_html = _create_table_type_html(
+        tbl_type=input_tbl_type, tbl_name=None, font_size="10px"
+    )
 
     tbl_dims_html = _create_table_dims_html(
         columns=n_columns,
@@ -3232,12 +3241,14 @@ def missing_vals_tbl(
 
     By default, missingness is treated as binary (a value is either Null or it isn't) and the
     function renders a sector-based heatmap of the proportion of Null values across the rows of each
-    column. When a `missing=` mapping of columns to [`MissingSpec`](`pointblank.MissingSpec`) objects
+    column. A `NaN` in a floating-point column counts as Null, as it does in
+    [`col_vals_null()`](`pointblank.Validate.col_vals_null`) and the other checks for missing
+    values. When a `missing=` mapping of columns to [`MissingSpec`](`pointblank.MissingSpec`) objects
     is supplied, the function instead renders a *structured missingness* breakdown: one row per
     column with the count and percentage of complete values and of each missing *reason* (e.g.,
     `refused`, `not_asked`). Declared (coded) reasons are grouped under a "Missing Reasons" spanner
-    and keep their raw input form as labels; actual `Null`/`None`/`NA` values (which are not part of
-    the spec) are tallied in a fixed "Null" column at the far right (styled like "Complete"), so
+    and keep their raw input form as labels; actual `Null`/`None`/`NA`/`NaN` values (which are not
+    part of the spec) are tallied in a fixed "Null" column at the far right (styled like "Complete"), so
     they aren't mistaken for declared reasons.
 
     Note that supplying `missing=` produces a *different report* than the default view: it is a
@@ -3347,6 +3358,16 @@ def missing_vals_tbl(
     if missing is not None:
         return _build_structured_missing_tbl(data=data, missing=missing, as_heatmap=as_heatmap)
 
+    # The sector heatmap slices the table by rows, so a Polars LazyFrame is collected and a
+    # PyArrow table is converted to a Polars (or pandas) DataFrame; the header still shows the
+    # type of the table that was passed in
+    input_tbl_type = tbl_type
+    if is_polars_lazyframe(data):
+        data = data.collect()
+    elif is_pyarrow_table(data):
+        df_lib = _select_df_lib(preference="polars")
+        data = df_lib.from_arrow(data) if df_lib.__name__ == "polars" else data.to_pandas()
+
     # Get the number of rows in the table
     n_rows = get_row_count(data)
 
@@ -3390,8 +3411,6 @@ def missing_vals_tbl(
     # - get 10 cut points for table preview, these are row numbers used as buckets for determining
     #   the proportion of missing values in each 'sector' in each column
     if ibis_tbl:
-        from pointblank._interrogation import _ibis_backend_supports_is_nan
-
         # Get the column names from the table
         col_names = list(data.columns)
 
@@ -3672,7 +3691,9 @@ def missing_vals_tbl(
     n_missing_total_fmt = _format_to_integer_value(n_missing_total)
 
     # Create the label, table type, and thresholds HTML fragments
-    table_type_html = _create_table_type_html(tbl_type=tbl_type, tbl_name=None, font_size="10px")
+    table_type_html = _create_table_type_html(
+        tbl_type=input_tbl_type, tbl_name=None, font_size="10px"
+    )
 
     tbl_dims_html = _create_table_dims_html(
         # pyrefly: ignore[unbound-name]  # set only for Ibis and DataFrame tables (other table types aren't supported here)
@@ -18170,7 +18191,8 @@ class Validate:
             How schema differences affect the result. With `"strict"` (the default), any schema
             difference (other than renames given in `column_map=`) means the tables don't match,
             and every test unit fails. With `"common"`, only the shared columns are compared and
-            schema differences are reported without failing any test units.
+            schema differences are reported without failing any test units. Without `keys=`,
+            there must be at least one shared column for any test unit to pass.
         dup_keys
             Rows whose key appears more than once in either table always fail. With `"flag"` (the
             default), the step report lists the duplicated keys. With `"compare"`, the step report
@@ -20502,7 +20524,13 @@ class Validate:
 
                         # The comparison table is the source (expected data) and the table under
                         # validation is the target; each aligned row (`tbl_match()`) or key group
-                        # (`tbl_reconcile()`) is one test unit
+                        # (`tbl_reconcile()`) is one test unit. As in `compare()`, a file path
+                        # names the source in the report.
+                        source_name = (
+                            str(tbl_compare)
+                            if isinstance(tbl_compare, (str, os.PathLike))
+                            else "source"
+                        )
                         try:
                             if assertion_type == "tbl_reconcile":
                                 comparison = _reconcile(
@@ -20514,7 +20542,7 @@ class Validate:
                                     tolerance=value.get("tolerance"),
                                     column_map=value.get("column_map"),
                                     partitions=value.get("partitions"),
-                                    source_name="tbl_compare",
+                                    source_name=source_name,
                                     target_name=self.tbl_name or "target",
                                 )
                             else:
@@ -20531,7 +20559,7 @@ class Validate:
                                     dup_keys=value.get("dup_keys", "flag"),
                                     order_by=value.get("order_by"),
                                     partitions=value.get("partitions"),
-                                    source_name="tbl_compare",
+                                    source_name=source_name,
                                     target_name=self.tbl_name or "target",
                                     # Without keys, tables with no inherent row order (PySpark,
                                     # databases) are compared in the order their rows are

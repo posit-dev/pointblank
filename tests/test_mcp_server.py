@@ -6,6 +6,7 @@ import pytest
 pytest.importorskip("mcp", reason="mcp package not installed", exc_type=ImportError)
 
 from fastmcp import Client
+from fastmcp.exceptions import ToolError
 from pointblank.mcp.server import mcp
 
 
@@ -181,3 +182,148 @@ async def test_full_validation_workflow(mcp_server, csv_file: str, tmp_path: Pat
 
         assert len(pass_df) == 1  # Only the row with age=9 passed all validations
         assert pass_df.iloc[0]["age"] == 9
+
+
+@pytest.mark.asyncio
+async def test_get_validation_step_output_polars_backend(mcp_server, csv_file: str, tmp_path: Path):
+    """Test validation output export for a Polars-backed validator."""
+    pytest.importorskip("polars")
+
+    async with Client(mcp_server) as client:
+        load_result = await client.call_tool(
+            "load_dataframe", {"input_path": csv_file, "backend": "polars"}
+        )
+        assert not load_result.is_error
+        df_id = load_result.data.df_id
+
+        validator_result = await client.call_tool("create_validator", {"df_id": df_id})
+        assert not validator_result.is_error
+        validator_id = validator_result.data.validator_id
+
+        step_result = await client.call_tool(
+            "add_validation_step",
+            {
+                "validator_id": validator_id,
+                "validation_type": "col_vals_gt",
+                "params": {"columns": "age", "value": 30},
+            },
+        )
+        assert not step_result.is_error
+
+        interrogate_result = await client.call_tool(
+            "interrogate_validator", {"validator_id": validator_id}
+        )
+        assert not interrogate_result.is_error
+
+        step_output_path = str(tmp_path / "polars_step_output.csv")
+        step_output_result = await client.call_tool(
+            "get_validation_step_output",
+            {
+                "validator_id": validator_id,
+                "output_path": step_output_path,
+                "step_index": 1,
+            },
+        )
+        assert not step_output_result.is_error
+        assert step_output_result.data.output_file is not None
+        assert Path(step_output_result.data.output_file).exists()
+        assert len(pd.read_csv(step_output_result.data.output_file)) == 2
+
+        sundered_output_path = str(tmp_path / "polars_sundered_output.csv")
+        sundered_output_result = await client.call_tool(
+            "get_validation_step_output",
+            {
+                "validator_id": validator_id,
+                "output_path": sundered_output_path,
+                "sundered_type": "fail",
+            },
+        )
+        assert not sundered_output_result.is_error
+        assert sundered_output_result.data.output_file is not None
+        assert Path(sundered_output_result.data.output_file).exists()
+        assert len(pd.read_csv(sundered_output_result.data.output_file)) == 2
+
+
+async def _polars_validator(client, csv_file: str, value: int) -> str:
+    """Load the CSV with Polars and add one `col_vals_gt()` step on `age` (not interrogated)."""
+    df_id = (
+        await client.call_tool("load_dataframe", {"input_path": csv_file, "backend": "polars"})
+    ).data.df_id
+    validator_id = (await client.call_tool("create_validator", {"df_id": df_id})).data.validator_id
+    await client.call_tool(
+        "add_validation_step",
+        {
+            "validator_id": validator_id,
+            "validation_type": "col_vals_gt",
+            "params": {"columns": "age", "value": value},
+        },
+    )
+    return validator_id
+
+
+@pytest.mark.asyncio
+async def test_get_validation_step_output_polars_no_failures(
+    mcp_server, csv_file: str, tmp_path: Path
+):
+    """Test that a Polars-backed validator with no failing rows doesn't write a CSV."""
+    pytest.importorskip("polars")
+
+    async with Client(mcp_server) as client:
+        validator_id = await _polars_validator(client, csv_file, value=0)
+        await client.call_tool("interrogate_validator", {"validator_id": validator_id})
+
+        for args, message in [
+            ({"step_index": 1}, "No data extract available for step 1."),
+            ({"sundered_type": "fail"}, "No sundered data available for type 'fail'."),
+        ]:
+            result = await client.call_tool(
+                "get_validation_step_output",
+                {"validator_id": validator_id, "output_path": str(tmp_path / "out.csv"), **args},
+            )
+            assert result.data.output_file is None
+            assert result.data.message == message
+
+        assert not (tmp_path / "out.csv").exists()
+
+
+@pytest.mark.asyncio
+async def test_get_validation_step_output_interrogates_first(
+    mcp_server, csv_file: str, tmp_path: Path
+):
+    """Test that the output of a validator that wasn't interrogated is still exported."""
+    pytest.importorskip("polars")
+
+    async with Client(mcp_server) as client:
+        validator_id = await _polars_validator(client, csv_file, value=30)
+
+        result = await client.call_tool(
+            "get_validation_step_output",
+            {
+                "validator_id": validator_id,
+                "output_path": str(tmp_path / "out.csv"),
+                "step_index": 1,
+            },
+        )
+        assert len(pd.read_csv(result.data.output_file)) == 2
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("step_index", [0, 2, -1])
+async def test_get_validation_step_output_step_index_out_of_range(
+    mcp_server, csv_file: str, tmp_path: Path, step_index: int
+):
+    """Test that a step index outside of the validation's steps gives a clear error."""
+    pytest.importorskip("polars")
+
+    async with Client(mcp_server) as client:
+        validator_id = await _polars_validator(client, csv_file, value=30)
+
+        with pytest.raises(ToolError, match="must be a step number from 1 to 1"):
+            await client.call_tool(
+                "get_validation_step_output",
+                {
+                    "validator_id": validator_id,
+                    "output_path": str(tmp_path / "out.csv"),
+                    "step_index": step_index,
+                },
+            )

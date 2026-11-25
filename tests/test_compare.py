@@ -621,6 +621,53 @@ def test_compare_mixed_file_types():
     cmp = compare("data_raw/small_table.csv", "tests/tbl_files/tbl_xyz.parquet", schema="common")
     assert not cmp.schema_diff.matches
     assert cmp.compared_columns == []
+    # Positional rows with nothing to compare can't pass
+    assert cmp.n_passed == 0
+    assert not cmp.identical
+
+
+@pytest.mark.parametrize("schema", ["strict", "common"])
+@pytest.mark.parametrize("keys", [None, "*"])
+@pytest.mark.parametrize("backend", BACKENDS)
+def test_compare_without_common_columns_never_passes(backend, keys, schema):
+    if backend == "duckdb" and keys is None:
+        pytest.skip("positional alignment of database tables needs `order_by=`")
+    src = _make(backend, {"id": [1, 2, 3], "name": ["a", "b", "c"]}, "nc_src")
+    tgt = _make(backend, {"sku": ["A", "B", "C"], "price": [1.0, 2.0, 3.0]}, "nc_tgt")
+
+    cmp = compare(src, tgt, keys=keys, schema=schema)
+
+    assert cmp.compared_columns == []
+    # The rows keep their statuses, but none of them pass
+    assert cmp.status_counts["match"] == 3
+    assert (cmp.n, cmp.n_passed, cmp.n_failed) == (3, 0, 3)
+    assert not cmp.identical
+    assert not cmp
+    assert cmp.to_dict()["identical"] is False
+
+
+def test_compare_empty_tables_without_common_columns_are_not_identical():
+    src = pl.DataFrame({"id": []}, schema={"id": pl.Int64})
+    tgt = pl.DataFrame({"sku": []}, schema={"sku": pl.String})
+    for keys in (None, "*"):
+        cmp = compare(src, tgt, keys=keys, schema="common")
+        assert cmp.n == 0
+        assert not cmp.identical
+
+
+def test_compare_keyed_with_only_the_keys_in_common_still_passes():
+    # With keys, the comparison still checks which keys are present in both tables
+    src = pl.DataFrame({"id": [1, 2, 3], "name": ["a", "b", "c"]})
+    tgt = pl.DataFrame({"id": [1, 2, 3], "sku": ["A", "B", "C"]})
+
+    cmp = compare(src, tgt, keys="id", schema="common")
+
+    assert cmp.compared_columns == []
+    assert cmp.n_passed == 3
+    assert cmp.identical
+
+    partial = compare(src, tgt.head(2), keys="id", schema="common")
+    assert (partial.n_passed, partial.n_missing) == (2, 1)
 
 
 # ----------------------------------------------------------------------------------------------

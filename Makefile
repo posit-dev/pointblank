@@ -1,5 +1,3 @@
-.PHONY: check
-
 .PHONY: pyi
 pyi: ## Generate .pyi stub files
 	@uv run stubgen ./pointblank/validate.py \
@@ -63,11 +61,6 @@ run-pre-commit: # Run pre-commit hooks
 	@uvx pre-commit run --all-files
 
 
-check:
-	pyright --pythonversion 3.8 pointblank
-	pyright --pythonversion 3.9 pointblank
-	pyright --pythonversion 3.10 pointblank
-	pyright --pythonversion 3.11 pointblank
 
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
@@ -90,11 +83,6 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 
-dist: clean ## builds source and wheel package
-	python3 setup.py sdist
-	python3 setup.py bdist_wheel
-	ls -l dist
-
 .PHONY: docs-build
 docs-build: ## Build the documentation site with great-docs
 	@uv run great-docs build --jobs auto
@@ -114,6 +102,3 @@ docs-api-text: ## Regenerate api-docs.txt for DraftValidation/assistant
 	@uv run python scripts/generate_api_docs.py
 
 docs-full: docs-build ## Build docs
-
-install: dist ## install the package to the active Python's site-packages
-	python3 -m pip install --force-reinstall dist/pointblank*.whl

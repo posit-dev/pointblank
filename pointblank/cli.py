@@ -2492,15 +2492,16 @@ def _compare_load_source(data_source: str, duckdb_con: Any = None) -> Any:
     return data_source
 
 
-def _fmt_compare_value(value: Any, width: int = 30) -> str:
+def _fmt_compare_value(value: Any, width: int = 30, text: str | None = None) -> str:
+    """A value for the terminal summary (`text=` gives its display text, e.g. from
+    `_pair_texts()`, which keeps the difference between a changed pair of values visible)."""
     from rich.markup import escape
 
-    if value is None or (isinstance(value, float) and value != value):
+    from pointblank._compare_report import _is_null, _value_text
+
+    if _is_null(value):
         return "[dim italic]NULL[/dim italic]"
-    text = f"{value:.6g}" if isinstance(value, float) else str(value)
-    if len(text) > width:
-        text = text[: width - 1] + "…"
-    return escape(text)
+    return escape(text if text is not None else _value_text(value, width))
 
 
 def _compare_section(title: str) -> None:
@@ -2516,6 +2517,8 @@ def _compare_sample_title(title: str, shown: int, total: int) -> str:
 def _rich_print_comparison(cmp: Any, limit: int) -> None:
     """Print a terminal summary of a `Comparison`."""
     from rich.markup import escape
+
+    from pointblank._compare_report import _Ctx, _pair_texts, _summary_text
 
     status_style = {
         "match": "green",
@@ -2539,10 +2542,22 @@ def _rich_print_comparison(cmp: Any, limit: int) -> None:
         verdict = (
             f"[bold red]DIFFERENT[/bold red]: {cmp.n_failed:,} of {cmp.n:,} rows fail ({pct:.1f}%)"
         )
-        if not cmp.schema_ok:
+        if cmp._nothing_compared:
+            if not cmp.schema_ok:
+                verdict += "\n[red]Schema differs[/red]"
+            verdict += (
+                "\n[red]No columns compared[/red] "
+                "(no shared columns to compare: all rows count as failing)"
+            )
+        elif not cmp.schema_ok:
             verdict += (
                 "\n[red]Schema differs[/red] (strict schema check: all rows count as failing)"
             )
+    # (the terminal summary is in English)
+    ctx = _Ctx(unit=cmp.unit)
+    summary = _summary_text(cmp, ctx)
+    if summary is not None:
+        verdict += f"\n{escape(summary)}"
 
     header = (
         f"[bold]{escape(cmp.source_name)}[/bold] ({cmp.n_source_rows:,} rows) → "
@@ -2620,11 +2635,13 @@ def _rich_print_comparison(cmp: Any, limit: int) -> None:
             key = ", ".join(_fmt_compare_value(row[k]) for k in key_cols)
             for i, spec in enumerate(cmp._specs):
                 if row.get(f"__pb_d_{i}"):
+                    old, new = row[f"{spec.source}_source"], row[f"{spec.source}_target"]
+                    old_text, new_text = _pair_texts(old, new, width=30)
                     changed_tbl.add_row(
                         key,
                         escape(spec.source),
-                        _fmt_compare_value(row[f"{spec.source}_source"]),
-                        _fmt_compare_value(row[f"{spec.source}_target"]),
+                        _fmt_compare_value(old, text=old_text),
+                        _fmt_compare_value(new, text=new_text),
                     )
                     key = ""
         console.print(changed_tbl)
@@ -2633,6 +2650,18 @@ def _rich_print_comparison(cmp: Any, limit: int) -> None:
     for status, title in (("missing", "Missing from target"), ("extra", "Extra in target")):
         count = cmp.n_missing if status == "missing" else cmp.n_extra
         if not count:
+            continue
+        other_rows = cmp.n_target_rows if status == "missing" else cmp.n_source_rows
+        if other_rows == 0 or cmp._nothing_compared:
+            # (a sample would only repeat a table, or have no values)
+            _compare_section(_compare_sample_title(title, count, count))
+            if other_rows == 0:
+                note = ctx.t(
+                    "summary_target_empty" if status == "missing" else "summary_source_empty"
+                )
+            else:
+                note = ctx.t("no_values_note")
+            console.print(f"[dim]{escape(note)}[/dim]")
             continue
         frame = cmp._fetch(status, limit)
         columns = [c for c in frame.columns if not c.startswith("__pb_")][:8]

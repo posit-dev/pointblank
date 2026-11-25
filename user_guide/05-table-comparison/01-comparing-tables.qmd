@@ -65,10 +65,13 @@ comparison = pb.compare(source, target, keys="order_id")
 comparison
 ```
 
-The report's header gives the verdict and a breakdown of the rows. Below it, each section shows one
-kind of difference: which columns have mismatched values (and how often), then samples of the
-changed, missing, and extra rows. For changed rows, only the differing values are shown, as
-*old → new* with the numeric difference alongside.
+The report's header gives the verdict, a one-line summary of how different the tables are (from
+"1 of the 12 compared values differs" to "The tables have no keys in common"), and a breakdown of
+the rows. Below it, each section shows one kind of difference: which columns have mismatched values
+(and how often), then samples of the changed, missing, and extra rows. For changed rows, only the
+differing values are shown, as *old → new* with the numeric difference alongside. When the tables
+have no keys in common, the missing and extra keys are listed on a line each, so that an offset
+or a difference in how the keys are written is easy to spot.
 
 ## Row Statuses
 
@@ -198,6 +201,12 @@ pb.compare(
 
 To compare just some of the columns, list them in `columns=`. The schema check is then limited to
 the keys and those columns.
+
+A comparison without keys (by position or as multisets) aligns rows through their values alone, so
+it needs at least one shared column. If the tables have none, the report marks the comparison
+*NO COLUMNS COMPARED*, and no row passes, even with `schema="common"`. A keyed comparison whose only
+shared columns are the keys is still useful, since it checks which keys are present in both tables,
+so its rows pass as usual.
 
 ## Duplicate Keys
 

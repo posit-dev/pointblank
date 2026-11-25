@@ -51,12 +51,25 @@ def test_differences_exit_one_with_summary(files):
         "DIFFERENT",
         "Row status",
         "Column mismatches",
+        "1 of the 6 compared values differs.",
         "Changed rows (1)",
         "Missing from target (1)",
         "Extra in target (1)",
         "20.5",
     ]:
         assert text in result.output, text
+
+
+def test_rows_compared_with_an_empty_table_are_not_sampled(tmp_path, files):
+    src, _ = files
+    empty = tmp_path / "empty.csv"
+    SOURCE.head(0).write_csv(empty)
+
+    result = _run(src, str(empty), "-k", "id")
+    assert result.exit_code == 1
+    assert "The target table is empty." in result.output
+    assert "Missing from target (4)\nThe target table is empty." in result.output
+    assert "30.0" not in result.output
 
 
 def test_no_exit_code(files):
@@ -139,6 +152,31 @@ def test_schema_and_column_map_options(tmp_path, files):
     )
     assert common["identical"] is True
     assert common["compared_columns"] == ["amount"]
+
+
+def test_tables_without_common_columns(tmp_path, files):
+    src, _ = files
+    unrelated = tmp_path / "unrelated.csv"
+    pl.DataFrame({"sku": ["A", "B", "C", "D"], "price": [1.0, 2.0, 3.0, 4.0]}).write_csv(unrelated)
+
+    result = _run(src, str(unrelated), "--schema", "common")
+    assert result.exit_code == 1
+    assert "No columns compared" in result.output
+    assert "Schema differs" not in result.output
+
+    data = json.loads(_run(src, str(unrelated), "--schema", "common", "--format", "json").output)
+    assert data["identical"] is False
+    assert data["n_passed"] == 0
+
+
+def test_changed_values_stay_distinguishable(tmp_path):
+    src, tgt = tmp_path / "source.csv", tmp_path / "target.csv"
+    pl.DataFrame({"id": [1], "v": [1234567.891]}).write_csv(src)
+    pl.DataFrame({"id": [1], "v": [1234568.0]}).write_csv(tgt)
+
+    result = _run(str(src), str(tgt), "-k", "id")
+    assert "1234567.9" in result.output
+    assert "e+06" not in result.output
 
 
 def test_builtin_dataset(files):
