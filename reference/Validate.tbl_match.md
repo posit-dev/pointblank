@@ -212,6 +212,15 @@ Three of the five aligned rows failed: one changed, one missing from the target,
 validation.get_step_report(i=1)
 ```
 
-[TABLE]
+| Report for Validation Step 1 ✗ ASSERTION `tbl_match(keys='a')` **source** (4 rows) → **target** (4 rows), aligned by key `a` DIFFERENT 3 of 5 rows fail (60.0%) match **2**changed **1**missing **1**extra **1** |  |
+|----|----|
+| Column mismatches (1 of 2 columns) |  |
+| c | 1 of 3 matched rows differ (33.3%) |
+| Changed rows (1 row) |  |
+| 2 | c: 5 → 5.5 (+0.5) |
+| Missing from target (1 row) |  |
+| 3 | b: y c: 6 |
+| Extra in target (1 row) |  |
+| 5 | b: v c: 8 |
 
 The report groups the differences: column `c` is the only column with mismatched values, the row with key `2` changed (`5.0` became `5.5`), the row with key `3` is missing from the target, and the row with key `5` is extra. The key values identify each row, so you can look up the problem rows in either table.

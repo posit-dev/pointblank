@@ -77,7 +77,44 @@ comparison = pb.compare(
 comparison
 ```
 
-[TABLE]
+| Table Comparison |  |
+|----|----|
+| **/tmp/tmpln00h2h7/source.csv** (200,000 rows) → **/tmp/tmpln00h2h7/target.csv** (199,850 rows), aligned by key `order_id` DIFFERENT 650 of 200,050 rows fail (0.3%) match **199,400**changed **400**missing **200**extra **50** |  |
+| Column mismatches (1 of 2 columns) |  |
+| amount | 400 of 199,800 matched rows differ (0.2%) |
+| Changed rows (showing 10 of 400 rows) |  |
+| 3 | amount: 53.62 → 54.62 (+1) |
+| 503 | amount: 115.89 → 116.89 (+1) |
+| 1003 | amount: 104.27 → 105.27 (+1) |
+| 1503 | amount: 117.92 → 118.92 (+1) |
+| 2003 | amount: 56.37 → 57.37 (+1) |
+| 2503 | amount: 119.27 → 120.27 (+1) |
+| 3003 | amount: 88.82 → 89.82 (+1) |
+| 3503 | amount: 58.09 → 59.09 (+1) |
+| 4003 | amount: 86.61 → 87.61 (+1) |
+| 4503 | amount: 96.4 → 97.4 (+1) |
+| Missing from target (showing 10 of 200 rows) |  |
+| 7 | amount: 112.12 region: north |
+| 1007 | amount: 94.3 region: south |
+| 2007 | amount: 88.68 region: north |
+| 3007 | amount: 140 region: west |
+| 4007 | amount: 108.94 region: west |
+| 5007 | amount: 108.42 region: west |
+| 6007 | amount: 78.28 region: north |
+| 7007 | amount: 68.5 region: north |
+| 8007 | amount: 58.93 region: east |
+| 9007 | amount: 95.88 region: south |
+| Extra in target (showing 10 of 50 rows) |  |
+| 399950 | amount: 104.47 region: south |
+| 399951 | amount: 102.32 region: east |
+| 399952 | amount: 88.29 region: north |
+| 399953 | amount: 91.71 region: east |
+| 399954 | amount: 103.78 region: south |
+| 399955 | amount: 134.2 region: south |
+| 399956 | amount: 133.98 region: north |
+| 399957 | amount: 107.84 region: east |
+| 399958 | amount: 76.61 region: north |
+| 399959 | amount: 90.26 region: east |
 
 All four questions are answered in one place: missing and extra rows, changed rows (with the `amount` column identified as the one that differs), and the schema check in the header.
 

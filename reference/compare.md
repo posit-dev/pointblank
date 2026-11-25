@@ -145,7 +145,19 @@ comparison = pb.compare(
 comparison
 ```
 
-[TABLE]
+| Table Comparison |  |
+|----|----|
+| **catalog_v1** (5 rows) → **catalog_v2** (5 rows), aligned by key `sku` DIFFERENT 4 of 6 rows fail (66.7%) match **2**changed **2**missing **1**extra **1** |  |
+| Column mismatches (2 of 3 columns) |  |
+| price | 1 of 4 matched rows differ (25.0%) |
+| in_stock | 1 of 4 matched rows differ (25.0%) |
+| Changed rows (2 rows) |  |
+| A-102 | price: 149 → 139 (-10) |
+| A-105 | in_stock: True → False |
+| Missing from target (1 row) |  |
+| A-103 | name: Monitor arm price: 59.5 in_stock: False |
+| Extra in target (1 row) |  |
+| A-106 | name: USB hub price: 19.99 in_stock: True |
 
 The report's header gives the verdict and a breakdown of the six aligned rows. Below it are the columns with mismatched values, then samples of the changed, missing, and extra rows. For changed rows, only the differing values are shown.
 
@@ -195,7 +207,21 @@ catalog_v3 = catalog_v2.rename({"price": "unit_price"})
 pb.compare(catalog_v1, catalog_v3, keys="sku", column_map={"price": "unit_price"})
 ```
 
-[TABLE]
+| Table Comparison |  |
+|----|----|
+| **source** (5 rows) → **target** (5 rows), aligned by key `sku` DIFFERENT 4 of 6 rows fail (66.7%) match **2**changed **2**missing **1**extra **1** |  |
+| Schema differences |  |
+| price | renamed → `unit_price` (via `column_map=`) |
+| Column mismatches (2 of 3 columns) |  |
+| price → unit_price | 1 of 4 matched rows differ (25.0%) |
+| in_stock | 1 of 4 matched rows differ (25.0%) |
+| Changed rows (2 rows) |  |
+| A-102 | price: 149 → 139 (-10) |
+| A-105 | in_stock: True → False |
+| Missing from target (1 row) |  |
+| A-103 | name: Monitor arm price: 59.5 in_stock: False |
+| Extra in target (1 row) |  |
+| A-106 | name: USB hub unit_price: 19.99 in_stock: True |
 
 The rename is listed as a schema difference, but it no longer causes a failure, and the result is the same as the comparison of `catalog_v1` with `catalog_v2`. To make a comparison like this part of a validation, with thresholds, actions, and a step in the validation report, use [`Validate.tbl_match()`](../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) with the same arguments.
 

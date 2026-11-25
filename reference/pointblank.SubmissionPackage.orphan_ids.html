@@ -190,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="39"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="40"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -302,7 +302,7 @@ If <code>child</code> or <code>parent</code> isn’t a dataset in the package.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s make a package where the AE dataset has a subject, <code>S-009</code>, who isn’t in DM:</p>
-<div id="084db822" class="cell" data-execution_count="1">
+<div id="19a0de87" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -317,7 +317,7 @@ If <code>child</code> or <code>parent</code> isn’t a dataset in the package.
 </div>
 </div>
 <p>The orphan subject is found once, though they have two records in AE. The datasets that are compared can be changed with <code>parent=</code>. Here, a SUPPAE dataset holds supplemental qualifiers for adverse events, so each of its subjects should have a record in AE:</p>
-<div id="f48c5234" class="cell" data-execution_count="2">
+<div id="07ba8da0" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>suppae <span class="op">=</span> pl.DataFrame({<span class="st">"USUBJID"</span>: [<span class="st">"S-001"</span>, <span class="st">"S-002"</span>], <span class="st">"QNAM"</span>: [<span class="st">"AETRTEM"</span>, <span class="st">"AETRTEM"</span>]})</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> pb.SubmissionPackage(datasets<span class="op">=</span>{<span class="st">"DM"</span>: dm, <span class="st">"AE"</span>: ae, <span class="st">"SUPPAE"</span>: suppae})</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>

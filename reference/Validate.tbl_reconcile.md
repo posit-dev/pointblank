@@ -147,7 +147,14 @@ Of the four regions, `north` and `south` reconcile; `east` has a different total
 validation.get_step_report(i=1)
 ```
 
-[TABLE]
+| Report for Validation Step 1 ✗ ASSERTION `tbl_reconcile(keys='region', measures='amount', agg='sum', column_map={'amount': 'amt'})` **source** (4 groups) → **target** (3 groups), aligned by key `region` DIFFERENT 2 of 4 groups fail (50.0%) match **2**changed **1**missing **1**extra **0** `sum` by `region` |  |
+|----|----|
+| Column mismatches (1 of 1 columns) |  |
+| amount_sum | 1 of 3 matched groups differ (33.3%) |
+| Changed groups (1 group) |  |
+| east | amount_sum: 30 → 31 (+1) |
+| Missing from target (1 group) |  |
+| west | amount_sum: 12 |
 
 Grand totals don't need any keys. Here, the total amount matches within a tolerance of `20`, and so the step passes:
 

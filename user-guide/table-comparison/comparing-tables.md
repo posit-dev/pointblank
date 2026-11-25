@@ -45,7 +45,17 @@ comparison = pb.compare(source, target, keys="order_id")
 comparison
 ```
 
-[TABLE]
+| Table Comparison |  |
+|----|----|
+| **source** (5 rows) → **target** (5 rows), aligned by key `order_id` DIFFERENT 3 of 6 rows fail (50.0%) match **3**changed **1**missing **1**extra **1** |  |
+| Column mismatches (1 of 3 columns) |  |
+| amount | 1 of 4 matched rows differ (25.0%) |
+| Changed rows (1 row) |  |
+| 1002 | amount: 40.5 → 45.5 (+5) |
+| Missing from target (1 row) |  |
+| 1003 | customer: Cho amount: 12.75 status: pending |
+| Extra in target (1 row) |  |
+| 1006 | customer: Fay amount: 18.25 status: pending |
 
 The report's header gives the verdict and a breakdown of the rows. Below it, each section shows one kind of difference: which columns have mismatched values (and how often), then samples of the changed, missing, and extra rows. For changed rows, only the differing values are shown, as *old → new* with the numeric difference alongside.
 
@@ -197,7 +207,20 @@ pb.compare(
 )
 ```
 
-[TABLE]
+| Table Comparison |  |
+|----|----|
+| **source** (5 rows) → **target** (5 rows), aligned by key `order_id` DIFFERENT 3 of 6 rows fail (50.0%) match **3**changed **1**missing **1**extra **1** schema: common columns |  |
+| Schema differences |  |
+| region | only in target |
+| customer | renamed → `customer_name` (via `column_map=`) |
+| Column mismatches (1 of 3 columns) |  |
+| amount | 1 of 4 matched rows differ (25.0%) |
+| Changed rows (1 row) |  |
+| 1002 | amount: 40.5 → 45.5 (+5) |
+| Missing from target (1 row) |  |
+| 1003 | customer: Cho amount: 12.75 status: pending |
+| Extra in target (1 row) |  |
+| 1006 | customer_name: Fay amount: 18.25 status: pending region: EU |
 
 To compare just some of the columns, list them in `columns=`. The schema check is then limited to the keys and those columns.
 
@@ -233,7 +256,16 @@ Three of the six aligned rows differ, exceeding both the 'warning' and 'error' t
 validation.get_step_report(i=1)
 ```
 
-[TABLE]
+| Report for Validation Step 1 ✗ ASSERTION `tbl_match(keys='order_id')` **source** (5 rows) → **orders** (5 rows), aligned by key `order_id` DIFFERENT 3 of 6 rows fail (50.0%) match **3**changed **1**missing **1**extra **1** |  |
+|----|----|
+| Column mismatches (1 of 3 columns) |  |
+| amount | 1 of 4 matched rows differ (25.0%) |
+| Changed rows (1 row) |  |
+| 1002 | amount: 40.5 → 45.5 (+5) |
+| Missing from target (1 row) |  |
+| 1003 | customer: Cho amount: 12.75 status: pending |
+| Extra in target (1 row) |  |
+| 1006 | customer: Fay amount: 18.25 status: pending |
 
 The data extract for the step contains the failing rows from both tables, with a `_status_` column and source/target value pairs:
 
@@ -286,7 +318,16 @@ validation = (
 validation.get_step_report(i=1)
 ```
 
-[TABLE]
+| Report for Validation Step 1 ✗ ASSERTION `tbl_reconcile(keys='customer', measures='amount', agg='sum')` **source** (5 groups) → **order_lines** (5 groups), aligned by key `customer` DIFFERENT 3 of 6 groups fail (50.0%) match **3**changed **1**missing **1**extra **1** `sum` by `customer` |  |
+|----|----|
+| Column mismatches (1 of 1 columns) |  |
+| amount_sum | 1 of 4 matched groups differ (25.0%) |
+| Changed groups (1 group) |  |
+| Ben | amount_sum: 40.5 → 45.5 (+5) |
+| Missing from target (1 group) |  |
+| Cho | amount_sum: 12.75 |
+| Extra in target (1 group) |  |
+| Fay | amount_sum: 18.25 |
 
 `Ben`'s two order lines add up to more than his order in the source, `Cho` is missing, and `Fay` is new. Without `keys=`, [tbl_reconcile()](../../reference/Validate.tbl_reconcile.md#pointblank.Validate.tbl_reconcile) compares grand totals (a single test unit), and `agg="count"` without `measures=` compares the number of rows in each group. Tolerances, `column_map=`, and `partitions=` work as they do in [tbl_match()](../../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match). Rows with a null key form a group of their own, which is matched with the other table's null-key group.
 
