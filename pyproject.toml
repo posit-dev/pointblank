@@ -144,7 +144,7 @@ dev = [
     "shiny>=1.4.0",
     "openpyxl>=3.0.0",
     "fastmcp>=2.14.2",
-    "pyrefly>=1.5.0",
+    "pyrefly==1.5.0",  # NOTE: pinned since new releases can add errors (CI runs the type checker)
     "mypy>=1.19.0",
     "tox-uv>=1.33.4",
     "tox>=4.49.1",
