@@ -2523,7 +2523,7 @@ def _rich_print_comparison(cmp: Any, limit: int) -> None:
     """Print a terminal summary of a `Comparison`."""
     from rich.markup import escape
 
-    from pointblank._compare_report import _pair_texts
+    from pointblank._compare_report import _Ctx, _pair_texts, _summary_text
 
     status_style = {
         "match": "green",
@@ -2558,6 +2558,11 @@ def _rich_print_comparison(cmp: Any, limit: int) -> None:
             verdict += (
                 "\n[red]Schema differs[/red] (strict schema check: all rows count as failing)"
             )
+    # (the terminal summary is in English)
+    ctx = _Ctx(unit=cmp.unit)
+    summary = _summary_text(cmp, ctx)
+    if summary is not None:
+        verdict += f"\n{escape(summary)}"
 
     header = (
         f"[bold]{escape(cmp.source_name)}[/bold] ({cmp.n_source_rows:,} rows) → "
@@ -2650,6 +2655,18 @@ def _rich_print_comparison(cmp: Any, limit: int) -> None:
     for status, title in (("missing", "Missing from target"), ("extra", "Extra in target")):
         count = cmp.n_missing if status == "missing" else cmp.n_extra
         if not count:
+            continue
+        other_rows = cmp.n_target_rows if status == "missing" else cmp.n_source_rows
+        if other_rows == 0 or cmp._nothing_compared:
+            # (a sample would only repeat a table, or have no values)
+            _compare_section(_compare_sample_title(title, count, count))
+            if other_rows == 0:
+                note = ctx.t(
+                    "summary_target_empty" if status == "missing" else "summary_source_empty"
+                )
+            else:
+                note = ctx.t("no_values_note")
+            console.print(f"[dim]{escape(note)}[/dim]")
             continue
         frame = cmp._fetch(status, limit)
         columns = [c for c in frame.columns if not c.startswith("__pb_")][:8]
