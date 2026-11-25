@@ -152,9 +152,11 @@ validation.get_step_report(i=1)
 | Column mismatches (1 of 1 columns) |  |
 | amount_sum | 1 of 3 matched groups differ (33.3%) |
 | Changed groups (1 group) |  |
-| east | amount_sum: 30 → 31 (+1) |
+| region | sourcetarget |
+| east | amount_sum30→31(+1) |
 | Missing from target (1 group) |  |
-| west | amount_sum: 12 |
+| region | amount_sum |
+| west | 12 |
 
 Grand totals don't need any keys. Here, the total amount matches within a tolerance of `20`, and so the step passes:
 

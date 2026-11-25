@@ -217,10 +217,13 @@ validation.get_step_report(i=1)
 | Column mismatches (1 of 2 columns) |  |
 | c | 1 of 3 matched rows differ (33.3%) |
 | Changed rows (1 row) |  |
-| 2 | c: 5 → 5.5 (+0.5) |
+| a | sourcetarget |
+| 2 | c5→5.5(+0.5) |
 | Missing from target (1 row) |  |
-| 3 | b: y c: 6 |
+| a | bc |
+| 3 | y6 |
 | Extra in target (1 row) |  |
-| 5 | b: v c: 8 |
+| a | bc |
+| 5 | v8 |
 
 The report groups the differences: column `c` is the only column with mismatched values, the row with key `2` changed (`5.0` became `5.5`), the row with key `3` is missing from the target, and the row with key `5` is extra. The key values identify each row, so you can look up the problem rows in either table.

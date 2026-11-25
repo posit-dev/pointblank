@@ -2214,7 +2214,7 @@ Important
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll create two simple tables to demonstrate the <code>tbl_match()</code> validation.</p>
-<div id="e806ff4c" class="cell" data-execution_count="2">
+<div id="d9a5890d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2352,7 +2352,7 @@ Important
 </div>
 </div>
 <p>Let’s validate that <code>tbl_1</code> matches <code>tbl_2</code>. Since these tables are identical, the validation should pass.</p>
-<div id="baf4aa01" class="cell" data-execution_count="3">
+<div id="2261219d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl_1)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .tbl_match(tbl_compare<span class="op">=</span>tbl_2)</span>
@@ -2523,7 +2523,7 @@ Important
 </div>
 <p>The validation table shows that all four test units (one per row) passed, indicating that the two tables match completely.</p>
 <p>Now, let’s compare against a table that has one different value, is missing a row, and has an extra row. Since the rows can be identified by column <code>a</code>, we’ll use it as the key.</p>
-<div id="e9f9e513" class="cell" data-execution_count="4">
+<div id="4b2927cd" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tbl_3 <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"a"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">5</span>],</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"b"</span>: [<span class="st">"w"</span>, <span class="st">"x"</span>, <span class="st">"z"</span>, <span class="st">"v"</span>],</span>
@@ -2699,7 +2699,7 @@ Important
 </div>
 </div>
 <p>Three of the five aligned rows failed: one changed, one missing from the target, and one extra. The step report shows exactly what differs.</p>
-<div id="9d25b092" class="cell" data-execution_count="5">
+<div id="49723cc4" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2767,12 +2767,7 @@ Important
  #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
-<table style="table-layout: fixed;; width: 900px" class="gt_table" aria-labelledby="pb_comparison_tbl-title" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
-<colgroup>
-  <col style="width:30%;">
-  <col style="width:70%;">
-</colgroup>
-
+<table class="gt_table" aria-labelledby="pb_comparison_tbl-title" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 
   <tr class="gt_heading">
@@ -2782,32 +2777,44 @@ Important
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-2-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 2 columns)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-2-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Column mismatches (1 of 2 columns)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left">c</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:33.33%; height:100%; background:#E8A33D;"></div></div>1 of 3 matched rows differ (33.3%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left">c</td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:33.33%; height:100%; background:#E8A33D;"></div></div>1 of 3 matched rows differ (33.3%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Changed rows (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left">2</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">c:</span> <span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">5.5</span> <span style="color:#888; font-size:11px;">(+0.5)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">a</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">source</bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">target</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">2</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;color:#666;"><bdi dir="ltr">c</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">5</span></bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr">→</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">5.5</span></bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr"><span style="color:#888; font-size:11px;">(+0.5)</span></bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #CF142B;">Missing from target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left">3</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">b:</span> y</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">c:</span> 6</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">a</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">b</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">c</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">3</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">y</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">6</bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #3D7CC9;">Extra in target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left">5</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">b:</span> v</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">c:</span> 8</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">a</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">b</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">c</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">5</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">v</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">8</bdi></span></div></td>
   </tr>
 </tbody>
 

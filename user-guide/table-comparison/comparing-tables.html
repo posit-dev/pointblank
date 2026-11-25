@@ -705,7 +705,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="a-first-comparison" class="level1">
 <h1>A First Comparison</h1>
 <p>Let’s make two small tables of orders. The target is a later extract of the same data: one order had its amount corrected, one order is gone, and a new order has appeared.</p>
-<div id="3e93391a" class="cell" data-execution_count="2">
+<div id="1575a51d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>source <span class="op">=</span> pl.DataFrame(</span>
@@ -727,7 +727,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <p>Since every order has a unique <code>order_id</code>, we’ll use it as the <em>key</em> to line up the rows of the two tables:</p>
-<div id="58e4cfaf" class="cell" data-execution_count="3">
+<div id="bdbd4e24" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>comparison <span class="op">=</span> pb.compare(source, target, keys<span class="op">=</span><span class="st">"order_id"</span>)</span>
@@ -799,12 +799,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
-<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
-<colgroup>
-  <col style="width:30%;">
-  <col style="width:70%;">
-</colgroup>
-
+<table class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 
   <tr class="gt_heading">
@@ -817,32 +812,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-3-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 3 columns)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-3-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Column mismatches (1 of 3 columns)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left">amount</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left">amount</td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Changed rows (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left">1002</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">order_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">source</bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">target</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">1002</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;color:#666;"><bdi dir="ltr">amount</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">40.5</span></bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr">→</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span></bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr"><span style="color:#888; font-size:11px;">(+5)</span></bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #CF142B;">Missing from target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left">1003</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">order_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:8ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">customer</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">amount</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">status</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">1003</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:8ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">Cho</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">12.75</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">pending</bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #3D7CC9;">Extra in target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left">1006</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">order_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:8ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">customer</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">amount</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">status</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">1006</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:8ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">Fay</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">18.25</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">pending</bdi></span></div></td>
   </tr>
 </tbody>
 
@@ -887,20 +894,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <p>The counts are available directly on the <a href="../../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> object:</p>
-<div id="e691cb51" class="cell" data-execution_count="4">
+<div id="9fa36fea" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison.status_counts</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>{'match': 3, 'changed': 1, 'missing': 1, 'extra': 1, 'dup_key': 0}</code></pre>
 </div>
 </div>
-<div id="c62f9fe0" class="cell" data-execution_count="5">
+<div id="29250f4a" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>comparison.n_changed, comparison.n_missing, comparison.n_extra</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>(1, 1, 1)</code></pre>
 </div>
 </div>
 <p>A <a href="../../reference/Comparison.html#pointblank.Comparison" class="gdls-link gdls-code">Comparison</a> is truthy only if the tables match, so it can be used directly in a test or an <code>if</code> statement:</p>
-<div id="46a70671" class="cell" data-execution_count="6">
+<div id="8e407707" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">bool</span>(comparison)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>False</code></pre>
@@ -910,7 +917,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="getting-the-differing-rows" class="level1">
 <h1>Getting the Differing Rows</h1>
 <p>Use the <a href="../../reference/Comparison.rows.html#pointblank.Comparison.rows" class="gdls-link gdls-code">rows()</a> method to get the rows with a given status as a table. Changed rows come with a <code>&lt;column&gt;_source</code> and a <code>&lt;column&gt;_target</code> column for each compared column:</p>
-<div id="46ba6696" class="cell" data-execution_count="7">
+<div id="56784fc0" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"changed"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div><style>
@@ -924,7 +931,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Missing rows come from the source and extra rows from the target:</p>
-<div id="8bd87c31" class="cell" data-execution_count="8">
+<div id="566bb4c2" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"missing"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div><style>
@@ -937,7 +944,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <small>shape: (1, 4)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>order_id</th><th>customer</th><th>amount</th><th>status</th></tr><tr><td>i64</td><td>str</td><td>f64</td><td>str</td></tr></thead><tbody><tr><td>1003</td><td>"Cho"</td><td>12.75</td><td>"pending"</td></tr></tbody></table></div>
 </div>
 </div>
-<div id="3f8a6f6a" class="cell" data-execution_count="9">
+<div id="a15b3cb3" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"extra"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div><style>
@@ -951,7 +958,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Only up to <code>limit=</code> rows (100 by default) are collected, so this is safe even for very large tables. For a per-column view of the mismatches, use <a href="../../reference/Comparison.column_summary.html#pointblank.Comparison.column_summary" class="gdls-link gdls-code">column_summary()</a>:</p>
-<div id="f6fd99fa" class="cell" data-execution_count="10">
+<div id="393cb262" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>comparison.column_summary()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div><style>
@@ -974,7 +981,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>As multisets</strong> (<code>keys="*"</code>): whole rows are compared regardless of their order, with duplicates counted. This is for tables that have no key at all.</li>
 </ul>
 <p>Here’s what positional alignment makes of the same two tables. Since a row was removed and another added, most rows no longer line up:</p>
-<div id="1f452d7f" class="cell" data-execution_count="11">
+<div id="74aaed6f" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>pb.compare(source, target).status_counts</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>{'match': 1, 'changed': 4, 'missing': 0, 'extra': 0, 'dup_key': 0}</code></pre>
@@ -984,7 +991,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="tolerances-normalization-and-nulls" class="level1">
 <h1>Tolerances, Normalization, and Nulls</h1>
 <p>Not every difference matters. Numeric and datetime columns can be compared with a tolerance, given for all numeric columns or per column. An absolute tolerance of <code>5</code> absorbs the corrected amount:</p>
-<div id="dcd49edf" class="cell" data-execution_count="12">
+<div id="40d95854" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>pb.compare(source, target, keys<span class="op">=</span><span class="st">"order_id"</span>, tolerance<span class="op">=</span>{<span class="st">"amount"</span>: <span class="dv">5</span>}).n_changed</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>0</code></pre>
@@ -997,7 +1004,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="schema-differences" class="level1">
 <h1>Schema Differences</h1>
 <p>Column differences are reported in the <em>Schema differences</em> section of the report and in the <code>schema_diff</code> attribute. Suppose the target renamed a column and added another:</p>
-<div id="ea19554b" class="cell" data-execution_count="13">
+<div id="1b5ea0af" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>target_v2 <span class="op">=</span> target.rename({<span class="st">"customer"</span>: <span class="st">"customer_name"</span>}).with_columns(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    region<span class="op">=</span>pl.lit(<span class="st">"EU"</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1010,7 +1017,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>With the default <code>schema="strict"</code>, any schema difference means the tables don’t match and every row counts as failing. Two arguments help here. <code>column_map=</code> pairs up renamed columns, and <code>schema="common"</code> compares only the columns that both tables share (still reporting the schema differences, but without failing any rows):</p>
-<div id="fc454ad6" class="cell" data-execution_count="14">
+<div id="290336ee" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>pb.compare(</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    source,</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    target_v2,</span>
@@ -1084,12 +1091,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
-<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
-<colgroup>
-  <col style="width:30%;">
-  <col style="width:70%;">
-</colgroup>
-
+<table class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 
   <tr class="gt_heading">
@@ -1102,43 +1104,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Schema-differences" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Schema differences</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Schema-differences" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #7A7A7A;">Schema differences</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left">region</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left"><span style="border:1px solid #3D7CC9; color:#3D7CC9; padding:0 5px; border-radius:3px; font-size:11px; white-space:nowrap;">only in target</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left">region</td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left"><span style="border:1px solid #3D7CC9; color:#3D7CC9; padding:0 5px; border-radius:3px; font-size:11px; white-space:nowrap;">only in target</span></td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left">customer</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left">renamed → <code>customer_name</code> (via <code>column_map=</code>)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left">customer</td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Schema-differences" class="gt_row gt_left">renamed → <code>customer_name</code> (via <code>column_map=</code>)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-3-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 3 columns)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-3-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Column mismatches (1 of 3 columns)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left">amount</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left">amount</td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Changed rows (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left">1002</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">order_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">source</bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">target</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">1002</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;color:#666;"><bdi dir="ltr">amount</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">40.5</span></bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr">→</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span></bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr"><span style="color:#888; font-size:11px;">(+5)</span></bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #CF142B;">Missing from target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left">1003</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">order_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:8ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">customer</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">amount</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">status</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">1003</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:8ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">Cho</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">12.75</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">pending</bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #3D7CC9;">Extra in target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left">1006</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer_name:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">region:</span> EU</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">order_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:13ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">customer_name</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">amount</bdi></span><span style="display:inline-block; width:7ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">status</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">region</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">1006</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:13ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">Fay</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">18.25</bdi></span><span style="display:inline-block; width:7ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">pending</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">EU</bdi></span></div></td>
   </tr>
 </tbody>
 
@@ -1157,7 +1171,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="table-comparison-as-a-validation-step" class="level1">
 <h1>Table Comparison as a Validation Step</h1>
 <p>The <a href="../../reference/Validate.tbl_match.html#pointblank.Validate.tbl_match" class="gdls-link gdls-code">tbl_match()</a> validation method uses the same comparison, which makes it a validation step like any other: it can have thresholds and actions, and it shows up in the validation report. The table being validated is the target, and <code>tbl_compare=</code> is the source. Every aligned row is a <em>test unit</em>, so thresholds can be set as a proportion of rows:</p>
-<div id="79369cd1" class="cell" data-execution_count="15">
+<div id="6649c6d1" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>target, tbl_name<span class="op">=</span><span class="st">"orders"</span>, thresholds<span class="op">=</span>(<span class="fl">0.1</span>, <span class="fl">0.25</span>))</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    .tbl_match(tbl_compare<span class="op">=</span>source, keys<span class="op">=</span><span class="st">"order_id"</span>)</span>
@@ -1340,7 +1354,7 @@ Note
 </div>
 </div>
 <p>Three of the six aligned rows differ, exceeding both the ‘warning’ and ‘error’ thresholds. The step report holds the full comparison:</p>
-<div id="4961765d" class="cell" data-execution_count="16">
+<div id="10026af2" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="16">
 <div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1408,12 +1422,7 @@ Note
  #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
-<table style="table-layout: fixed;; width: 900px" class="gt_table" aria-labelledby="pb_comparison_tbl-title" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
-<colgroup>
-  <col style="width:30%;">
-  <col style="width:70%;">
-</colgroup>
-
+<table class="gt_table" aria-labelledby="pb_comparison_tbl-title" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 
   <tr class="gt_heading">
@@ -1423,32 +1432,44 @@ Note
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-3-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 3 columns)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-3-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Column mismatches (1 of 3 columns)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left">amount</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left">amount</td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-3-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched rows differ (25.0%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Changed rows (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left">1002</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount:</span> <span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">order_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">source</bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">orders</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">1002</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;color:#666;"><bdi dir="ltr">amount</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">40.5</span></bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr">→</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span></bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr"><span style="color:#888; font-size:11px;">(+5)</span></bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #CF142B;">Missing from target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left">1003</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Cho</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 12.75</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">order_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:8ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">customer</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">amount</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">status</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">1003</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:8ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">Cho</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">12.75</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">pending</bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #3D7CC9;">Extra in target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left">1006</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">customer:</span> Fay</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount:</span> 18.25</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">status:</span> pending</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">order_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:8ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">customer</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">amount</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">status</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">1006</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:8ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">Fay</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">18.25</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">pending</bdi></span></div></td>
   </tr>
 </tbody>
 
@@ -1458,7 +1479,7 @@ Note
 </div>
 </div>
 <p>The data extract for the step contains the failing rows from both tables, with a <code>_status_</code> column and source/target value pairs:</p>
-<div id="a6d0e382" class="cell" data-execution_count="17">
+<div id="0d6c4174" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
 <div><style>
@@ -1484,7 +1505,7 @@ Note
 <h1>Reconciling Aggregates</h1>
 <p>Sometimes two tables shouldn’t have the same rows but should add up to the same numbers: a warehouse table loaded from a source system, a summary table built from detailed transactions, or two systems that record the same activity at different levels of detail. For these, the <a href="../../reference/Validate.tbl_reconcile.html#pointblank.Validate.tbl_reconcile" class="gdls-link gdls-code">tbl_reconcile()</a> validation method compares <em>aggregates</em> instead of rows. It groups both tables by the <code>keys=</code> columns, aggregates the <code>measures=</code> columns (with <code>agg="sum"</code> by default, or <code>"count"</code>, <code>"mean"</code>, <code>"min"</code>, or <code>"max"</code>), and compares the results group by group. Each group is a test unit.</p>
 <p>Here, the orders in the target have been loaded at a finer grain than in the source, so we reconcile the total amount per customer:</p>
-<div id="11fbdd7d" class="cell" data-execution_count="18">
+<div id="1bcdc668" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>order_lines <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="dv">1001</span>, <span class="dv">1002</span>, <span class="dv">1002</span>, <span class="dv">1004</span>, <span class="dv">1005</span>, <span class="dv">1006</span>],</span>
@@ -1566,12 +1587,7 @@ Note
  #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
-<table style="table-layout: fixed;; width: 900px" class="gt_table" aria-labelledby="pb_comparison_tbl-title" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
-<colgroup>
-  <col style="width:30%;">
-  <col style="width:70%;">
-</colgroup>
-
+<table class="gt_table" aria-labelledby="pb_comparison_tbl-title" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 
   <tr class="gt_heading">
@@ -1581,32 +1597,44 @@ Note
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-1-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 1 columns)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-1-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Column mismatches (1 of 1 columns)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-1-columns" class="gt_row gt_left">amount_sum</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-1-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched groups differ (25.0%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-1-columns" class="gt_row gt_left">amount_sum</td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-1-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:25.00%; height:100%; background:#E8A33D;"></div></div>1 of 4 matched groups differ (25.0%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-groups-1-group" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed groups (1 group)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-groups-1-group" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Changed groups (1 group)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left">Ben</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount_sum:</span> <span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">40.5</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span> <span style="color:#888; font-size:11px;">(+5)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">customer</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:10ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">source</bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">order_lines</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">Ben</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:10ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;color:#666;"><bdi dir="ltr">amount_sum</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">40.5</span></bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr">→</bdi></span><span style="display:inline-block; width:11ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">45.5</span></bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr"><span style="color:#888; font-size:11px;">(+5)</span></bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-group" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 group)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-group" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #CF142B;">Missing from target (1 group)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left">Cho</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount_sum:</span> 12.75</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">customer</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">amount_sum</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">Cho</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">12.75</bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-group" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 group)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-group" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #3D7CC9;">Extra in target (1 group)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-group" class="gt_row gt_left">Fay</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-group" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount_sum:</span> 18.25</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Extra-in-target-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">customer</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Extra-in-target-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">amount_sum</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Extra-in-target-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">Fay</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Extra-in-target-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">18.25</bdi></span></div></td>
   </tr>
 </tbody>
 
@@ -1620,7 +1648,7 @@ Note
 <section id="exporting-the-results" class="level1">
 <h1>Exporting the Results</h1>
 <p>The results can be serialized with <a href="../../reference/Comparison.to_dict.html#pointblank.Comparison.to_dict" class="gdls-link"><code>to_dict()</code></a> or <a href="../../reference/Comparison.to_json.html#pointblank.Comparison.to_json" class="gdls-link"><code>to_json()</code></a>, which include the counts, the schema differences, and (by default) samples of the differing rows. If the data could contain sensitive values, leave the samples out:</p>
-<div id="25e91d8b" class="cell" data-execution_count="19">
+<div id="6f65591e" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(comparison.to_json(samples<span class="op">=</span><span class="va">False</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>{

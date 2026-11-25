@@ -126,7 +126,7 @@ for metric in metrics:
     pb.validation.test_units.passed 7
     pb.validation.test_units.failed 3
     pb.validation.pass_rate 0.7
-    pb.validation.duration 0.01096
+    pb.validation.duration 0.024136
     pb.validation.threshold.warning 2
     pb.validation.threshold.error 2
     pb.validation.threshold.critical 1
@@ -203,7 +203,7 @@ validation = (
     • Highest Severity: critical
     • Total Steps: 2
     • Failed Steps: 2
-    • Time: 2026-11-25 03:55:58.025740
+    • Time: 2026-11-25 14:59:57.168249
     ==============
 
 The actions run in the order they're given, so the metrics are sent before the Slack message. The message summarizes the same results as the metrics: both steps failed, and the highest threshold level reached was critical.

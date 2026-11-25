@@ -78,11 +78,14 @@ comparison.get_tabular_report()
 | Column mismatches (1 of 2 columns) |  |
 | salary | 1 of 3 matched rows differ (33.3%) |
 | Changed rows (1 row) |  |
-| 102 | salary: 61000 → 63500 (+2500) |
+| emp_id | payroll_janpayroll_feb |
+| 102 | salary61000→63500(+2500) |
 | Missing from target (1 row) |  |
-| 104 | dept: Ops salary: 47000 |
+| emp_id | deptsalary |
+| 104 | Ops47000 |
 | Extra in target (1 row) |  |
-| 105 | dept: Ops salary: 49000 |
+| emp_id | deptsalary |
+| 105 | Ops49000 |
 
 The verdict and counts are at the top, and below them are the sections that have something to show: the mismatches in `salary`, the changed row for employee 102, and the employees who left and joined.
 
@@ -98,10 +101,13 @@ comparison.get_tabular_report(title="Paie : janvier et février", lang="fr")
 | Écarts par colonne (1 colonnes sur 2) |  |
 | salary | 1 lignes appariées sur 3 diffèrent (33,3%) |
 | Lignes modifiées (1 ligne) |  |
-| 102 | salary: 61000 → 63500 (+2500) |
+| emp_id | payroll_janpayroll_feb |
+| 102 | salary61000→63500(+2500) |
 | Absentes de la cible (1 ligne) |  |
-| 104 | dept: Ops salary: 47000 |
+| emp_id | deptsalary |
+| 104 | Ops47000 |
 | Supplémentaires dans la cible (1 ligne) |  |
-| 105 | dept: Ops salary: 49000 |
+| emp_id | deptsalary |
+| 105 | Ops49000 |
 
 Numbers are formatted for the French locale too, with a decimal comma (as in `60,0%`). Use `locale=` to format them differently from the labels. To save a report as a standalone HTML file, use the `write_raw_html()` method of the returned Great Tables object.

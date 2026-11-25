@@ -2168,7 +2168,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s reconcile a small table of loaded orders against the source system’s orders. The loaded table names the amount column differently, has a different number of rows (one order was split into two rows), and is missing the orders for one region.</p>
-<div id="26c1bdd3" class="cell" data-execution_count="2">
+<div id="0d16f90b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2355,7 +2355,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>Of the four regions, <code>north</code> and <code>south</code> reconcile; <code>east</code> has a different total, and <code>west</code> is missing from the loaded orders. The step report shows the details:</p>
-<div id="731d61c5" class="cell" data-execution_count="3">
+<div id="930d2e98" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2423,12 +2423,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
  #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
-<table style="table-layout: fixed;; width: 900px" class="gt_table" aria-labelledby="pb_comparison_tbl-title" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
-<colgroup>
-  <col style="width:30%;">
-  <col style="width:70%;">
-</colgroup>
-
+<table class="gt_table" aria-labelledby="pb_comparison_tbl-title" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 
   <tr class="gt_heading">
@@ -2438,25 +2433,33 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-1-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 1 columns)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-1-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Column mismatches (1 of 1 columns)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-1-columns" class="gt_row gt_left">amount_sum</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-1-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:33.33%; height:100%; background:#E8A33D;"></div></div>1 of 3 matched groups differ (33.3%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-1-columns" class="gt_row gt_left">amount_sum</td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-1-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:33.33%; height:100%; background:#E8A33D;"></div></div>1 of 3 matched groups differ (33.3%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-groups-1-group" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed groups (1 group)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-groups-1-group" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Changed groups (1 group)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left">east</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">amount_sum:</span> <span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">30</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">31</span> <span style="color:#888; font-size:11px;">(+1)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">region</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:10ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">source</bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">target</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">east</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Changed-groups-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:10ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;color:#666;"><bdi dir="ltr">amount_sum</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">30</span></bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr">→</bdi></span><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">31</span></bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr"><span style="color:#888; font-size:11px;">(+1)</span></bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-group" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 group)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-group" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #CF142B;">Missing from target (1 group)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left">west</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">amount_sum:</span> 12</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">region</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">amount_sum</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">west</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-group" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">12</bdi></span></div></td>
   </tr>
 </tbody>
 
@@ -2466,7 +2469,7 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 </div>
 </div>
 <p>Grand totals don’t need any keys. Here, the total amount matches within a tolerance of <code>20</code>, and so the step passes:</p>
-<div id="c073ad63" class="cell" data-execution_count="4">
+<div id="5dab0f95" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>loaded_orders)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .tbl_reconcile(</span>

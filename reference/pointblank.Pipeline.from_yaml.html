@@ -309,7 +309,7 @@ If the file is empty, if it has neither a <code>source</code> nor a <code>target
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s write the pipeline file shown above to a temporary directory, then load it.</p>
-<div id="a9cc1b18" class="cell" data-execution_count="2">
+<div id="bfd6e9f5" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -348,7 +348,7 @@ If the file is empty, if it has neither a <code>source</code> nor a <code>target
 </div>
 </div>
 <p>The loaded pipeline works like one defined in Python. Here it runs a transformation that converts weights from pounds to kilograms:</p>
-<div id="485d3898" class="cell" data-execution_count="3">
+<div id="f14835b3" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>raw_shipments <span class="op">=</span> pl.DataFrame({<span class="st">"shipment_id"</span>: [<span class="st">"S1"</span>, <span class="st">"S2"</span>], <span class="st">"weight_lb"</span>: [<span class="fl">26.5</span>, <span class="fl">410.0</span>]})</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> shipments_pipeline.run(</span>

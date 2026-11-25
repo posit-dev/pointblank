@@ -152,12 +152,15 @@ comparison
 | price | 1 of 4 matched rows differ (25.0%) |
 | in_stock | 1 of 4 matched rows differ (25.0%) |
 | Changed rows (2 rows) |  |
-| A-102 | price: 149 → 139 (-10) |
-| A-105 | in_stock: True → False |
+| sku | catalog_v1catalog_v2 |
+| A-102 | price149→139(-10) |
+| A-105 | in_stockTrue→False |
 | Missing from target (1 row) |  |
-| A-103 | name: Monitor arm price: 59.5 in_stock: False |
+| sku | namepricein_stock |
+| A-103 | Monitor arm59.5False |
 | Extra in target (1 row) |  |
-| A-106 | name: USB hub price: 19.99 in_stock: True |
+| sku | namepricein_stock |
+| A-106 | USB hub19.99True |
 
 The report's header gives the verdict and a breakdown of the six aligned rows. Below it are the columns with mismatched values, then samples of the changed, missing, and extra rows. For changed rows, only the differing values are shown.
 
@@ -216,12 +219,15 @@ pb.compare(catalog_v1, catalog_v3, keys="sku", column_map={"price": "unit_price"
 | price → unit_price | 1 of 4 matched rows differ (25.0%) |
 | in_stock | 1 of 4 matched rows differ (25.0%) |
 | Changed rows (2 rows) |  |
-| A-102 | price: 149 → 139 (-10) |
-| A-105 | in_stock: True → False |
+| sku | sourcetarget |
+| A-102 | price149→139(-10) |
+| A-105 | in_stockTrue→False |
 | Missing from target (1 row) |  |
-| A-103 | name: Monitor arm price: 59.5 in_stock: False |
+| sku | namepricein_stock |
+| A-103 | Monitor arm59.5False |
 | Extra in target (1 row) |  |
-| A-106 | name: USB hub unit_price: 19.99 in_stock: True |
+| sku | nameunit_pricein_stock |
+| A-106 | USB hub19.99True |
 
 The rename is listed as a schema difference, but it no longer causes a failure, and the result is the same as the comparison of `catalog_v1` with `catalog_v2`. To make a comparison like this part of a validation, with thresholds, actions, and a step in the validation report, use [`Validate.tbl_match()`](../reference/Validate.tbl_match.md#pointblank.Validate.tbl_match) with the same arguments.
 

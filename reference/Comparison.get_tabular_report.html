@@ -2096,7 +2096,7 @@ A Great Tables object.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s compare two months of a payroll table. Naming the tables with <code>source_name=</code> and <code>target_name=</code> makes the report easier to read.</p>
-<div id="3fbbc6b9" class="cell" data-execution_count="2">
+<div id="370c16a1" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2190,12 +2190,7 @@ A Great Tables object.
  #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
-<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
-<colgroup>
-  <col style="width:30%;">
-  <col style="width:70%;">
-</colgroup>
-
+<table class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 
   <tr class="gt_heading">
@@ -2208,32 +2203,44 @@ A Great Tables object.
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-2-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Column mismatches (1 of 2 columns)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Column-mismatches-1-of-2-columns" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Column mismatches (1 of 2 columns)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left">salary</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:33.33%; height:100%; background:#E8A33D;"></div></div>1 of 3 matched rows differ (33.3%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left">salary</td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Column-mismatches-1-of-2-columns" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:33.33%; height:100%; background:#E8A33D;"></div></div>1 of 3 matched rows differ (33.3%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Changed rows (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Changed-rows-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Changed rows (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left">102</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">salary:</span> <span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">61000</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">63500</span> <span style="color:#888; font-size:11px;">(+2500)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">emp_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"></span><span style="display:inline-block; width:11ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">payroll_jan</bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">payroll_feb</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">102</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Changed-rows-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;color:#666;"><bdi dir="ltr">salary</bdi></span><span style="display:inline-block; width:11ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">61000</span></bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr">→</bdi></span><span style="display:inline-block; width:11ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">63500</span></bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr"><span style="color:#888; font-size:11px;">(+2500)</span></bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Missing from target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Missing-from-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #CF142B;">Missing from target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left">104</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">dept:</span> Ops</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">salary:</span> 47000</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">emp_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:4ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">dept</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">salary</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">104</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Missing-from-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:4ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">Ops</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">47000</bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Extra in target (1 row)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Extra-in-target-1-row" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #3D7CC9;">Extra in target (1 row)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left">105</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">dept:</span> Ops</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">salary:</span> 49000</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">emp_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:4ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">dept</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">salary</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">105</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Extra-in-target-1-row" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:4ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">Ops</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">49000</bdi></span></div></td>
   </tr>
 </tbody>
 
@@ -2244,7 +2251,7 @@ A Great Tables object.
 </div>
 <p>The verdict and counts are at the top, and below them are the sections that have something to show: the mismatches in <code>salary</code>, the changed row for employee 102, and the employees who left and joined.</p>
 <p>The title can be replaced, and the labels can be shown in any of Pointblank’s reporting languages. Here’s the same report in French:</p>
-<div id="25645047" class="cell" data-execution_count="3">
+<div id="cfae1a59" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison.get_tabular_report(title<span class="op">=</span><span class="st">"Paie : janvier et février"</span>, lang<span class="op">=</span><span class="st">"fr"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_comparison_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2312,12 +2319,7 @@ A Great Tables object.
  #pb_comparison_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
-<table style="table-layout: fixed;; width: 100%" class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
-<colgroup>
-  <col style="width:30%;">
-  <col style="width:70%;">
-</colgroup>
-
+<table class="gt_table" aria-labelledby="pb_comparison_tbl-title" aria-describedby="pb_comparison_tbl-subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 
   <tr class="gt_heading">
@@ -2330,32 +2332,44 @@ A Great Tables object.
 </thead>
 <tbody class="gt_table_body">
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Écarts-par-colonne-1-colonnes-sur-2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Écarts par colonne (1 colonnes sur 2)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Écarts-par-colonne-1-colonnes-sur-2" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Écarts par colonne (1 colonnes sur 2)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Écarts-par-colonne-1-colonnes-sur-2" class="gt_row gt_left">salary</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Écarts-par-colonne-1-colonnes-sur-2" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:33.33%; height:100%; background:#E8A33D;"></div></div>1 lignes appariées sur 3 diffèrent (33,3%)</td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Écarts-par-colonne-1-colonnes-sur-2" class="gt_row gt_left">salary</td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Écarts-par-colonne-1-colonnes-sur-2" class="gt_row gt_left"><div style="display:inline-block; vertical-align:middle; width:120px; height:7px; background:#EEE; border-radius:2px; margin-right:8px; margin-left:8px; overflow:hidden;"><div style="width:33.33%; height:100%; background:#E8A33D;"></div></div>1 lignes appariées sur 3 diffèrent (33,3%)</td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Lignes-modifiées-1-ligne" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Lignes modifiées (1 ligne)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Lignes-modifiées-1-ligne" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #E8A33D;">Lignes modifiées (1 ligne)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Lignes-modifiées-1-ligne" class="gt_row gt_left">102</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Lignes-modifiées-1-ligne" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:14px;"><span style="color:#666;">salary:</span> <span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">61000</span> → <span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">63500</span> <span style="color:#888; font-size:11px;">(+2500)</span></span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Lignes-modifiées-1-ligne" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">emp_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Lignes-modifiées-1-ligne" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"></span><span style="display:inline-block; width:11ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">payroll_jan</bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">payroll_feb</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Lignes-modifiées-1-ligne" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">102</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Lignes-modifiées-1-ligne" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:6ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;color:#666;"><bdi dir="ltr">salary</bdi></span><span style="display:inline-block; width:11ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="color:#555; text-decoration:line-through; text-decoration-color:#AAA;">61000</span></bdi></span><span style="display:inline-block; width:1ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr">→</bdi></span><span style="display:inline-block; width:11ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:6px;"><bdi dir="ltr"><span style="background:#FDF1DC; padding:0 3px; border-radius:2px;">63500</span></bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr"><span style="color:#888; font-size:11px;">(+2500)</span></bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Absentes-de-la-cible-1-ligne" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Absentes de la cible (1 ligne)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Absentes-de-la-cible-1-ligne" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #CF142B;">Absentes de la cible (1 ligne)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Absentes-de-la-cible-1-ligne" class="gt_row gt_left">104</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Absentes-de-la-cible-1-ligne" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">dept:</span> Ops</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">salary:</span> 47000</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Absentes-de-la-cible-1-ligne" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">emp_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Absentes-de-la-cible-1-ligne" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:4ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">dept</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">salary</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Absentes-de-la-cible-1-ligne" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">104</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Absentes-de-la-cible-1-ligne" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:4ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">Ops</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">47000</bdi></span></div></td>
   </tr>
   <tr class="gt_group_heading_row">
-    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Supplémentaires-dans-la-cible-1-ligne" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8;">Supplémentaires dans la cible (1 ligne)</th>
+    <th class="gt_group_heading" colspan="2" scope="colgroup" id="pb_comparison_tbl-Supplémentaires-dans-la-cible-1-ligne" style="font-size: 12px;font-weight: bold; background-color: #F6F7F8; border-inline-start: 4px solid #3D7CC9;">Supplémentaires dans la cible (1 ligne)</th>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono;font-size: 12px;" headers="pb_comparison_tbl-Supplémentaires-dans-la-cible-1-ligne" class="gt_row gt_left">105</td>
-    <td style="font-size: 12px;" headers="pb_comparison_tbl-Supplémentaires-dans-la-cible-1-ligne" class="gt_row gt_left"><span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">dept:</span> Ops</span> <span style="white-space:nowrap; margin-right:10px;"><span style="color:#666;">salary:</span> 49000</span></td>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Supplémentaires-dans-la-cible-1-ligne" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">emp_id</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top; color: #8A8A8A; padding-top: 4px; padding-bottom: 2px; border-bottom-style: none;" headers="pb_comparison_tbl-Supplémentaires-dans-la-cible-1-ligne" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:4ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">dept</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">salary</bdi></span></div></td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono;font-size: 12px; white-space: nowrap; padding-inline-end: 16px; vertical-align: top;" headers="pb_comparison_tbl-Supplémentaires-dans-la-cible-1-ligne" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">105</bdi></span></div></td>
+    <td style="font-size: 12px; width: 100%; vertical-align: top;" headers="pb_comparison_tbl-Supplémentaires-dans-la-cible-1-ligne" class="gt_row gt_left"><div style="white-space:nowrap; line-height:1.7; font-family:IBM Plex Mono, ui-monospace, monospace;"><span style="display:inline-block; width:4ch; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">Ops</bdi></span><span style="display:inline-block; overflow:hidden; text-overflow:ellipsis; vertical-align:top; margin-inline-end:14px;"><bdi dir="ltr">49000</bdi></span></div></td>
   </tr>
 </tbody>
 
