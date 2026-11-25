@@ -2515,6 +2515,11 @@ def _generate_display_table(
     if "pyspark" not in tbl_type:
         data = copy.deepcopy(data)
 
+    # Do we have a DataFrame library to work with? We need at least one to display
+    # the table using Great Tables
+    _check_any_df_lib(method_used="preview_tbl")
+
+    # Display a PyArrow table through Polars (or Pandas), but keep its type for the header
     input_tbl_type = tbl_type
     if is_pyarrow_table(data):
         df_lib = _select_df_lib(preference="polars")
@@ -2536,10 +2541,6 @@ def _generate_display_table(
     # Check that the n_head and n_tail aren't greater than the limit
     if limit is not None and n_head + n_tail > limit:
         raise ValueError(f"The sum of `n_head=` and `n_tail=` cannot exceed the limit ({limit}).")
-
-    # Do we have a DataFrame library to work with? We need at least one to display
-    # the table using Great Tables
-    _check_any_df_lib(method_used="preview_tbl")
 
     # Set flag for whether the full dataset is shown, or just the head and tail; if the table
     # is very small, the value likely will be `True`
