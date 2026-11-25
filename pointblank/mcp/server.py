@@ -611,7 +611,7 @@ async def get_validation_step_output(
     output_path: Annotated[str, "Path to save the output file. Must end with .csv."],
     sundered_type: Annotated[str, "Retrieve all 'pass' or 'fail' rows."] = "fail",
     step_index: Annotated[
-        Optional[int], "Specific step index (0-based). Overrides sundered_type."
+        Optional[int], "Specific step number (1-based). Overrides sundered_type."
     ] = None,
 ) -> ValidationOutput:
     """Retrieves validation output and saves it to a CSV file."""
@@ -624,13 +624,18 @@ async def get_validation_step_output(
 
     p_output_path = validate_output_path(output_path, {".csv"})
 
-    if step_index is not None and step_index < 0:
-        raise ValueError("The 'step_index' cannot be a negative number.")
+    n_steps = len(validator.validation_info)
+    if step_index is not None and not 1 <= step_index <= n_steps:
+        raise ValueError(
+            f"The 'step_index' must be a step number from 1 to {n_steps} (it's 1-based), "
+            f"not {step_index}."
+        )
 
     if not getattr(validator, "time_processed", None):
         await ctx.warning(
             f"Validator '{validator_id}' has not been interrogated. Interrogating now."
         )
+        validator.interrogate()
 
     message = ""
     data_extract_df = None
