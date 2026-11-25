@@ -2332,11 +2332,8 @@ def validate(
                 )
 
                 # Check if this validation failed
-                if (
-                    hasattr(validation, "validation_info")
-                    and len(cast(list[Any], validation.validation_info)) > i
-                ):
-                    step_info = cast(list[Any], validation.validation_info)[i]
+                if hasattr(validation, "validation_info") and len(validation.validation_info) > i:
+                    step_info = validation.validation_info[i]
                     if (step_info.n_failed or 0) > 0:
                         any_failed = True
 
