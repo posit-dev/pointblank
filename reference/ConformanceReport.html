@@ -2097,7 +2097,7 @@ The results of the rules, for a report of the built-in rules. The default is <co
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s check a small DM dataset with the built-in rules. It has a date that isn’t in the ISO 8601 format, a negative age and a <code>SEX</code> value that isn’t in its codelist:</p>
-<div id="9252cecf" class="cell" data-execution_count="1">
+<div id="9df5faaa" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2123,7 +2123,7 @@ The results of the rules, for a report of the built-in rules. The default is <co
 </div>
 </div>
 <p>Ten of the 362 rules fail. Most of them are about what the dataset lacks, such as the DM variables <code>SUBJID</code> and <code>RACE</code> and the TS and TA datasets. The failing records are found by three of the rules:</p>
-<div id="93402cb7" class="cell" data-execution_count="2">
+<div id="5db4fdb2" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>report.findings_df().select(<span class="st">"rule_id"</span>, <span class="st">"row_index"</span>, <span class="st">"checked_column"</span>, <span class="st">"checked_value"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div><style>

@@ -213,7 +213,7 @@ def custom_action():
 )
 ```
 
-    Data quality issue found (2026-11-25 17:29:53.524747).
+    Data quality issue found (2026-11-25 18:47:42.588786).
 
 [TABLE]
 
