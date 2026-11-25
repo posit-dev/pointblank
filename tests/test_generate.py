@@ -2484,14 +2484,21 @@ class TestLocaleMixing:
 
         assert len(result["city"]) == 100
 
-    def test_list_single_element_equivalent_to_string(self):
-        """A single-element list produces identical output to a plain string."""
+    # Presets from a coherence group (`name`, `city`) and presets generated column by column
+    # (`job`, `company`, `country`, `ssn`)
+    SINGLE_COUNTRY_FIELDS = {
+        preset: string_field(preset=preset)
+        for preset in ["name", "city", "job", "company", "country", "ssn"]
+    }
+
+    @pytest.mark.parametrize("country", [["DE"], ["DE", "DE"]])
+    def test_list_single_country_equivalent_to_string(self, country):
+        """A list with a single country produces identical output to a plain string."""
         config_str = GeneratorConfig(n=50, seed=23, output="dict", country="DE")
-        config_list = GeneratorConfig(n=50, seed=23, output="dict", country=["DE"])
-        fields = {"name": string_field(preset="name")}
-        result_str = generate_dataframe(fields, config_str)
-        result_list = generate_dataframe(fields, config_list)
-        assert result_str["name"] == result_list["name"]
+        config_list = GeneratorConfig(n=50, seed=23, output="dict", country=country)
+        result_str = generate_dataframe(self.SINGLE_COUNTRY_FIELDS, config_str)
+        result_list = generate_dataframe(self.SINGLE_COUNTRY_FIELDS, config_list)
+        assert result_str == result_list
 
     # ── Dict form ─────────────────────────────────────────────────────────
 
@@ -2502,14 +2509,24 @@ class TestLocaleMixing:
         result = generate_dataframe(fields, config)
         assert len(result["name"]) == 100
 
-    def test_dict_single_element_equivalent_to_string(self):
+    @pytest.mark.parametrize("country", [{"FR": 1.0}, {"FR": 3}])
+    def test_dict_single_element_equivalent_to_string(self, country):
         """A single-element dict produces identical output to a plain string."""
         config_str = GeneratorConfig(n=50, seed=23, output="dict", country="FR")
-        config_dict = GeneratorConfig(n=50, seed=23, output="dict", country={"FR": 1.0})
-        fields = {"name": string_field(preset="name")}
-        result_str = generate_dataframe(fields, config_str)
-        result_dict = generate_dataframe(fields, config_dict)
-        assert result_str["name"] == result_dict["name"]
+        config_dict = GeneratorConfig(n=50, seed=23, output="dict", country=country)
+        result_str = generate_dataframe(self.SINGLE_COUNTRY_FIELDS, config_str)
+        result_dict = generate_dataframe(self.SINGLE_COUNTRY_FIELDS, config_dict)
+        assert result_str == result_dict
+
+    def test_generate_dataset_single_country_list(self):
+        """`generate_dataset()` accepts a one-element `country=` list for non-coherent presets."""
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(x=string_field(preset="job"))
+
+        result = generate_dataset(schema, n=3, seed=1, country=["US"])
+
+        assert result.equals(generate_dataset(schema, n=3, seed=1, country="US"))
 
     def test_dict_form_weight_normalization(self):
         """Weights that sum to more/less than 1.0 work correctly."""
