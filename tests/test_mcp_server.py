@@ -181,3 +181,63 @@ async def test_full_validation_workflow(mcp_server, csv_file: str, tmp_path: Pat
 
         assert len(pass_df) == 1  # Only the row with age=9 passed all validations
         assert pass_df.iloc[0]["age"] == 9
+
+
+@pytest.mark.asyncio
+async def test_get_validation_step_output_polars_backend(mcp_server, csv_file: str, tmp_path: Path):
+    """Test validation output export for a Polars-backed validator."""
+    pytest.importorskip("polars")
+
+    async with Client(mcp_server) as client:
+        load_result = await client.call_tool(
+            "load_dataframe", {"input_path": csv_file, "backend": "polars"}
+        )
+        assert not load_result.is_error
+        df_id = load_result.data.df_id
+
+        validator_result = await client.call_tool("create_validator", {"df_id": df_id})
+        assert not validator_result.is_error
+        validator_id = validator_result.data.validator_id
+
+        step_result = await client.call_tool(
+            "add_validation_step",
+            {
+                "validator_id": validator_id,
+                "validation_type": "col_vals_gt",
+                "params": {"columns": "age", "value": 30},
+            },
+        )
+        assert not step_result.is_error
+
+        interrogate_result = await client.call_tool(
+            "interrogate_validator", {"validator_id": validator_id}
+        )
+        assert not interrogate_result.is_error
+
+        step_output_path = str(tmp_path / "polars_step_output.csv")
+        step_output_result = await client.call_tool(
+            "get_validation_step_output",
+            {
+                "validator_id": validator_id,
+                "output_path": step_output_path,
+                "step_index": 1,
+            },
+        )
+        assert not step_output_result.is_error
+        assert step_output_result.data.output_file is not None
+        assert Path(step_output_result.data.output_file).exists()
+        assert len(pd.read_csv(step_output_result.data.output_file)) == 2
+
+        sundered_output_path = str(tmp_path / "polars_sundered_output.csv")
+        sundered_output_result = await client.call_tool(
+            "get_validation_step_output",
+            {
+                "validator_id": validator_id,
+                "output_path": sundered_output_path,
+                "sundered_type": "fail",
+            },
+        )
+        assert not sundered_output_result.is_error
+        assert sundered_output_result.data.output_file is not None
+        assert Path(sundered_output_result.data.output_file).exists()
+        assert len(pd.read_csv(sundered_output_result.data.output_file)) == 2

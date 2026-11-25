@@ -637,14 +637,14 @@ async def get_validation_step_output(
 
     if step_index is not None:
         data_extract_df = validator.get_data_extracts(i=step_index, frame=True)
-        if data_extract_df is None or data_extract_df.empty:
+        if data_extract_df is None or len(data_extract_df) == 0:
             message = f"No data extract available for step {step_index}."
             data_extract_df = None
         else:
             message = f"Data extract for step {step_index} retrieved."
     else:
         data_extract_df = validator.get_sundered_data(type=sundered_type)
-        if data_extract_df is None or data_extract_df.empty:
+        if data_extract_df is None or len(data_extract_df) == 0:
             message = f"No sundered data available for type '{sundered_type}'."
             data_extract_df = None
         else:
