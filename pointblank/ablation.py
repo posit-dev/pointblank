@@ -881,10 +881,7 @@ class Ablation:
                 )
         self._columns = columns
         self._order_by = _check_duplicates_policy(duplicates, duplicates_order_by, columns=columns)
-        # (the stub of `Validate` types `validation_info` as `...`)
-        steps, skipped = _row_result_steps(
-            cast(Any, validation.validation_info), duplicates=duplicates
-        )
+        steps, skipped = _row_result_steps(validation.validation_info, duplicates=duplicates)
 
         if repeats < 3:
             warnings.warn(
@@ -2436,7 +2433,7 @@ class Ablation:
     def _ineligible_reason(self, i: int) -> str:
         if i in self._skipped:
             return self._skipped[i]
-        step = next((v for v in cast(list[Any], self.validation.validation_info) if v.i == i), None)
+        step = next((v for v in self.validation.validation_info if v.i == i), None)
         if step is None:
             return f"the validation has no step {i}"
         if not step.active:
@@ -2958,7 +2955,7 @@ class Ablation:
         if self.holdout_validation is None:
             return None
         steps = []
-        for info in cast(list[Any], self.holdout_validation.validation_info):
+        for info in self.holdout_validation.validation_info:
             failed = info.eval_error or info.n is None
             steps.append(
                 {
@@ -4334,7 +4331,7 @@ class Ablation:
             raise TypeError(
                 f"`validation=` must be a `Validate` object, got {type(target).__name__} instead."
             )
-        info = {step.i: step for step in cast(list[Any], target.validation_info)}
+        info = {step.i: step for step in target.validation_info}
         if target is not self.validation:
             for i, step in self._steps.items():
                 other = info.get(i)
