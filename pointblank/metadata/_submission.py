@@ -1801,7 +1801,7 @@ class ConformanceReport:
 
         out: dict[str, dict] = {}
         for name, v in self.validations.items():
-            steps = cast(list[Any], v.validation_info)
+            steps = v.validation_info
             n_steps = len(steps)
             n_steps_failed = sum(1 for s in steps if not s.all_passed)
             n_failed = sum(int(s.n_failed or 0) for s in steps)
@@ -1915,7 +1915,7 @@ class ConformanceReport:
 
         issues: list[dict] = []
         for name, v in self.validations.items():
-            for s in cast(list[Any], v.validation_info):
+            for s in v.validation_info:
                 n_failed = int(s.n_failed or 0)
                 if n_failed == 0:
                     continue
