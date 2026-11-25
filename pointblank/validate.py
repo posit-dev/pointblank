@@ -2515,6 +2515,16 @@ def _generate_display_table(
     if "pyspark" not in tbl_type:
         data = copy.deepcopy(data)
 
+    # Do we have a DataFrame library to work with? We need at least one to display
+    # the table using Great Tables
+    _check_any_df_lib(method_used="preview_tbl")
+
+    # Display a PyArrow table through Polars (or Pandas), but keep its type for the header
+    input_tbl_type = tbl_type
+    if is_pyarrow_table(data):
+        df_lib = _select_df_lib(preference="polars")
+        data = df_lib.from_arrow(data) if df_lib.__name__ == "polars" else data.to_pandas()
+
     # Does the data table already have a leading row number column? (Column names of lazy tables
     # are read from the schema, which avoids resolving the full query)
     data_columns = (
@@ -2531,10 +2541,6 @@ def _generate_display_table(
     # Check that the n_head and n_tail aren't greater than the limit
     if limit is not None and n_head + n_tail > limit:
         raise ValueError(f"The sum of `n_head=` and `n_tail=` cannot exceed the limit ({limit}).")
-
-    # Do we have a DataFrame library to work with? We need at least one to display
-    # the table using Great Tables
-    _check_any_df_lib(method_used="preview_tbl")
 
     # Set flag for whether the full dataset is shown, or just the head and tail; if the table
     # is very small, the value likely will be `True`
@@ -2905,7 +2911,9 @@ def _generate_display_table(
         col_dtype_labels_dict = {"_row_num_": ""} | col_dtype_labels_dict
 
     # Create the label, table type, and thresholds HTML fragments
-    table_type_html = _create_table_type_html(tbl_type=tbl_type, tbl_name=None, font_size="10px")
+    table_type_html = _create_table_type_html(
+        tbl_type=input_tbl_type, tbl_name=None, font_size="10px"
+    )
 
     tbl_dims_html = _create_table_dims_html(columns=n_columns, rows=n_rows, font_size="10px")
 

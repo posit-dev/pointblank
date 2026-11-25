@@ -13664,6 +13664,26 @@ def test_preview_no_fail_duckdb_table() -> None:
     preview(small_table, n_head=2, n_tail=2)
 
 
+def test_preview_no_fail_pyarrow_table() -> None:
+    tbl = pa.table({"a": [1, 2, None, 4, 5, 6], "b": ["u", "v", "w", "x", "y", "z"]})
+
+    preview(tbl)
+    preview(tbl, columns_subset="b")
+
+    html = preview(tbl, n_head=2, n_tail=2, incl_header=True).as_raw_html()
+    assert ">PyArrow</span>" in html
+    assert ">u<" in html and ">z<" in html
+    assert ">w<" not in html
+
+
+def test_step_report_pyarrow_table() -> None:
+    tbl = pa.table({"a": [1, 2, None]})
+
+    validation = Validate(data=tbl).col_vals_gt(columns="a", value=1).interrogate()
+
+    validation.get_step_report(i=1)
+
+
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 def test_preview_no_fail_pyspark_table() -> None:
     # Create a simple PySpark DataFrame to test the preview functionality
