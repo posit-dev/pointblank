@@ -4,7 +4,7 @@ Add a `rows_not_contaminated()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1697-L1746)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1696-L1745)
 
 ``` python
 rows_not_contaminated(

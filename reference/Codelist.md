@@ -4,7 +4,7 @@ A set of permitted values, each with a label.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L93-L299)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L95-L301)
 
 ``` python
 Codelist(
@@ -122,7 +122,7 @@ Get the permitted values of the codelist.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L204-L230)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L206-L232)
 
 ``` python
 to_set()
@@ -159,7 +159,7 @@ Get a mapping of each value to its label.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L271-L296)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L273-L298)
 
 ``` python
 to_dict()
@@ -192,7 +192,7 @@ Get the values that were added to an extensible codelist.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L232-L269)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L234-L271)
 
 ``` python
 extended_values()

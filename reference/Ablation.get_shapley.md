@@ -4,7 +4,7 @@ Get the Shapley values of the steps as a table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4526-L4635)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L4549-L4658)
 
 ``` python
 Ablation.get_shapley()

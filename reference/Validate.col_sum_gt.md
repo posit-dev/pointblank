@@ -4,7 +4,7 @@ Does the column sum satisfy a greater than comparison?
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.pyi#L1032-L1072)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.pyi#L1068-L1108)
 
 ``` python
 Validate.col_sum_gt(

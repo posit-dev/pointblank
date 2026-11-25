@@ -4,7 +4,7 @@ Score text by its perplexity under a language model.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1237-L1312)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1246-L1321)
 
 ``` python
 scorers.perplexity(

@@ -17,5 +17,5 @@ Generate a comprehensive column-level summary of the DataFrame.
 `dataframe_id: string`  
 required
 
-`table_name: string`  
+`table_name: any`  
 No description.

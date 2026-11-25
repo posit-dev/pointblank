@@ -4,7 +4,7 @@ Helper function for referencing a column in the input table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L250-L545)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L252-L547)
 
 ``` python
 col(exprs)

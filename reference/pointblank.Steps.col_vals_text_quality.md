@@ -4,7 +4,7 @@ Add a `col_vals_text_quality()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1159-L1221)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1158-L1220)
 
 ``` python
 col_vals_text_quality(

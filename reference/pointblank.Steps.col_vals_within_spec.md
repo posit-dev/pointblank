@@ -4,7 +4,7 @@ Add a `col_vals_within_spec()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L961-L1004)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L960-L1003)
 
 ``` python
 col_vals_within_spec(

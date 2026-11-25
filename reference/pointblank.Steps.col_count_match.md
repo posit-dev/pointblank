@@ -4,7 +4,7 @@ Add a `col_count_match()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1965-L2002)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1964-L2001)
 
 ``` python
 col_count_match(

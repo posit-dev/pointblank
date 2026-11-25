@@ -4,7 +4,7 @@ Add a `col_vals_ge()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L462-L505)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L461-L504)
 
 ``` python
 col_vals_ge(

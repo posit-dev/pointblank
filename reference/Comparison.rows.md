@@ -4,7 +4,7 @@ Get a sample of rows with a given status.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L1585-L1702)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L1629-L1746)
 
 ``` python
 Comparison.rows(

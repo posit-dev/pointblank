@@ -4,7 +4,7 @@ Create a column expression for use in [Validate.conjointly()](../reference/Valid
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L2027-L2094)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L2031-L2098)
 
 ``` python
 expr_col(column_name)

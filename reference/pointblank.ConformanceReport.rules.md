@@ -4,7 +4,7 @@ Get the result of each rule.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2000-L2064)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2002-L2066)
 
 ``` python
 rules(status=None)

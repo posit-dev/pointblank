@@ -4,7 +4,7 @@ Add a `col_vals_between()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L552-L599)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L551-L598)
 
 ``` python
 col_vals_between(

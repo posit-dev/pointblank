@@ -4,7 +4,7 @@ List the issues that the conformance check found.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1816-L1940)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1816-L1942)
 
 ``` python
 issues(

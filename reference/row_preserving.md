@@ -4,7 +4,7 @@ Mark a `pre=` function as one that keeps the rows of the table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/preprocessing.py#L40-L130)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/preprocessing.py#L41-L131)
 
 ``` python
 row_preserving(fn)

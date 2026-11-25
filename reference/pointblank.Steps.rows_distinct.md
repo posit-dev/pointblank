@@ -4,7 +4,7 @@ Add a `rows_distinct()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1611-L1648)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1610-L1647)
 
 ``` python
 rows_distinct(

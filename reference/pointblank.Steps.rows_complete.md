@@ -4,7 +4,7 @@ Add a `rows_complete()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1748-L1785)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1747-L1784)
 
 ``` python
 rows_complete(

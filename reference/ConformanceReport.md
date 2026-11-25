@@ -4,7 +4,7 @@ The results of a CDISC conformance check.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1337-L2968)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1337-L2970)
 
 ``` python
 ConformanceReport(

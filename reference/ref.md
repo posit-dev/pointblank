@@ -4,7 +4,7 @@ Reference a column from the reference data for aggregate comparisons.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L548-L633)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/column.py#L550-L635)
 
 ``` python
 ref(column_name)

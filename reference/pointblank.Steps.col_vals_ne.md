@@ -4,7 +4,7 @@ Add a `col_vals_ne()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L418-L460)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L417-L459)
 
 ``` python
 col_vals_ne(

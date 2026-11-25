@@ -4,7 +4,7 @@ Score text with a text-classification model from Hugging Face.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L877-L956)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L881-L960)
 
 ``` python
 scorers.classifier(

@@ -4,7 +4,7 @@ The result of comparing two [DataScan](../reference/DataScan.md#pointblank.DataS
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1491-L2038)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1494-L2043)
 
 ``` python
 DataScanDiff(
@@ -159,7 +159,7 @@ Generate a GT table summarizing the differences between the two scans.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1857-L2028)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1860-L2033)
 
 ``` python
 get_tabular_report()
@@ -210,7 +210,7 @@ Export the comparison results as a dictionary.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1771-L1855)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L1774-L1858)
 
 ``` python
 to_dict()

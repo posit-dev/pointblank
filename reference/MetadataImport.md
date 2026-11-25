@@ -4,7 +4,7 @@ The metadata for a single dataset.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L585-L1108)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L587-L1110)
 
 ``` python
 MetadataImport(
@@ -49,7 +49,7 @@ A human-readable label for the dataset, such as `"Demographics"`. The default is
 `dataset_description: str | None = None`  
 A longer description of the dataset. The default is `None`.
 
-`creation_date: str | None = None`  
+`creation_date: str | datetime.datetime | None = None`  
 When the metadata was created, as given in the file. The default is `None`.
 
 `study_id: str | None = None`  

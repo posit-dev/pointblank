@@ -4,7 +4,7 @@ Get the metadata of a variable by name.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L836-L872)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L838-L874)
 
 ``` python
 get_variable(name)

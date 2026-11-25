@@ -4,7 +4,7 @@ Validate whether column values are not in a set of values.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10017-L10348)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L10079-L10411)
 
 ``` python
 Validate.col_vals_not_in_set(

@@ -4,7 +4,7 @@ Validate YAML configuration against the expected structure.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L2058-L2257)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L2059-L2258)
 
 ``` python
 validate_yaml(yaml)

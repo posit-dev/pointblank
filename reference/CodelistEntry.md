@@ -4,7 +4,7 @@ A single permitted value in a codelist.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L21-L90)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L23-L92)
 
 ``` python
 CodelistEntry(

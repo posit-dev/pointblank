@@ -4,7 +4,7 @@ Create a Schema from an existing table with inferred Field constraints.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1618-L1700)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1626-L1708)
 
 ``` python
 schema_from_tbl(

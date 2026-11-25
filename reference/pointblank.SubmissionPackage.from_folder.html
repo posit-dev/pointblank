@@ -193,7 +193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="40"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="41"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -330,7 +330,7 @@ If the folder has an <code>.xpt</code> file and <code>pyreadstat</code> isn’t 
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s make a folder with a DM dataset as an XPT file and a Define-XML file for the study. Both files come with Pointblank:</p>
-<div id="fdc46c60" class="cell" data-execution_count="1">
+<div id="2a47d281" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -353,7 +353,7 @@ If the folder has an <code>.xpt</code> file and <code>pyreadstat</code> isn’t 
 </div>
 </div>
 <p>The package has the <code>DM</code> dataset from <code>dm.xpt</code>, and it found the Define-XML file. The dataset is a Pandas DataFrame:</p>
-<div id="492200ce" class="cell" data-execution_count="2">
+<div id="a96bfc6c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>study.get_dataset(<span class="st">"DM"</span>).head(<span class="dv">3</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
@@ -428,7 +428,7 @@ If the folder has an <code>.xpt</code> file and <code>pyreadstat</code> isn’t 
 </div>
 </div>
 <p>Since a Define-XML file was found, the built-in rules engine also runs the rules that check the datasets against it. Here, one of the subjects has a <code>RACE</code> of <code>BLACK</code>, which isn’t a term in the study’s codelist for <code>RACE</code>:</p>
-<div id="54e6fbf6" class="cell" data-execution_count="3">
+<div id="15162c17" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> study.validate_conformance()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>[i[<span class="st">"message"</span>] <span class="cf">for</span> i <span class="kw">in</span> report.issues() <span class="cf">if</span> i[<span class="st">"rule_type"</span>] <span class="op">==</span> <span class="st">"DEFINE_CODELIST_CHECK"</span>]</span></code></pre></div>

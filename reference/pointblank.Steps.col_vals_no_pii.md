@@ -4,7 +4,7 @@ Add a `col_vals_no_pii()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1325-L1367)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1324-L1366)
 
 ``` python
 col_vals_no_pii(

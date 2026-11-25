@@ -4,7 +4,7 @@ Add a `col_exists()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1408-L1440)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1407-L1439)
 
 ``` python
 col_exists(

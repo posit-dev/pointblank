@@ -4,7 +4,7 @@ Add a `col_vals_lt()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L330-L372)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L329-L371)
 
 ``` python
 col_vals_lt(

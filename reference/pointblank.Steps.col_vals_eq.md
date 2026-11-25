@@ -4,7 +4,7 @@ Add a `col_vals_eq()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L374-L416)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L373-L415)
 
 ``` python
 col_vals_eq(

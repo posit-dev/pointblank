@@ -4,7 +4,7 @@ Build a [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) for 
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L874-L950)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L876-L952)
 
 ``` python
 missing_specs()

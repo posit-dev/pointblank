@@ -4,7 +4,7 @@ Get the failing records found by the built-in rules, as a DataFrame.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2384-L2486)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2386-L2488)
 
 ``` python
 findings_df()

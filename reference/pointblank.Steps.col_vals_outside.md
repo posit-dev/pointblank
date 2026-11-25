@@ -4,7 +4,7 @@ Add a `col_vals_outside()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L601-L648)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L600-L647)
 
 ``` python
 col_vals_outside(

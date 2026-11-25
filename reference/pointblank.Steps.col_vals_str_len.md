@@ -4,7 +4,7 @@ Add a `col_vals_str_len()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1006-L1051)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1005-L1050)
 
 ``` python
 col_vals_str_len(

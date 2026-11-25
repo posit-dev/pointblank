@@ -4,7 +4,7 @@ Get a text summary of the metadata.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1010-L1095)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1012-L1097)
 
 ``` python
 summary()

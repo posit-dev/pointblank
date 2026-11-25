@@ -4,7 +4,7 @@ Add a `col_vals_in_set()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L650-L691)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L649-L690)
 
 ``` python
 col_vals_in_set(

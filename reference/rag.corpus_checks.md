@@ -4,7 +4,7 @@ Make validation steps that check the corpus of a RAG system.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L88-L307)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/rag.py#L87-L308)
 
 ``` python
 rag.corpus_checks(

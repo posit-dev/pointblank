@@ -4,7 +4,7 @@ Get the number of rows in a table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L4138-L4315)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L4173-L4350)
 
 ``` python
 get_row_count(data)

@@ -190,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="40"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="41"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2041,7 +2041,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L236-L803" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L236-L806" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">SplitCheck</span>(</span>
@@ -2086,7 +2086,7 @@ The problems found, as messages: overlapping rows, missing or unseen labels, and
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here are the training and test splits of a small dataset of animals, labeled as pets or wild animals. One test row is also in the training split.</p>
-<div id="84ce7ace" class="cell" data-execution_count="1">
+<div id="b0aecd25" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2107,14 +2107,14 @@ The problems found, as messages: overlapping rows, missing or unseen labels, and
 </div>
 </div>
 <p>One of the two test rows is the same as a training row. The test split also has no wild animals, which shows in the check of the labels:</p>
-<div id="c831c5c3" class="cell" data-execution_count="2">
+<div id="d00efbdb" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>check.labels[<span class="st">"missing"</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>{'test': ['wild']}</code></pre>
 </div>
 </div>
 <p>Every problem is in <a href="../reference/pointblank.ConformanceReport.issues.html" class="gdls-link gdls-code">issues</a>, as a message:</p>
-<div id="2351c399" class="cell" data-execution_count="3">
+<div id="ebd9404d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>check.issues</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>["1 row of 'test' (50.0%) is also in 'train' (1 the same).",

@@ -4,7 +4,7 @@ Add a `col_schema_match()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1830-L1875)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1829-L1874)
 
 ``` python
 col_schema_match(

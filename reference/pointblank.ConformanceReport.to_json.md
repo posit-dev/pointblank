@@ -4,7 +4,7 @@ Save the report as a JSON file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2101-L2209)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2103-L2211)
 
 ``` python
 to_json(path)

@@ -4,7 +4,7 @@ Add a `rows_near_distinct()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1650-L1695)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1649-L1694)
 
 ``` python
 rows_near_distinct(

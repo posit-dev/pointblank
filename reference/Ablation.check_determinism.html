@@ -190,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="40"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="41"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2043,7 +2043,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3290-L3394" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3305-L3409" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Ablation</span><span class="op">.</span><span class="fu">check_determinism</span>(</span>
@@ -2083,7 +2083,7 @@ The largest difference in a metric that still counts as the same. Differences fr
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s an <code>evaluate()</code> function that forgets to use its seed, so that its model starts from a different random weight every time.</p>
-<div id="48006991" class="cell" data-execution_count="1">
+<div id="c94fbfff" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
@@ -2112,7 +2112,7 @@ The largest difference in a metric that still counts as the same. Differences fr
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(caught[<span class="dv">0</span>].message)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>False
-`evaluate=` isn't deterministic: given the full table and the seed 0 twice, it returned different results (score: 1.7476182306362595 and 0.5255053742129512). Use the seed for every source of randomness in training, or the ablation's comparisons will be noisier than they need to be.</code></pre>
+`evaluate=` isn't deterministic: given the full table and the seed 0 twice, it returned different results (score: 0.8211422713862682 and 1.0562326441032717). Use the seed for every source of randomness in training, or the ablation's comparisons will be noisier than they need to be.</code></pre>
 </div>
 </div>
 <p>Creating the generator with <code>random.Random(seed)</code> would fix it, and the check would then return <code>True</code>.</p>

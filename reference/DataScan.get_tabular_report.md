@@ -4,7 +4,7 @@ Get a tabular report of the scan.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L339-L659)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L339-L662)
 
 ``` python
 DataScan.get_tabular_report(

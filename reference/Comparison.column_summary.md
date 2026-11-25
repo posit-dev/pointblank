@@ -4,7 +4,7 @@ Get a per-column summary of value mismatches.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L2191-L2281)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L2235-L2325)
 
 ``` python
 Comparison.column_summary()

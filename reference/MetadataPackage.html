@@ -193,7 +193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="40"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="41"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2052,7 +2052,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1111-L1352" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1113-L1354" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MetadataPackage</span>(</span>
@@ -2092,7 +2092,7 @@ The version of the package or of the standard it follows. The default is <code>N
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>The bundled Define-XML document describes two datasets of a clinical study:</p>
-<div id="9709a004" class="cell" data-execution_count="2">
+<div id="334a2bcf" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>package <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>))</span>
@@ -2110,7 +2110,7 @@ AE - Adverse Events</code></pre>
 </div>
 </div>
 <p>Each entry is a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link gdls-code">MetadataImport</a>, so it can be used like one. Here the Demographics metadata is used to check a small table:</p>
-<div id="94f659da" class="cell" data-execution_count="3">
+<div id="f29b9f01" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>dm_data <span class="op">=</span> pl.DataFrame(</span>
@@ -2836,7 +2836,7 @@ tr { background-color: transparent; }
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1268-L1308" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1270-L1310" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb5"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_domain</span>(<span class="va">name</span>)</span></code></pre></div>
@@ -2879,7 +2879,7 @@ If there’s no dataset with that name.
 </section>
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="274d27e4" class="cell" data-execution_count="4">
+<div id="b2e49291" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>package <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>))</span>
@@ -2905,7 +2905,7 @@ If there’s no dataset with that name.
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1219-L1240" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1221-L1242" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb8"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">keys</span>()</span></code></pre></div>
@@ -2923,7 +2923,7 @@ The names, in the order of the source file, as a dictionary keys view.
 </section>
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="0f1644cd" class="cell" data-execution_count="5">
+<div id="7018f42c" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>ct <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"sdtm_ct.xml"</span>))</span>
@@ -2950,7 +2950,7 @@ The names, in the order of the source file, as a dictionary keys view.
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1242-L1266" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1244-L1268" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb11"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">values</span>()</span></code></pre></div>
@@ -2968,7 +2968,7 @@ The <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="
 </section>
 <section id="examples-3" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
-<div id="7c26ce62" class="cell" data-execution_count="6">
+<div id="1229d611" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>package <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>))</span>
@@ -2993,7 +2993,7 @@ AE 10 ['Severity', 'No Yes Response']</code></pre>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1310-L1346" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1312-L1348" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb14"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>()</span></code></pre></div>
@@ -3014,7 +3014,7 @@ The summary, as a string with one line per item.
 </section>
 <section id="examples-4" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
-<div id="345ab70d" class="cell" data-execution_count="7">
+<div id="a2562590" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>package <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>))</span>

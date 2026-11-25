@@ -4,7 +4,7 @@ The result of comparing a source table with a target table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L792-L2558)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L792-L2602)
 
 ``` python
 Comparison()
@@ -24,22 +24,22 @@ What you do with a [Comparison](../reference/Comparison.md#pointblank.Comparison
 `source_name, target_name`  
 Labels for the two tables.
 
-`keys`  
+`keys: list[str]`  
 The key columns used to align rows (empty for positional alignment).
 
-`mode`  
+`mode: str`  
 `"keyed"`, `"positional"`, or `"multiset"` (for `keys="*"`).
 
-`compared_columns`  
+`compared_columns: list[str]`  
 The source columns whose values were compared.
 
-`column_map`  
+`column_map: dict[str, str]`  
 The mapping of source to target column names given in `column_map=`.
 
-`schema_mode`  
+`schema_mode: str`  
 How schema differences affect the result: `"strict"` or `"common"`.
 
-`schema_diff`  
+`schema_diff: SchemaDiff`  
 A [`SchemaDiff`](../reference/SchemaDiff.md#pointblank.SchemaDiff) describing schema differences.
 
 `n_source_rows, n_target_rows`  
@@ -48,10 +48,10 @@ Row counts of the two tables.
 `n_match, n_changed, n_missing, n_extra, n_dup_key`  
 Number of test units (aligned rows) with each status.
 
-`n_dup_key_values`  
+`n_dup_key_values: int`  
 Number of distinct key values that are duplicated in either table.
 
-`column_mismatches`  
+`column_mismatches: dict[str, int]`  
 A dict mapping each compared source column to the number of matched rows where its values differ.
 
 ## Examples

@@ -4,7 +4,7 @@ Save the report as an Excel workbook.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2211-L2382)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2213-L2384)
 
 ``` python
 to_excel(path)

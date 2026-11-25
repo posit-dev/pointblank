@@ -4,7 +4,7 @@ Add a `col_vals_chat_format()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1104-L1157)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1103-L1156)
 
 ``` python
 col_vals_chat_format(

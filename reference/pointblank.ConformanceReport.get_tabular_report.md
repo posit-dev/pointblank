@@ -4,7 +4,7 @@ Make a table of the results of the built-in rules.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2660-L2886)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2662-L2888)
 
 ``` python
 get_tabular_report()

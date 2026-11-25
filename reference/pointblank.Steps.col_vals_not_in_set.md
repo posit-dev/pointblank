@@ -4,7 +4,7 @@ Add a `col_vals_not_in_set()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L693-L736)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L692-L735)
 
 ``` python
 col_vals_not_in_set(

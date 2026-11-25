@@ -4,7 +4,7 @@ Add a `col_missing_consistent()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1787-L1828)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1786-L1827)
 
 ``` python
 col_missing_consistent(

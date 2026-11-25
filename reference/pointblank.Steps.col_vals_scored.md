@@ -4,7 +4,7 @@ Add a `col_vals_scored()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1053-L1102)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1052-L1101)
 
 ``` python
 col_vals_scored(

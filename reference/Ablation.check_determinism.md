@@ -4,7 +4,7 @@ Check that `evaluate=` gives the same result twice for the same table and seed.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3290-L3394)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L3305-L3409)
 
 ``` python
 Ablation.check_determinism(
@@ -62,7 +62,7 @@ print(caught[0].message)
 ```
 
     False
-    `evaluate=` isn't deterministic: given the full table and the seed 0 twice, it returned different results (score: 1.7476182306362595 and 0.5255053742129512). Use the seed for every source of randomness in training, or the ablation's comparisons will be noisier than they need to be.
+    `evaluate=` isn't deterministic: given the full table and the seed 0 twice, it returned different results (score: 0.8211422713862682 and 1.0562326441032717). Use the seed for every source of randomness in training, or the ablation's comparisons will be noisier than they need to be.
 
 Creating the generator with `random.Random(seed)` would fix it, and the check would then return `True`.
 

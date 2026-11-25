@@ -4,7 +4,7 @@ Build a validation plan for a table from the metadata.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L740-L834)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L742-L836)
 
 ``` python
 to_validate(

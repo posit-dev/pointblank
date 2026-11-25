@@ -4,7 +4,7 @@ A declared missing-value code, as read from a metadata file.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L302-L365)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L304-L367)
 
 ``` python
 MissingValueCode(

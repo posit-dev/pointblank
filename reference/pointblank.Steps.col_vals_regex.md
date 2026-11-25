@@ -4,7 +4,7 @@ Add a `col_vals_regex()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L914-L959)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L913-L958)
 
 ``` python
 col_vals_regex(

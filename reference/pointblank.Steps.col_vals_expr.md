@@ -4,7 +4,7 @@ Add a `col_vals_expr()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1369-L1406)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1368-L1405)
 
 ``` python
 col_vals_expr(

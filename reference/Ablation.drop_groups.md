@@ -4,7 +4,7 @@ Add a variant for each group of rows, removing the rows of that group.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1385-L1502)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1393-L1510)
 
 ``` python
 Ablation.drop_groups(

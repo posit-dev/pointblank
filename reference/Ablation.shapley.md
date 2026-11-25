@@ -4,7 +4,7 @@ Split the effect of removing the steps' rows fairly among the steps (Shapley val
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2152-L2318)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L2162-L2328)
 
 ``` python
 Ablation.shapley(

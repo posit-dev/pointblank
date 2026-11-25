@@ -4,7 +4,7 @@ Add a `col_vals_gt()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L286-L328)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L285-L327)
 
 ``` python
 col_vals_gt(

@@ -4,7 +4,7 @@ Add a `col_vals_in_language()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1223-L1274)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1222-L1273)
 
 ``` python
 col_vals_in_language(

@@ -4,7 +4,7 @@ Add a `col_vals_token_len()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1276-L1323)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1275-L1322)
 
 ``` python
 col_vals_token_len(

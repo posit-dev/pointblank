@@ -4,7 +4,7 @@ Add a `col_pct_missing()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1480-L1521)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1479-L1520)
 
 ``` python
 col_pct_missing(

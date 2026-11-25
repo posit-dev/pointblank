@@ -4,7 +4,7 @@ Add a `col_vals_in_table()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L2004-L2045)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L2003-L2044)
 
 ``` python
 col_vals_in_table(

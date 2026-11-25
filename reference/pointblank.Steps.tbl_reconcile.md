@@ -4,7 +4,7 @@ Add a `tbl_reconcile()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L2103-L2150)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L2102-L2149)
 
 ``` python
 tbl_reconcile(

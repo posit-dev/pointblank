@@ -4,7 +4,7 @@ The metadata for several datasets, read from one source.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1111-L1352)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1113-L1354)
 
 ``` python
 MetadataPackage(
@@ -107,7 +107,7 @@ Get the metadata of a dataset by name.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1268-L1308)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1270-L1310)
 
 ``` python
 get_domain(name)
@@ -153,7 +153,7 @@ Get the names of the datasets in the package.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1219-L1240)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1221-L1242)
 
 ``` python
 keys()
@@ -188,7 +188,7 @@ Get the metadata of the datasets in the package.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1242-L1266)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1244-L1268)
 
 ``` python
 values()
@@ -221,7 +221,7 @@ Get a text summary of the package.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1310-L1346)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L1312-L1348)
 
 ``` python
 summary()

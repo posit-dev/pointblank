@@ -4,7 +4,7 @@ Add a `col_vals_decreasing()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L787-L834)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L786-L833)
 
 ``` python
 col_vals_decreasing(

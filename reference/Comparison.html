@@ -193,7 +193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="40"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="41"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2045,7 +2045,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L792-L2558" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L792-L2602" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Comparison</span>()</span></code></pre></div>
@@ -2068,27 +2068,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dd>
 <p>Labels for the two tables.</p>
 </dd>
-<dt><code><span class="doc-parameter-name">keys</span></code></dt>
+<dt><code><span class="doc-parameter-name">keys</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str]</span></code></dt>
 <dd>
 <p>The key columns used to align rows (empty for positional alignment).</p>
 </dd>
-<dt><code><span class="doc-parameter-name">mode</span></code></dt>
+<dt><code><span class="doc-parameter-name">mode</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
 <p><code>"keyed"</code>, <code>"positional"</code>, or <code>"multiset"</code> (for <code>keys="*"</code>).</p>
 </dd>
-<dt><code><span class="doc-parameter-name">compared_columns</span></code></dt>
+<dt><code><span class="doc-parameter-name">compared_columns</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">list[str]</span></code></dt>
 <dd>
 <p>The source columns whose values were compared.</p>
 </dd>
-<dt><code><span class="doc-parameter-name">column_map</span></code></dt>
+<dt><code><span class="doc-parameter-name">column_map</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[str, str]</span></code></dt>
 <dd>
 <p>The mapping of source to target column names given in <code>column_map=</code>.</p>
 </dd>
-<dt><code><span class="doc-parameter-name">schema_mode</span></code></dt>
+<dt><code><span class="doc-parameter-name">schema_mode</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
 <p>How schema differences affect the result: <code>"strict"</code> or <code>"common"</code>.</p>
 </dd>
-<dt><code><span class="doc-parameter-name">schema_diff</span></code></dt>
+<dt><code><span class="doc-parameter-name">schema_diff</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">SchemaDiff</span></code></dt>
 <dd>
 <p>A <a href="../reference/SchemaDiff.html#pointblank.SchemaDiff" class="gdls-link"><code>SchemaDiff</code></a> describing schema differences.</p>
 </dd>
@@ -2100,11 +2100,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dd>
 <p>Number of test units (aligned rows) with each status.</p>
 </dd>
-<dt><code><span class="doc-parameter-name">n_dup_key_values</span></code></dt>
+<dt><code><span class="doc-parameter-name">n_dup_key_values</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span></code></dt>
 <dd>
 <p>Number of distinct key values that are duplicated in either table.</p>
 </dd>
-<dt><code><span class="doc-parameter-name">column_mismatches</span></code></dt>
+<dt><code><span class="doc-parameter-name">column_mismatches</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">dict[str, int]</span></code></dt>
 <dd>
 A dict mapping each compared source column to the number of matched rows where its values differ.
 </dd>
@@ -2114,7 +2114,7 @@ A dict mapping each compared source column to the number of matched rows where i
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s compare the output of a reporting job with the output of a new version of the job. The new version should produce exactly the same daily totals.</p>
-<div id="dd8b656f" class="cell" data-execution_count="2">
+<div id="d5d033a1" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2142,7 +2142,7 @@ A dict mapping each compared source column to the number of matched rows where i
 </div>
 </div>
 <p>The printed form is a one-line summary: one day changed and the schemas agree, so the tables aren’t identical. In a test or a deployment script, the comparison can be used as a condition directly. Here, when the tables differ, we look at the rows that changed:</p>
-<div id="bcb19a91" class="cell" data-execution_count="3">
+<div id="c8789212" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> comparison:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"The new job reproduces the old totals."</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -2161,7 +2161,7 @@ shape: (1, 5)
 </div>
 </div>
 <p>The revenue for June 3 has two digits swapped. To see where the mismatches are concentrated, which matters more when there are many columns, use <a href="../reference/Comparison.column_summary.html#pointblank.Comparison.column_summary" class="gdls-link gdls-code">column_summary()</a>:</p>
-<div id="e0555434" class="cell" data-execution_count="4">
+<div id="843b5eba" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>comparison.column_summary()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div><style>

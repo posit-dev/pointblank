@@ -4,7 +4,7 @@ Score text by a simple statistic, like its number of words or its share of bulle
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1353-L1447)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/scorers.py#L1362-L1456)
 
 ``` python
 scorers.text_stat(

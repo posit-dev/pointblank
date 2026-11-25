@@ -9,7 +9,7 @@ When performing data validation, use the `Validate` class to get the process sta
 
 
 
-Validate(data: IntoDataFrame, reference: IntoFrame | None = None, tbl_name: str | None = None, label: str | None = None, thresholds: int | float | bool | tuple | dict | Thresholds | None = None, actions: Actions | None = None, final_actions: FinalActions | None = None, brief: str | bool | None = None, lang: str | None = None, locale: str | None = None, owner: str | None = None, consumers: str | list[str] | None = None, version: str | None = None, _reference_source: str | None = ...)
+Validate(data: IntoDataFrame, reference: IntoFrame | None = None, tbl_name: str | None = None, label: str | None = None, thresholds: int | float | bool | tuple | dict | Thresholds | None = None, actions: Actions | None = None, final_actions: FinalActions | None = None, brief: str | bool | None = None, lang: str | None = None, locale: str | None = None, owner: str | None = None, consumers: str | list[str] | None = None, version: str | None = None, _reference_source: str | None = ..., col_names: list[str] | None = ..., col_types: list[str] | None = ..., time_start: datetime.datetime | None = ..., time_end: datetime.datetime | None = ..., validation_info: list[_ValidationInfo] = ...)
 
 Workflow for defining a set of validations on a table and interrogating for results.
 
@@ -1047,7 +1047,7 @@ failures (`d` has values of `1000` or less and `c` has missing values), and only
 
 :   Define actions that run when a step exceeds a threshold.
 
-Schema(columns: str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None = None, tbl: Any | None = None, **kwargs)
+Schema(columns: str | list[str] | list[tuple[str, str]] | list[tuple[str]] | list[tuple[str] | tuple[str, Any]] | dict[str, str] | None = None, tbl: Any | None = None, **kwargs)
 
 Definition of a schema object.
 
@@ -1077,7 +1077,7 @@ then there shouldn't be any other inputs provided through either `columns=` or `
 ## Parameters {.doc-parameters}
 
 ::: {.doc-definition-items}
-<code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
+<code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [(<br>&nbsp;&nbsp;&nbsp;&nbsp;str<br>&nbsp;&nbsp;&nbsp;&nbsp;| list[str]<br>&nbsp;&nbsp;&nbsp;&nbsp;| list[tuple[str, str]]<br>&nbsp;&nbsp;&nbsp;&nbsp;| list[tuple[str]]<br>&nbsp;&nbsp;&nbsp;&nbsp;| list[tuple[str] | tuple[str, Any]]<br>&nbsp;&nbsp;&nbsp;&nbsp;| dict[str, str]<br>&nbsp;&nbsp;&nbsp;&nbsp;| None<br>)]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
 :   A list of strings (representing column names), a list of tuples (for column names and column
     dtypes), or a dictionary containing column and dtype information. If any of these inputs are
@@ -32343,27 +32343,27 @@ What you do with a `Comparison` depends on the question being asked:
 
 :   Labels for the two tables.
 
-<code>[keys]{.doc-parameter-name}</code>
+<code>[keys]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [list[str]]{.doc-parameter-annotation}</code>
 
 :   The key columns used to align rows (empty for positional alignment).
 
-<code>[mode]{.doc-parameter-name}</code>
+<code>[mode]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [str]{.doc-parameter-annotation}</code>
 
 :   `"keyed"`, `"positional"`, or `"multiset"` (for `keys="*"`).
 
-<code>[compared_columns]{.doc-parameter-name}</code>
+<code>[compared_columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [list[str]]{.doc-parameter-annotation}</code>
 
 :   The source columns whose values were compared.
 
-<code>[column_map]{.doc-parameter-name}</code>
+<code>[column_map]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [dict[str, str]]{.doc-parameter-annotation}</code>
 
 :   The mapping of source to target column names given in `column_map=`.
 
-<code>[schema_mode]{.doc-parameter-name}</code>
+<code>[schema_mode]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [str]{.doc-parameter-annotation}</code>
 
 :   How schema differences affect the result: `"strict"` or `"common"`.
 
-<code>[schema_diff]{.doc-parameter-name}</code>
+<code>[schema_diff]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [SchemaDiff]{.doc-parameter-annotation}</code>
 
 :   A [`SchemaDiff`](`pointblank.SchemaDiff`) describing schema differences.
 
@@ -32375,11 +32375,11 @@ What you do with a `Comparison` depends on the question being asked:
 
 :   Number of test units (aligned rows) with each status.
 
-<code>[n_dup_key_values]{.doc-parameter-name}</code>
+<code>[n_dup_key_values]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [int]{.doc-parameter-annotation}</code>
 
 :   Number of distinct key values that are duplicated in either table.
 
-<code>[column_mismatches]{.doc-parameter-name}</code>
+<code>[column_mismatches]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [dict[str, int]]{.doc-parameter-annotation}</code>
 
 :   A dict mapping each compared source column to the number of matched rows where its values
     differ.
@@ -41981,7 +41981,7 @@ dataset.
 
 :   Read metadata from a file, such as one of these examples.
 
-MetadataImport(source_format: str, source_path: str | None = None, source_version: str | None = None, dataset_name: str | None = None, dataset_label: str | None = None, dataset_description: str | None = None, creation_date: str | None = None, study_id: str | None = None, domain: str | None = None, variables: list[VariableMetadata] = list(), codelists: dict[str, Codelist] = dict(), missing_value_codes: dict[str, list[MissingValueCode]] = dict())
+MetadataImport(source_format: str, source_path: str | None = None, source_version: str | None = None, dataset_name: str | None = None, dataset_label: str | None = None, dataset_description: str | None = None, creation_date: str | datetime.datetime | None = None, study_id: str | None = None, domain: str | None = None, variables: list[VariableMetadata] = list(), codelists: dict[str, Codelist] = dict(), missing_value_codes: dict[str, list[MissingValueCode]] = dict())
 
 The metadata for a single dataset.
 
@@ -42036,7 +42036,7 @@ dataset that doesn't come with a metadata file and still use the methods above. 
 
 :   A longer description of the dataset. The default is `None`.
 
-<code>[creation_date]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [str | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
+<code>[creation_date]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [str | datetime.datetime | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
 :   When the metadata was created, as given in the file. The default is `None`.
 

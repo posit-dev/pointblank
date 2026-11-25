@@ -4,7 +4,7 @@ Add a `col_missing_only_coded()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1564-L1609)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1563-L1608)
 
 ``` python
 col_missing_only_coded(

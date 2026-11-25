@@ -4,7 +4,7 @@ Get a codelist by name.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L952-L989)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L954-L991)
 
 ``` python
 get_codelist(name)

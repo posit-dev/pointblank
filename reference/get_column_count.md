@@ -4,7 +4,7 @@ Get the number of columns in a table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L3926-L4093)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L3961-L4128)
 
 ``` python
 get_column_count(data)

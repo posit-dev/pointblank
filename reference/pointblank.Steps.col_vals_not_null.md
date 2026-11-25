@@ -4,7 +4,7 @@ Add a `col_vals_not_null()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L875-L912)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L874-L911)
 
 ``` python
 col_vals_not_null(

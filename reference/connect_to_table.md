@@ -4,7 +4,7 @@ Connect to a database table using a connection string.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5580-L5764)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L5615-L5800)
 
 ``` python
 connect_to_table(connection_string)

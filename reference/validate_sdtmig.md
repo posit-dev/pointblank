@@ -4,7 +4,7 @@ Check SDTM datasets with Pointblank's bundled SDTMIG conformance rules.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L3149-L3333)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L3151-L3335)
 
 ``` python
 validate_sdtmig(

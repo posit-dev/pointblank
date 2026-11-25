@@ -4,7 +4,7 @@ Get the failing records that the conformance check found.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1942-L1998)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L1944-L2000)
 
 ``` python
 findings()

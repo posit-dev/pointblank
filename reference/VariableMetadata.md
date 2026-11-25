@@ -4,7 +4,7 @@ The metadata for a single variable (column).
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L368-L582)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L370-L584)
 
 ``` python
 VariableMetadata(
@@ -191,7 +191,7 @@ Build a [`MissingSpec`](../reference/MissingSpec.md#pointblank.MissingSpec) from
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L538-L582)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L540-L584)
 
 ``` python
 to_missing_spec()

@@ -4,7 +4,7 @@ Make a table of the failing records found by the built-in rules.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2488-L2658)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_submission.py#L2490-L2660)
 
 ``` python
 get_findings_table()

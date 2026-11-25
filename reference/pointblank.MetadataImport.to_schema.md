@@ -4,7 +4,7 @@ Get a [Schema](../reference/Schema.md#pointblank.Schema) of the variables' names
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L706-L738)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/metadata/_types.py#L708-L740)
 
 ``` python
 to_schema()

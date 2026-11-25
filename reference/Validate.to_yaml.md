@@ -4,7 +4,7 @@ Serialize this validation plan to a [yaml_interrogate()](../reference/yaml_inter
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22789-L22936)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22948-L23098)
 
 ``` python
 Validate.to_yaml(path=None)

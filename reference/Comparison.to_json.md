@@ -4,7 +4,7 @@ Get the comparison results as a JSON string.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L2397-L2455)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/_compare.py#L2441-L2499)
 
 ``` python
 Comparison.to_json(

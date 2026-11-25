@@ -4,7 +4,7 @@ Validate whether the text of rows has no near duplicates.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15203-L15433)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15292-L15524)
 
 ``` python
 Validate.rows_near_distinct(

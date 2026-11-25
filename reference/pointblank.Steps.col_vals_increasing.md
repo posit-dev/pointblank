@@ -4,7 +4,7 @@ Add a `col_vals_increasing()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L738-L785)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L737-L784)
 
 ``` python
 col_vals_increasing(

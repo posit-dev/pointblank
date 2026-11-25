@@ -4,7 +4,7 @@ The results of [`check_splits()`](../reference/check_splits.md#pointblank.check_
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L236-L803)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L236-L806)
 
 ``` python
 SplitCheck(

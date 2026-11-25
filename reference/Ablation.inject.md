@@ -4,7 +4,7 @@ Add a variant for each rate of a defect, put into clean rows of the table.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1863-L2150)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/ablation.py#L1871-L2160)
 
 ``` python
 Ablation.inject(

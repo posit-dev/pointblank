@@ -4,7 +4,7 @@ Add a `conjointly()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L2152-L2189)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L2151-L2188)
 
 ``` python
 conjointly(

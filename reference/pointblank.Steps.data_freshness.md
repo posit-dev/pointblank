@@ -4,7 +4,7 @@ Add a `data_freshness()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1918-L1963)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L1917-L1962)
 
 ``` python
 data_freshness(

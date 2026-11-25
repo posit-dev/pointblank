@@ -4,7 +4,7 @@ Add a `tbl_match()` step to the collection.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L2047-L2101)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/steps.py#L2046-L2100)
 
 ``` python
 tbl_match(

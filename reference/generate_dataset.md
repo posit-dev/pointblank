@@ -4,7 +4,7 @@ Generate synthetic test data from a schema.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1324-L1615)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L1332-L1623)
 
 ``` python
 generate_dataset(

@@ -4,7 +4,7 @@ Get the results as a dictionary (that can be written as JSON).
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L527-L582)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/splits.py#L530-L585)
 
 ``` python
 SplitCheck.to_dict()

@@ -4,7 +4,7 @@ Convert YAML validation configuration to equivalent Python code.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L2281-L2843)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/yaml.py#L2282-L2844)
 
 ``` python
 yaml_to_python(yaml)

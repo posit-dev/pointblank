@@ -4,7 +4,7 @@ Get a summary of a dataset.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L40-L1262)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/datascan.py#L40-L1265)
 
 ``` python
 DataScan(

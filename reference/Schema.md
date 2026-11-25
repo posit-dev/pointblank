@@ -4,7 +4,7 @@ Definition of a schema object.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L20-L742)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L20-L749)
 
 ``` python
 Schema(
@@ -27,7 +27,7 @@ The schema object can also be constructed by providing a DataFrame or Ibis table
 
 ## Parameters
 
-`columns: str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None = None`  
+`columns: (     str     | list[str]     | list[tuple[str, str]]     | list[tuple[str]]     | list[tuple[str] | tuple[str, Any]]     | dict[str, str]     | None ) = None`  
 A list of strings (representing column names), a list of tuples (for column names and column dtypes), or a dictionary containing column and dtype information. If any of these inputs are provided here, it will take precedence over any column arguments provided via `**kwargs`.
 
 `tbl: Any | None = None`  
