@@ -223,6 +223,129 @@ def test_multiset_rows_show_surplus_copies_only_when_more_than_one():
     assert "&times;1" not in html_str
 
 
+# ----------------------------------------------------------------------------------------------
+# Layout
+# ----------------------------------------------------------------------------------------------
+
+
+def _grid_lines(html_str: str) -> list[list[tuple[str | None, str]]]:
+    """The cells (width, text) of each grid line in a report."""
+    lines = []
+    for line in re.findall(
+        r"<div style='white-space:nowrap; line-height:1.7;.*?'>(.*?)</div>", html_str
+    ):
+        cells = re.findall(
+            r"<span(?: title='[^']*')? style='display:inline-block;(?: width:(\d+)ch;)?[^']*'>(.*?)</span>(?=<span(?: title='[^']*')? style='display:inline-block|$)",
+            line,
+        )
+        lines.append([(w or None, html_lib.unescape(re.sub(r"<[^>]+>", "", t))) for w, t in cells])
+    return lines
+
+
+def test_sample_sections_are_aligned_grids_under_column_names():
+    s = pl.DataFrame({"id": [1, 22, 333], "name": ["a", "a much longer name", "c"], "v": [1, 2, 3]})
+    t = pl.DataFrame({"id": [9999], "name": ["z"], "v": [4]})
+    html_str = pb.compare(s, t, keys="id").get_tabular_report().as_raw_html()
+    lines = _grid_lines(html_str)
+
+    # Column names head the section (and label the key column), then one line per row, with
+    # each column as wide as its widest value
+    assert ["id"] in [[text for _, text in line] for line in lines]
+    header = next(line for line in lines if [text for _, text in line] == ["name", "v"])
+    rows = [
+        line for line in lines if len(line) == 2 and line[0][1] in {"a", "a much longer name", "c"}
+    ]
+    assert len(rows) == 3
+    assert {line[0][0] for line in rows + [header]} == {str(len("a much longer name"))}
+    # The key column is labeled, and only as wide as it needs to be
+    assert '<col style="width:30%;"/>' not in html_str
+    assert "white-space: nowrap; padding-inline-end: 16px;" in html_str
+
+
+def test_changed_rows_are_one_aligned_line_per_changed_value():
+    s = pl.DataFrame({"id": [1, 2], "a": [1, 2], "b": ["x", "y"]})
+    t = pl.DataFrame({"id": [1, 2], "a": [10, 2], "b": ["xx", "z"]})
+    html_str = (
+        pb.compare(s, t, keys="id", source_name="old", target_name="new")
+        .get_tabular_report()
+        .as_raw_html()
+    )
+    lines = [[text for _, text in line] for line in _grid_lines(html_str)]
+
+    # The table names label the values before and after
+    assert ["", "old", "", "new"] in lines
+    assert ["a", "1", "→", "10", "(+9)"] in lines
+    assert ["b", "x", "→", "xx"] in lines
+    assert ["b", "y", "→", "z"] in lines
+
+
+def test_changed_rows_list_at_most_eight_changed_values():
+    cols = {f"c{i}": [0] for i in range(10)}
+    s = pl.DataFrame({"id": [1], **cols})
+    t = s.with_columns(pl.exclude("id") + 1)
+    text = _text(pb.compare(s, t, keys="id").get_tabular_report())
+    changed = text[text.index("Changed rows") :]
+
+    assert "c7 0 → 1" in changed
+    assert "c8" not in changed
+    assert changed.endswith("+2 more")
+
+
+def test_sample_grids_show_as_many_columns_as_fit():
+    def header(s, t):
+        lines = _grid_lines(pb.compare(s, t, keys="id").get_tabular_report().as_raw_html())
+        return next(texts for texts in ([t for _, t in line] for line in lines) if "c0" in texts)
+
+    # Up to eight narrow columns, but fewer wide ones, and fewer still beside a long key
+    narrow = pl.DataFrame({"id": [1, 2], **{f"c{i}": [i, i] for i in range(10)}})
+    assert header(narrow, narrow.head(1)) == [f"c{i}" for i in range(8)] + ["+2 more"]
+
+    wide = narrow.with_columns(pl.exclude("id").cast(pl.String).str.pad_end(30, "x"))
+    assert header(wide, wide.head(1)) == ["c0", "c1", "c2", "c3", "+6 more"]
+
+    long_key = wide.with_columns(id=pl.Series(["k" * 40, "j" * 40]))
+    assert header(long_key, long_key.head(1)) == ["c0", "c1", "+8 more"]
+
+
+def test_composite_keys_are_aligned_columns():
+    s = pl.DataFrame({"region": ["N", "South"], "id": [1, 200], "v": [1, 2]})
+    t = pl.DataFrame({"region": ["E"], "id": [3], "v": [3]})
+    lines = _grid_lines(pb.compare(s, t, keys=["region", "id"]).get_tabular_report().as_raw_html())
+
+    key_lines = [
+        line
+        for line in lines
+        if [text for _, text in line] in (["region", "id"], ["N", "1"], ["South", "200"])
+    ]
+    # (the key columns head both the missing and the extra rows)
+    assert len(key_lines) == 4
+    assert {line[0][0] for line in key_lines} == {"6"}
+
+
+def test_section_labels_are_colored_by_status(comparison):
+    from pointblank._compare_report import STATUS_COLORS
+
+    html_str = comparison.get_tabular_report().as_raw_html()
+    for title, status in [
+        ("Changed rows", "changed"),
+        ("Missing from target", "missing"),
+        ("Extra in target", "extra"),
+        ("Duplicate keys", "dup_key"),
+    ]:
+        heading = re.search(rf"<th class=\"gt_group_heading\"[^>]*>{title}", html_str).group(0)
+        assert f"border-inline-start: 4px solid {STATUS_COLORS[status]};" in heading, title
+
+
+def test_right_to_left_layout(comparison):
+    html_str = comparison.get_tabular_report(lang="ar").as_raw_html()
+    # The columns run right to left, arrows point from source to target, and data stays left to
+    # right inside its cell
+    assert "#pb_comparison_tbl .gt_table { direction: rtl; }" in html_str
+    assert "&larr;" in html_str and "&rarr;" not in html_str
+    assert "<bdi dir='ltr'>" in html_str
+    assert "&larr;" not in comparison.get_tabular_report().as_raw_html()
+
+
 def test_verdict_flags_comparisons_without_common_columns():
     src = pl.DataFrame({"id": [1, 2, 3], "name": ["a", "b", "c"]})
     tgt = pl.DataFrame({"sku": ["A", "B", "C"], "price": [1.0, 2.0, 3.0]})
