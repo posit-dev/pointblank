@@ -4,7 +4,7 @@ Validate whether text has no personal information.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L16508-L16664)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L16516-L16672)
 
 ``` python
 Validate.col_vals_no_pii(

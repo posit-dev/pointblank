@@ -4,7 +4,7 @@ Get the rows that failed for each validation step.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22446-L22590)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22454-L22598)
 
 ``` python
 Validate.get_data_extracts(

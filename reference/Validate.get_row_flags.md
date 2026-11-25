@@ -4,7 +4,7 @@ Get the target table with columns flagging the validation steps each row failed.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L24428-L24681)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L24436-L24689)
 
 ``` python
 Validate.get_row_flags(
