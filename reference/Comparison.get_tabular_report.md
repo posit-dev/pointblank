@@ -74,7 +74,7 @@ comparison.get_tabular_report()
 
 | Table Comparison |  |
 |----|----|
-| **payroll_jan** (4 rows) → **payroll_feb** (4 rows), aligned by key `emp_id` DIFFERENT 3 of 5 rows fail (60.0%) match **2**changed **1**missing **1**extra **1** |  |
+| **payroll_jan** (4 rows) → **payroll_feb** (4 rows), aligned by key `emp_id` DIFFERENT 3 of 5 rows fail (60.0%) 1 of the 6 compared values differs. match **2**changed **1**missing **1**extra **1** |  |
 | Column mismatches (1 of 2 columns) |  |
 | salary | 1 of 3 matched rows differ (33.3%) |
 | Changed rows (1 row) |  |
@@ -97,7 +97,7 @@ comparison.get_tabular_report(title="Paie : janvier et février", lang="fr")
 
 | Paie : janvier et février |  |
 |----|----|
-| **payroll_jan** (4 lignes) → **payroll_feb** (4 lignes), alignées par la clé `emp_id` DIFFÉRENTES 3 lignes sur 5 en échec (60,0%) identique **2**modifiée **1**manquante **1**supplémentaire **1** |  |
+| **payroll_jan** (4 lignes) → **payroll_feb** (4 lignes), alignées par la clé `emp_id` DIFFÉRENTES 3 lignes sur 5 en échec (60,0%) 1 des 6 valeurs comparées diffère. identique **2**modifiée **1**manquante **1**supplémentaire **1** |  |
 | Écarts par colonne (1 colonnes sur 2) |  |
 | salary | 1 lignes appariées sur 3 diffèrent (33,3%) |
 | Lignes modifiées (1 ligne) |  |

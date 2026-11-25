@@ -147,7 +147,7 @@ comparison
 
 | Table Comparison |  |
 |----|----|
-| **catalog_v1** (5 rows) → **catalog_v2** (5 rows), aligned by key `sku` DIFFERENT 4 of 6 rows fail (66.7%) match **2**changed **2**missing **1**extra **1** |  |
+| **catalog_v1** (5 rows) → **catalog_v2** (5 rows), aligned by key `sku` DIFFERENT 4 of 6 rows fail (66.7%) 2 of the 12 compared values differ. match **2**changed **2**missing **1**extra **1** |  |
 | Column mismatches (2 of 3 columns) |  |
 | price | 1 of 4 matched rows differ (25.0%) |
 | in_stock | 1 of 4 matched rows differ (25.0%) |
@@ -212,7 +212,7 @@ pb.compare(catalog_v1, catalog_v3, keys="sku", column_map={"price": "unit_price"
 
 | Table Comparison |  |
 |----|----|
-| **source** (5 rows) → **target** (5 rows), aligned by key `sku` DIFFERENT 4 of 6 rows fail (66.7%) match **2**changed **2**missing **1**extra **1** |  |
+| **source** (5 rows) → **target** (5 rows), aligned by key `sku` DIFFERENT 4 of 6 rows fail (66.7%) 2 of the 12 compared values differ. match **2**changed **2**missing **1**extra **1** |  |
 | Schema differences |  |
 | price | renamed → `unit_price` (via `column_map=`) |
 | Column mismatches (2 of 3 columns) |  |

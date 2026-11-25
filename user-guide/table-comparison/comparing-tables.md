@@ -47,7 +47,7 @@ comparison
 
 | Table Comparison |  |
 |----|----|
-| **source** (5 rows) → **target** (5 rows), aligned by key `order_id` DIFFERENT 3 of 6 rows fail (50.0%) match **3**changed **1**missing **1**extra **1** |  |
+| **source** (5 rows) → **target** (5 rows), aligned by key `order_id` DIFFERENT 3 of 6 rows fail (50.0%) 1 of the 12 compared values differs. match **3**changed **1**missing **1**extra **1** |  |
 | Column mismatches (1 of 3 columns) |  |
 | amount | 1 of 4 matched rows differ (25.0%) |
 | Changed rows (1 row) |  |
@@ -60,7 +60,7 @@ comparison
 | order_id | customeramountstatus |
 | 1006 | Fay18.25pending |
 
-The report's header gives the verdict and a breakdown of the rows. Below it, each section shows one kind of difference: which columns have mismatched values (and how often), then samples of the changed, missing, and extra rows. For changed rows, only the differing values are shown, as *old → new* with the numeric difference alongside.
+The report's header gives the verdict, a one-line summary of how different the tables are (from "1 of the 12 compared values differs" to "The tables have no keys in common"), and a breakdown of the rows. Below it, each section shows one kind of difference: which columns have mismatched values (and how often), then samples of the changed, missing, and extra rows. For changed rows, only the differing values are shown, as *old → new* with the numeric difference alongside. When the tables have no keys in common, the missing and extra keys are listed on a line each, so that an offset or a difference in how the keys are written is easy to spot.
 
 ## Row Statuses
 
@@ -212,7 +212,7 @@ pb.compare(
 
 | Table Comparison |  |
 |----|----|
-| **source** (5 rows) → **target** (5 rows), aligned by key `order_id` DIFFERENT 3 of 6 rows fail (50.0%) match **3**changed **1**missing **1**extra **1** schema: common columns |  |
+| **source** (5 rows) → **target** (5 rows), aligned by key `order_id` DIFFERENT 3 of 6 rows fail (50.0%) 1 of the 12 compared values differs. match **3**changed **1**missing **1**extra **1** schema: common columns |  |
 | Schema differences |  |
 | region | only in target |
 | customer | renamed → `customer_name` (via `column_map=`) |
@@ -262,7 +262,7 @@ Three of the six aligned rows differ, exceeding both the 'warning' and 'error' t
 validation.get_step_report(i=1)
 ```
 
-| Report for Validation Step 1 ✗ ASSERTION `tbl_match(keys='order_id')` **source** (5 rows) → **orders** (5 rows), aligned by key `order_id` DIFFERENT 3 of 6 rows fail (50.0%) match **3**changed **1**missing **1**extra **1** |  |
+| Report for Validation Step 1 ✗ ASSERTION `tbl_match(keys='order_id')` **source** (5 rows) → **orders** (5 rows), aligned by key `order_id` DIFFERENT 3 of 6 rows fail (50.0%) 1 of the 12 compared values differs. match **3**changed **1**missing **1**extra **1** |  |
 |----|----|
 | Column mismatches (1 of 3 columns) |  |
 | amount | 1 of 4 matched rows differ (25.0%) |
@@ -327,7 +327,7 @@ validation = (
 validation.get_step_report(i=1)
 ```
 
-| Report for Validation Step 1 ✗ ASSERTION `tbl_reconcile(keys='customer', measures='amount', agg='sum')` **source** (5 groups) → **order_lines** (5 groups), aligned by key `customer` DIFFERENT 3 of 6 groups fail (50.0%) match **3**changed **1**missing **1**extra **1** `sum` by `customer` |  |
+| Report for Validation Step 1 ✗ ASSERTION `tbl_reconcile(keys='customer', measures='amount', agg='sum')` **source** (5 groups) → **order_lines** (5 groups), aligned by key `customer` DIFFERENT 3 of 6 groups fail (50.0%) 1 of the 4 compared values differs. match **3**changed **1**missing **1**extra **1** `sum` by `customer` |  |
 |----|----|
 | Column mismatches (1 of 1 columns) |  |
 | amount_sum | 1 of 4 matched groups differ (25.0%) |

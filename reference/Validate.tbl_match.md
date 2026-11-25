@@ -212,7 +212,7 @@ Three of the five aligned rows failed: one changed, one missing from the target,
 validation.get_step_report(i=1)
 ```
 
-| Report for Validation Step 1 ✗ ASSERTION `tbl_match(keys='a')` **source** (4 rows) → **target** (4 rows), aligned by key `a` DIFFERENT 3 of 5 rows fail (60.0%) match **2**changed **1**missing **1**extra **1** |  |
+| Report for Validation Step 1 ✗ ASSERTION `tbl_match(keys='a')` **source** (4 rows) → **target** (4 rows), aligned by key `a` DIFFERENT 3 of 5 rows fail (60.0%) 1 of the 6 compared values differs. match **2**changed **1**missing **1**extra **1** |  |
 |----|----|
 | Column mismatches (1 of 2 columns) |  |
 | c | 1 of 3 matched rows differ (33.3%) |
