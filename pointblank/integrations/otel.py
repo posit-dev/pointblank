@@ -499,6 +499,7 @@ class OTelExporter:
         pass_rate = units_passed / units_total if units_total > 0 else 1.0
 
         assert validation.time_start is not None and validation.time_end is not None
+        # pyrefly: ignore[unsupported-operation]  # the stub types these fields as `...`
         duration = (validation.time_end - validation.time_start).total_seconds()
 
         self._counter_steps_total.add(steps_total, attrs)
@@ -537,6 +538,7 @@ class OTelExporter:
             **attrs,
             "pb.steps.total": len(cast(list[Any], validation.validation_info)),
             "pb.all_passed": validation.all_passed(),
+            # pyrefly: ignore[unsupported-operation]  # the stub types these fields as `...`
             "pb.duration_s": (validation.time_end - validation.time_start).total_seconds(),
         }
 

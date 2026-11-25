@@ -48,6 +48,7 @@ class Stat(ABC):
 
 @dataclass(frozen=True)
 class MeanStat(Stat):
+    # pyrefly: ignore[bad-override]  # Stat.val is Any; each stat has its own value type
     val: str
     name: ClassVar[str] = "mean"
     group = StatGroup.SUMMARY
@@ -57,6 +58,7 @@ class MeanStat(Stat):
 
 @dataclass(frozen=True)
 class StdStat(Stat):  # TODO: Rename this SD for consistency
+    # pyrefly: ignore[bad-override]  # Stat.val is Any; each stat has its own value type
     val: str
     name: ClassVar[str] = "std"
     group = StatGroup.SUMMARY
@@ -66,6 +68,7 @@ class StdStat(Stat):  # TODO: Rename this SD for consistency
 
 @dataclass(frozen=True)
 class MinStat(Stat):
+    # pyrefly: ignore[bad-override]  # Stat.val is Any; each stat has its own value type
     val: str
     name: ClassVar[str] = "min"
     group = StatGroup.BOUNDS  # TODO: These should get put back in DESCR once datetime p*
@@ -75,6 +78,7 @@ class MinStat(Stat):
 
 @dataclass(frozen=True)
 class MaxStat(Stat):
+    # pyrefly: ignore[bad-override]  # Stat.val is Any; each stat has its own value type
     val: str
     name: ClassVar[str] = "max"
     group = StatGroup.BOUNDS  # TODO: These should get put back in DESCR once datetime p*
@@ -84,6 +88,7 @@ class MaxStat(Stat):
 
 @dataclass(frozen=True)
 class P05Stat(Stat):
+    # pyrefly: ignore[bad-override]  # Stat.val is Any; each stat has its own value type
     val: str
     name: ClassVar[str] = "p05"
     group = StatGroup.DESCR
@@ -93,6 +98,7 @@ class P05Stat(Stat):
 
 @dataclass(frozen=True)
 class Q1Stat(Stat):
+    # pyrefly: ignore[bad-override]  # Stat.val is Any; each stat has its own value type
     val: str
     name: ClassVar[str] = "q_1"
     group = StatGroup.DESCR
@@ -102,6 +108,7 @@ class Q1Stat(Stat):
 
 @dataclass(frozen=True)
 class MedianStat(Stat):
+    # pyrefly: ignore[bad-override]  # Stat.val is Any; each stat has its own value type
     val: str
     name: ClassVar[str] = "median"
     group = StatGroup.DESCR
@@ -111,6 +118,7 @@ class MedianStat(Stat):
 
 @dataclass(frozen=True)
 class Q3Stat(Stat):
+    # pyrefly: ignore[bad-override]  # Stat.val is Any; each stat has its own value type
     val: str
     name: ClassVar[str] = "q_3"
     group = StatGroup.DESCR
@@ -120,6 +128,7 @@ class Q3Stat(Stat):
 
 @dataclass(frozen=True)
 class P95Stat(Stat):
+    # pyrefly: ignore[bad-override]  # Stat.val is Any; each stat has its own value type
     val: str
     name: ClassVar[str] = "p95"
     group = StatGroup.DESCR
@@ -129,6 +138,7 @@ class P95Stat(Stat):
 
 @dataclass(frozen=True)
 class IQRStat(Stat):
+    # pyrefly: ignore[bad-override]  # Stat.val is Any; each stat has its own value type
     val: str
     name: ClassVar[str] = "iqr"
     group = StatGroup.IQR
@@ -138,6 +148,7 @@ class IQRStat(Stat):
 
 @dataclass(frozen=True)
 class FreqStat(Stat):
+    # pyrefly: ignore[bad-override]  # Stat.val is Any; each stat has its own value type
     val: dict[str, int]  # the key must be stringified
     name: ClassVar[str] = "freqs"
     group = StatGroup.FREQ
@@ -147,6 +158,7 @@ class FreqStat(Stat):
 
 @dataclass(frozen=True)
 class NMissing(Stat):
+    # pyrefly: ignore[bad-override]  # Stat.val is Any; each stat has its own value type
     val: int
     name: ClassVar[str] = "n_missing"
     group = StatGroup.STRUCTURE
@@ -156,6 +168,7 @@ class NMissing(Stat):
 
 @dataclass(frozen=True)
 class NUnique(Stat):
+    # pyrefly: ignore[bad-override]  # Stat.val is Any; each stat has its own value type
     val: int
     name: ClassVar[str] = "n_unique"
     group = StatGroup.STRUCTURE

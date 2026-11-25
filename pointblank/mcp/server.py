@@ -774,7 +774,9 @@ async def missing_values_table(ctx: Context, dataframe_id: str) -> str:
 
 
 @mcp.tool()
-async def column_summary_table(ctx: Context, dataframe_id: str, table_name: str = None) -> str:
+async def column_summary_table(
+    ctx: Context, dataframe_id: str, table_name: str | None = None
+) -> str:
     """Generate a comprehensive column-level summary of the DataFrame."""
     app_ctx: AppContext = cast(Any, ctx.request_context).lifespan_context
     dataframe_id = validate_resource_id(dataframe_id, "DataFrame")
@@ -905,7 +907,12 @@ def validation_assistant(
 
         null_pct = round(null_count / rows * 100, 1) if rows > 0 else 0
 
-        col_info = {"name": col, "dtype": dtype, "null_count": null_count, "null_pct": null_pct}
+        col_info: dict[str, Any] = {
+            "name": col,
+            "dtype": dtype,
+            "null_count": null_count,
+            "null_pct": null_pct,
+        }
 
         # Numeric analysis
         is_numeric = any(t in dtype.lower() for t in ["int", "float", "decimal", "numeric"])

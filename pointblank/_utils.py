@@ -70,12 +70,14 @@ def _derive_single_bound(ref: int | float, tol: int | float, integer: bool = Tru
 def _derive_bounds(ref: int | float, tol: Tolerance, integer: bool = True) -> AbsoluteBounds:
     """Validate and extract the absolute bounds of the tolerance."""
     if isinstance(tol, tuple):
+        # pyrefly: ignore[bad-return]  # float bounds when integer=False (AbsoluteBounds is the integer form)
         return (
             _derive_single_bound(ref, tol[0], integer=integer),
             _derive_single_bound(ref, tol[1], integer=integer),
         )
 
     bound = _derive_single_bound(ref, tol, integer=integer)
+    # pyrefly: ignore[bad-return]  # float bounds when integer=False (AbsoluteBounds is the integer form)
     return bound, bound
 
 
@@ -802,7 +804,7 @@ def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
 
     # If `columns` is Column value or a string, place it in a list for iteration
     if isinstance(columns, (Column, str)):
-        columns: list[Column] | list[str] = cast("list[Column] | list[str]", [columns])
+        return cast("list[Column] | list[str]", [columns])
 
     return columns
 
@@ -816,6 +818,8 @@ def _resolve_columns_subset(
         return col(columns_subset)
     if isinstance(columns_subset, str):
         return [columns_subset]
+    # (a collection of names is passed through as given, so it can be a tuple or another collection)
+    # pyrefly: ignore[bad-return]  # a collection of names is passed through as given
     return columns_subset
 
 

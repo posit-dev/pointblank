@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
-from typing import Any
+from typing import Any, Callable
 
 __all__ = [
     "SDTMDomainTemplate",
@@ -1456,7 +1456,7 @@ def _cm_template() -> SDTMDomainTemplate:
 
 
 # Registry of all domain templates
-_DOMAIN_TEMPLATES: dict[str, callable] = {
+_DOMAIN_TEMPLATES: dict[str, Callable[..., Any]] = {
     "DM": _dm_template,
     "AE": _ae_template,
     "LB": _lb_template,

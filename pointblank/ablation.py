@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from great_tables import GT
 
     from pointblank.thresholds import Thresholds
-    from pointblank.validate import Validate
+    from pointblank.validate import Validate, _ValidationInfo
 
 __all__ = [
     "Ablation",
@@ -346,6 +346,8 @@ class _Spec:
     @property
     def base(self) -> tuple[int, ...]:
         """For a `drop_all_but_each()` variant, all the steps (including the one left out)."""
+        if self.left_out is None:
+            return tuple(sorted(self.steps))
         return tuple(sorted((*self.steps, self.left_out)))
 
 
@@ -879,7 +881,10 @@ class Ablation:
                 )
         self._columns = columns
         self._order_by = _check_duplicates_policy(duplicates, duplicates_order_by, columns=columns)
-        steps, skipped = _row_result_steps(validation.validation_info, duplicates=duplicates)
+        # (the stub of `Validate` types `validation_info` as `...`)
+        steps, skipped = _row_result_steps(
+            cast(Any, validation.validation_info), duplicates=duplicates
+        )
 
         if repeats < 3:
             warnings.warn(
@@ -924,7 +929,9 @@ class Ablation:
             self._holdout_n_rows = get_row_count(self.holdout_validation.data)
 
         self._n_rows = get_row_count(validation.data)
-        self._steps = {step.i: step for step in steps}
+        self._steps: dict[int, _ValidationInfo] = {
+            step.i: step for step in steps if step.i is not None
+        }
         self._skipped = dict(skipped)
         self._pass_variant = evaluate is not None and _accepts_keyword(evaluate, "variant")
 
@@ -1641,7 +1648,7 @@ class Ablation:
             base_id, base_name = f"step_{score}", msg("abl_name_step", i=str(score))
             missing_label = msg("abl_note_no_score_step", step=str(score))
             if remove is None:
-                bounds = step.values or {}
+                bounds = step.values if isinstance(step.values, dict) else {}
                 only_max = bounds.get("min_val") is None and bounds.get("max_val") is not None
                 remove = "highest" if only_max else "lowest"
 
@@ -2055,7 +2062,7 @@ class Ablation:
         dtype = None
         if kind != "duplicate":
             frame = frame.select(_INDEX, cast(str, column))
-            dtype = frame.collect_schema()[column]
+            dtype = frame.collect_schema()[cast(str, column)]
             if kind == "truncate" and dtype != nw.String:
                 raise TypeError(
                     f'`corruption="truncate"` needs a text column, but {column!r} is {dtype}.'
@@ -2065,7 +2072,7 @@ class Ablation:
         if isinstance(frame, nw.LazyFrame):
             frame = frame.collect()
         rows = [int(k) for k in frame[_INDEX].to_list()]
-        values = dict(zip(rows, frame[column].to_list())) if kind != "duplicate" else {}
+        values = dict(zip(rows, frame[cast(str, column)].to_list())) if kind != "duplicate" else {}
 
         # The clean rows: those that fail none of the steps (and have a value to corrupt)
         dirty = frozenset().union(*self._failed_rows(sorted(self._steps)).values())
@@ -2326,15 +2333,15 @@ class Ablation:
     def _check_sweep_values(self, values: Any, arg: str) -> list[float]:
         if not isinstance(values, (list, tuple, range)):
             raise TypeError(f"`{arg}=` must be a list of numbers, got {type(values).__name__}.")
-        values = list(values)
-        if not values:
+        items: list[float] = list(values)
+        if not items:
             raise ValueError(f"`{arg}=` must have at least one value.")
-        for v in values:
+        for v in items:
             if not _is_number(v) or not math.isfinite(float(v)):
                 raise TypeError(f"The values of `{arg}=` must be finite numbers, got {v!r}.")
-        if len(set(values)) != len(values):
+        if len(set(items)) != len(items):
             raise ValueError(f"The values of `{arg}=` must be different from each other.")
-        return values
+        return items
 
     def _step_scores(self, i: int) -> dict[int, float]:
         """The scores of a `col_vals_scored()` step, by row number (rows with no score left out)."""
@@ -2871,6 +2878,8 @@ class Ablation:
 
     def _cache_get(self, key: str) -> Any:
         """The result of an evaluation in the cache (`None` if it isn't there)."""
+        if self.cache is None:
+            return None
         try:
             with open(self.cache / f"{key}.json", encoding="utf-8") as f:
                 entry = json.load(f)
@@ -2883,7 +2892,10 @@ class Ablation:
     def _cache_put(self, key: str, result: Any, variant: AblationVariant, seed: int) -> None:
         import tempfile
 
-        cast(Any, self.cache).mkdir(parents=True, exist_ok=True)
+        cache = self.cache
+        if cache is None:
+            raise RuntimeError("The evaluation cache isn't set.")
+        cache.mkdir(parents=True, exist_ok=True)
         entry = {
             "result": result,
             "variant": variant.id,
@@ -2891,11 +2903,11 @@ class Ablation:
             "evaluate_version": self.evaluate_version,
         }
         # Write to a temporary file first, so that an interrupted run never leaves a partial entry
-        fd, tmp = tempfile.mkstemp(dir=self.cache, prefix=f".{key}.", suffix=".tmp")
+        fd, tmp = tempfile.mkstemp(dir=cache, prefix=f".{key}.", suffix=".tmp")
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as f:
                 json.dump(entry, f)
-            os.replace(tmp, self.cache / f"{key}.json")
+            os.replace(tmp, cache / f"{key}.json")
         except BaseException:
             Path(tmp).unlink(missing_ok=True)
             raise
@@ -3804,7 +3816,8 @@ class Ablation:
         kwargs: dict[str, Any] = {"seed": seed}
         if self._pass_variant:
             kwargs["variant"] = variant
-        return self.evaluate(self._training_input(variant, removed), **kwargs)
+        evaluate = cast(Callable[..., Any], self.evaluate)
+        return evaluate(self._training_input(variant, removed), **kwargs)
 
     def _training_input(self, variant: AblationVariant, removed: frozenset[int]) -> Any:
         """What `evaluate=` is given: the training table, or the numbers of its kept rows."""
@@ -3862,11 +3875,12 @@ class Ablation:
 
         if executor == "process":
             # Not forked: forking a process that uses threads (as Polars does) can deadlock
+            initargs: tuple[Any, ...] = (self.evaluate,)
             pool: Any = ProcessPoolExecutor(
                 max_workers=max_workers,
                 mp_context=multiprocessing.get_context("spawn"),
                 initializer=_set_worker_evaluate,
-                initargs=(self.evaluate,),
+                initargs=initargs,
             )
         else:
             pool = ThreadPoolExecutor(max_workers=max_workers)
@@ -4161,6 +4175,8 @@ class Ablation:
         """The Shapley value of each step of `shapley()`, for each metric."""
         resolved = self._resolve()
         info = self._shapley
+        if info is None:
+            raise RuntimeError("The Shapley values weren't requested.")
         players = info["steps"]
         k = len(players)
         repeats = range(self.repeats)
@@ -4762,6 +4778,8 @@ class Ablation:
         skipped: dict[int, list[str]] = {}
         for sweep_id, points in by_sweep.items():
             step = self._injections[points[0]["variant"]].step
+            if step is None:  # pragma: no cover (`by_sweep` has only variants with a step)
+                continue
             label = ENGLISH.r(self._sweeps[sweep_id]["label"])
             shares = [self._caught_share(row["variant"]) for row in points]
             harms = [
@@ -4770,7 +4788,7 @@ class Ablation:
             ]
             used = [(x, d) for x, d in zip(shares, harms) if x > 0]
             reason = None
-            cost = None
+            cost: float = 0.0
             if not used:
                 reason = f"the {label} make none of its test units fail"
             else:
@@ -4817,6 +4835,8 @@ class Ablation:
         from pointblank.validate import Validate, _validation_info_to_step
 
         injection = self._injections[variant_id]
+        if injection.step is None:  # pragma: no cover (inject variants have a step)
+            raise RuntimeError("The injected variant has no step.")
         info = self._steps[injection.step]
         found = _validation_info_to_step(info, None, None, [], keep_objects=True)
         if found is None:  # pragma: no cover
@@ -5353,13 +5373,15 @@ class Ablation:
     def _group_order(self, variant: AblationVariant) -> tuple[int, float]:
         """Where a variant is listed in the plan and the report: by its group, then its value."""
         if variant.sweep is not None:
+            if variant.value is None:
+                raise ValueError("A sweep variant needs the value of its sweep point.")
             return (2 + list(self._sweeps).index(variant.sweep), variant.value)
         if variant.strategy == "shapley":
             return (2 + len(self._sweeps), float(len(variant.steps)))
         return (int(variant.left_out is not None), 0.0)
 
     def _group_label(self, variant: AblationVariant, ctx: Localizer = ENGLISH) -> str:
-        if variant.strategy == "inject":
+        if variant.strategy == "inject" and variant.sweep is not None:
             return ctx.t("abl_group_injected", label=self._sweeps[variant.sweep]["label"])
         if variant.sweep is not None:
             return ctx.t("abl_group_sweep", label=self._sweeps[variant.sweep]["label"])
@@ -5371,6 +5393,8 @@ class Ablation:
 
     def _shapley_note(self, total: str, ctx: Localizer = ENGLISH) -> str:
         info = self._shapley
+        if info is None:
+            raise RuntimeError("The Shapley values weren't requested.")
         k = len(info["steps"])
         if info["exact"]:
             how = ctx.t("abl_shapley_exact", k=k)
@@ -6195,7 +6219,7 @@ def _worker_evaluate(train: Any, seed: int, variant: AblationVariant | None) -> 
     kwargs: dict[str, Any] = {"seed": seed}
     if variant is not None:
         kwargs["variant"] = variant
-    return _WORKER_EVALUATE(train, **kwargs)
+    return cast(Callable[..., Any], _WORKER_EVALUATE)(train, **kwargs)
 
 
 def _unique_slugs(ids: Any) -> dict[str, str]:

@@ -495,11 +495,14 @@ class DataScan:
                     cells.append(_fmt_date_bound(val))
                 elif isinstance(val, numbers.Number):
                     cells.append(
-                        fmt_number(
-                            val,
-                            decimals=2,
-                            drop_trailing_zeros=True,
-                            drop_trailing_dec_mark=True,
+                        cast(
+                            list[str],
+                            fmt_number(
+                                val,
+                                decimals=2,
+                                drop_trailing_zeros=True,
+                                drop_trailing_dec_mark=True,
+                            ),
                         )[0]
                     )
                 else:

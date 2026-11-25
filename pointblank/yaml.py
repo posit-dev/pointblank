@@ -92,12 +92,12 @@ _DECLARATIVE_VALUE_CALLS = {
 
 # Operators that combine column selectors (e.g., `pb.starts_with("a") & pb.ends_with("z")`) or
 # negate a number
-_DECLARATIVE_BINARY_OPS = {
+_DECLARATIVE_BINARY_OPS: dict[type, Any] = {
     ast.BitAnd: operator.and_,
     ast.BitOr: operator.or_,
     ast.Sub: operator.sub,
 }
-_DECLARATIVE_UNARY_OPS = {
+_DECLARATIVE_UNARY_OPS: dict[type, Any] = {
     ast.Invert: operator.invert,
     ast.USub: operator.neg,
 }

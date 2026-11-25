@@ -1712,7 +1712,7 @@ def interrogate_within_spec(
     ).drop("pb_is_good_1", "pb_is_good_2")
 
     if is_polars_lazy:
-        return result_tbl.to_native().lazy()
+        return cast(Any, result_tbl.to_native()).lazy()
 
     return result_tbl.to_native()
 

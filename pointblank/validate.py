@@ -754,7 +754,11 @@ def load_dataset(
 
         import polars as pl
 
-        tbl = pl.read_csv(ZipFile(data_path).read(f"{dataset}.csv"), try_parse_dates=True)
+        tbl = pl.read_csv(
+            # pyrefly: ignore[no-matching-overload]  # importlib.resources' `files()` gives a Traversable (a Path when installed)
+            ZipFile(data_path).read(f"{dataset}.csv"),
+            try_parse_dates=True,
+        )
 
     if tbl_type == "pandas":
         if not _is_lib_present(lib_name="pandas"):
@@ -765,6 +769,7 @@ def load_dataset(
 
         import pandas as pd
 
+        # pyrefly: ignore[no-matching-overload]  # importlib.resources' `files()` gives a Traversable (a Path when installed); pandas' `parse_dates=` is typed narrower
         tbl = pd.read_csv(data_path, parse_dates=_DATASET_DATE_COLUMNS[dataset])
 
     if tbl_type == "duckdb":  # pragma: no cover
@@ -779,7 +784,11 @@ def load_dataset(
         data_path = files("pointblank.data") / f"{dataset}-duckdb.zip"
 
         # Unzip the DuckDB dataset to a temporary directory
-        with tempfile.TemporaryDirectory() as tmp, ZipFile(data_path, "r") as z:
+        with (
+            tempfile.TemporaryDirectory() as tmp,
+            # pyrefly: ignore[no-matching-overload]  # importlib.resources' `files()` gives a Traversable (a Path when installed)
+            ZipFile(data_path, "r") as z,
+        ):
             z.extractall(path=tmp)
 
             data_path = f"{tmp}/{dataset}.ddb"
@@ -900,7 +909,7 @@ def read_file(filepath: str | Path) -> Validate:
             for func_name, source_code in function_sources.items():  # pragma: no cover
                 try:  # pragma: no cover
                     # Create a namespace with common imports that functions might need
-                    execution_namespace = {}  # pragma: no cover
+                    execution_namespace: dict[str, Any] = {}  # pragma: no cover
 
                     # Add common imports to the execution namespace
                     try:  # pragma: no cover
@@ -1760,6 +1769,7 @@ def _write_dataset_file(dataset: str, file_type: str, path: str) -> None:
     """Write a bundled dataset to `path` as a CSV, Parquet or DuckDB file."""
     if file_type == "csv":
         # Extract the CSV from its zip, since most libraries expect actual file paths
+        # pyrefly: ignore[no-matching-overload]  # importlib.resources' `files()` gives a Traversable (a Path when installed)
         with ZipFile(files("pointblank.data") / f"{dataset}.zip") as zip_file:
             content = zip_file.read(f"{dataset}.csv")
         with open(path, "wb") as out_file:
@@ -1771,17 +1781,20 @@ def _write_dataset_file(dataset: str, file_type: str, path: str) -> None:
         if _is_lib_present(lib_name="polars"):
             import polars as pl
 
+            # pyrefly: ignore[no-matching-overload]  # importlib.resources' `files()` gives a Traversable (a Path when installed)
             with ZipFile(data_path) as zip_file:
                 content = zip_file.read(f"{dataset}.csv")
             pl.read_csv(content, try_parse_dates=True).write_parquet(path)
         else:
             import pandas as pd
 
+            # pyrefly: ignore[no-matching-overload]  # importlib.resources' `files()` gives a Traversable (a Path when installed); pandas' `parse_dates=` is typed narrower
             df = pd.read_csv(data_path, parse_dates=_DATASET_DATE_COLUMNS[dataset])
             df.to_parquet(path, index=False)
 
     else:
         # Extract the DuckDB database file from its zip
+        # pyrefly: ignore[no-matching-overload]  # importlib.resources' `files()` gives a Traversable (a Path when installed)
         with ZipFile(files("pointblank.data") / f"{dataset}-duckdb.zip") as zip_file:
             content = zip_file.read(f"{dataset}.ddb")
         with open(path, "wb") as out_file:
@@ -2644,8 +2657,10 @@ def _generate_display_table(
         # Get the Schema of the table
         tbl_schema = Schema(tbl=data)
 
+        # pyrefly: ignore[unbound-name]  # pl is imported only in the df_lib_name_gt branch above; this branch runs only for those tables
         if tbl_type == "polars" and isinstance(data, pl.LazyFrame):
             # For a LazyFrame, count the rows lazily and collect only the rows to display
+            # pyrefly: ignore[unbound-name]  # pl is imported only in the df_lib_name_gt branch above; this branch runs only for those tables
             n_rows = int(data.select(pl.len()).collect().item())
 
             if n_head + n_tail >= n_rows:
@@ -2675,6 +2690,7 @@ def _generate_display_table(
                     row_number_list = list(range(1, n_rows + 1))
 
             else:
+                # pyrefly: ignore[unbound-name]  # pl is imported only in the df_lib_name_gt branch above; this branch runs only for those tables
                 data = pl.concat([data.head(n=n_head), data.tail(n=n_tail)])
 
                 if row_number_list is None:
@@ -2683,6 +2699,8 @@ def _generate_display_table(
                     )
 
         if tbl_type == "pandas":
+            import pandas as pd
+
             # Note: pandas DataFrames have shape, head(), tail() attributes
             n_rows = data.shape[0]
 
@@ -2711,6 +2729,8 @@ def _generate_display_table(
 
                 row_number_list = list(range(1, n_rows + 1))
             else:
+                import pandas as pd
+
                 # Get head and tail samples, then convert to pandas
                 head_data = data.limit(n_head).toPandas()
 
@@ -2722,8 +2742,6 @@ def _generate_display_table(
                     tail_data = tail_df.toPandas()
                 else:
                     # If no tail data, create empty DataFrame with same schema
-                    import pandas as pd
-
                     tail_data = pd.DataFrame(columns=head_data.columns)
 
                 # Suppress the FutureWarning about DataFrame concatenation with empty entries
@@ -2746,6 +2764,7 @@ def _generate_display_table(
             tbl_schema = Schema(tbl=data)
 
     # From the table schema, get a list of tuples containing column names and data types
+    # pyrefly: ignore[unbound-name]  # set only for Ibis and DataFrame tables (other table types aren't supported here)
     col_dtype_list = tbl_schema.columns or []
 
     # Extract the column names from the list of tuples (first element of each tuple)
@@ -2907,7 +2926,12 @@ def _generate_display_table(
     # Create the label, table type, and thresholds HTML fragments
     table_type_html = _create_table_type_html(tbl_type=tbl_type, tbl_name=None, font_size="10px")
 
-    tbl_dims_html = _create_table_dims_html(columns=n_columns, rows=n_rows, font_size="10px")
+    tbl_dims_html = _create_table_dims_html(
+        columns=n_columns,
+        # pyrefly: ignore[unbound-name]  # set only for Ibis and DataFrame tables (other table types aren't supported here)
+        rows=n_rows,
+        font_size="10px",
+    )
 
     # Compose the subtitle HTML fragment
     combined_subtitle = (
@@ -3379,7 +3403,7 @@ def missing_vals_tbl(
             else set()
         )
 
-        def _is_missing(col_data, col: str):
+        def _is_missing_sector(col_data, col: str):
             if col in nan_cols:
                 return col_data.isnull() | col_data.isnan()
             return col_data.isnull()
@@ -3407,7 +3431,7 @@ def missing_vals_tbl(
 
                     if sector_size > 0:
                         sector_data = data[start_row:end_row][col]
-                        null_sum = _is_missing(sector_data, col).sum()
+                        null_sum = _is_missing_sector(sector_data, col).sum()
 
                         # Apply the appropriate conversion method
                         if use_polars_conversion:
@@ -3426,7 +3450,7 @@ def missing_vals_tbl(
                     sector_size = n_rows - start_row
 
                     sector_data = data[start_row:n_rows][col]
-                    null_sum = _is_missing(sector_data, col).sum()
+                    null_sum = _is_missing_sector(sector_data, col).sum()
 
                     # Apply the appropriate conversion method
                     if use_polars_conversion:
@@ -3465,11 +3489,11 @@ def missing_vals_tbl(
         # Get a dictionary of counts of missing values in each column
         if df_lib_name_gt == "polars":
             missing_val_counts = {
-                col: _is_missing(data[col], col).sum().to_polars() for col in data.columns
+                col: _is_missing_sector(data[col], col).sum().to_polars() for col in data.columns
             }  # pragma: no cover
         else:
             missing_val_counts = {
-                col: _is_missing(data[col], col).sum().to_pandas() for col in data.columns
+                col: _is_missing_sector(data[col], col).sum().to_pandas() for col in data.columns
             }  # pragma: no cover
 
     if pl_pb_tbl:
@@ -3630,15 +3654,18 @@ def missing_vals_tbl(
         import polars as pl
 
         # Create a Polars DataFrame from the `missing_vals` dictionary
+        # pyrefly: ignore[unbound-name]  # set only for Ibis and DataFrame tables (other table types aren't supported here)
         missing_vals_df = pl.DataFrame(missing_vals)
 
     else:
         import pandas as pd
 
         # Create a Pandas DataFrame from the `missing_vals` dictionary
+        # pyrefly: ignore[unbound-name]  # set only for Ibis and DataFrame tables (other table types aren't supported here)
         missing_vals_df = pd.DataFrame(missing_vals)
 
     # Get a count of total missing values
+    # pyrefly: ignore[unbound-name]  # set only for Ibis and DataFrame tables (other table types aren't supported here)
     n_missing_total = int(sum(missing_val_counts.values()))
 
     # Format `n_missing_total` for HTML display
@@ -3647,7 +3674,12 @@ def missing_vals_tbl(
     # Create the label, table type, and thresholds HTML fragments
     table_type_html = _create_table_type_html(tbl_type=tbl_type, tbl_name=None, font_size="10px")
 
-    tbl_dims_html = _create_table_dims_html(columns=len(col_names), rows=n_rows, font_size="10px")
+    tbl_dims_html = _create_table_dims_html(
+        # pyrefly: ignore[unbound-name]  # set only for Ibis and DataFrame tables (other table types aren't supported here)
+        columns=len(col_names),
+        rows=n_rows,
+        font_size="10px",
+    )
 
     check_mark = '<span style="color:#4CA64C;">&check;</span>'
 
@@ -3770,6 +3802,7 @@ def missing_vals_tbl(
         # For every column in the DataFrame, determine the indices of the rows where the value is 0
         # and use tab_style to fill the cell with a light blue color
         for col in missing_vals_df.columns:
+            # pyrefly: ignore[bad-index]  # this branch is pandas, so `missing_vals_df` is a pandas DataFrame
             row_indices = list(missing_vals_df[missing_vals_df[col] == 0].index)
 
             missing_vals_tbl = missing_vals_tbl.tab_style(
@@ -5719,6 +5752,7 @@ def connect_to_table(connection_string: str) -> Any:
         ):
             # Try to get available tables for a helpful error message
             try:  # pragma: no cover
+                # pyrefly: ignore[unbound-name]  # unset if connecting failed; the `except` below handles it
                 available_tables = conn.list_tables()
                 if available_tables:
                     table_list = "\n".join(f"  - {table}" for table in available_tables)
@@ -19936,6 +19970,7 @@ class Validate:
                         "col_vals_str_len",
                     ]:
                         column = cast(str, column)
+                        results_tbl = None
                         na_pass = cast(
                             Any, na_pass
                         )  # not passed for some of these step types, so it may be None
@@ -20874,6 +20909,7 @@ class Validate:
 
             # If there is any threshold level that has been exceeded, then produce and
             # set the general failure text for the validation step
+            failure_text: str | None = None
             if validation.warning or validation.error or validation.critical:
                 # Generate failure text for the validation step
                 failure_text = _create_autobrief_or_failure_text(
@@ -21965,7 +22001,7 @@ class Validate:
         result = self._get_validation_dict(i, "f_passed")
         if scalar and isinstance(i, int):
             return result[i]
-        return result
+        return cast(dict[int, float] | float, result)
 
     def f_failed(
         self, i: int | list[int] | None = None, scalar: bool = False
@@ -22050,7 +22086,7 @@ class Validate:
         result = self._get_validation_dict(i, "f_failed")
         if scalar and isinstance(i, int):
             return result[i]
-        return result
+        return cast(dict[int, float] | float, result)
 
     def warning(
         self, i: int | list[int] | None = None, scalar: bool = False
@@ -22154,8 +22190,8 @@ class Validate:
         """
         result = self._get_validation_dict(i, "warning")
         if scalar and isinstance(i, int):
-            return result[i]
-        return result
+            return cast(bool | dict[int, bool], result[i])
+        return cast(bool | dict[int, bool], result)
 
     def error(
         self, i: int | list[int] | None = None, scalar: bool = False
@@ -22260,8 +22296,8 @@ class Validate:
         """
         result = self._get_validation_dict(i, "error")
         if scalar and isinstance(i, int):
-            return result[i]
-        return result
+            return cast(bool | dict[int, bool], result[i])
+        return cast(bool | dict[int, bool], result)
 
     def critical(
         self, i: int | list[int] | None = None, scalar: bool = False
@@ -22366,8 +22402,8 @@ class Validate:
         """
         result = self._get_validation_dict(i, "critical")
         if scalar and isinstance(i, int):
-            return result[i]
-        return result
+            return cast(bool | dict[int, bool], result[i])
+        return cast(bool | dict[int, bool], result)
 
     def calibrate_prompt(self, i: int, labels: str | Any) -> dict[str, Any]:
         """
@@ -23143,7 +23179,7 @@ class Validate:
             with open(out_path, "w") as f:
                 json.dump(schema_doc, f, indent=2)
 
-        return schema_doc
+        return cast(dict[str, Any], schema_doc)
 
     def to_data_card(
         self,
@@ -23994,6 +24030,7 @@ class Validate:
 
         lang = self._normalized_lang() or "en"
 
+        segment_steps: Any = None
         if by is not None:
             segment_steps = self._steps_by_segment(by)
             dimension_scores = {
@@ -26405,11 +26442,13 @@ class Validate:
         if validation_step["eval_error"]:
             notes = self.validation_info[i - 1].notes or {}
             reasons = " ".join(note["text"] for note in notes.values() if note.get("text"))
+            # pyrefly: ignore[bad-return]  # returns a message string or None (the stub says GT)
             return f"Step {i} couldn't be evaluated. {reasons}".strip()
 
         # TODO: Show a report with the validation plan but state that the step is inactive
         # If the step is not active then return a message indicating that the step is inactive
         if not active:
+            # pyrefly: ignore[bad-return]  # returns a message string or None (the stub says GT)
             return "This validation step is inactive."
 
         # Get the column position in the table (`None` for a column that isn't in the table, such
@@ -26562,6 +26601,7 @@ class Validate:
             if legend_html and hasattr(step_report, "tab_source_note"):
                 step_report = step_report.tab_source_note(source_note=html(legend_html))
 
+        # pyrefly: ignore[bad-return]  # returns a message string or None (the stub says GT)
         return step_report
 
     def get_dataframe_report(
@@ -26871,7 +26911,7 @@ class Validate:
                 "assertion_type": dt.String(),
                 "column": dt.String(),
                 "values": dt.String(),
-                "pre": dt.json(),
+                "pre": cast(Any, dt.json)(),
                 "segments": dt.String(),
                 "eval_error": dt.Boolean(),
                 "n": dt.Int64(),
@@ -27012,6 +27052,7 @@ class Validate:
                 columns_resolved = []
                 # Store columns list for note generation
                 try:
+                    # pyrefly: ignore[unbound-name]  # guarded by the locals() check on this line
                     columns = list(table.columns) if "table" in locals() else []
                 except Exception:
                     columns = []
@@ -27488,6 +27529,7 @@ def _row_result_steps(
 
         steps.append(validation)
 
+    # pyrefly: ignore[bad-return]  # a step may have no number (`i`) yet
     return steps, skipped
 
 
@@ -27872,7 +27914,7 @@ def _process_brief(
     segment: Any | None,
     assertion_type: str | None = None,
     lang: str = "en",
-) -> str:
+) -> str | None:
     # If there is no brief, return `None`
     if brief is None:
         return None
@@ -28382,7 +28424,7 @@ def _placeholder_column(col: Any, assertion_type: str | None, lang: str) -> str:
 def _placeholder_value(values: Any, assertion_type: str | None) -> str:
     """Get the text for a `{value}` placeholder (empty for a step without a value to show)."""
     if isinstance(values, dict):
-        values = values.get(_PLACEHOLDER_VALUE_KEYS.get(assertion_type, "value"))
+        values = values.get(_PLACEHOLDER_VALUE_KEYS.get(cast(str, assertion_type), "value"))
     if values is None or callable(values):
         return ""
     if isinstance(values, list):
@@ -28447,7 +28489,7 @@ def _create_autobrief_or_failure_text(
     for_failure: bool,
     locale: str | None = None,
     n_rows: int | None = None,
-) -> str:
+) -> str | None:
     if assertion_type in [
         "col_vals_gt",
         "col_vals_ge",
@@ -29219,13 +29261,13 @@ def _prep_values_text(
 
         # Format datetime objects as strings if present
         formatted_values = []
-        for value in values[:limit]:
+        for value in cast(Any, values)[:limit]:
             if isinstance(value, (datetime.datetime, datetime.date)):
                 formatted_values.append(f"`{value.isoformat()}`")  # pragma: no cover
             else:
                 formatted_values.append(f"`{value}`")
 
-        values_str = ", ".join([f"`{value}`" for value in values[:limit]])
+        values_str = ", ".join([f"`{value}`" for value in cast(Any, values)[:limit]])
 
         additional_text = EXPECT_FAIL_TEXT["values_text"][lang]
 
@@ -29247,7 +29289,7 @@ def _prep_values_text(
     return values_str
 
 
-def _seg_expr_from_string(data_tbl: Any, segments_expr: str) -> tuple[str, str]:
+def _seg_expr_from_string(data_tbl: Any, segments_expr: str) -> list[tuple[str, Any]]:
     """
     Obtain the segmentation categories from a table column.
 
@@ -30021,7 +30063,7 @@ def _process_title_text(title: str | None, tbl_name: str | None, lang: str) -> s
         else:
             title_text = ""
     else:
-        title_text = commonmark.commonmark(title)
+        title_text = cast(str, commonmark.commonmark(title))
 
     return title_text
 
@@ -30148,7 +30190,7 @@ def _fmt_lg(value: int, locale: str, df_lib=None) -> str:
         )
     else:
         # Fallback to the original behavior
-        return vals.fmt_number(value, n_sigfig=3, compact=True, locale=locale)[0]
+        return cast(list[str], vals.fmt_number(value, n_sigfig=3, compact=True, locale=locale))[0]
 
 
 def _format_single_float_with_gt(
@@ -30199,7 +30241,9 @@ def _transform_passed_failed(
             return _format_single_float_with_gt(value, decimals=2, locale=locale, df_lib=df_lib)
         else:
             # Fallback to the original behavior
-            return vals.fmt_number(value, decimals=2, locale=locale)[0]  # pragma: no cover
+            return cast(list[str], vals.fmt_number(value, decimals=2, locale=locale))[
+                0
+            ]  # pragma: no cover
 
     passed_failed = [
         (
@@ -30467,7 +30511,7 @@ def _transform_assertion_str(
     # In some sandboxed HTML environments (e.g., Streamlit), <p> tags don't inherit
     # font-size from parent divs, so we add inline styles directly to the <p> tags
     brief_str = [
-        re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', x)
+        re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', cast(str, x))
         if cast(str, x).strip()
         else x
         for x in brief_str
@@ -31227,6 +31271,7 @@ def _check_unit_interval(value: Any, param: str, allow_zero: bool = True) -> Non
     """Check that a value is a number between 0 and 1 (and not 0, unless `allow_zero=True`)."""
     if isinstance(value, bool) or not isinstance(value, numbers.Real):
         raise TypeError(f"`{param}=` must be a number, got {type(value).__name__}.")
+    # pyrefly: ignore[unsupported-operation]  # `numbers.Real` supports comparisons at runtime
     if not (0 <= value <= 1) or (value == 0 and not allow_zero):
         bounds = "between 0 and 1" if allow_zero else "greater than 0 and at most 1"
         raise ValueError(f"`{param}=` must be {bounds}, got {value}.")

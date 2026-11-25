@@ -180,6 +180,7 @@ class ColumnLiteral(Column):
     A class to represent a literal value for a column parameter (the column name).
     """
 
+    # pyrefly: ignore[bad-override]  # the base's `exprs` is a wider type; public API
     exprs: str
 
     def resolve(self, columns: list[str], table: IntoDataFrame | None = None) -> list[str]:
@@ -228,6 +229,7 @@ class ColumnSelectorNarwhals(Column):
     based on their data type or other properties.
     """
 
+    # pyrefly: ignore[bad-override]  # the base's `exprs` is a wider type; public API
     exprs: nw.selectors.Selector
 
     def resolve(
@@ -1983,9 +1985,11 @@ class ColumnExpression:
     def __lt__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="lt", left=self, right=other)
 
+    # pyrefly: ignore[bad-override]  # builds an expression, not a bool
     def __eq__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="eq", left=self, right=other)
 
+    # pyrefly: ignore[bad-override]  # builds an expression, not a bool
     def __ne__(self, other) -> ColumnExpression:
         return ColumnExpression(operation="ne", left=self, right=other)
 

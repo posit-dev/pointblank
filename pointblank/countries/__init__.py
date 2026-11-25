@@ -2033,7 +2033,7 @@ class LocaleGenerator:
         nanp_exchange = self._nanp_exchange() if is_nanp else None
         for ch in result:
             if ch == "#":
-                if is_nanp and hash_count < 3:
+                if is_nanp and nanp_exchange is not None and hash_count < 3:
                     chars.append(nanp_exchange[hash_count])
                 else:
                     chars.append(str(self.rng.randint(0, 9)))
@@ -2312,8 +2312,10 @@ class LocaleGenerator:
 
                 # 70% chance to use city-relevant company if available
                 if city_companies and self.rng.random() < 0.7:
+                    # pyrefly: ignore[bad-return]  # a well-known entry may have no name
                     return self.rng.choice(city_companies)
                 elif all_companies:
+                    # pyrefly: ignore[bad-return]  # a well-known entry may have no name
                     return self.rng.choice(all_companies)
 
         # Generate a fictional company name

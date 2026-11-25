@@ -10,6 +10,9 @@ from great_tables import GT, google_font, html, loc, style
 from pointblank._constants import RTL_LANGUAGES
 from pointblank._constants_translations import COMPARISON_REPORT_TEXT
 
+# The reporter below has a method named `int`, so its annotations use this alias
+_Int = int
+
 if TYPE_CHECKING:
     from pointblank._compare import Comparison
 
@@ -79,7 +82,7 @@ class _Ctx:
         text = _lookup(entry, self.lang) or entry.get("en", key)
         return text.format(**fields) if fields else text
 
-    def t_count(self, key: str, n: int, **fields: Any) -> str:
+    def t_count(self, key: str, n: _Int, **fields: Any) -> str:
         """Like `t()`, but uses the singular form (`<key>_one`) for a count of 1 if available."""
         if n == 1:
             singular = _lookup(COMPARISON_REPORT_TEXT.get(f"{key}_one", {}), self.lang)
@@ -87,7 +90,7 @@ class _Ctx:
                 return singular.format(n=self.int(n), **fields)
         return self.t(key, n=self.int(n), **fields)
 
-    def int(self, n: int) -> str:
+    def int(self, n: _Int) -> str:
         sep, _ = _locale_marks(self.locale)
         return f"{n:,}".replace(",", sep)
 

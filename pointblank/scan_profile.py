@@ -97,9 +97,8 @@ class _TypeMap(Enum):
             cls.DATE: "date",
             cls.BOOL: "boolean",
         }
-        try:
-            icon_key = icon_map[_type]
-        except KeyError:
+        icon_key = icon_map.get(_type) if _type is not None else None
+        if icon_key is None:
             icon_key = "object"
         return SVG_ICONS_FOR_DATA_TYPES[icon_key]
 
@@ -147,7 +146,7 @@ class ColumnProfile(_ColumnProfileABC):
 
 
 class _DateProfile(ColumnProfile):
-    _type: _TypeMap = _TypeMap.DATE
+    _type: ClassVar[_TypeMap] = _TypeMap.DATE
 
     def calc_stats(self, data: Frame) -> None:
         res = data.rename({self.colname: "_col"}).select(_min=MinStat.expr, _max=MaxStat.expr)
@@ -163,7 +162,7 @@ class _DateProfile(ColumnProfile):
 
 
 class _BoolProfile(ColumnProfile):
-    _type: _TypeMap = _TypeMap.BOOL
+    _type: ClassVar[_TypeMap] = _TypeMap.BOOL
 
     def calc_stats(self, data: Frame) -> None:
         group_by_contexts = (
@@ -184,7 +183,7 @@ class _BoolProfile(ColumnProfile):
 
 
 class _StringProfile(ColumnProfile):
-    _type: _TypeMap = _TypeMap.STRING
+    _type: ClassVar[_TypeMap] = _TypeMap.STRING
 
     def calc_stats(self, data: Frame) -> None:
         # `_string_expr()` casts only Categorical and Enum columns, keeping missing values missing
@@ -233,7 +232,7 @@ class _StringProfile(ColumnProfile):
 
 
 class _NumericProfile(ColumnProfile):
-    _type: _TypeMap = _TypeMap.NUMERIC
+    _type: ClassVar[_TypeMap] = _TypeMap.NUMERIC
 
     def calc_stats(self, data: Frame) -> None:
         res = (

@@ -808,7 +808,9 @@ def _generate_single_country(
                 )
                 # Only replace if the bounds actually changed
                 if new_min != cur_min or new_max != cur_max:
-                    fields[col_name] = dc_replace(col_field, min_val=new_min, max_val=new_max)
+                    fields[col_name] = dc_replace(
+                        cast(Any, col_field), min_val=new_min, max_val=new_max
+                    )
 
     # Each coherence group (e.g., the `customer_` and `seller_` profiles) gets its own row
     # context. The first group uses the base seed, so a schema with a single group generates the
@@ -932,7 +934,7 @@ def _check_numeric_values(col_name: str, field: Field, values: list[Any]) -> Non
             if (
                 isinstance(value, bool)
                 or not isinstance(value, numbers.Integral)
-                or not min_val <= value <= max_val
+                or not min_val <= int(value) <= max_val
             ):
                 raise ValueError(
                     f"Column '{col_name}' has the dtype {field.dtype}, but it got the value "

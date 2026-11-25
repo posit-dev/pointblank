@@ -436,6 +436,7 @@ class Schema:
 
         elif table_type == "pyspark":  # pragma: no cover
             # Convert PySpark DataFrame to Narwhals to get schema
+            # pyrefly: ignore[no-matching-overload]  # `self.tbl` is a PySpark DataFrame in this branch
             nw_df = nw.from_native(self.tbl)  # pragma: no cover
             if _is_lazy_frame(data=nw_df):  # pragma: no cover
                 schema_dict = dict(nw_df.collect_schema())  # pragma: no cover

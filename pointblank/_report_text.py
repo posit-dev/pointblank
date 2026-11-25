@@ -11,6 +11,9 @@ from typing import Any
 from pointblank._constants import RTL_LANGUAGES
 from pointblank._constants_translations import MODEL_DATA_TEXT
 
+# The reporter below has a method named `int`, so its annotations use this alias
+_Int = int
+
 # Languages that don't put spaces between sentences
 _NO_SENTENCE_SPACE = ("zh-Hans", "zh-Hant", "ja")
 
@@ -125,7 +128,7 @@ class Localizer:
         """Swap the `,` and `.` of a number written in Python for the locale's marks."""
         return text.replace(",", "\0").replace(".", self.dec).replace("\0", self.sep)
 
-    def int(self, n: int) -> str:
+    def int(self, n: _Int) -> str:
         return self.marks(f"{n:,}")
 
     def num(self, x: float, spec: str = "") -> str:
@@ -136,7 +139,7 @@ class Localizer:
             text = str(int(x)) if x.is_integer() and abs(x) < 1e15 else repr(x)
         return self.marks(text)
 
-    def pct(self, share: float, digits: int = 1) -> str:
+    def pct(self, share: float, digits: _Int = 1) -> str:
         """A share as a percentage (e.g., `"12.5%"`)."""
         return self.marks(f"{share:.{digits}%}")
 

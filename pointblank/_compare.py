@@ -2770,6 +2770,7 @@ def _to_polars_lazy(frame: Any) -> Any:
     native = eager.to_native()
     if eager.implementation == nw.Implementation.PANDAS:
         return nw.from_native(pl.from_pandas(native)).lazy()
+    # pyrefly: ignore[no-matching-overload]  # `pl.from_arrow` is typed as a DataFrame or a Series; a table gives a DataFrame
     return nw.from_native(pl.from_arrow(eager.to_arrow())).lazy()
 
 

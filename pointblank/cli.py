@@ -97,7 +97,7 @@ def _load_data_source(data_source: str) -> Any:
 
 def _is_piped_data_source(data_source: str) -> bool:
     """Check if the data source is from a piped pb command."""
-    return (
+    return bool(
         data_source
         and ("pb_pipe_" in data_source)
         and (data_source.startswith("/var/folders/") or data_source.startswith("/tmp/"))

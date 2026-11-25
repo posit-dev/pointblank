@@ -17,8 +17,7 @@ from pointblank.steps import Steps
 
 if TYPE_CHECKING:
     from pointblank._typing import SegmentSpec
-    from pointblank.actions import Actions
-    from pointblank.thresholds import Thresholds
+    from pointblank.thresholds import Actions, Thresholds
 
 __all__ = ["corpus_checks", "eval_checks"]
 
@@ -248,6 +247,8 @@ def corpus_checks(
     check_bound(min_tokens, "min_tokens")
     check_bound(max_tokens, "max_tokens")
     threshold = _near_threshold(near_duplicates)
+    reference: Any = None
+    cutoff: Any = None
     if updated_at is not None:
         _check_column_name(updated_at, "updated_at")
         if max_age is None:
