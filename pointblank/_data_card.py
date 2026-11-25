@@ -163,7 +163,7 @@ class _Card:
         self.columns = cast(list[tuple[str, ...]], Schema(tbl=validation.data).columns)
         self.n_rows = get_row_count(validation.data)
         self.null_counts = _null_counts(validation.data)
-        self.steps = cast(list[Any], validation.validation_info)
+        self.steps = validation.validation_info
 
     # Facts -------------------------------------------------------------------------------------
 
