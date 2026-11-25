@@ -183,7 +183,8 @@ def _read_spss_metadata(path: Path, **kwargs: Any) -> MetadataImport:
                 )
 
         # Missing values
-        missing_vals: list[float | int | str] | None = None
+        # (typed loosely: pyreadstat types the `lo`/`hi` range endpoints as optional)
+        missing_vals: list[Any] | None = None
         if hasattr(meta, "missing_ranges") and col_name in meta.missing_ranges:
             raw_missing = meta.missing_ranges[col_name]
             if raw_missing:
